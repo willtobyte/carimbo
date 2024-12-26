@@ -93,6 +93,8 @@ void socket::connect() noexcept {
       "localhost",
       "3000",
 #else
+      "carimbo.run",
+      "443",
 #endif
       beast::bind_front_handler(&socket::on_resolve, this)
   );
@@ -186,7 +188,15 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
   );
 
   _connected = true;
-  _ws.async_handshake("localhost", "/socket", beast::bind_front_handler(&socket::on_handshake, this));
+  _ws.async_handshake(
+#ifdef LOCAL
+      "localhost",
+#else
+      "carimbo.run"
+#endif
+      "/socket",
+      beast::bind_front_handler(&socket::on_handshake, this)
+  );
 }
 
 void socket::on_handshake(beast::error_code ec) noexcept {
