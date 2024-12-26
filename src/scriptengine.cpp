@@ -370,7 +370,6 @@ void framework::scriptengine::run() {
           sio.emit(event, j.dump()); },
       "on", [](network::socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
           sol::state_view lua(state);
-          std::cout << ">>> on " << event << std::endl;
           sio.on(event, [callback, lua](const std::string &data) {
               const auto j = nlohmann::json::parse(data);
               callback(_to_lua(j, lua));
