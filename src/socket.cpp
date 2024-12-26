@@ -192,7 +192,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
 #ifdef LOCAL
       "localhost",
 #else
-      "carimbo.run"
+      "carimbo.run",
 #endif
       "/socket",
       beast::bind_front_handler(&socket::on_handshake, this)
