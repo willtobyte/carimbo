@@ -173,6 +173,7 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
 
 void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept {
   UNUSED(endpoint);
+  _connected = true;
 
   if (ec) {
     std::cerr << "[socket] connect error: " << ec.message() << std::endl;
@@ -181,13 +182,8 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
 
   beast::get_lowest_layer(_ws).expires_never();
 
-  _ws.set_option(
-      websocket::stream_base::timeout::suggested(
-          beast::role_type::client
-      )
-  );
+  _ws.set_option(websocket::stream_base::timeout::suggested(beast::role_type::client));
 
-  _connected = true;
   _ws.async_handshake(
 #ifdef LOCAL
       "localhost",
