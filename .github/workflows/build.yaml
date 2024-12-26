@@ -39,7 +39,6 @@ jobs:
             C:/Users/runneradmin/.conan2/p
           key: ${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py') }}
           restore-keys: |
-            ${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py') }}
             ${{ matrix.config.name }}-
 
       - name: Prepare Build Directory
