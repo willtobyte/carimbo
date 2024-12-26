@@ -363,12 +363,14 @@ void framework::scriptengine::run() {
   lua.new_usertype<network::socket>(
       "Socket",
       sol::constructors<network::socket()>(),
+      "connect", &network::socket::connect,
       "emit", [](network::socket &sio, const std::string &event, sol::table data, sol::this_state state) {
           sol::state_view lua(state);
           const auto j = _to_json(data);
           sio.emit(event, j.dump()); },
       "on", [](network::socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
           sol::state_view lua(state);
+          std::cout << ">>> on " << event << std::endl;
           sio.on(event, [callback, lua](const std::string &data) {
               const auto j = nlohmann::json::parse(data);
               callback(_to_lua(j, lua));

@@ -38,9 +38,32 @@ EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void
 }
 #endif
 
-socket::socket() noexcept {
+socket::socket() noexcept
+#ifndef EMSCRIPTEN
+    : _resolver(net::make_strand(_io_context)), _ws(net::make_strand(_io_context))
+#endif
+{
   _queue.reserve(8);
+}
 
+socket::~socket() noexcept {
+#ifdef EMSCRIPTEN
+  constexpr int code = 1000;
+  constexpr const char *reason = "Client disconnecting";
+
+  if (_socket) {
+    emscripten_websocket_close(_socket, code, reason);
+    emscripten_websocket_delete(_socket);
+    _socket = 0;
+  }
+#else
+  _ws.async_close(websocket::close_code::normal, [](beast::error_code ec) {
+    UNUSED(ec);
+  });
+#endif
+}
+
+void socket::connect() noexcept {
 #ifdef EMSCRIPTEN
   const std::string url =
 #ifdef LOCAL
@@ -64,19 +87,18 @@ socket::socket() noexcept {
   emscripten_websocket_set_onmessage_callback(_socket, this, websocket_on_message);
   emscripten_websocket_set_onerror_callback(_socket, this, websocket_on_error);
   emscripten_websocket_set_onclose_callback(_socket, this, websocket_on_close);
+#else
+  _resolver.async_resolve(
+#ifdef LOCAL
+      "localhost",
+      "3000",
+#else
 #endif
-}
+      beast::bind_front_handler(&socket::on_resolve, this)
+  );
 
-socket::~socket() noexcept {
-#ifdef EMSCRIPTEN
-  constexpr int code = 1000;
-  constexpr const char *reason = "Client disconnecting";
-
-  if (_socket) {
-    emscripten_websocket_close(_socket, code, reason);
-    emscripten_websocket_delete(_socket);
-    _socket = 0;
-  }
+  std::thread t([&]() { _io_context.run(); });
+  t.detach();
 #endif
 }
 
@@ -134,6 +156,68 @@ void socket::handle_close(const EmscriptenWebSocketCloseEvent *event) {
 }
 #endif
 
+#ifndef EMSCRIPTEN
+void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type results) noexcept {
+  UNUSED(results);
+
+  if (ec) {
+    std::cerr << "[error] resolve error: " << ec.message() << std::endl;
+    return;
+  }
+
+  beast::get_lowest_layer(_ws).expires_after(std::chrono::seconds(30));
+  beast::get_lowest_layer(_ws).async_connect(results, beast::bind_front_handler(&socket::on_connect, this));
+}
+
+void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept {
+  UNUSED(endpoint);
+
+  if (ec) {
+    std::cerr << "[socket] connect error: " << ec.message() << std::endl;
+    return;
+  }
+
+  beast::get_lowest_layer(_ws).expires_never();
+
+  _ws.set_option(
+      websocket::stream_base::timeout::suggested(
+          beast::role_type::client
+      )
+  );
+
+  _connected = true;
+  _ws.async_handshake("localhost", "/socket", beast::bind_front_handler(&socket::on_handshake, this));
+}
+
+void socket::on_handshake(beast::error_code ec) noexcept {
+  if (ec) {
+    std::cerr << "[socket] handshake error: " << ec.message() << std::endl;
+    return;
+  }
+
+  do_read();
+}
+
+void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) noexcept {
+  UNUSED(bytes_transferred);
+
+  if (ec) {
+    std::cerr << "[socket] read error: " << ec.message() << std::endl;
+    return;
+  }
+
+  std::string message = beast::buffers_to_string(_buffer.data());
+  _buffer.consume(_buffer.size());
+  on_message(message);
+
+  do_read();
+}
+
+void socket::do_read() {
+  _ws.async_read(_buffer, beast::bind_front_handler(&socket::on_read, this));
+}
+#endif
+
 void socket::on_message(const std::string &buffer) noexcept {
   auto j = json::parse(buffer, nullptr, false);
   if (j.is_discarded()) {
@@ -186,6 +270,20 @@ void socket::send(const std::string &message) noexcept {
 
 #ifdef EMSCRIPTEN
   emscripten_websocket_send_utf8_text(_socket, message.c_str());
+#else
+  net::post(_ws.get_executor(), [self = this, message]() {
+    self->_ws.async_write(
+        net::buffer(message),
+        [](boost::system::error_code ec, std::size_t bytes_transferred) {
+          UNUSED(bytes_transferred);
+
+          if (ec) {
+            std::cerr << "[socket] write error: " << ec.message() << std::endl;
+            return;
+          }
+        }
+    );
+  });
 #endif
 }
 

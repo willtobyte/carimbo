@@ -3,10 +3,20 @@
 #include "common.hpp"
 
 namespace network {
+
+#ifndef EMSCRIPTEN
+namespace beast = boost::beast;
+namespace websocket = beast::websocket;
+namespace net = boost::asio;
+using tcp = net::ip::tcp;
+#endif
+
 class socket {
 public:
   socket() noexcept;
   ~socket() noexcept;
+
+  void connect() noexcept;
 
   void emit(const std::string &topic, const std::string &data) noexcept;
   void on(const std::string &topic, std::function<void(const std::string &)> callback) noexcept;
@@ -19,6 +29,13 @@ public:
   void handle_close(const EmscriptenWebSocketCloseEvent *event);
 #endif
 private:
+#ifndef EMSCRIPTEN
+  void on_resolve(beast::error_code ec, tcp::resolver::results_type results) noexcept;
+  void on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept;
+  void on_handshake(beast::error_code ec) noexcept;
+  void on_read(beast::error_code ec, std::size_t bytes_transferred) noexcept;
+  void do_read();
+#endif
   void on_message(const std::string &buffer) noexcept;
   void send(const std::string &message) noexcept;
   void invoke(const std::string &event, const std::string &data = "{}") const noexcept;
@@ -30,6 +47,14 @@ private:
 
 #ifdef EMSCRIPTEN
   EMSCRIPTEN_WEBSOCKET_T _socket{0};
+#else
+  net::io_context _io_context;
+  tcp::resolver _resolver;
+  websocket::stream<beast::tcp_stream> _ws;
+  beast::flat_buffer _buffer;
+  // std::string host_;
+  // std::string port_;
+  std::function<void(const std::string &)> _on_message;
 #endif
 };
 }
