@@ -121,10 +121,6 @@ void entity::set_props(entityprops props) noexcept {
 
 void entity::set_placement(int32_t x, int32_t y) noexcept {
   _props.position.set(x, y);
-  // const auto body = _props.body.get();
-  // cpBodySetVelocity(body, cpvzero);
-  // cpBodySetForce(body, cpvzero);
-  // cpBodySetPosition(body, {static_cast<cpFloat>(x), static_cast<cpFloat>(y)});
 }
 
 void entity::set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept {
