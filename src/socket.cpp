@@ -4,6 +4,7 @@ using namespace network;
 
 using json = nlohmann::json;
 
+#ifdef EMSCRIPTEN
 EM_BOOL websocket_on_open(int, const EmscriptenWebSocketOpenEvent *event, void *data) {
   auto *self = static_cast<socket *>(data);
   if (!self) return EM_FALSE;
@@ -35,10 +36,12 @@ EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void
   self->handle_close(event);
   return EM_FALSE;
 }
+#endif
 
 socket::socket() noexcept {
   _queue.reserve(8);
 
+#ifdef EMSCRIPTEN
   const std::string url =
 #ifdef LOCAL
       "http://localhost:3000/socket";
@@ -61,9 +64,11 @@ socket::socket() noexcept {
   emscripten_websocket_set_onmessage_callback(_socket, this, websocket_on_message);
   emscripten_websocket_set_onerror_callback(_socket, this, websocket_on_error);
   emscripten_websocket_set_onclose_callback(_socket, this, websocket_on_close);
+#endif
 }
 
 socket::~socket() noexcept {
+#ifdef EMSCRIPTEN
   constexpr int code = 1000;
   constexpr const char *reason = "Client disconnecting";
 
@@ -72,6 +77,7 @@ socket::~socket() noexcept {
     emscripten_websocket_delete(_socket);
     _socket = 0;
   }
+#endif
 }
 
 void socket::emit(const std::string &topic, const std::string &data) noexcept {
@@ -97,6 +103,7 @@ void socket::rpc(const std::string &method, const std::string &arguments, std::f
   _callbacks[method].push_back(std::move(callback));
 }
 
+#ifdef EMSCRIPTEN
 void socket::handle_open(const EmscriptenWebSocketOpenEvent *event) {
   UNUSED(event);
   _connected = true;
@@ -113,6 +120,21 @@ void socket::handle_message(const EmscriptenWebSocketMessageEvent *event) {
   }
 
   std::string buffer(reinterpret_cast<const char *>(event->data), event->numBytes);
+
+  on_message(buffer);
+}
+
+void socket::handle_error(const EmscriptenWebSocketErrorEvent *event) {
+  UNUSED(event);
+  invoke("error", "WebSocket error occurred");
+}
+
+void socket::handle_close(const EmscriptenWebSocketCloseEvent *event) {
+  UNUSED(event);
+}
+#endif
+
+void socket::on_message(const std::string &buffer) noexcept {
   auto j = json::parse(buffer, nullptr, false);
   if (j.is_discarded()) {
     return;
@@ -124,7 +146,9 @@ void socket::handle_message(const EmscriptenWebSocketMessageEvent *event) {
   }
 
   if (j.value("command", "") == "reload") {
+#ifdef EMSCRIPTEN
     emscripten_run_script_string("window.location.reload()");
+#endif
     return;
   }
 
@@ -144,23 +168,14 @@ void socket::handle_message(const EmscriptenWebSocketMessageEvent *event) {
           std::to_string(response.at("id").get<uint64_t>()),
           response.at("result").dump()
       );
-
-      // return;
     }
 
-    // TODO handle error
-    // TODO remove callback from _callbacks
+    if (response.contains("error")) {
+      // TODO handle error
+    }
+
     return;
   }
-}
-
-void socket::handle_error(const EmscriptenWebSocketErrorEvent *event) {
-  UNUSED(event);
-  invoke("error", "WebSocket error occurred");
-}
-
-void socket::handle_close(const EmscriptenWebSocketCloseEvent *event) {
-  UNUSED(event);
 }
 
 void socket::send(const std::string &message) noexcept {
@@ -169,7 +184,9 @@ void socket::send(const std::string &message) noexcept {
     return;
   }
 
+#ifdef EMSCRIPTEN
   emscripten_websocket_send_utf8_text(_socket, message.c_str());
+#endif
 }
 
 void socket::invoke(const std::string &event, const std::string &data) const noexcept {

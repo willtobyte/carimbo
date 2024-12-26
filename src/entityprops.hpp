@@ -32,7 +32,7 @@ struct entityprops {
   geometry::point pivot{};
   geometry::size size{};
   float_t scale{1.0f};
-  math::vector2d velocity{};
+  algebra::vector2d velocity{};
   std::string kind{};
   std::string action{};
   graphics::reflection reflection{graphics::reflection::none};

@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-namespace math {
+namespace algebra {
 class vector2d {
 public:
   vector2d() noexcept;

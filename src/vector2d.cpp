@@ -1,6 +1,6 @@
 #include "vector2d.hpp"
 
-using namespace math;
+using namespace algebra;
 
 vector2d::vector2d() noexcept
     : _x(0), _y(0) {}

@@ -30,8 +30,8 @@ public:
   int32_t y() const noexcept;
 
   void move(float_t x_velocity, float_t y_velocity) noexcept;
-  void set_velocity(const math::vector2d &velocity) noexcept;
-  math::vector2d velocity() const noexcept;
+  void set_velocity(const algebra::vector2d &velocity) noexcept;
+  algebra::vector2d velocity() const noexcept;
 
   void set_placement(int32_t x, int32_t y) noexcept;
 

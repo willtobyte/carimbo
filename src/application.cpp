@@ -18,7 +18,7 @@ application::application(int argc, char **argv) {
 int application::run() {
   try {
 #if SANDBOX
-    storage::filesystem::mount("../../sandbox", "/");
+    storage::filesystem::mount("../sandbox", "/");
 #else
     storage::filesystem::mount("bundle.7z", "/");
 #endif

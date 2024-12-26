@@ -11,6 +11,7 @@
 #include "kv.hpp"
 #include "label.hpp"
 #include "loopable.hpp"
+#include "overlay.hpp"
 #include "point.hpp"
 #include "postalservice.hpp"
 #include "socket.hpp"
@@ -18,24 +19,15 @@
 #include "vector2d.hpp"
 #include "widget.hpp"
 
-using namespace audio;
-using namespace framework;
-using namespace input;
-using namespace graphics;
-using namespace math;
-using namespace storage;
-using namespace network;
-using namespace memory;
-
 sol::table require(sol::state &lua, const std::string &module) {
-  const auto data = io::read("scripts/" + module + ".lua");
+  const auto data = storage::io::read("scripts/" + module + ".lua");
   const auto script = std::string(data.begin(), data.end());
   const auto result = lua.script(script);
 
   return result.get<sol::table>();
 }
 
-class lua_loopable : public loopable {
+class lua_loopable : public framework::loopable {
 public:
   explicit lua_loopable(sol::function function)
       : _function(std::move(function)) {}
@@ -113,7 +105,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
   }
 }
 
-void scriptengine::run() {
+void framework::scriptengine::run() {
   sol::state lua;
 
   lua.open_libraries();
@@ -140,38 +132,38 @@ void scriptengine::run() {
       }
   );
 
-  lua.new_usertype<soundmanager>(
+  lua.new_usertype<audio::soundmanager>(
       "SoundManager",
-      "play", &soundmanager::play,
-      "stop", &soundmanager::stop
+      "play", &audio::soundmanager::play,
+      "stop", &audio::soundmanager::stop
   );
 
   lua.new_enum(
       "Anchor",
-      "top", anchor::top,
-      "bottom", anchor::bottom,
-      "left", anchor::left,
-      "right", anchor::right,
-      "none", anchor::none
+      "top", framework::anchor::top,
+      "bottom", framework::anchor::bottom,
+      "left", framework::anchor::left,
+      "right", framework::anchor::right,
+      "none", framework::anchor::none
   );
 
   lua.new_enum(
       "Reflection",
-      "none", reflection::none,
-      "horizontal", reflection::horizontal,
-      "vertical", reflection::vertical,
-      "both", reflection::both
+      "none", graphics::reflection::none,
+      "horizontal", graphics::reflection::horizontal,
+      "vertical", graphics::reflection::vertical,
+      "both", graphics::reflection::both
   );
 
   struct reflectionproxy {
     entity &e;
 
-    void set(reflection value) {
+    void set(graphics::reflection value) {
       e.set_reflection(value);
     }
 
     void unset() {
-      e.set_reflection(reflection::none);
+      e.set_reflection(graphics::reflection::none);
     }
   };
 
@@ -219,7 +211,7 @@ void scriptengine::run() {
       e.set_velocity({x, y});
     }
 
-    vector2d get() {
+    algebra::vector2d get() {
       return e.velocity();
     }
 
@@ -252,11 +244,11 @@ void scriptengine::run() {
       "y", sol::property(&velocityproxy::get_y, &velocityproxy::set_y)
   );
 
-  lua.new_usertype<kv>(
+  lua.new_usertype<memory::kv>(
       "KeyValue",
-      "get", [](kv &self, const std::string &key, sol::this_state state) { return self.get(key, state); },
-      "set", [](kv &self, const std::string &key, const sol::object &new_value, sol::this_state state) { self.set(key, new_value, state); },
-      "subscribe", [](kv &self, const std::string &key, const sol::function &callback, sol::this_state state) { self.subscribe(key, callback, state); }
+      "get", [](memory::kv &self, const std::string &key, sol::this_state state) { return self.get(key, state); },
+      "set", [](memory::kv &self, const std::string &key, const sol::object &new_value, sol::this_state state) { self.set(key, new_value, state); },
+      "subscribe", [](memory::kv &self, const std::string &key, const sol::function &callback, sol::this_state state) { self.subscribe(key, callback, state); }
   );
 
   lua.new_usertype<entity>(
@@ -275,7 +267,7 @@ void scriptengine::run() {
       "action", sol::property([](entity &e) -> actionproxy { return actionproxy{e}; }),
       "placement", sol::property([](entity &e) -> placementproxy { return placementproxy{e}; }),
       "velocity", sol::property([](entity &e) -> velocityproxy { return velocityproxy{e}; }),
-      "kv", sol::property([](entity &e) -> kv & { return e.kv(); })
+      "kv", sol::property([](entity &e) -> memory::kv & { return e.kv(); })
   );
 
   lua.new_usertype<entitymanager>(
@@ -300,55 +292,55 @@ void scriptengine::run() {
       }
   );
 
-  lua.new_usertype<statemanager>(
+  lua.new_usertype<framework::statemanager>(
       "StateManager",
-      "is_keydown", &statemanager::is_keydown
+      "is_keydown", &framework::statemanager::is_keydown
   );
 
-  lua.new_usertype<scenemanager>(
+  lua.new_usertype<framework::scenemanager>(
       "SceneManager",
-      "set", &scenemanager::set
+      "set", &framework::scenemanager::set
   );
 
   lua.new_enum(
       "WidgetType",
-      "label", widgettype::label
+      "label", graphics::widgettype::label
   );
 
-  lua.new_usertype<overlay>(
+  lua.new_usertype<graphics::overlay>(
       "Overlay",
-      "create", &overlay::create,
-      "destroy", &overlay::destroy
+      "create", &graphics::overlay::create,
+      "destroy", &graphics::overlay::destroy
   );
 
-  lua.new_usertype<engine>(
+  lua.new_usertype<framework::engine>(
       "Engine",
-      "add_loopable", &engine::add_loopable,
-      "entitymanager", &engine::entitymanager,
-      "fontfactory", &engine::fontfactory,
-      "overlay", &engine::overlay,
-      "resourcemanager", &engine::resourcemanager,
-      "soundmanager", &engine::soundmanager,
-      "statemanager", &engine::statemanager,
-      "scenemanager", &engine::scenemanager,
-      "run", &engine::run
+      "add_loopable", &framework::engine::add_loopable,
+      "entitymanager", &framework::engine::entitymanager,
+      "fontfactory", &framework::engine::fontfactory,
+      "overlay", &framework::engine::overlay,
+      "resourcemanager", &framework::engine::resourcemanager,
+      "soundmanager", &framework::engine::soundmanager,
+      "statemanager", &framework::engine::statemanager,
+      "scenemanager", &framework::engine::scenemanager,
+      "run", &framework::engine::run
   );
 
-  lua.new_usertype<font>(
+  lua.new_usertype<graphics::font>(
       "Font",
-      sol::constructors<font()>()
+      sol::constructors<graphics::font()>()
   );
 
-  lua.new_usertype<enginefactory>(
+  lua.new_usertype<framework::enginefactory>(
       "EngineFactory",
-      sol::constructors<enginefactory()>(),
-      "with_title", &enginefactory::with_title,
-      "with_width", &enginefactory::with_width,
-      "with_height", &enginefactory::with_height,
-      "with_scale", &enginefactory::with_scale,
-      "with_gravity", &enginefactory::with_gravity,
-      "with_fullscreen", &enginefactory::with_fullscreen,
-      "create", &enginefactory::create
+      sol::constructors<framework::enginefactory()>(),
+      "with_title", &framework::enginefactory::with_title,
+      "with_width", &framework::enginefactory::with_width,
+      "with_height", &framework::enginefactory::with_height,
+      "with_scale", &framework::enginefactory::with_scale,
+      "with_gravity", &framework::enginefactory::with_gravity,
+      "with_fullscreen", &framework::enginefactory::with_fullscreen,
+      "create", &framework::enginefactory::create
   );
 
   lua.new_usertype<geometry::point>(
@@ -368,20 +360,20 @@ void scriptengine::run() {
       "height", sol::property(&geometry::size::height, &geometry::size::set_height)
   );
 
-  lua.new_usertype<socket>(
+  lua.new_usertype<network::socket>(
       "Socket",
-      sol::constructors<socket()>(),
-      "emit", [](socket &sio, const std::string &event, sol::table data, sol::this_state state) {
+      sol::constructors<network::socket()>(),
+      "emit", [](network::socket &sio, const std::string &event, sol::table data, sol::this_state state) {
           sol::state_view lua(state);
           const auto j = _to_json(data);
           sio.emit(event, j.dump()); },
-      "on", [](socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
+      "on", [](network::socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
           sol::state_view lua(state);
           sio.on(event, [callback, lua](const std::string &data) {
               const auto j = nlohmann::json::parse(data);
               callback(_to_lua(j, lua));
           }); },
-      "rpc", [](socket &sio, const std::string &method, sol::table arguments, sol::function callback, sol::this_state state) {
+      "rpc", [](network::socket &sio, const std::string &method, sol::table arguments, sol::function callback, sol::this_state state) {
           sol::state_view lua(state);
           const auto args_json = _to_json(arguments);
           sio.rpc(method, args_json.dump(), [callback, lua](const std::string &response) {
@@ -390,18 +382,18 @@ void scriptengine::run() {
           }); }
   );
 
-  lua.new_usertype<color>(
+  lua.new_usertype<graphics::color>(
       "Color",
-      "color", sol::constructors<color(const std::string &)>(),
+      "color", sol::constructors<graphics::color(const std::string &)>(),
 
-      "r", sol::property(&color::r, &color::set_r),
-      "g", sol::property(&color::g, &color::set_g),
-      "b", sol::property(&color::b, &color::set_b),
-      "a", sol::property(&color::a, &color::set_a),
+      "r", sol::property(&graphics::color::r, &graphics::color::set_r),
+      "g", sol::property(&graphics::color::g, &graphics::color::set_g),
+      "b", sol::property(&graphics::color::b, &graphics::color::set_b),
+      "a", sol::property(&graphics::color::a, &graphics::color::set_a),
 
-      sol::meta_function::equal_to, &color::operator==, // sol::meta_function::not_equal_to, &color::operator!=,
+      sol::meta_function::equal_to, &graphics::color::operator==, // sol::meta_function::not_equal_to, &color::operator!=,
 
-      sol::meta_function::to_string, [](const color &c) {
+      sol::meta_function::to_string, [](const graphics::color &c) {
         return "color(" + std::to_string(c.r()) + ", " +
                std::to_string(c.g()) + ", " +
                std::to_string(c.b()) + ", " +
@@ -411,73 +403,73 @@ void scriptengine::run() {
 
   lua.new_enum(
       "KeyEvent",
-      "up", keyevent::up,
-      "left", keyevent::left,
-      "down", keyevent::down,
-      "right", keyevent::right,
-      "space", keyevent::space
+      "up", input::keyevent::up,
+      "left", input::keyevent::left,
+      "down", input::keyevent::down,
+      "right", input::keyevent::right,
+      "space", input::keyevent::space
   );
 
-  lua.new_usertype<mail>(
+  lua.new_usertype<framework::mail>(
       "Mail",
-      sol::constructors<mail(std::shared_ptr<entity>, const std::string &, const std::string &)>()
+      sol::constructors<framework::mail(std::shared_ptr<entity>, const std::string &, const std::string &)>()
   );
 
-  lua.new_usertype<postalservice>(
-      "PostalService", sol::constructors<postalservice()>(),
-      "post", &postalservice::post
+  lua.new_usertype<framework::postalservice>(
+      "PostalService", sol::constructors<framework::postalservice()>(),
+      "post", &framework::postalservice::post
   );
 
-  lua.new_usertype<timermanager>(
-      "TimeManager", sol::constructors<timermanager()>(),
-      "set", &timermanager::set,
-      "singleshot", &timermanager::singleshot,
-      "clear", &timermanager::clear
+  lua.new_usertype<framework::timermanager>(
+      "TimeManager", sol::constructors<framework::timermanager()>(),
+      "set", &framework::timermanager::set,
+      "singleshot", &framework::timermanager::singleshot,
+      "clear", &framework::timermanager::clear
   );
 
-  lua.new_usertype<vector2d>(
-      "Vector2D", sol::constructors<vector2d(), vector2d(double_t, double_t)>(),
+  lua.new_usertype<algebra::vector2d>(
+      "Vector2D", sol::constructors<algebra::vector2d(), algebra::vector2d(double_t, double_t)>(),
 
-      "x", sol::property(&vector2d::x, &vector2d::set_x),
-      "y", sol::property(&vector2d::y, &vector2d::set_y),
-      "set", &vector2d::set,
+      "x", sol::property(&algebra::vector2d::x, &algebra::vector2d::set_x),
+      "y", sol::property(&algebra::vector2d::y, &algebra::vector2d::set_y),
+      "set", &algebra::vector2d::set,
 
-      "magnitude", &vector2d::magnitude,
-      "unit", &vector2d::unit,
-      "dot", &vector2d::dot,
+      "magnitude", &algebra::vector2d::magnitude,
+      "unit", &algebra::vector2d::unit,
+      "dot", &algebra::vector2d::dot,
 
-      sol::meta_function::addition, &vector2d::operator+,
-      sol::meta_function::subtraction, &vector2d::operator-,
+      sol::meta_function::addition, &algebra::vector2d::operator+,
+      sol::meta_function::subtraction, &algebra::vector2d::operator-,
 
-      "add_assign", &vector2d::operator+=,
-      "sub_assign", &vector2d::operator-=,
-      "mul_assign", &vector2d::operator*=,
-      "div_assign", &vector2d::operator/=,
+      "add_assign", &algebra::vector2d::operator+=,
+      "sub_assign", &algebra::vector2d::operator-=,
+      "mul_assign", &algebra::vector2d::operator*=,
+      "div_assign", &algebra::vector2d::operator/=,
 
-      sol::meta_function::equal_to, &vector2d::operator==,
+      sol::meta_function::equal_to, &algebra::vector2d::operator==,
 
-      "zero", &vector2d::zero,
-      "moving", &vector2d::moving,
-      "right", &vector2d::right,
-      "left", &vector2d::left
+      "zero", &algebra::vector2d::zero,
+      "moving", &algebra::vector2d::moving,
+      "right", &algebra::vector2d::right,
+      "left", &algebra::vector2d::left
   );
 
-  lua.new_usertype<label>(
+  lua.new_usertype<graphics::label>(
       "Label",
-      sol::constructors<label()>(),
-      sol::base_classes, sol::bases<widget>(),
-      "font", sol::property(&label::set_font),
-      "set", sol::overload([](label &self, const std::string &text) { self.set(text); }, [](label &self, const std::string &text, int32_t x, int32_t y) { self.set_with_placement(text, x, y); })
+      sol::constructors<graphics::label()>(),
+      sol::base_classes, sol::bases<graphics::widget>(),
+      "font", sol::property(&graphics::label::set_font),
+      "set", sol::overload([](graphics::label &self, const std::string &text) { self.set(text); }, [](graphics::label &self, const std::string &text, int32_t x, int32_t y) { self.set_with_placement(text, x, y); })
   );
 
-  lua.new_usertype<widget>(
+  lua.new_usertype<graphics::widget>(
       "Widget",
       sol::no_constructor
   );
 
-  lua.new_usertype<fontfactory>(
+  lua.new_usertype<graphics::fontfactory>(
       "FontFactory",
-      "get", &fontfactory::get
+      "get", &graphics::fontfactory::get
   );
 
   const auto script = storage::io::read("scripts/main.lua");

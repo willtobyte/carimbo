@@ -47,11 +47,11 @@ void entity::move(float_t x_velocity, float_t y_velocity) noexcept {
   // cpBodySetVelocity(_props.body.get(), {x_velocity, y_velocity});
 }
 
-void entity::set_velocity(const math::vector2d &velocity) noexcept {
+void entity::set_velocity(const algebra::vector2d &velocity) noexcept {
   _props.velocity = velocity;
 }
 
-math::vector2d entity::velocity() const noexcept {
+algebra::vector2d entity::velocity() const noexcept {
   return _props.velocity;
 }
 

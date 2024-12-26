@@ -10,9 +10,22 @@
 #define NOMINMAX
 #endif
 
+#define WEBSOCKET
+
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
+#ifdef WEBSOCKET
 #include <emscripten/websocket.h>
+#endif
+#endif
+
+#ifndef EMSCRIPTEN
+#ifdef WEBSOCKET
+#include <boost/asio.hpp>
+#include <boost/asio/strand.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/websocket.hpp>
+#endif
 #endif
 
 #ifdef STEAM
@@ -109,7 +122,7 @@ class eventmanager;
 class eventreceiver;
 }
 
-namespace math {
+namespace algebra {
 class vector2d;
 }
 
