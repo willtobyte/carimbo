@@ -20,6 +20,8 @@ timermanager::~timermanager() noexcept {
   for (const auto &timer : _timers) {
     SDL_RemoveTimer(timer.first);
   }
+
+  _timers.clear();
 }
 
 void timermanager::set(int32_t interval, std::function<void()> fn) {
@@ -38,7 +40,7 @@ void timermanager::clear(int32_t id) noexcept {
 }
 
 void timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
-  const auto ptr = std::make_shared<std::function<void()>>(std::move(fn));
+  const auto ptr = std::make_shared<std::function<void()>>(fn);
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr.get());
   if (!id) [[unlikely]] {
     std::ostringstream oss;
