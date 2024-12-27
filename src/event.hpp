@@ -5,6 +5,7 @@
 namespace input {
 enum eventtype : Uint32 {
   mail = SDL_USEREVENT + 1,
+  timer
 };
 
 enum class keyevent : int32_t {

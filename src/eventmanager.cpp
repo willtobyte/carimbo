@@ -1,5 +1,5 @@
 #include "eventmanager.hpp"
-#include <SDL_keycode.h>
+#include "event.hpp"
 
 using namespace input;
 
@@ -116,6 +116,14 @@ void eventmanager::update(float_t delta) {
         for (const auto &receiver : _receivers) {
           receiver->on_mail(mailevent(ptr->to, ptr->body));
         }
+        delete ptr;
+      }
+    } break;
+
+    case input::eventtype::timer: {
+      auto *ptr = static_cast<std::function<void()> *>(event.user.data1);
+      if (ptr) {
+        (*ptr)();
         delete ptr;
       }
     } break;
