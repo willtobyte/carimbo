@@ -19,6 +19,7 @@ class MeuProjetoConan(ConanFile):
 
         if self.settings.os != "Emscripten":
           self.requires("boost/1.86.0")
+          self.requires("openssl/3.3.2")
 
     def generate(self):
         tc = CMakeToolchain(self)

@@ -40,10 +40,18 @@ EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void
 
 socket::socket() noexcept
 #ifndef EMSCRIPTEN
-    : _resolver(net::make_strand(_io_context)), _ws(net::make_strand(_io_context))
+    : _resolver(net::make_strand(_io_context)),
+      _ssl_context(boost::asio::ssl::context::tlsv13_client),
+      _ws(boost::asio::make_strand(_io_context), _ssl_context)
 #endif
 {
   _queue.reserve(8);
+#ifndef EMSCRIPTEN
+#ifndef LOCAL
+  _ssl_context.set_verify_mode(boost::asio::ssl::verify_peer);
+  _ssl_context.set_default_verify_paths();
+#endif
+#endif
 }
 
 socket::~socket() noexcept {
@@ -58,7 +66,7 @@ socket::~socket() noexcept {
   }
 #else
   _ws.async_close(websocket::close_code::normal, [](beast::error_code ec) {
-    UNUSED(ec);
+    std::cerr << "[socket] websocket close error: " << ec.message() << std::endl;
   });
 #endif
 }
@@ -89,13 +97,8 @@ void socket::connect() noexcept {
   emscripten_websocket_set_onclose_callback(_socket, this, websocket_on_close);
 #else
   _resolver.async_resolve(
-#ifdef LOCAL
-      "localhost",
-      "3000",
-#else
       "carimbo.run",
       "443",
-#endif
       beast::bind_front_handler(&socket::on_resolve, this)
   );
 
@@ -168,7 +171,19 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
   }
 
   beast::get_lowest_layer(_ws).expires_after(std::chrono::seconds(30));
-  beast::get_lowest_layer(_ws).async_connect(results, beast::bind_front_handler(&socket::on_connect, this));
+  beast::get_lowest_layer(_ws).async_connect(
+      results,
+      beast::bind_front_handler(
+          &socket::on_connect,
+          this
+      )
+  );
+
+  // auto &layer = _ws.next_layer();
+  // layer.async_connect(
+  //     results,
+  //     boost::beast::bind_front_handler(&socket::on_connect, this)
+  // );
 }
 
 void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept {
@@ -180,15 +195,30 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
   }
 
   _connected = true;
+  beast::get_lowest_layer(_ws).expires_after(std::chrono::seconds(30));
+
+  SSL_set_tlsext_host_name(_ws.next_layer().native_handle(), "carimbo.run");
+
+  _ws.next_layer().async_handshake(
+      ssl::stream_base::client,
+      beast::bind_front_handler(
+          &socket::on_ssl_handshake,
+          this
+      )
+  );
+}
+
+void socket::on_ssl_handshake(beast::error_code ec) noexcept {
+  if (ec) {
+    std::cerr << "[socket] ssl handshake error: " << ec.message() << std::endl;
+    return;
+  }
+
   beast::get_lowest_layer(_ws).expires_never();
   _ws.set_option(websocket::stream_base::timeout::suggested(beast::role_type::client));
 
   _ws.async_handshake(
-#ifdef LOCAL
-      "localhost",
-#else
       "carimbo.run",
-#endif
       "/socket",
       beast::bind_front_handler(&socket::on_handshake, this)
   );
@@ -219,7 +249,13 @@ void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) noexce
 }
 
 void socket::do_read() {
-  _ws.async_read(_buffer, beast::bind_front_handler(&socket::on_read, this));
+  _ws.async_read(
+      _buffer,
+      beast::bind_front_handler(
+          &socket::on_read,
+          this
+      )
+  );
 }
 #endif
 

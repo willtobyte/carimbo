@@ -22,9 +22,12 @@
 #ifndef EMSCRIPTEN
 #ifdef WEBSOCKET
 #include <boost/asio.hpp>
+#include <boost/asio/connect.hpp>
+#include <boost/asio/ssl.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
+#include <boost/beast/websocket/ssl.hpp>
 #endif
 #endif
 
