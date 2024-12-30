@@ -36,3 +36,7 @@ rect::operator SDL_Rect() const noexcept {
       .h = static_cast<int>(_size.height())
   };
 }
+
+rect rect::operator+(const point &offset) const noexcept {
+  return rect(_position + offset, _size);
+}

@@ -2,24 +2,36 @@
 
 using namespace geometry;
 
-point::point(int32_t x, int32_t y) noexcept : _x(x), _y(y) {}
+point::point(int32_t x, int32_t y) noexcept
+    : _x(x), _y(y) {}
 
-point::point(const point &other) noexcept : _x(other._x), _y(other._y) {}
+point::point(const point &other) noexcept
+    : _x(other._x), _y(other._y) {}
 
 void point::set(int32_t x, int32_t y) noexcept {
   _x = x;
   _y = y;
 }
 
-int32_t point::x() const noexcept { return _x; }
+int32_t point::x() const noexcept {
+  return _x;
+}
 
-void point::set_x(int32_t x) noexcept { _x = x; }
+void point::set_x(int32_t x) noexcept {
+  _x = x;
+}
 
-int32_t point::y() const noexcept { return _y; }
+int32_t point::y() const noexcept {
+  return _y;
+}
 
-void point::set_y(int32_t y) noexcept { _y = y; }
+void point::set_y(int32_t y) noexcept {
+  _y = y;
+}
 
-point::operator SDL_Point() const noexcept { return SDL_Point{_x, _y}; }
+point::operator SDL_Point() const noexcept {
+  return SDL_Point{_x, _y};
+}
 
 point point::operator+(const point &other) const noexcept {
   return point(_x + other._x, _y + other._y);
@@ -38,4 +50,12 @@ point &point::operator+=(std::pair<char, int32_t> offset) noexcept {
     _y += offset.second;
   }
   return *this;
+}
+
+point point::operator-(const size &rhs) const noexcept {
+  return point(_x - rhs.width(), _y - rhs.height());
+}
+
+point point::operator-(const point &rhs) const noexcept {
+  return point(_x - rhs._x, _y - rhs._y);
 }
