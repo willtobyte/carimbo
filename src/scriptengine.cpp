@@ -251,34 +251,34 @@ void framework::scriptengine::run() {
       "subscribe", [](memory::kv &self, const std::string &key, const sol::function &callback, sol::this_state state) { self.subscribe(key, callback, state); }
   );
 
-  lua.new_usertype<entity>(
+  lua.new_usertype<framework::entity>(
       "Entity",
-      "id", sol::property(&entity::id),
-      "x", sol::property(&entity::x),
-      "y", sol::property(&entity::y),
-      "visible", sol::property(&entity::visible),
-      "size", sol::property(&entity::size),
-      "move", &entity::move,
-      "on_update", &entity::set_onupdate,
-      "on_animationfinished", &entity::set_onanimationfinished,
-      "on_mail", &entity::set_onmail,
-      "on_collision", &entity::set_oncollision,
-      "reflection", sol::property([](entity &e) -> reflectionproxy { return reflectionproxy{e}; }),
-      "action", sol::property([](entity &e) -> actionproxy { return actionproxy{e}; }),
-      "placement", sol::property([](entity &e) -> placementproxy { return placementproxy{e}; }),
-      "velocity", sol::property([](entity &e) -> velocityproxy { return velocityproxy{e}; }),
-      "kv", sol::property([](entity &e) -> memory::kv & { return e.kv(); })
+      "id", sol::property(&framework::entity::id),
+      "x", sol::property(&framework::entity::x),
+      "y", sol::property(&framework::entity::y),
+      "visible", sol::property(&framework::entity::visible),
+      "size", sol::property(&framework::entity::size),
+      "move", &framework::entity::move,
+      "on_update", &framework::entity::set_onupdate,
+      "on_animationfinished", &framework::entity::set_onanimationfinished,
+      "on_mail", &framework::entity::set_onmail,
+      "on_collision", &framework::entity::set_oncollision,
+      "reflection", sol::property([](framework::entity &e) -> reflectionproxy { return reflectionproxy{e}; }),
+      "action", sol::property([](framework::entity &e) -> actionproxy { return actionproxy{e}; }),
+      "placement", sol::property([](framework::entity &e) -> placementproxy { return placementproxy{e}; }),
+      "velocity", sol::property([](framework::entity &e) -> velocityproxy { return velocityproxy{e}; }),
+      "kv", sol::property([](framework::entity &e) -> memory::kv & { return e.kv(); })
   );
 
-  lua.new_usertype<entitymanager>(
+  lua.new_usertype<framework::entitymanager>(
       "EntityManager",
-      "spawn", &entitymanager::spawn,
-      "destroy", &entitymanager::destroy
+      "spawn", &framework::entitymanager::spawn,
+      "destroy", &framework::entitymanager::destroy
   );
 
-  lua.new_usertype<resourcemanager>(
+  lua.new_usertype<framework::resourcemanager>(
       "ResourceManager",
-      "flush", &resourcemanager::flush,
+      "flush", &framework::resourcemanager::flush,
       "prefetch", [](std::shared_ptr<resourcemanager> manager, sol::table table) {
         std::vector<std::string> filenames(table.size());
         std::ranges::transform(
@@ -292,8 +292,39 @@ void framework::scriptengine::run() {
       }
   );
 
+  struct playerproxy {
+    framework::statemanager &e;
+
+    int8_t at(int8_t val) noexcept {
+      return val;
+    }
+  };
+
+  struct playereventproxy {
+    framework::statemanager &e;
+    uint8_t index;
+
+    void event() noexcept {
+      std::cout << "Event called for index: " << static_cast<int>(index) << std::endl;
+    }
+  };
+
+  lua.new_usertype<playereventproxy>(
+      "PlayerEventProxy",
+      "event", &playereventproxy::event
+  );
+
+  lua.new_usertype<playerproxy>(
+      "PlayerProxy",
+      sol::meta_function::index, [](playerproxy &proxy, uint8_t index) -> playereventproxy {
+        // return proxy.at(static_cast<int8_t>(index));
+        return playereventproxy{proxy.e, index};
+      }
+  );
+
   lua.new_usertype<framework::statemanager>(
       "StateManager",
+      "player", sol::property([](framework::statemanager &e) -> playerproxy { return playerproxy{e}; }),
       "is_keydown", &framework::statemanager::is_keydown
   );
 
@@ -365,22 +396,22 @@ void framework::scriptengine::run() {
       sol::constructors<network::socket()>(),
       "connect", &network::socket::connect,
       "emit", [](network::socket &sio, const std::string &event, sol::table data, sol::this_state state) {
-          sol::state_view lua(state);
-          const auto j = _to_json(data);
-          sio.emit(event, j.dump()); },
+    sol::state_view lua(state);
+    const auto j = _to_json(data);
+    sio.emit(event, j.dump()); },
       "on", [](network::socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
-          sol::state_view lua(state);
-          sio.on(event, [callback, lua](const std::string &data) {
-              const auto j = nlohmann::json::parse(data);
-              callback(_to_lua(j, lua));
-          }); },
+    sol::state_view lua(state);
+    sio.on(event, [callback, lua](const std::string &data) {
+      const auto j = nlohmann::json::parse(data);
+      callback(_to_lua(j, lua));
+    }); },
       "rpc", [](network::socket &sio, const std::string &method, sol::table arguments, sol::function callback, sol::this_state state) {
-          sol::state_view lua(state);
-          const auto args_json = _to_json(arguments);
-          sio.rpc(method, args_json.dump(), [callback, lua](const std::string &response) {
-            const auto j = nlohmann::json::parse(response);
-            callback(_to_lua(j, lua));
-          }); }
+    sol::state_view lua(state);
+    const auto args_json = _to_json(arguments);
+    sio.rpc(method, args_json.dump(), [callback, lua](const std::string &response) {
+      const auto j = nlohmann::json::parse(response);
+      callback(_to_lua(j, lua));
+    }); }
   );
 
   lua.new_usertype<graphics::color>(

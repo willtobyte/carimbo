@@ -98,11 +98,11 @@ void eventmanager::update(float_t delta) {
 
       switch (axis) {
       case SDL_CONTROLLER_AXIS_LEFTY:
-        process(SDLK_w, SDLK_s);
+        process(SDLK_UP, SDLK_DOWN);
         break;
 
       case SDL_CONTROLLER_AXIS_LEFTX:
-        process(SDLK_a, SDLK_d);
+        process(SDLK_LEFT, SDLK_RIGHT);
         break;
 
       default:
