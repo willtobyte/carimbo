@@ -304,7 +304,7 @@ void framework::scriptengine::run() {
       }
   );
 
-  struct player {
+  struct playerwrapper {
     int index;
     const framework::statemanager &e;
 
@@ -313,19 +313,25 @@ void framework::scriptengine::run() {
     }
   };
 
-  lua.new_usertype<player>(
-      "Player",
-      "on", &player::on
+  lua.new_usertype<playerwrapper>(
+      "PlayerWrapper",
+      "on", &playerwrapper::on
   );
 
-  static std::unordered_map<int, player> _p;
+  lua.new_enum(
+      "Player",
+      "one", input::player::one,
+      "two", input::player::two
+  );
+
+  static std::unordered_map<input::player, playerwrapper> _p;
 
   lua.new_usertype<framework::statemanager>(
       "StateManager",
-      "player", [](const framework::statemanager &self, int index, sol::this_state state) {
+      "player", [](const framework::statemanager &self, input::player player, sol::this_state state) {
         sol::state_view lua(state);
 
-        auto [iterator, inserted] = _p.try_emplace(index, index, self);
+        auto [iterator, inserted] = _p.try_emplace(player, player, self);
 
         return iterator->second;
       }

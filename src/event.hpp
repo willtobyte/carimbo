@@ -3,6 +3,11 @@
 #include "common.hpp"
 
 namespace input {
+enum player : uint8_t {
+  one = 0,
+  two
+};
+
 enum eventtype : Uint32 {
   mail = SDL_USEREVENT + 1,
   timer
