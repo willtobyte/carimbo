@@ -16,6 +16,17 @@ enum class keyevent : int32_t {
   space = SDLK_SPACE,
 };
 
+enum class controller : uint32_t {
+  up,
+  down,
+  left,
+  right,
+  triangle,
+  circle,
+  cross,
+  square
+};
+
 enum class mouseevent : int32_t {};
 
 enum class joystickevent : int32_t {

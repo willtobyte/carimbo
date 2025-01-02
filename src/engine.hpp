@@ -38,7 +38,7 @@ public:
 
   void add_loopable(std::shared_ptr<loopable> loopable) noexcept;
   void flush() const noexcept;
-  bool is_keydown(const input::keyevent &event) const noexcept;
+  // bool is_keydown(const input::keyevent &event) const noexcept;
   void prefetch(const std::vector<std::string> &filenames) noexcept;
   void run() noexcept;
   void _loop() noexcept;

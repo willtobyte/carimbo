@@ -118,9 +118,9 @@ void engine::flush() const noexcept {
   _resourcemanager->flush();
 }
 
-bool engine::is_keydown(const input::keyevent &event) const noexcept {
-  return _statemanager->is_keydown(event);
-}
+// bool engine::is_keydown(const input::keyevent &event) const noexcept {
+//   return _statemanager->is_keydown(event);
+// }
 
 void engine::prefetch(const std::vector<std::string> &filenames) noexcept {
   _resourcemanager->prefetch(filenames);

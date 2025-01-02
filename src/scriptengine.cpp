@@ -139,6 +139,18 @@ void framework::scriptengine::run() {
   );
 
   lua.new_enum(
+      "Controller",
+      "up", input::controller::up,
+      "down", input::controller::down,
+      "left", input::controller::left,
+      "right", input::controller::right,
+      "triangle", input::controller::triangle,
+      "circle", input::controller::circle,
+      "cross", input::controller::cross,
+      "square", input::controller::square
+  );
+
+  lua.new_enum(
       "Anchor",
       "top", framework::anchor::top,
       "bottom", framework::anchor::bottom,
@@ -292,40 +304,31 @@ void framework::scriptengine::run() {
       }
   );
 
-  struct playerproxy {
-    framework::statemanager &e;
+  struct player {
+    int index;
+    const framework::statemanager &e;
 
-    int8_t at(int8_t val) noexcept {
-      return val;
+    bool on(std::variant<input::controller> type) {
+      return e.on(index, type);
     }
   };
 
-  struct playereventproxy {
-    framework::statemanager &e;
-    uint8_t index;
-
-    void event() noexcept {
-      std::cout << "Event called for index: " << static_cast<int>(index) << std::endl;
-    }
-  };
-
-  lua.new_usertype<playereventproxy>(
-      "PlayerEventProxy",
-      "event", &playereventproxy::event
+  lua.new_usertype<player>(
+      "Player",
+      "on", &player::on
   );
 
-  lua.new_usertype<playerproxy>(
-      "PlayerProxy",
-      sol::meta_function::index, [](playerproxy &proxy, uint8_t index) -> playereventproxy {
-        // return proxy.at(static_cast<int8_t>(index));
-        return playereventproxy{proxy.e, index};
-      }
-  );
+  static std::unordered_map<int, player> _p;
 
   lua.new_usertype<framework::statemanager>(
       "StateManager",
-      "player", sol::property([](framework::statemanager &e) -> playerproxy { return playerproxy{e}; }),
-      "is_keydown", &framework::statemanager::is_keydown
+      "player", [](const framework::statemanager &self, int index, sol::this_state state) {
+        sol::state_view lua(state);
+
+        auto [iterator, inserted] = _p.try_emplace(index, index, self);
+
+        return iterator->second;
+      }
   );
 
   lua.new_usertype<framework::scenemanager>(
