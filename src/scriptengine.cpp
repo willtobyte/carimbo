@@ -140,14 +140,14 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
       "Controller",
-      "up", input::controller::up,
-      "down", input::controller::down,
-      "left", input::controller::left,
-      "right", input::controller::right,
-      "triangle", input::controller::triangle,
-      "circle", input::controller::circle,
-      "cross", input::controller::cross,
-      "square", input::controller::square
+      "up", input::joystickevent::up,
+      "down", input::joystickevent::down,
+      "left", input::joystickevent::left,
+      "right", input::joystickevent::right,
+      "triangle", input::joystickevent::triangle,
+      "circle", input::joystickevent::circle,
+      "cross", input::joystickevent::cross,
+      "square", input::joystickevent::square
   );
 
   lua.new_enum(
@@ -308,7 +308,7 @@ void framework::scriptengine::run() {
     int index;
     const framework::statemanager &e;
 
-    bool on(std::variant<input::controller> type) {
+    bool on(std::variant<input::joystickevent> type) {
       return e.on(index, type);
     }
   };

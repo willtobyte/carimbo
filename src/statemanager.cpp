@@ -5,7 +5,7 @@
 
 using namespace framework;
 
-bool statemanager::on(int player, const std::variant<input::controller> &type) const noexcept {
+bool statemanager::on(int player, const std::variant<input::joystickevent> &type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -15,21 +15,21 @@ bool statemanager::on(int player, const std::variant<input::controller> &type) c
   return false;
 }
 
-constexpr std::optional<input::controller> keytoctrl(const input::keyevent &event) {
-  using input::controller;
+constexpr std::optional<input::joystickevent> keytoctrl(const input::keyevent &event) {
+  using input::joystickevent;
   using input::keyevent;
 
   switch (event) {
   case keyevent::up:
-    return controller::up;
+    return joystickevent::up;
   case keyevent::down:
-    return controller::down;
+    return joystickevent::down;
   case keyevent::left:
-    return controller::left;
+    return joystickevent::left;
   case keyevent::right:
-    return controller::right;
+    return joystickevent::right;
   case keyevent::space:
-    return controller::cross;
+    return joystickevent::cross;
   default:
     return std::nullopt;
   }
@@ -48,9 +48,9 @@ void statemanager::on_keyup(const input::keyevent &event) noexcept {
 }
 
 void statemanager::on_joystickbuttondown(int who, const input::joystickevent &event) noexcept {
-  _state[who][static_cast<input::controller>(event)] = true;
+  _state[who][event] = true;
 }
 
 void statemanager::on_joystickbuttonup(int who, const input::joystickevent &event) noexcept {
-  _state[who][static_cast<input::controller>(event)] = false;
+  _state[who][event] = false;
 }
