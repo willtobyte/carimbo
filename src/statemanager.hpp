@@ -16,6 +16,10 @@ protected:
 
   virtual void on_keyup(const input::keyevent &event) noexcept;
 
+  virtual void on_joystickbuttondown(int who, const input::joystickevent &event) noexcept;
+
+  virtual void on_joystickbuttonup(int who, const input::joystickevent &event) noexcept;
+
 private:
   std::unordered_map<uint8_t, std::unordered_map<std::variant<input::controller>, bool>> _state;
 };

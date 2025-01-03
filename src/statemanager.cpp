@@ -6,11 +6,8 @@
 using namespace framework;
 
 bool statemanager::on(int player, const std::variant<input::controller> &type) const noexcept {
-  auto pit = _state.find(player);
-  if (pit != _state.end()) {
-    auto &map = pit->second;
-    auto tit = map.find(type);
-    if (tit != map.end()) {
+  if (const auto pit = _state.find(player); pit != _state.end()) {
+    if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
     }
   }
@@ -48,4 +45,12 @@ void statemanager::on_keyup(const input::keyevent &event) noexcept {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = false;
   }
+}
+
+void statemanager::on_joystickbuttondown(int who, const input::joystickevent &event) noexcept {
+  _state[who][static_cast<input::controller>(event)] = true;
+}
+
+void statemanager::on_joystickbuttonup(int who, const input::joystickevent &event) noexcept {
+  _state[who][static_cast<input::controller>(event)] = false;
 }

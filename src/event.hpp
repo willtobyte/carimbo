@@ -21,25 +21,29 @@ enum class keyevent : int32_t {
   space = SDLK_SPACE,
 };
 
-enum class controller : uint32_t {
-  up,
-  down,
-  left,
-  right,
-  triangle,
-  circle,
-  cross,
-  square
+enum class joystickevent : int32_t {
+  up = SDL_CONTROLLER_BUTTON_DPAD_UP,
+  down = SDL_CONTROLLER_BUTTON_DPAD_DOWN,
+  left = SDL_CONTROLLER_BUTTON_DPAD_LEFT,
+  right = SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
+  triangle = SDL_CONTROLLER_BUTTON_Y,
+  circle = SDL_CONTROLLER_BUTTON_B,
+  cross = SDL_CONTROLLER_BUTTON_A,
+  square = SDL_CONTROLLER_BUTTON_X,
+};
+
+enum class controller : int32_t {
+  up = static_cast<int32_t>(joystickevent::up),
+  down = static_cast<int32_t>(joystickevent::down),
+  left = static_cast<int32_t>(joystickevent::left),
+  right = static_cast<int32_t>(joystickevent::right),
+  triangle = static_cast<int32_t>(joystickevent::triangle),
+  circle = static_cast<int32_t>(joystickevent::circle),
+  cross = static_cast<int32_t>(joystickevent::cross),
+  square = static_cast<int32_t>(joystickevent::square),
 };
 
 enum class mouseevent : int32_t {};
-
-enum class joystickevent : int32_t {
-  dpad_up = SDL_CONTROLLER_BUTTON_DPAD_UP,
-  dpad_down = SDL_CONTROLLER_BUTTON_DPAD_DOWN,
-  dpad_left = SDL_CONTROLLER_BUTTON_DPAD_LEFT,
-  dpad_right = SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
-};
 
 class mailevent {
 public:
