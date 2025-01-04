@@ -130,10 +130,14 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case input::eventtype::timer: {
-      auto *ptr = static_cast<std::function<void()> *>(event.user.data1);
-      if (ptr) {
-        (*ptr)();
-        delete ptr;
+      const auto *fn = static_cast<std::function<void()> *>(event.user.data1);
+      const auto *repeat = static_cast<bool *>(event.user.data2);
+      if (fn) {
+        (*fn)();
+
+        if (repeat && !(*repeat)) {
+          delete fn;
+        }
       }
     } break;
 

@@ -308,6 +308,9 @@ void framework::scriptengine::run() {
     int index;
     const framework::statemanager &e;
 
+    playerwrapper(input::player player, const framework::statemanager &state_manager)
+        : index(static_cast<int>(player)), e(state_manager) {}
+
     bool on(std::variant<input::joystickevent> type) {
       return e.on(index, type);
     }
