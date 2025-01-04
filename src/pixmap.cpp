@@ -47,12 +47,29 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Su
   }
 }
 
-void pixmap::draw(const geometry::rect &source, const geometry::rect &destination, const double_t angle, reflection reflection, const uint8_t alpha) const noexcept {
+void pixmap::draw(
+    const geometry::rect &source,
+    const geometry::rect &destination,
+    const double_t angle,
+    reflection reflection,
+    const uint8_t alpha
+#ifdef DEBUG
+    ,
+    const geometry::rect &outline
+#endif
+) const noexcept {
   const SDL_Rect &src = source;
   const SDL_Rect &dst = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderCopyEx(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_RendererFlip>(reflection));
+
+#ifdef DEBUG
+  const SDL_Rect &debug = outline;
+
+  SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
+  SDL_RenderDrawRect(*_renderer, &debug);
+#endif
 }
 
 geometry::size pixmap::size() const noexcept {

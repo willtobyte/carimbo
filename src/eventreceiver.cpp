@@ -22,6 +22,11 @@ void eventreceiver::on_joystickbuttonup(int who, const joystickevent &event) noe
   UNUSED(event);
 }
 
+void eventreceiver::on_joystickaxismotion(int who, const joystickaxisevent &event) noexcept {
+  UNUSED(who);
+  UNUSED(event);
+}
+
 void eventreceiver::on_mail(const mailevent &event) noexcept {
   UNUSED(event);
 }

@@ -22,6 +22,10 @@ public:
       double_t angle = 0.0f,
       reflection reflection = reflection::none,
       uint8_t alpha = 255
+#ifdef DEBUG
+      ,
+      const geometry::rect &outline = {}
+#endif
   ) const noexcept;
 
   geometry::size size() const noexcept;

@@ -37,6 +37,7 @@ else()
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
+  target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
   if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /Od /Zi)
   else()
@@ -65,13 +66,8 @@ if (${CMAKE_SYSTEM_NAME} MATCHES Emscripten)
   if (ENABLE_PROFILING)
     list(APPEND EMSCRIPTEN_OPTIONS
       -O0
-      -g
-      -gsource-map
-      -sDEMANGLE_SUPPORT=1
       -sASSERTIONS=1
-      -sNO_DISABLE_EXCEPTION_CATCHING
-      --profiling-funcs
-      -sSAFE_HEAP=0
+      -sSAFE_HEAP=1
       -sSTACK_OVERFLOW_CHECK=2
     )
   else()

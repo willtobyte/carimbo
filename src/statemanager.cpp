@@ -1,7 +1,6 @@
 #include "statemanager.hpp"
 
 #include "event.hpp"
-#include <unordered_map>
 
 using namespace framework;
 
@@ -16,8 +15,7 @@ bool statemanager::on(int player, const std::variant<input::joystickevent> &type
 }
 
 constexpr std::optional<input::joystickevent> keytoctrl(const input::keyevent &event) {
-  using input::joystickevent;
-  using input::keyevent;
+  using namespace input;
 
   switch (event) {
   case keyevent::up:
@@ -53,4 +51,43 @@ void statemanager::on_joystickbuttondown(int who, const input::joystickevent &ev
 
 void statemanager::on_joystickbuttonup(int who, const input::joystickevent &event) noexcept {
   _state[who][event] = false;
+}
+
+void statemanager::on_joystickaxismotion(int who, const input::joystickaxisevent &event) noexcept {
+  using namespace input;
+
+  static constexpr auto threshold = 8000;
+  static constexpr auto deadzone = 4000;
+
+  const auto process = [&](keyevent negative, keyevent positive) {
+    if (event.value < -threshold) {
+      if (auto ctrl = keytoctrl(negative)) {
+        _state[who][*ctrl] = true;
+      }
+    } else if (event.value > threshold) {
+      if (auto ctrl = keytoctrl(positive)) {
+        _state[who][*ctrl] = true;
+      }
+    } else if (std::abs(event.value) < deadzone) {
+      if (auto ctrl = keytoctrl(negative)) {
+        _state[who][*ctrl] = false;
+      }
+      if (auto ctrl = keytoctrl(positive)) {
+        _state[who][*ctrl] = false;
+      }
+    }
+  };
+
+  switch (event.kind) {
+  case joystickaxisevent::axis::lefty:
+    process(keyevent::up, keyevent::down);
+    break;
+
+  case joystickaxisevent::axis::leftx:
+    process(keyevent::left, keyevent::right);
+    break;
+
+  default:
+    break;
+  }
 }

@@ -41,8 +41,9 @@ public:
   void set_oncollision(const std::string &kind, const std::function<void(std::shared_ptr<entity>, uint64_t)> &fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
-  void set_action(const std::string &action);
-  void unset_action();
+  void set_action(const std::string &action) noexcept;
+  std::string get_action() const noexcept;
+  void unset_action() noexcept;
 
   std::string action() const noexcept;
   geometry::size size() const noexcept;

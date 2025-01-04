@@ -8,7 +8,7 @@ enum player : uint8_t {
   two
 };
 
-enum eventtype : Uint32 {
+enum eventtype : uint32_t {
   mail = SDL_USEREVENT + 1,
   timer
 };
@@ -30,6 +30,22 @@ enum class joystickevent : int32_t {
   circle = SDL_CONTROLLER_BUTTON_B,
   cross = SDL_CONTROLLER_BUTTON_A,
   square = SDL_CONTROLLER_BUTTON_X,
+};
+
+struct joystickaxisevent {
+  enum class axis : uint8_t {
+    invalid = SDL_CONTROLLER_AXIS_INVALID,
+    leftx = SDL_CONTROLLER_AXIS_LEFTX,
+    lefty = SDL_CONTROLLER_AXIS_LEFTY,
+    rightx = SDL_CONTROLLER_AXIS_RIGHTX,
+    righty = SDL_CONTROLLER_AXIS_RIGHTY,
+    triggerleft = SDL_CONTROLLER_AXIS_TRIGGERLEFT,
+    triggerright = SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
+    max = SDL_CONTROLLER_AXIS_MAX
+  };
+
+  axis kind;
+  int16_t value;
 };
 
 enum class mouseevent : int32_t {};

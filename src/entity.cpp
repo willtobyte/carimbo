@@ -68,14 +68,14 @@ void entity::update(float_t delta) noexcept {
 
   const auto now = SDL_GetTicks();
   const auto &animation = _props.animations.at(_props.action);
-  const auto &frame = animation[_props.frame];
+  const auto &frame = animation.keyframes.at(_props.frame);
 
   if (frame.duration > 0 && now - _props.last_frame >= frame.duration) {
     ++_props.frame;
     _props.last_frame = now;
 
-    if (_props.frame >= animation.size()) {
-      if (std::ranges::any_of(animation, [](const auto &keyframe) { return keyframe.singleshoot; })) {
+    if (_props.frame >= animation.keyframes.size()) {
+      if (std::ranges::any_of(animation.keyframes, [](const auto &keyframe) { return keyframe.singleshoot; })) {
         _props.action.clear();
 
         if (_onanimationfinished) {
@@ -99,9 +99,13 @@ void entity::draw() const noexcept {
     return;
   }
 
-  const auto &animation = _props.animations.at(_props.action)[_props.frame];
+  const auto &animation = _props.animations.at(_props.action).keyframes.at(_props.frame);
   const auto &source = animation.frame;
   const auto &offset = animation.offset;
+#ifdef DEBUG
+  const auto &hitbox = _props.animations.at(_props.action).hitbox;
+#endif
+
   geometry::rect destination{_props.position + offset, source.size()};
 
   destination.scale(_props.scale);
@@ -112,6 +116,10 @@ void entity::draw() const noexcept {
       _props.angle,
       _props.reflection,
       _props.alpha
+#ifdef DEBUG
+      ,
+      {_props.position + hitbox.position(), hitbox.size()}
+#endif
   );
 }
 
@@ -143,7 +151,7 @@ void entity::set_reflection(graphics::reflection reflection) noexcept {
   _props.reflection = reflection;
 }
 
-void entity::set_action(const std::string &action) {
+void entity::set_action(const std::string &action) noexcept {
   if (_props.action != action) {
     _props.action.assign(action);
     _props.frame = 0;
@@ -151,7 +159,11 @@ void entity::set_action(const std::string &action) {
   }
 }
 
-void entity::unset_action() {
+std::string entity::get_action() const noexcept {
+  return _props.action;
+}
+
+void entity::unset_action() noexcept {
   _props.action.clear();
   _props.frame = 0;
   _props.last_frame = SDL_GetTicks();

@@ -192,6 +192,10 @@ void framework::scriptengine::run() {
       e.set_action(value);
     }
 
+    std::string get() const {
+      return e.get_action();
+    }
+
     void unset() {
       e.unset_action();
     }
@@ -200,6 +204,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<actionproxy>(
       "ActionProxy",
       "set", &actionproxy::set,
+      "get", &actionproxy::get,
       "unset", &actionproxy::unset
   );
 

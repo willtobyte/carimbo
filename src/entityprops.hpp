@@ -21,6 +21,15 @@ struct keyframe {
       : frame(rect), offset(offset), duration(duration), singleshoot(singleshoot) {}
 };
 
+struct animation {
+  geometry::rect hitbox;
+  std::vector<keyframe> keyframes;
+
+  animation() = default;
+  animation(const geometry::rect &hitbox, std::vector<keyframe> keyframes)
+      : hitbox(hitbox), keyframes(std::move(keyframes)) {}
+};
+
 struct entityprops {
   uint64_t id{};
   uint32_t frame{};
@@ -37,6 +46,6 @@ struct entityprops {
   std::string action{};
   graphics::reflection reflection{graphics::reflection::none};
   std::shared_ptr<graphics::pixmap> spritesheet{};
-  std::map<std::string, std::vector<keyframe>> animations{};
+  std::map<std::string, animation> animations{};
 };
 }

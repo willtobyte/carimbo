@@ -1,5 +1,6 @@
 #include "entitymanager.hpp"
 #include "common.hpp"
+#include "entityprops.hpp"
 #include <ostream>
 
 using namespace framework;
@@ -21,20 +22,21 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                          ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
                          : nullptr;
 
-  std::map<std::string, std::vector<keyframe>> animations;
-  for (const auto &[key, frames] : j["animations"].items()) {
+  std::map<std::string, animation> animations;
+  for (const auto &[key, anim] : j["animations"].items()) {
+    const auto hitbox = anim.value("hitbox", geometry::rect{});
+
     std::vector<keyframe> keyframes;
-    for (const auto &frame : frames) {
-      for (const auto &f : frame) {
-        keyframes.emplace_back(
-            f["rect"].get<geometry::rect>(),
-            f["duration"].get<uint64_t>(),
-            f.value("singleshoot", false),
-            f.value("offset", geometry::point{})
-        );
-      }
+    keyframes.reserve(16);
+    for (const auto &frame : anim["frames"]) {
+      keyframes.emplace_back(
+          frame["rect"].get<geometry::rect>(),
+          frame["duration"].get<uint64_t>(),
+          frame.value("singleshoot", false),
+          frame.value("offset", geometry::point{})
+      );
     }
-    animations.emplace(key, std::move(keyframes));
+    animations.emplace(key, animation{hitbox, std::move(keyframes)});
   }
 
   entityprops props{
