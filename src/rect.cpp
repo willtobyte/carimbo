@@ -28,6 +28,15 @@ void rect::scale(float_t factor) noexcept {
   _size.set_height(static_cast<int>(_size.height() * factor));
 }
 
+bool rect::intersects(const rect &other) const noexcept {
+  return !(
+      _position.x() + _size.width() <= other._position.x() ||
+      _position.x() >= other._position.x() + other._size.width() ||
+      _position.y() + _size.height() <= other._position.y() ||
+      _position.y() >= other._position.y() + other._size.height()
+  );
+}
+
 rect::operator SDL_Rect() const noexcept {
   return SDL_Rect{
       .x = static_cast<int>(_position.x()),

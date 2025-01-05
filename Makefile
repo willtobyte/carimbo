@@ -20,5 +20,5 @@ build: ## Build
 
 configure: clean ## Configure
 	conan remote update conancenter --url https://center2.conan.io
-	conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Debug
-	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DSDL2_DIR=generators -DCMAKE_BUILD_TYPE=Debug -DLOCAL=ON -DSANDBOX=OFF -DENABLE_PROFILING=ON
+	conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
+	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DSDL2_DIR=generators -DCMAKE_BUILD_TYPE=Release -DLOCAL=ON -DHITBOX=ON -DSANDBOX=OFF -DENABLE_PROFILING=ON

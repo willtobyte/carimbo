@@ -15,19 +15,11 @@ struct keyframe {
   geometry::point offset;
   uint64_t duration{};
   bool singleshoot{};
-
-  keyframe() noexcept = default;
-  keyframe(const geometry::rect &rect, uint64_t duration, bool singleshoot, const geometry::point &offset) noexcept
-      : frame(rect), offset(offset), duration(duration), singleshoot(singleshoot) {}
 };
 
 struct animation {
-  geometry::rect hitbox;
+  std::optional<geometry::rect> hitbox;
   std::vector<keyframe> keyframes;
-
-  animation() = default;
-  animation(const geometry::rect &hitbox, std::vector<keyframe> keyframes)
-      : hitbox(hitbox), keyframes(std::move(keyframes)) {}
 };
 
 struct entityprops {

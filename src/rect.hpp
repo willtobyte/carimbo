@@ -20,6 +20,8 @@ public:
 
   void scale(float_t factor) noexcept;
 
+  bool intersects(const rect &other) const noexcept;
+
   operator SDL_Rect() const noexcept;
 
   rect operator+(const point &offset) const noexcept;

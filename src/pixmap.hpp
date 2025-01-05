@@ -22,9 +22,9 @@ public:
       double_t angle = 0.0f,
       reflection reflection = reflection::none,
       uint8_t alpha = 255
-#ifdef DEBUG
+#ifdef HITBOX
       ,
-      const geometry::rect &outline = {}
+      const std::optional<geometry::rect> &outline = std::nullopt
 #endif
   ) const noexcept;
 

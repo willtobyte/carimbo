@@ -37,7 +37,6 @@ else()
 endif()
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
-  target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG)
   if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /Od /Zi)
   else()
@@ -47,7 +46,7 @@ elseif (CMAKE_BUILD_TYPE MATCHES "Release")
   if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /O2 /GL)
   else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -O2 -flto)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Os -flto)
   endif()
 endif()
 
@@ -87,6 +86,11 @@ endif()
 option(SANDBOX "Use sandbox" OFF)
 if(SANDBOX)
   target_compile_definitions(${PROJECT_NAME} PRIVATE SANDBOX)
+endif()
+
+option(HITBOX "Show hitboxes" OFF)
+if(LOCAL)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE HITBOX)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

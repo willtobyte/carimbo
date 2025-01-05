@@ -53,9 +53,9 @@ void pixmap::draw(
     const double_t angle,
     reflection reflection,
     const uint8_t alpha
-#ifdef DEBUG
+#ifdef HITBOX
     ,
-    const geometry::rect &outline
+    const std::optional<geometry::rect> &outline
 #endif
 ) const noexcept {
   const SDL_Rect &src = source;
@@ -64,11 +64,13 @@ void pixmap::draw(
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderCopyEx(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_RendererFlip>(reflection));
 
-#ifdef DEBUG
-  const SDL_Rect &debug = outline;
+#ifdef HITBOX
+  if (outline) {
+    const SDL_Rect &debug = *outline;
 
-  SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
-  SDL_RenderDrawRect(*_renderer, &debug);
+    SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
+    SDL_RenderDrawRect(*_renderer, &debug);
+  }
 #endif
 }
 

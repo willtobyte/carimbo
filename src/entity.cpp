@@ -102,7 +102,7 @@ void entity::draw() const noexcept {
   const auto &animation = _props.animations.at(_props.action).keyframes.at(_props.frame);
   const auto &source = animation.frame;
   const auto &offset = animation.offset;
-#ifdef DEBUG
+#ifdef HITBOX
   const auto &hitbox = _props.animations.at(_props.action).hitbox;
 #endif
 
@@ -110,16 +110,21 @@ void entity::draw() const noexcept {
 
   destination.scale(_props.scale);
 
+#ifdef HITBOX
+  const auto debug = hitbox
+                         ? std::make_optional(geometry::rect{_props.position + hitbox->position(), hitbox->size() * _props.scale})
+                         : std::nullopt;
+#else
+  const auto debug = std::nullopt;
+#endif
+
   _props.spritesheet->draw(
       source,
       destination,
       _props.angle,
       _props.reflection,
-      _props.alpha
-#ifdef DEBUG
-      ,
-      {_props.position + hitbox.position(), hitbox.size()}
-#endif
+      _props.alpha,
+      debug
   );
 }
 
@@ -179,6 +184,16 @@ geometry::size entity::size() const noexcept {
 
 bool entity::visible() const noexcept {
   return _props.visible;
+}
+
+bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
+  const auto &hitbox = _props.animations.at(_props.action).hitbox;
+  const auto &other_hitbox = other->_props.animations.at(_props.action).hitbox;
+  if (!hitbox || !other_hitbox) [[likely]] {
+    return false;
+  }
+
+  return hitbox->intersects(*other_hitbox);
 }
 
 void entity::on_email(const std::string &message) {

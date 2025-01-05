@@ -24,16 +24,18 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
 
   std::map<std::string, animation> animations;
   for (const auto &[key, anim] : j["animations"].items()) {
-    const auto hitbox = anim.value("hitbox", geometry::rect{});
+    const auto hitbox = anim.contains("hitbox")
+                            ? std::make_optional(anim["hitbox"].get<geometry::rect>())
+                            : std::nullopt;
 
     std::vector<keyframe> keyframes;
     keyframes.reserve(16);
     for (const auto &frame : anim["frames"]) {
       keyframes.emplace_back(
           frame["rect"].get<geometry::rect>(),
+          frame.value("offset", geometry::point{}),
           frame["duration"].get<uint64_t>(),
-          frame.value("singleshoot", false),
-          frame.value("offset", geometry::point{})
+          frame.value("singleshoot", false)
       );
     }
     animations.emplace(key, animation{hitbox, std::move(keyframes)});
@@ -95,8 +97,8 @@ void entitymanager::update(float_t delta) noexcept {
       continue;
     }
 
-    const auto &pos1 = entity1->position();
-    const auto &size1 = entity1->size() * entity1->props().scale;
+    // const auto &pos1 = entity1->position();
+    // const auto &size1 = entity1->size() * entity1->props().scale;
 
     for (const auto &[kind, callback] : entity1->_collisionmapping) {
       if (auto it = mapping.find(kind); it != mapping.end()) [[likely]] {
@@ -106,17 +108,26 @@ void entitymanager::update(float_t delta) noexcept {
           if (entity1 == entity2) [[unlikely]]
             continue;
 
-          const auto &pos2 = entity2->position();
-          const auto &size2 = entity2->size() * entity2->props().scale;
-
-          if (pos1.x() < pos2.x() + size2.width() &&
-              pos1.x() + size1.width() > pos2.x() &&
-              pos1.y() < pos2.y() + size2.height() &&
-              pos1.y() + size1.height() > pos2.y()) [[likely]] {
-
+          if (entity1->intersects(entity2)) {
             callback(entity1, entity2->id());
           }
         }
+
+        // for (const auto &entity2 : mapping) {
+        //   if (entity1 == entity2) [[unlikely]]
+        //     continue;
+
+        //   const auto &pos2 = entity2->position();
+        //   const auto &size2 = entity2->size() * entity2->props().scale;
+
+        //   if (pos1.x() < pos2.x() + size2.width() &&
+        //       pos1.x() + size1.width() > pos2.x() &&
+        //       pos1.y() < pos2.y() + size2.height() &&
+        //       pos1.y() + size1.height() > pos2.y()) [[likely]] {
+
+        //     callback(entity1, entity2->id());
+        //   }
+        // }
       }
     }
   }

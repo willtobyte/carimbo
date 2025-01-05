@@ -5,7 +5,7 @@ using namespace graphics;
 using json = nlohmann::json;
 
 fontfactory::fontfactory(const std::shared_ptr<graphics::renderer> renderer) noexcept
-    : _renderer(std::move(renderer)) {}
+    : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
   if (auto it = _pool.find(family); it != _pool.end()) [[likely]] {
