@@ -33,7 +33,7 @@ enum class joystickevent : int32_t {
 };
 
 struct joystickaxisevent {
-  enum class axis : uint8_t {
+  enum class axis : int8_t {
     invalid = SDL_CONTROLLER_AXIS_INVALID,
     leftx = SDL_CONTROLLER_AXIS_LEFTX,
     lefty = SDL_CONTROLLER_AXIS_LEFTY,
