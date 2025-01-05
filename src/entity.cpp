@@ -114,8 +114,6 @@ void entity::draw() const noexcept {
   const auto debug = hitbox
                          ? std::make_optional(geometry::rect{_props.position + hitbox->position(), hitbox->size() * _props.scale})
                          : std::nullopt;
-#else
-  const auto debug = std::nullopt;
 #endif
 
   _props.spritesheet->draw(
