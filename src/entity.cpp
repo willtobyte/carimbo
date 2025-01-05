@@ -123,8 +123,9 @@ void entity::draw() const noexcept {
       destination,
       _props.angle,
       _props.reflection,
-      _props.alpha,
+      _props.alpha
 #ifdef HITBOX
+      ,
       debug
 #endif
   );
