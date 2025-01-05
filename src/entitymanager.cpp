@@ -97,9 +97,6 @@ void entitymanager::update(float_t delta) noexcept {
       continue;
     }
 
-    // const auto &pos1 = entity1->position();
-    // const auto &size1 = entity1->size() * entity1->props().scale;
-
     for (const auto &[kind, callback] : entity1->_collisionmapping) {
       if (auto it = mapping.find(kind); it != mapping.end()) [[likely]] {
         const auto &mapping = it->second;
@@ -108,26 +105,10 @@ void entitymanager::update(float_t delta) noexcept {
           if (entity1 == entity2) [[unlikely]]
             continue;
 
-          if (entity1->intersects(entity2)) {
+          if (entity1->intersects(entity2)) [[unlikely]] {
             callback(entity1, entity2->id());
           }
         }
-
-        // for (const auto &entity2 : mapping) {
-        //   if (entity1 == entity2) [[unlikely]]
-        //     continue;
-
-        //   const auto &pos2 = entity2->position();
-        //   const auto &size2 = entity2->size() * entity2->props().scale;
-
-        //   if (pos1.x() < pos2.x() + size2.width() &&
-        //       pos1.x() + size1.width() > pos2.x() &&
-        //       pos1.y() < pos2.y() + size2.height() &&
-        //       pos1.y() + size1.height() > pos2.y()) [[likely]] {
-
-        //     callback(entity1, entity2->id());
-        //   }
-        // }
       }
     }
   }
