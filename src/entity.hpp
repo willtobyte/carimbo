@@ -34,6 +34,7 @@ public:
   algebra::vector2d velocity() const noexcept;
 
   void set_placement(int32_t x, int32_t y) noexcept;
+  geometry::point get_placement() const noexcept;
 
   void set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept;
   void set_onanimationfinished(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept;

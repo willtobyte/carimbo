@@ -211,14 +211,19 @@ void framework::scriptengine::run() {
   struct placementproxy {
     entity &e;
 
-    void set(int32_t x, int32_t y) {
+    void set(int32_t x, int32_t y) noexcept {
       e.set_placement(x, y);
+    }
+
+    geometry::point get() const noexcept {
+      return e.get_placement();
     }
   };
 
   lua.new_usertype<placementproxy>(
       "PlacementProxy",
-      "set", &placementproxy::set
+      "set", &placementproxy::set,
+      "get", &placementproxy::get
   );
 
   struct velocityproxy {

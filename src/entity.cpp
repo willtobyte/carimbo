@@ -124,7 +124,9 @@ void entity::draw() const noexcept {
       _props.angle,
       _props.reflection,
       _props.alpha,
+#ifdef HITBOX
       debug
+#endif
   );
 }
 
@@ -134,6 +136,10 @@ void entity::set_props(entityprops props) noexcept {
 
 void entity::set_placement(int32_t x, int32_t y) noexcept {
   _props.position.set(x, y);
+}
+
+geometry::point entity::get_placement() const noexcept {
+  return _props.position;
 }
 
 void entity::set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept {
@@ -187,8 +193,22 @@ bool entity::visible() const noexcept {
 }
 
 bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
-  const auto &hitbox = _props.animations.at(_props.action).hitbox;
-  const auto &other_hitbox = other->_props.animations.at(_props.action).hitbox;
+  if (_props.action.empty() || other->_props.action.empty()) [[unlikely]] {
+    return false;
+  }
+
+  const auto sit = _props.animations.find(_props.action);
+  if (sit == _props.animations.end()) [[unlikely]] {
+    return false;
+  }
+
+  const auto oit = other->_props.animations.find(other->_props.action);
+  if (oit == other->_props.animations.end()) [[unlikely]] {
+    return false;
+  }
+
+  const auto &hitbox = sit->second.hitbox;
+  const auto &other_hitbox = oit->second.hitbox;
   if (!hitbox || !other_hitbox) [[likely]] {
     return false;
   }

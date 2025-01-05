@@ -4,14 +4,14 @@
 using namespace input;
 
 eventmanager::eventmanager() {
-  const auto number = SDL_NumJoysticks();
-  for (auto id = 0; id < number; ++id) {
-    if (SDL_IsGameController(id)) {
-      if (auto controller = SDL_GameControllerOpen(id)) {
-        _controllers.emplace(SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)), gamecontroller_ptr(controller));
-      }
-    }
-  }
+  // const auto number = SDL_NumJoysticks();
+  // for (auto id = 0; id < number; ++id) {
+  //   if (SDL_IsGameController(id)) {
+  //     if (auto controller = SDL_GameControllerOpen(id)) {
+  //       _controllers.emplace(SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)), gamecontroller_ptr(controller));
+  //     }
+  //   }
+  // }
 }
 
 void eventmanager::update(float_t delta) {
