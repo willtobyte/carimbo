@@ -245,21 +245,21 @@ void framework::scriptengine::run() {
       return e.velocity();
     }
 
-    double get_x() const {
+    double_t get_x() const {
       return e.velocity().x();
     }
 
-    void set_x(double x) {
+    void set_x(double_t x) {
       auto velocity = e.velocity();
       velocity.set_x(x);
       e.set_velocity(velocity);
     }
 
-    double get_y() const {
+    double_t get_y() const {
       return e.velocity().y();
     }
 
-    void set_y(double y) {
+    void set_y(double_t y) {
       auto velocity = e.velocity();
       velocity.set_y(y);
       e.set_velocity(velocity);
