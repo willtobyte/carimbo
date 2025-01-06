@@ -107,6 +107,10 @@ void entitymanager::update(float_t delta) noexcept {
 
           if (entity1->intersects(entity2)) [[unlikely]] {
             callback(entity1, entity2->id());
+
+            if (auto it2 = entity2->_collisionmapping.find(entity1->kind()); it2 != entity2->_collisionmapping.end()) {
+              it2->second(entity2, entity1->id());
+            }
           }
         }
       }

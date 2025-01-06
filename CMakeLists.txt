@@ -62,7 +62,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES Emscripten)
     -sEXPORTED_RUNTIME_METHODS=['callMain']
   )
 
-  if (ENABLE_PROFILING)
+  if (ASSERTIONS)
     list(APPEND EMSCRIPTEN_OPTIONS
       -O0
       -sASSERTIONS=1
@@ -72,7 +72,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES Emscripten)
     )
   else()
     list(APPEND EMSCRIPTEN_OPTIONS
-      -O2
+      -Os
     )
   endif()
 

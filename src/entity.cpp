@@ -212,7 +212,8 @@ bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
     return false;
   }
 
-  return hitbox->intersects({other->position() + other_hitbox->position(), other_hitbox->size()});
+  return geometry::rect(position() + hitbox->position(), hitbox->size())
+      .intersects({other->position() + other_hitbox->position(), other_hitbox->size()});
 }
 
 void entity::on_email(const std::string &message) {
