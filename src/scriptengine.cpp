@@ -328,6 +328,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<playerwrapper>(
       "PlayerWrapper",
+      sol::no_constructor,
       "on", &playerwrapper::on
   );
 
@@ -337,13 +338,11 @@ void framework::scriptengine::run() {
       "two", input::player::two
   );
 
-  static std::unordered_map<input::player, playerwrapper> _p;
+  std::unordered_map<input::player, playerwrapper> _p;
 
   lua.new_usertype<framework::statemanager>(
       "StateManager",
-      "player", [](const framework::statemanager &self, input::player player, sol::this_state state) {
-        sol::state_view lua(state);
-
+      "player", [&_p](framework::statemanager &self, input::player player) -> playerwrapper & {
         auto [iterator, inserted] = _p.try_emplace(player, player, self);
 
         return iterator->second;
