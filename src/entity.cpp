@@ -76,10 +76,11 @@ void entity::update(float_t delta) noexcept {
 
     if (_props.frame >= animation.keyframes.size()) {
       if (std::ranges::any_of(animation.keyframes, [](const auto &keyframe) { return keyframe.singleshoot; })) {
+        const auto &name = _props.action;
         _props.action.clear();
 
         if (_onanimationfinished) {
-          _onanimationfinished(shared_from_this());
+          _onanimationfinished(shared_from_this(), name);
         }
 
         return;
@@ -145,7 +146,7 @@ void entity::set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn
   _onupdate = std::move(fn);
 }
 
-void entity::set_onanimationfinished(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept {
+void entity::set_onanimationfinished(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept {
   _onanimationfinished = std::move(fn);
 }
 

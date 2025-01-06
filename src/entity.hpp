@@ -37,7 +37,7 @@ public:
   geometry::point get_placement() const noexcept;
 
   void set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept;
-  void set_onanimationfinished(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept;
+  void set_onanimationfinished(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept;
   void set_onmail(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept;
   void set_oncollision(const std::string &kind, const std::function<void(std::shared_ptr<entity>, uint64_t)> &fn) noexcept;
 
@@ -62,7 +62,7 @@ private:
   entityprops _props;
   memory::kv _kv;
   std::function<void(std::shared_ptr<entity>)> _onupdate;
-  std::function<void(std::shared_ptr<entity>)> _onanimationfinished;
+  std::function<void(std::shared_ptr<entity>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<entity>, const std::string &)> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<entity>, uint64_t)>> _collisionmapping;
 };

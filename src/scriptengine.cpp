@@ -29,8 +29,8 @@ sol::table require(sol::state &lua, const std::string &module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  explicit lua_loopable(sol::function function)
-      : _function(std::move(function)) {}
+  lua_loopable(const sol::state &lua, sol::function function)
+      : _gc(lua["collectgarbage"]), _function(std::move(function)) {}
 
   virtual ~lua_loopable() = default;
 
@@ -38,9 +38,17 @@ public:
     UNUSED(delta);
 
     _function();
+
+    const auto mem = _gc("count").get<double>() / 1024.0;
+    if (mem <= 8.0) [[likely]] {
+      _gc("step", 8);
+      return;
+    }
+    _gc("collect");
   }
 
 private:
+  sol::function _gc;
   sol::function _function;
 };
 
@@ -532,6 +540,6 @@ void framework::scriptengine::run() {
   lua["setup"]();
   const auto loop = lua["loop"].get<sol::function>();
   const auto engine = lua["engine"].get<framework::engine *>();
-  engine->add_loopable(std::make_shared<lua_loopable>(std::move(loop)));
+  engine->add_loopable(std::make_shared<lua_loopable>(lua, std::move(loop)));
   lua["run"]();
 }
