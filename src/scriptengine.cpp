@@ -29,8 +29,8 @@ sol::table require(sol::state &lua, const std::string &module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  lua_loopable(const sol::state &lua, sol::protected_function function)
-      : _gc(lua["collectgarbage"]), _function(std::move(function)) {}
+  lua_loopable(const sol::state &lua, sol::function function)
+      : _gc(lua["collectgarbage"].get<sol::function>()), _function(std::move(function)) {}
 
   virtual ~lua_loopable() = default;
 
@@ -49,7 +49,7 @@ public:
 
 private:
   sol::function _gc;
-  sol::protected_function _function;
+  sol::function _function;
 };
 
 auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
