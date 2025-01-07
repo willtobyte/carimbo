@@ -32,10 +32,12 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
     keyframes.reserve(16);
     for (const auto &frame : anim["frames"]) {
       keyframes.emplace_back(
-          {frame["rect"].get<geometry::rect>(),
-           frame.value("offset", geometry::point{}),
-           frame["duration"].get<uint64_t>(),
-           frame.value("singleshoot", false)}
+          keyframe{
+              frame["rect"].get<geometry::rect>(),
+              frame.value("offset", geometry::point{}),
+              frame["duration"].get<uint64_t>(),
+              frame.value("singleshoot", false)
+          }
       );
     }
     animations.emplace(key, animation{hitbox, std::move(keyframes)});
