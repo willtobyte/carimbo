@@ -76,7 +76,8 @@ void entity::update(float_t delta) noexcept {
 
     if (_props.frame >= animation.keyframes.size()) {
       if (std::ranges::any_of(animation.keyframes, [](const auto &keyframe) { return keyframe.singleshoot; })) {
-        const auto &name = _props.action;
+        const auto name = _props.action;
+
         _props.action.clear();
 
         if (_onanimationfinished) {
