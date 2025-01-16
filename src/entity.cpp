@@ -44,7 +44,6 @@ int32_t entity::y() const noexcept {
 void entity::move(float_t x_velocity, float_t y_velocity) noexcept {
   UNUSED(x_velocity);
   UNUSED(y_velocity);
-  // cpBodySetVelocity(_props.body.get(), {x_velocity, y_velocity});
 }
 
 void entity::set_velocity(const algebra::vector2d &velocity) noexcept {

@@ -14,6 +14,10 @@ bool statemanager::on(int player, const std::variant<input::joystickevent> &type
   return false;
 }
 
+int8_t statemanager::players() const noexcept {
+  return 0; // TODO
+}
+
 constexpr std::optional<input::joystickevent> keytoctrl(const input::keyevent &event) {
   using namespace input;
 

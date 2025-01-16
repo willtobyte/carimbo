@@ -8,8 +8,9 @@ public:
   statemanager() = default;
   virtual ~statemanager() = default;
 
-  // bool is_keydown(const input::keyevent &event) const;
   bool on(int player, const std::variant<input::joystickevent> &type) const noexcept;
+
+  int8_t players() const noexcept;
 
 protected:
   virtual void on_keydown(const input::keyevent &event) noexcept;

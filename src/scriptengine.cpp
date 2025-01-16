@@ -350,6 +350,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::statemanager>(
       "StateManager",
+      "players", sol::property(&statemanager::players),
       "player", [&_p](framework::statemanager &self, input::player player) -> playerwrapper & {
         auto [iterator, inserted] = _p.try_emplace(player, player, self);
 
