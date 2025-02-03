@@ -4,6 +4,23 @@
 
 using namespace framework;
 
+statemanager::statemanager()
+    : _collision_map(128, [](const std::pair<uint64_t, uint64_t> &p) -> size_t {
+        size_t h1 = std::hash<uint64_t>{}(p.first);
+        size_t h2 = std::hash<uint64_t>{}(p.second);
+        return h1 ^ (h2 << 1);
+      }) {}
+
+static const auto make_key = [](const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) {
+  return (a->id() <= b->id()) ? std::make_pair(a->id(), b->id())
+                              : std::make_pair(b->id(), a->id());
+};
+
+bool statemanager::collides(const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) const noexcept {
+  auto it = _collision_map.find(make_key(a, b));
+  return (it != _collision_map.end()) ? it->second : false;
+}
+
 bool statemanager::on(int player, const std::variant<input::joystickevent> &type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
@@ -15,7 +32,7 @@ bool statemanager::on(int player, const std::variant<input::joystickevent> &type
 }
 
 int8_t statemanager::players() const noexcept {
-  return 0; // TODO
+  return _state.size();
 }
 
 constexpr std::optional<input::joystickevent> keytoctrl(const input::keyevent &event) {

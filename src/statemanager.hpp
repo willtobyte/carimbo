@@ -1,12 +1,15 @@
 #pragma once
 
 #include "common.hpp"
+#include "entity.hpp"
 
 namespace framework {
 class statemanager : public input::eventreceiver {
 public:
-  statemanager() = default;
+  statemanager();
   virtual ~statemanager() = default;
+
+  bool collides(const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) const noexcept;
 
   bool on(int player, const std::variant<input::joystickevent> &type) const noexcept;
 
@@ -25,5 +28,7 @@ protected:
 
 private:
   std::unordered_map<int8_t, std::unordered_map<std::variant<input::joystickevent>, bool>> _state;
+
+  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, std::function<size_t(const std::pair<uint64_t, uint64_t> &)>> _collision_map;
 };
 }
