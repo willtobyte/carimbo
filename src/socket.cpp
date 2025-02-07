@@ -178,12 +178,6 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
           this
       )
   );
-
-  // auto &layer = _ws.next_layer();
-  // layer.async_connect(
-  //     results,
-  //     boost::beast::bind_front_handler(&socket::on_connect, this)
-  // );
 }
 
 void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept {

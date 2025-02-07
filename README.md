@@ -6,34 +6,66 @@ It is a transcendental descendant of the [Wintermoon](https://github.com/winterm
 
 ### Build
 
-Python & virtualenv
+**Python & virtualenv**
 
 ```shell
 uv venv
 source .venv/bin/activate
 ```
 
-Conan & pre-commit hooks
+**Conan & hooks pre-commit**
 
 ```shell
 uv pip install -r requirements.txt
 pre-commit install
 conan profile detect --force
 conan remote update conancenter --url https://center2.conan.io
-conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
 ```
 
-CMake build
+**Adding the WebAssembly profile**
 
 ```shell
-cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release -DSANDBOX=ON
-cmake --build . --parallel 8
+cat > ~/.conan2/profiles/webassembly <<EOF
+include(default)
+
+[settings]
+arch=wasm
+os=Emscripten
+
+[tool_requires]
+*: emsdk/3.1.72
+EOF
 ```
 
-Run
+**Installing all dependencies**
 
 ```shell
-# if not in build directory, cd build
-./carimbo
+conan install . --output-folder=build --build="*" --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
 ```
+
+**Building the project**
+
+```shell
+make -f Makefile.webassembly build
+```
+
+**Cloning a game**
+
+```shell
+gh repo clone willtobyte/slime sandbox
+```
+
+**Cloning the playground web application**
+
+```shell
+gh repo clone willtobyte/run
+```
+
+**Running the application**
+**Note:** Ensure Docker is running. If not, install [OrbStack](https://orbstack.dev/).
+
+```shell
+make run
+```
+
+Finally, open [http://localhost:3000/playground](http://localhost:3000/playground) in your browser.
