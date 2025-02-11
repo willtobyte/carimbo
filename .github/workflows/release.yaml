@@ -59,26 +59,15 @@ jobs:
       - name: Set Conan Center
         run: conan remote update conancenter --url https://center2.conan.io
 
-      - name: Detect WebAssembly Conan Profile
-        if: matrix.config.name == 'WebAssembly'
-        run: |
-          cat > ~/.conan2/profiles/webassembly <<EOF
-          include(default)
-
-          [settings]
-          arch=wasm
-          os=Emscripten
-
-          [tool_requires]
-          *: emsdk/3.1.72
-          EOF
-
       - name: Install Conan
         run: pip install conan
 
       - name: Detect Conan Profile
         run: conan profile detect --force
 
+      - name: Set Conan Center
+        run: conan remote update conancenter --url https://center2.conan.io
+
       - name: Detect WebAssembly Conan Profile
         if: matrix.config.name == 'WebAssembly'
         run: |
@@ -90,7 +79,7 @@ jobs:
           os=Emscripten
 
           [tool_requires]
-          *: emsdk/3.1.44
+          *: emsdk/3.1.73
           EOF
 
       - name: Install Windows Or macOS Dependencies

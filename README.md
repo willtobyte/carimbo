@@ -1,8 +1,10 @@
 # Carimbo
 
-Carimbo is a simple 2D game engine, scriptable in Lua, created during the spare time of [@skhaz](https://github.com/skhaz).
+Carimbo is a simple 2D game engine, scriptable in Lua, created during the spare time of [Rodrigo Delduca](https://github.com/skhaz).
 
-It is a transcendental descendant of the [Wintermoon](https://github.com/wintermoon/wintermoon) engine, a project by the same author. It runs on Linux, Windows, macOS, and the Web (WebAssembly).
+It is a transcendental descendant of the [Wintermoon](https://github.com/wintermoon/wintermoon) engine, a project by the same author.
+
+It runs on Linux, Windows, macOS, and the Web (WebAssembly).
 
 ### Build
 
@@ -33,7 +35,7 @@ arch=wasm
 os=Emscripten
 
 [tool_requires]
-*: emsdk/3.1.72
+*: emsdk/3.1.73
 EOF
 ```
 
@@ -41,6 +43,12 @@ EOF
 
 ```shell
 conan install . --output-folder=build --build="*" --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
+```
+
+**Configure the project***
+
+```shell
+make -f Makefile.webassembly configure
 ```
 
 **Building the project**
