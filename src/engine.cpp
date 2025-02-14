@@ -150,6 +150,8 @@ void engine::_loop() noexcept {
 
   prior = now;
 
+  // on_preupdate || on_beginupdate
+
   _resourcemanager->update(delta);
   _scenemanager->update(delta);
   _eventmanager->update(delta);
@@ -160,11 +162,17 @@ void engine::_loop() noexcept {
     loopable->loop(delta);
   }
 
+  // on_postupdate || on_endupdate
+
+  // on_predraw || on_begindraw
+
   _renderer->begin();
   _scenemanager->draw();
   _entitymanager->draw();
   _overlay->draw();
   _renderer->end();
+
+  // on_postdraw || on_enddraw
 }
 
 void engine::on_quit() noexcept {

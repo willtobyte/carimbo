@@ -61,6 +61,9 @@ struct mailevent {
 }
 
 struct collisionevent {
+  collisionevent(uint64_t a, uint64_t b)
+      : a(a), b(b) {}
+
   uint64_t a;
   uint64_t b;
 };
