@@ -62,15 +62,15 @@ void statemanager::on_keyup(const input::keyevent &event) noexcept {
   }
 }
 
-void statemanager::on_joystickbuttondown(int who, const input::joystickevent &event) noexcept {
+void statemanager::on_joystickbuttondown(uint8_t who, const input::joystickevent &event) noexcept {
   _state[who][event] = true;
 }
 
-void statemanager::on_joystickbuttonup(int who, const input::joystickevent &event) noexcept {
+void statemanager::on_joystickbuttonup(uint8_t who, const input::joystickevent &event) noexcept {
   _state[who][event] = false;
 }
 
-void statemanager::on_joystickaxismotion(int who, const input::joystickaxisevent &event) noexcept {
+void statemanager::on_joystickaxismotion(uint8_t who, const input::joystickaxisevent &event) noexcept {
   using namespace input;
 
   static constexpr auto threshold = 8000;

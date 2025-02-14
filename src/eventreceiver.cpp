@@ -12,17 +12,17 @@ void eventreceiver::on_keyup(const keyevent &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_joystickbuttondown(int who, const joystickevent &event) noexcept {
+void eventreceiver::on_joystickbuttondown(uint8_t who, const joystickevent &event) noexcept {
   UNUSED(who);
   UNUSED(event);
 }
 
-void eventreceiver::on_joystickbuttonup(int who, const joystickevent &event) noexcept {
+void eventreceiver::on_joystickbuttonup(uint8_t who, const joystickevent &event) noexcept {
   UNUSED(who);
   UNUSED(event);
 }
 
-void eventreceiver::on_joystickaxismotion(int who, const joystickaxisevent &event) noexcept {
+void eventreceiver::on_joystickaxismotion(uint8_t who, const joystickaxisevent &event) noexcept {
   UNUSED(who);
   UNUSED(event);
 }
