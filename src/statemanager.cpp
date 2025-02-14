@@ -118,3 +118,7 @@ void statemanager::on_collision(const collisionevent &event) noexcept {
   std::cout << "a " << event.a << " b " << event.b << std::endl;
   UNUSED(event);
 }
+
+void statemanager::on_endupdate() noexcept {
+  std::cout << "on_endupdate" << std::endl;
+}

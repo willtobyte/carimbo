@@ -91,6 +91,7 @@ class entitymanager;
 class entityprops;
 class framerate;
 class garbagecollector;
+class lifecycleobserver;
 class loopable;
 class postalservice;
 class resourcemanager;

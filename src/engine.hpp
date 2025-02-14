@@ -3,6 +3,7 @@
 #include "common.hpp"
 #include "event.hpp"
 #include "eventreceiver.hpp"
+#include "lifecycleobserver.hpp"
 
 namespace framework {
 class engine : public input::eventreceiver {
@@ -62,5 +63,6 @@ private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::shared_ptr<graphics::window> _window;
   std::shared_ptr<graphics::fontfactory> _fontfactory;
+  std::list<std::shared_ptr<lifecycleobserver>> _observers;
 };
 }
