@@ -6,19 +6,14 @@
 using namespace framework;
 
 statemanager::statemanager()
-    : _collision_map(128, [](const std::pair<uint64_t, uint64_t> &p) -> size_t {
-        size_t h1 = std::hash<uint64_t>{}(p.first);
-        size_t h2 = std::hash<uint64_t>{}(p.second);
-        return h1 ^ (h2 << 1);
-      }) {}
+    : _collision_map(1024) {}
 
-static const auto make_key = [](const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) {
-  return (a->id() <= b->id()) ? std::make_pair(a->id(), b->id())
-                              : std::make_pair(b->id(), a->id());
-};
+static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) noexcept {
+  return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
+}
 
 bool statemanager::collides(const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) const noexcept {
-  auto it = _collision_map.find(make_key(a, b));
+  auto it = _collision_map.find(make_key(a->id(), b->id()));
   return (it != _collision_map.end()) ? it->second : false;
 }
 
@@ -115,10 +110,9 @@ void statemanager::on_joystickaxismotion(int who, const input::joystickaxisevent
 }
 
 void statemanager::on_collision(const collisionevent &event) noexcept {
-  std::cout << "a " << event.a << " b " << event.b << std::endl;
-  UNUSED(event);
+  _collision_map[make_key(event.a, event.b)] = true;
 }
 
 void statemanager::on_endupdate() noexcept {
-  std::cout << "on_endupdate" << std::endl;
+  _collision_map.clear();
 }

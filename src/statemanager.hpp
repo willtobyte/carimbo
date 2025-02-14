@@ -6,6 +6,14 @@
 #include "lifecycleobserver.hpp"
 
 namespace framework {
+struct pairhash {
+  size_t operator()(const std::pair<uint64_t, uint64_t> &p) const noexcept {
+    size_t h1 = std::hash<uint64_t>{}(p.first);
+    size_t h2 = std::hash<uint64_t>{}(p.second);
+    return h1 ^ (h2 << 1);
+  }
+};
+
 class statemanager : public input::eventreceiver, public lifecycleobserver {
 public:
   statemanager();
@@ -35,6 +43,6 @@ protected:
 private:
   std::unordered_map<int8_t, std::unordered_map<std::variant<input::joystickevent>, bool>> _state;
 
-  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, std::function<size_t(const std::pair<uint64_t, uint64_t> &)>> _collision_map;
+  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, pairhash> _collision_map;
 };
 }
