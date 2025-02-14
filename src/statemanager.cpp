@@ -1,5 +1,6 @@
 #include "statemanager.hpp"
 
+#include "entity.hpp"
 #include "event.hpp"
 
 using namespace framework;
@@ -111,4 +112,9 @@ void statemanager::on_joystickaxismotion(int who, const input::joystickaxisevent
   default:
     break;
   }
+}
+
+void statemanager::on_collision(const collisionevent &event) noexcept {
+  std::cout << "a " << event.a << " b " << event.b << std::endl;
+  UNUSED(event);
 }

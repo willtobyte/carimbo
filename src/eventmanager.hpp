@@ -1,5 +1,6 @@
 #pragma once
 
+#include "collision.hpp"
 #include "common.hpp"
 #include "event.hpp"
 #include "eventreceiver.hpp"

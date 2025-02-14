@@ -30,3 +30,7 @@ void eventreceiver::on_joystickaxismotion(int who, const joystickaxisevent &even
 void eventreceiver::on_mail(const mailevent &event) noexcept {
   UNUSED(event);
 }
+
+void eventreceiver::on_collision(const collisionevent &event) noexcept {
+  UNUSED(event);
+}

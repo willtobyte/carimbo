@@ -26,6 +26,8 @@ protected:
 
   virtual void on_joystickaxismotion(int who, const input::joystickaxisevent &event) noexcept;
 
+  virtual void on_collision(const collisionevent &event) noexcept;
+
 private:
   std::unordered_map<int8_t, std::unordered_map<std::variant<input::joystickevent>, bool>> _state;
 

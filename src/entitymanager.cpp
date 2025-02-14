@@ -7,6 +7,21 @@ using namespace framework;
 
 using json = nlohmann::json;
 
+static void noop(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &) noexcept {}
+
+static const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> noop_fn = noop;
+
+template <typename T>
+std::function<T> operator||(const std::function<T> &lhs, const std::function<T> &rhs) {
+  return lhs ? lhs : rhs;
+}
+
+template <typename Map>
+auto get_or_default(const Map &m, const typename Map::key_type &key, const typename Map::mapped_type &d) {
+  auto it = m.find(key);
+  return (it != m.end()) ? it->second : d;
+}
+
 entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
     : _resourcemanager{std::move(resourcemanager)} {
 }
@@ -84,38 +99,28 @@ std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
   return (it != _entities.end()) ? *it : nullptr;
 }
 
-void entitymanager::update(float_t delta) noexcept {
-  for (const auto &entity : _entities) {
-    entity->update(delta);
+void entitymanager::update(float_t delta_time) noexcept {
+  for (auto &entity : _entities) {
+    entity->update(delta_time);
   }
 
-  std::unordered_map<std::string, std::vector<std::shared_ptr<entity>>> mapping;
-  for (const auto &entity : _entities) {
-    mapping[entity->kind()].emplace_back(entity);
-  }
+  for (auto it = _entities.begin(); it != _entities.end(); ++it) {
+    const auto &entity_a = *it;
+    for (const auto &entity_b : std::ranges::subrange(std::next(it), _entities.end())) {
+      if (!entity_a->intersects(entity_b))
+        continue;
 
-  for (const auto &entity1 : _entities) {
-    if (entity1->_collisionmapping.empty()) [[likely]] {
-      continue;
-    }
+      const auto callback_a = get_or_default(entity_a->_collisionmapping, entity_b->kind(), noop_fn);
+      const auto callback_b = get_or_default(entity_b->_collisionmapping, entity_a->kind(), noop_fn);
 
-    for (const auto &[kind, callback] : entity1->_collisionmapping) {
-      if (auto it = mapping.find(kind); it != mapping.end()) [[likely]] {
-        const auto &mapping = it->second;
+      callback_a(entity_a, entity_b);
+      callback_b(entity_b, entity_a);
 
-        for (const auto &entity2 : mapping) {
-          if (entity1 == entity2) [[unlikely]]
-            continue;
-
-          if (entity1->intersects(entity2)) [[unlikely]] {
-            callback(entity1, entity2->id());
-
-            if (auto it2 = entity2->_collisionmapping.find(entity1->kind()); it2 != entity2->_collisionmapping.end()) {
-              it2->second(entity2, entity1->id());
-            }
-          }
-        }
-      }
+      SDL_Event event{};
+      event.type = input::eventtype::collision;
+      auto ptr = std::make_unique<collision>(entity_a->id(), entity_b->id());
+      event.user.data1 = ptr.release();
+      SDL_PushEvent(&event);
     }
   }
 }

@@ -154,7 +154,7 @@ void entity::set_onmail(const std::function<void(std::shared_ptr<entity>, const 
   _onmail = std::move(fn);
 }
 
-void entity::set_oncollision(const std::string &kind, const std::function<void(std::shared_ptr<entity>, uint64_t)> &fn) noexcept {
+void entity::set_oncollision(const std::string &kind, const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> &fn) noexcept {
   _collisionmapping[kind] = std::move(fn);
 }
 

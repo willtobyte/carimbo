@@ -76,6 +76,16 @@ void eventmanager::update(float_t delta) {
       }
     } break;
 
+    case input::eventtype::collision: {
+      auto *ptr = static_cast<framework::collision *>(event.user.data1);
+      if (ptr) {
+        for (const auto &receiver : _receivers) {
+          receiver->on_collision(collisionevent(ptr->a, ptr->b));
+        }
+        delete ptr;
+      }
+    } break;
+
     case input::eventtype::mail: {
       auto *ptr = static_cast<framework::mail *>(event.user.data1);
       if (ptr) {

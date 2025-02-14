@@ -9,7 +9,8 @@ enum player : uint8_t {
 };
 
 enum eventtype : uint32_t {
-  mail = SDL_USEREVENT + 1,
+  collision = SDL_USEREVENT + 1,
+  mail,
   timer
 };
 
@@ -50,8 +51,7 @@ struct joystickaxisevent {
 
 enum class mouseevent : int32_t {};
 
-class mailevent {
-public:
+struct mailevent {
   mailevent(uint64_t to, const std::string &body) noexcept
       : to(to), body(body) {}
 
@@ -59,3 +59,8 @@ public:
   std::string body;
 };
 }
+
+struct collisionevent {
+  uint64_t a;
+  uint64_t b;
+};
