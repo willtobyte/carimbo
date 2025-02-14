@@ -104,6 +104,7 @@ void eventmanager::update(float_t delta) {
 
         if (repeat && !(*repeat)) {
           delete fn;
+          delete repeat;
         }
       }
     } break;
