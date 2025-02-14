@@ -7,7 +7,7 @@
 
 namespace framework {
 struct pairhash {
-  constexpr size_t operator()(const std::pair<uint64_t, uint64_t> &p) const noexcept {
+  size_t operator()(const std::pair<uint64_t, uint64_t> &p) const noexcept {
     const auto h1 = std::hash<uint64_t>{}(p.first);
     const auto h2 = std::hash<uint64_t>{}(p.second);
     return h1 ^ (h2 << 1);
