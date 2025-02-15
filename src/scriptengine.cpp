@@ -541,7 +541,7 @@ void framework::scriptengine::run() {
 
   lua["setup"]();
   const auto loop = lua["loop"].get<sol::function>();
-  const auto engine = lua["engine"].get<framework::engine *>();
+  const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, std::move(loop)));
   lua["run"]();
 }
