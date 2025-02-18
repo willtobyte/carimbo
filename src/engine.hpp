@@ -22,6 +22,7 @@ public:
   std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
   std::shared_ptr<graphics::window> window() const noexcept;
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
+  std::shared_ptr<graphics::canvas> canvas() const noexcept;
 
   int32_t height() const noexcept;
   int32_t width() const noexcept;
@@ -61,6 +62,7 @@ private:
   std::shared_ptr<framework::scenemanager> _scenemanager;
   std::shared_ptr<framework::statemanager> _statemanager;
   std::shared_ptr<graphics::renderer> _renderer;
+  std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::window> _window;
   std::shared_ptr<graphics::fontfactory> _fontfactory;
   std::list<std::shared_ptr<lifecycleobserver>> _observers;

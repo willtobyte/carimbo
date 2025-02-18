@@ -107,6 +107,7 @@ class size;
 }
 
 namespace graphics {
+class canvas;
 class effect;
 class fontfactory;
 class font;

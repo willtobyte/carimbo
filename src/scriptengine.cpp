@@ -539,15 +539,14 @@ void framework::scriptengine::run() {
       "get", &graphics::fontfactory::get
   );
 
-  lua.new_usertype<graphics::renderer>(
-      "Renderer",
+  lua.new_usertype<graphics::canvas>(
+      "Canvas",
       sol::no_constructor,
-      "pixels", sol::property([](graphics::renderer &) -> sol::object { return sol::lua_nil; }, [](graphics::renderer &r, std::string_view buffer) {
-                      std::span<const uint32_t> pixels(
-                          reinterpret_cast<const uint32_t *>(buffer.data()),
-                          buffer.size() / sizeof(uint32_t)
-                      );
-                      r.draw(pixels); })
+      "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, std::string_view buffer) {
+            std::span<const uint32_t> pixels(
+                reinterpret_cast<const uint32_t *>(buffer.data()),
+                buffer.size() / sizeof(uint32_t));
+            c.set_pixels(pixels); })
   );
 
   const auto script = storage::io::read("scripts/main.lua");
