@@ -31,7 +31,7 @@ void renderer::draw(std::span<const uint32_t> pixels) {
 
   if (!framebuffer) [[unlikely]] {
     std::ostringstream error;
-    error << "Failed to create texture: " << SDL_GetError();
+    error << "[SDL_CreateTexture] failed to create texture: " << SDL_GetError();
     throw std::runtime_error(error.str());
   }
 
