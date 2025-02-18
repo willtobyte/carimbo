@@ -13,6 +13,8 @@ public:
   void begin() noexcept;
   void end() noexcept;
 
+  void draw(std::span<const uint32_t> pixels);
+
 private:
   std::unique_ptr<SDL_Renderer, SDL_Deleter> _renderer;
 };

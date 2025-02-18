@@ -115,11 +115,14 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
 
 void framework::scriptengine::run() {
   sol::state lua;
-
   lua.open_libraries();
 
   lua["require"] = [&lua](const std::string &module) {
     return require(lua, module);
+  };
+
+  lua["read"] = [](const std::string &filename) -> std::vector<uint8_t> {
+    return storage::io::read(filename);
   };
 
   lua["JSON"] = lua.create_table_with(
@@ -381,6 +384,7 @@ void framework::scriptengine::run() {
       "entitymanager", &framework::engine::entitymanager,
       "fontfactory", &framework::engine::fontfactory,
       "overlay", &framework::engine::overlay,
+      "renderer", &framework::engine::renderer,
       "resourcemanager", &framework::engine::resourcemanager,
       "soundmanager", &framework::engine::soundmanager,
       "statemanager", &framework::engine::statemanager,
@@ -533,6 +537,17 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::fontfactory>(
       "FontFactory",
       "get", &graphics::fontfactory::get
+  );
+
+  lua.new_usertype<graphics::renderer>(
+      "Renderer",
+      sol::no_constructor,
+      "pixels", sol::property([](graphics::renderer &) -> sol::object { return sol::lua_nil; }, [](graphics::renderer &r, std::string_view buffer) {
+                      std::span<const uint32_t> pixels(
+                          reinterpret_cast<const uint32_t *>(buffer.data()),
+                          buffer.size() / sizeof(uint32_t)
+                      );
+                      r.draw(pixels); })
   );
 
   const auto script = storage::io::read("scripts/main.lua");
