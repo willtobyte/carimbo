@@ -6,11 +6,6 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
   SDL_GetRendererOutputSize(*renderer, &_width, &_height);
 
-  std::cout << "SDL_GetRendererOutputSize " << _width << "x" << _height << std::endl;
-
-  _width = 800;
-  _height = 600;
-
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, _width, _height);
   if (!texture) [[unlikely]] {
     std::ostringstream error;

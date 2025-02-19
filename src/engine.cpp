@@ -114,7 +114,7 @@ void engine::set_window(std::shared_ptr<graphics::window> window) noexcept {
 void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept {
   _renderer = std::move(renderer);
 
-  _canvas = std::make_shared<graphics::canvas>(_renderer);
+  // _canvas = std::make_shared<graphics::canvas>(_renderer);
 }
 
 void engine::add_loopable(std::shared_ptr<loopable> loopable) noexcept {
@@ -124,10 +124,6 @@ void engine::add_loopable(std::shared_ptr<loopable> loopable) noexcept {
 void engine::flush() const noexcept {
   _resourcemanager->flush();
 }
-
-// bool engine::is_keydown(const input::keyevent &event) const noexcept {
-//   return _statemanager->is_keydown(event);
-// }
 
 void engine::prefetch(const std::vector<std::string> &filenames) noexcept {
   _resourcemanager->prefetch(filenames);
