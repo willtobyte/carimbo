@@ -42,6 +42,7 @@ public:
   void flush() const noexcept;
   void prefetch(const std::vector<std::string> &filenames) noexcept;
   void run() noexcept;
+
   void _loop() noexcept;
 
 protected:
