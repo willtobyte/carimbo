@@ -10,7 +10,7 @@ public:
 
   void set_pixels(std::span<const uint32_t> pixels) noexcept;
 
-  void draw() const;
+  void draw();
 
 private:
   int32_t _width, _height;

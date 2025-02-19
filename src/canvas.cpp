@@ -8,6 +8,9 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
 
   std::cout << "SDL_GetRendererOutputSize " << _width << "x" << _height << std::endl;
 
+  _width = 800;
+  _height = 600;
+
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, _width, _height);
   if (!texture) [[unlikely]] {
     std::ostringstream error;
@@ -22,7 +25,7 @@ void canvas::set_pixels(std::span<const uint32_t> pixels) noexcept {
   _pixels = std::move(pixels);
 }
 
-void canvas::draw() const {
+void canvas::draw() {
   if (_pixels.empty()) [[likely]] {
     return;
   }
