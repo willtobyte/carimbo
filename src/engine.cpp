@@ -179,7 +179,7 @@ void engine::_loop() noexcept {
   _scenemanager->draw();
   _entitymanager->draw();
   _overlay->draw();
-  _canvas->draw();
+  // _canvas->draw();
   _renderer->end();
 
   for (const auto &observer : _observers) {
