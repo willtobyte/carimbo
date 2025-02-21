@@ -30,7 +30,7 @@ int application::run() {
     return 1;
   } catch (...) {
     std::cerr << "Unknown error occurred" << std::endl;
-    return 1;
+    return 3;
   }
 
   return 0;
