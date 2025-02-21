@@ -21,7 +21,6 @@ source .venv/bin/activate
 uv pip install -r requirements.txt
 pre-commit install
 conan profile detect --force
-conan remote update conancenter --url https://center2.conan.io
 ```
 
 **Adding the WebAssembly profile**
@@ -37,12 +36,6 @@ os=Emscripten
 [tool_requires]
 *: emsdk/3.1.73
 EOF
-```
-
-**Installing all dependencies**
-
-```shell
-conan install . --output-folder=build --build="*" --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
 ```
 
 **Configure the project***
