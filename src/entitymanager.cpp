@@ -81,11 +81,6 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   return e;
 }
 
-void entitymanager::flush() noexcept {
-  std::cout << "[entitymanager] flushing cache with " << _cache.size() << " entries" << std::endl;
-  _cache.clear();
-}
-
 void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
   if (!entity) {
     return;
