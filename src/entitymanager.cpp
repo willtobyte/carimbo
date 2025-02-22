@@ -25,14 +25,8 @@ entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) n
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
-  nlohmann::json j;
-  if (const auto it = _cache.find(kind); it != _cache.end()) {
-    j = it->second;
-  } else {
-    const auto buffer = storage::io::read((std::ostringstream() << "entities/" << kind << ".json").str());
-    j = nlohmann::json::parse(buffer);
-    _cache[kind] = j;
-  }
+  const auto buffer = storage::io::read((std::ostringstream() << "entities/" << kind << ".json").str());
+  const auto j = nlohmann::json::parse(buffer);
 
   const auto size = j["size"].get<geometry::size>();
   const auto scale = j["scale"].get<float_t>();

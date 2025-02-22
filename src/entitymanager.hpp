@@ -12,8 +12,6 @@ public:
 
   std::shared_ptr<entity> spawn(const std::string &kind);
 
-  void flush() noexcept;
-
   void destroy(const std::shared_ptr<entity> entity) noexcept;
 
   std::shared_ptr<entity> find(uint64_t id) const noexcept;
@@ -28,7 +26,6 @@ protected:
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::list<std::shared_ptr<entity>> _entities;
-  std::unordered_map<std::string, nlohmann::json> _cache{64};
   std::atomic<uint64_t> _counter{0};
 };
 }
