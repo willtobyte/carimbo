@@ -306,6 +306,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::entitymanager>(
       "EntityManager",
       "spawn", &framework::entitymanager::spawn,
+      "clone", &framework::entitymanager::clone,
       "destroy", &framework::entitymanager::destroy
   );
 

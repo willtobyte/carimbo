@@ -81,6 +81,25 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   return e;
 }
 
+std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matrix) noexcept {
+  if (!matrix) {
+    return nullptr;
+  }
+
+  auto props = matrix->props();
+
+  props.id = _counter++;
+  props.last_frame = SDL_GetTicks();
+
+  const auto entity = entity::create(std::move(props));
+
+  _entities.emplace_back(entity);
+
+  std::cout << "[entitymanager] cloned entity " << entity->id() << " from source " << matrix->id() << std::endl;
+
+  return entity;
+}
+
 void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
   if (!entity) {
     return;
@@ -97,26 +116,26 @@ std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
   return (it != _entities.end()) ? *it : nullptr;
 }
 
-void entitymanager::update(float_t delta_time) noexcept {
+void entitymanager::update(float_t delta) noexcept {
   for (auto &entity : _entities) {
-    entity->update(delta_time);
+    entity->update(delta);
   }
 
   for (auto it = _entities.begin(); it != _entities.end(); ++it) {
-    const auto &entity_a = *it;
-    for (const auto &entity_b : std::ranges::subrange(std::next(it), _entities.end())) {
-      if (!entity_a->intersects(entity_b))
+    const auto &a = *it;
+    for (const auto &b : std::ranges::subrange(std::next(it), _entities.end())) {
+      if (!a->intersects(b))
         continue;
 
-      const auto callback_a = get_or_default(entity_a->_collisionmapping, entity_b->kind(), noop_fn);
-      const auto callback_b = get_or_default(entity_b->_collisionmapping, entity_a->kind(), noop_fn);
+      const auto callback_a = get_or_default(a->_collisionmapping, b->kind(), noop_fn);
+      const auto callback_b = get_or_default(b->_collisionmapping, a->kind(), noop_fn);
 
-      callback_a(entity_a, entity_b);
-      callback_b(entity_b, entity_a);
+      callback_a(a, b);
+      callback_b(b, a);
 
       SDL_Event event{};
       event.type = input::eventtype::collision;
-      auto ptr = std::make_unique<collision>(entity_a->id(), entity_b->id());
+      auto ptr = std::make_unique<collision>(a->id(), b->id());
       event.user.data1 = ptr.release();
       SDL_PushEvent(&event);
     }
