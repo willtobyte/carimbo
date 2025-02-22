@@ -87,7 +87,6 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
   }
 
   auto props = matrix->props();
-
   props.id = _counter++;
   props.last_frame = SDL_GetTicks();
 
