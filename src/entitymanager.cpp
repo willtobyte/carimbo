@@ -5,8 +5,6 @@
 
 using namespace framework;
 
-using json = nlohmann::json;
-
 static void noop(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &) noexcept {}
 
 static const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> noop_fn = noop;
@@ -27,8 +25,14 @@ entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) n
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
-  const auto buffer = storage::io::read((std::ostringstream() << "entities/" << kind << ".json").str());
-  const auto j = json::parse(buffer);
+  nlohmann::json j;
+  if (const auto it = _cache.find(kind); it != _cache.end()) {
+    j = it->second;
+  } else {
+    const auto buffer = storage::io::read((std::ostringstream() << "entities/" << kind << ".json").str());
+    j = nlohmann::json::parse(buffer);
+    _cache[kind] = j;
+  }
 
   const auto size = j["size"].get<geometry::size>();
   const auto scale = j["scale"].get<float_t>();
@@ -81,6 +85,10 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   std::cout << "[entitymanager] spawn " << e->id() << " kind " << kind << std::endl;
   _entities.emplace_back(e);
   return e;
+}
+
+void entitymanager::flush() noexcept {
+  _cache.clear();
 }
 
 void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {

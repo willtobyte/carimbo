@@ -137,6 +137,8 @@ inline void run(void *arg) noexcept {
 #endif
 
 void engine::run() noexcept {
+  _entitymanager->flush();
+
 #ifdef EMSCRIPTEN
   emscripten_set_main_loop_arg(::run<engine>, this, 0, true);
 #else
