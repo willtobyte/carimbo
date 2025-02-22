@@ -153,6 +153,10 @@ void engine::_loop() noexcept {
 
   prior = now;
 
+#ifdef STEAM
+  SteamAPI_RunCallbacks();
+#endif
+
   for (const auto &observer : _observers) {
     observer->on_beginupdate();
   }

@@ -33,4 +33,11 @@ private:
   int32_t _x{0};
   int32_t _y{0};
 };
+
+inline point operator*(const point &p, float_t factor) noexcept {
+  return point(
+      static_cast<int32_t>(std::round(p.x() * factor)),
+      static_cast<int32_t>(std::round(p.y() * factor))
+  );
+}
 }

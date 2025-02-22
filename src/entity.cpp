@@ -213,8 +213,16 @@ bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
     return false;
   }
 
-  return geometry::rect(position() + hitbox->position(), hitbox->size())
-      .intersects({other->position() + other_hitbox->position(), other_hitbox->size()});
+  // return geometry::rect(position() + hitbox->position(), hitbox->size())
+  //     .intersects({other->position() + other_hitbox->position(), other_hitbox->size()});
+  return geometry::rect(
+             position() + hitbox->position() * _props.scale,
+             hitbox->size() * _props.scale
+  )
+      .intersects(
+          {other->position() + other_hitbox->position() * other->_props.scale,
+           other_hitbox->size() * other->_props.scale}
+      );
 }
 
 void entity::on_email(const std::string &message) {
