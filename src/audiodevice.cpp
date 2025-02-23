@@ -10,6 +10,7 @@ audiodevice::audiodevice()
       }),
       context(nullptr, [](ALCcontext *context) {
         if (context) {
+          alcMakeContextCurrent(nullptr);
           alcDestroyContext(context);
         }
       }) {
@@ -25,8 +26,4 @@ audiodevice::audiodevice()
   }
 
   alcMakeContextCurrent(context.get());
-}
-
-audiodevice::~audiodevice() noexcept {
-  alcMakeContextCurrent(nullptr);
 }

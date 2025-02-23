@@ -6,10 +6,9 @@ namespace audio {
 class audiodevice {
 public:
   audiodevice();
-  ~audiodevice() noexcept;
+  ~audiodevice() noexcept = default;
 
 private:
-  // uint32_t _id;
   std::unique_ptr<ALCdevice, void (*)(ALCdevice *)> device;
   std::unique_ptr<ALCcontext, void (*)(ALCcontext *)> context;
 };
