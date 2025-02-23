@@ -21,7 +21,7 @@ void canvas::set_pixels(std::span<const uint32_t> pixels) noexcept {
 }
 
 void canvas::draw() {
-  if (_pixels.empty()) [[likely]] {
+  if (_pixels.empty()) [[unlikely]] {
     return;
   }
 
