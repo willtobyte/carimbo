@@ -25,6 +25,13 @@ entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) n
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
+  if (const auto it = std::find_if(_entities.begin(), _entities.end(), [&kind](const auto &e) {
+        return e->kind() == kind;
+      });
+      it != _entities.end()) {
+    return clone(*it);
+  }
+
   const auto buffer = storage::io::read((std::ostringstream() << "entities/" << kind << ".json").str());
   const auto j = nlohmann::json::parse(buffer);
 

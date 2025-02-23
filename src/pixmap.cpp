@@ -3,7 +3,8 @@
 using namespace graphics;
 
 pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &filename)
-    : _renderer(renderer), _size(0, 0) {
+    : _renderer(renderer), _size(0, 0), _filename(filename) {
+  const auto start = SDL_GetTicks();
   std::vector<uint8_t> output;
   std::tie(output, _size) = _load_png(filename);
 
@@ -33,6 +34,10 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
         << filename;
     throw std::runtime_error(oss.str());
   }
+
+  const auto end = SDL_GetTicks();
+  std::cout << "[pixmap] loaded '" << _filename << "' in "
+            << (end - start) << " ms" << std::endl;
 }
 
 pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface)
@@ -45,6 +50,10 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Su
         << SDL_GetError();
     throw std::runtime_error(oss.str());
   }
+}
+
+pixmap::~pixmap() noexcept {
+  std::cout << "[pixmap] destroyed " << _filename << std::endl;
 }
 
 void pixmap::draw(
