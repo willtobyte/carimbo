@@ -109,7 +109,7 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
 
   _entities.emplace_back(entity);
 
-  std::cout << "[entitymanager] cloned entity " << entity->id() << " from source " << matrix->id() << std::endl;
+  std::cout << "[entitymanager] cloned entity " << entity->id() << " from matrix " << matrix->id() << std::endl;
 
   return entity;
 }
