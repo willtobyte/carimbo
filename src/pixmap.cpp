@@ -3,16 +3,16 @@
 using namespace graphics;
 
 pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &filename)
-    : _renderer(renderer), _size(0, 0), _filename(filename) {
-  const auto start = SDL_GetTicks();
+    : _renderer{std::move(renderer)} {
   std::vector<uint8_t> output;
-  std::tie(output, _size) = _load_png(filename);
+  geometry::size size;
+  std::tie(output, size) = _load_png(filename);
 
   std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface{
       SDL_CreateRGBSurfaceWithFormat(
           0,
-          _size.width(),
-          _size.height(),
+          size.width(),
+          size.height(),
           0,
           SDL_PIXELFORMAT_ABGR8888
       ),
@@ -34,15 +34,10 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
         << filename;
     throw std::runtime_error(oss.str());
   }
-
-  const auto end = SDL_GetTicks();
-  std::cout << "[pixmap] loaded " << _filename << " in "
-            << (end - start) << " ms" << std::endl;
 }
 
 pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface)
-    : _renderer(renderer), _size(surface->w, surface->h) {
-
+    : _renderer(renderer) {
   _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter());
   if (!_texture) [[unlikely]] {
     std::ostringstream oss;
@@ -50,10 +45,6 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Su
         << SDL_GetError();
     throw std::runtime_error(oss.str());
   }
-}
-
-pixmap::~pixmap() noexcept {
-  std::cout << "[pixmap] destroyed " << _filename << std::endl;
 }
 
 void pixmap::draw(
@@ -83,13 +74,13 @@ void pixmap::draw(
 #endif
 }
 
-geometry::size pixmap::size() const noexcept {
-  return _size;
-}
+// geometry::size pixmap::size() const noexcept {
+//   return _size;
+// }
 
-void pixmap::set_size(const geometry::size &size) noexcept {
-  _size = size;
-}
+// void pixmap::set_size(const geometry::size &size) noexcept {
+//   _size = size;
+// }
 
 pixmap::operator SDL_Texture *() const noexcept {
   return _texture.get();

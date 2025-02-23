@@ -14,8 +14,7 @@ public:
   pixmap() = default;
   pixmap(const std::shared_ptr<renderer> &renderer, const std::string &filename);
   pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface);
-  // ~pixmap() = default;
-  ~pixmap() noexcept;
+  ~pixmap() noexcept = default;
 
   void draw(
       const geometry::rect &source,
@@ -29,17 +28,10 @@ public:
 #endif
   ) const noexcept;
 
-  geometry::size size() const noexcept;
-
-  void set_size(const geometry::size &size) noexcept;
-
   operator SDL_Texture *() const noexcept;
 
 private:
   std::shared_ptr<renderer> _renderer;
-  geometry::size _size{0, 0};
   texture_ptr _texture;
-
-  std::string _filename;
 };
 }
