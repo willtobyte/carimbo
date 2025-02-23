@@ -105,13 +105,13 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
   props.action = {};
   props.reflection = {graphics::reflection::none};
 
-  const auto entity = entity::create(std::move(props));
+  const auto e = entity::create(std::move(props));
 
-  _entities.emplace_back(entity);
+  _entities.emplace_back(e);
 
-  std::cout << "[entitymanager] cloned entity " << entity->id() << " from matrix " << matrix->id() << std::endl;
+  std::cout << "[entitymanager] cloned entity " << e->id() << " from matrix " << matrix->id() << std::endl;
 
-  return entity;
+  return e;
 }
 
 void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
