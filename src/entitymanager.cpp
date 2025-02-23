@@ -95,7 +95,16 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
 
   auto props = matrix->props();
   props.id = _counter++;
+  props.frame = {};
   props.last_frame = SDL_GetTicks();
+  props.angle = {};
+  props.alpha = {255};
+  props.position = {};
+  props.pivot = {};
+  props.size = {};
+  props.velocity = {};
+  props.action = {};
+  props.reflection = {graphics::reflection::none};
 
   const auto entity = entity::create(std::move(props));
 
