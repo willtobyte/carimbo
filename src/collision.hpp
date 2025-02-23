@@ -4,7 +4,7 @@
 
 namespace framework {
 struct collision {
-  collision(uint64_t a, uint64_t b)
+  constexpr collision(uint64_t a, uint64_t b)
       : a(a), b(b) {}
 
   uint64_t a;
