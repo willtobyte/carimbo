@@ -67,7 +67,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       _counter++,
       0,
       SDL_GetTicks(),
-      0.0,
+      0.,
       255,
       true,
       {},
@@ -101,7 +101,6 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
   props.alpha = {255};
   props.position = {};
   props.pivot = {};
-  props.size = {};
   props.velocity = {};
   props.action = {};
   props.reflection = {graphics::reflection::none};
