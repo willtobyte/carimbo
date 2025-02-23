@@ -36,7 +36,7 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
   }
 
   const auto end = SDL_GetTicks();
-  std::cout << "[pixmap] loaded '" << _filename << "' in "
+  std::cout << "[pixmap] loaded " << _filename << " in "
             << (end - start) << " ms" << std::endl;
 }
 
