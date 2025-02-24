@@ -24,4 +24,6 @@ See [BUILDING](BUILDING.md).
 
 ### License
 
-Permissive: use, modify, distribute with attribution. See [LICENSE](LICENSE).
+### License
+
+A simple, permissive license that offers complete commercial freedom—use, modify, and distribute your projects with ease. With minimal restrictions and a single attribution requirement, it promotes innovation and collaboration across both open source and proprietary ventures. See [LICENSE](LICENSE).
