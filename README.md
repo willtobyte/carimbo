@@ -24,4 +24,4 @@ See [BUILDING](BUILDING.md).
 
 ### License
 
-See [LICENSE](LICENSE).
+Permissive: use, modify, distribute with attribution. See [LICENSE](LICENSE).
