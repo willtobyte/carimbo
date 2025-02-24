@@ -4,17 +4,25 @@ using namespace graphics;
 
 using json = nlohmann::json;
 
+namespace {
+constexpr std::string_view ext{".json"};
+}
+
 fontfactory::fontfactory(const std::shared_ptr<graphics::renderer> renderer) noexcept
     : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
-  if (auto it = _pool.find(family); it != _pool.end()) [[likely]] {
+  const auto name = family.ends_with(ext)
+                        ? family.substr(0, family.size() - ext.size())
+                        : family;
+
+  if (auto it = _pool.find(name); it != _pool.end()) [[likely]] {
     return it->second;
   }
 
-  std::cout << "[fontfactory] cache miss " << family << std::endl;
+  std::cout << "[fontfactory] cache miss " << name << std::endl;
 
-  const auto &buffer = storage::io::read("fonts/" + family + ".json");
+  const auto &buffer = storage::io::read("fonts/" + name + ".json");
   const auto &j = json::parse(buffer);
   const auto &alphabet = j["alphabet"].get<std::string>();
   const auto spacing = j["spacing"].get<int16_t>();
