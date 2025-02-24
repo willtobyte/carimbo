@@ -1,7 +1,11 @@
 #pragma once
 
-#ifdef DEBUG
+#ifdef LOCAL
 #define SOL_ALL_SAFETIES_ON 1
+#define SOL_USING_CXX_LUAJIT 1
+#define SOL_SAFE_NUMERICS 1
+#define SOL_CHECK_ARGUMENTS 1
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #endif
 
 #ifdef _WIN32
