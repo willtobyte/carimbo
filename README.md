@@ -1,5 +1,9 @@
 ## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
+<p align="center">
+  <img src="carimbo.png" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">
+</p>
+
 ### About
 
 Carimbo is a simple yet complete 2D game engine written in modern C++ using SDL. It is scriptable in Lua and was created during the spare time of [Rodrigo Delduca](https://rodrigodelduca.com.br/).
