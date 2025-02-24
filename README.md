@@ -8,7 +8,7 @@
 
 Carimbo is a simple yet complete 2D game engine written in modern C++ using SDL. It is scriptable in Lua and was created during the spare time of [Rodrigo Delduca](https://rodrigodelduca.com.br/).
 
-It is a spiritual successor to the [Wintermoon](https://github.com/skhaz/wintermoon) framework, a project by the same author. It runs natively on Linux, Windows, macOS, and on the web (via WebAssembly), and it also supports mobile platforms, including Android & iOS.
+It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wintermoon) framework, a project by the same author. It runs natively on Linux, Windows, macOS, and on the web (via WebAssembly), and it also supports mobile platforms, including Android & iOS.
 
 ### Name
 
@@ -16,4 +16,4 @@ The name _“carimbo”_ comes from the Portuguese word for “stamp,” and tha
 
 ### Games
 
-I host all the games and demos made with the Carimbo engine on the website https://carimbo.run. You can test or play them without installing anything at all, thanks to WebAssembly technology, which is native to all modern browsers.
+Games and demos created with the Carimbo engine are hosted on https://carimbo.run. They can be tested or played without any installation, thanks to WebAssembly technology native to all modern browsers.
