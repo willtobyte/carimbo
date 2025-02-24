@@ -32,12 +32,6 @@ void resourcemanager::prefetch(const std::vector<std::string> &filenames) noexce
   }
 }
 
-void resourcemanager::update(float_t delta) noexcept {
-  _pixmappool->update(delta);
-  _soundmanager->update(delta);
-  _fontfactory->update(delta);
-}
-
 std::shared_ptr<graphics::renderer> resourcemanager::renderer() const noexcept {
   return _renderer;
 }

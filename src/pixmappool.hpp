@@ -14,8 +14,6 @@ public:
 
   void flush() noexcept;
 
-  void update(float_t delta) noexcept;
-
 private:
   std::shared_ptr<renderer> _renderer;
   std::unordered_map<std::string, pixmap_ptr> _pool;

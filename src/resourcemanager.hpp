@@ -14,8 +14,8 @@ public:
   ~resourcemanager() noexcept = default;
 
   void flush() noexcept;
+
   void prefetch(const std::vector<std::string> &filenames) noexcept;
-  void update(float_t delta) noexcept;
 
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
   std::shared_ptr<graphics::pixmappool> pixmappool() const noexcept;

@@ -13,8 +13,6 @@ public:
 
   void flush() noexcept;
 
-  void update(float_t delta) noexcept;
-
 private:
   std::list<std::string> _filenames{};
   std::unordered_map<std::string, std::shared_ptr<font>> _pool{};

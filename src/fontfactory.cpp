@@ -2,28 +2,14 @@
 
 using namespace graphics;
 
-using json = nlohmann::json;
-
-namespace {
-constexpr std::string_view ext{".json"};
-}
-
 fontfactory::fontfactory(const std::shared_ptr<graphics::renderer> renderer) noexcept
     : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
-  const auto name = family.ends_with(ext)
-                        ? family.substr(0, family.size() - ext.size())
-                        : family;
+  std::cout << "[fontfactory] cache miss " << family << std::endl;
 
-  if (auto it = _pool.find(name); it != _pool.end()) [[likely]] {
-    return it->second;
-  }
-
-  std::cout << "[fontfactory] cache miss " << name << std::endl;
-
-  const auto &buffer = storage::io::read("fonts/" + name + ".json");
-  const auto &j = json::parse(buffer);
+  const auto &buffer = storage::io::read("fonts/" + family + ".json");
+  const auto &j = nlohmann::json::parse(buffer);
   const auto &alphabet = j["alphabet"].get<std::string>();
   const auto spacing = j["spacing"].get<int16_t>();
   const auto scale = j["scale"].get<float_t>();
@@ -99,8 +85,4 @@ void fontfactory::flush() noexcept {
 
   const auto count = std::erase_if(_pool, [](const auto &pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
   std::cout << "[fontfactory] " << count << " objects have been flushed" << std::endl;
-}
-
-void fontfactory::update(float_t delta) noexcept {
-  UNUSED(delta);
 }

@@ -14,8 +14,6 @@ public:
   void stop(const std::string &filename) noexcept;
   void flush() noexcept;
 
-  void update(float_t delta) noexcept;
-
 private:
   std::shared_ptr<audiodevice> _audiodevice;
   std::unordered_map<std::string, std::shared_ptr<soundfx>> _pool;

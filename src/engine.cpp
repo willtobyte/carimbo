@@ -161,7 +161,6 @@ void engine::_loop() noexcept {
     observer->on_beginupdate();
   }
 
-  _resourcemanager->update(delta);
   _scenemanager->update(delta);
   _eventmanager->update(delta);
   _overlay->update(delta);
