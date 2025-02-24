@@ -1,7 +1,7 @@
 ## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
 <p align="center">
-  <img src="carimbo.png" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">
+  <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">
 </p>
 
 ### About
