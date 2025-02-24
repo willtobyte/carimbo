@@ -35,9 +35,7 @@ public:
   virtual ~lua_loopable() = default;
 
   void loop(float_t delta) noexcept override {
-    UNUSED(delta);
-
-    _function();
+    _function(delta);
 
     const auto mem = _gc("count").get<double>() / 1024.0;
     if (mem <= 8.0) [[likely]] {
