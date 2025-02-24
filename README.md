@@ -1,4 +1,4 @@
-# Carimbo 2D Game Engine
+## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
 ### About
 
