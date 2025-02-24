@@ -18,12 +18,10 @@ _“Carimbo”_ comes from the Portuguese word for “stamp,” and that’s exa
 
 Games and demos created with the Carimbo engine are hosted on https://carimbo.run. They can be tested or played online without any installation, thanks to WebAssembly technology native to all modern browsers.
 
-### Building
-
-See [BUILDING](BUILDING.md).
-
-### License
-
 ### License
 
 A simple, permissive license that offers complete commercial freedom—use, modify, and distribute your projects with ease. With minimal restrictions and a single attribution requirement. See [LICENSE](LICENSE).
+
+### Building
+
+See [BUILDING](BUILDING.md).
