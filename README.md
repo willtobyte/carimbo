@@ -26,4 +26,4 @@ See [BUILDING](BUILDING.md).
 
 ### License
 
-A simple, permissive license that offers complete commercial freedom—use, modify, and distribute your projects with ease. With minimal restrictions and a single attribution requirement, it promotes innovation and collaboration across both open source and proprietary ventures. See [LICENSE](LICENSE).
+A simple, permissive license that offers complete commercial freedom—use, modify, and distribute your projects with ease. With minimal restrictions and a single attribution requirement. See [LICENSE](LICENSE).
