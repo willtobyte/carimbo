@@ -12,7 +12,7 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 ### Name
 
-_“carimbo”_ comes from the Portuguese word for “stamp,” and that’s exactly what a 2D game engine does—it constantly stamps sprites onto the screen.
+_“Carimbo”_ comes from the Portuguese word for “stamp,” and that’s exactly what a 2D game engine does—it constantly stamps sprites onto the screen.
 
 ### Games
 
