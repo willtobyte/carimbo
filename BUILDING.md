@@ -1,21 +1,28 @@
-# Build
+## Project Setup
 
-**Python & virtualenv**
+This guide provides a simple walkthrough for setting up and building the project. Follow the instructions below to get started.
+
+### Python Environment & Virtualenv
+
+Set up the Python virtual environment:
 
 ```shell
 uv venv
 source .venv/bin/activate
 ```
 
-**Conan & hooks pre-commit**
+### Conan & Pre-commit Hooks
+
+Install the necessary Python packages, set up pre-commit hooks, and configure Conan:
 
 ```shell
 uv pip install -r requirements.txt
-pre-commit install
 conan profile detect --force
 ```
 
-**Adding the WebAssembly profile**
+### Add the WebAssembly Profile
+
+Create a Conan profile for WebAssembly:
 
 ```shell
 cat > ~/.conan2/profiles/webassembly <<EOF
@@ -30,35 +37,46 @@ os=Emscripten
 EOF
 ```
 
-**Configure the project**
+### Configure the Project
+
+Run the configuration step:
 
 ```shell
 make -f Makefile.webassembly configure
 ```
 
-**Building the project**
+### Build the Project
+
+Compile the project:
 
 ```shell
 make -f Makefile.webassembly build
 ```
 
-**Cloning a game**
+### Clone a Game Repository
+
+Clone the game repository into a local folder named sandbox:
 
 ```shell
 gh repo clone willtobyte/slime sandbox
 ```
 
-**Cloning the playground web application**
+### Clone the Playground Web Application
+
+Clone the playground web application repository:
 
 ```shell
 gh repo clone willtobyte/run
 ```
 
-**Running the application**
-**Note:** Ensure Docker is running. If not, install [OrbStack](https://orbstack.dev/).
+### Run the Application
+
+Note: Ensure Docker is running. If Docker is not installed, consider installing [OrbStack](https://orbstack.dev/).
+
+Start the application:
 
 ```shell
 make run
 ```
 
-Finally, open [http://localhost:3000/playground](http://localhost:3000/playground) in your browser.
+Finally, open [localhost:3000/playground](http://localhost:3000/playground) in your browser.
