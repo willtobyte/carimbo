@@ -13,10 +13,10 @@ source .venv/bin/activate
 
 ### Conan
 
-Install the necessary Python packages, and configure Conan:
+Install Conan, and configure it:
 
 ```shell
-uv pip install -r requirements.txt
+uv pip install conan
 conan profile detect --force
 ```
 
