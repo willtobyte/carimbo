@@ -11,9 +11,9 @@ uv venv
 source .venv/bin/activate
 ```
 
-### Conan & Pre-commit Hooks
+### Conan
 
-Install the necessary Python packages, set up pre-commit hooks, and configure Conan:
+Install the necessary Python packages, and configure Conan:
 
 ```shell
 uv pip install -r requirements.txt
