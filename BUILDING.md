@@ -37,20 +37,12 @@ os=Emscripten
 EOF
 ```
 
-### Configure the Project
+### Configure & Build
 
-Run the configuration step:
-
-```shell
-make -f Makefile.webassembly configure
-```
-
-### Build the Project
-
-Compile the project:
+Run the command:
 
 ```shell
-make -f Makefile.webassembly build
+make -f Makefile.webassembly release
 ```
 
 ### Clone a Game Repository

@@ -1,25 +1,29 @@
-.PHONY: help build clean configure
-.SILENT:
+.PHONY: help build clean configure debug release
 
-SHELL := bash -eou pipefail
-
-ifeq ($(shell command -v docker-compose;),)
-	COMPOSE := docker compose
-else
-	COMPOSE := docker-compose
-endif
+BUILD_TYPE ?= Release
 
 help:
 	awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-clean: ## Clean
+clean: ## Clean build files and remove marker file
 	unalias rm 2>/dev/null || true
+	rm -rf ~/.conan2/p 2>/dev/null
 	rm -rf build 2>/dev/null
 
-build: ## Build
-	cmake --build build --parallel 8
+build: ## Build the project
+	cmake --build build --parallel 8 --config $(BUILD_TYPE) --verbose
 
-configure: clean ## Configure
-	conan remote update conancenter --url https://center2.conan.io
-	conan install . --output-folder=build --build=missing --profile=default --settings compiler.cppstd=20 --settings build_type=Release
-	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DSDL2_DIR=generators -DCMAKE_BUILD_TYPE=Release -DLOCAL=OFF -DHITBOX=OFF -DSANDBOX=ON -DASSERTIONS=OFF
+configure: ## Configure the project
+	@if [ ! -f build/ready ]; then \
+		$(MAKE) clean; \
+		conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=$(BUILD_TYPE); \
+		cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DHITBOX=ON -DSANDBOX=ON; \
+		mkdir -p build; \
+		touch build/ready; \
+	fi
+
+debug: BUILD_TYPE=Debug
+debug: configure build
+
+release: BUILD_TYPE=Release
+release: configure build

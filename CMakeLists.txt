@@ -37,6 +37,21 @@ else()
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror -pedantic)
 endif()
 
+option(HITBOX "Enable HITBOX flag" OFF)
+if(HITBOX)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE HITBOX)
+endif()
+
+option(LOCAL "Enable LOCAL flag" OFF)
+if(LOCAL)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE LOCAL)
+endif()
+
+option(SANDBOX "Enable SANDBOX flag" OFF)
+if(SANDBOX)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE SANDBOX)
+endif()
+
 if(EMSCRIPTEN)
   set(EMSDK_COMPILE_DEBUG_FLAGS
     -O0
@@ -57,16 +72,6 @@ if(EMSCRIPTEN)
     $<$<CONFIG:Debug>:${EMSDK_COMPILE_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_RELEASE_FLAGS}>
   )
-
-  option(HITBOX "Enable HITBOX flag" OFF)
-  if(HITBOX)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HITBOX)
-  endif()
-
-  option(LOCAL "Enable LOCAL flag" OFF)
-  if(LOCAL)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE LOCAL)
-  endif()
 
   target_link_options(${PROJECT_NAME} PRIVATE
     -sEVAL_CTORS=1

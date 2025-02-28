@@ -155,7 +155,7 @@ void entity::set_onmail(const std::function<void(std::shared_ptr<entity>, const 
 }
 
 void entity::set_oncollision(const std::string &kind, const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> &fn) noexcept {
-  _collisionmapping[kind] = std::move(fn);
+  _collisionmapping[kind] = fn;
 }
 
 void entity::set_reflection(graphics::reflection reflection) noexcept {
@@ -213,8 +213,6 @@ bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
     return false;
   }
 
-  // return geometry::rect(position() + hitbox->position(), hitbox->size())
-  //     .intersects({other->position() + other_hitbox->position(), other_hitbox->size()});
   return geometry::rect(
              position() + hitbox->position() * _props.scale,
              hitbox->size() * _props.scale

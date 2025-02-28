@@ -50,6 +50,7 @@ private:
   EMSCRIPTEN_WEBSOCKET_T _socket{0};
 #else
   net::io_context _io_context;
+  boost::asio::executor_work_guard<net::io_context::executor_type> _work_guard;
   tcp::resolver _resolver;
   boost::asio::ssl::context _ssl_context;
   websocket::stream<ssl::stream<beast::tcp_stream>> _ws;

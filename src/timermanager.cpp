@@ -14,7 +14,7 @@ uint32_t generic_wrapper(uint32_t interval, void *param, bool repeat) {
   SDL_Event event{};
   event.type = input::eventtype::timer;
   event.user.data1 = fn;
-  event.user.data2 = &repeat;
+  event.user.data2 = new bool(repeat);
 
   SDL_PushEvent(&event);
 #endif

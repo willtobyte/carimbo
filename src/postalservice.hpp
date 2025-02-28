@@ -10,6 +10,9 @@ struct mail {
 
   mail(std::shared_ptr<entity> to, std::shared_ptr<entity> from, const std::string &body)
       : to(to->id()), kind(from->kind()), body(body) {}
+
+  mail(const mail &other)
+      : to(other.to), kind(other.kind), body(other.body) {}
 };
 
 class postalservice {

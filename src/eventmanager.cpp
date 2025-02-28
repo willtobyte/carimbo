@@ -92,6 +92,7 @@ void eventmanager::update(float_t delta) {
         for (const auto &receiver : _receivers) {
           receiver->on_mail(mailevent(ptr->to, ptr->body));
         }
+
         delete ptr;
       }
     } break;
