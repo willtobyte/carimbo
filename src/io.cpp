@@ -20,11 +20,11 @@ std::vector<uint8_t> io::read(const std::string &filename) noexcept(false) {
   }
 
   std::vector<uint8_t> buffer(length);
-  auto bytesRead = PHYSFS_readBytes(ptr.get(), buffer.data(), length);
-  if (bytesRead != length) [[unlikely]] {
+  auto bytes = PHYSFS_readBytes(ptr.get(), buffer.data(), length);
+  if (bytes != length) [[unlikely]] {
     std::ostringstream oss;
     oss << "[PHYSFS_readBytes] error reading file: " << filename
-        << ", expected " << length << " bytes but read " << bytesRead
+        << ", expected " << length << " bytes but read " << bytes
         << ", error: " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     throw std::runtime_error(oss.str());
   }
