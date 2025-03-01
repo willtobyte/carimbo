@@ -16,7 +16,7 @@ _"Carimbo"_ comes from the 🇧🇷 word for "stamp," and that is exactly what a
 
 ### Motivation
 
-In 2009, during an extended summer break, I attempted to port my SDL-based 2D game engine to Google’s Native Client (NaCl) in a shared student residence room. NaCl, Chrome’s sandbox for native code, can be seen as a precursor to WebAssembly. Although I eventually moved from game to web development, low-level programming still courses through my veins, fueling my dream of building a web-based game engine.
+In 2009, during an extended summer break, I attempted to port my SDL-based 2D game engine (Wintermoon) to Google’s Native Client (NaCl) in a shared student residence room. NaCl, Chrome’s sandbox for native code, can be seen as a precursor to WebAssembly. Although I eventually moved from game to web development, low-level programming still courses through my veins, fueling my dream of building a web-based game engine.
 
 ### Games
 
