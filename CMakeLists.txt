@@ -69,12 +69,12 @@ if(EMSCRIPTEN)
   )
 
   set(EMSDK_COMPILE_RELEASE_FLAGS
-    -Os
+    -Oz
     -flto
   )
 
   set(EMSDK_LINK_RELEASE_FLAGS
-    -Os
+    -Oz
     -flto
     --strip-all
     -sASSERTIONS=0
