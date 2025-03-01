@@ -68,11 +68,22 @@ if(EMSCRIPTEN)
     -sDISABLE_EXCEPTION_CATCHING=0
   )
 
-  set(EMSDK_RELEASE_FLAGS -Os)
+  set(EMSDK_COMPILE_RELEASE_FLAGS
+    -Os
+    -flto
+  )
+
+  set(EMSDK_LINK_RELEASE_FLAGS
+    -Os
+    -flto
+    --strip-all
+    -sASSERTIONS=0
+    -sDISABLE_EXCEPTION_CATCHING=1
+  )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
     $<$<CONFIG:Debug>:${EMSDK_COMPILE_DEBUG_FLAGS}>
-    $<$<CONFIG:Release>:${EMSDK_RELEASE_FLAGS}>
+    $<$<CONFIG:Release>:${EMSDK_COMPILE_RELEASE_FLAGS}>
   )
 
   target_link_options(${PROJECT_NAME} PRIVATE
@@ -85,7 +96,7 @@ if(EMSCRIPTEN)
     -sWEBSOCKET_SUBPROTOCOL=text
     -sEXPORTED_RUNTIME_METHODS=['callMain']
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
-    $<$<CONFIG:Release>:${EMSDK_RELEASE_FLAGS}>
+    $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
 else()
   if(MSVC)

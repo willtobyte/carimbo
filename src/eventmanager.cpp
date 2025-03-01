@@ -39,9 +39,9 @@ void eventmanager::update(float_t delta) {
       break;
 
     case SDL_MOUSEBUTTONDOWN:
-      for (const auto &receiver : _receivers) {
-        receiver->on_mouseup();
-      }
+      // for (const auto &receiver : _receivers) {
+      //   receiver->on_mouseup();
+      // }
       break;
 
     case SDL_MOUSEBUTTONUP:
