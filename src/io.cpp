@@ -2,7 +2,7 @@
 
 using namespace storage;
 
-std::vector<uint8_t> io::read(const std::string &filename) noexcept(false) {
+std::vector<uint8_t> io::read(const std::string &filename) {
   std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> ptr(PHYSFS_openRead(filename.c_str()), PHYSFS_close);
   if (!ptr) [[unlikely]] {
     std::ostringstream oss;
