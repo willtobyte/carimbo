@@ -33,5 +33,6 @@ std::shared_ptr<observable> &kv::get_or_create_observable(const std::string &key
   if (inserted) {
     it->second->set(sol::make_object(L, sol::lua_nil));
   }
+
   return it->second;
 }
