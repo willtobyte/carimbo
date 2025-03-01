@@ -92,7 +92,7 @@ jobs:
         run: cmake --build . --parallel 4 --config Release --verbose
         working-directory: build
 
-      - name: Install wasm-opt (Binaryen)
+      - name: Install Binaryen
         if: matrix.config.name == 'WebAssembly'
         run: |
           sudo apt-get update
@@ -102,6 +102,5 @@ jobs:
         if: matrix.config.name == 'WebAssembly'
         run: |
           for wasm_file in build/*.wasm; do
-            echo "Optimizing $wasm_file"
             wasm-opt -O3 --enable-sign-ext "$wasm_file" -o "$wasm_file"
           done
