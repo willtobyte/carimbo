@@ -39,34 +39,36 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto pixels = static_cast<uint32_t *>(surface->pixels);
   const auto separator = color(pixels[0], surface->format);
 
-  glyphmap map;
-  auto x = 0, y = 0, width = 0, height = 0;
+  glyphmap map{};
+  auto [x, y, w, h] = std::tuple{0, 0, 0, 0};
+  const auto width = size.width();
+  const auto height = size.height();
 
   for (const char letter : alphabet) {
-    while (x < size.width() && color(pixels[y * size.width() + x], surface->format) == separator) {
+    while (x < width && color(pixels[y * width + x], surface->format) == separator) {
       ++x;
     }
 
-    if (x >= size.width()) [[unlikely]] {
+    if (x >= width) [[unlikely]] {
       std::ostringstream oss;
       oss << "Error: missing glyph for '" << letter << "'";
       throw std::runtime_error(oss.str());
     }
 
-    width = 0;
-    while (x + width < size.width() &&
-           color(pixels[y * size.width() + x + width], surface->format) != separator) {
-      ++width;
+    w = 0;
+    while (x + w < width &&
+           color(pixels[y * width + x + w], surface->format) != separator) {
+      ++w;
     }
 
-    height = 0;
-    while (y + height < size.height() &&
-           color(pixels[(y + height) * size.width() + x], surface->format) != separator) {
-      ++height;
+    h = 0;
+    while (y + h < height &&
+           color(pixels[(y + h) * width + x], surface->format) != separator) {
+      ++h;
     }
 
-    map[letter] = {{x, y}, {width, height}};
-    x += width;
+    map[letter] = {{x, y}, {w, h}};
+    x += w;
   }
 
   auto ptr = std::make_shared<font>(
