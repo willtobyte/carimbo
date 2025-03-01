@@ -20,8 +20,6 @@ Roughly 16 years ago, 2009, during an extended summer holiday, in a shared room 
 
 A considerable amount of time has elapsed, and many changes have transpired. I transitioned from game development to web development, yet low-level programming has always coursed through my veins. Consequently, I resolved to revive the dream of crafting my own game engine running on the web.
 
-Today, with the advent of WebAssembly, achieving this goal is significantly more feasible and portable.
-
 ### Games
 
 Games and demos created with the Carimbo engine are hosted on https://carimbo.run. They can be tested or played online without any installation, thanks to WebAssembly technology native to all modern browsers.
