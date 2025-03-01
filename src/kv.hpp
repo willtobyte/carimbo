@@ -23,6 +23,6 @@ public:
 private:
   std::unordered_map<std::string, std::shared_ptr<observable>> _values;
 
-  std::shared_ptr<observable> &get_or_create_observable(const std::string &key, lua_State *L);
+  std::shared_ptr<observable> get_or_create_observable(const std::string &key, lua_State *L);
 };
 }
