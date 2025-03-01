@@ -38,6 +38,6 @@ struct entityprops {
   std::string action{};
   graphics::reflection reflection{graphics::reflection::none};
   std::shared_ptr<graphics::pixmap> spritesheet{};
-  std::map<std::string, animation> animations{};
+  std::unordered_map<std::string, animation> animations{};
 };
 }

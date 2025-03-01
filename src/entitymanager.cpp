@@ -42,7 +42,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                          ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
                          : nullptr;
 
-  std::map<std::string, animation> animations;
+  std::unordered_map<std::string, animation> animations;
   animations.reserve(j["animations"].size());
   for (const auto &[key, anim] : j["animations"].items()) {
     const auto hitbox = anim.contains("hitbox")
