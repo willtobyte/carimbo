@@ -91,19 +91,6 @@ jobs:
         run: cmake --build . --parallel 4 --config Release --verbose
         working-directory: build
 
-      - name: Install Binaryen
-        if: matrix.config.name == 'WebAssembly'
-        run: |
-          sudo apt-get update
-          sudo apt-get install --yes binaryen
-
-      - name: Optimize WebAssembly Modules
-        if: matrix.config.name == 'WebAssembly'
-        run: |
-          for wasm_file in build/*.wasm; do
-            wasm-opt -Oz --enable-sign-ext "$wasm_file" -o "$wasm_file"
-          done
-
       - name: Create Artifacts Directory
         run: mkdir artifacts
 
