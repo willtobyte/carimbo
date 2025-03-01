@@ -101,7 +101,7 @@ jobs:
         if: matrix.config.name == 'WebAssembly'
         run: |
           for wasm_file in build/*.wasm; do
-            wasm-opt -O3 --enable-sign-ext "$wasm_file" -o "$wasm_file"
+            wasm-opt -Oz --enable-sign-ext "$wasm_file" -o "$wasm_file"
           done
 
       - name: Create Artifacts Directory
