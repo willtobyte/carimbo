@@ -38,6 +38,15 @@ void eventmanager::update(float_t delta) {
       }
       break;
 
+    case SDL_MOUSEBUTTONDOWN:
+      for (const auto &receiver : _receivers) {
+        receiver->on_mouseup();
+      }
+      break;
+
+    case SDL_MOUSEBUTTONUP:
+      break;
+
     case SDL_CONTROLLERDEVICEADDED:
       if (SDL_IsGameController(event.cdevice.which)) {
         if (auto controller = SDL_GameControllerOpen(event.cdevice.which)) {

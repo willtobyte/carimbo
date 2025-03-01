@@ -68,7 +68,7 @@ Note: Ensure Docker is running. If Docker is not installed, consider installing 
 Start the application:
 
 ```shell
-make run
+make
 ```
 
 Finally, open [localhost:3000/playground](http://localhost:3000/playground) in your browser.
