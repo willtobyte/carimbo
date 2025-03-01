@@ -11,7 +11,7 @@ std::vector<uint8_t> io::read(const std::string &filename) noexcept(false) {
     throw std::runtime_error(oss.str());
   }
 
-  PHYSFS_sint64 length = PHYSFS_fileLength(ptr.get());
+  const auto length = PHYSFS_fileLength(ptr.get());
   if (length <= 0) [[unlikely]] {
     std::ostringstream oss;
     oss << "[PHYSFS_fileLength] invalid file length, file: " << filename
@@ -20,7 +20,7 @@ std::vector<uint8_t> io::read(const std::string &filename) noexcept(false) {
   }
 
   std::vector<uint8_t> buffer(length);
-  auto bytes = PHYSFS_readBytes(ptr.get(), buffer.data(), length);
+  const auto bytes = PHYSFS_readBytes(ptr.get(), buffer.data(), length);
   if (bytes != length) [[unlikely]] {
     std::ostringstream oss;
     oss << "[PHYSFS_readBytes] error reading file: " << filename
