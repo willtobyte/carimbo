@@ -6,6 +6,10 @@ fontfactory::fontfactory(const std::shared_ptr<graphics::renderer> renderer) noe
     : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
+  if (const auto it = _pool.find(family); it != _pool.end()) {
+    return it->second;
+  }
+
   std::cout << "[fontfactory] cache miss " << family << std::endl;
 
   const auto &buffer = storage::io::read("fonts/" + family + ".json");
