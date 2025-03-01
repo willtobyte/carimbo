@@ -96,7 +96,7 @@ jobs:
         if: matrix.config.name == 'WebAssembly'
         run: |
           sudo apt-get update
-          sudo apt-get install --yyes binaryen
+          sudo apt-get install --yes binaryen
 
       - name: Optimize WebAssembly Modules
         if: matrix.config.name == 'WebAssembly'
