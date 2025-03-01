@@ -43,13 +43,14 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                          : nullptr;
 
   std::map<std::string, animation> animations;
+  animations.reserve(j["animations"].size());
   for (const auto &[key, anim] : j["animations"].items()) {
     const auto hitbox = anim.contains("hitbox")
                             ? std::make_optional(anim["hitbox"].get<geometry::rect>())
                             : std::nullopt;
 
     std::vector<keyframe> keyframes;
-    keyframes.reserve(16);
+    keyframes.reserve(anim["frames"].size());
     for (const auto &frame : anim["frames"]) {
       keyframes.emplace_back(
           keyframe{

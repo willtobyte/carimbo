@@ -54,15 +54,16 @@ endif()
 
 if(EMSCRIPTEN)
   set(EMSDK_COMPILE_DEBUG_FLAGS
-    -g
     -O0
+    -g3
     -gsource-map
   )
 
   set(EMSDK_LINK_DEBUG_FLAGS
+    -g3
     -gsource-map
     -sASSERTIONS=1
-    -sSAFE_HEAP=1
+    -sSAFE_HEAP=0
     -sSTACK_OVERFLOW_CHECK=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
