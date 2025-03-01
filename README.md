@@ -12,7 +12,7 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 ### Motivation
 
-Roughly 15 years ago, during an extended summer holiday, in a shared room of a student residence, I found myself endeavoring to port my 2D game engine built on top of SDL to the Google Native Client (NaCl). NaCl served as a sandboxing mechanism for Chrome, enabling the execution of native code within the browser, specifically within the Chrome browser. It is safe to assert that NaCl can be considered the progenitor of WebAssembly.
+Roughly 16 years ago, 2009, during an extended summer holiday, in a shared room of a student residence, I found myself endeavoring to port my 2D game engine built on top of SDL to the Google Native Client (NaCl). NaCl served as a sandboxing mechanism for Chrome, enabling the execution of native code within the browser, specifically within the Chrome browser. It is safe to assert that NaCl can be considered the progenitor of WebAssembly.
 
 A considerable amount of time has elapsed, and many changes have transpired. I transitioned from game development to web development, yet low-level programming has always coursed through my veins. Consequently, I resolved to revive the dream of crafting my own game engine running on the web.
 
