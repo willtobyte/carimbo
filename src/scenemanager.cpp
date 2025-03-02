@@ -11,7 +11,7 @@ void scenemanager::set(const std::string &name) noexcept {
   _background.reset();
   const auto buffer = storage::io::read("scenes/" + name + ".json");
   const auto j = json::parse(buffer);
-  _background = _pixmappool->get(j["background"].get<std::string>());
+  _background = _pixmappool->get(j["background"].get_ref<const std::string &>());
   _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 }
 
