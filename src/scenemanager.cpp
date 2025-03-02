@@ -15,6 +15,10 @@ void scenemanager::set(const std::string &name) noexcept {
   _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 }
 
+void scenemanager::grab(const std::string &key) noexcept {
+  UNUSED(key);
+}
+
 void scenemanager::update(float_t delta) noexcept {
   UNUSED(delta);
 }

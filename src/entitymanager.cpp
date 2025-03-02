@@ -15,7 +15,7 @@ std::function<T> operator||(const std::function<T> &lhs, const std::function<T> 
 }
 
 template <typename Map>
-auto get_or_default(const Map &m, const typename Map::key_type &key, const typename Map::mapped_type &d) {
+auto ensure_callback(const Map &m, const typename Map::key_type &key, const typename Map::mapped_type &d) {
   auto it = m.find(key);
   return (it != m.end()) ? it->second : d;
 }
@@ -142,8 +142,8 @@ void entitymanager::update(float_t delta) noexcept {
       if (!a->intersects(b))
         continue;
 
-      const auto callback_a = get_or_default(a->_collisionmapping, b->kind(), noop_fn);
-      const auto callback_b = get_or_default(b->_collisionmapping, a->kind(), noop_fn);
+      const auto callback_a = ensure_callback(a->_collisionmapping, b->kind(), noop_fn);
+      const auto callback_b = ensure_callback(b->_collisionmapping, a->kind(), noop_fn);
 
       callback_a(a, b);
       callback_b(b, a);

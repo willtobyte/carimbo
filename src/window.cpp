@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-window::window(const std::string &title, int32_t width, int32_t height, bool fullscreen) noexcept(false)
+window::window(const std::string &title, int32_t width, int32_t height, bool fullscreen)
     : _width(width), _height(height),
       _window(
           SDL_CreateWindow(
