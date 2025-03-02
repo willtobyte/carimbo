@@ -25,7 +25,7 @@ void canvas::draw() {
   }
 
   if (!_framebuffer) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_CreateTexture] framebuffer is null."));
+    throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
   }
 
   if (SDL_UpdateTexture(_framebuffer.get(), nullptr, _pixels.data(), _width * sizeof(uint32_t)) != 0) [[unlikely]] {
