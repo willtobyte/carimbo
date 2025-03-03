@@ -419,88 +419,88 @@ void framework::scriptengine::run() {
       "Cassete",
       sol::no_constructor,
       "set", [](storage::cassete &c, const std::string &key, sol::object obj) {
-              if (obj.is<int>()) {
-                  c.set<int>(key, obj.as<int>());
-              } else if (obj.is<double>()) {
-                  c.set<double>(key, obj.as<double>());
-              } else if (obj.is<bool>()) {
-                  c.set<bool>(key, obj.as<bool>());
-              } else if (obj.is<std::string>()) {
-                  c.set<std::string>(key, obj.as<std::string>());
-              } else if (obj.is<sol::table>()) {
-                  sol::table tbl = obj.as<sol::table>();
-                  nlohmann::json j;
-                  for (auto& pair : tbl) {
-                      sol::object k_obj = pair.first;
-                      sol::object v_obj = pair.second;
-                      if (!k_obj.is<std::string>()) continue;
-                      std::string jkey = k_obj.as<std::string>();
-                      if (v_obj.is<int>()) {
-                          j[jkey] = v_obj.as<int>();
-                      } else if (v_obj.is<double>()) {
-                          j[jkey] = v_obj.as<double>();
-                      } else if (v_obj.is<bool>()) {
-                          j[jkey] = v_obj.as<bool>();
-                      } else if (v_obj.is<std::string>()) {
-                          j[jkey] = v_obj.as<std::string>();
-                      } else if (v_obj.is<sol::table>()) {
-                          j[jkey] = nullptr;
-                      } else {
-                          j[jkey] = nullptr;
+                  if (obj.is<int>()) {
+                      c.set<int>(key, obj.as<int>());
+                  } else if (obj.is<double>()) {
+                      c.set<double>(key, obj.as<double>());
+                  } else if (obj.is<bool>()) {
+                      c.set<bool>(key, obj.as<bool>());
+                  } else if (obj.is<std::string>()) {
+                      c.set<std::string>(key, obj.as<std::string>());
+                  } else if (obj.is<sol::table>()) {
+                      sol::table tbl = obj.as<sol::table>();
+                      nlohmann::json j;
+                      for (auto& pair : tbl) {
+                          sol::object k_obj = pair.first;
+                          sol::object v_obj = pair.second;
+                          if (!k_obj.is<std::string>()) continue;
+                          std::string jkey = k_obj.as<std::string>();
+                          if (v_obj.is<int>()) {
+                              j[jkey] = v_obj.as<int>();
+                          } else if (v_obj.is<double>()) {
+                              j[jkey] = v_obj.as<double>();
+                          } else if (v_obj.is<bool>()) {
+                              j[jkey] = v_obj.as<bool>();
+                          } else if (v_obj.is<std::string>()) {
+                              j[jkey] = v_obj.as<std::string>();
+                          } else if (v_obj.is<sol::table>()) {
+                              j[jkey] = nullptr;
+                          } else {
+                              j[jkey] = nullptr;
+                          }
                       }
-                  }
-                  c.set<nlohmann::json>(key, j);
-              } else {
-                  throw std::runtime_error("Unsupported type for set");
-              } },
+                      c.set<nlohmann::json>(key, j);
+                  } else {
+                      throw std::runtime_error("Unsupported type for set");
+                  } },
       "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
-              auto opt = c.get<nlohmann::json>(key);
-              if (!opt.has_value()) return sol::nil;
-              const nlohmann::json &j = opt.value();
-              sol::state_view lua(ts);
-              if (j.is_number_integer()) {
-                  return sol::make_object(lua, j.get<int>());
-              } else if (j.is_number_float()) {
-                  return sol::make_object(lua, j.get<double>());
-              } else if (j.is_boolean()) {
-                  return sol::make_object(lua, j.get<bool>());
-              } else if (j.is_string()) {
-                  return sol::make_object(lua, j.get<std::string>());
-              } else if (j.is_object() || j.is_array()) {
-                  sol::table tbl = lua.create_table();
-                  if (j.is_object()) {
-                      for (auto& [k, v] : j.items()) {
-                          if (v.is_number_integer()) {
-                              tbl[k] = v.get<int>();
-                          } else if (v.is_number_float()) {
-                              tbl[k] = v.get<double>();
-                          } else if (v.is_boolean()) {
-                              tbl[k] = v.get<bool>();
-                          } else if (v.is_string()) {
-                              tbl[k] = v.get<std::string>();
-                          } else {
-                              tbl[k] = sol::nil;
+                  auto opt = c.get<nlohmann::json>(key);
+                  if (!opt.has_value()) return sol::nil;
+                  const nlohmann::json &j = opt.value();
+                  sol::state_view lua(ts);
+                  if (j.is_number_integer()) {
+                      return sol::make_object(lua, j.get<int>());
+                  } else if (j.is_number_float()) {
+                      return sol::make_object(lua, j.get<double>());
+                  } else if (j.is_boolean()) {
+                      return sol::make_object(lua, j.get<bool>());
+                  } else if (j.is_string()) {
+                      return sol::make_object(lua, j.get<std::string>());
+                  } else if (j.is_object() || j.is_array()) {
+                      sol::table tbl = lua.create_table();
+                      if (j.is_object()) {
+                          for (auto& [k, v] : j.items()) {
+                              if (v.is_number_integer()) {
+                                  tbl[k] = v.get<int>();
+                              } else if (v.is_number_float()) {
+                                  tbl[k] = v.get<double>();
+                              } else if (v.is_boolean()) {
+                                  tbl[k] = v.get<bool>();
+                              } else if (v.is_string()) {
+                                  tbl[k] = v.get<std::string>();
+                              } else {
+                                  tbl[k] = sol::nil;
+                              }
+                          }
+                      } else if (j.is_array()) {
+                          int index = 1;
+                          for (auto& v : j) {
+                              if (v.is_number_integer()) {
+                                  tbl[index++] = v.get<int>();
+                              } else if (v.is_number_float()) {
+                                  tbl[index++] = v.get<double>();
+                              } else if (v.is_boolean()) {
+                                  tbl[index++] = v.get<bool>();
+                              } else if (v.is_string()) {
+                                  tbl[index++] = v.get<std::string>();
+                              } else {
+                                  tbl[index++] = sol::nil;
+                              }
                           }
                       }
-                  } else if (j.is_array()) {
-                      int index = 1;
-                      for (auto& v : j) {
-                          if (v.is_number_integer()) {
-                              tbl[index++] = v.get<int>();
-                          } else if (v.is_number_float()) {
-                              tbl[index++] = v.get<double>();
-                          } else if (v.is_boolean()) {
-                              tbl[index++] = v.get<bool>();
-                          } else if (v.is_string()) {
-                              tbl[index++] = v.get<std::string>();
-                          } else {
-                              tbl[index++] = sol::nil;
-                          }
-                      }
+                      return sol::make_object(lua, tbl);
                   }
-                  return sol::make_object(lua, tbl);
-              }
-              return sol::nil; },
+                  return sol::nil; },
       "clear", &storage::cassete::clear
   );
 
@@ -509,22 +509,22 @@ void framework::scriptengine::run() {
       sol::constructors<network::socket()>(),
       "connect", &network::socket::connect,
       "emit", [](network::socket &sio, const std::string &event, sol::table data, sol::this_state state) {
-    sol::state_view lua(state);
-    const auto j = _to_json(data);
-    sio.emit(event, j.dump()); },
+        sol::state_view lua(state);
+        const auto j = _to_json(data);
+        sio.emit(event, j.dump()); },
       "on", [](network::socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
-    sol::state_view lua(state);
-    sio.on(event, [callback, lua](const std::string &data) {
-      const auto j = nlohmann::json::parse(data);
-      callback(_to_lua(j, lua));
-    }); },
+        sol::state_view lua(state);
+        sio.on(event, [callback, lua](const std::string &data) {
+          const auto j = nlohmann::json::parse(data);
+          callback(_to_lua(j, lua));
+        }); },
       "rpc", [](network::socket &sio, const std::string &method, sol::table arguments, sol::function callback, sol::this_state state) {
-    sol::state_view lua(state);
-    const auto args_json = _to_json(arguments);
-    sio.rpc(method, args_json.dump(), [callback, lua](const std::string &response) {
-      const auto j = nlohmann::json::parse(response);
-      callback(_to_lua(j, lua));
-    }); }
+        sol::state_view lua(state);
+        const auto args_json = _to_json(arguments);
+        sio.rpc(method, args_json.dump(), [callback, lua](const std::string &response) {
+          const auto j = nlohmann::json::parse(response);
+          callback(_to_lua(j, lua));
+        }); }
   );
 
   lua.new_usertype<graphics::color>(
@@ -622,10 +622,10 @@ void framework::scriptengine::run() {
       "Canvas",
       sol::no_constructor,
       "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, std::string_view buffer) {
-            std::span<const uint32_t> pixels(
-                reinterpret_cast<const uint32_t *>(buffer.data()),
-                buffer.size() / sizeof(uint32_t));
-            c.set_pixels(pixels); })
+                std::span<const uint32_t> pixels(
+                    reinterpret_cast<const uint32_t *>(buffer.data()),
+                    buffer.size() / sizeof(uint32_t));
+                c.set_pixels(pixels); })
   );
 
   const auto script = storage::io::read("scripts/main.lua");
