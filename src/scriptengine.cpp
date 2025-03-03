@@ -1,21 +1,10 @@
 #include "scriptengine.hpp"
 
-#include "color.hpp"
 #include "common.hpp"
-#include "enginefactory.hpp"
 #include "entity.hpp"
-#include "entitymanager.hpp"
-#include "entityprops.hpp"
 #include "event.hpp"
-#include "io.hpp"
-#include "kv.hpp"
-#include "label.hpp"
 #include "loopable.hpp"
-#include "overlay.hpp"
 #include "point.hpp"
-#include "postalservice.hpp"
-#include "socket.hpp"
-#include "soundmanager.hpp"
 #include "vector2d.hpp"
 #include "widget.hpp"
 
@@ -424,6 +413,95 @@ void framework::scriptengine::run() {
       "Size", sol::constructors<geometry::size(), geometry::size(int32_t, int32_t), geometry::size(const geometry::size &)>(),
       "width", sol::property(&geometry::size::width, &geometry::size::set_width),
       "height", sol::property(&geometry::size::height, &geometry::size::set_height)
+  );
+
+  lua.new_usertype<storage::cassete>(
+      "Cassete",
+      sol::no_constructor,
+      "set", [](storage::cassete &c, const std::string &key, sol::object obj) {
+              if (obj.is<int>()) {
+                  c.set<int>(key, obj.as<int>());
+              } else if (obj.is<double>()) {
+                  c.set<double>(key, obj.as<double>());
+              } else if (obj.is<bool>()) {
+                  c.set<bool>(key, obj.as<bool>());
+              } else if (obj.is<std::string>()) {
+                  c.set<std::string>(key, obj.as<std::string>());
+              } else if (obj.is<sol::table>()) {
+                  sol::table tbl = obj.as<sol::table>();
+                  nlohmann::json j;
+                  for (auto& pair : tbl) {
+                      sol::object k_obj = pair.first;
+                      sol::object v_obj = pair.second;
+                      if (!k_obj.is<std::string>()) continue;
+                      std::string jkey = k_obj.as<std::string>();
+                      if (v_obj.is<int>()) {
+                          j[jkey] = v_obj.as<int>();
+                      } else if (v_obj.is<double>()) {
+                          j[jkey] = v_obj.as<double>();
+                      } else if (v_obj.is<bool>()) {
+                          j[jkey] = v_obj.as<bool>();
+                      } else if (v_obj.is<std::string>()) {
+                          j[jkey] = v_obj.as<std::string>();
+                      } else if (v_obj.is<sol::table>()) {
+                          j[jkey] = nullptr;
+                      } else {
+                          j[jkey] = nullptr;
+                      }
+                  }
+                  c.set<nlohmann::json>(key, j);
+              } else {
+                throw std::runtime_error("Unsupported type for set");
+              } },
+      "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
+              auto opt = c.get<nlohmann::json>(key);
+              if (!opt.has_value()) return sol::nil;
+              const nlohmann::json &j = opt.value();
+              sol::state_view lua(ts);
+              if (j.is_number_integer()) {
+                  return sol::make_object(lua, j.get<int>());
+              } else if (j.is_number_float()) {
+                  return sol::make_object(lua, j.get<double>());
+              } else if (j.is_boolean()) {
+                  return sol::make_object(lua, j.get<bool>());
+              } else if (j.is_string()) {
+                  return sol::make_object(lua, j.get<std::string>());
+              } else if (j.is_object() || j.is_array()) {
+                  sol::table tbl = lua.create_table();
+                  if (j.is_object()) {
+                      for (auto& [k, v] : j.items()) {
+                          if (v.is_number_integer()) {
+                              tbl[k] = v.get<int>();
+                          } else if (v.is_number_float()) {
+                              tbl[k] = v.get<double>();
+                          } else if (v.is_boolean()) {
+                              tbl[k] = v.get<bool>();
+                          } else if (v.is_string()) {
+                              tbl[k] = v.get<std::string>();
+                          } else {
+                              tbl[k] = sol::nil;
+                          }
+                      }
+                  } else if (j.is_array()) {
+                      int index = 1;
+                      for (auto& v : j) {
+                          if (v.is_number_integer()) {
+                              tbl[index++] = v.get<int>();
+                          } else if (v.is_number_float()) {
+                              tbl[index++] = v.get<double>();
+                          } else if (v.is_boolean()) {
+                              tbl[index++] = v.get<bool>();
+                          } else if (v.is_string()) {
+                              tbl[index++] = v.get<std::string>();
+                          } else {
+                              tbl[index++] = sol::nil;
+                          }
+                      }
+                  }
+                  return sol::make_object(lua, tbl);
+              }
+              return sol::nil; },
+      "clear", &storage::cassete::clear
   );
 
   lua.new_usertype<network::socket>(
