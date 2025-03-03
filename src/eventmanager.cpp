@@ -80,7 +80,7 @@ void eventmanager::update(float_t delta) {
 
     case SDL_CONTROLLERDEVICEADDED: {
       if (!SDL_IsGameController(event.cdevice.which)) {
-        continue;
+        break;
       }
 
       if (auto controller = SDL_GameControllerOpen(event.cdevice.which)) {
