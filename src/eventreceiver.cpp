@@ -1,4 +1,5 @@
 #include "eventreceiver.hpp"
+#include <fmt/base.h>
 
 using namespace input;
 
@@ -9,6 +10,18 @@ void eventreceiver::on_keydown(const keyevent &event) noexcept {
 }
 
 void eventreceiver::on_keyup(const keyevent &event) noexcept {
+  UNUSED(event);
+}
+
+void eventreceiver::on_mousemotion(const mousemotionevent &event) noexcept {
+  UNUSED(event);
+}
+
+void eventreceiver::on_mousebuttondown(const mousebuttonevent &event) noexcept {
+  UNUSED(event);
+}
+
+void eventreceiver::on_mousebuttoup(const mousebuttonevent &event) noexcept {
   UNUSED(event);
 }
 

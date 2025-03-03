@@ -38,6 +38,12 @@ void eventmanager::update(float_t delta) {
       }
       break;
 
+    case SDL_MOUSEMOTION:
+      for (const auto &receiver : _receivers) {
+        receiver->on_mousemotion(mousemotionevent{event.motion.x, event.motion.y});
+      }
+      break;
+
     case SDL_MOUSEBUTTONDOWN:
       // for (const auto &receiver : _receivers) {
       //   receiver->on_mouseup();

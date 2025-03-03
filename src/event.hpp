@@ -22,6 +22,35 @@ enum class keyevent : int32_t {
   space = SDLK_SPACE,
 };
 
+struct mousemotionevent {
+  int32_t x;
+  int32_t y;
+
+  constexpr mousemotionevent(int32_t x, int32_t y)
+      : x(x), y(y) {}
+};
+
+struct mousebuttonevent {
+  enum class Type : uint32_t {
+    down = SDL_MOUSEBUTTONDOWN,
+    up = SDL_MOUSEBUTTONUP,
+  };
+
+  enum class Button : uint8_t {
+    left = SDL_BUTTON_LEFT,
+    middle = SDL_BUTTON_MIDDLE,
+    right = SDL_BUTTON_RIGHT,
+  };
+
+  Type type;
+  Button button;
+  int32_t x;
+  int32_t y;
+
+  constexpr mousebuttonevent(Type type, Button button, int32_t x, int32_t y)
+      : type(type), button(button), x(x), y(y) {}
+};
+
 enum class joystickevent : int32_t {
   up = SDL_CONTROLLER_BUTTON_DPAD_UP,
   down = SDL_CONTROLLER_BUTTON_DPAD_DOWN,
@@ -48,8 +77,6 @@ struct joystickaxisevent {
   axis kind;
   int16_t value;
 };
-
-enum class mouseevent : int32_t {};
 
 struct mailevent {
   mailevent(uint64_t to, const std::string &body) noexcept
