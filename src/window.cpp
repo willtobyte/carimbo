@@ -16,16 +16,12 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
           SDL_Deleter()
       ) {
   if (_window == nullptr) [[unlikely]] {
-    std::ostringstream oss;
-    oss << "[SDL_CreateWindow] failed to create window: " << SDL_GetError();
-    throw std::runtime_error(oss.str());
+    throw std::runtime_error(fmt::format("[SDL_CreateWindow] failed to create window: {}", SDL_GetError()));
   }
 
   auto context = SDL_GL_CreateContext(_window.get());
   if (!context) [[unlikely]] {
-    std::ostringstream oss;
-    oss << "[SDL_GL_CreateContext] failed to create context: " << SDL_GetError();
-    throw std::runtime_error(oss.str());
+    throw std::runtime_error(fmt::format("[SDL_GL_CreateContext] failed to create context: {}", SDL_GetError()));
   }
 
   SDL_GL_MakeCurrent(_window.get(), context);

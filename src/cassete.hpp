@@ -27,5 +27,4 @@ private:
 };
 
 #include "cassete.tpp"
-
 }

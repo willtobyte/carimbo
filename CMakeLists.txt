@@ -17,6 +17,7 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
 endif()
+find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
@@ -60,6 +61,7 @@ if(EMSCRIPTEN)
     -O0
     -g3
     -gsource-map
+    -fexperimental-library
   )
 
   set(EMSDK_LINK_DEBUG_FLAGS
@@ -74,6 +76,7 @@ if(EMSCRIPTEN)
   set(EMSDK_COMPILE_RELEASE_FLAGS
     -Oz
     -flto
+    -fexperimental-library
   )
 
   set(EMSDK_LINK_RELEASE_FLAGS
@@ -123,6 +126,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+  fmt::fmt
   nlohmann_json::nlohmann_json
   Ogg::ogg
   physfs-static

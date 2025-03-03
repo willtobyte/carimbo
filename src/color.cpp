@@ -11,15 +11,11 @@ color::color(const SDL_Color &scolor) noexcept
 color::color(const std::string &hex)
     : _r(0), _g(0), _b(0), _a(255) {
   if (hex.length() != 7 && hex.length() != 9) [[unlikely]] {
-    std::ostringstream oss;
-    oss << "Invalid hex code format: '" << hex << "'. Use #RRGGBB or #RRGGBBAA.";
-    throw std::invalid_argument(oss.str());
+    throw std::invalid_argument(fmt::format("Invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
   }
 
   if (hex[0] != '#') [[unlikely]] {
-    std::ostringstream oss;
-    oss << "Hex code '" << hex << "' must start with '#'.";
-    throw std::invalid_argument(oss.str());
+    throw std::invalid_argument(fmt::format("Hex code '{}' must start with '#'.", hex));
   }
 
   _r = static_cast<uint8_t>(std::stoi(hex.substr(1, 2), nullptr, 16));

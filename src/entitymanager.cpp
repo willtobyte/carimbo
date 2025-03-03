@@ -32,7 +32,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
     return clone(*it);
   }
 
-  const auto buffer = storage::io::read((std::ostringstream() << "entities/" << kind << ".json").str());
+  const auto buffer = storage::io::read(fmt::format("entities/{}.json", kind));
   const auto j = nlohmann::json::parse(buffer);
 
   const auto size = j["size"].get<geometry::size>();
@@ -84,7 +84,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   };
 
   auto e = entity::create(std::move(props));
-  std::cout << "[entitymanager] spawn " << e->id() << " kind " << kind << std::endl;
+  fmt::print("[entitymanager] spawn {} kind {}", e->id(), kind);
   _entities.emplace_back(e);
   return e;
 }
@@ -110,7 +110,7 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
 
   _entities.emplace_back(e);
 
-  std::cout << "[entitymanager] cloned entity " << e->id() << " from matrix " << matrix->id() << std::endl;
+  fmt::print("[entitymanager] cloned entity {} from matrix {}", e->id(), matrix->id());
 
   return e;
 }

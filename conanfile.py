@@ -8,6 +8,7 @@ class MeuProjetoConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
     def requirements(self):
+        self.requires("fmt/11.1.3")
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.11.3")
         self.requires("ogg/1.3.5")

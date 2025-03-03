@@ -32,6 +32,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL2/SDL.h>
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
 #include <ogg/ogg.h>
 #include <physfs.h>
@@ -41,12 +42,13 @@
 #include <vorbis/vorbisfile.h>
 
 #include <algorithm>
+#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
+#include <cstdio>
 #include <filesystem>
-#include <format>
 #include <functional>
 #include <iostream>
 #include <iterator>

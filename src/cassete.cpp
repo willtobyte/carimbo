@@ -38,8 +38,8 @@ cassete::cassete() {
 void cassete::persist() const {
 #ifdef EMSCRIPTEN
   constexpr auto path = "; path=/";
-  const auto value = std::format("{}{}{}", _cookiekey, _j.dump(), path);
-  const auto script = std::format("document.cookie = '{}';", value);
+  const auto value = fmt::format("{}{}{}", _cookiekey, _j.dump(), path);
+  const auto script = fmt::format("document.cookie = '{}';", value);
   emscripten_run_script(script.c_str());
 #else
   std::ofstream file(_filename);

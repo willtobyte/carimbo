@@ -19,20 +19,14 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
       SDL_FreeSurface
   };
   if (!surface) [[unlikely]] {
-    std::ostringstream oss;
-    oss << "[SDL_CreateRGBSurfaceWithFormat] error while creating surface, file: "
-        << filename << ", error: " << SDL_GetError();
-    throw std::runtime_error(oss.str());
+    throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormat] error while creating surface, file: {}, error: {}", filename, SDL_GetError()));
   }
 
   std::memcpy(surface->pixels, output.data(), output.size());
 
   _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter());
   if (!_texture) [[unlikely]] {
-    std::ostringstream oss;
-    oss << "[SDL_CreateTextureFromSurface] error while creating texture from surface, file: "
-        << filename;
-    throw std::runtime_error(oss.str());
+    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture from surface, file: {}", filename));
   }
 }
 
@@ -40,10 +34,7 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Su
     : _renderer(renderer) {
   _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter());
   if (!_texture) [[unlikely]] {
-    std::ostringstream oss;
-    oss << "[SDL_CreateTextureFromSurface] error while creating texture, SDL Error: "
-        << SDL_GetError();
-    throw std::runtime_error(oss.str());
+    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture, SDL Error: {}", SDL_GetError()));
   }
 }
 

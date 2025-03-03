@@ -67,7 +67,7 @@ socket::~socket() noexcept {
   }
 #else
   _ws.async_close(websocket::close_code::normal, [](beast::error_code ec) {
-    std::cerr << "[socket] websocket close error: " << ec.message() << std::endl;
+    fmt::print(stderr, "[socket] websocket close error: {}", ec.message());
   });
 #endif
 }
@@ -109,25 +109,16 @@ void socket::connect() noexcept {
 }
 
 void socket::emit(const std::string &topic, const std::string &data) noexcept {
-  std::ostringstream oss;
-  oss << R"({"event": {"topic": ")" << topic << R"(", "data": )" << data << R"(}})";
-  send(oss.str());
+  send(fmt::format(fmt::runtime(R"({"event": {"topic": "{}", "data": {}}})"), topic, data));
 }
 
 void socket::on(const std::string &topic, std::function<void(const std::string &)> callback) noexcept {
-  std::ostringstream oss;
-  oss << R"({"subscribe": ")" << topic << R"("})";
-  send(oss.str());
+  send(fmt::format(fmt::runtime(R"({"subscribe": "{}"})"), topic));
   _callbacks[topic].push_back(std::move(callback));
 }
 
 void socket::rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) noexcept {
-  std::ostringstream oss;
-  oss << R"({"rpc": {"request": {"id": )" << ++counter
-      << R"(, "method": ")" << method
-      << R"(", "arguments": )" << arguments << R"(}}})";
-  send(oss.str());
-
+  send(fmt::format(R"({"rpc": {"request": {"id": {}, "method": "{}", "arguments": {}}}}})", ++counter, method, arguments));
   _callbacks[method].push_back(std::move(callback));
 }
 

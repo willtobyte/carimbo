@@ -27,12 +27,17 @@ std::string querybuilder::build() const noexcept {
     return {};
   }
 
-  std::ostringstream query;
-  for (auto it = _parameters.begin(); it != _parameters.end(); ++it) {
-    query << it->first << '=' << encode(it->second);
-    if (std::next(it) != _parameters.end()) query << '&';
+  std::string result;
+  bool first = true;
+  for (const auto &[key, value] : _parameters) {
+    if (!first) {
+      result.push_back('&');
+    } else {
+      first = false;
+    }
+    result.append(fmt::format("{}={}", key, encode(value)));
   }
-  return query.str();
+  return result;
 }
 
 std::string querybuilder::make(std::initializer_list<std::pair<std::string, std::string>> entries) {

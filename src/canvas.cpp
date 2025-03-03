@@ -8,7 +8,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
 
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, _width, _height);
   if (!texture) [[unlikely]] {
-    const auto error = std::format("[SDL_CreateTexture] failed to create texture: {}", SDL_GetError());
+    const auto error = fmt::format("[SDL_CreateTexture] failed to create texture: {}", SDL_GetError());
     throw std::runtime_error(error);
   }
 
@@ -29,9 +29,7 @@ void canvas::draw() {
   }
 
   if (SDL_UpdateTexture(_framebuffer.get(), nullptr, _pixels.data(), _width * sizeof(uint32_t)) != 0) [[unlikely]] {
-    std::ostringstream error;
-    error << "[SDL_UpdateTexture] failed: " << SDL_GetError();
-    throw std::runtime_error(error.str());
+    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] failed: {}", SDL_GetError()));
   }
 
   SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
