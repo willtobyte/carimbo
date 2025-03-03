@@ -451,7 +451,7 @@ void framework::scriptengine::run() {
                   }
                   c.set<nlohmann::json>(key, j);
               } else {
-                throw std::runtime_error("Unsupported type for set");
+                  throw std::runtime_error("Unsupported type for set");
               } },
       "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
               auto opt = c.get<nlohmann::json>(key);
