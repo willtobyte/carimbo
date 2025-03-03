@@ -69,6 +69,7 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   engine->eventmanager()->add_receiver(engine->entitymanager());
   engine->eventmanager()->add_receiver(engine);
   engine->eventmanager()->add_receiver(engine->statemanager());
+  engine->eventmanager()->add_receiver(overlay);
 
   return engine;
 }

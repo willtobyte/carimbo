@@ -1,10 +1,11 @@
 #pragma once
 
 #include "common.hpp"
+#include "eventreceiver.hpp"
 #include "widget.hpp"
 
 namespace graphics {
-class overlay {
+class overlay : public input::eventreceiver {
 public:
   explicit overlay(std::shared_ptr<renderer> renderer);
   ~overlay() = default;
