@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "event.hpp"
+
 namespace input {
 class eventreceiver {
 public:

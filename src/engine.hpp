@@ -1,9 +1,7 @@
 #pragma once
 
 #include "common.hpp"
-#include "event.hpp"
 #include "eventreceiver.hpp"
-#include "lifecycleobserver.hpp"
 
 namespace framework {
 class engine : public input::eventreceiver {
@@ -23,6 +21,7 @@ public:
   std::shared_ptr<graphics::window> window() const noexcept;
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
   std::shared_ptr<graphics::canvas> canvas() const noexcept;
+  std::shared_ptr<storage::cassete> cassete() const noexcept;
 
   int32_t height() const noexcept;
   int32_t width() const noexcept;
@@ -65,6 +64,7 @@ private:
   std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::window> _window;
   std::shared_ptr<graphics::fontfactory> _fontfactory;
+  std::shared_ptr<storage::cassete> _cassete;
   std::list<std::shared_ptr<lifecycleobserver>> _observers;
 };
 }

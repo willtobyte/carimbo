@@ -16,6 +16,7 @@ using namespace framework;
 engine::engine() noexcept
     : _running(true) {
   add_loopable(std::make_shared<framerate>());
+  _cassete = std::make_shared<storage::cassete>();
 }
 
 std::shared_ptr<audio::audiodevice> engine::audiodevice() const noexcept {
@@ -64,6 +65,10 @@ std::shared_ptr<graphics::renderer> engine::renderer() const noexcept {
 
 std::shared_ptr<graphics::canvas> engine::canvas() const noexcept {
   return _canvas;
+}
+
+std::shared_ptr<storage::cassete> engine::cassete() const noexcept {
+  return _cassete;
 }
 
 int32_t engine::height() const noexcept {

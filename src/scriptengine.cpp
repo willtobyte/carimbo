@@ -371,6 +371,7 @@ void framework::scriptengine::run() {
       "Engine",
       "add_loopable", &framework::engine::add_loopable,
       "canvas", &framework::engine::canvas,
+      "cassete", &framework::engine::cassete,
       "entitymanager", &framework::engine::entitymanager,
       "fontfactory", &framework::engine::fontfactory,
       "overlay", &framework::engine::overlay,
@@ -418,32 +419,32 @@ void framework::scriptengine::run() {
   lua.new_usertype<storage::cassete>(
       "Cassete",
       sol::no_constructor,
-      "set", [](storage::cassete &c, const std::string &key, sol::object obj) {
-                  if (obj.is<int>()) {
-                      c.set<int>(key, obj.as<int>());
-                  } else if (obj.is<double>()) {
-                      c.set<double>(key, obj.as<double>());
-                  } else if (obj.is<bool>()) {
-                      c.set<bool>(key, obj.as<bool>());
-                  } else if (obj.is<std::string>()) {
-                      c.set<std::string>(key, obj.as<std::string>());
-                  } else if (obj.is<sol::table>()) {
-                      sol::table tbl = obj.as<sol::table>();
+      "set", [](storage::cassete &c, const std::string &key, sol::object object) {
+                  if (object.is<int>()) {
+                      c.set<int>(key, object.as<int>());
+                  } else if (object.is<double>()) {
+                      c.set<double>(key, object.as<double>());
+                  } else if (object.is<bool>()) {
+                      c.set<bool>(key, object.as<bool>());
+                  } else if (object.is<std::string>()) {
+                      c.set<std::string>(key, object.as<std::string>());
+                  } else if (object.is<sol::table>()) {
+                      const auto table = object.as<sol::table>();
                       nlohmann::json j;
-                      for (auto& pair : tbl) {
-                          sol::object k_obj = pair.first;
-                          sol::object v_obj = pair.second;
-                          if (!k_obj.is<std::string>()) continue;
-                          std::string jkey = k_obj.as<std::string>();
-                          if (v_obj.is<int>()) {
-                              j[jkey] = v_obj.as<int>();
-                          } else if (v_obj.is<double>()) {
-                              j[jkey] = v_obj.as<double>();
-                          } else if (v_obj.is<bool>()) {
-                              j[jkey] = v_obj.as<bool>();
-                          } else if (v_obj.is<std::string>()) {
-                              j[jkey] = v_obj.as<std::string>();
-                          } else if (v_obj.is<sol::table>()) {
+                      for (auto& pair : table) {
+                          const auto k = pair.first;
+                          const auto v = pair.second;
+                          if (!k.is<std::string>()) continue;
+                          const auto jkey = k.as<std::string>();
+                          if (v.is<int>()) {
+                              j[jkey] = v.as<int>();
+                          } else if (v.is<double>()) {
+                              j[jkey] = v.as<double>();
+                          } else if (v.is<bool>()) {
+                              j[jkey] = v.as<bool>();
+                          } else if (v.is<std::string>()) {
+                              j[jkey] = v.as<std::string>();
+                          } else if (v.is<sol::table>()) {
                               j[jkey] = nullptr;
                           } else {
                               j[jkey] = nullptr;
@@ -467,38 +468,38 @@ void framework::scriptengine::run() {
                   } else if (j.is_string()) {
                       return sol::make_object(lua, j.get<std::string>());
                   } else if (j.is_object() || j.is_array()) {
-                      sol::table tbl = lua.create_table();
+                      auto table = lua.create_table();
                       if (j.is_object()) {
                           for (auto& [k, v] : j.items()) {
                               if (v.is_number_integer()) {
-                                  tbl[k] = v.get<int>();
+                                  table[k] = v.get<int>();
                               } else if (v.is_number_float()) {
-                                  tbl[k] = v.get<double>();
+                                  table[k] = v.get<double>();
                               } else if (v.is_boolean()) {
-                                  tbl[k] = v.get<bool>();
+                                  table[k] = v.get<bool>();
                               } else if (v.is_string()) {
-                                  tbl[k] = v.get<std::string>();
+                                  table[k] = v.get<std::string>();
                               } else {
-                                  tbl[k] = sol::nil;
+                                  table[k] = sol::nil;
                               }
                           }
                       } else if (j.is_array()) {
-                          int index = 1;
+                          auto index = 1;
                           for (auto& v : j) {
                               if (v.is_number_integer()) {
-                                  tbl[index++] = v.get<int>();
+                                  table[index++] = v.get<int>();
                               } else if (v.is_number_float()) {
-                                  tbl[index++] = v.get<double>();
+                                  table[index++] = v.get<double>();
                               } else if (v.is_boolean()) {
-                                  tbl[index++] = v.get<bool>();
+                                  table[index++] = v.get<bool>();
                               } else if (v.is_string()) {
-                                  tbl[index++] = v.get<std::string>();
+                                  table[index++] = v.get<std::string>();
                               } else {
-                                  tbl[index++] = sol::nil;
+                                  table[index++] = sol::nil;
                               }
                           }
                       }
-                      return sol::make_object(lua, tbl);
+                      return sol::make_object(lua, table);
                   }
                   return sol::nil; },
       "clear", &storage::cassete::clear
