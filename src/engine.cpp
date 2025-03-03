@@ -168,8 +168,8 @@ void engine::_loop() noexcept {
 
   _scenemanager->update(delta);
   _eventmanager->update(delta);
-  _overlay->update(delta);
   _entitymanager->update(delta);
+  _overlay->update(delta);
 
   for (const auto &loopable : _loopables) {
     loopable->loop(delta);
