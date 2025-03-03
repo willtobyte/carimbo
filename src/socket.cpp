@@ -158,7 +158,7 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
   UNUSED(results);
 
   if (ec) {
-    std::cerr << "[error] resolve error: " << ec.message() << std::endl;
+    fmt::print(stderr, "[error] resolve error: {}\n", ec.message());
     return;
   }
 
@@ -176,7 +176,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
   UNUSED(endpoint);
 
   if (ec) {
-    std::cerr << "[socket] connect error: " << ec.message() << std::endl;
+    fmt::print(stderr, "[socket] connect error: {}\n", ec.message());
     return;
   }
 
@@ -196,7 +196,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
 
 void socket::on_ssl_handshake(beast::error_code ec) noexcept {
   if (ec) {
-    std::cerr << "[socket] ssl handshake error: " << ec.message() << std::endl;
+    fmt::print(stderr, "[socket] ssl handshake error: {}\n", ec.message());
     return;
   }
 
@@ -212,7 +212,7 @@ void socket::on_ssl_handshake(beast::error_code ec) noexcept {
 
 void socket::on_handshake(beast::error_code ec) noexcept {
   if (ec) {
-    std::cerr << "[socket] handshake error: " << ec.message() << std::endl;
+    fmt::print(stderr, "[socket] handshake error: {}\n", ec.message());
     return;
   }
 
@@ -223,7 +223,7 @@ void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) noexce
   UNUSED(bytes_transferred);
 
   if (ec) {
-    std::cerr << "[socket] read error: " << ec.message() << std::endl;
+    fmt::print(stderr, "[socket] read error: {}\n", ec.message());
     return;
   }
 
@@ -305,7 +305,7 @@ void socket::send(const std::string &message) noexcept {
           UNUSED(bytes_transferred);
 
           if (ec) {
-            std::cerr << "[socket] write error: " << ec.message() << std::endl;
+            fmt::print(stderr, "[socket] write error: {}\n", ec.message());
             return;
           }
         }
