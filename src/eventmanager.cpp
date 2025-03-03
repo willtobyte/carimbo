@@ -20,62 +20,93 @@ void eventmanager::update(float_t delta) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
-    case SDL_QUIT:
+    case SDL_QUIT: {
       for (const auto &receiver : _receivers) {
         receiver->on_quit();
       }
-      break;
+    } break;
 
-    case SDL_KEYDOWN:
+    case SDL_KEYDOWN: {
+      const keyevent e{event.key.keysym.sym};
+
       for (const auto &receiver : _receivers) {
-        receiver->on_keydown(keyevent(event.key.keysym.sym));
+        receiver->on_keydown(e);
       }
-      break;
+    } break;
 
-    case SDL_KEYUP:
+    case SDL_KEYUP: {
+      const keyevent e{event.key.keysym.sym};
+
       for (const auto &receiver : _receivers) {
-        receiver->on_keyup(keyevent(event.key.keysym.sym));
+        receiver->on_keyup(e);
       }
-      break;
+    } break;
 
-    case SDL_MOUSEMOTION:
+    case SDL_MOUSEMOTION: {
+      const mousemotionevent e{
+          event.motion.x, event.motion.y
+      };
+
       for (const auto &receiver : _receivers) {
-        receiver->on_mousemotion(mousemotionevent{event.motion.x, event.motion.y});
+        receiver->on_mousemotion(e);
+      }
+    } break;
+
+    case SDL_MOUSEBUTTONDOWN: {
+      const mousebuttonevent e{
+          .type = mousebuttonevent::type::down,
+          .button = static_cast<enum mousebuttonevent::button>(event.button.button),
+          .x = event.button.x,
+          .y = event.button.y
+      };
+
+      for (const auto &receiver : _receivers) {
+        receiver->on_mousebuttondown(e);
       }
       break;
+    }
+    case SDL_MOUSEBUTTONUP: {
+      const mousebuttonevent e{
+          .type = mousebuttonevent::type::up,
+          .button = static_cast<enum mousebuttonevent::button>(event.button.button),
+          .x = event.button.x,
+          .y = event.button.y
+      };
 
-    case SDL_MOUSEBUTTONDOWN:
-      // for (const auto &receiver : _receivers) {
-      //   receiver->on_mouseup();
-      // }
-      break;
-
-    case SDL_MOUSEBUTTONUP:
-      break;
-
-    case SDL_CONTROLLERDEVICEADDED:
-      if (SDL_IsGameController(event.cdevice.which)) {
-        if (auto controller = SDL_GameControllerOpen(event.cdevice.which)) {
-          const auto joystick = SDL_GameControllerGetJoystick(controller);
-          const auto id = SDL_JoystickInstanceID(joystick);
-          _controllers[id] = gamecontroller_ptr(controller);
-        }
+      for (const auto &receiver : _receivers) {
+        receiver->on_mousebuttonup(e);
       }
-      break;
+    } break;
+
+    case SDL_CONTROLLERDEVICEADDED: {
+      if (!SDL_IsGameController(event.cdevice.which)) {
+        continue;
+      }
+
+      if (auto controller = SDL_GameControllerOpen(event.cdevice.which)) {
+        const auto joystick = SDL_GameControllerGetJoystick(controller);
+        const auto id = SDL_JoystickInstanceID(joystick);
+        _controllers[id] = gamecontroller_ptr(controller);
+      }
+    } break;
 
     case SDL_CONTROLLERDEVICEREMOVED:
       _controllers.erase(event.cdevice.which);
       break;
 
     case SDL_CONTROLLERBUTTONDOWN: {
+      const joystickevent e{event.cbutton.button};
+
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickbuttondown(event.cbutton.which, joystickevent(event.cbutton.button));
+        receiver->on_joystickbuttondown(event.cbutton.which, e);
       }
     } break;
 
     case SDL_CONTROLLERBUTTONUP: {
+      const joystickevent e{event.cbutton.button};
+
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickbuttonup(event.cbutton.which, joystickevent(event.cbutton.button));
+        receiver->on_joystickbuttonup(event.cbutton.which, e);
       }
     } break;
 
@@ -83,11 +114,10 @@ void eventmanager::update(float_t delta) {
       const auto who = event.caxis.which;
       const auto axis = static_cast<input::joystickaxisevent::axis>(event.caxis.axis);
       const auto value = event.caxis.value;
-
-      joystickaxisevent event = {axis, value};
+      const joystickaxisevent e{axis, value};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickaxismotion(who, event);
+        receiver->on_joystickaxismotion(who, e);
       }
     } break;
 

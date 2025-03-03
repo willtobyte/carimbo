@@ -25,30 +25,24 @@ enum class keyevent : int32_t {
 struct mousemotionevent {
   int32_t x;
   int32_t y;
-
-  constexpr mousemotionevent(int32_t x, int32_t y)
-      : x(x), y(y) {}
 };
 
 struct mousebuttonevent {
-  enum class Type : uint32_t {
+  enum class type : uint32_t {
     down = SDL_MOUSEBUTTONDOWN,
     up = SDL_MOUSEBUTTONUP,
   };
 
-  enum class Button : uint8_t {
+  enum class button : uint8_t {
     left = SDL_BUTTON_LEFT,
     middle = SDL_BUTTON_MIDDLE,
     right = SDL_BUTTON_RIGHT,
   };
 
-  Type type;
-  Button button;
+  type type;
+  button button;
   int32_t x;
   int32_t y;
-
-  constexpr mousebuttonevent(Type type, Button button, int32_t x, int32_t y)
-      : type(type), button(button), x(x), y(y) {}
 };
 
 enum class joystickevent : int32_t {

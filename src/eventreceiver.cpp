@@ -21,7 +21,7 @@ void eventreceiver::on_mousebuttondown(const mousebuttonevent &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_mousebuttoup(const mousebuttonevent &event) noexcept {
+void eventreceiver::on_mousebuttonup(const mousebuttonevent &event) noexcept {
   UNUSED(event);
 }
 
