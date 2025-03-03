@@ -31,6 +31,9 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 file(GLOB HEADER_FILES "src/*.hpp")
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
+file(GLOB TEMPLATE_FILES "src/*.tpp")
+target_sources(${PROJECT_NAME} PRIVATE ${TEMPLATE_FILES})
+
 if(MSVC)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 else()

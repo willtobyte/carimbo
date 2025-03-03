@@ -7,7 +7,6 @@ help:
 
 clean: ## Clean build files and remove marker file
 	unalias rm 2>/dev/null || true
-	rm -rf ~/.conan2/p 2>/dev/null
 	rm -rf build 2>/dev/null
 
 build: ## Build the project
