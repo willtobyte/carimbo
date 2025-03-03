@@ -15,7 +15,7 @@ void framerate::loop(float_t delta) noexcept {
   _start = now;
 
   if (_elapsed >= 1000) {
-    std::cout << std::fixed << std::setprecision(1) << (_frames / (_elapsed / 1000.0f)) << std::endl;
+    fmt::print("{:.1f}\n", _frames / (_elapsed / 1000.0f));
     _elapsed = 0;
     _frames = 0;
   }

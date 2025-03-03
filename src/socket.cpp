@@ -118,7 +118,7 @@ void socket::on(const std::string &topic, std::function<void(const std::string &
 }
 
 void socket::rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) noexcept {
-  send(fmt::format(R"({"rpc": {"request": {"id": {}, "method": "{}", "arguments": {}}}}})", ++counter, method, arguments));
+  send(fmt::format(fmt::runtime(R"({"rpc": {"request": {"id": {}, "method": "{}", "arguments": {}}}}})"), ++counter, method, arguments));
   _callbacks[method].push_back(std::move(callback));
 }
 
