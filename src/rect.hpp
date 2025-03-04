@@ -26,6 +26,8 @@ public:
 
   operator SDL_Rect() const noexcept;
 
+  operator SDL_FRect() const noexcept;
+
   rect operator+(const point &offset) const noexcept;
 
   auto operator<=>(const rect &) const = default;

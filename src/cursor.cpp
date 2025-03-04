@@ -15,7 +15,6 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
       _frame(0),
       _last_frame(0),
       _resourcemanager(std::move(resourcemanager)) {
-
   SDL_ShowCursor(false);
 
   const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));

@@ -6,7 +6,7 @@ application::application(int argc, char **argv) {
   UNUSED(argc);
   UNUSED(argv);
 
-  SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_VIDEO);
+  SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_TIMER | SDL_INIT_VIDEO);
 
   PHYSFS_init(argv[0]);
 }

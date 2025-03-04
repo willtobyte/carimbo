@@ -25,16 +25,15 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   geometry::size size;
   std::tie(output, size) = _load_png(j["spritesheet"].get_ref<const std::string &>());
 
-  auto surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>{
-      SDL_CreateRGBSurfaceWithFormatFrom(
-          output.data(),
+  auto surface = std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)>{
+      SDL_CreateSurfaceFrom(
           size.width(),
           size.height(),
-          32,
-          size.width() * 4,
-          SDL_PIXELFORMAT_ABGR8888
+          SDL_PIXELFORMAT_ABGR8888,
+          output.data(),
+          size.width() * 4
       ),
-      SDL_FreeSurface
+      SDL_DestroySurface
   };
 
   if (!surface) [[unlikely]] {

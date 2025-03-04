@@ -42,7 +42,7 @@ void eventmanager::update(float_t delta) {
       }
     } break;
 
-    case SDL_MOUSEMOTION: {
+    case SDL_EVENT_MOUSE_MOTION: {
       const mousemotionevent e{
           event.motion.x, event.motion.y
       };
@@ -52,7 +52,7 @@ void eventmanager::update(float_t delta) {
       }
     } break;
 
-    case SDL_MOUSEBUTTONDOWN: {
+    case SDL_EVENT_MOUSE_BUTTON_DOWN: {
       const mousebuttonevent e{
           .type = mousebuttonevent::type::down,
           .button = static_cast<enum mousebuttonevent::button>(event.button.button),
@@ -65,7 +65,7 @@ void eventmanager::update(float_t delta) {
       }
       break;
     }
-    case SDL_MOUSEBUTTONUP: {
+    case SDL_EVENT_MOUSE_BUTTON_UP: {
       const mousebuttonevent e{
           .type = mousebuttonevent::type::up,
           .button = static_cast<enum mousebuttonevent::button>(event.button.button),
@@ -100,7 +100,7 @@ void eventmanager::update(float_t delta) {
       _controllers.erase(event.cdevice.which);
       break;
 
-    case SDL_CONTROLLERBUTTONDOWN: {
+    case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
       const joystickevent e{event.cbutton.button};
 
       for (const auto &receiver : _receivers) {
