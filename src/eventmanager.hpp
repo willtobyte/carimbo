@@ -1,12 +1,8 @@
 #pragma once
 
-#include "collision.hpp"
 #include "common.hpp"
-#include "event.hpp"
 #include "eventreceiver.hpp"
-#include "helpers.hpp"
 #include "noncopyable.hpp"
-#include "postalservice.hpp"
 
 typedef std::unique_ptr<SDL_Gamepad, SDL_Deleter> gamepad_ptr;
 

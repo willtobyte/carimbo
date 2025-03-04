@@ -36,12 +36,14 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       SDL_DestroySurface
   };
 
+  const auto *format = &surface->format.format;
+
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormatFrom] error: {}", SDL_GetError()));
   }
 
   const auto pixels = static_cast<uint32_t *>(surface->pixels);
-  const auto separator = color(pixels[0], surface->format);
+  const auto separator = color(pixels[0], format);
 
   glyphmap map{};
   auto [x, y, w, h] = std::tuple{0, 0, 0, 0};
@@ -49,7 +51,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto height = size.height();
 
   for (const char letter : alphabet) {
-    while (x < width && color(pixels[y * width + x], surface->format) == separator) {
+    while (x < width && color(pixels[y * width + x], format) == separator) {
       ++x;
     }
 
@@ -59,13 +61,13 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
     w = 0;
     while (x + w < width &&
-           color(pixels[y * width + x + w], surface->format) != separator) {
+           color(pixels[y * width + x + w], format) != separator) {
       ++w;
     }
 
     h = 0;
     while (y + h < height &&
-           color(pixels[(y + h) * width + x], surface->format) != separator) {
+           color(pixels[(y + h) * width + x], format) != separator) {
       ++h;
     }
 
