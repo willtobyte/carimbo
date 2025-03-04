@@ -371,7 +371,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<cursorproxy>(
       "CursorProxy",
-      "set", &cursorproxy::set,
+      "set", &cursorproxy::set
   );
 
   lua.new_usertype<graphics::overlay>(
@@ -470,7 +470,9 @@ void framework::scriptengine::run() {
                   } },
       "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
                   auto opt = c.get<nlohmann::json>(key);
-                  if (!opt.has_value()) return sol::nil;
+                  if (!opt.has_value()) {
+                    return sol::nil;
+                  }
                   const nlohmann::json &j = opt.value();
                   sol::state_view lua(ts);
                   if (j.is_number_integer()) {
