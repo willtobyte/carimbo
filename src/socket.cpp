@@ -67,7 +67,7 @@ socket::~socket() noexcept {
   }
 #else
   _ws.async_close(websocket::close_code::normal, [](beast::error_code ec) {
-    fmt::print(stderr, "[socket] websocket close error: {}", ec.message());
+    fmt::println(stderr, "[socket] websocket close error: {}", ec.message());
   });
 #endif
 }
@@ -158,7 +158,7 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
   UNUSED(results);
 
   if (ec) {
-    fmt::print(stderr, "[error] resolve error: {}\n", ec.message());
+    fmt::println(stderr, "[error] resolve error: {}", ec.message());
     return;
   }
 
@@ -176,7 +176,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
   UNUSED(endpoint);
 
   if (ec) {
-    fmt::print(stderr, "[socket] connect error: {}\n", ec.message());
+    fmt::println(stderr, "[socket] connect error: {}", ec.message());
     return;
   }
 
@@ -196,7 +196,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
 
 void socket::on_ssl_handshake(beast::error_code ec) noexcept {
   if (ec) {
-    fmt::print(stderr, "[socket] ssl handshake error: {}\n", ec.message());
+    fmt::println(stderr, "[socket] ssl handshake error: {}", ec.message());
     return;
   }
 
@@ -212,7 +212,7 @@ void socket::on_ssl_handshake(beast::error_code ec) noexcept {
 
 void socket::on_handshake(beast::error_code ec) noexcept {
   if (ec) {
-    fmt::print(stderr, "[socket] handshake error: {}\n", ec.message());
+    fmt::println(stderr, "[socket] handshake error: {}", ec.message());
     return;
   }
 
@@ -223,7 +223,7 @@ void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) noexce
   UNUSED(bytes_transferred);
 
   if (ec) {
-    fmt::print(stderr, "[socket] read error: {}\n", ec.message());
+    fmt::println(stderr, "[socket] read error: {}", ec.message());
     return;
   }
 
@@ -305,7 +305,7 @@ void socket::send(const std::string &message) noexcept {
           UNUSED(bytes_transferred);
 
           if (ec) {
-            fmt::print(stderr, "[socket] write error: {}\n", ec.message());
+            fmt::println(stderr, "[socket] write error: {}", ec.message());
             return;
           }
         }

@@ -361,10 +361,29 @@ void framework::scriptengine::run() {
       "label", graphics::widgettype::label
   );
 
+  struct cursorproxy {
+    graphics::overlay &o;
+
+    void set(const std::string &name) {
+      o.set_cursor(name);
+    }
+
+    void unset() {
+      o.unset_cursor();
+    }
+  };
+
+  lua.new_usertype<cursorproxy>(
+      "CursorProxy",
+      "set", &cursorproxy::set,
+      "unset", &cursorproxy::unset
+  );
+
   lua.new_usertype<graphics::overlay>(
       "Overlay",
       "create", &graphics::overlay::create,
-      "destroy", &graphics::overlay::destroy
+      "destroy", &graphics::overlay::destroy,
+      "cursor", sol::property([](graphics::overlay &o) -> cursorproxy { return cursorproxy{o}; }),
   );
 
   lua.new_usertype<framework::engine>(

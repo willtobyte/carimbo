@@ -10,7 +10,7 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string &filename) noexcept
     return it->second;
   }
 
-  fmt::print("[soundmanager] cache miss {}\n", filename);
+  fmt::println("[soundmanager] cache miss {}", filename);
 
   assert(_audiodevice);
 
@@ -34,7 +34,7 @@ void soundmanager::stop(const std::string &filename) noexcept {
 
 void soundmanager::flush() noexcept {
   const auto count = _pool.size();
-  fmt::print("[soundmanager] actual size {}\n", count);
+  fmt::println("[soundmanager] actual size {}", count);
   _pool.clear();
-  fmt::print("[soundmanager] {} objects have been flushed\n", count);
+  fmt::println("[soundmanager] {} objects have been flushed", count);
 }

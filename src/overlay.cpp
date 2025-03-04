@@ -43,3 +43,11 @@ void overlay::draw() const noexcept {
     widget->draw();
   }
 }
+
+void overlay::set_cursor(const std::string &name) noexcept {
+  fmt::println("Set cursor {}", name);
+  UNUSED(name);
+}
+
+void overlay::unset_cursor() noexcept {
+}

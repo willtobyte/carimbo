@@ -10,7 +10,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
     return it->second;
   }
 
-  fmt::print("[fontfactory] cache miss {}\n", family);
+  fmt::println("[fontfactory] cache miss {}", family);
 
   const auto &buffer = storage::io::read("fonts/" + family + ".json");
   const auto &j = nlohmann::json::parse(buffer);
@@ -84,7 +84,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
 void fontfactory::flush() noexcept {
   const auto count = _pool.size();
-  fmt::print("[fontfactory] actual size {}\n", count);
+  fmt::println("[fontfactory] actual size {}", count);
   _pool.clear();
-  fmt::print("[fontfactory] {} objects have been flushed\n", count);
+  fmt::println("[fontfactory] {} objects have been flushed", count);
 }

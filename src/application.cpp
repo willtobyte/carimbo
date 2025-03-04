@@ -26,10 +26,10 @@ int application::run() {
     auto se = scriptengine();
     se.run();
   } catch (const std::exception &ex) {
-    fmt::print(stderr, "{}", ex.what());
+    fmt::println(stderr, "{}", ex.what());
     return 1;
   } catch (...) {
-    fmt::print(stderr, "Unknown error occurred");
+    fmt::println(stderr, "Unknown error occurred");
     return 3;
   }
 

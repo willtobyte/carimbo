@@ -18,6 +18,10 @@ public:
 
   void draw() const noexcept;
 
+  void set_cursor(const std::string &name) noexcept;
+
+  void unset_cursor() noexcept;
+
 private:
   std::shared_ptr<renderer> _renderer;
   std::list<std::shared_ptr<widget>> _widgets;

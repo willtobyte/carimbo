@@ -10,7 +10,7 @@ const std::shared_ptr<pixmap> pixmappool::get(const std::string &filename) {
     return it->second;
   }
 
-  fmt::print("[pixmappool] cache miss {}\n", filename);
+  fmt::println("[pixmappool] cache miss {}", filename);
 
   assert(_renderer);
 
@@ -21,8 +21,8 @@ const std::shared_ptr<pixmap> pixmappool::get(const std::string &filename) {
 }
 
 void pixmappool::flush() noexcept {
-  fmt::print("[pixmappool] actual size {}\n", _pool.size());
+  fmt::println("[pixmappool] actual size {}", _pool.size());
 
   const auto count = std::erase_if(_pool, [](const auto &pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
-  fmt::print("[pixmappool] {} objects have been flushed\n", count);
+  fmt::println("[pixmappool] {} objects have been flushed", count);
 }
