@@ -22,11 +22,15 @@ uint32_t generic_wrapper(uint32_t interval, void *param, bool repeat) {
   return repeat ? interval : 0;
 }
 
-uint32_t wrapper(uint32_t interval, void *param) {
+uint32_t wrapper(void *userdata, uint32_t interval, void *param) {
+  UNUSED(userdata);
+
   return generic_wrapper(interval, param, true);
 }
 
-uint32_t singleshot_wrapper(uint32_t interval, void *param) {
+uint32_t singleshot_wrapper(void *userdata, uint32_t interval, void *param) {
+  UNUSED(userdata);
+
   return generic_wrapper(interval, param, false);
 }
 

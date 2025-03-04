@@ -4,7 +4,7 @@
 using namespace input;
 
 eventmanager::eventmanager() {
-  const auto number = SDL_NumJoysticks();
+  const auto number = SDL_GetNumJoysticks();
   for (auto id = 0; id < number; ++id) {
     if (!SDL_IsGamepad(id)) {
       continue;
@@ -22,22 +22,22 @@ void eventmanager::update(float_t delta) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
-    case SDL_QUIT: {
+    case SDL_EVENT_QUIT: {
       for (const auto &receiver : _receivers) {
         receiver->on_quit();
       }
     } break;
 
-    case SDL_KEYDOWN: {
-      const keyevent e{event.key.keysym.sym};
+    case SDL_EVENT_KEY_DOWN: {
+      const keyevent e{static_cast<keyevent>(event.key.key)};
 
       for (const auto &receiver : _receivers) {
         receiver->on_keydown(e);
       }
     } break;
 
-    case SDL_KEYUP: {
-      const keyevent e{event.key.keysym.sym};
+    case SDL_EVENT_KEY_UP: {
+      const keyevent e{static_cast<keyevent>(event.key.key)};
 
       for (const auto &receiver : _receivers) {
         receiver->on_keyup(e);
@@ -45,7 +45,11 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_EVENT_MOUSE_MOTION: {
+<<<<<<< HEAD
       const mousemotionevent e{event.motion.x, event.motion.y };
+=======
+      const mousemotionevent e{event.motion.x, event.motion.y};
+>>>>>>> 6641ab0 (Work in progress)
 
       for (const auto &receiver : _receivers) {
         receiver->on_mousemotion(e);

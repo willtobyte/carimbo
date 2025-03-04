@@ -23,8 +23,8 @@ enum class keyevent : int32_t {
 };
 
 struct mousemotionevent {
-  int32_t x;
-  int32_t y;
+  float_t x;
+  float_t y;
 };
 
 struct mousebuttonevent {
@@ -41,8 +41,8 @@ struct mousebuttonevent {
 
   type type;
   button button;
-  int32_t x;
-  int32_t y;
+  float_t x;
+  float_t y;
 };
 
 enum class joystickevent : int32_t {

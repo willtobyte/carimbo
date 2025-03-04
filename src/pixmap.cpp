@@ -8,11 +8,17 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
   geometry::size size;
   std::tie(output, size) = _load_png(filename);
 
+<<<<<<< HEAD
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
           *_renderer,
           SDL_PIXELFORMAT_ABGR8888,
           SDL_TEXTUREACCESS_STATIC,
+=======
+  std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface{
+      SDL_CreateSurfaceFrom(
+          0,
+>>>>>>> 6641ab0 (Work in progress)
           size.width(),
           size.height()
       ),
