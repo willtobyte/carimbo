@@ -24,6 +24,8 @@ public:
 
   operator SDL_Rect() const noexcept;
 
+  operator SDL_FRect() const noexcept;
+
   rect operator+(const point &offset) const noexcept;
 
   friend void from_json(const nlohmann::json &j, rect &r) noexcept;

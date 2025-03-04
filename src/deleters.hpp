@@ -5,7 +5,7 @@
 struct SDL_Deleter {
   void operator()(SDL_Surface *ptr) const noexcept {
     if (ptr) {
-      SDL_FreeSurface(ptr);
+      SDL_DestroySurface(ptr);
     }
   }
 
@@ -27,15 +27,15 @@ struct SDL_Deleter {
     }
   }
 
-  void operator()(SDL_RWops *ptr) const noexcept {
+  void operator()(SDL_IOStream *ptr) const noexcept {
     if (ptr) {
-      SDL_RWclose(ptr);
+      SDL_CloseIO(ptr);
     }
   }
 
-  void operator()(SDL_GameController *ptr) const noexcept {
+  void operator()(SDL_Gamepad *ptr) const noexcept {
     if (ptr) {
-      SDL_GameControllerClose(ptr);
+      SDL_CloseGamepad(ptr);
     }
   }
 };

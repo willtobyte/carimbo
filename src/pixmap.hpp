@@ -13,7 +13,7 @@ class pixmap {
 public:
   pixmap() = default;
   pixmap(const std::shared_ptr<renderer> &renderer, const std::string &filename);
-  pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface);
+  pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface);
   ~pixmap() noexcept = default;
 
   void draw(
