@@ -136,7 +136,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Ogg::ogg
   physfs-static
   SDL3::SDL3-static
-  SDL3::SDL3main
   sol2::sol2
   spng::spng_static
   vorbis::vorbis

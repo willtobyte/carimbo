@@ -17,10 +17,18 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 =======
   std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface{
       SDL_CreateSurfaceFrom(
+<<<<<<< HEAD
           0,
 >>>>>>> 6641ab0 (Work in progress)
           size.width(),
           size.height()
+=======
+          size.width(),
+          size.height(),
+          SDL_PIXELFORMAT_ABGR8888,
+          nullptr,
+          0
+>>>>>>> 0772df8 (Work in progress)
       ),
       SDL_Deleter{}
   );

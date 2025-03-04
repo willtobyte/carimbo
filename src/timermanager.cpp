@@ -2,8 +2,9 @@
 
 using namespace framework;
 
-uint32_t generic_wrapper(uint32_t interval, void *param, bool repeat) {
-  const auto fn = static_cast<std::function<void()> *>(param);
+uint32_t generic_wrapper(void *userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
+  UNUSED(id);
+  const auto fn = static_cast<std::function<void()> *>(userdata);
 
 #ifdef EMSCRIPTEN
   (*fn)();
@@ -22,16 +23,12 @@ uint32_t generic_wrapper(uint32_t interval, void *param, bool repeat) {
   return repeat ? interval : 0;
 }
 
-uint32_t wrapper(void *userdata, uint32_t interval, void *param) {
-  UNUSED(userdata);
-
-  return generic_wrapper(interval, param, true);
+uint32_t wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
+  return generic_wrapper(userdata, id, interval, true);
 }
 
-uint32_t singleshot_wrapper(void *userdata, uint32_t interval, void *param) {
-  UNUSED(userdata);
-
-  return generic_wrapper(interval, param, false);
+uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
+  return generic_wrapper(userdata, id, interval, false);
 }
 
 timermanager::~timermanager() noexcept {

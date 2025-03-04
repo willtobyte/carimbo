@@ -4,7 +4,8 @@
 using namespace input;
 
 eventmanager::eventmanager() {
-  const auto number = SDL_GetNumJoysticks();
+  int32_t number = 0;
+  SDL_GetGamepads(&number);
   for (auto id = 0; id < number; ++id) {
     if (!SDL_IsGamepad(id)) {
       continue;
@@ -45,11 +46,7 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_EVENT_MOUSE_MOTION: {
-<<<<<<< HEAD
       const mousemotionevent e{event.motion.x, event.motion.y };
-=======
-      const mousemotionevent e{event.motion.x, event.motion.y};
->>>>>>> 6641ab0 (Work in progress)
 
       for (const auto &receiver : _receivers) {
         receiver->on_mousemotion(e);

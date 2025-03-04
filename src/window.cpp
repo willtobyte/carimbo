@@ -7,11 +7,9 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
       _window(
           SDL_CreateWindow(
               title.c_str(),
-              SDL_WINDOWPOS_CENTERED,
-              SDL_WINDOWPOS_CENTERED,
               width,
               height,
-              0
+              fullscreen ? SDL_WINDOW_FULLSCREEN : 0
           ),
           SDL_Deleter{}
       ) {
