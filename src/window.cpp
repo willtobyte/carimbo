@@ -7,20 +7,14 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
       _window(
           SDL_CreateWindow(
               title.c_str(),
-              SDL_WINDOWPOS_CENTERED,
-              SDL_WINDOWPOS_CENTERED,
               width,
               height,
-              0
+              fullscreen ? SDL_WINDOW_FULLSCREEN : 0
           ),
           SDL_Deleter()
       ) {
   if (_window == nullptr) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateWindow] failed to create window: {}", SDL_GetError()));
-  }
-
-  if (fullscreen) {
-    SDL_SetWindowFullscreen(_window.get(), SDL_WINDOW_FULLSCREEN);
   }
 
   auto context = SDL_GL_CreateContext(_window.get());
