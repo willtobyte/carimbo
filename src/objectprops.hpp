@@ -24,8 +24,8 @@ struct animation {
 namespace framework {
 struct objectprops {
   uint64_t id{};
-  uint32_t frame{};
-  uint32_t last_frame{};
+  uint64_t frame{};
+  uint64_t last_frame{};
   double_t angle{};
   uint8_t alpha{255};
   geometry::point position{};

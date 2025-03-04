@@ -5,7 +5,6 @@ using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
-
   int32_t lw, lh;
   SDL_RenderGetLogicalSize(*_renderer, &lw, &lh);
 
@@ -44,4 +43,10 @@ void canvas::draw() {
   }
 
   SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
+
+  if (SDL_UpdateTexture(_framebuffer.get(), nullptr, _pixels.data(), _width * sizeof(uint32_t)) != 0) [[unlikely]] {
+    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] failed: {}", SDL_GetError()));
+  }
+
+  SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }

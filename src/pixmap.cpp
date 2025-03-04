@@ -60,10 +60,10 @@ void pixmap::draw(
 
 #ifdef HITBOX
   if (outline) {
-    const SDL_Rect &debug = *outline;
+    const SDL_FRect &debug = *outline;
 
     SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
-    SDL_RenderDrawRect(*_renderer, &debug);
+    SDL_RenderRect(*_renderer, &debug);
   }
 #endif
 }

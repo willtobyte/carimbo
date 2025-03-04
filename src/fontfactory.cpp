@@ -1,5 +1,4 @@
 #include "fontfactory.hpp"
-#include "deleters.hpp"
 
 using namespace graphics;
 
@@ -31,9 +30,9 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
           output.data(),
           size.width(),
           size.height(),
-          32,
-          size.width() * 4,
-          SDL_PIXELFORMAT_ABGR8888
+          SDL_PIXELFORMAT_ABGR8888,
+          output.data(),
+          size.width() * 4
       ),
       SDL_Deleter{}
   };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "rectangle.hpp"
 #include "reflection.hpp"
 #include "renderer.hpp"
@@ -12,6 +13,7 @@ public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
   pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface);
+
   ~pixmap() noexcept = default;
 
   void draw(

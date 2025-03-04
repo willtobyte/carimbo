@@ -21,7 +21,7 @@ find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
-find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
@@ -102,7 +102,7 @@ if(EMSCRIPTEN)
     -sWEBSOCKET_SUBPROTOCOL=text
     -sEXPORTED_RUNTIME_METHODS=['callMain']
     -lwebsocket.js
-    --use-port=sdl2
+    --use-port=sdl3
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
@@ -135,8 +135,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   nlohmann_json::nlohmann_json
   Ogg::ogg
   physfs-static
-  SDL2::SDL2-static
-  SDL2::SDL2main
+  SDL3::SDL3-static
+  SDL3::SDL3main
   sol2::sol2
   spng::spng_static
   vorbis::vorbis

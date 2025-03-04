@@ -1,8 +1,10 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "eventreceiver.hpp"
 #include "noncopyable.hpp"
+#include "postalservice.hpp"
 
 namespace input {
 class eventmanager : private framework::noncopyable {
