@@ -378,7 +378,7 @@ void framework::scriptengine::run() {
       "Overlay",
       "create", &graphics::overlay::create,
       "destroy", &graphics::overlay::destroy,
-      "cursor", sol::property([](graphics::overlay &o) -> cursorproxy { return cursorproxy{o}; }),
+      "cursor", sol::property([](graphics::overlay &o) -> cursorproxy { return cursorproxy{o}; })
   );
 
   lua.new_usertype<framework::engine>(
