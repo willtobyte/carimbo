@@ -11,12 +11,16 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
               SDL_WINDOWPOS_CENTERED,
               width,
               height,
-              SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
+              0
           ),
           SDL_Deleter()
       ) {
   if (_window == nullptr) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateWindow] failed to create window: {}", SDL_GetError()));
+  }
+
+  if (fullscreen) {
+    SDL_SetWindowFullscreen(_window.get(), SDL_WINDOW_FULLSCREEN);
   }
 
   auto context = SDL_GL_CreateContext(_window.get());
@@ -35,8 +39,8 @@ window::operator SDL_Window *() noexcept {
 std::shared_ptr<renderer> window::create_renderer(float_t scale) const noexcept {
   const auto ptr = std::make_shared<renderer>(_window.get());
   UNUSED(scale);
-  SDL_SetRenderLogicalPresentation(*ptr, _width, _height);
-  SDL_RenderSetScale(*ptr, scale, scale);
+  SDL_SetRenderLogicalPresentation(*ptr, _width, _height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+  SDL_SetRenderScale(*ptr, scale, scale);
   return ptr;
 }
 

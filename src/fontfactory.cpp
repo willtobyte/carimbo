@@ -33,7 +33,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       SDL_DestroySurface
   };
 
-  const auto *format = &surface->format.format;
+  const auto format = SDL_GetPixelFormatDetails(surface->format);
 
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormatFrom] error: {}", SDL_GetError()));
