@@ -52,11 +52,11 @@ void pixmap::draw(
     const std::optional<geometry::rectangle> &outline
 #endif
 ) const noexcept {
-  const SDL_Rect &src = source;
-  const SDL_Rect &dst = destination;
+  const SDL_FRect &src = source;
+  const SDL_FRect &dst = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
-  SDL_RenderCopyEx(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_RendererFlip>(reflection));
+  SDL_RenderTextureRotated(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 
 #ifdef HITBOX
   if (outline) {

@@ -4,16 +4,14 @@
 using namespace input;
 
 eventmanager::eventmanager() {
-  const auto count = SDL_NumJoysticks();
-  for (const auto id : std::views::iota(0, count)) {
-    if (!SDL_IsGameController(id)) {
+  const auto number = SDL_NumJoysticks();
+  for (auto id = 0; id < number; ++id) {
+    if (!SDL_IsGamepad(id)) {
       continue;
     }
 
-    if (auto *controller = SDL_GameControllerOpen(id)) {
-      const auto joystick = SDL_GameControllerGetJoystick(controller);
-      const auto instanceId = SDL_JoystickInstanceID(joystick);
-      _controllers.emplace(instanceId, std::unique_ptr<SDL_GameController, SDL_Deleter>(controller));
+    if (auto controller = SDL_OpenGamepad(id)) {
+      _controllers.emplace(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)), gamepad_ptr(controller));
     }
   }
 }
@@ -81,48 +79,42 @@ void eventmanager::update(float_t delta) {
       }
     } break;
 
-    case SDL_CONTROLLERDEVICEADDED: {
-      if (!SDL_IsGameController(event.cdevice.which))
-        break;
-
-      auto controller = SDL_GameControllerOpen(event.cdevice.which);
-      if (!controller)
-        break;
-
-      const auto joystick = SDL_GameControllerGetJoystick(controller);
-      const auto id = SDL_JoystickInstanceID(joystick);
-      if (_controllers.find(id) != _controllers.end()) {
-        SDL_GameControllerClose(controller);
+    case SDL_EVENT_GAMEPAD_ADDED: {
+      if (!SDL_IsGamepad(event.cdevice.which)) {
         break;
       }
 
-      _controllers.emplace(id, std::unique_ptr<SDL_GameController, SDL_Deleter>(controller));
+      if (auto controller = SDL_OpenGamepad(event.cdevice.which)) {
+        const auto joystick = SDL_GetGamepadJoystick(controller);
+        const auto id = SDL_GetJoystickID(joystick);
+        _controllers[id] = std::unique_ptr<SDL_GameController, SDL_Deleter>(controller)
+      }
     } break;
 
-    case SDL_CONTROLLERDEVICEREMOVED:
+    case SDL_EVENT_GAMEPAD_REMOVED:
       _controllers.erase(event.cdevice.which);
       break;
 
     case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
-      const joystickevent e{event.cbutton.button};
+      const joystickevent e{event.gbutton.button};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickbuttondown(event.cbutton.which, e);
+        receiver->on_joystickbuttondown(event.gbutton.which, e);
       }
     } break;
 
-    case SDL_CONTROLLERBUTTONUP: {
-      const joystickevent e{event.cbutton.button};
+    case SDL_EVENT_GAMEPAD_BUTTON_UP: {
+      const joystickevent e{event.gbutton.button};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickbuttonup(event.cbutton.which, e);
+        receiver->on_joystickbuttonup(event.gbutton.which, e);
       }
     } break;
 
-    case SDL_CONTROLLERAXISMOTION: {
-      const auto who = event.caxis.which;
-      const auto axis = static_cast<input::joystickaxisevent::axis>(event.caxis.axis);
-      const auto value = event.caxis.value;
+    case SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION: {
+      const auto who = event.gaxis.which;
+      const auto axis = static_cast<input::joystickaxisevent::axis>(event.gaxis.axis);
+      const auto value = event.gaxis.value;
       const joystickaxisevent e{axis, value};
 
       for (const auto &receiver : _receivers) {
