@@ -5,7 +5,8 @@
 using namespace input;
 
 eventmanager::eventmanager() {
-  const auto number = SDL_GetNumJoysticks();
+  int32_t number = 0;
+  SDL_GetGamepads(&number);
   for (auto id = 0; id < number; ++id) {
     if (!SDL_IsGamepad(id)) {
       continue;
