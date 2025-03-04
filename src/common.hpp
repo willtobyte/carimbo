@@ -49,6 +49,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <filesystem>
+#include <fstream>
 #include <functional>
 #include <iterator>
 #include <limits>
