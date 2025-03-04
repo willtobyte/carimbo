@@ -71,7 +71,6 @@
 #include "constants.hpp"
 #include "deleters.hpp"
 #include "helpers.hpp"
-#include "types.hpp"
 
 namespace audio {
 class audiodevice;

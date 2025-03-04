@@ -36,10 +36,10 @@ public:
   void set_placement(int32_t x, int32_t y) noexcept;
   geometry::point get_placement() const noexcept;
 
-  void set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept;
-  void set_onanimationfinished(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept;
-  void set_onmail(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept;
-  void set_oncollision(const std::string &kind, const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> &fn) noexcept;
+  void set_onupdate(std::function<void(std::shared_ptr<entity>)> fn) noexcept;
+  void set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
+  void set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
+  void set_oncollision(const std::string &kind, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
   void set_action(const std::string &action) noexcept;

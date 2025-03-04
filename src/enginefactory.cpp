@@ -49,7 +49,7 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   const auto window = std::make_shared<graphics::window>(_title, _width, _height, _fullscreen);
   const auto renderer = window->create_renderer(_scale);
   const auto resourcemanager = std::make_shared<framework::resourcemanager>(renderer, audiodevice);
-  const auto overlay = std::make_shared<graphics::overlay>(renderer);
+  const auto overlay = std::make_shared<graphics::overlay>(resourcemanager, eventmanager);
   const auto statemanager = std::make_shared<framework::statemanager>();
   const auto entitymanager = std::make_shared<framework::entitymanager>(resourcemanager);
   const auto fontfactory = std::make_shared<graphics::fontfactory>(renderer);
@@ -64,7 +64,7 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   engine->set_scenemanager(std::move(scenemanager));
   engine->set_statemanager(std::move(statemanager));
   engine->set_window(std::move(window));
-  engine->set_fontfactory(fontfactory);
+  engine->set_fontfactory(std::move(fontfactory));
 
   engine->eventmanager()->add_receiver(engine->entitymanager());
   engine->eventmanager()->add_receiver(engine);

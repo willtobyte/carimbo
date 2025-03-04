@@ -57,8 +57,8 @@ algebra::vector2d entity::velocity() const noexcept {
 void entity::update(float_t delta) noexcept {
   UNUSED(delta);
 
-  if (_onupdate) {
-    _onupdate(shared_from_this());
+  if (const auto fn = _onupdate; fn) {
+    fn(shared_from_this());
   }
 
   if (_props.action.empty() || !_props.visible) {
@@ -79,8 +79,8 @@ void entity::update(float_t delta) noexcept {
 
         _props.action.clear();
 
-        if (_onanimationfinished) {
-          _onanimationfinished(shared_from_this(), name);
+        if (const auto fn = _onanimationfinished; fn) {
+          fn(shared_from_this(), name);
         }
 
         return;
@@ -142,19 +142,19 @@ geometry::point entity::get_placement() const noexcept {
   return _props.position;
 }
 
-void entity::set_onupdate(const std::function<void(std::shared_ptr<entity>)> &fn) noexcept {
+void entity::set_onupdate(std::function<void(std::shared_ptr<entity>)> fn) noexcept {
   _onupdate = std::move(fn);
 }
 
-void entity::set_onanimationfinished(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept {
+void entity::set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
   _onanimationfinished = std::move(fn);
 }
 
-void entity::set_onmail(const std::function<void(std::shared_ptr<entity>, const std::string &)> &fn) noexcept {
+void entity::set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
   _onmail = std::move(fn);
 }
 
-void entity::set_oncollision(const std::string &kind, const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> &fn) noexcept {
+void entity::set_oncollision(const std::string &kind, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> fn) noexcept {
   _collisionmapping[kind] = std::move(fn);
 }
 
@@ -224,8 +224,8 @@ bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
 }
 
 void entity::on_email(const std::string &message) {
-  if (_onmail) {
-    _onmail(shared_from_this(), message);
+  if (const auto fn = _onmail; fn) {
+    fn(shared_from_this(), message);
   }
 }
 

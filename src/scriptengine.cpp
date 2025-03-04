@@ -367,16 +367,11 @@ void framework::scriptengine::run() {
     void set(const std::string &name) {
       o.set_cursor(name);
     }
-
-    void unset() {
-      o.unset_cursor();
-    }
   };
 
   lua.new_usertype<cursorproxy>(
       "CursorProxy",
       "set", &cursorproxy::set,
-      "unset", &cursorproxy::unset
   );
 
   lua.new_usertype<graphics::overlay>(

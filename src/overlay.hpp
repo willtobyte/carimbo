@@ -1,13 +1,16 @@
 #pragma once
 
 #include "common.hpp"
+#include "cursor.hpp"
+#include "eventmanager.hpp"
 #include "eventreceiver.hpp"
+#include "resourcemanager.hpp"
 #include "widget.hpp"
 
 namespace graphics {
 class overlay : public input::eventreceiver {
 public:
-  explicit overlay(std::shared_ptr<renderer> renderer);
+  explicit overlay(const std::shared_ptr<framework::resourcemanager> resourcemanager, const std::shared_ptr<input::eventmanager> eventmanager);
   ~overlay() = default;
 
   std::variant<std::shared_ptr<label>> create(widgettype type) noexcept;
@@ -20,10 +23,10 @@ public:
 
   void set_cursor(const std::string &name) noexcept;
 
-  void unset_cursor() noexcept;
-
 private:
-  std::shared_ptr<renderer> _renderer;
+  std::shared_ptr<framework::resourcemanager> _resourcemanager;
+  const std::shared_ptr<input::eventmanager> _eventmanager;
   std::list<std::shared_ptr<widget>> _widgets;
+  std::shared_ptr<cursor> _cursor;
 };
 }

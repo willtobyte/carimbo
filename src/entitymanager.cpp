@@ -42,18 +42,18 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                          ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
                          : nullptr;
 
-  std::unordered_map<std::string, animation> animations;
+  std::unordered_map<std::string, graphics::animation> animations;
   animations.reserve(j["animations"].size());
   for (const auto &[key, anim] : j["animations"].items()) {
     const auto hitbox = anim.contains("hitbox")
                             ? std::make_optional(anim["hitbox"].get<geometry::rect>())
                             : std::nullopt;
 
-    std::vector<keyframe> keyframes;
+    std::vector<graphics::keyframe> keyframes;
     keyframes.reserve(anim["frames"].size());
     for (const auto &frame : anim["frames"]) {
       keyframes.emplace_back(
-          keyframe{
+          graphics::keyframe{
               frame["rect"].get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
               frame["duration"].get<uint64_t>(),
@@ -61,7 +61,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
           }
       );
     }
-    animations.emplace(key, animation{hitbox, std::move(keyframes)});
+    animations.emplace(key, graphics::animation{hitbox, std::move(keyframes)});
   }
 
   entityprops props{
