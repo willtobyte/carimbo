@@ -471,7 +471,7 @@ void framework::scriptengine::run() {
       "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
                   auto opt = c.get<nlohmann::json>(key);
                   if (!opt.has_value()) {
-                    return sol::nil;
+                    return sol::lua_nil;
                   }
                   const nlohmann::json &j = opt.value();
                   sol::state_view lua(ts);
@@ -496,7 +496,7 @@ void framework::scriptengine::run() {
                               } else if (v.is_string()) {
                                   table[k] = v.get<std::string>();
                               } else {
-                                  table[k] = sol::nil;
+                                  table[k] = sol::lua_nil;
                               }
                           }
                       } else if (j.is_array()) {
@@ -511,13 +511,13 @@ void framework::scriptengine::run() {
                               } else if (v.is_string()) {
                                   table[index++] = v.get<std::string>();
                               } else {
-                                  table[index++] = sol::nil;
+                                  table[index++] = sol::lua_nil;
                               }
                           }
                       }
                       return sol::make_object(lua, table);
                   }
-                  return sol::nil; },
+                  return sol::lua_nil; },
       "clear", &storage::cassete::clear
   );
 
