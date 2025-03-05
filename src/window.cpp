@@ -33,7 +33,7 @@ window::operator SDL_Window *() noexcept {
 std::shared_ptr<renderer> window::create_renderer(float_t scale) const noexcept {
   const auto ptr = std::make_shared<renderer>(_window.get());
   UNUSED(scale);
-  SDL_SetRenderLogicalPresentation(*ptr, _width, _height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+  SDL_SetRenderLogicalPresentation(*ptr, _width, _height, SDL_LOGICAL_PRESENTATION_INTEGER_SCALE);
   SDL_SetRenderScale(*ptr, scale, scale);
   return ptr;
 }
