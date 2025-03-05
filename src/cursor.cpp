@@ -4,8 +4,8 @@ using namespace graphics;
 
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _x(0), _y(0), _resourcemanager(resourcemanager) {
-  SDL_ShowCursor(false);
-  // SDL_SetRelativeMouseMode(true);
+  // SDL_ShowCursor(false);
+  //  SDL_SetRelativeMouseMode(true);
 
   UNUSED(name);
 
