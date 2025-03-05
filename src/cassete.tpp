@@ -12,7 +12,7 @@ void cassete::set(const std::string &key, const T &value) {
 
 template<typename T>
 std::optional<T> cassete::get(const std::string &key) const {
-  if (not _j.contains(key)) {
+  if (!_j.contains(key)) {
     return std::nullopt;
   }
 

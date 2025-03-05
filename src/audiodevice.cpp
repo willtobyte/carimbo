@@ -16,7 +16,7 @@ audiodevice::audiodevice()
       }) {
 
   device.reset(alcOpenDevice(nullptr));
-  if (not device || alcGetError(device.get()) not_eq ALC_NO_ERROR) [[unlikely]] {
+  if (!device || alcGetError(device.get()) != ALC_NO_ERROR) [[unlikely]] {
     throw std::runtime_error("Failed to open ALC device");
   }
 

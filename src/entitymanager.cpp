@@ -90,7 +90,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
 }
 
 std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matrix) noexcept {
-  if (not matrix) {
+  if (!matrix) {
     return nullptr;
   }
 
@@ -116,7 +116,7 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matr
 }
 
 void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
-  if (not entity) {
+  if (!entity) {
     return;
   }
 
@@ -139,7 +139,7 @@ void entitymanager::update(float_t delta) noexcept {
   for (auto it = _entities.begin(); it != _entities.end(); ++it) {
     const auto &a = *it;
     for (const auto &b : std::ranges::subrange(std::next(it), _entities.end())) {
-      if (not a->intersects(b))
+      if (!a->intersects(b))
         continue;
 
       const auto callback_a = ensure_callback(a->_collisionmapping, b->kind(), noop_fn);

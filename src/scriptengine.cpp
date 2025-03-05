@@ -449,7 +449,7 @@ void framework::scriptengine::run() {
                   nlohmann::json tmp;
                   bool isArray = true;
                   for (auto &pair : tbl) {
-                      if (not pair.first.is<int>()) {
+                      if (!pair.first.is<int>()) {
                         isArray = false; break;
                       }
                   }
@@ -511,8 +511,9 @@ void framework::scriptengine::run() {
       "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
           auto opt = c.get<nlohmann::json>(key);
           sol::state_view lua(ts);
-          if (not opt.has_value())
+          if (!opt.has_value()) {
               return sol::lua_nil;
+          }
           const nlohmann::json &j = opt.value();
           // Lambda inline para converter nlohmann::json em sol::object recursivamente
           std::function<sol::object(const nlohmann::json&)> jsonToLua = [&](const nlohmann::json &js) -> sol::object {

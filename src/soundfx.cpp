@@ -73,7 +73,7 @@ const char *ov_strerror(int code) {
 soundfx::soundfx(std::shared_ptr<audiodevice> audiodevice, const std::string &filename)
     : _audiodevice(std::move(audiodevice)) {
   std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> fp{PHYSFS_openRead(filename.c_str()), PHYSFS_close};
-  if (not fp) [[unlikely]] {
+  if (!fp) [[unlikely]] {
     throw std::runtime_error(fmt::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
@@ -83,7 +83,7 @@ soundfx::soundfx(std::shared_ptr<audiodevice> audiodevice, const std::string &fi
   }
 
   const auto info = ov_info(vf.get(), -1);
-  if (not info) [[unlikely]] {
+  if (!info) [[unlikely]] {
     throw std::runtime_error("[ov_info] failed to retrieve OggVorbis info");
   }
 
