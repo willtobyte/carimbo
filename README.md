@@ -16,7 +16,7 @@ _"Carimbo"_ comes from the 🇧🇷 word for "stamp," and that is exactly what a
 
 ### Motivation
 
-In the summer of 2009, I attempted to port my SDL-based game engine to Google’s Native Client—a precursor to WebAssembly—but its complexity led to my failure. Low-level programming still courses through my veins, and now, with more experience and WebAssembly as a turning point, I am building my own game engine, again.
+During the summer of 2009, I attempted to port my SDL-based game engine to Google’s Native Client—a Chrome-specific technology and early precursor to WebAssembly. Low-level programming still courses through my veins, and now, with the universal reach of WebAssembly and a wealth of experience, I’m building my own game engine once again.
 
 ### Games
 

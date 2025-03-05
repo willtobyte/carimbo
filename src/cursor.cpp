@@ -4,12 +4,12 @@ using namespace graphics;
 
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _x(0), _y(0), _resourcemanager(resourcemanager) {
-  SDL_ShowCursor(SDL_DISABLE);
-  SDL_SetRelativeMouseMode(SDL_TRUE);
+  // SDL_ShowCursor(false);
+  // SDL_SetRelativeMouseMode(true);
 
   UNUSED(name);
 
-  _temp = _resourcemanager->pixmappool()->get("blobs/horn.png");
+  _temp = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}.png", name));
 }
 
 void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
@@ -31,5 +31,8 @@ void cursor::update(float_t delta) noexcept {
 }
 
 void cursor::draw() const noexcept {
+  // float lx, ly;
+  // SDL_RenderCoordinatesFromWindow(*_resourcemanager->renderer(), static_cast<float>(_x), static_cast<float>(_y), &lx, &ly);
+  // _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({static_cast<int32_t>(lx), static_cast<int32_t>(ly)}, {32, 32}));
   _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({_x, _y}, {32, 32}));
 }
