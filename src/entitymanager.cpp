@@ -201,6 +201,6 @@ void entitymanager::on_mousebuttondown(const input::mousebuttonevent &event) noe
       continue;
     }
 
-    fmt::println("{} touched", entity->kind());
+    entity->on_touch();
   }
 }

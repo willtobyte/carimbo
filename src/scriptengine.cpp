@@ -283,6 +283,7 @@ void framework::scriptengine::run() {
       "on_update", &framework::entity::set_onupdate,
       "on_animationfinished", &framework::entity::set_onanimationfinished,
       "on_mail", &framework::entity::set_onmail,
+      "on_touch", &framework::entity::set_ontouch,
       "on_collision", &framework::entity::set_oncollision,
       "reflection", sol::property([](framework::entity &e) -> reflectionproxy { return reflectionproxy{e}; }),
       "action", sol::property([](framework::entity &e) -> actionproxy { return actionproxy{e}; }),

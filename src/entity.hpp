@@ -39,6 +39,7 @@ public:
   void set_onupdate(std::function<void(std::shared_ptr<entity>)> fn) noexcept;
   void set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
   void set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
+  void set_ontouch(std::function<void()> fn) noexcept;
   void set_oncollision(const std::string &kind, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
@@ -54,6 +55,8 @@ public:
 
   void on_email(const std::string &message);
 
+  void on_touch() noexcept;
+
   memory::kv &kv() noexcept;
 
 private:
@@ -64,6 +67,7 @@ private:
   std::function<void(std::shared_ptr<entity>)> _onupdate;
   std::function<void(std::shared_ptr<entity>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<entity>, const std::string &)> _onmail;
+  std::function<void()> _ontouch;
   std::unordered_map<std::string, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)>> _collisionmapping;
 };
 }

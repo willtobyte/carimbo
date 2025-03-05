@@ -154,6 +154,10 @@ void entity::set_onmail(std::function<void(std::shared_ptr<entity>, const std::s
   _onmail = std::move(fn);
 }
 
+void entity::set_ontouch(std::function<void()> fn) noexcept {
+  _ontouch = std::move(fn);
+}
+
 void entity::set_oncollision(const std::string &kind, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> fn) noexcept {
   _collisionmapping[kind] = std::move(fn);
 }
@@ -226,6 +230,12 @@ bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
 void entity::on_email(const std::string &message) {
   if (const auto fn = _onmail; fn) {
     fn(shared_from_this(), message);
+  }
+}
+
+void entity::on_touch() noexcept {
+  if (const auto fn = _ontouch; fn) {
+    fn();
   }
 }
 
