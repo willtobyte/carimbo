@@ -6,15 +6,18 @@ fontfactory::fontfactory(const std::shared_ptr<graphics::renderer> renderer) noe
     : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
-  if (const auto it = _pool.find(family); it != _pool.end()) {
+  std::filesystem::path p{family};
+  const auto key = p.has_extension() ? family : ("fonts/" + family + ".json");
+
+  if (auto it = _pool.find(key); it != _pool.end()) {
     return it->second;
   }
 
-  fmt::println("[fontfactory] cache miss {}", family);
+  fmt::println("[fontfactory] cache miss {}", key);
 
-  const auto &buffer = storage::io::read("fonts/" + family + ".json");
+  const auto &buffer = storage::io::read(key);
   const auto &j = nlohmann::json::parse(buffer);
-  const auto &alphabet = j["alphabet"].get<std::string>();
+  const auto &alphabet = j["alphabet"].get_ref<const std::string &>();
   const auto spacing = j["spacing"].get<int16_t>();
   const auto scale = j["scale"].get<float_t>();
 
@@ -78,7 +81,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       scale
   );
 
-  _pool.emplace(family, ptr);
+  _pool.emplace(key, ptr);
   return ptr;
 }
 

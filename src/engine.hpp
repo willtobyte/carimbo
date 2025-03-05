@@ -29,7 +29,6 @@ public:
   void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept;
   void set_entitymanager(std::shared_ptr<framework::entitymanager> entitymanager) noexcept;
   void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept;
-  void set_fontfactory(std::shared_ptr<graphics::fontfactory> fontfactory) noexcept;
   void set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept;
   void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
   void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept;
@@ -63,7 +62,6 @@ private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::window> _window;
-  std::shared_ptr<graphics::fontfactory> _fontfactory;
   std::shared_ptr<storage::cassete> _cassete;
   std::list<std::shared_ptr<lifecycleobserver>> _observers;
 };

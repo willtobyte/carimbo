@@ -64,7 +64,6 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   engine->set_scenemanager(scenemanager);
   engine->set_statemanager(statemanager);
   engine->set_window(window);
-  engine->set_fontfactory(fontfactory);
 
   engine->eventmanager()->add_receiver(engine->entitymanager());
   engine->eventmanager()->add_receiver(engine);
