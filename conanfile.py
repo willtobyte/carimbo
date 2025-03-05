@@ -14,13 +14,14 @@ class MeuProjetoConan(ConanFile):
         self.requires("ogg/1.3.5")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
-        self.requires("sdl/2.30.9")
+        #self.requires("sdl/2.30.9")
+        self.requires("sdl/3.2.6")
         self.requires("sol2/3.3.1")
         self.requires("vorbis/1.3.7")
 
         if self.settings.os != "Emscripten":
-          self.requires("boost/1.86.0")
-          self.requires("openssl/3.3.2")
+          self.requires("boost/1.87.0")
+          self.requires("openssl/3.4.1")
 
     def generate(self):
         tc = CMakeToolchain(self)

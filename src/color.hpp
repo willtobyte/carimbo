@@ -9,7 +9,7 @@ public:
   color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
   color(const SDL_Color &color) noexcept;
   color(const std::string &hex);
-  color(uint32_t pixel, const SDL_PixelFormat *format) noexcept;
+  color(uint32_t pixel, const SDL_PixelFormatDetails *format) noexcept;
   ~color() = default;
 
   uint8_t r() const noexcept;
