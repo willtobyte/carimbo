@@ -13,8 +13,8 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
           size.width(),
           size.height(),
           SDL_PIXELFORMAT_ABGR8888,
-          nullptr,
-          0
+          output.data(),
+          size.width() * 4
       ),
       SDL_DestroySurface
   };
