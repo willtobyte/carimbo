@@ -18,8 +18,8 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto &buffer = storage::io::read(key);
   const auto &j = nlohmann::json::parse(buffer);
   const auto &alphabet = j["alphabet"].get_ref<const std::string &>();
-  const auto spacing = j["spacing"].get<int16_t>();
-  const auto scale = j["scale"].get<float_t>();
+  const auto spacing = j.value("spacing", int16_t{0});
+  const auto scale = j.value("scale", float_t{1.0f});
 
   std::vector<uint8_t> output;
   geometry::size size;
