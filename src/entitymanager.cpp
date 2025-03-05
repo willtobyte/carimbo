@@ -57,7 +57,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
               frame["rect"].get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
               frame["duration"].get<uint64_t>(),
-              frame.value("singleshoot", false)
+              frame.value("singleshoot", bool{false})
           }
       );
     }
