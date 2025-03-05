@@ -7,7 +7,9 @@ using json = nlohmann::json;
 #ifdef EMSCRIPTEN
 EM_BOOL websocket_on_open(int, const EmscriptenWebSocketOpenEvent *event, void *data) {
   auto *self = static_cast<socket *>(data);
-  if (!self) return EM_FALSE;
+  if (!self) {
+    return EM_FALSE;
+  }
 
   self->handle_open(event);
   return EM_FALSE;
@@ -15,7 +17,9 @@ EM_BOOL websocket_on_open(int, const EmscriptenWebSocketOpenEvent *event, void *
 
 EM_BOOL websocket_on_message(int, const EmscriptenWebSocketMessageEvent *event, void *data) {
   auto *self = static_cast<socket *>(data);
-  if (!self) return EM_FALSE;
+  if (!self) {
+    return EM_FALSE;
+  }
 
   self->handle_message(event);
   return EM_FALSE;
@@ -23,7 +27,9 @@ EM_BOOL websocket_on_message(int, const EmscriptenWebSocketMessageEvent *event, 
 
 EM_BOOL websocket_on_error(int, const EmscriptenWebSocketErrorEvent *event, void *data) {
   auto *self = static_cast<socket *>(data);
-  if (!self) return EM_FALSE;
+  if (!self) {
+    return EM_FALSE;
+  }
 
   self->handle_error(event);
   return EM_FALSE;
@@ -31,7 +37,9 @@ EM_BOOL websocket_on_error(int, const EmscriptenWebSocketErrorEvent *event, void
 
 EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void *data) {
   auto *self = static_cast<socket *>(data);
-  if (!self) return EM_FALSE;
+  if (!self) {
+    return EM_FALSE;
+  }
 
   self->handle_close(event);
   return EM_FALSE;

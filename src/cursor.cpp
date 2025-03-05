@@ -31,8 +31,8 @@ void cursor::update(float_t delta) noexcept {
 }
 
 void cursor::draw() const noexcept {
-  float lx, ly;
-  SDL_RenderCoordinatesFromWindow(*_resourcemanager->renderer(), static_cast<float>(_x), static_cast<float>(_y), &lx, &ly);
-
-  _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({static_cast<int32_t>(lx), static_cast<int32_t>(ly)}, {32, 32}));
+  // float lx, ly;
+  // SDL_RenderCoordinatesFromWindow(*_resourcemanager->renderer(), static_cast<float>(_x), static_cast<float>(_y), &lx, &ly);
+  // _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({static_cast<int32_t>(lx), static_cast<int32_t>(ly)}, {32, 32}));
+  _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({_x, _y}, {32, 32}));
 }

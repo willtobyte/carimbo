@@ -32,7 +32,7 @@ std::shared_ptr<input::eventmanager> engine::eventmanager() const noexcept {
 }
 
 std::shared_ptr<graphics::fontfactory> engine::fontfactory() const noexcept {
-  return _fontfactory;
+  return _resourcemanager->fontfactory();
 }
 
 std::shared_ptr<graphics::overlay> engine::overlay() const noexcept {
@@ -89,10 +89,6 @@ void engine::set_entitymanager(std::shared_ptr<framework::entitymanager> entitym
 
 void engine::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept {
   _eventmanager = std::move(eventmanager);
-}
-
-void engine::set_fontfactory(std::shared_ptr<graphics::fontfactory> fontfactory) noexcept {
-  _fontfactory = std::move(fontfactory);
 }
 
 void engine::set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept {

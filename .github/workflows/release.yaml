@@ -88,7 +88,7 @@ jobs:
         working-directory: build
 
       - name: Build
-        run: cmake --build . --parallel 4 --config Release --verbose
+        run: cmake --build . --parallel 8 --config Release --verbose
         working-directory: build
 
       - name: Create Artifacts Directory
