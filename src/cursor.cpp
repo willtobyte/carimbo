@@ -94,7 +94,6 @@ void cursor::update(float_t) noexcept {
 }
 
 void cursor::draw() const noexcept {
-<<<<<<< HEAD
   const auto &animation = _animations.at(_action).keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
@@ -113,7 +112,5 @@ void cursor::handle(const std::string &message) noexcept {
   UNUSED(message);
 
   _queued_action = "damage";
-=======
   // _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({_x, _y}, {32, 32}));
->>>>>>> 539248b (Work in progress)
 }
