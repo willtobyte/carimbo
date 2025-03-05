@@ -7,7 +7,7 @@ uint32_t generic_wrapper(uint32_t interval, void *param, bool repeat) {
 
 #ifdef EMSCRIPTEN
   (*fn)();
-  if (!repeat) {
+  if (not repeat) {
     delete fn;
   }
 #else
@@ -56,7 +56,7 @@ void timermanager::clear(int32_t id) noexcept {
 void timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
   const auto ptr = new std::function<void()>(fn);
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
-  if (!id) [[unlikely]] {
+  if (not id) [[unlikely]] {
     delete ptr;
     throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
   }

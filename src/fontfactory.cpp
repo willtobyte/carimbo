@@ -34,7 +34,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       SDL_FreeSurface
   };
 
-  if (!surface) [[unlikely]] {
+  if (not surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormatFrom] error: {}", SDL_GetError()));
   }
 

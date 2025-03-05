@@ -20,7 +20,7 @@ private:
 #ifndef EMSCRIPTEN
   static constexpr const char *_filename = "cassete.json";
 #else
-  static constexpr const char *_cookiekey = "casseteCookie=";
+  static constexpr const char *_cookiekey = "cassete=";
 #endif
 
   void persist() const;

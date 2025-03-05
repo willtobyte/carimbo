@@ -22,7 +22,7 @@ cassete::cassete() {
     _j = nlohmann::json::object();
   }
 #else
-  if (!std::filesystem::exists(_filename)) {
+  if (not std::filesystem::exists(_filename)) {
     _j = nlohmann::json::object();
     return;
   }

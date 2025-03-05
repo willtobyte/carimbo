@@ -209,7 +209,7 @@ bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
 
   const auto &hitbox = sit->second.hitbox;
   const auto &other_hitbox = oit->second.hitbox;
-  if (!hitbox || !other_hitbox) [[likely]] {
+  if (not hitbox || not other_hitbox) [[likely]] {
     return false;
   }
 

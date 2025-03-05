@@ -79,7 +79,7 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_CONTROLLERDEVICEADDED: {
-      if (!SDL_IsGameController(event.cdevice.which)) {
+      if (not SDL_IsGameController(event.cdevice.which)) {
         break;
       }
 

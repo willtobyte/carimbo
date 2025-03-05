@@ -20,7 +20,7 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
   }
 
   auto context = SDL_GL_CreateContext(_window.get());
-  if (!context) [[unlikely]] {
+  if (not context) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_GL_CreateContext] failed to create context: {}", SDL_GetError()));
   }
 

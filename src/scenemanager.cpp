@@ -24,7 +24,7 @@ void scenemanager::update(float_t delta) noexcept {
 }
 
 void scenemanager::draw() const noexcept {
-  if (!_background) {
+  if (not _background) {
     return;
   }
 

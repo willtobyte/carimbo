@@ -30,7 +30,7 @@ std::string querybuilder::build() const noexcept {
   std::string result;
   bool first = true;
   for (const auto &[key, value] : _parameters) {
-    if (!first) {
+    if (not first) {
       result.push_back('&');
     } else {
       first = false;
