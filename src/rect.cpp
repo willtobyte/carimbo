@@ -37,6 +37,13 @@ bool rect::intersects(const rect &other) const noexcept {
   );
 }
 
+bool rect::contains(const point &p) const noexcept {
+  return p.x() >= _position.x() &&
+         p.x() < _position.x() + _size.width() &&
+         p.y() >= _position.y() &&
+         p.y() < _position.y() + _size.height();
+}
+
 rect::operator SDL_Rect() const noexcept {
   return SDL_Rect{
       .x = static_cast<int>(_position.x()),

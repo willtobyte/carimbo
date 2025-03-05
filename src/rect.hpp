@@ -22,6 +22,8 @@ public:
 
   bool intersects(const rect &other) const noexcept;
 
+  bool contains(const point &p) const noexcept;
+
   operator SDL_Rect() const noexcept;
 
   rect operator+(const point &offset) const noexcept;

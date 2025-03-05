@@ -24,6 +24,7 @@ public:
 
 protected:
   virtual void on_mail(const input::mailevent &event) noexcept override;
+  virtual void on_mousebuttondown(const input::mousebuttonevent &event) noexcept override;
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;

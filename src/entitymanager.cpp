@@ -168,3 +168,35 @@ void entitymanager::on_mail(const input::mailevent &event) noexcept {
     entity->on_email(event.body);
   }
 }
+
+void entitymanager::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
+  if (event.button != input::mousebuttonevent::button::left) {
+    return;
+  }
+
+  const geometry::point point{event.x, event.y};
+
+  for (const auto &entity : _entities) {
+    if (entity->props().action.empty()) {
+      continue;
+    }
+
+    if (const auto it = entity->props().animations.find(entity->props().action); it != entity->props().animations.end()) {
+      const auto &animation = it->second;
+
+      if (!animation.hitbox) {
+        continue;
+      }
+
+      const auto hitbox = geometry::rect{
+          entity->position() + animation.hitbox->position() * entity->props().scale,
+          animation.hitbox->size() * entity->props().scale
+      };
+
+      if (hitbox.contains(point)) {
+        // entity->on_touch();
+        fmt::println("{} touched", entity->kind());
+      }
+    }
+  }
+}
