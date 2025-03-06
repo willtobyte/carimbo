@@ -56,3 +56,11 @@ void overlay::set_cursor(const std::string &name) noexcept {
   _cursor = std::make_shared<cursor>(name, _resourcemanager);
   _eventmanager->add_receiver(_cursor);
 }
+
+void overlay::dispatch(const std::string &message) noexcept {
+  if (const auto cursor = _cursor; cursor) {
+    UNUSED(message);
+    UNUSED(cursor);
+    // cursor->handle(message);
+  }
+}

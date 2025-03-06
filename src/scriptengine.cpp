@@ -368,10 +368,15 @@ void framework::scriptengine::run() {
     void set(const std::string &name) {
       o.set_cursor(name);
     }
+
+    void dispatch(const std::string &message) {
+      o.dispatch(message);
+    }
   };
 
   lua.new_usertype<cursorproxy>(
       "CursorProxy",
+      "dispatch", &cursorproxy::dispatch,
       "set", &cursorproxy::set
   );
 

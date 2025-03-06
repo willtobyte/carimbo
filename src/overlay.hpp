@@ -23,6 +23,8 @@ public:
 
   void set_cursor(const std::string &name) noexcept;
 
+  void dispatch(const std::string &message) noexcept;
+
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   const std::shared_ptr<input::eventmanager> _eventmanager;
