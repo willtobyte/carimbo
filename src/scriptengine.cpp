@@ -278,7 +278,6 @@ void framework::scriptengine::run() {
       "x", sol::property(&framework::entity::x),
       "y", sol::property(&framework::entity::y),
       "visible", sol::property(&framework::entity::visible),
-      "size", sol::property(&framework::entity::size),
       "move", &framework::entity::move,
       "on_update", &framework::entity::set_onupdate,
       "on_animationfinished", &framework::entity::set_onanimationfinished,

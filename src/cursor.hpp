@@ -30,7 +30,6 @@ private:
   uint64_t _frame;
   uint64_t _last_frame;
   geometry::point _point;
-  geometry::size _size;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, graphics::animation> _animations;

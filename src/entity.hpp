@@ -48,7 +48,6 @@ public:
   void unset_action() noexcept;
 
   std::string action() const noexcept;
-  geometry::size size() const noexcept;
   bool visible() const noexcept;
 
   bool intersects(const std::shared_ptr<entity> &other) const noexcept;

@@ -35,8 +35,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   const auto buffer = storage::io::read(fmt::format("entities/{}.json", kind));
   const auto j = nlohmann::json::parse(buffer);
 
-  const auto size = j["size"].get<geometry::size>();
-  const auto scale = j["scale"].get<float_t>();
+  const auto scale = j.value("scale", float_t{1.f});
 
   auto spritesheet = j.contains("spritesheet")
                          ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
@@ -73,7 +72,6 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       true,
       {},
       {},
-      size,
       scale,
       {},
       kind,

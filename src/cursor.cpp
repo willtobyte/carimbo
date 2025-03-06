@@ -4,7 +4,7 @@ using namespace graphics;
 
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _x(0), _y(0), _frame(0), _last_frame(0), _resourcemanager(resourcemanager) {
-  // SDL_ShowCursor(false);
+  SDL_ShowCursor(false);
   //  SDL_SetRelativeMouseMode(true);
 
   _action = "idle";
@@ -14,9 +14,9 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   const auto j = nlohmann::json::parse(buffer);
 
   _point = j["point"].get<geometry::point>();
-  _size = j["size"].get<geometry::size>();
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>());
   _animations.reserve(j["animations"].size());
+
   for (const auto &[key, anim] : j["animations"].items()) {
     std::vector<graphics::keyframe> keyframes;
     keyframes.reserve(anim["frames"].size());

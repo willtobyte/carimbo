@@ -187,10 +187,6 @@ std::string entity::action() const noexcept {
   return _props.action;
 }
 
-geometry::size entity::size() const noexcept {
-  return _props.size;
-}
-
 bool entity::visible() const noexcept {
   return _props.visible;
 }
