@@ -13,9 +13,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   const auto j = nlohmann::json::parse(buffer);
 
   _size = j["size"].get<geometry::size>();
-
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>());
-
   _animations.reserve(j["animations"].size());
   for (const auto &[key, anim] : j["animations"].items()) {
     std::vector<graphics::keyframe> keyframes;
