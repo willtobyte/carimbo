@@ -674,7 +674,7 @@ void framework::scriptengine::run() {
 
   const auto start = SDL_GetPerformanceCounter();
   lua["setup"]();
-  fmt::println("boot time {:.2f} ms", (SDL_GetPerformanceCounter() - start) * 1000.0 / SDL_GetPerformanceFrequency());
+  fmt::println("boot time {:.2f}", (SDL_GetPerformanceCounter() - start) * 1000.0 / SDL_GetPerformanceFrequency());
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   const auto loop = lua["loop"].get<sol::function>();
