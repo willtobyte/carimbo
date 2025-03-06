@@ -62,6 +62,9 @@ void entity::update(float_t delta) noexcept {
   }
 
   if (_props.action.empty() || !_props.visible) {
+    const auto x = static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta);
+    const auto y = static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta);
+    _props.position.set(x, y);
     return;
   }
 
@@ -70,22 +73,18 @@ void entity::update(float_t delta) noexcept {
   const auto &frame = animation.keyframes.at(_props.frame);
 
   if (frame.duration > 0 && now - _props.last_frame >= frame.duration) {
-    ++_props.frame;
     _props.last_frame = now;
-
-    if (_props.frame >= animation.keyframes.size()) {
-      if (std::ranges::any_of(animation.keyframes, [](const auto &keyframe) { return keyframe.singleshoot; })) {
-        const auto name = _props.action;
-
+    if (++_props.frame >= animation.keyframes.size()) {
+      if (std::ranges::any_of(animation.keyframes, [](const auto &kf) { return kf.singleshoot; })) {
+        const auto action = _props.action;
         _props.action.clear();
 
         if (const auto fn = _onanimationfinished; fn) {
-          fn(shared_from_this(), name);
+          fn(shared_from_this(), action);
         }
 
         return;
       }
-
       _props.frame = 0;
     }
   }

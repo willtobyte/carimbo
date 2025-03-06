@@ -4,6 +4,7 @@
 
 #include "event.hpp"
 #include "eventreceiver.hpp"
+#include "pixmap.hpp"
 #include "resourcemanager.hpp"
 #include "types.hpp"
 
@@ -24,9 +25,12 @@ public:
 private:
   int32_t _x;
   int32_t _y;
+  std::string _action;
+  uint64_t _frame;
+  uint64_t _last_frame;
+  geometry::size _size;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
-  std::unordered_map<std::string, animation> _animations;
-
-  std::shared_ptr<pixmap> _temp;
+  std::shared_ptr<graphics::pixmap> _spritesheet;
+  std::unordered_map<std::string, graphics::animation> _animations;
 };
 }
