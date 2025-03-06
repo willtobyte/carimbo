@@ -368,15 +368,10 @@ void framework::scriptengine::run() {
     void set(const std::string &name) {
       o.set_cursor(name);
     }
-
-    void dispatch(const std::string &message) {
-      o.dispatch(message);
-    }
   };
 
   lua.new_usertype<cursorproxy>(
       "CursorProxy",
-      "dispatch", &cursorproxy::dispatch,
       "set", &cursorproxy::set
   );
 
@@ -384,6 +379,7 @@ void framework::scriptengine::run() {
       "Overlay",
       "create", &graphics::overlay::create,
       "destroy", &graphics::overlay::destroy,
+      "dispatch", &graphics::overlay::dispatch,
       "cursor", sol::property([](graphics::overlay &o) -> cursorproxy { return cursorproxy{o}; })
   );
 
@@ -676,7 +672,10 @@ void framework::scriptengine::run() {
 
   lua.script(std::string_view(reinterpret_cast<const char *>(script.data()), script.size()));
 
+  const auto start = SDL_GetPerformanceCounter();
   lua["setup"]();
+  fmt::println("boot time {:.2f} ms", (SDL_GetPerformanceCounter() - start) * 1000.0 / SDL_GetPerformanceFrequency());
+
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   const auto loop = lua["loop"].get<sol::function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, std::move(loop)));

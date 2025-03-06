@@ -26,8 +26,10 @@ private:
   int32_t _x;
   int32_t _y;
   std::string _action;
+  std::string _next_action;
   uint64_t _frame;
   uint64_t _last_frame;
+  geometry::point _point;
   geometry::size _size;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<graphics::pixmap> _spritesheet;

@@ -8,10 +8,12 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   //  SDL_SetRelativeMouseMode(true);
 
   _action = "idle";
+  _next_action = "idle";
 
   const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));
   const auto j = nlohmann::json::parse(buffer);
 
+  _point = j["point"].get<geometry::point>();
   _size = j["size"].get<geometry::size>();
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>());
   _animations.reserve(j["animations"].size());
@@ -40,6 +42,9 @@ void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
 
 void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   UNUSED(event);
+
+  _action = "click";
+  _next_action = "idle";
 }
 
 void cursor::on_mousebuttonup(const input::mousebuttonevent &event) noexcept {
@@ -66,7 +71,7 @@ void cursor::draw() const noexcept {
   const auto &source = animation.frame;
   const auto &offset = animation.offset;
 
-  geometry::rect destination{geometry::point{_x, _y} + offset, source.size()};
+  geometry::rect destination{geometry::point{_x, _y} - _point + offset, source.size()};
 
   _spritesheet->draw(
       source,
