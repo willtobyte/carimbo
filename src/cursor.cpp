@@ -79,40 +79,4 @@ void cursor::draw() const noexcept {
       std::nullopt
 #endif
   );
-
-  /*
-  if (_props.action.empty() || !_props.visible) {
-    return;
-  }
-
-  const auto &animation = _props.animations.at(_props.action).keyframes.at(_props.frame);
-  const auto &source = animation.frame;
-  const auto &offset = animation.offset;
-#ifdef HITBOX
-  const auto &hitbox = _props.animations.at(_props.action).hitbox;
-#endif
-
-  geometry::rect destination{_props.position + offset, source.size()};
-
-  destination.scale(_props.scale);
-
-#ifdef HITBOX
-  const auto debug = hitbox
-                         ? std::make_optional(geometry::rect{_props.position + hitbox->position(), hitbox->size() * _props.scale})
-                         : std::nullopt;
-#endif
-
-  _props.spritesheet->draw(
-      source,
-      destination,
-      _props.angle,
-      _props.reflection,
-      _props.alpha
-#ifdef HITBOX
-      ,
-      debug
-#endif
-  );
-
-  */
 }
