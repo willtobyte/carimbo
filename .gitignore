@@ -24,3 +24,6 @@ tmp/
 # Cache
 .cache
 .cpp-linter_cache
+
+# Misc
+cassete.json
