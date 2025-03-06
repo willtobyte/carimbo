@@ -17,10 +17,10 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>());
   _animations.reserve(j["animations"].size());
 
-  for (const auto &[key, anim] : j["animations"].items()) {
+  for (const auto &[key, a] : j["animations"].items()) {
     std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(anim["frames"].size());
-    for (const auto &frame : anim["frames"]) {
+    keyframes.reserve(a["frames"].size());
+    for (const auto &frame : a["frames"]) {
       keyframes.emplace_back(
           graphics::keyframe{
               frame["rect"].get<geometry::rect>(),
