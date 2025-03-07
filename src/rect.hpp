@@ -28,6 +28,8 @@ public:
 
   rect operator+(const point &offset) const noexcept;
 
+  auto operator<=>(const rect &) const = default;
+
   friend void from_json(const nlohmann::json &j, rect &r) noexcept;
 
 private:

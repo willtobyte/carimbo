@@ -105,6 +105,8 @@ if(EMSCRIPTEN)
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
 else()
+  set(SANITIZER_FLAGS -fsanitize=address,undefined)
+
   if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:/Od;/Zi>
@@ -112,10 +114,11 @@ else()
     )
   else()
     target_compile_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:-O0;-g>
+      $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
       $<$<CONFIG:Release>:-O2;-flto>
     )
     target_link_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
       $<$<CONFIG:Release>:-flto>
     )
   endif()

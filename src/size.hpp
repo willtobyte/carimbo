@@ -20,6 +20,8 @@ public:
 
   size operator*(float_t factor) const noexcept;
 
+  auto operator<=>(const size &) const = default;
+
   friend void from_json(const nlohmann::json &j, size &s) noexcept;
 
 private:

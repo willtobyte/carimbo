@@ -111,8 +111,11 @@ void socket::connect() noexcept {
       beast::bind_front_handler(&socket::on_resolve, this)
   );
 
-  std::thread t([&]() { _io_context.run(); });
-  t.detach();
+  _thread = std::thread([this]() {
+    _io_context.run();
+  });
+
+  _thread.detach();
 #endif
 }
 

@@ -79,15 +79,21 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_CONTROLLERDEVICEADDED: {
-      if (!SDL_IsGameController(event.cdevice.which)) {
+      if (!SDL_IsGameController(event.cdevice.which))
+        break;
+
+      auto controller = SDL_GameControllerOpen(event.cdevice.which);
+      if (!controller)
+        break;
+
+      const auto joystick = SDL_GameControllerGetJoystick(controller);
+      const auto id = SDL_JoystickInstanceID(joystick);
+      if (_controllers.find(id) != _controllers.end()) {
+        SDL_GameControllerClose(controller);
         break;
       }
 
-      if (auto controller = SDL_GameControllerOpen(event.cdevice.which)) {
-        const auto joystick = SDL_GameControllerGetJoystick(controller);
-        const auto id = SDL_JoystickInstanceID(joystick);
-        _controllers[id] = gamecontroller_ptr(controller);
-      }
+      _controllers.emplace(id, gamecontroller_ptr(controller));
     } break;
 
     case SDL_CONTROLLERDEVICEREMOVED:

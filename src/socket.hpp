@@ -56,6 +56,7 @@ private:
   websocket::stream<ssl::stream<beast::tcp_stream>> _ws;
   beast::flat_buffer _buffer;
   std::function<void(const std::string &)> _on_message;
+  std::thread _thread;
 #endif
 };
 }
