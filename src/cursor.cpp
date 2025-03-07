@@ -2,13 +2,15 @@
 
 using namespace graphics;
 
-cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
-    : _x(0), _y(0), _frame(0), _last_frame(0), _resourcemanager(resourcemanager) {
-  SDL_ShowCursor(false);
-  //  SDL_SetRelativeMouseMode(true);
+namespace {
+constexpr const auto ACTION_IDLE = "idle";
+constexpr const auto ACTION_CLICK = "click";
+}
 
-  _action = "idle";
-  _next_action = "idle";
+cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
+    : _x(0), _y(0), _action(ACTION_IDLE), _frame(0), _last_frame(0), _resourcemanager(resourcemanager) {
+  SDL_ShowCursor(false);
+  // SDL_SetRelativeMouseMode(true);
 
   const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));
   const auto j = nlohmann::json::parse(buffer);
@@ -42,7 +44,8 @@ void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
 
 void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   UNUSED(event);
-  _action = "click";
+
+  _action = ACTION_CLICK;
   _frame = 0;
   _last_frame = SDL_GetTicks();
 }
@@ -53,6 +56,7 @@ void cursor::on_mousebuttonup(const input::mousebuttonevent &event) noexcept {
 
 void cursor::update(float_t delta) noexcept {
   UNUSED(delta);
+
   const auto now = SDL_GetTicks();
   const auto &animation = _animations.at(_action);
   const auto &frame = animation.keyframes.at(_frame);
@@ -61,11 +65,12 @@ void cursor::update(float_t delta) noexcept {
     return;
 
   _last_frame = now;
-  if (_action == "click" && _frame + 1 >= animation.keyframes.size()) {
-    _action = "idle";
+  if (_action == ACTION_CLICK && _frame + 1 >= animation.keyframes.size()) {
+    _action = ACTION_IDLE;
     _frame = 0;
     return;
   }
+
   _frame = (_frame + 1) % animation.keyframes.size();
 }
 
