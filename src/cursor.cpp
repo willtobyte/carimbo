@@ -42,9 +42,9 @@ void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
 
 void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   UNUSED(event);
-
   _action = "click";
-  _next_action = "idle";
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
 }
 
 void cursor::on_mousebuttonup(const input::mousebuttonevent &event) noexcept {
@@ -53,16 +53,19 @@ void cursor::on_mousebuttonup(const input::mousebuttonevent &event) noexcept {
 
 void cursor::update(float_t delta) noexcept {
   UNUSED(delta);
-
   const auto now = SDL_GetTicks();
   const auto &animation = _animations.at(_action);
   const auto &frame = animation.keyframes.at(_frame);
 
-  if (frame.duration == 0 || now - _last_frame < frame.duration) {
+  if (frame.duration == 0 || now - _last_frame < frame.duration)
     return;
-  }
 
   _last_frame = now;
+  if (_action == "click" && _frame + 1 >= animation.keyframes.size()) {
+    _action = "idle";
+    _frame = 0;
+    return;
+  }
   _frame = (_frame + 1) % animation.keyframes.size();
 }
 
