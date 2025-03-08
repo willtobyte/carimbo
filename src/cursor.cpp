@@ -4,7 +4,8 @@ using namespace graphics;
 
 namespace {
 constexpr const auto ACTION_IDLE = "idle";
-constexpr const auto ACTION_CLICK = "click";
+constexpr const auto ACTION_LEFT = "left";
+// constexpr const auto ACTION_RIGHT = "right";
 }
 
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
@@ -45,7 +46,7 @@ void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
 void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   UNUSED(event);
 
-  _action = ACTION_CLICK;
+  _action = ACTION_LEFT;
   _frame = 0;
   _last_frame = SDL_GetTicks();
 }
@@ -65,7 +66,7 @@ void cursor::update(float_t delta) noexcept {
     return;
 
   _last_frame = now;
-  if (_action == ACTION_CLICK && _frame + 1 >= animation.keyframes.size()) {
+  if (_action == ACTION_LEFT && _frame + 1 >= animation.keyframes.size()) {
     _action = ACTION_IDLE;
     _frame = 0;
     return;
