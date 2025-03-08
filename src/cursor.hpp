@@ -23,8 +23,7 @@ public:
   void draw() const noexcept;
 
 private:
-  int32_t _x;
-  int32_t _y;
+  geometry::point _position;
   std::string _action;
   uint64_t _frame;
   uint64_t _last_frame;
