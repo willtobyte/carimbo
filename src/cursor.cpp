@@ -68,9 +68,9 @@ void cursor::on_mousebuttonup(const input::mousebuttonevent &event) noexcept {
 void cursor::update(float_t) noexcept {
   const auto now = SDL_GetTicks();
   const auto &animation = _animations.at(_action);
-  const auto &current_frame = animation.keyframes[_frame];
+  const auto &frame = animation.keyframes[_frame];
 
-  if (current_frame.duration == 0 || now - _last_frame < current_frame.duration)
+  if (frame.duration == 0 || now - _last_frame < frame.duration)
     return;
 
   _last_frame = now;
