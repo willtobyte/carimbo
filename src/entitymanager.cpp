@@ -43,23 +43,31 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
 
   std::unordered_map<std::string, graphics::animation> animations;
   animations.reserve(j["animations"].size());
-  for (const auto &[key, anim] : j["animations"].items()) {
-    const auto hitbox = anim.contains("hitbox")
-                            ? std::make_optional(anim["hitbox"].get<geometry::rect>())
+
+  for (const auto &item : j["animations"].items()) {
+    const auto &key = item.key();
+    const auto &a = item.value();
+
+    const auto hitbox = a.contains("hitbox")
+                            ? std::make_optional(a["hitbox"].template get<geometry::rect>())
                             : std::nullopt;
 
     std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(anim["frames"].size());
-    for (const auto &frame : anim["frames"]) {
-      keyframes.emplace_back(
-          graphics::keyframe{
-              frame["rect"].get<geometry::rect>(),
+    keyframes.reserve(a["frames"].size());
+    std::transform(
+        a["frames"].begin(),
+        a["frames"].end(),
+        std::back_inserter(keyframes),
+        [](const auto &frame) -> graphics::keyframe {
+          return graphics::keyframe{
+              frame["rect"].template get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
-              frame["duration"].get<uint64_t>(),
+              frame["duration"].template get<uint64_t>(),
               frame.value("singleshoot", bool{false})
-          }
-      );
-    }
+          };
+        }
+    );
+
     animations.emplace(key, graphics::animation{hitbox, std::move(keyframes)});
   }
 
