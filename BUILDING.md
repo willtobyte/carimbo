@@ -39,7 +39,13 @@ EOF
 
 ### Configure & Build
 
-Run the command:
+Configure:
+
+```
+make -f Makefile.webassembly configure
+```
+
+Build:
 
 ```shell
 make -f Makefile.webassembly release
