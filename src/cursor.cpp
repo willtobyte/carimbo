@@ -28,13 +28,13 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
     std::vector<graphics::keyframe> keyframes;
     keyframes.reserve(a["frames"].size());
 
-    for (const auto &frame_json : a["frames"]) {
+    for (const auto &frame : a["frames"]) {
       keyframes.emplace_back(
           graphics::keyframe{
-              frame_json["rect"].get<geometry::rect>(),
-              frame_json.value("offset", geometry::point{}),
-              frame_json["duration"].get<uint64_t>(),
-              frame_json.value("singleshoot", false)
+              frame["rect"].get<geometry::rect>(),
+              frame.value("offset", geometry::point{}),
+              frame["duration"].get<uint64_t>(),
+              frame.value("singleshoot", false)
           }
       );
     }
