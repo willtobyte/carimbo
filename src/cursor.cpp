@@ -24,20 +24,28 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get<std::string>());
   _animations.reserve(j["animations"].size());
 
-  for (const auto &[key, a] : j["animations"].items()) {
+  _animations.reserve(j["animations"].size());
+
+  for (const auto &item : j["animations"].items()) {
+    const auto &key = item.key();
+    const auto &a = item.value();
+
     std::vector<graphics::keyframe> keyframes;
     keyframes.reserve(a["frames"].size());
-
-    for (const auto &frame : a["frames"]) {
-      keyframes.emplace_back(
-          graphics::keyframe{
-              frame["rect"].get<geometry::rect>(),
+    std::transform(
+        a["frames"].begin(),
+        a["frames"].end(),
+        std::back_inserter(keyframes),
+        [](const auto &frame) -> graphics::keyframe {
+          return graphics::keyframe{
+              frame["rect"].template get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
-              frame["duration"].get<uint64_t>(),
+              frame["duration"].template get<uint64_t>(),
               frame.value("singleshoot", false)
-          }
-      );
-    }
+          };
+        }
+    );
+
     _animations.emplace(key, graphics::animation{std::nullopt, std::move(keyframes)});
   }
 }
