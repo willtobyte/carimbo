@@ -23,11 +23,12 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   _point = j["point"].get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get<std::string>());
 
-  for (const auto &[key, anim_json] : j["animations"].items()) {
+  _animations.reserve(j["animations"].size());
+  for (const auto &[key, a] : j["animations"].items()) {
     std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(anim_json["frames"].size());
+    keyframes.reserve(a["frames"].size());
 
-    for (const auto &frame_json : anim_json["frames"]) {
+    for (const auto &frame_json : a["frames"]) {
       keyframes.emplace_back(
           graphics::keyframe{
               frame_json["rect"].get<geometry::rect>(),
