@@ -1,7 +1,5 @@
-from pathlib import Path
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMakeDeps
-from conan.tools.files import save, load
 
 
 class MeuProjetoConan(ConanFile):
