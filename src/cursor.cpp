@@ -22,8 +22,8 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
 
   _point = j["point"].get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get<std::string>());
-
   _animations.reserve(j["animations"].size());
+
   for (const auto &[key, a] : j["animations"].items()) {
     std::vector<graphics::keyframe> keyframes;
     keyframes.reserve(a["frames"].size());
