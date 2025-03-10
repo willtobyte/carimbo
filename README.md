@@ -14,10 +14,6 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 _"Carimbo"_ comes from the 🇧🇷 word for "stamp," and that is exactly what a 2D game engine does—it constantly stamps sprites onto the screen.
 
-### Motivation
-
-During the summer of 2009, I attempted to port my SDL-based game engine to Google’s Native Client—a Chrome-specific technology and early precursor to WebAssembly. Low-level programming still courses through my veins, and now, with the universal reach of WebAssembly and a wealth of experience, I’m building my own game engine once again.
-
 ### Games
 
 Games and demos created with the Carimbo engine are hosted on https://carimbo.run. They can be tested or played online without any installation, thanks to WebAssembly technology native to all modern browsers.
