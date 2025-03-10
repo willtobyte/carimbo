@@ -36,7 +36,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
         a["frames"].begin(),
         a["frames"].end(),
         std::back_inserter(keyframes),
-        [](const auto &frame) -> graphics::keyframe {
+        [](const auto &frame) {
           return graphics::keyframe{
               frame["rect"].template get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
