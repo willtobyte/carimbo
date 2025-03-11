@@ -53,7 +53,7 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   const auto statemanager = std::make_shared<framework::statemanager>();
   const auto entitymanager = std::make_shared<framework::entitymanager>(resourcemanager);
   const auto fontfactory = std::make_shared<graphics::fontfactory>(renderer);
-  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager->pixmappool());
+  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager->pixmappool(), entitymanager);
 
   engine->set_audiodevice(audiodevice);
   engine->set_entitymanager(entitymanager);

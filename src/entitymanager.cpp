@@ -52,11 +52,12 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                             ? std::make_optional(a["hitbox"].template get<geometry::rect>())
                             : std::nullopt;
 
+    const auto &f = a["frames"];
     std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(a["frames"].size());
+    keyframes.reserve(f.size());
     std::transform(
-        a["frames"].begin(),
-        a["frames"].end(),
+        f.begin(),
+        f.end(),
         std::back_inserter(keyframes),
         [](const auto &frame) {
           return graphics::keyframe{

@@ -6,7 +6,7 @@
 namespace framework {
 class scenemanager {
 public:
-  scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool) noexcept;
+  explicit scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std::shared_ptr<entitymanager> entitymanager) noexcept;
 
   void set(const std::string &name) noexcept;
 
@@ -19,6 +19,7 @@ public:
 private:
   std::unordered_map<std::string, std::shared_ptr<entity>> _entities;
   std::shared_ptr<graphics::pixmappool> _pixmappool;
+  std::shared_ptr<entitymanager> _entitymanager;
   std::shared_ptr<graphics::pixmap> _background;
   geometry::size _size;
 };

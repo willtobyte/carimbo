@@ -30,11 +30,12 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
     const auto &key = item.key();
     const auto &a = item.value();
 
+    const auto &f = a["frames"];
     std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(a["frames"].size());
+    keyframes.reserve(f.size());
     std::transform(
-        a["frames"].begin(),
-        a["frames"].end(),
+        f.begin(),
+        f.end(),
         std::back_inserter(keyframes),
         [](const auto &frame) {
           return graphics::keyframe{
