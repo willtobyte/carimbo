@@ -12,7 +12,7 @@ public:
 
   std::shared_ptr<entity> spawn(const std::string &kind);
 
-  std::shared_ptr<entity> clone(const std::shared_ptr<entity> &matrix) noexcept;
+  std::shared_ptr<entity> clone(const std::shared_ptr<entity> matrix) noexcept;
 
   void destroy(const std::shared_ptr<entity> entity) noexcept;
 

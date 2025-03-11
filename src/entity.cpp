@@ -17,6 +17,10 @@ uint64_t entity::id() const noexcept {
   return _props.id;
 }
 
+void entity::set_id(uint64_t id) noexcept {
+  _props.id = id;
+}
+
 std::string entity::kind() const noexcept {
   return _props.kind;
 }

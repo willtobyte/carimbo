@@ -6,6 +6,7 @@
 #include "kv.hpp"
 #include "reflection.hpp"
 #include "vector2d.hpp"
+#include <cstdint>
 
 namespace framework {
 class entity : public std::enable_shared_from_this<entity> {
@@ -16,6 +17,8 @@ public:
   static std::shared_ptr<entity> create(entityprops &&props);
 
   uint64_t id() const noexcept;
+  void set_id(uint64_t id) noexcept;
+
   std::string kind() const noexcept;
 
   virtual void update(float_t delta) noexcept;
