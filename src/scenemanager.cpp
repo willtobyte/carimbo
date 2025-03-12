@@ -21,7 +21,7 @@ void scenemanager::set(const std::string &name) noexcept {
       i.begin(),
       i.end(),
       std::inserter(_entities, _entities.end()),
-      [this](const auto &item) -> std::pair<std::string, std::shared_ptr<entity>> {
+      [&](const auto &item) -> std::pair<std::string, std::shared_ptr<entity>> {
         const auto &key = item.key();
         const auto &data = item.value();
         const auto &kind = data["kind"].template get_ref<const std::string &>();
