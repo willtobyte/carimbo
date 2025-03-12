@@ -13,9 +13,13 @@ void scenemanager::set(const std::string &name) noexcept {
   _background = _pixmappool->get(j["background"].get_ref<const std::string &>());
   _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 
+  const auto old = std::exchange(_entities, {});
+  for (const auto &pair : old) {
+    _entitymanager->destroy(pair.second);
+  }
+
   const auto &es = j["entities"];
   const auto &i = es.items();
-  _entities.clear();
   _entities.reserve(es.size());
   std::transform(
       i.begin(),
