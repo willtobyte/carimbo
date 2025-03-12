@@ -88,7 +88,7 @@ void cursor::update(float_t) noexcept {
   _last_frame = now;
 
   if (animation.oneshot && (_frame + 1 >= animation.keyframes.size())) {
-    _action = ACTION_IDLE;
+    _action = std::exchange(_queued_action, std::nullopt).value_or(ACTION_IDLE);
     _frame = 0;
     return;
   }
@@ -114,7 +114,5 @@ void cursor::draw() const noexcept {
 void cursor::handle(const std::string &message) noexcept {
   UNUSED(message);
 
-  _action = "damage";
-  _frame = 0;
-  _last_frame = SDL_GetTicks();
+  _queued_action = "damage";
 }
