@@ -1,4 +1,5 @@
 #include "scenemanager.hpp"
+#include "entity.hpp"
 
 using namespace framework;
 
@@ -6,14 +7,15 @@ scenemanager::scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std
     : _pixmappool(pixmappool), _entitymanager(entitymanager) {}
 
 void scenemanager::set(const std::string &name) noexcept {
-  _background.reset();
   const auto buffer = storage::io::read("scenes/" + name + ".json");
   const auto j = nlohmann::json::parse(buffer);
+  _background.reset();
   _background = _pixmappool->get(j["background"].get_ref<const std::string &>());
   _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 
   const auto &es = j["entities"];
   const auto &i = es.items();
+  _entities.clear();
   _entities.reserve(es.size());
   std::transform(
       i.begin(),
@@ -35,8 +37,12 @@ void scenemanager::set(const std::string &name) noexcept {
   );
 }
 
-void scenemanager::grab(const std::string &key) noexcept {
-  UNUSED(key);
+std::shared_ptr<entity> scenemanager::grab(const std::string &key) const noexcept {
+  if (auto it = _entities.find(std::string{key}); it != _entities.end()) {
+    return it->second;
+  }
+
+  return nullptr;
 }
 
 void scenemanager::update(float_t delta) noexcept {

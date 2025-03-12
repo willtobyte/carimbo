@@ -7,6 +7,7 @@
 #include "point.hpp"
 #include "vector2d.hpp"
 #include "widget.hpp"
+#include <sol/raii.hpp>
 
 sol::table require(sol::state &lua, const std::string &module) {
   const auto data = storage::io::read("scripts/" + module + ".lua");
@@ -342,6 +343,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::statemanager>(
       "StateManager",
+      sol::no_constructor,
       "collides", &statemanager::collides,
       "players", sol::property(&statemanager::players),
       "player", [&_p](framework::statemanager &self, input::player player) -> playerwrapper & {
@@ -353,7 +355,9 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::scenemanager>(
       "SceneManager",
-      "set", &framework::scenemanager::set
+      sol::no_constructor,
+      "set", &framework::scenemanager::set,
+      "grab", &framework::scenemanager::grab
   );
 
   lua.new_enum(
