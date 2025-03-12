@@ -38,7 +38,7 @@ void scenemanager::set(const std::string &name) noexcept {
 }
 
 std::shared_ptr<entity> scenemanager::grab(const std::string &key) const noexcept {
-  if (auto it = _entities.find(std::string{key}); it != _entities.end()) {
+  if (auto it = _entities.find(key); it != _entities.end()) {
     return it->second;
   }
 
