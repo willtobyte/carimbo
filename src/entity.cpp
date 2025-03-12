@@ -81,6 +81,7 @@ void entity::update(float_t delta) noexcept {
         static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
         static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
     );
+
     return;
   }
 
@@ -94,6 +95,7 @@ void entity::update(float_t delta) noexcept {
 
       return;
     }
+
     _props.frame = 0;
   }
 
