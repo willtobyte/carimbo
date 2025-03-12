@@ -82,8 +82,9 @@ void cursor::update(float_t) noexcept {
   const auto &animation = _animations.at(_action);
   const auto &frame = animation.keyframes[_frame];
 
-  if (frame.duration == 0 || now - _last_frame < frame.duration)
+  if (frame.duration == 0 || now - _last_frame < frame.duration) {
     return;
+  }
 
   _last_frame = now;
 
