@@ -48,6 +48,8 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
     const auto &key = item.key();
     const auto &a = item.value();
 
+    const auto oneshot = a.value("oneshot", false);
+
     const auto hitbox = a.contains("hitbox")
                             ? std::make_optional(a["hitbox"].template get<geometry::rect>())
                             : std::nullopt;
@@ -64,12 +66,11 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
               frame["rect"].template get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
               frame["duration"].template get<uint64_t>(),
-              frame.value("singleshoot", bool{false})
           };
         }
     );
 
-    animations.emplace(key, graphics::animation{hitbox, std::move(keyframes)});
+    animations.emplace(key, graphics::animation{oneshot, hitbox, std::move(keyframes)});
   }
 
   entityprops props{

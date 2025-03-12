@@ -59,43 +59,46 @@ algebra::vector2d entity::velocity() const noexcept {
 }
 
 void entity::update(float_t delta) noexcept {
-  UNUSED(delta);
-
   if (const auto fn = _onupdate; fn) {
     fn(shared_from_this());
   }
 
   if (_props.action.empty() || !_props.visible) {
-    const auto x = static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta);
-    const auto y = static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta);
-    _props.position.set(x, y);
+    _props.position.set(
+        static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
+        static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
+    );
+
     return;
   }
 
   const auto now = SDL_GetTicks();
   const auto &animation = _props.animations.at(_props.action);
-  const auto &frame = animation.keyframes.at(_props.frame);
+  const auto &frame = animation.keyframes[_props.frame];
 
-  if (frame.duration > 0 && now - _props.last_frame >= frame.duration) {
-    _props.last_frame = now;
-    if (++_props.frame >= animation.keyframes.size()) {
-      if (std::ranges::any_of(animation.keyframes, [](const auto &kf) { return kf.singleshoot; })) {
-        const auto action = _props.action;
-        _props.action.clear();
-
-        if (const auto fn = _onanimationfinished; fn) {
-          fn(shared_from_this(), action);
-        }
-
-        return;
-      }
-      _props.frame = 0;
-    }
+  if (frame.duration > 0 && now - _props.last_frame < frame.duration) {
+    _props.position.set(
+        static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
+        static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
+    );
+    return;
   }
 
-  const auto x = static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta);
-  const auto y = static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta);
-  _props.position.set(x, y);
+  _props.last_frame = now;
+  if (++_props.frame >= animation.keyframes.size()) {
+    if (animation.oneshot) {
+      auto finished = std::exchange(_props.action, "");
+      if (_onanimationfinished)
+        _onanimationfinished(shared_from_this(), finished);
+      return;
+    }
+    _props.frame = 0;
+  }
+
+  _props.position.set(
+      static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
+      static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
+  );
 }
 
 void entity::draw() const noexcept {

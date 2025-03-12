@@ -1,5 +1,6 @@
 #include "overlay.hpp"
 #include "helpers.hpp"
+#include "widget.hpp"
 
 using namespace graphics;
 
@@ -11,9 +12,9 @@ std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
     switch (type) {
     case widgettype::label:
       return std::make_shared<label>();
+    default:
+      std::terminate();
     }
-
-    std::terminate();
   }();
 
   _widgets.emplace_back(widget);
@@ -57,10 +58,18 @@ void overlay::set_cursor(const std::string &name) noexcept {
   _eventmanager->add_receiver(_cursor);
 }
 
-void overlay::dispatch(const std::string &message) noexcept {
-  if (const auto cursor = _cursor; cursor) {
-    UNUSED(message);
-    UNUSED(cursor);
-    // cursor->handle(message);
+void overlay::dispatch(widgettype type, const std::string &message) noexcept {
+  UNUSED(message);
+
+  switch (type) {
+  case widgettype::cursor: {
+    if (const auto cursor = _cursor; cursor) {
+      cursor->handle(message);
+    }
+
+  } break;
+
+  default:
+    break;
   }
 }

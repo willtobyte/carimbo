@@ -4,7 +4,8 @@
 
 namespace graphics {
 enum class widgettype : uint8_t {
-  label = 0,
+  cursor = 0,
+  label,
 };
 
 class widget {

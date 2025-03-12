@@ -29,7 +29,6 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   for (const auto &item : j["animations"].items()) {
     const auto &key = item.key();
     const auto &a = item.value();
-
     const auto &f = a["frames"];
     std::vector<graphics::keyframe> keyframes;
     keyframes.reserve(f.size());
@@ -42,12 +41,13 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
               frame["rect"].template get<geometry::rect>(),
               frame.value("offset", geometry::point{}),
               frame["duration"].template get<uint64_t>(),
-              frame.value("singleshoot", false)
           };
         }
     );
 
-    _animations.emplace(key, graphics::animation{std::nullopt, std::move(keyframes)});
+    const auto oneshot = a.value("oneshot", false);
+
+    _animations.emplace(key, graphics::animation{oneshot, std::nullopt, std::move(keyframes)});
   }
 }
 
@@ -85,7 +85,7 @@ void cursor::update(float_t) noexcept {
 
   _last_frame = now;
 
-  if ((_action == ACTION_LEFT || _action == ACTION_RIGHT) && (_frame + 1 >= animation.keyframes.size())) {
+  if (animation.oneshot && (_frame + 1 >= animation.keyframes.size())) {
     _action = ACTION_IDLE;
     _frame = 0;
     return;
@@ -107,4 +107,12 @@ void cursor::draw() const noexcept {
       std::nullopt
 #endif
   );
+}
+
+void cursor::handle(const std::string &message) noexcept {
+  UNUSED(message);
+
+  _action = "damage";
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
 }

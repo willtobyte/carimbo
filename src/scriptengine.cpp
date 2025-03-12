@@ -362,6 +362,7 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
       "WidgetType",
+      "cursor", graphics::widgettype::cursor,
       "label", graphics::widgettype::label
   );
 

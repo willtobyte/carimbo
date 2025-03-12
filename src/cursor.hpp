@@ -22,6 +22,8 @@ public:
   void update(float_t delta) noexcept;
   void draw() const noexcept;
 
+  void handle(const std::string &message) noexcept;
+
 private:
   geometry::point _position;
   std::string _action;
