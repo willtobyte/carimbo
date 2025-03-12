@@ -14,7 +14,7 @@ void scenemanager::set(const std::string &name) noexcept {
   _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 
   const auto old = std::exchange(_entities, {});
-  for (const auto &pair : std::exchange(_entities, {})) {
+  for (const auto &pair : old) {
     _entitymanager->destroy(pair.second);
   }
 
