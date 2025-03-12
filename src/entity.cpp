@@ -88,8 +88,10 @@ void entity::update(float_t delta) noexcept {
   if (++_props.frame >= animation.keyframes.size()) {
     if (animation.oneshot) {
       auto finished = std::exchange(_props.action, "");
-      if (_onanimationfinished)
-        _onanimationfinished(shared_from_this(), finished);
+      if (const auto fn = _onanimationfinished; fn) {
+        fn(shared_from_this(), finished);
+      }
+
       return;
     }
     _props.frame = 0;
