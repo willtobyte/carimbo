@@ -50,7 +50,7 @@ void scenemanager::update(float_t delta) noexcept {
 }
 
 void scenemanager::draw() const noexcept {
-  if (!_background) {
+  if (!_background) [[unlikely]] {
     return;
   }
 
