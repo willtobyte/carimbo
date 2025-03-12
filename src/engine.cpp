@@ -162,10 +162,10 @@ void engine::_loop() noexcept {
     observer->on_beginupdate();
   }
 
-  _scenemanager->update(delta);
   _eventmanager->update(delta);
-  _entitymanager->update(delta);
   _overlay->update(delta);
+  _scenemanager->update(delta);
+  _entitymanager->update(delta);
 
   for (const auto &loopable : _loopables) {
     loopable->loop(delta);

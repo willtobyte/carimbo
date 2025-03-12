@@ -8,7 +8,6 @@
 #include "resourcemanager.hpp"
 #include "scenemanager.hpp"
 #include "window.hpp"
-#include "world.hpp"
 
 using namespace framework;
 

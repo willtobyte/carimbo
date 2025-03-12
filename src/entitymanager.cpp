@@ -1,7 +1,6 @@
 #include "entitymanager.hpp"
 #include "common.hpp"
 #include "entityprops.hpp"
-#include <ostream>
 
 using namespace framework;
 

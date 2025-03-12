@@ -1,4 +1,5 @@
 #include "cursor.hpp"
+#include "event.hpp"
 
 using namespace graphics;
 
@@ -56,6 +57,7 @@ void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
 }
 
 void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
+  // TODO using enum input::mousebuttonevent::button;
   switch (event.button) {
   case input::mousebuttonevent::button::left:
     _action = ACTION_LEFT;
