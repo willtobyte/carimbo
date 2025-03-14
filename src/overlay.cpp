@@ -22,15 +22,10 @@ std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
   return widget;
 }
 
-void overlay::destroy(std::variant<std::shared_ptr<label>> &&widget) noexcept {
-  std::visit(
-      [this](auto &&argument) {
-        std::erase_if(_widgets, [&argument](const auto &existing) {
-          return existing == argument;
-        });
-      },
-      widget
-  );
+void overlay::destroy(const std::variant<std::shared_ptr<label>> &widget) noexcept {
+  std::erase_if(_widgets, [&widget](const auto &existing) {
+    return existing == widget;
+  });
 }
 
 void overlay::update(float_t delta) noexcept {

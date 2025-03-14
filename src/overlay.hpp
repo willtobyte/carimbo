@@ -15,7 +15,7 @@ public:
 
   std::variant<std::shared_ptr<label>> create(widgettype type) noexcept;
 
-  void destroy(std::variant<std::shared_ptr<label>> &&widget) noexcept;
+  void destroy(const std::variant<std::shared_ptr<label>> &widget) noexcept;
 
   void update(float_t delta) noexcept;
 
