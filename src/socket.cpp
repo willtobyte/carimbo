@@ -257,7 +257,7 @@ void socket::do_read() {
 #endif
 
 void socket::on_message(const std::string &buffer) noexcept {
-  auto j = json::parse(buffer, nullptr, false);
+  const auto j = json::parse(buffer, nullptr, false);
   if (j.is_discarded()) {
     return;
   }
@@ -274,7 +274,7 @@ void socket::on_message(const std::string &buffer) noexcept {
     return;
   }
 
-  if (auto event = j.value("event", json::object()); !event.empty()) {
+  if (const auto event = j.value("event", json::object()); !event.empty()) {
     invoke(
         event.at("topic").get_ref<const std::string &>(),
         event.at("data").dump()
@@ -283,8 +283,8 @@ void socket::on_message(const std::string &buffer) noexcept {
     return;
   }
 
-  if (auto rpc = j.value("rpc", json::object()); !rpc.empty() && rpc.contains("response")) {
-    auto response = rpc.at("response");
+  if (const auto rpc = j.value("rpc", json::object()); !rpc.empty() && rpc.contains("response")) {
+    const auto response = rpc.at("response");
     if (response.contains("result")) {
       invoke(
           std::to_string(response.at("id").get<uint64_t>()),
