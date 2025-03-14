@@ -31,20 +31,14 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
     const auto &key = item.key();
     const auto &a = item.value();
     const auto &f = a["frames"];
-    std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(f.size());
-    std::transform(
-        f.begin(),
-        f.end(),
-        std::back_inserter(keyframes),
-        [](const auto &frame) {
-          return graphics::keyframe{
-              frame["rect"].template get<geometry::rect>(),
-              frame.value("offset", geometry::point{}),
-              frame["duration"].template get<uint64_t>(),
-          };
-        }
-    );
+    std::vector<graphics::keyframe> keyframes(f.size());
+    std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
+      return graphics::keyframe{
+          frame["rect"].template get<geometry::rect>(),
+          frame.value("offset", geometry::point{}),
+          frame["duration"].template get<uint64_t>(),
+      };
+    });
 
     const auto oneshot = a.value("oneshot", false);
 

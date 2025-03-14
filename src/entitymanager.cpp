@@ -4,19 +4,17 @@
 
 using namespace framework;
 
-static void noop(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &) noexcept {}
-
-static const std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> noop_fn = noop;
-
 template <typename T>
-std::function<T> operator||(const std::function<T> &lhs, const std::function<T> &rhs) {
+std::optional<std::function<T>> operator||(const std::optional<std::function<T>> &lhs, const std::optional<std::function<T>> &rhs) {
   return lhs ? lhs : rhs;
 }
 
 template <typename Map>
-auto ensure_callback(const Map &m, const typename Map::key_type &key, const typename Map::mapped_type &d) {
-  auto it = m.find(key);
-  return (it != m.end()) ? it->second : d;
+auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optional<typename Map::mapped_type> d) {
+  if (auto it = m.find(key); it != m.end()) {
+    return std::optional<typename Map::mapped_type>{it->second};
+  }
+  return d;
 }
 
 entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
@@ -24,10 +22,7 @@ entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) n
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
-  if (const auto it = std::find_if(_entities.begin(), _entities.end(), [&kind](const auto &e) {
-        return e->kind() == kind;
-      });
-      it != _entities.end()) {
+  if (const auto it = std::ranges::find_if(_entities, [&kind](const auto &e) { return e->kind() == kind; }); it != _entities.end()) {
     return clone(*it);
   }
 
@@ -54,20 +49,14 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                             : std::nullopt;
 
     const auto &f = a["frames"];
-    std::vector<graphics::keyframe> keyframes;
-    keyframes.reserve(f.size());
-    std::transform(
-        f.begin(),
-        f.end(),
-        std::back_inserter(keyframes),
-        [](const auto &frame) {
-          return graphics::keyframe{
-              frame["rect"].template get<geometry::rect>(),
-              frame.value("offset", geometry::point{}),
-              frame["duration"].template get<uint64_t>(),
-          };
-        }
-    );
+    std::vector<graphics::keyframe> keyframes(f.size());
+    std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
+      return graphics::keyframe{
+          frame["rect"].template get<geometry::rect>(),
+          frame.value("offset", geometry::point{}),
+          frame["duration"].template get<uint64_t>(),
+      };
+    });
 
     animations.emplace(key, graphics::animation{oneshot, hitbox, std::move(keyframes)});
   }
@@ -151,11 +140,11 @@ void entitymanager::update(float_t delta) noexcept {
       if (!a->intersects(b))
         continue;
 
-      const auto callback_a = ensure_callback(a->_collisionmapping, b->kind(), noop_fn);
-      const auto callback_b = ensure_callback(b->_collisionmapping, a->kind(), noop_fn);
+      const auto callback_a = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt);
+      const auto callback_b = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt);
 
-      callback_a(a, b);
-      callback_b(b, a);
+      if (callback_a) (*callback_a)(a, b);
+      if (callback_b) (*callback_b)(b, a);
 
       SDL_Event event{};
       event.type = input::eventtype::collision;
