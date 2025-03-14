@@ -10,11 +10,12 @@ std::optional<std::function<T>> operator||(const std::optional<std::function<T>>
 }
 
 template <typename Map>
-auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optional<typename Map::mapped_type> d) {
-  if (auto it = m.find(key); it != m.end()) {
+auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optional<typename Map::mapped_type> fallback) {
+  if (const auto it = m.find(key); it != m.end()) {
     return std::optional<typename Map::mapped_type>{it->second};
   }
-  return d;
+
+  return fallback;
 }
 
 entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
