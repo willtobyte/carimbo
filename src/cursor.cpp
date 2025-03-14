@@ -58,11 +58,14 @@ void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
 
 void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   // TODO using enum input::mousebuttonevent::button;
+
+  constexpr auto left = input::mousebuttonevent::button::left;
+  constexpr auto right = input::mousebuttonevent::button::right;
   switch (event.button) {
-  case input::mousebuttonevent::button::left:
+  case left:
     _action = ACTION_LEFT;
     break;
-  case input::mousebuttonevent::button::right:
+  case right:
     _action = ACTION_RIGHT;
     break;
   default:
