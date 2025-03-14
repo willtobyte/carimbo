@@ -9,7 +9,6 @@
 #include "resourcemanager.hpp"
 #include "statemanager.hpp"
 #include "window.hpp"
-#include "world.hpp"
 
 using namespace framework;
 
