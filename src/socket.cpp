@@ -285,14 +285,14 @@ void socket::on_message(const std::string &buffer) noexcept {
 
   if (const auto rpc = j.value("rpc", json::object()); !rpc.empty() && rpc.contains("response")) {
     const auto response = rpc.at("response");
-    if (response.contains("result")) {
+    if (response.contains("result")) [[likely]] {
       invoke(
           std::to_string(response.at("id").get<uint64_t>()),
           response.at("result").dump()
       );
     }
 
-    if (response.contains("error")) {
+    if (response.contains("error")) [[unlikely]] {
       // TODO handle error
     }
 
@@ -315,7 +315,7 @@ void socket::send(const std::string &message) noexcept {
         [](boost::system::error_code ec, std::size_t bytes_transferred) {
           UNUSED(bytes_transferred);
 
-          if (ec) {
+          if (ec) [[unlikely]] {
             fmt::println(stderr, "[socket] write error: {}", ec.message());
             return;
           }
@@ -326,8 +326,10 @@ void socket::send(const std::string &message) noexcept {
 }
 
 void socket::invoke(const std::string &event, const std::string &data) const noexcept {
-  if (auto it = _callbacks.find(event); it != _callbacks.end()) {
-    for (const auto &callback : it->second) {
+  if (const auto it = _callbacks.find(event); it != _callbacks.end()) {
+    const auto &callbacks = it->second;
+
+    for (const auto &callback : callbacks) {
       callback(data);
     }
   }
