@@ -19,15 +19,13 @@ sol::table require(sol::state &lua, const std::string &module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  lua_loopable(const sol::state &lua, sol::function function)
-      : _gc(lua["collectgarbage"].get<sol::function>()), _function(std::move(function)) {}
-
-  virtual ~lua_loopable() = default;
+  explicit lua_loopable(const sol::state &lua, sol::function function) noexcept
+      : _gc(lua["collectgarbage"].get<sol::function>()), _function(std::exchange(function, {})) {}
 
   void loop(float_t delta) noexcept override {
     _function(delta);
 
-    const auto memory = _gc("count").get<double>() / 1024.0;
+    const double memory = _gc("count").get<double>() / 1024.0;
     if (memory <= 8.0) [[likely]] {
       _gc("step", 8);
       return;
