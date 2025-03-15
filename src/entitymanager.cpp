@@ -86,7 +86,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   return e;
 }
 
-std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> matrix) noexcept {
+std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> &matrix) noexcept {
   if (!matrix) {
     return nullptr;
   }
@@ -112,15 +112,12 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> matri
   return e;
 }
 
-void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
+void entitymanager::destroy(const std::shared_ptr<entity> &entity) noexcept {
   if (!entity) {
     return;
   }
 
-  _entities.erase(
-      std::remove(_entities.begin(), _entities.end(), entity),
-      _entities.end()
-  );
+  _entities.erase(std::remove(_entities.begin(), _entities.end(), entity), _entities.end());
 }
 
 std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
