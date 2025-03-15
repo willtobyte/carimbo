@@ -54,7 +54,7 @@ private:
   std::shared_ptr<audio::audiodevice> _audiodevice;
   std::shared_ptr<framework::entitymanager> _entitymanager;
   std::shared_ptr<input::eventmanager> _eventmanager;
-  std::list<std::shared_ptr<loopable>> _loopables;
+  std::vector<std::shared_ptr<loopable>> _loopables;
   std::shared_ptr<graphics::overlay> _overlay;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<framework::scenemanager> _scenemanager;
@@ -63,6 +63,6 @@ private:
   std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::window> _window;
   std::shared_ptr<storage::cassete> _cassete;
-  std::list<std::shared_ptr<lifecycleobserver>> _observers;
+  std::vector<std::shared_ptr<lifecycleobserver>> _observers;
 };
 }

@@ -23,7 +23,7 @@ public:
   void remove_receiver(std::shared_ptr<eventreceiver> receiver) noexcept;
 
 private:
-  std::list<std::shared_ptr<eventreceiver>> _receivers;
+  std::vector<std::shared_ptr<eventreceiver>> _receivers;
   std::unordered_map<SDL_JoystickID, gamecontroller_ptr> _controllers;
 };
 }

@@ -70,8 +70,7 @@ vector2d &vector2d::operator/=(int32_t scalar) noexcept {
 }
 
 bool vector2d::operator==(const vector2d &other) const noexcept {
-  constexpr int32_t epsilon = std::numeric_limits<int32_t>::epsilon();
-  return std::fabs(_x - other._x) < epsilon && std::fabs(_y - other._y) < epsilon;
+  return _x == other._x && _y == other._y;
 }
 
 bool vector2d::operator!=(const vector2d &other) const noexcept {
@@ -104,6 +103,5 @@ bool vector2d::left() const noexcept {
 }
 
 bool vector2d::zero() const noexcept {
-  constexpr int32_t epsilon = std::numeric_limits<int32_t>::epsilon();
-  return std::fabs(_x) < epsilon && std::fabs(_y) < epsilon;
+  return _x == 0 && _y == 0;
 }

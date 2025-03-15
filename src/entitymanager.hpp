@@ -28,7 +28,7 @@ protected:
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
-  std::list<std::shared_ptr<entity>> _entities;
+  std::vector<std::shared_ptr<entity>> _entities;
   std::atomic<uint64_t> _counter{0};
 };
 }

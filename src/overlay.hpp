@@ -28,7 +28,7 @@ public:
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   const std::shared_ptr<input::eventmanager> _eventmanager;
-  std::list<std::shared_ptr<widget>> _widgets;
+  std::vector<std::shared_ptr<widget>> _widgets;
   std::shared_ptr<cursor> _cursor;
 };
 }
