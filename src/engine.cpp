@@ -14,8 +14,8 @@ using namespace framework;
 
 engine::engine() noexcept
     : _running(true) {
-  add_loopable(std::make_shared<framerate>());
   _cassete = std::make_shared<storage::cassete>();
+  add_loopable(std::make_shared<framerate>());
 }
 
 std::shared_ptr<audio::audiodevice> engine::audiodevice() const noexcept {
