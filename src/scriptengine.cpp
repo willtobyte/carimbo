@@ -674,7 +674,7 @@ void framework::scriptengine::run() {
 
   const auto script = storage::io::read("scripts/main.lua");
 
-  lua.script(std::string_view(reinterpret_cast<const char *>(script.data()), script.size()));
+  lua.script(std::string{script.begin(), script.end()});
 
   const auto start = SDL_GetPerformanceCounter();
   lua["setup"]();
