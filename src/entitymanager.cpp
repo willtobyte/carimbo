@@ -20,6 +20,7 @@ auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optio
 
 entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
     : _resourcemanager{std::move(resourcemanager)} {
+  _entities.reserve(256);
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
