@@ -117,8 +117,8 @@ void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept
   // _canvas = std::make_shared<graphics::canvas>(_renderer);
 }
 
-void engine::add_loopable(std::shared_ptr<loopable> loopable) noexcept {
-  _loopables.emplace_back(std::move(loopable));
+void engine::add_loopable(const std::shared_ptr<loopable> &loopable) noexcept {
+  _loopables.emplace_back(loopable);
 }
 
 void engine::flush() const noexcept {
