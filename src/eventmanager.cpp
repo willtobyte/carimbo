@@ -172,5 +172,8 @@ void eventmanager::add_receiver(std::shared_ptr<eventreceiver> receiver) noexcep
 }
 
 void eventmanager::remove_receiver(std::shared_ptr<eventreceiver> receiver) noexcept {
-  _receivers.remove(receiver);
+  _receivers.erase(
+      std::remove(_receivers.begin(), _receivers.end(), receiver),
+      _receivers.end()
+  );
 }

@@ -117,9 +117,10 @@ void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
     return;
   }
 
-  entity->set_id(_counter++);
-
-  _entities.remove(entity);
+  _entities.erase(
+      std::remove(_entities.begin(), _entities.end(), entity),
+      _entities.end()
+  );
 }
 
 std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
