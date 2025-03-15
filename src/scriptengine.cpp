@@ -25,7 +25,7 @@ public:
   void loop(float_t delta) noexcept override {
     _function(delta);
 
-    const double memory = _gc("count").get<double>() / 1024.0;
+    const auto memory = _gc("count").get<double>() / 1024.0;
     if (memory <= 8.0) [[likely]] {
       _gc("step", 8);
       return;
