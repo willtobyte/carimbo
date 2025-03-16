@@ -39,8 +39,16 @@ EOF
 
 ### Configure & Build
 
-```
+On very first build
+
+```shell
 make configure release profile=webassembly
+```
+
+On next builds
+
+```shell
+make release profile=webassembly
 ```
 
 ### Clone a Game Repository
