@@ -39,16 +39,8 @@ EOF
 
 ### Configure & Build
 
-Configure:
-
 ```
-make -f Makefile.webassembly configure
-```
-
-Build:
-
-```shell
-make -f Makefile.webassembly release
+make configure release profile=webassembly
 ```
 
 ### Clone a Game Repository
