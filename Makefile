@@ -3,9 +3,9 @@ PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
 
 ifeq ($(PROFILE),webassembly)
-	EXTRA_FLAGS :=
+	EXTRA_FLAGS := -DHITBOX=ON
 else
-	EXTRA_FLAGS := -DSANDBOX=ON
+	EXTRA_FLAGS := -DHITBOX=ON -DSANDBOX=ON
 endif
 
 .PHONY: clean
@@ -19,7 +19,7 @@ conan: ## Install dependencies
 
 .PHONY: build
 build: ## Build
-	 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) -DHITBOX=ON $(EXTRA_FLAGS)
+	 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) $(EXTRA_FLAGS)
 	 cmake --build build --parallel 8 --config $(BUILDTYPE) --verbose
 
 .PHONY: help
