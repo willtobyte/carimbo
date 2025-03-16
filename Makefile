@@ -1,32 +1,11 @@
-.PHONY: help build clean configure debug release
-
-BUILD_TYPE ?= Release
+SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
+BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
 
-ifeq ($(PROFILE),webassembly)
-SANDBOX = OFF
-LOCAL = OFF
-else
-SANDBOX = ON
-LOCAL = ON
-endif
+.PHONY: install
+install: ## Install dependencies
+	conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
 
+.PHONY: help
 help:
-	awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
-
-clean: ## Clean build files
-	unalias rm 2>/dev/null || true
-	rm -rf build 2>/dev/null
-
-configure: clean ## Configure the project
-	conan install . --output-folder=build --build="*" --profile=$(PROFILE) --settings compiler.cppstd=20 --settings build_type=$(BUILD_TYPE)
-	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DHITBOX=ON -DLOCAL=$(LOCAL) -DSANDBOX=$(SANDBOX)
-
-build: ## Build the project
-	cmake --build build --parallel 8 --config $(BUILD_TYPE) --verbose
-
-debug: ## Configure and build in Debug mode
-	$(MAKE) BUILD_TYPE=Debug build
-
-release: ## Configure and build in Release mode
-	$(MAKE) BUILD_TYPE=Release build
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
