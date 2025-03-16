@@ -6,7 +6,7 @@
 
 ### About
 
-Carimbo is a simple yet complete 2D game engine written in modern C++ using SDL. It is scriptable in Lua and was created during [Rodrigo Delduca's](https://rodrigodelduca.org/) spare time.
+Carimbo is a simple yet complete 2D game engine written in modern C++ using SDL. It is scriptable in Lua and was created during [Rodrigo Delduca's](https://rodrigodelduca.org) spare time.
 
 It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wintermoon) framework, a project by the same author. It runs natively on Linux, Windows, macOS, and the web (via WebAssembly), and it also supports mobile platforms, including Android & iOS.
 
