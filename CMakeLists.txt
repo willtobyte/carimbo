@@ -68,11 +68,7 @@ if(EMSCRIPTEN)
     -g3
     -gsource-map
     -sASSERTIONS=2
-<<<<<<< HEAD
     -sSAFE_HEAP=1
-=======
-    -sSAFE_HEAP=0
->>>>>>> 0387458 (Work in progress)
     -sSTACK_OVERFLOW_CHECK=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
