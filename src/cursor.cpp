@@ -81,7 +81,6 @@ void cursor::update(float_t) noexcept {
 }
 
 void cursor::draw() const noexcept {
-<<<<<<< HEAD
   const auto &animation = _animations.at(_action).keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
