@@ -2,8 +2,8 @@ SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
 
-.PHONY: install
-install: ## Install dependencies
+.PHONY: conan
+conan: ## Install dependencies
 	conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
 
 .PHONY: help
