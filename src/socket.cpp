@@ -83,7 +83,7 @@ socket::~socket() noexcept {
 void socket::connect() noexcept {
 #ifdef EMSCRIPTEN
   const std::string url =
-#ifdef LOCAL
+#ifdef SANDBOX
       "http://localhost:3000/socket";
 #else
       "https://" + std::string(emscripten_run_script_string("window.location.hostname")) + "/socket";
