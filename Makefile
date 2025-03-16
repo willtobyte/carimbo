@@ -3,6 +3,14 @@
 BUILD_TYPE ?= Release
 PROFILE := $(if $(profile),$(profile),default)
 
+ifeq ($(PROFILE),webassembly)
+SANDBOX = OFF
+LOCAL = OFF
+else
+SANDBOX = ON
+LOCAL = ON
+endif
+
 help:
 	awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
@@ -14,7 +22,7 @@ configure: ## Configure the project
 	@if [ ! -f build/ready ]; then \
 		$(MAKE) clean; \
 		conan install . --output-folder=build --build="*" --profile=$(PROFILE) --settings compiler.cppstd=20 --settings build_type=$(BUILD_TYPE); \
-		cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DHITBOX=ON -DLOCAL=ON; \
+		cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE) -DHITBOX=ON -DLOCAL=$(LOCAL) -DSANDBOX=$(SANDBOX); \
 		mkdir -p build; \
 		touch build/ready; \
 	fi
