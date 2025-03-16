@@ -15,7 +15,6 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
       _frame(0),
       _last_frame(0),
       _resourcemanager(std::move(resourcemanager)) {
-
   SDL_ShowCursor(false);
 
   const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));
@@ -113,4 +112,5 @@ void cursor::handle(const std::string &message) noexcept {
   UNUSED(message);
 
   _queued_action = "damage";
+  // _temp->draw(geometry::rect({0, 0}, {32, 32}), geometry::rect({_x, _y}, {32, 32}));
 }

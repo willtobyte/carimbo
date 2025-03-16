@@ -8,15 +8,15 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
   geometry::size size;
   std::tie(output, size) = _load_png(filename);
 
-  std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface{
-      SDL_CreateRGBSurfaceWithFormat(
-          0,
+  std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface{
+      SDL_CreateSurfaceFrom(
           size.width(),
           size.height(),
-          0,
-          SDL_PIXELFORMAT_ABGR8888
+          SDL_PIXELFORMAT_ABGR8888,
+          output.data(),
+          size.width() * 4
       ),
-      SDL_FreeSurface
+      SDL_DestroySurface
   };
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormat] error while creating surface, file: {}, error: {}", filename, SDL_GetError()));
@@ -30,7 +30,7 @@ pixmap::pixmap(const std::shared_ptr<renderer> &renderer, const std::string &fil
   }
 }
 
-pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface)
+pixmap::pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface)
     : _renderer(renderer) {
   _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter());
   if (!_texture) [[unlikely]] {
@@ -49,18 +49,18 @@ void pixmap::draw(
     const std::optional<geometry::rect> &outline
 #endif
 ) const noexcept {
-  const SDL_Rect &src = source;
-  const SDL_Rect &dst = destination;
+  const SDL_FRect &src = source;
+  const SDL_FRect &dst = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
-  SDL_RenderCopyEx(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_RendererFlip>(reflection));
+  SDL_RenderTextureRotated(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 
 #ifdef HITBOX
   if (outline) {
-    const SDL_Rect &debug = *outline;
+    const SDL_FRect &debug = *outline;
 
     SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
-    SDL_RenderDrawRect(*_renderer, &debug);
+    SDL_RenderRect(*_renderer, &debug);
   }
 #endif
 }

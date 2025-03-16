@@ -25,24 +25,25 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   geometry::size size;
   std::tie(output, size) = _load_png(j["spritesheet"].get_ref<const std::string &>());
 
-  auto surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>{
-      SDL_CreateRGBSurfaceWithFormatFrom(
-          output.data(),
+  auto surface = std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)>{
+      SDL_CreateSurfaceFrom(
           size.width(),
           size.height(),
-          32,
-          size.width() * 4,
-          SDL_PIXELFORMAT_ABGR8888
+          SDL_PIXELFORMAT_ABGR8888,
+          output.data(),
+          size.width() * 4
       ),
-      SDL_FreeSurface
+      SDL_DestroySurface
   };
+
+  const auto format = SDL_GetPixelFormatDetails(surface->format);
 
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormatFrom] error: {}", SDL_GetError()));
   }
 
   const auto pixels = static_cast<uint32_t *>(surface->pixels);
-  const auto separator = color(pixels[0], surface->format);
+  const auto separator = color(pixels[0], format);
 
   glyphmap map{};
   auto [x, y, w, h] = std::tuple{0, 0, 0, 0};
@@ -50,7 +51,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto height = size.height();
 
   for (const char letter : alphabet) {
-    while (x < width && color(pixels[y * width + x], surface->format) == separator) {
+    while (x < width && color(pixels[y * width + x], format) == separator) {
       ++x;
     }
 
@@ -60,13 +61,13 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
     w = 0;
     while (x + w < width &&
-           color(pixels[y * width + x + w], surface->format) != separator) {
+           color(pixels[y * width + x + w], format) != separator) {
       ++w;
     }
 
     h = 0;
     while (y + h < height &&
-           color(pixels[(y + h) * width + x], surface->format) != separator) {
+           color(pixels[(y + h) * width + x], format) != separator) {
       ++h;
     }
 

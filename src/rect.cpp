@@ -53,6 +53,15 @@ rect::operator SDL_Rect() const noexcept {
   };
 }
 
+rect::operator SDL_FRect() const noexcept {
+  return SDL_FRect{
+      .x = static_cast<float>(_position.x()),
+      .y = static_cast<float>(_position.y()),
+      .w = static_cast<float>(_size.width()),
+      .h = static_cast<float>(_size.height())
+  };
+}
+
 rect rect::operator+(const point &offset) const noexcept {
   return rect(_position + offset, _size);
 }

@@ -4,7 +4,7 @@ using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer{std::move(renderer)} {
-  SDL_GetRendererOutputSize(*renderer, &_width, &_height);
+  SDL_GetCurrentRenderOutputSize(*renderer, &_width, &_height);
 
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, _width, _height);
   if (!texture) [[unlikely]] {
@@ -32,5 +32,5 @@ void canvas::draw() {
     throw std::runtime_error(fmt::format("[SDL_UpdateTexture] failed: {}", SDL_GetError()));
   }
 
-  SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
+  SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }
