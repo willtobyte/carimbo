@@ -42,13 +42,13 @@ EOF
 On very first build
 
 ```shell
-make configure release profile=webassembly
+make conan profile=webassembly
 ```
 
 On next builds
 
 ```shell
-make release profile=webassembly
+make build profile=webassembly
 ```
 
 ### Clone a Game Repository
