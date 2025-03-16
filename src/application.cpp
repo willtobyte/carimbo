@@ -9,10 +9,6 @@ application::application(int argc, char **argv) {
   SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMECONTROLLER | SDL_INIT_TIMER | SDL_INIT_VIDEO);
 
   PHYSFS_init(argv[0]);
-
-#ifdef STEAM
-  SteamAPI_Init();
-#endif
 }
 
 int application::run() {
@@ -37,9 +33,6 @@ int application::run() {
 }
 
 application::~application() noexcept {
-#ifdef STEAM
-  SteamAPI_Shutdown();
-#endif
   PHYSFS_deinit();
   SDL_Quit();
 }

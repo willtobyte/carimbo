@@ -25,10 +25,6 @@
 #endif
 #endif
 
-#ifdef STEAM
-#include <steam/steam_api.h>
-#endif
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL2/SDL.h>
