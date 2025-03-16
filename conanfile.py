@@ -18,7 +18,7 @@ class Carimbo(ConanFile):
 
         if self.settings.os != "Emscripten":
             self.requires("boost/1.86.0")
-            self.requires("libressl/3.9.1", override=True)
+            self.requires("openssl/3.4.1")
 
     def generate(self):
         tc = CMakeToolchain(self)
