@@ -11,7 +11,7 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
               SDL_WINDOWPOS_CENTERED,
               width,
               height,
-              SDL_WINDOW_SHOWN | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
+              SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
           ),
           SDL_Deleter()
       ) {
