@@ -2,12 +2,15 @@ SHELL := /usr/bin/env bash
 SHELLFLAGS = -euo pipefail -c
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
+NCPUS := $(shell sysctl -n hw.ncpu)
 
 ifeq ($(PROFILE),webassembly)
 	EXTRA_FLAGS := -DHITBOX=ON
 else
 	EXTRA_FLAGS := -DHITBOX=ON -DSANDBOX=ON
 endif
+
+.DEFAULT_GOAL := help
 
 .PHONY: clean
 clean: ## Clean
@@ -21,7 +24,7 @@ conan: ## Install dependencies
 .PHONY: build
 build: ## Build
 	 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) $(EXTRA_FLAGS)
-	 cmake --build build --parallel 8 --config $(BUILDTYPE) --verbose
+	 cmake --build build --parallel $(NCPUS) --config $(BUILDTYPE) --verbose
 
 .PHONY: help
 help:
