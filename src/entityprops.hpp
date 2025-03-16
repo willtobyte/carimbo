@@ -1,11 +1,10 @@
 #pragma once
 
+#include "animation.hpp"
 #include "common.hpp"
 #include "pixmap.hpp"
 #include "point.hpp"
 #include "reflection.hpp"
-#include "size.hpp"
-#include "types.hpp"
 #include "vector2d.hpp"
 
 namespace framework {

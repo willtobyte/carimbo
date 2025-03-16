@@ -1,5 +1,4 @@
 #include "cursor.hpp"
-#include "event.hpp"
 
 using namespace graphics;
 

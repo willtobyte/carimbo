@@ -2,11 +2,11 @@
 
 #include "common.hpp"
 
+#include "animation.hpp"
 #include "event.hpp"
 #include "eventreceiver.hpp"
 #include "pixmap.hpp"
 #include "resourcemanager.hpp"
-#include "types.hpp"
 
 namespace graphics {
 class cursor : public input::eventreceiver {
