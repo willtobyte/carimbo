@@ -1,6 +1,6 @@
 ## Project Setup
 
-This guide provides a simple walkthrough for setting up and building the project. Follow the instructions below to get started.
+This guide provides a straightforward walkthrough for setting up and building the project. Follow the instructions below to get started.
 
 ### Python Environment & Virtualenv
 
@@ -8,15 +8,25 @@ Set up the Python virtual environment:
 
 ```shell
 uv venv
+```
+
+Activate it:
+
+```shell
 source .venv/bin/activate
 ```
 
 ### Conan
 
-Install Conan, and configure it:
+Install Conan:
 
 ```shell
 uv pip install conan
+```
+
+Create your profile:
+
+```shell
 conan profile detect --force
 ```
 
@@ -39,21 +49,21 @@ EOF
 
 ### Configure & Build
 
-On very first build
+On the first build:
 
 ```shell
 make conan profile=webassembly
 ```
 
-On next builds
+On subsequent builds:
 
 ```shell
 make build profile=webassembly
 ```
 
-### Clone a Game Repository
+### Clone the Game Repository
 
-Clone the game repository into a local folder named sandbox:
+Clone the game repository into a local folder named `sandbox`:
 
 ```shell
 gh repo clone willtobyte/slime sandbox
@@ -69,7 +79,7 @@ gh repo clone willtobyte/run
 
 ### Run the Application
 
-Note: Ensure Docker is running. If Docker is not installed, consider installing [OrbStack](https://orbstack.dev/).
+**Note**: Ensure Docker is running. If Docker is not installed, consider installing [OrbStack](https://orbstack.dev/).
 
 Start the application:
 
