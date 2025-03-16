@@ -52,7 +52,7 @@ EOF
 On the first build:
 
 ```shell
-make conan profile=webassembly
+make cry profile=webassembly
 ```
 
 On subsequent builds:

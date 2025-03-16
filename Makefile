@@ -14,8 +14,8 @@ clean: ## Clean
 	 rm -rf build
 	 rm -rf ~/.conan2/p
 
-.PHONY: conan
-conan: ## Install dependencies
+.PHONY: cry
+cry: ## Install dependencies
 	 conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
 
 .PHONY: build
