@@ -1,11 +1,13 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeToolchain, CMakeDeps
+from conan.tools.layout import cmake_layout
 
 
-class MeuProjetoConan(ConanFile):
-    name = "Carimbo"
-    version = "1.0"
+class Carimbo(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
+
+    def layout(self):
+        cmake_layout(self)
 
     def requirements(self):
         self.requires("fmt/11.1.3")
@@ -20,7 +22,7 @@ class MeuProjetoConan(ConanFile):
 
         if self.settings.os != "Emscripten":
             self.requires("boost/1.86.0")
-            self.requires("openssl/3.3.2")
+            self.requires("libressl/3.9.1")
 
     def generate(self):
         tc = CMakeToolchain(self)

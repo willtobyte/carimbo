@@ -15,7 +15,7 @@ endif()
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
   find_package(Boost CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
-  find_package(OpenSSL CONFIG REQUIRED)
+  find_package(LibreSSL CONFIG REQUIRED)
 endif()
 find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
@@ -144,6 +144,6 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
   target_link_libraries(${PROJECT_NAME} PRIVATE
     Boost::boost
     OpenAL::OpenAL
-    openssl::openssl
+    libressl::libressl
   )
 endif()
