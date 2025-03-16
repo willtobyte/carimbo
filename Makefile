@@ -1,4 +1,5 @@
 SHELL := /usr/bin/env bash
+SHELLFLAGS = -euo pipefail -c
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
 
