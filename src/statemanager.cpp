@@ -6,7 +6,7 @@
 using namespace framework;
 
 statemanager::statemanager()
-    : _collision_map(728) {}
+    : _collision_map(64) {}
 
 static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) noexcept {
   return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
