@@ -125,6 +125,7 @@ void framework::scriptengine::run() {
         for (const auto &pair : table) {
           result[pair.first.as<std::string>()] = _to_json(pair.second);
         }
+
         return result.dump();
       }
   );
