@@ -4,12 +4,16 @@
 using namespace input;
 
 eventmanager::eventmanager() {
-  const auto number = SDL_NumJoysticks();
-  for (auto id = 0; id < number; ++id) {
-    if (SDL_IsGameController(id)) {
-      if (auto controller = SDL_GameControllerOpen(id)) {
-        _controllers.emplace(SDL_JoystickInstanceID(SDL_GameControllerGetJoystick(controller)), gamecontroller_ptr(controller));
-      }
+  const auto count = SDL_NumJoysticks();
+  for (const auto id : std::views::iota(0, count)) {
+    if (!SDL_IsGameController(id)) {
+      continue;
+    }
+
+    if (auto *controller = SDL_GameControllerOpen(id)) {
+      const auto joystick = SDL_GameControllerGetJoystick(controller);
+      const auto instanceId = SDL_JoystickInstanceID(joystick);
+      _controllers.emplace(instanceId, std::unique_ptr<SDL_GameController, SDL_Deleter>(controller));
     }
   }
 }

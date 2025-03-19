@@ -1,14 +1,8 @@
 #pragma once
 
-#include "collision.hpp"
 #include "common.hpp"
-#include "event.hpp"
 #include "eventreceiver.hpp"
-#include "helpers.hpp"
 #include "noncopyable.hpp"
-#include "postalservice.hpp"
-
-typedef std::unique_ptr<SDL_GameController, SDL_Deleter> gamecontroller_ptr;
 
 namespace input {
 class eventmanager : private framework::noncopyable {
@@ -24,6 +18,6 @@ public:
 
 private:
   std::vector<std::shared_ptr<eventreceiver>> _receivers;
-  std::unordered_map<SDL_JoystickID, gamecontroller_ptr> _controllers;
+  std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_GameController, SDL_Deleter>> _controllers;
 };
 }
