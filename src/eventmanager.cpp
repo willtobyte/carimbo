@@ -97,7 +97,7 @@ void eventmanager::update(float_t delta) {
         break;
       }
 
-      _controllers.emplace(id, gamecontroller_ptr(controller));
+      _controllers.emplace(id, std::unique_ptr<SDL_GameController, SDL_Deleter>(controller));
     } break;
 
     case SDL_CONTROLLERDEVICEREMOVED:
