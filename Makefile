@@ -23,7 +23,7 @@ conan: ## Install dependencies
 
 .PHONY: build
 build: ## Build
-	 cmake --source . --build build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) $(EXTRA_FLAGS)
+	 cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) $(EXTRA_FLAGS)
 	 cmake --build build --parallel $(NCPUS) --config $(BUILDTYPE) --verbose
 
 .PHONY: help
