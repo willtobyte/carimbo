@@ -10,7 +10,7 @@
 #include <sol/raii.hpp>
 
 sol::table require(sol::state &lua, const std::string &module) {
-  const auto data = storage::io::read("scripts/" + module + ".lua");
+  const auto data = storage::io::read(fmt::format("scripts/{}.lua", module));
   const auto script = std::string(data.begin(), data.end());
   const auto result = lua.script(script);
 
