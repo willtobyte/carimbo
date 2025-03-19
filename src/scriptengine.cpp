@@ -45,6 +45,7 @@ auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
     for (const auto &[k, v] : value.items()) {
       t[k] = _to_lua(v, lua);
     }
+
     return t;
   }
   case nlohmann::json::value_t::array: {
@@ -52,8 +53,10 @@ auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
     for (size_t i = 0; i < value.size(); ++i) {
       t[i + 1] = _to_lua(value[i], lua);
     }
+
     return t;
   }
+
   case nlohmann::json::value_t::string:
     return sol::make_object(lua, value.get<std::string>());
   case nlohmann::json::value_t::boolean:
@@ -80,12 +83,14 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
       }
       return j;
     }
+
     nlohmann::json j = nlohmann::json::object();
     for (const auto &pair : lua_table) {
       j[pair.first.as<std::string>()] = _to_json(pair.second);
     }
     return j;
   }
+
   case sol::type::string:
     return value.as<std::string>();
   case sol::type::boolean:
@@ -94,6 +99,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
     const auto num = value.as<double>();
     return std::trunc(num) == num ? static_cast<int64_t>(num) : num;
   }
+
   default:
     return nullptr;
   }
