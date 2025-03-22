@@ -409,7 +409,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<graphics::font>(
       "Font",
-      sol::constructors<graphics::font()>()
+      sol::no_constructor
   );
 
   lua.new_usertype<framework::enginefactory>(
