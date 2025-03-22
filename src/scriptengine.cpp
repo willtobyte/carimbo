@@ -10,10 +10,10 @@
 #include <sol/raii.hpp>
 
 sol::table require(sol::state &lua, const std::string &module) {
-  const auto data = storage::io::read(fmt::format("scripts/{}.lua", module));
+  const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
   std::string script;
-  script.resize(data.size());
-  std::ranges::transform(data, script.begin(), [](std::byte b) -> char { return static_cast<char>(std::to_integer<uint8_t>(b)); });
+  script.resize(buffer.size());
+  std::ranges::transform(buffer, script.begin(), [](std::byte b) -> char { return static_cast<char>(std::to_integer<uint8_t>(b)); });
 
   return lua.script(script).get<sol::table>();
 }
@@ -680,10 +680,10 @@ void framework::scriptengine::run() {
                 c.set_pixels(pixels); })
   );
 
-  const auto script_bytes = storage::io::read("scripts/main.lua");
+  const auto buffer = storage::io::read("scripts/main.lua");
   std::string script;
-  script.resize(script_bytes.size());
-  std::ranges::transform(script_bytes, script.begin(), [](std::byte b) { return static_cast<char>(b); });
+  script.resize(buffer.size());
+  std::ranges::transform(buffer, script.begin(), [](std::byte b) { return static_cast<char>(b); });
   lua.script(script);
 
   const auto start = SDL_GetPerformanceCounter();
