@@ -8,6 +8,6 @@ public:
   io() = delete;
   ~io() = delete;
 
-  static std::vector<uint8_t> read(const std::string &filename);
+  static std::span<const std::byte> read(const std::string &filename);
 };
 }
