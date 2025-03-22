@@ -202,7 +202,7 @@ bool entity::visible() const noexcept {
   return _props.visible;
 }
 
-bool entity::intersects(const std::shared_ptr<entity> &other) const noexcept {
+bool entity::intersects(const std::shared_ptr<entity> other) const noexcept {
   if (_props.action.empty() || other->_props.action.empty()) [[unlikely]] {
     return false;
   }

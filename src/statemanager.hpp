@@ -19,7 +19,7 @@ public:
   statemanager();
   virtual ~statemanager() = default;
 
-  bool collides(const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) const noexcept;
+  bool collides(const std::shared_ptr<entity> a, const std::shared_ptr<entity> b) const noexcept;
 
   bool on(int player, const std::variant<input::joystickevent> &type) const noexcept;
 

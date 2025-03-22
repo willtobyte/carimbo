@@ -12,7 +12,7 @@ static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint6
   return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
 }
 
-bool statemanager::collides(const std::shared_ptr<entity> &a, const std::shared_ptr<entity> &b) const noexcept {
+bool statemanager::collides(const std::shared_ptr<entity> a, const std::shared_ptr<entity> b) const noexcept {
   auto it = _collision_map.find(make_key(a->id(), b->id()));
   return (it != _collision_map.end()) ? it->second : false;
 }

@@ -53,7 +53,7 @@ public:
   std::string action() const noexcept;
   bool visible() const noexcept;
 
-  bool intersects(const std::shared_ptr<entity> &other) const noexcept;
+  bool intersects(const std::shared_ptr<entity> other) const noexcept;
 
   void on_email(const std::string &message);
 
