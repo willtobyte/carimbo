@@ -69,7 +69,7 @@ struct SDL_Deleter {
         SDL_DestroyRenderer(ptr);
       } else if constexpr (std::is_same_v<T, SDL_RWops>) {
         SDL_RWclose(ptr);
-      } else if constexpr (std::is_same_v<T, SDL_Semaphore>) {
+      } else if constexpr (std::is_same_v<T, SDL_semaphore>) {
         SDL_DestroySemaphore(ptr);
       } else if constexpr (std::is_same_v<T, SDL_Surface>) {
         SDL_FreeSurface(ptr);
