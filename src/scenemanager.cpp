@@ -7,17 +7,18 @@ scenemanager::scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std
     : _pixmappool(pixmappool), _entitymanager(entitymanager) {}
 
 void scenemanager::set(const std::string &name) noexcept {
-  const auto buffer = storage::io::read("scenes/" + name + ".json");
-  const auto j = nlohmann::json::parse(buffer);
-
   _background.reset();
-  _background = _pixmappool->get(j["background"].get_ref<const std::string &>());
-  _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 
   const auto old = std::exchange(_entities, {});
   for (const auto &pair : old) {
     _entitymanager->destroy(pair.second);
   }
+
+  const auto buffer = storage::io::read("scenes/" + name + ".json");
+  const auto j = nlohmann::json::parse(buffer);
+
+  _background = _pixmappool->get(j["background"].get_ref<const std::string &>());
+  _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 
   const auto &es = j.value("entities", nlohmann::json::object());
   const auto &i = es.items();
