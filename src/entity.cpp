@@ -45,6 +45,11 @@ int32_t entity::y() const noexcept {
   return _props.position.y();
 }
 
+geometry::size entity::size() const noexcept {
+  // TODO
+  return geometry::size{};
+}
+
 void entity::move(float_t x_velocity, float_t y_velocity) noexcept {
   UNUSED(x_velocity);
   UNUSED(y_velocity);

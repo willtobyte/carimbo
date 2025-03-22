@@ -19,7 +19,7 @@ void scenemanager::set(const std::string &name) noexcept {
     _entitymanager->destroy(pair.second);
   }
 
-  const auto &es = j["entities"];
+  const auto &es = j.value("entities", nlohmann::json::object());
   const auto &i = es.items();
   _entities.reserve(es.size());
   std::transform(

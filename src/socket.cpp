@@ -124,12 +124,12 @@ void socket::emit(const std::string &topic, const std::string &data) noexcept {
 }
 
 void socket::on(const std::string &topic, std::function<void(const std::string &)> callback) noexcept {
-  send(fmt::format(fmt::runtime(R"({"subscribe": "{}"})"), topic));
+  send(fmt::format(R"({{"subscribe": "{}"}})", topic));
   _callbacks[topic].push_back(std::move(callback));
 }
 
 void socket::rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) noexcept {
-  send(fmt::format(fmt::runtime(R"({"rpc": {"request": {"id": {}, "method": "{}", "arguments": {}}}}})"), ++counter, method, arguments));
+  send(fmt::format(fmt::runtime(R"({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})"), ++counter, method, arguments));
   _callbacks[method].push_back(std::move(callback));
 }
 
