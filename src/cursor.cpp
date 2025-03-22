@@ -109,7 +109,5 @@ void cursor::draw() const noexcept {
 }
 
 void cursor::handle(const std::string &message) noexcept {
-  UNUSED(message);
-
-  _queued_action = "damage";
+  _queued_action = message;
 }
