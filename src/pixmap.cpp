@@ -8,7 +8,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
   geometry::size size;
   std::tie(output, size) = _load_png(filename);
 
-  std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface{
+  std::unique_ptr<SDL_Surface, SDL_Deleter> surface{
       SDL_CreateRGBSurfaceWithFormat(
           0,
           size.width(),
@@ -16,7 +16,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
           0,
           SDL_PIXELFORMAT_ABGR8888
       ),
-      SDL_FreeSurface
+      SDL_Deleter{}
   };
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormat] error while creating surface, file: {}, error: {}", filename, SDL_GetError()));
@@ -24,7 +24,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 
   std::memcpy(surface->pixels, output.data(), output.size());
 
-  _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter());
+  _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter{});
   if (!_texture) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture from surface, file: {}", filename));
   }
@@ -32,7 +32,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface)
     : _renderer(renderer) {
-  _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter());
+  _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter{});
   if (!_texture) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture, SDL Error: {}", SDL_GetError()));
   }

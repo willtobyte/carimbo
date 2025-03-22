@@ -13,7 +13,7 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
               height,
               SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | (fullscreen ? SDL_WINDOW_FULLSCREEN : 0)
           ),
-          SDL_Deleter()
+          SDL_Deleter{}
       ) {
   if (_window == nullptr) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateWindow] failed to create window: {}", SDL_GetError()));
