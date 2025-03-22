@@ -11,10 +11,7 @@
 
 sol::table require(sol::state &lua, const std::string &module) {
   const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
-  std::string script;
-  script.resize(buffer.size());
-  std::ranges::transform(buffer, script.begin(), [](std::byte b) -> char { return static_cast<char>(std::to_integer<uint8_t>(b)); });
-
+  std::string script(buffer.begin(), buffer.end());
   return lua.script(script).get<sol::table>();
 }
 
@@ -112,12 +109,6 @@ void framework::scriptengine::run() {
 
   lua["require"] = [&lua](const std::string &module) {
     return require(lua, module);
-  };
-
-  lua["read"] = [](const std::string &filename) -> std::vector<uint8_t> {
-    auto buffer = storage::io::read(filename);
-    auto bytes = buffer | std::views::transform([](std::byte b) { return static_cast<uint8_t>(b); });
-    return {bytes.begin(), bytes.end()};
   };
 
   lua["JSON"] = lua.create_table_with(
@@ -681,9 +672,7 @@ void framework::scriptengine::run() {
   );
 
   const auto buffer = storage::io::read("scripts/main.lua");
-  std::string script;
-  script.resize(buffer.size());
-  std::ranges::transform(buffer, script.begin(), [](std::byte b) { return static_cast<char>(b); });
+  std::string script(buffer.begin(), buffer.end());
   lua.script(script);
 
   const auto start = SDL_GetPerformanceCounter();
