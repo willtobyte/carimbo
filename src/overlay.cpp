@@ -4,7 +4,7 @@
 
 using namespace graphics;
 
-overlay::overlay(const std::shared_ptr<framework::resourcemanager> resourcemanager, const std::shared_ptr<input::eventmanager> eventmanager)
+overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager)
     : _resourcemanager(resourcemanager), _eventmanager(eventmanager) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {

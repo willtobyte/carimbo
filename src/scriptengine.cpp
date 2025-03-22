@@ -316,7 +316,7 @@ void framework::scriptengine::run() {
               return item.second.template as<std::string>();
             }
         );
-        manager->prefetch(std::move(filenames));
+        manager->prefetch(filenames);
       }
   );
 
@@ -687,7 +687,7 @@ void framework::scriptengine::run() {
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   const auto loop = lua["loop"].get<sol::function>();
-  engine->add_loopable(std::make_shared<lua_loopable>(lua, std::move(loop)));
+  engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
   lua["run"]();
 }

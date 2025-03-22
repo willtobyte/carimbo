@@ -2,10 +2,10 @@
 
 using namespace graphics;
 
-pixmappool::pixmappool(const std::shared_ptr<renderer> renderer) noexcept
-    : _renderer(std::move(renderer)) {}
+pixmappool::pixmappool(std::shared_ptr<renderer> renderer) noexcept
+    : _renderer(renderer) {}
 
-const std::shared_ptr<pixmap> pixmappool::get(const std::string &filename) {
+std::shared_ptr<pixmap> pixmappool::get(const std::string &filename) {
   if (auto it = _pool.find(filename); it != _pool.end()) [[likely]] {
     return it->second;
   }

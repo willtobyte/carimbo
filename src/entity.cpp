@@ -2,15 +2,15 @@
 
 using namespace framework;
 
-entity::entity(entityprops &&props) noexcept
-    : _props(std::move(props)) {}
+entity::entity(const entityprops &props) noexcept
+    : _props(props) {}
 
 entity::~entity() noexcept {
   fmt::println("entity {} destroyed", kind());
 }
 
-std::shared_ptr<entity> entity::create(entityprops &&props) {
-  return std::make_shared<entity>(std::move(props));
+std::shared_ptr<entity> entity::create(const entityprops &props) {
+  return std::make_shared<entity>(props);
 }
 
 uint64_t entity::id() const noexcept {
@@ -140,8 +140,8 @@ void entity::draw() const noexcept {
   );
 }
 
-void entity::set_props(entityprops props) noexcept {
-  _props = std::move(props);
+void entity::set_props(const entityprops &props) noexcept {
+  _props = props;
 }
 
 void entity::set_placement(int32_t x, int32_t y) noexcept {
@@ -153,23 +153,23 @@ geometry::point entity::get_placement() const noexcept {
 }
 
 void entity::set_onupdate(std::function<void(std::shared_ptr<entity>)> fn) noexcept {
-  _onupdate = std::move(fn);
+  _onupdate = fn;
 }
 
 void entity::set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
-  _onanimationfinished = std::move(fn);
+  _onanimationfinished = fn;
 }
 
 void entity::set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
-  _onmail = std::move(fn);
+  _onmail = fn;
 }
 
 void entity::set_ontouch(std::function<void()> fn) noexcept {
-  _ontouch = std::move(fn);
+  _ontouch = fn;
 }
 
-void entity::set_oncollision(const std::string &kind, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> fn) noexcept {
-  _collisionmapping[kind] = std::move(fn);
+void entity::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)> fn) noexcept {
+  _collisionmapping[kind] = fn;
 }
 
 void entity::set_reflection(graphics::reflection reflection) noexcept {
@@ -202,7 +202,7 @@ bool entity::visible() const noexcept {
   return _props.visible;
 }
 
-bool entity::intersects(const std::shared_ptr<entity> other) const noexcept {
+bool entity::intersects(std::shared_ptr<entity> other) const noexcept {
   if (_props.action.empty() || other->_props.action.empty()) [[unlikely]] {
     return false;
   }

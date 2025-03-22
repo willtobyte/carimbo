@@ -13,7 +13,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
       _action(ACTION_IDLE),
       _frame(0),
       _last_frame(0),
-      _resourcemanager(std::move(resourcemanager)) {
+      _resourcemanager(resourcemanager) {
 
   SDL_ShowCursor(false);
 
@@ -41,7 +41,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
 
     const auto oneshot = a.value("oneshot", false);
 
-    _animations.emplace(key, graphics::animation{oneshot, std::nullopt, std::move(keyframes)});
+    _animations.emplace(key, graphics::animation{oneshot, std::nullopt, keyframes});
   }
 }
 

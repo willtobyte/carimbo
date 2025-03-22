@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-fontfactory::fontfactory(const std::shared_ptr<graphics::renderer> renderer) noexcept
+fontfactory::fontfactory(std::shared_ptr<graphics::renderer> renderer) noexcept
     : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
@@ -75,7 +75,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   }
 
   auto ptr = std::make_shared<font>(
-      std::move(map),
+      map,
       std::make_shared<pixmap>(_renderer, std::move(surface)),
       spacing,
       scale

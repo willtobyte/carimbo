@@ -12,8 +12,8 @@ typedef std::unique_ptr<SDL_Texture, SDL_Deleter> texture_ptr;
 class pixmap {
 public:
   pixmap() = default;
-  pixmap(const std::shared_ptr<renderer> &renderer, const std::string &filename);
-  pixmap(const std::shared_ptr<renderer> &renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface);
+  pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
+  pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface);
   ~pixmap() noexcept = default;
 
   void draw(

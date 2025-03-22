@@ -2,8 +2,8 @@
 
 using namespace audio;
 
-soundmanager::soundmanager(const std::shared_ptr<audiodevice> audiodevice) noexcept
-    : _audiodevice(std::move(audiodevice)) {}
+soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept
+    : _audiodevice(audiodevice) {}
 
 std::shared_ptr<soundfx> soundmanager::get(const std::string &filename) noexcept {
   if (auto it = _pool.find(filename); it != _pool.end()) [[likely]] {

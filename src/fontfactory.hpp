@@ -6,7 +6,7 @@ namespace graphics {
 class fontfactory {
 public:
   fontfactory() noexcept = delete;
-  explicit fontfactory(const std::shared_ptr<graphics::renderer> renderer) noexcept;
+  explicit fontfactory(std::shared_ptr<graphics::renderer> renderer) noexcept;
   ~fontfactory() noexcept = default;
 
   std::shared_ptr<font> get(const std::string &family);

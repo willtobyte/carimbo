@@ -3,7 +3,7 @@
 using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
-    : _renderer{std::move(renderer)} {
+    : _renderer(renderer) {
   SDL_GetRendererOutputSize(*renderer, &_width, &_height);
 
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, _width, _height);

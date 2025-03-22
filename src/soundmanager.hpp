@@ -6,7 +6,7 @@
 namespace audio {
 class soundmanager {
 public:
-  soundmanager(const std::shared_ptr<audiodevice> audiodevice) noexcept;
+  soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept;
   ~soundmanager() noexcept = default;
 
   std::shared_ptr<soundfx> get(const std::string &filename) noexcept;

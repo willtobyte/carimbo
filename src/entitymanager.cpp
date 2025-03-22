@@ -19,7 +19,7 @@ auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optio
 }
 
 entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
-    : _resourcemanager{std::move(resourcemanager)} {
+    : _resourcemanager(resourcemanager) {
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
@@ -59,7 +59,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       };
     });
 
-    animations.emplace(key, graphics::animation{oneshot, hitbox, std::move(keyframes)});
+    animations.emplace(key, graphics::animation{oneshot, hitbox, keyframes});
   }
 
   entityprops props{
@@ -76,17 +76,17 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       kind,
       "",
       graphics::reflection::none,
-      std::move(spritesheet),
-      std::move(animations),
+      spritesheet,
+      animations,
   };
 
-  auto e = entity::create(std::move(props));
+  auto e = entity::create(props);
   fmt::println("[entitymanager] spawn {} kind {}", e->id(), kind);
   _entities.emplace_back(e);
   return e;
 }
 
-std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> matrix) noexcept {
+std::shared_ptr<entity> entitymanager::clone(std::shared_ptr<entity> matrix) noexcept {
   if (!matrix) {
     return nullptr;
   }
@@ -103,7 +103,7 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> matri
   props.action = {};
   props.reflection = {graphics::reflection::none};
 
-  const auto e = entity::create(std::move(props));
+  const auto e = entity::create(props);
 
   _entities.emplace_back(e);
 
@@ -112,7 +112,7 @@ std::shared_ptr<entity> entitymanager::clone(const std::shared_ptr<entity> matri
   return e;
 }
 
-void entitymanager::destroy(const std::shared_ptr<entity> entity) noexcept {
+void entitymanager::destroy(std::shared_ptr<entity> entity) noexcept {
   if (!entity) {
     return;
   }

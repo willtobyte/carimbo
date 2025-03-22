@@ -11,10 +11,10 @@
 namespace framework {
 class entity : public std::enable_shared_from_this<entity> {
 public:
-  explicit entity(entityprops &&props) noexcept;
+  explicit entity(const entityprops &props) noexcept;
   ~entity() noexcept;
 
-  static std::shared_ptr<entity> create(entityprops &&props);
+  static std::shared_ptr<entity> create(const entityprops &props);
 
   uint64_t id() const noexcept;
   void set_id(uint64_t id) noexcept;
@@ -26,7 +26,7 @@ public:
 
   entityprops &props() noexcept;
   const entityprops &props() const noexcept;
-  void set_props(entityprops props) noexcept;
+  void set_props(const entityprops &props) noexcept;
 
   geometry::point position() const noexcept;
   int32_t x() const noexcept;
@@ -43,7 +43,7 @@ public:
   void set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
   void set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
   void set_ontouch(std::function<void()> fn) noexcept;
-  void set_oncollision(const std::string &kind, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)> fn) noexcept;
+  void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)> fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
   void set_action(const std::string &action) noexcept;
@@ -53,7 +53,7 @@ public:
   std::string action() const noexcept;
   bool visible() const noexcept;
 
-  bool intersects(const std::shared_ptr<entity> other) const noexcept;
+  bool intersects(std::shared_ptr<entity> other) const noexcept;
 
   void on_email(const std::string &message);
 
@@ -70,6 +70,6 @@ private:
   std::function<void(std::shared_ptr<entity>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<entity>, const std::string &)> _onmail;
   std::function<void()> _ontouch;
-  std::unordered_map<std::string, std::function<void(const std::shared_ptr<entity> &, const std::shared_ptr<entity> &)>> _collisionmapping;
+  std::unordered_map<std::string, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)>> _collisionmapping;
 };
 }

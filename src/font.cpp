@@ -3,7 +3,7 @@
 using namespace graphics;
 
 font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, float_t scale)
-    : _glyphs(glyphs), _pixmap(std::move(pixmap)), _spacing(spacing), _scale(scale) {}
+    : _glyphs(glyphs), _pixmap(pixmap), _spacing(spacing), _scale(scale) {}
 
 void font::draw(const std::string &text, const geometry::point &position) const noexcept {
   geometry::point cursor = position;
