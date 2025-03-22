@@ -20,7 +20,7 @@ void scenemanager::set(const std::string &name) noexcept {
   _background = _pixmappool->get(j["background"].get_ref<const std::string &>());
   _size = {j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
 
-  const auto &es = j.value("entities", nlohmann::json::object());
+  const auto &es = j.value("entities", nlohmann::json::array());
   const auto &i = es.items();
   _entities.reserve(es.size());
   std::transform(
