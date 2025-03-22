@@ -283,7 +283,6 @@ void framework::scriptengine::run() {
       "id", sol::property(&framework::entity::id),
       "x", sol::property(&framework::entity::x),
       "y", sol::property(&framework::entity::y),
-      "size", sol::property(&framework::entity::size),
       "visible", sol::property(&framework::entity::visible),
       "move", &framework::entity::move,
       "on_update", &framework::entity::set_onupdate,

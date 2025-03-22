@@ -32,8 +32,6 @@ public:
   int32_t x() const noexcept;
   int32_t y() const noexcept;
 
-  geometry::size size() const noexcept;
-
   void move(float_t x_velocity, float_t y_velocity) noexcept;
   void set_velocity(const algebra::vector2d &velocity) noexcept;
   algebra::vector2d velocity() const noexcept;
