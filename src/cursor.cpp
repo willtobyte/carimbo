@@ -2,18 +2,8 @@
 
 using namespace graphics;
 
-namespace {
-constexpr auto ACTION_IDLE = "idle";
-constexpr auto ACTION_LEFT = "left";
-constexpr auto ACTION_RIGHT = "right";
-}
-
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
-    : _position{0, 0},
-      _action(ACTION_IDLE),
-      _frame(0),
-      _last_frame(0),
-      _resourcemanager(resourcemanager) {
+    : _resourcemanager(resourcemanager) {
 
   SDL_ShowCursor(false);
 
