@@ -48,7 +48,6 @@ protected:
 
 private:
   bool _running{true};
-
   std::shared_ptr<audio::audiodevice> _audiodevice;
   std::shared_ptr<framework::entitymanager> _entitymanager;
   std::shared_ptr<input::eventmanager> _eventmanager;
