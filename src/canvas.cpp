@@ -5,14 +5,14 @@ using namespace graphics;
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
 
-  int32_t logocal_width, logical_height;
-  SDL_RenderGetLogicalSize(*_renderer, &logocal_width, &logical_height);
+  int32_t lw, lh;
+  SDL_RenderGetLogicalSize(*_renderer, &lw, &lh);
 
-  float_t scale_x, scale_y;
-  SDL_RenderGetScale(*_renderer, &scale_x, &scale_y);
+  float_t sx, sy;
+  SDL_RenderGetScale(*_renderer, &sx, &sy);
 
-  const auto width = static_cast<int32_t>(logocal_width / scale_x);
-  const auto height = static_cast<int32_t>(logical_height / scale_y);
+  const auto width = static_cast<int32_t>(lw / sx);
+  const auto height = static_cast<int32_t>(lh / sy);
 
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
   if (!texture) [[unlikely]] {
