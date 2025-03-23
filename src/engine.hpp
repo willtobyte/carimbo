@@ -48,8 +48,6 @@ protected:
 
 private:
   bool _running{true};
-  int32_t _height{0};
-  int32_t _width{0};
 
   std::shared_ptr<audio::audiodevice> _audiodevice;
   std::shared_ptr<framework::entitymanager> _entitymanager;
@@ -62,7 +60,7 @@ private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::window> _window;
-  std::shared_ptr<storage::cassete> _cassete;
   std::vector<std::shared_ptr<lifecycleobserver>> _observers;
+  std::shared_ptr<storage::cassete> _cassete = std::make_shared<storage::cassete>();
 };
 }

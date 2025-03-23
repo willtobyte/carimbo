@@ -12,9 +12,7 @@
 
 using namespace framework;
 
-engine::engine() noexcept
-    : _running(true) {
-  _cassete = std::make_shared<storage::cassete>();
+engine::engine() noexcept {
   add_loopable(std::make_shared<framerate>());
 }
 
