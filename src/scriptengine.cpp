@@ -664,11 +664,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
       "Canvas",
       sol::no_constructor,
-      "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, std::string_view buffer) {
-                std::span<const uint32_t> pixels(
-                    reinterpret_cast<const uint32_t *>(buffer.data()),
-                    buffer.size() / sizeof(uint32_t));
-                c.set_pixels(pixels); })
+      "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, const std::vector<uint32_t> &pixels) { c.set_pixels(pixels); })
   );
 
   const auto buffer = storage::io::read("scripts/main.lua");

@@ -8,13 +8,11 @@ public:
   explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() noexcept = default;
 
-  void set_pixels(std::span<const uint32_t> pixels) noexcept;
+  void set_pixels(const std::vector<uint32_t> &pixels) noexcept;
 
   void draw();
 
 private:
-  int32_t _width, _height;
-  std::span<const uint32_t> _pixels;
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _framebuffer;
 };
