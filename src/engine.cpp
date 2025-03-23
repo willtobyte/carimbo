@@ -110,9 +110,9 @@ void engine::set_window(std::shared_ptr<graphics::window> window) noexcept {
 }
 
 void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept {
-  _renderer = renderer;
+  _renderer = std::move(renderer);
 
-  // _canvas = std::make_shared<graphics::canvas>(_renderer);
+  _canvas = std::make_shared<graphics::canvas>(_renderer);
 }
 
 void engine::add_loopable(std::shared_ptr<loopable> loopable) noexcept {
@@ -176,7 +176,7 @@ void engine::_loop() noexcept {
   _scenemanager->draw();
   _entitymanager->draw();
   _overlay->draw();
-  // _canvas->draw();
+  _canvas->draw();
   _renderer->end();
 
   for (const auto &observer : _observers) {

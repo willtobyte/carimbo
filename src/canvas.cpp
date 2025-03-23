@@ -4,8 +4,15 @@ using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
-  int32_t width, height;
-  SDL_GetRendererOutputSize(*_renderer, &width, &height);
+
+  int32_t logocal_width, logical_height;
+  SDL_RenderGetLogicalSize(*_renderer, &logocal_width, &logical_height);
+
+  float_t scale_x, scale_y;
+  SDL_RenderGetScale(*_renderer, &scale_x, &scale_y);
+
+  const auto width = static_cast<int32_t>(logocal_width / scale_x);
+  const auto height = static_cast<int32_t>(logical_height / scale_y);
 
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
   if (!texture) [[unlikely]] {
@@ -33,5 +40,5 @@ void canvas::draw() {
     throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
   }
 
-  SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
+  // SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }
