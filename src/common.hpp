@@ -112,7 +112,6 @@ class canvas;
 class effect;
 class fontfactory;
 class font;
-class glyph;
 class pixmap;
 class pixmappool;
 class overlay;

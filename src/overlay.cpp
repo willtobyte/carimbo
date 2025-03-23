@@ -5,7 +5,7 @@
 using namespace graphics;
 
 overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager)
-    : _resourcemanager(resourcemanager), _eventmanager(eventmanager) {}
+    : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
   auto widget = [&]() noexcept {

@@ -4,7 +4,7 @@
 using namespace framework;
 
 scenemanager::scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std::shared_ptr<entitymanager> entitymanager) noexcept
-    : _pixmappool(pixmappool), _entitymanager(entitymanager) {}
+    : _pixmappool(std::move(pixmappool)), _entitymanager(std::move(entitymanager)) {}
 
 void scenemanager::set(const std::string &name) noexcept {
   _background.reset();

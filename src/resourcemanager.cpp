@@ -3,8 +3,8 @@
 using namespace framework;
 
 resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<audio::audiodevice> audiodevice) noexcept
-    : _renderer(renderer),
-      _audiodevice(audiodevice),
+    : _renderer(std::move(renderer)),
+      _audiodevice(std::move(audiodevice)),
       _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
       _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
       _fontfactory(std::make_shared<graphics::fontfactory>(_renderer)) {

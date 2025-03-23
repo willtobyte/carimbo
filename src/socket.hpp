@@ -49,12 +49,12 @@ private:
 #ifdef EMSCRIPTEN
   EMSCRIPTEN_WEBSOCKET_T _socket{0};
 #else
-  net::io_context _io_context;
-  boost::asio::executor_work_guard<net::io_context::executor_type> _work_guard;
-  tcp::resolver _resolver;
-  boost::asio::ssl::context _ssl_context;
-  websocket::stream<ssl::stream<beast::tcp_stream>> _ws;
-  beast::flat_buffer _buffer;
+  net::io_context _io_context{};
+  boost::asio::executor_work_guard<net::io_context::executor_type> _work_guard{boost::asio::make_work_guard(_io_context)};
+  tcp::resolver _resolver{net::make_strand(_io_context)};
+  boost::asio::ssl::context _ssl_context{boost::asio::ssl::context::tlsv13_client};
+  websocket::stream<ssl::stream<beast::tcp_stream>> _ws{boost::asio::make_strand(_io_context), _ssl_context};
+  beast::flat_buffer _buffer{};
   std::function<void(const std::string &)> _on_message;
   std::thread _thread;
 #endif

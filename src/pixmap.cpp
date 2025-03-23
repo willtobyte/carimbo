@@ -3,7 +3,7 @@
 using namespace graphics;
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
-    : _renderer(renderer) {
+    : _renderer(std::move(renderer)) {
   std::vector<uint8_t> output;
   geometry::size size;
   std::tie(output, size) = _load_png(filename);
@@ -24,15 +24,15 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 
   std::memcpy(surface->pixels, output.data(), output.size());
 
-  _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter{});
+  _texture = texture_ptr(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
   if (!_texture) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture from surface, file: {}", filename));
   }
 }
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface)
-    : _renderer(renderer) {
-  _texture = texture_ptr(SDL_CreateTextureFromSurface(*renderer, surface.get()), SDL_Deleter{});
+    : _renderer(std::move(renderer)) {
+  _texture = texture_ptr(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
   if (!_texture) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture, SDL Error: {}", SDL_GetError()));
   }

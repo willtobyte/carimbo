@@ -46,15 +46,8 @@ EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void
 }
 #endif
 
-socket::socket() noexcept
-#ifndef EMSCRIPTEN
-    : _work_guard(boost::asio::make_work_guard(_io_context)),
-      _resolver(net::make_strand(_io_context)),
-      _ssl_context(boost::asio::ssl::context::tlsv13_client),
-      _ws(boost::asio::make_strand(_io_context), _ssl_context)
-#endif
-{
-  _queue.reserve(8);
+socket::socket() noexcept {
+  _queue.reserve(64);
 #ifndef EMSCRIPTEN
 #ifndef LOCAL
   _ssl_context.set_verify_mode(boost::asio::ssl::verify_peer);
