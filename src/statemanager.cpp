@@ -10,8 +10,8 @@ static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint6
 }
 
 bool statemanager::collides(std::shared_ptr<entity> a, std::shared_ptr<entity> b) const noexcept {
-  auto it = _collision_map.find(make_key(a->id(), b->id()));
-  return (it != _collision_map.end()) ? it->second : false;
+  auto it = _collision_mapping.find(make_key(a->id(), b->id()));
+  return (it != _collision_mapping.end()) ? it->second : false;
 }
 
 bool statemanager::on(int player, const std::variant<input::joystickevent> &type) const noexcept {
@@ -107,9 +107,9 @@ void statemanager::on_joystickaxismotion(uint8_t who, const input::joystickaxise
 }
 
 void statemanager::on_collision(const collisionevent &event) noexcept {
-  _collision_map[make_key(event.a, event.b)] = true;
+  _collision_mapping[make_key(event.a, event.b)] = true;
 }
 
 void statemanager::on_endupdate() noexcept {
-  _collision_map.clear();
+  _collision_mapping.clear();
 }
