@@ -77,36 +77,37 @@ int32_t engine::width() const noexcept {
 }
 
 void engine::set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept {
-  _audiodevice = audiodevice;
+  _audiodevice = std::move(audiodevice);
 }
 
 void engine::set_entitymanager(std::shared_ptr<framework::entitymanager> entitymanager) noexcept {
-  _entitymanager = entitymanager;
+  _entitymanager = std::move(entitymanager);
 }
 
 void engine::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept {
-  _eventmanager = eventmanager;
+  _eventmanager = std::move(eventmanager);
 }
 
 void engine::set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept {
-  _overlay = overlay;
+  _overlay = std::move(overlay);
 }
 
 void engine::set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept {
-  _resourcemanager = resourcemanager;
+  _resourcemanager = std::move(resourcemanager);
 }
 
 void engine::set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept {
-  _scenemanager = scenemanager;
+  _scenemanager = std::move(scenemanager);
 }
 
 void engine::set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept {
-  _statemanager = statemanager;
+  _statemanager = std::move(statemanager);
+
   _observers.emplace_back(_statemanager);
 }
 
 void engine::set_window(std::shared_ptr<graphics::window> window) noexcept {
-  _window = window;
+  _window = std::move(window);
 }
 
 void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept {
