@@ -4,7 +4,7 @@ UseTab: Never
 BreakBeforeBraces: Attach
 AllowShortIfStatementsOnASingleLine: true
 IndentCaseLabels: false
-ColumnLimit: 0
+ColumnLimit: 120
 IndentWidth: 2
 TabWidth: 2
 AlignAfterOpenBracket: BlockIndent
