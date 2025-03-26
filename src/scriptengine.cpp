@@ -665,13 +665,12 @@ void framework::scriptengine::run() {
       "Canvas",
       sol::no_constructor,
       "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, sol::table t) {
-                  std::vector<uint32_t> pixels;
-                  const auto n = t.size();
-                  pixels.reserve(n);
-                  for (size_t i = 1; i <= n; ++i) {
-                      pixels.push_back(t[i].get<uint32_t>());
-                  }
-                  c.set_pixels(pixels); })
+              const auto n = t.size();
+              std::vector<uint32_t> p(n);
+              std::ranges::transform(std::views::iota(1u, n + 1u), p.begin(), [&t](auto i) {
+                  return t[i].template get<uint32_t>();
+              });
+              c.set_pixels(p); })
   );
 
   const auto buffer = storage::io::read("scripts/main.lua");
