@@ -32,7 +32,8 @@ void canvas::set_pixels(const std::vector<uint32_t> &pixels) noexcept {
     return;
   }
 
-  std::memcpy(ptr, pixels.data(), pixels.size() * sizeof(uint32_t));
+  using value_type = std::remove_reference_t<decltype(pixels)>::value_type;
+  std::memcpy(ptr, pixels.data(), pixels.size() * sizeof(value_type));
 
   SDL_UnlockTexture(_framebuffer.get());
 }
