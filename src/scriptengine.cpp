@@ -664,7 +664,14 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
       "Canvas",
       sol::no_constructor,
-      "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, const std::vector<uint32_t> &pixels) { c.set_pixels(pixels); })
+      "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, sol::table t) {
+                  std::vector<uint32_t> pixels;
+                  const auto n = t.size();
+                  pixels.reserve(n);
+                  for (size_t i = 1; i <= n; ++i) {
+                      pixels.push_back(t[i].get<uint32_t>());
+                  }
+                  c.set_pixels(pixels); })
   );
 
   const auto buffer = storage::io::read("scripts/main.lua");

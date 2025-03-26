@@ -1,4 +1,5 @@
 #include "canvas.hpp"
+#include <fmt/base.h>
 
 using namespace graphics;
 
@@ -21,32 +22,12 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
 
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
-  ///
-  void *ptr = nullptr;
-  int pitch = 0;
-  if (SDL_LockTexture(texture, nullptr, &ptr, &pitch) != 0) [[unlikely]] {
-    SDL_DestroyTexture(texture);
-    throw std::runtime_error("[SDL_LockTexture] failed to lock texture");
-  }
-
-  auto *pixels = static_cast<uint32_t *>(ptr);
-  const uint32_t green = 0xFF00FF00;
-  const uint32_t transparent = 0xFF000000;
-
-  for (int32_t y = 0; y < height; ++y) {
-    for (int32_t x = 0; x < width; ++x) {
-      const bool border = x < 4 || x >= width - 4 || y < 4 || y >= height - 4;
-      pixels[y * width + x] = border ? green : transparent;
-    }
-  }
-
-  SDL_UnlockTexture(texture);
-  ///
-
   _framebuffer.reset(texture);
 }
 
 void canvas::set_pixels(const std::vector<uint32_t> &pixels) noexcept {
+  UNUSED(pixels);
+
   void *ptr = nullptr;
   int pitch = 0;
   if (SDL_LockTexture(_framebuffer.get(), nullptr, &ptr, &pitch) != 0) [[unlikely]] {
@@ -63,5 +44,5 @@ void canvas::draw() {
     throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
   }
 
-  // SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
+  SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }
