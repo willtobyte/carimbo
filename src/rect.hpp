@@ -23,7 +23,7 @@ public:
 
   bool intersects(const rect &other) const noexcept;
 
-  bool contains(const geometry::point &p) const noexcept;
+  bool contains(const geometry::point &point) const noexcept;
 
   operator SDL_Rect() const noexcept;
 
