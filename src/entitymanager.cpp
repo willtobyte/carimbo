@@ -41,9 +41,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   for (const auto &item : j["animations"].items()) {
     const auto &key = item.key();
     const auto &a = item.value();
-
     const auto oneshot = a.value("oneshot", false);
-
     const auto hitbox = a.contains("hitbox")
                             ? std::make_optional(a["hitbox"].template get<geometry::rect>())
                             : std::nullopt;
