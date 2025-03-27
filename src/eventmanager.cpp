@@ -47,9 +47,7 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_MOUSEMOTION: {
-      const mousemotionevent e{
-          event.motion.x, event.motion.y
-      };
+      const mousemotionevent e{event.motion.x, event.motion.y};
 
       for (const auto &receiver : _receivers) {
         receiver->on_mousemotion(e);
