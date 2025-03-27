@@ -46,6 +46,7 @@ point &point::operator+=(std::pair<char, int32_t> offset) noexcept {
   } else if (offset.first == 'y') {
     _y += offset.second;
   }
+
   return *this;
 }
 

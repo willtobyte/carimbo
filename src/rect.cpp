@@ -35,10 +35,10 @@ bool rect::intersects(const rect &other) const noexcept {
   return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
 }
 
-bool rect::contains(const geometry::point &p) const noexcept {
+bool rect::contains(const geometry::point &point) const noexcept {
   const auto x0 = _position.x(), y0 = _position.y();
   const auto x1 = x0 + _size.width(), y1 = y0 + _size.height();
-  return p.x() >= x0 && p.x() < x1 && p.y() >= y0 && p.y() < y1;
+  return point.x() >= x0 && point.x() < x1 && point.y() >= y0 && point.y() < y1;
 }
 
 rect::operator SDL_Rect() const noexcept {
