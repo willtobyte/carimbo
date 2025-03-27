@@ -33,10 +33,9 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   const auto j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float_t{1.f});
-
-  auto spritesheet = j.contains("spritesheet")
-                         ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
-                         : nullptr;
+  const auto spritesheet = j.contains("spritesheet")
+                               ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
+                               : nullptr;
 
   std::unordered_map<std::string, graphics::animation> animations;
   animations.reserve(j["animations"].size());
