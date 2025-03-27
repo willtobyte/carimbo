@@ -13,8 +13,6 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   _spritesheet = _resourcemanager->pixmappool()->get(j["spritesheet"].get<std::string>());
   _animations.reserve(j["animations"].size());
 
-  _animations.reserve(j["animations"].size());
-
   for (const auto &item : j["animations"].items()) {
     const auto &key = item.key();
     const auto &a = item.value();
