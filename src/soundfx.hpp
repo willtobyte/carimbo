@@ -13,6 +13,6 @@ public:
 
 private:
   std::shared_ptr<audiodevice> _audiodevice;
-  ALuint source{};
+  ALuint _source;
 };
 }

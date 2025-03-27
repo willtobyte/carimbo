@@ -14,7 +14,7 @@ public:
   void flush() noexcept;
 
 private:
-  std::unordered_map<std::string, std::shared_ptr<font>> _pool{};
-  std::shared_ptr<graphics::renderer> _renderer{};
+  std::unordered_map<std::string, std::shared_ptr<font>> _pool;
+  std::shared_ptr<graphics::renderer> _renderer;
 };
 }

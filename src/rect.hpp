@@ -34,7 +34,7 @@ public:
   friend void from_json(const nlohmann::json &j, rect &r) noexcept;
 
 private:
-  point _position;
-  geometry::size _size;
+  point _position{};
+  geometry::size _size{};
 };
 }

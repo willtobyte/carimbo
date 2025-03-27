@@ -20,8 +20,8 @@ public:
   void draw() const noexcept override;
 
 private:
-  std::shared_ptr<font> _font{};
-  std::string _text{};
-  geometry::point _position{};
+  std::shared_ptr<font> _font;
+  std::string _text;
+  geometry::point _position;
 };
 }

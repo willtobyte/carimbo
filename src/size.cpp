@@ -2,6 +2,9 @@
 
 using namespace geometry;
 
+size::size() noexcept
+    : _width(0), _height(0) {}
+
 size::size(int32_t width, int32_t height) noexcept
     : _width(width), _height(height) {}
 

@@ -115,20 +115,20 @@ soundfx::soundfx(std::shared_ptr<audiodevice> audiodevice, const std::string &fi
   alGenBuffers(1, &buffer);
   alBufferData(buffer, format, data.data(), static_cast<ALsizei>(data.size()), frequency);
 
-  alGenSources(1, &source);
-  alSourcei(source, AL_BUFFER, buffer);
+  alGenSources(1, &_source);
+  alSourcei(_source, AL_BUFFER, buffer);
   alDeleteBuffers(1, &buffer);
 }
 
 soundfx::~soundfx() noexcept {
-  alDeleteSources(1, &source);
+  alDeleteSources(1, &_source);
 }
 
 void soundfx::play() const noexcept {
-  alSourcei(source, AL_LOOPING, /* loop */ AL_FALSE);
-  alSourcePlay(source);
+  alSourcei(_source, AL_LOOPING, /* loop */ AL_FALSE);
+  alSourcePlay(_source);
 }
 
 void soundfx::stop() const noexcept {
-  alSourceStop(source);
+  alSourceStop(_source);
 }
