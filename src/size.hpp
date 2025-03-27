@@ -5,10 +5,9 @@
 namespace geometry {
 class size {
 public:
-  constexpr size() noexcept = default;
-  constexpr size(const size &) noexcept = default;
-  constexpr size(int32_t width, int32_t height) noexcept
-      : _width(width), _height(height) {}
+  size() noexcept = default;
+  size(const size &) noexcept = default;
+  size(int32_t width, int32_t height) noexcept;
 
   ~size() = default;
 

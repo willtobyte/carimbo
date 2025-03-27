@@ -1,10 +1,11 @@
 #include "rect.hpp"
-#include "point.hpp"
-#include "size.hpp"
 
 using namespace geometry;
 
-void rect::set_position(const class point &position) noexcept {
+rect::rect(const geometry::point &position, const geometry::size &size) noexcept
+    : _position(position), _size(size) {}
+
+void rect::set_position(const geometry::point &position) noexcept {
   _position = position;
 }
 
@@ -34,7 +35,7 @@ bool rect::intersects(const rect &other) const noexcept {
   );
 }
 
-bool rect::contains(const point &p) const noexcept {
+bool rect::contains(const geometry::point &p) const noexcept {
   return p.x() >= _position.x() &&
          p.x() < _position.x() + _size.width() &&
          p.y() >= _position.y() &&
@@ -50,6 +51,6 @@ rect::operator SDL_Rect() const noexcept {
   };
 }
 
-rect rect::operator+(const point &offset) const noexcept {
+rect rect::operator+(const geometry::point &offset) const noexcept {
   return rect(_position + offset, _size);
 }

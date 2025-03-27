@@ -5,13 +5,12 @@
 namespace graphics {
 class color {
 public:
-  constexpr color() = default;
+  color() = default;
+  explicit color(uint32_t pixel) noexcept;
+  explicit color(const SDL_Color &scolor) noexcept;
+  color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
+
   color(const std::string &hex);
-  color(uint32_t pixel, const SDL_PixelFormat *format) noexcept;
-  constexpr color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
-      : _r(r), _g(g), _b(b), _a(a) {}
-  constexpr color(const SDL_Color &scolor) noexcept
-      : color(scolor.r, scolor.g, scolor.b, scolor.a) {}
 
   ~color() = default;
 

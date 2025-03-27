@@ -2,6 +2,23 @@
 
 using namespace graphics;
 
+// color::color(uint32_t pixel, const SDL_PixelFormat *format) noexcept {
+//   SDL_GetRGBA(pixel, format, &_r, &_g, &_b, &_a);
+// }
+
+color::color(uint32_t pixel) noexcept {
+  _r = pixel >> 24;
+  _g = pixel >> 16;
+  _b = pixel >> 8;
+  _a = pixel;
+}
+
+color::color(const SDL_Color &scolor) noexcept
+    : color(scolor.r, scolor.g, scolor.b, scolor.a) {}
+
+color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
+    : _r(r), _g(g), _b(b), _a(a) {}
+
 color::color(const std::string &hex)
     : _r(0), _g(0), _b(0), _a(255) {
   if (hex.length() != 7 && hex.length() != 9) [[unlikely]] {
@@ -20,19 +37,18 @@ color::color(const std::string &hex)
   }
 }
 
-color::color(uint32_t pixel, const SDL_PixelFormat *format) noexcept {
-  SDL_GetRGBA(pixel, format, &_r, &_g, &_b, &_a);
-}
-
 uint8_t color::r() const noexcept {
   return _r;
 }
+
 uint8_t color::g() const noexcept {
   return _g;
 }
+
 uint8_t color::b() const noexcept {
   return _b;
 }
+
 uint8_t color::a() const noexcept {
   return _a;
 }
@@ -40,12 +56,15 @@ uint8_t color::a() const noexcept {
 void color::set_r(uint8_t r) noexcept {
   _r = r;
 }
+
 void color::set_g(uint8_t g) noexcept {
   _g = g;
 }
+
 void color::set_b(uint8_t b) noexcept {
   _b = b;
 }
+
 void color::set_a(uint8_t a) noexcept {
   _a = a;
 }
