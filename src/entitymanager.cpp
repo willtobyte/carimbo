@@ -23,6 +23,8 @@ entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) n
 }
 
 std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
+  _dirty = true;
+
   if (const auto it = std::ranges::find_if(_entities, [&kind](const auto &e) { return e->kind() == kind; }); it != _entities.end()) {
     return clone(*it);
   }
@@ -117,6 +119,7 @@ void entitymanager::destroy(std::shared_ptr<entity> entity) noexcept {
     return;
   }
 
+  _dirty = true;
   _entities.erase(std::remove(_entities.begin(), _entities.end(), entity), _entities.end());
 }
 
@@ -129,17 +132,23 @@ std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
 }
 
 void entitymanager::update(float_t delta) noexcept {
-  std::for_each(
-      _entities.begin(),
-      _entities.end(),
-      [delta](const auto &entity) {
-        entity->update(delta);
-      }
-  );
+  for (auto &e : _entities) {
+    const auto old = e->x();
 
-  std::sort(_entities.begin(), _entities.end(), [](const auto &a, const auto &b) {
-    return a->position().x() < b->position().x();
-  });
+    e->update(delta);
+
+    if (e->x() != old) {
+      _dirty = true;
+    }
+  }
+
+  if (_dirty) {
+    std::sort(_entities.begin(), _entities.end(), [](const auto &a, const auto &b) {
+      return a->position().x() < b->position().x();
+    });
+
+    _dirty = false;
+  }
 
   for (auto it = _entities.begin(); it != _entities.end(); ++it) {
     const auto &a = *it;

@@ -30,5 +30,6 @@ private:
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::vector<std::shared_ptr<entity>> _entities;
   std::atomic<uint64_t> _counter{0};
+  bool _dirty{true};
 };
 }
