@@ -151,11 +151,14 @@ void entitymanager::update(float_t delta) noexcept {
     }
 
     const auto &ha = *aita->second.hitbox;
-    const auto ax2 = a->position().x() + (ha.position().x() + ha.size().width()) * props_a.scale;
+
+    const auto has = geometry::rect{
+        a->position() + ha.position() * props_a.scale,
+        ha.size() * props_a.scale
+    };
 
     for (auto jt = std::next(it); jt != _entities.end(); ++jt) {
       const auto &b = *jt;
-      if (b->position().x() > ax2) break;
 
       const auto &props_b = b->props();
       const auto aitb = props_b.animations.find(props_b.action);
@@ -163,8 +166,20 @@ void entitymanager::update(float_t delta) noexcept {
         continue;
       }
 
-      if (!a->intersects(b))
+      const auto &hb = *aitb->second.hitbox;
+
+      const auto hbs = geometry::rect{
+          b->position() + hb.position() * props_b.scale,
+          hb.size() * props_b.scale
+      };
+
+      if (hbs.position().x() > has.position().x() + has.size().width()) break;
+      if (hbs.position().y() > has.position().y() + has.size().height()) continue;
+      if (hbs.position().y() + hbs.size().height() < has.position().y()) continue;
+
+      if (!has.intersects(hbs)) {
         continue;
+      }
 
       const auto callback_a = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt);
       const auto callback_b = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt);
