@@ -67,7 +67,6 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       255,
       true,
       {},
-      {},
       scale,
       {},
       kind,
@@ -95,7 +94,6 @@ std::shared_ptr<entity> entitymanager::clone(std::shared_ptr<entity> matrix) noe
   props.angle = {};
   props.alpha = {255};
   props.position = {};
-  props.pivot = {};
   props.velocity = {};
   props.action = {};
   props.reflection = {graphics::reflection::none};

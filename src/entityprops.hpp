@@ -17,7 +17,6 @@ struct entityprops {
   uint8_t alpha{255};
   bool visible{true};
   geometry::point position{};
-  geometry::point pivot{};
   float_t scale{1.f};
   algebra::vector2d velocity{};
   std::string kind{};
