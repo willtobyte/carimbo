@@ -9,7 +9,7 @@ void rect::set_position(const geometry::point &position) noexcept {
   _position = position;
 }
 
-::point rect::position() const noexcept {
+geometry::point rect::position() const noexcept {
   return _position;
 }
 
