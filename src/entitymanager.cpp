@@ -143,36 +143,26 @@ void entitymanager::update(float_t delta) noexcept {
 
   for (auto it = _entities.begin(); it != _entities.end(); ++it) {
     const auto &a = *it;
-    const auto &props_a = a->props();
+    const auto &ap = a->props();
 
-    const auto aita = props_a.animations.find(props_a.action);
-    if (aita == props_a.animations.end() || !aita->second.hitbox) {
+    const auto aita = ap.animations.find(ap.action);
+    if (aita == ap.animations.end() || !aita->second.hitbox) {
       continue;
     }
 
     const auto &ha = *aita->second.hitbox;
-
-    const auto has = geometry::rect{
-        a->position() + ha.position() * props_a.scale,
-        ha.size() * props_a.scale
-    };
-
+    const auto has = geometry::rect{a->position() + ha.position() * ap.scale, ha.size() * ap.scale};
     for (auto jt = std::next(it); jt != _entities.end(); ++jt) {
       const auto &b = *jt;
 
-      const auto &props_b = b->props();
-      const auto aitb = props_b.animations.find(props_b.action);
-      if (aitb == props_b.animations.end() || !aitb->second.hitbox) {
+      const auto &bp = b->props();
+      const auto aitb = bp.animations.find(bp.action);
+      if (aitb == bp.animations.end() || !aitb->second.hitbox) {
         continue;
       }
 
       const auto &hb = *aitb->second.hitbox;
-
-      const auto hbs = geometry::rect{
-          b->position() + hb.position() * props_b.scale,
-          hb.size() * props_b.scale
-      };
-
+      const auto hbs = geometry::rect{b->position() + hb.position() * bp.scale, hb.size() * bp.scale};
       if (hbs.position().x() > has.position().x() + has.size().width()) break;
       if (hbs.position().y() > has.position().y() + has.size().height()) continue;
       if (hbs.position().y() + hbs.size().height() < has.position().y()) continue;
