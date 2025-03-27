@@ -37,8 +37,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                                ? _resourcemanager->pixmappool()->get(j["spritesheet"].get_ref<const std::string &>())
                                : nullptr;
 
-  std::unordered_map<std::string, graphics::animation> animations;
-  animations.reserve(j["animations"].size());
+  std::unordered_map<std::string, graphics::animation> animations(j["animations"].size());
 
   for (const auto &item : j["animations"].items()) {
     const auto &key = item.key();
