@@ -2,12 +2,6 @@
 
 using namespace geometry;
 
-size::size(int32_t width, int32_t height) noexcept
-    : _width(width), _height(height) {}
-
-size::size(const size &other) noexcept
-    : _width(other._width), _height(other._height) {}
-
 void size::set_width(int32_t width) noexcept {
   _width = width;
 }

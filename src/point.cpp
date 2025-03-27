@@ -2,12 +2,6 @@
 
 using namespace geometry;
 
-point::point(int32_t x, int32_t y) noexcept
-    : _x(x), _y(y) {}
-
-point::point(const point &other) noexcept
-    : _x(other._x), _y(other._y) {}
-
 void point::set(int32_t x, int32_t y) noexcept {
   _x = x;
   _y = y;

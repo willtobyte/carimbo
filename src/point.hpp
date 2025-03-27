@@ -5,9 +5,11 @@
 namespace geometry {
 class point {
 public:
-  point() = default;
-  point(int32_t x, int32_t y) noexcept;
-  point(const point &other) noexcept;
+  constexpr point() = default;
+  constexpr point(const point &) noexcept = default;
+  constexpr point(int32_t x, int32_t y) noexcept
+      : _x(x), _y(y) {}
+
   ~point() = default;
 
   void set(int32_t x, int32_t y) noexcept;

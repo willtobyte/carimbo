@@ -4,10 +4,7 @@
 
 using namespace geometry;
 
-rect::rect(const ::point &position, const ::size &size) noexcept
-    : _position(position), _size(size) {}
-
-void rect::set_position(const ::point &position) noexcept {
+void rect::set_position(const class point &position) noexcept {
   _position = position;
 }
 
