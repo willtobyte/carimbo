@@ -75,12 +75,14 @@ if(EMSCRIPTEN)
 
   set(EMSDK_COMPILE_RELEASE_FLAGS
     -Oz
+    -g0
     -flto
     -fexperimental-library
   )
 
   set(EMSDK_LINK_RELEASE_FLAGS
     -Oz
+    -g0
     -flto
     --strip-all
     -sASSERTIONS=0
