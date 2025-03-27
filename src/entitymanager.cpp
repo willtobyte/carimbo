@@ -38,7 +38,6 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
                                : nullptr;
 
   std::unordered_map<std::string, graphics::animation> animations(j["animations"].size());
-
   for (const auto &item : j["animations"].items()) {
     const auto &key = item.key();
     const auto &a = item.value();
