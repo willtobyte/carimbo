@@ -37,6 +37,7 @@ point point::operator+(const point &other) const noexcept {
 point &point::operator+=(const point &other) noexcept {
   _x += other._x;
   _y += other._y;
+
   return *this;
 }
 
