@@ -129,13 +129,40 @@ std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
 }
 
 void entitymanager::update(float_t delta) noexcept {
-  for (auto &entity : _entities) {
-    entity->update(delta);
-  }
+  std::for_each(
+      _entities.begin(),
+      _entities.end(),
+      [delta](const auto &entity) {
+        entity->update(delta);
+      }
+  );
+
+  std::sort(_entities.begin(), _entities.end(), [](const auto &a, const auto &b) {
+    return a->position().x() < b->position().x();
+  });
 
   for (auto it = _entities.begin(); it != _entities.end(); ++it) {
     const auto &a = *it;
-    for (const auto &b : std::ranges::subrange(std::next(it), _entities.end())) {
+    const auto &props_a = a->props();
+
+    const auto aita = props_a.animations.find(props_a.action);
+    if (aita == props_a.animations.end() || !aita->second.hitbox) {
+      continue;
+    }
+
+    const auto &ha = *aita->second.hitbox;
+    const auto ax2 = a->position().x() + (ha.position().x() + ha.size().width()) * props_a.scale;
+
+    for (auto jt = std::next(it); jt != _entities.end(); ++jt) {
+      const auto &b = *jt;
+      if (b->position().x() > ax2) break;
+
+      const auto &props_b = b->props();
+      const auto aitb = props_b.animations.find(props_b.action);
+      if (aitb == props_b.animations.end() || !aitb->second.hitbox) {
+        continue;
+      }
+
       if (!a->intersects(b))
         continue;
 

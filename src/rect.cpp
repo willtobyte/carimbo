@@ -27,12 +27,12 @@ void rect::scale(float_t factor) noexcept {
 }
 
 bool rect::intersects(const rect &other) const noexcept {
-  return !(
-      _position.x() + _size.width() <= other._position.x() ||
-      _position.x() >= other._position.x() + other._size.width() ||
-      _position.y() + _size.height() <= other._position.y() ||
-      _position.y() >= other._position.y() + other._size.height()
-  );
+  const auto ax1 = _position.x(), ay1 = _position.y();
+  const auto ax2 = ax1 + _size.width(), ay2 = ay1 + _size.height();
+  const auto bx1 = other._position.x(), by1 = other._position.y();
+  const auto bx2 = bx1 + other._size.width(), by2 = by1 + other._size.height();
+
+  return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
 }
 
 bool rect::contains(const geometry::point &p) const noexcept {
