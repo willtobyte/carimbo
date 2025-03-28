@@ -223,10 +223,7 @@ void entitymanager::on_mousebuttondown(const input::mousebuttonevent &event) noe
       continue;
     }
 
-    const auto hitbox = geometry::rect{
-        entity->position() + animation.hitbox->position() * props.scale,
-        animation.hitbox->size() * props.scale
-    };
+    const auto hitbox = geometry::rect{entity->position() + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
 
     if (!hitbox.contains(point)) {
       continue;
