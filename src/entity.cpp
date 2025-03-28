@@ -153,23 +153,27 @@ geometry::point entity::get_placement() const noexcept {
 }
 
 void entity::set_onupdate(std::function<void(std::shared_ptr<entity>)> fn) noexcept {
-  _onupdate = fn;
+  _onupdate = std::move(fn);
 }
 
 void entity::set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
-  _onanimationfinished = fn;
+  _onanimationfinished = std::move(fn);
 }
 
 void entity::set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
-  _onmail = fn;
+  _onmail = std::move(fn);
 }
 
 void entity::set_ontouch(std::function<void()> fn) noexcept {
-  _ontouch = fn;
+  _ontouch = std::move(fn);
 }
 
 void entity::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)> fn) noexcept {
-  _collisionmapping[kind] = fn;
+  _collisionmapping.emplace(kind, std::move(fn));
+}
+
+void entity::set_onntick(uint64_t n, std::function<void(std::shared_ptr<entity>)> fn) noexcept {
+  _tickinmapping.emplace(n, std::move(fn));
 }
 
 void entity::set_reflection(graphics::reflection reflection) noexcept {
@@ -178,7 +182,7 @@ void entity::set_reflection(graphics::reflection reflection) noexcept {
 
 void entity::set_action(const std::string &action) noexcept {
   if (_props.action != action) {
-    _props.action.assign(action);
+    _props.action.assign(std::move(action));
     _props.frame = 0;
     _props.last_frame = SDL_GetTicks();
   }

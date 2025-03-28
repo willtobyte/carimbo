@@ -44,6 +44,7 @@ public:
   void set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept;
   void set_ontouch(std::function<void()> fn) noexcept;
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)> fn) noexcept;
+  void set_onntick(uint64_t n, std::function<void(std::shared_ptr<entity>)> fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
   void set_action(const std::string &action) noexcept;
@@ -71,5 +72,6 @@ private:
   std::function<void(std::shared_ptr<entity>, const std::string &)> _onmail;
   std::function<void()> _ontouch;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)>> _collisionmapping;
+  std::unordered_map<uint64_t, std::function<void(std::shared_ptr<entity>)>> _tickinmapping;
 };
 }
