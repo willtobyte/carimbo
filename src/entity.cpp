@@ -223,13 +223,11 @@ bool entity::intersects(std::shared_ptr<entity> other) const noexcept {
     return false;
   }
 
-  return geometry::rect(
-             position() + hitbox->position() * _props.scale,
-             hitbox->size() * _props.scale
-  )
+  return geometry::rect(position() + hitbox->position() * _props.scale, hitbox->size() * _props.scale)
       .intersects(
           {other->position() + other_hitbox->position() * other->_props.scale,
-           other_hitbox->size() * other->_props.scale}
+           other_hitbox->size() * other->_props.scale
+          }
       );
 }
 
