@@ -7,6 +7,14 @@ scenemanager::scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std
     : _pixmappool(std::move(pixmappool)), _entitymanager(std::move(entitymanager)) {}
 
 void scenemanager::set(const std::string &name) noexcept {
+  if (!_current_scene.empty()) {
+    if (auto it = _onleave_mapping.find(_current_scene); it != _onleave_mapping.end()) {
+      it->second();
+    }
+  }
+
+  _current_scene = name;
+
   _background.reset();
 
   const auto old = std::exchange(_entities, {});
@@ -41,14 +49,10 @@ void scenemanager::set(const std::string &name) noexcept {
         return {key, e};
       }
   );
-}
 
-std::shared_ptr<entity> scenemanager::grab(const std::string &key) const noexcept {
-  if (const auto it = _entities.find(key); it != _entities.end()) {
-    return it->second;
+  if (auto it = _onenter_mapping.find(name); it != _onenter_mapping.end()) {
+    it->second();
   }
-
-  return nullptr;
 }
 
 void scenemanager::update(float_t delta) noexcept {
@@ -62,4 +66,20 @@ void scenemanager::draw() const noexcept {
 
   static geometry::point point{0, 0};
   _background->draw({point, _size}, {point, _size});
+}
+
+std::shared_ptr<entity> scenemanager::grab(const std::string &key) const noexcept {
+  if (const auto it = _entities.find(key); it != _entities.end()) {
+    return it->second;
+  }
+
+  return nullptr;
+}
+
+void scenemanager::set_onenter(const std::string &name, std::function<void()> fn) {
+  _onenter_mapping[name] = std::move(fn);
+}
+
+void scenemanager::set_onleave(const std::string &name, std::function<void()> fn) {
+  _onleave_mapping[name] = std::move(fn);
 }

@@ -323,7 +323,9 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::scenemanager>(
       "SceneManager", sol::no_constructor, "set", &framework::scenemanager::set,
-      "grab", &framework::scenemanager::grab
+      "grab", &framework::scenemanager::grab,
+      "on_leave", &framework::scenemanager::set_onleave,
+      "on_enter", &framework::scenemanager::set_onenter
   );
 
   lua.new_enum(
