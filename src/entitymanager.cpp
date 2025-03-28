@@ -77,7 +77,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
   };
 
   auto e = entity::create(props);
-  fmt::println("[entitymanager] spawn {} kind {}", e->id(), kind);
+  fmt::println("[entitymanager] spawn {} {}", e->id(), kind);
   _entities.emplace_back(e);
   return e;
 }
@@ -102,7 +102,7 @@ std::shared_ptr<entity> entitymanager::clone(std::shared_ptr<entity> matrix) noe
 
   _entities.emplace_back(e);
 
-  fmt::println("[entitymanager] cloned entity {} from matrix {}", e->id(), matrix->id());
+  fmt::println("[entitymanager] clone {} from {}", e->id(), matrix->id());
 
   return e;
 }
