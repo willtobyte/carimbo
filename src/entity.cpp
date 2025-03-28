@@ -182,7 +182,7 @@ void entity::set_reflection(graphics::reflection reflection) noexcept {
 
 void entity::set_action(const std::string &action) noexcept {
   if (_props.action != action) {
-    _props.action.assign(std::move(action));
+    _props.action = action;
     _props.frame = 0;
     _props.last_frame = SDL_GetTicks();
   }
@@ -206,32 +206,30 @@ bool entity::visible() const noexcept {
   return _props.visible;
 }
 
-bool entity::intersects(std::shared_ptr<entity> other) const noexcept {
-  if (_props.action.empty() || other->_props.action.empty()) [[unlikely]] {
+bool entity::intersects(const std::shared_ptr<entity> other) const noexcept {
+  if (_props.action.empty() || other->_props.action.empty()) [[likely]] {
     return false;
   }
 
   const auto sit = _props.animations.find(_props.action);
-  if (sit == _props.animations.end()) [[unlikely]] {
+  if (sit == _props.animations.end() || !sit->second.hitbox) [[likely]] {
     return false;
   }
 
   const auto oit = other->_props.animations.find(other->_props.action);
-  if (oit == other->_props.animations.end()) [[unlikely]] {
+  if (oit == other->_props.animations.end() || !oit->second.hitbox) [[likely]] {
     return false;
   }
 
-  const auto &hitbox = sit->second.hitbox;
-  const auto &other_hitbox = oit->second.hitbox;
-  if (!hitbox || !other_hitbox) [[likely]] {
-    return false;
-  }
-
-  return geometry::rect(position() + hitbox->position() * _props.scale, hitbox->size() * _props.scale)
+  return geometry::rect(
+             position() + sit->second.hitbox->position() * _props.scale,
+             sit->second.hitbox->size() * _props.scale
+  )
       .intersects(
-          {other->position() + other_hitbox->position() * other->_props.scale,
-           other_hitbox->size() * other->_props.scale
-          }
+          geometry::rect(
+              other->position() + oit->second.hitbox->position() * other->_props.scale,
+              oit->second.hitbox->size() * other->_props.scale
+          )
       );
 }
 
