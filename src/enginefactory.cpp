@@ -3,8 +3,8 @@
 #include "audiodevice.hpp"
 #include "common.hpp"
 #include "engine.hpp"
-#include "entitymanager.hpp"
 #include "eventmanager.hpp"
+#include "objectmanager.hpp"
 #include "resourcemanager.hpp"
 #include "scenemanager.hpp"
 #include "window.hpp"
@@ -50,12 +50,12 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   const auto resourcemanager = std::make_shared<framework::resourcemanager>(renderer, audiodevice);
   const auto overlay = std::make_shared<graphics::overlay>(resourcemanager, eventmanager);
   const auto statemanager = std::make_shared<framework::statemanager>();
-  const auto entitymanager = std::make_shared<framework::entitymanager>(resourcemanager);
+  const auto objectmanager = std::make_shared<framework::objectmanager>(resourcemanager);
   const auto fontfactory = std::make_shared<graphics::fontfactory>(renderer);
-  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager->pixmappool(), entitymanager);
+  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager->pixmappool(), objectmanager);
 
   engine->set_audiodevice(audiodevice);
-  engine->set_entitymanager(entitymanager);
+  engine->set_objectmanager(objectmanager);
   engine->set_eventmanager(eventmanager);
   engine->set_overlay(overlay);
   engine->set_renderer(renderer);
@@ -64,7 +64,7 @@ std::shared_ptr<engine> enginefactory::create() const noexcept {
   engine->set_statemanager(statemanager);
   engine->set_window(window);
 
-  engine->eventmanager()->add_receiver(engine->entitymanager());
+  engine->eventmanager()->add_receiver(engine->objectmanager());
   engine->eventmanager()->add_receiver(engine);
   engine->eventmanager()->add_receiver(engine->statemanager());
   engine->eventmanager()->add_receiver(overlay);

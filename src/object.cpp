@@ -1,64 +1,64 @@
-#include "entity.hpp"
+#include "object.hpp"
 
 using namespace framework;
 
-entity::entity(const entityprops &props) noexcept
+object::object(const objectprops &props) noexcept
     : _props(props) {}
 
-entity::~entity() noexcept {
-  fmt::println("[entity] destroyed {} {}", kind(), id());
+object::~object() noexcept {
+  fmt::println("[object] destroyed {} {}", kind(), id());
 }
 
-std::shared_ptr<entity> entity::create(const entityprops &props) {
-  return std::make_shared<entity>(props);
+std::shared_ptr<object> object::create(const objectprops &props) {
+  return std::make_shared<object>(props);
 }
 
-uint64_t entity::id() const noexcept {
+uint64_t object::id() const noexcept {
   return _props.id;
 }
 
-void entity::set_id(uint64_t id) noexcept {
+void object::set_id(uint64_t id) noexcept {
   _props.id = id;
 }
 
-std::string entity::kind() const noexcept {
+std::string object::kind() const noexcept {
   return _props.kind;
 }
 
-entityprops &entity::props() noexcept {
+objectprops &object::props() noexcept {
   return _props;
 }
 
-const entityprops &entity::props() const noexcept {
+const objectprops &object::props() const noexcept {
   return _props;
 }
 
-geometry::point entity::position() const noexcept {
+geometry::point object::position() const noexcept {
   return _props.position;
 }
 
-int32_t entity::x() const noexcept {
+int32_t object::x() const noexcept {
   return _props.position.x();
 }
 
-int32_t entity::y() const noexcept {
+int32_t object::y() const noexcept {
   return _props.position.y();
 }
 
-void entity::move(float_t x_velocity, float_t y_velocity) noexcept {
+void object::move(float_t x_velocity, float_t y_velocity) noexcept {
   UNUSED(x_velocity);
   UNUSED(y_velocity);
 }
 
-void entity::set_velocity(const algebra::vector2d &velocity) noexcept {
+void object::set_velocity(const algebra::vector2d &velocity) noexcept {
   _props.velocity = velocity;
 }
 
-algebra::vector2d entity::velocity() const noexcept {
+algebra::vector2d object::velocity() const noexcept {
   return _props.velocity;
 }
 
-void entity::update(float_t delta) noexcept {
+void object::update(float_t delta) noexcept {
   if (const auto fn = _onupdate; fn) {
     fn(shared_from_this());
   }
@@ -110,7 +110,7 @@ void entity::update(float_t delta) noexcept {
   );
 }
 
-void entity::draw() const noexcept {
+void object::draw() const noexcept {
   if (_props.action.empty()) [[unlikely]] {
     return;
   }
@@ -145,51 +145,51 @@ void entity::draw() const noexcept {
   );
 }
 
-void entity::set_props(const entityprops &props) noexcept {
+void object::set_props(const objectprops &props) noexcept {
   _props = props;
 }
 
-void entity::hide() noexcept {
+void object::hide() noexcept {
   unset_action();
 }
 
-void entity::set_placement(int32_t x, int32_t y) noexcept {
+void object::set_placement(int32_t x, int32_t y) noexcept {
   _props.position.set(x, y);
 }
 
-geometry::point entity::get_placement() const noexcept {
+geometry::point object::get_placement() const noexcept {
   return _props.position;
 }
 
-void entity::set_onupdate(std::function<void(std::shared_ptr<entity>)> fn) noexcept {
+void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) noexcept {
   _onupdate = std::move(fn);
 }
 
-void entity::set_onanimationfinished(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
+void object::set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept {
   _onanimationfinished = std::move(fn);
 }
 
-void entity::set_onmail(std::function<void(std::shared_ptr<entity>, const std::string &)> fn) noexcept {
+void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept {
   _onmail = std::move(fn);
 }
 
-void entity::set_ontouch(std::function<void()> fn) noexcept {
+void object::set_ontouch(std::function<void()> fn) noexcept {
   _ontouch = std::move(fn);
 }
 
-void entity::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<entity>, std::shared_ptr<entity>)> fn) noexcept {
+void object::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) noexcept {
   _collisionmapping.emplace(kind, std::move(fn));
 }
 
-void entity::set_onntick(uint64_t n, std::function<void(std::shared_ptr<entity>)> fn) noexcept {
+void object::set_onntick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept {
   _tickinmapping.emplace(n, std::move(fn));
 }
 
-void entity::set_reflection(graphics::reflection reflection) noexcept {
+void object::set_reflection(graphics::reflection reflection) noexcept {
   _props.reflection = reflection;
 }
 
-void entity::set_action(const std::string &action) noexcept {
+void object::set_action(const std::string &action) noexcept {
   if (_props.action != action) {
     _props.action = action;
     _props.frame = 0;
@@ -197,17 +197,17 @@ void entity::set_action(const std::string &action) noexcept {
   }
 }
 
-void entity::unset_action() noexcept {
+void object::unset_action() noexcept {
   _props.action.clear();
   _props.frame = 0;
   _props.last_frame = SDL_GetTicks();
 }
 
-std::string entity::action() const noexcept {
+std::string object::action() const noexcept {
   return _props.action;
 }
 
-bool entity::intersects(const std::shared_ptr<entity> other) const noexcept {
+bool object::intersects(const std::shared_ptr<object> other) const noexcept {
   if (_props.action.empty() || other->_props.action.empty()) [[likely]] {
     return false;
   }
@@ -234,18 +234,18 @@ bool entity::intersects(const std::shared_ptr<entity> other) const noexcept {
       );
 }
 
-void entity::on_email(const std::string &message) {
+void object::on_email(const std::string &message) {
   if (const auto fn = _onmail; fn) {
     fn(shared_from_this(), message);
   }
 }
 
-void entity::on_touch() noexcept {
+void object::on_touch() noexcept {
   if (const auto fn = _ontouch; fn) {
     fn();
   }
 }
 
-memory::kv &entity::kv() noexcept {
+memory::kv &object::kv() noexcept {
   return _kv;
 }

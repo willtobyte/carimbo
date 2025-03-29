@@ -9,7 +9,7 @@
 
 namespace framework {
 
-struct entityprops {
+struct objectprops {
   uint64_t id{};
   uint32_t frame{};
   uint32_t last_frame{};

@@ -1,9 +1,9 @@
 #pragma once
 
 #include "common.hpp"
-#include "entity.hpp"
 #include "eventreceiver.hpp"
 #include "lifecycleobserver.hpp"
+#include "object.hpp"
 
 namespace framework {
 struct pairhash {
@@ -19,7 +19,7 @@ public:
   statemanager() = default;
   virtual ~statemanager() = default;
 
-  bool collides(std::shared_ptr<entity> a, std::shared_ptr<entity> b) const noexcept;
+  bool collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept;
 
   bool on(int player, const std::variant<input::joystickevent> &type) const noexcept;
 

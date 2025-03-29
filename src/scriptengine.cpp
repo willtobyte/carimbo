@@ -1,9 +1,9 @@
 #include "scriptengine.hpp"
 
 #include "common.hpp"
-#include "entity.hpp"
 #include "event.hpp"
 #include "loopable.hpp"
+#include "object.hpp"
 #include "point.hpp"
 #include "vector2d.hpp"
 #include "widget.hpp"
@@ -166,7 +166,7 @@ void framework::scriptengine::run() {
   );
 
   struct reflectionproxy {
-    entity &e;
+    object &e;
 
     void set(graphics::reflection value) { e.set_reflection(value); }
 
@@ -180,7 +180,7 @@ void framework::scriptengine::run() {
   );
 
   struct actionproxy {
-    entity &e;
+    object &e;
 
     void set(const std::string &value) { e.set_action(value); }
 
@@ -197,7 +197,7 @@ void framework::scriptengine::run() {
   );
 
   struct placementproxy {
-    entity &e;
+    object &e;
 
     void set(int32_t x, int32_t y) noexcept { e.set_placement(x, y); }
 
@@ -211,7 +211,7 @@ void framework::scriptengine::run() {
   );
 
   struct velocityproxy {
-    entity &e;
+    object &e;
 
     void set(int32_t x, int32_t y) { e.set_velocity({x, y}); }
 
@@ -249,32 +249,32 @@ void framework::scriptengine::run() {
       "subscribe", [](memory::kv &self, const std::string &key, const sol::function &callback, sol::this_state state) { self.subscribe(key, callback, state); }
   );
 
-  lua.new_usertype<framework::entity>(
-      "Entity",
+  lua.new_usertype<framework::object>(
+      "object",
       sol::no_constructor,
-      "id", sol::property(&framework::entity::id),
-      "x", sol::property(&framework::entity::x),
-      "y", sol::property(&framework::entity::y),
-      "hide", &framework::entity::hide,
-      "move", &framework::entity::move,
-      "on_update", &framework::entity::set_onupdate,
-      "on_animationfinished", &framework::entity::set_onanimationfinished,
-      "on_mail", &framework::entity::set_onmail,
-      "on_touch", &framework::entity::set_ontouch,
-      "on_collision", &framework::entity::set_oncollision,
-      "on_ntick", &framework::entity::set_onntick,
-      "reflection", sol::property([](framework::entity &e) -> reflectionproxy { return reflectionproxy{e}; }),
-      "action", sol::property([](framework::entity &e) -> actionproxy { return actionproxy{e}; }),
-      "placement", sol::property([](framework::entity &e) -> placementproxy { return placementproxy{e}; }),
-      "velocity", sol::property([](framework::entity &e) -> velocityproxy { return velocityproxy{e}; }),
-      "kv", sol::property([](framework::entity &e) -> memory::kv & { return e.kv(); })
+      "id", sol::property(&framework::object::id),
+      "x", sol::property(&framework::object::x),
+      "y", sol::property(&framework::object::y),
+      "hide", &framework::object::hide,
+      "move", &framework::object::move,
+      "on_update", &framework::object::set_onupdate,
+      "on_animationfinished", &framework::object::set_onanimationfinished,
+      "on_mail", &framework::object::set_onmail,
+      "on_touch", &framework::object::set_ontouch,
+      "on_collision", &framework::object::set_oncollision,
+      "on_ntick", &framework::object::set_onntick,
+      "reflection", sol::property([](framework::object &e) -> reflectionproxy { return reflectionproxy{e}; }),
+      "action", sol::property([](framework::object &e) -> actionproxy { return actionproxy{e}; }),
+      "placement", sol::property([](framework::object &e) -> placementproxy { return placementproxy{e}; }),
+      "velocity", sol::property([](framework::object &e) -> velocityproxy { return velocityproxy{e}; }),
+      "kv", sol::property([](framework::object &e) -> memory::kv & { return e.kv(); })
   );
 
-  lua.new_usertype<framework::entitymanager>(
-      "EntityManager",
-      "spawn", &framework::entitymanager::spawn,
-      "clone", &framework::entitymanager::clone,
-      "destroy", &framework::entitymanager::destroy
+  lua.new_usertype<framework::objectmanager>(
+      "objectManager",
+      "spawn", &framework::objectmanager::spawn,
+      "clone", &framework::objectmanager::clone,
+      "destroy", &framework::objectmanager::destroy
   );
 
   lua.new_usertype<framework::resourcemanager>(
@@ -366,7 +366,7 @@ void framework::scriptengine::run() {
       "add_loopable", &framework::engine::add_loopable,
       "canvas", &framework::engine::canvas,
       "cassete", &framework::engine::cassete,
-      "entitymanager", &framework::engine::entitymanager,
+      "objectmanager", &framework::engine::objectmanager,
       "fontfactory", &framework::engine::fontfactory,
       "overlay", &framework::engine::overlay,
       "resourcemanager", &framework::engine::resourcemanager,
@@ -574,7 +574,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::mail>(
       "Mail",
-      sol::constructors<framework::mail(std::shared_ptr<framework::entity>, std::shared_ptr<framework::entity>, const std::string &)>()
+      sol::constructors<framework::mail(std::shared_ptr<framework::object>, std::shared_ptr<framework::object>, const std::string &)>()
   );
 
   lua.new_usertype<framework::postalservice>(

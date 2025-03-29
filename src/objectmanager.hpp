@@ -5,18 +5,18 @@
 #include "eventreceiver.hpp"
 
 namespace framework {
-class entitymanager : public input::eventreceiver {
+class objectmanager : public input::eventreceiver {
 public:
-  explicit entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
-  ~entitymanager() = default;
+  explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
+  ~objectmanager() = default;
 
-  std::shared_ptr<entity> spawn(const std::string &kind);
+  std::shared_ptr<object> spawn(const std::string &kind);
 
-  std::shared_ptr<entity> clone(std::shared_ptr<entity> matrix) noexcept;
+  std::shared_ptr<object> clone(std::shared_ptr<object> matrix) noexcept;
 
-  void destroy(std::shared_ptr<entity> entity) noexcept;
+  void destroy(std::shared_ptr<object> object) noexcept;
 
-  std::shared_ptr<entity> find(uint64_t id) const noexcept;
+  std::shared_ptr<object> find(uint64_t id) const noexcept;
 
   void update(float_t delta) noexcept;
 
@@ -28,7 +28,7 @@ protected:
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
-  std::vector<std::shared_ptr<entity>> _entities;
+  std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
   bool _dirty{true};
 };

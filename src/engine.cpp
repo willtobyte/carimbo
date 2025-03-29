@@ -1,10 +1,10 @@
 #include "engine.hpp"
 
 #include "audiodevice.hpp"
-#include "entitymanager.hpp"
 #include "eventmanager.hpp"
 #include "framerate.hpp"
 #include "loopable.hpp"
+#include "objectmanager.hpp"
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
 #include "statemanager.hpp"
@@ -20,8 +20,8 @@ std::shared_ptr<audio::audiodevice> engine::audiodevice() const noexcept {
   return _audiodevice;
 }
 
-std::shared_ptr<framework::entitymanager> engine::entitymanager() const noexcept {
-  return _entitymanager;
+std::shared_ptr<framework::objectmanager> engine::objectmanager() const noexcept {
+  return _objectmanager;
 }
 
 std::shared_ptr<input::eventmanager> engine::eventmanager() const noexcept {
@@ -80,8 +80,8 @@ void engine::set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) no
   _audiodevice = std::move(audiodevice);
 }
 
-void engine::set_entitymanager(std::shared_ptr<framework::entitymanager> entitymanager) noexcept {
-  _entitymanager = std::move(entitymanager);
+void engine::set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) noexcept {
+  _objectmanager = std::move(objectmanager);
 }
 
 void engine::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept {
@@ -159,7 +159,7 @@ void engine::_loop() noexcept {
   _eventmanager->update(delta);
   _overlay->update(delta);
   _scenemanager->update(delta);
-  _entitymanager->update(delta);
+  _objectmanager->update(delta);
 
   for (const auto &loopable : _loopables) {
     loopable->loop(delta);
@@ -175,7 +175,7 @@ void engine::_loop() noexcept {
 
   _renderer->begin();
   _scenemanager->draw();
-  _entitymanager->draw();
+  _objectmanager->draw();
   _overlay->draw();
   _canvas->draw();
   _renderer->end();

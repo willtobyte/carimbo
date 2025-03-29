@@ -81,9 +81,9 @@ namespace framework {
 class application;
 class engine;
 class enginefactory;
-class entity;
-class entitymanager;
-class entityprops;
+class object;
+class objectmanager;
+class objectprops;
 class framerate;
 class garbagecollector;
 class lifecycleobserver;

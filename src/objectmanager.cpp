@@ -1,6 +1,6 @@
-#include "entitymanager.hpp"
+#include "objectmanager.hpp"
 #include "common.hpp"
-#include "entityprops.hpp"
+#include "objectprops.hpp"
 
 using namespace framework;
 
@@ -18,18 +18,18 @@ auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optio
   return fallback;
 }
 
-entitymanager::entitymanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
+objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
     : _resourcemanager(resourcemanager) {
 }
 
-std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
+std::shared_ptr<object> objectmanager::spawn(const std::string &kind) {
   _dirty = true;
 
-  if (const auto it = std::ranges::find_if(_entities, [&kind](const auto &e) { return e->kind() == kind; }); it != _entities.end()) {
+  if (const auto it = std::ranges::find_if(_objects, [&kind](const auto &o) { return o->kind() == kind; }); it != _objects.end()) {
     return clone(*it);
   }
 
-  const auto buffer = storage::io::read(fmt::format("entities/{}.json", kind));
+  const auto buffer = storage::io::read(fmt::format("objects/{}.json", kind));
   const auto j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float_t{1.f});
@@ -62,7 +62,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
     animations.emplace(key, graphics::animation{next, oneshot, hitbox, keyframes});
   }
 
-  entityprops props{
+  objectprops props{
       _counter++,
       0,
       SDL_GetTicks(),
@@ -78,13 +78,13 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       animations,
   };
 
-  auto e = entity::create(props);
-  fmt::println("[entitymanager] spawn {} {}", kind, e->id());
-  _entities.emplace_back(e);
+  auto e = object::create(props);
+  fmt::println("[objectmanager] spawn {} {}", kind, e->id());
+  _objects.emplace_back(e);
   return e;
 }
 
-std::shared_ptr<entity> entitymanager::clone(std::shared_ptr<entity> matrix) noexcept {
+std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noexcept {
   if (!matrix) {
     return nullptr;
   }
@@ -100,52 +100,52 @@ std::shared_ptr<entity> entitymanager::clone(std::shared_ptr<entity> matrix) noe
   props.action = {};
   props.reflection = {graphics::reflection::none};
 
-  const auto e = entity::create(props);
+  const auto e = object::create(props);
 
-  _entities.emplace_back(e);
+  _objects.emplace_back(e);
 
-  fmt::println("[entitymanager] clone {} from {}", matrix->id(), e->id());
+  fmt::println("[objectmanager] clone {} from {}", matrix->id(), e->id());
 
   return e;
 }
 
-void entitymanager::destroy(std::shared_ptr<entity> entity) noexcept {
-  if (!entity) {
+void objectmanager::destroy(std::shared_ptr<object> object) noexcept {
+  if (!object) {
     return;
   }
 
   _dirty = true;
-  _entities.erase(std::remove(_entities.begin(), _entities.end(), entity), _entities.end());
+  _objects.erase(std::remove(_objects.begin(), _objects.end(), object), _objects.end());
 }
 
-std::shared_ptr<entity> entitymanager::find(uint64_t id) const noexcept {
-  auto it = std::ranges::find_if(_entities, [id](const auto &entity) {
-    return entity->id() == id;
+std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
+  auto it = std::ranges::find_if(_objects, [id](const auto &object) {
+    return object->id() == id;
   });
 
-  return (it != _entities.end()) ? *it : nullptr;
+  return (it != _objects.end()) ? *it : nullptr;
 }
 
-void entitymanager::update(float_t delta) noexcept {
-  for (auto &e : _entities) {
-    const auto old = e->x();
+void objectmanager::update(float_t delta) noexcept {
+  for (auto &o : _objects) {
+    const auto old = o->x();
 
-    e->update(delta);
+    o->update(delta);
 
-    if (e->x() != old) {
+    if (o->x() != old) {
       _dirty = true;
     }
   }
 
   if (_dirty) {
-    std::sort(_entities.begin(), _entities.end(), [](const auto &a, const auto &b) {
+    std::sort(_objects.begin(), _objects.end(), [](const auto &a, const auto &b) {
       return a->position().x() < b->position().x();
     });
 
     _dirty = false;
   }
 
-  for (auto it = _entities.begin(); it != _entities.end(); ++it) {
+  for (auto it = _objects.begin(); it != _objects.end(); ++it) {
     const auto &a = *it;
     const auto &ap = a->props();
 
@@ -156,7 +156,7 @@ void entitymanager::update(float_t delta) noexcept {
 
     const auto &ha = *aita->second.hitbox;
     const auto has = geometry::rect{a->position() + ha.position() * ap.scale, ha.size() * ap.scale};
-    for (auto jt = std::next(it); jt != _entities.end(); ++jt) {
+    for (auto jt = std::next(it); jt != _objects.end(); ++jt) {
       const auto &b = *jt;
 
       const auto &bp = b->props();
@@ -190,27 +190,27 @@ void entitymanager::update(float_t delta) noexcept {
   }
 }
 
-void entitymanager::draw() noexcept {
-  for (const auto &entity : _entities) {
-    entity->draw();
+void objectmanager::draw() noexcept {
+  for (const auto &object : _objects) {
+    object->draw();
   }
 }
 
-void entitymanager::on_mail(const input::mailevent &event) noexcept {
-  if (const auto entity = find(event.to); entity) {
-    entity->on_email(event.body);
+void objectmanager::on_mail(const input::mailevent &event) noexcept {
+  if (const auto object = find(event.to); object) {
+    object->on_email(event.body);
   }
 }
 
-void entitymanager::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
+void objectmanager::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   if (event.button != input::mousebuttonevent::button::left) {
     return;
   }
 
   const geometry::point point{event.x, event.y};
 
-  for (const auto &entity : _entities) {
-    const auto &props = entity->props();
+  for (const auto &object : _objects) {
+    const auto &props = object->props();
     if (props.action.empty()) {
       continue;
     }
@@ -225,12 +225,12 @@ void entitymanager::on_mousebuttondown(const input::mousebuttonevent &event) noe
       continue;
     }
 
-    const auto hitbox = geometry::rect{entity->position() + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
+    const auto hitbox = geometry::rect{object->position() + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
 
     if (!hitbox.contains(point)) {
       continue;
     }
 
-    entity->on_touch();
+    object->on_touch();
   }
 }

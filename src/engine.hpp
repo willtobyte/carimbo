@@ -10,7 +10,7 @@ public:
   virtual ~engine() = default;
 
   std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
-  std::shared_ptr<framework::entitymanager> entitymanager() const noexcept;
+  std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;
   std::shared_ptr<input::eventmanager> eventmanager() const noexcept;
   std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
   std::shared_ptr<graphics::overlay> overlay() const noexcept;
@@ -27,7 +27,7 @@ public:
   int32_t width() const noexcept;
 
   void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept;
-  void set_entitymanager(std::shared_ptr<framework::entitymanager> entitymanager) noexcept;
+  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) noexcept;
   void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept;
   void set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept;
   void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
@@ -49,7 +49,7 @@ protected:
 private:
   bool _running{true};
   std::shared_ptr<audio::audiodevice> _audiodevice;
-  std::shared_ptr<framework::entitymanager> _entitymanager;
+  std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<input::eventmanager> _eventmanager;
   std::vector<std::shared_ptr<loopable>> _loopables;
   std::shared_ptr<graphics::overlay> _overlay;

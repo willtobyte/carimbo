@@ -20,7 +20,7 @@ public:
   explicit cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager);
   virtual ~cursor() = default;
 
-  /* TODO entity manager will also listen for some mouse events to trigger entity action, here we just take care of animation */
+  /* TODO object manager will also listen for some mouse events to trigger object action, here we just take care of animation */
   virtual void on_mousemotion(const input::mousemotionevent &event) noexcept;
   virtual void on_mousebuttondown(const input::mousebuttonevent &event) noexcept;
   virtual void on_mousebuttonup(const input::mousebuttonevent &event) noexcept;
