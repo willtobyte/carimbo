@@ -250,7 +250,7 @@ void framework::scriptengine::run() {
   );
 
   lua.new_usertype<framework::object>(
-      "object",
+      "Object",
       sol::no_constructor,
       "id", sol::property(&framework::object::id),
       "x", sol::property(&framework::object::x),
@@ -271,7 +271,7 @@ void framework::scriptengine::run() {
   );
 
   lua.new_usertype<framework::objectmanager>(
-      "objectManager",
+      "ObjectManager",
       "spawn", &framework::objectmanager::spawn,
       "clone", &framework::objectmanager::clone,
       "destroy", &framework::objectmanager::destroy
