@@ -92,11 +92,16 @@ void entity::update(float_t delta) noexcept {
       if (const auto fn = _onanimationfinished; fn) {
         fn(shared_from_this(), finished);
       }
-
-      return;
+      if (animation.next.has_value()) {
+        _props.action = animation.next.value();
+        _props.frame = 0;
+        _props.last_frame = now;
+      } else {
+        return;
+      }
+    } else {
+      _props.frame = 0;
     }
-
-    _props.frame = 0;
   }
 
   _props.position.set(

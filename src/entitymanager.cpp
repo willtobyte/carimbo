@@ -45,6 +45,9 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
     const auto hitbox = a.contains("hitbox")
                             ? std::make_optional(a["hitbox"].template get<geometry::rect>())
                             : std::nullopt;
+    std::optional<std::string> next = a.contains("next")
+                                          ? std::make_optional(a["next"].get<std::string>())
+                                          : std::nullopt;
 
     const auto &f = a["frames"];
     std::vector<graphics::keyframe> keyframes(f.size());
@@ -56,7 +59,7 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       };
     });
 
-    animations.emplace(key, graphics::animation{oneshot, hitbox, keyframes});
+    animations.emplace(key, graphics::animation{next, oneshot, hitbox, keyframes});
   }
 
   entityprops props{

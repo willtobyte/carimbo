@@ -13,6 +13,7 @@ struct keyframe {
 };
 
 struct animation {
+  std::optional<std::string> next;
   bool oneshot{false};
   std::optional<geometry::rect> hitbox;
   std::vector<keyframe> keyframes;
