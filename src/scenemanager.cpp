@@ -40,8 +40,8 @@ void scenemanager::set(const std::string &name) noexcept {
         const auto &data = item.value();
         const auto &kind = data["kind"].template get_ref<const std::string &>();
         const auto &action = data["action"].template get_ref<const std::string &>();
-        const auto x = data["x"].template get<int32_t>();
-        const auto y = data["y"].template get<int32_t>();
+        const auto x = data.value("x", 0);
+        const auto y = data.value("y", 0);
 
         auto e = _entitymanager->spawn(kind);
         e->set_placement(x, y);
