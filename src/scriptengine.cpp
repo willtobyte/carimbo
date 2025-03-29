@@ -184,7 +184,7 @@ void framework::scriptengine::run() {
 
     void set(const std::string &value) { e.set_action(value); }
 
-    std::string get() const { return e.get_action(); }
+    std::string get() const { return e.action(); }
 
     void unset() { e.unset_action(); }
   };
@@ -255,7 +255,7 @@ void framework::scriptengine::run() {
       "id", sol::property(&framework::entity::id),
       "x", sol::property(&framework::entity::x),
       "y", sol::property(&framework::entity::y),
-      "visible", sol::property(&framework::entity::visible),
+      "hide", &framework::entity::hide,
       "move", &framework::entity::move,
       "on_update", &framework::entity::set_onupdate,
       "on_animationfinished", &framework::entity::set_onanimationfinished,

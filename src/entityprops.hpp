@@ -15,7 +15,6 @@ struct entityprops {
   uint32_t last_frame{};
   double_t angle{};
   uint8_t alpha{255};
-  bool visible{true};
   geometry::point position{};
   float_t scale{1.f};
   algebra::vector2d velocity{};

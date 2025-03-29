@@ -65,7 +65,6 @@ std::shared_ptr<entity> entitymanager::spawn(const std::string &kind) {
       SDL_GetTicks(),
       0.,
       255,
-      true,
       {},
       scale,
       {},

@@ -63,7 +63,7 @@ void entity::update(float_t delta) noexcept {
     fn(shared_from_this());
   }
 
-  if (_props.action.empty() || !_props.visible) {
+  if (_props.action.empty()) {
     _props.position.set(
         static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
         static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
@@ -106,7 +106,7 @@ void entity::update(float_t delta) noexcept {
 }
 
 void entity::draw() const noexcept {
-  if (_props.action.empty() || !_props.visible) {
+  if (_props.action.empty()) [[unlikely]] {
     return;
   }
 
@@ -142,6 +142,10 @@ void entity::draw() const noexcept {
 
 void entity::set_props(const entityprops &props) noexcept {
   _props = props;
+}
+
+void entity::hide() noexcept {
+  unset_action();
 }
 
 void entity::set_placement(int32_t x, int32_t y) noexcept {
@@ -188,10 +192,6 @@ void entity::set_action(const std::string &action) noexcept {
   }
 }
 
-std::string entity::get_action() const noexcept {
-  return _props.action;
-}
-
 void entity::unset_action() noexcept {
   _props.action.clear();
   _props.frame = 0;
@@ -200,10 +200,6 @@ void entity::unset_action() noexcept {
 
 std::string entity::action() const noexcept {
   return _props.action;
-}
-
-bool entity::visible() const noexcept {
-  return _props.visible;
 }
 
 bool entity::intersects(const std::shared_ptr<entity> other) const noexcept {

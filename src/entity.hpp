@@ -28,6 +28,8 @@ public:
   const entityprops &props() const noexcept;
   void set_props(const entityprops &props) noexcept;
 
+  void hide() noexcept;
+
   geometry::point position() const noexcept;
   int32_t x() const noexcept;
   int32_t y() const noexcept;
@@ -47,12 +49,10 @@ public:
   void set_onntick(uint64_t n, std::function<void(std::shared_ptr<entity>)> fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
-  void set_action(const std::string &action) noexcept;
-  std::string get_action() const noexcept;
-  void unset_action() noexcept;
 
+  void set_action(const std::string &action) noexcept;
+  void unset_action() noexcept;
   std::string action() const noexcept;
-  bool visible() const noexcept;
 
   bool intersects(std::shared_ptr<entity> other) const noexcept;
 
