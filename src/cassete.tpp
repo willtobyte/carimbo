@@ -11,14 +11,14 @@ void cassete::set(const std::string &key, const T &value) {
 }
 
 template<typename T>
-std::optional<T> cassete::get(const std::string &key) const {
+T cassete::get(const std::string &key, const T &default_value) const {
   if (!_j.contains(key)) {
-    return std::nullopt;
+    return default_value;
   }
 
   try {
     return _j.at(key).get<T>();
-  } catch (const nlohmann::json::exception &e) {
-    return std::nullopt;
+  } catch (const nlohmann::json::exception &) {
+    return default_value;
   }
 }

@@ -425,19 +425,16 @@ void framework::scriptengine::run() {
           c.set<std::string>(key, object.as<std::string>());
         else if (object.is<sol::table>()) {
           sol::table table = object.as<sol::table>();
-          // Lambda inline para converter sol::table em nlohmann::json
-          // recursivamente
-          std::function<nlohmann::json(sol::table)> tableToJson =
-              [&](sol::table tbl) -> nlohmann::json {
+          std::function<nlohmann::json(sol::table)> table2json = [&](sol::table tbl) -> nlohmann::json {
             nlohmann::json tmp;
-            bool isArray = true;
+            bool is_array = true;
             for (auto &pair : tbl) {
               if (!pair.first.is<int>()) {
-                isArray = false;
+                is_array = false;
                 break;
               }
             }
-            if (isArray) {
+            if (is_array) {
               tmp = nlohmann::json::array();
               for (size_t i = 1, n = tbl.size(); i <= n; ++i) {
                 sol::optional<sol::object> opt = tbl[i];
@@ -452,7 +449,7 @@ void framework::scriptengine::run() {
                   else if (obj.is<std::string>())
                     tmp.push_back(obj.as<std::string>());
                   else if (obj.is<sol::table>())
-                    tmp.push_back(tableToJson(obj.as<sol::table>()));
+                    tmp.push_back(table2json(obj.as<sol::table>()));
                   else
                     tmp.push_back(nullptr);
                 } else {
@@ -462,56 +459,51 @@ void framework::scriptengine::run() {
             } else {
               tmp = nlohmann::json::object();
               for (auto &pair : tbl) {
-                sol::object keyObj = pair.first;
-                sol::object valueObj = pair.second;
+                sol::object keyo = pair.first;
+                sol::object valueo = pair.second;
                 std::string k;
-                if (keyObj.is<std::string>())
-                  k = keyObj.as<std::string>();
-                else if (keyObj.is<int>())
-                  k = std::to_string(keyObj.as<int>());
+                if (keyo.is<std::string>())
+                  k = keyo.as<std::string>();
+                else if (keyo.is<int>())
+                  k = std::to_string(keyo.as<int>());
                 else
                   continue;
-                if (valueObj.is<int>())
-                  tmp[k] = valueObj.as<int>();
-                else if (valueObj.is<double>())
-                  tmp[k] = valueObj.as<double>();
-                else if (valueObj.is<bool>())
-                  tmp[k] = valueObj.as<bool>();
-                else if (valueObj.is<std::string>())
-                  tmp[k] = valueObj.as<std::string>();
-                else if (valueObj.is<sol::table>())
-                  tmp[k] = tableToJson(valueObj.as<sol::table>());
+                if (valueo.is<int>())
+                  tmp[k] = valueo.as<int>();
+                else if (valueo.is<double>())
+                  tmp[k] = valueo.as<double>();
+                else if (valueo.is<bool>())
+                  tmp[k] = valueo.as<bool>();
+                else if (valueo.is<std::string>())
+                  tmp[k] = valueo.as<std::string>();
+                else if (valueo.is<sol::table>())
+                  tmp[k] = table2json(valueo.as<sol::table>());
                 else
                   tmp[k] = nullptr;
               }
             }
             return tmp;
           };
-          nlohmann::json j = tableToJson(table);
+          nlohmann::json j = table2json(table);
           c.set<nlohmann::json>(key, j);
         } else
           throw std::runtime_error("Unsupported type for set"); },
-      "get", [](const storage::cassete &c, const std::string &key, sol::this_state ts) -> sol::object {
-        auto opt = c.get<nlohmann::json>(key);
+      "get", [](const storage::cassete &c, const std::string &key, sol::object default_value, sol::this_state ts) -> sol::object {
         sol::state_view lua(ts);
-        if (!opt.has_value()) {
-          return sol::lua_nil;
-        }
-        const nlohmann::json &j = opt.value();
-        // Lambda inline para converter nlohmann::json em sol::object
-        // recursivamente
-        std::function<sol::object(const nlohmann::json &)> jsonToLua =
+        const nlohmann::json j = c.get<nlohmann::json>(key, _to_json(default_value));
+
+        std::function<sol::object(const nlohmann::json &)> json2lua =
             [&](const nlohmann::json &js) -> sol::object {
           if (js.is_object()) {
             sol::table tbl = lua.create_table();
             for (auto it = js.begin(); it != js.end(); ++it)
-              tbl[it.key()] = jsonToLua(it.value());
+              tbl[it.key()] = json2lua(it.value());
             return sol::make_object(lua, tbl);
           } else if (js.is_array()) {
             sol::table tbl = lua.create_table();
             int index = 1;
             for (const auto &item : js)
-              tbl[index++] = jsonToLua(item);
+              tbl[index++] = json2lua(item);
             return sol::make_object(lua, tbl);
           } else if (js.is_number_integer())
             return sol::make_object(lua, js.get<int>());
@@ -523,7 +515,7 @@ void framework::scriptengine::run() {
             return sol::make_object(lua, js.get<std::string>());
           return sol::lua_nil;
         };
-        return jsonToLua(j); },
+        return json2lua(j); },
       "clear", &storage::cassete::clear
   );
 

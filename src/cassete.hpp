@@ -11,7 +11,7 @@ public:
   void set(const std::string &key, const T &value);
 
   template <typename T>
-  std::optional<T> get(const std::string &key) const;
+  T get(const std::string &key, const T &default_value) const;
 
   void clear(const std::string &key);
 
