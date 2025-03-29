@@ -38,12 +38,12 @@ timermanager::~timermanager() noexcept {
   _timers.clear();
 }
 
-void timermanager::set(int32_t interval, std::function<void()> fn) {
-  add_timer(interval, fn, true);
+int32_t timermanager::set(int32_t interval, std::function<void()> fn) {
+  return add_timer(interval, fn, true);
 }
 
-void timermanager::singleshot(int32_t interval, std::function<void()> fn) {
-  add_timer(interval, fn, false);
+int32_t timermanager::singleshot(int32_t interval, std::function<void()> fn) {
+  return add_timer(interval, fn, false);
 }
 
 void timermanager::clear(int32_t id) noexcept {
@@ -53,11 +53,13 @@ void timermanager::clear(int32_t id) noexcept {
   }
 }
 
-void timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
+int32_t timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
   const auto ptr = new std::function<void()>(fn);
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
-  if (!id) [[unlikely]] {
-    delete ptr;
-    throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
+  if (id) [[likely]] {
+    return id;
   }
+
+  delete ptr;
+  throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
 }
