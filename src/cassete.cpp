@@ -16,22 +16,33 @@ cassete::cassete() {
   const auto start = position + length;
   const auto end = cookie.find(';', start);
   const auto value = cookie.substr(start, (end == std::string::npos ? cookie.size() - start : end - start));
-  try {
+
+  if (nlohmann::json::accept(value)) {
     _j = nlohmann::json::parse(value);
-  } catch (...) {
-    _j = nlohmann::json::object();
+    return;
   }
+
+  _j = nlohmann::json::object();
+  const auto script = fmt::format("document.cookie = '{}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'", _cookiekey);
+  emscripten_run_script(script.c_str());
 #else
   if (!std::filesystem::exists(_filename)) {
     _j = nlohmann::json::object();
     return;
   }
+
   std::ifstream file(_filename);
-  if (file >> _j) {
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  const auto content = buffer.str();
+
+  if (nlohmann::json::accept(content)) {
+    _j = nlohmann::json::parse(content);
     return;
   }
 
   _j = nlohmann::json::object();
+  std::filesystem::remove(_filename);
 #endif
 }
 
