@@ -8,7 +8,9 @@ scene::scene(std::shared_ptr<graphics::pixmap> background, std::unordered_map<st
       _size(std::move(size)) {}
 
 void scene::update(float_t delta) noexcept {
-  UNUSED(delta);
+  if (const auto fn = _onloop; fn) {
+    fn(delta);
+  }
 }
 
 void scene::draw() const noexcept {
@@ -18,4 +20,32 @@ void scene::draw() const noexcept {
   for (const auto &o : _objects) {
     o.second->draw();
   }
+}
+
+std::shared_ptr<object> scene::get(const std::string &name) noexcept {
+  return _objects[name];
+}
+
+void scene::on_enter() noexcept {
+  if (const auto fn = _onenter; fn) {
+    fn();
+  }
+}
+
+void scene::on_leave() noexcept {
+  if (const auto fn = _onleave; fn) {
+    fn();
+  }
+}
+
+void scene::set_onenter(std::function<void()> fn) noexcept {
+  _onenter = std::move(fn);
+}
+
+void scene::set_onloop(std::function<void(float_t)> fn) noexcept {
+  _onloop = std::move(fn);
+}
+
+void scene::set_onleave(std::function<void()> fn) noexcept {
+  _onleave = std::move(fn);
 }

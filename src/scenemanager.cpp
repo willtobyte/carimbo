@@ -5,7 +5,7 @@ using namespace framework;
 scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager) noexcept
     : _pixmappool(resourcemanager->pixmappool()), _objectmanager(std::move(objectmanager)) {}
 
-void scenemanager::load(const std::string &name) noexcept {
+std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
   const auto buffer = storage::io::read("scenes/" + name + ".json");
   const auto j = nlohmann::json::parse(buffer);
 
@@ -30,68 +30,34 @@ void scenemanager::load(const std::string &name) noexcept {
         auto e = _objectmanager->create(kind);
         e->set_placement(x, y);
         e->set_action(action);
+
         return {key, e};
       }
   );
 
-  _scene_mapping[name] = std::make_shared<scene>(background, objects, size);
+  const auto s = std::make_shared<scene>(background, objects, size);
+  _scene_mapping[name] = s;
+  return s;
 }
 
 void scenemanager::set(const std::string &name) noexcept {
-  // if (auto it = _onleave_mapping.find(_current_scene); it != _onleave_mapping.end()) {
-  //   it->second();
-  // }
+  if (!_current_scene.empty()) {
+    _scene_mapping[_current_scene]->on_leave();
+  }
 
   _current_scene = name;
 
-  // _background.reset();
+  _scene_mapping[_current_scene]->on_enter();
+}
 
-  // const auto old = std::exchange(_objects, {});
-  // for (const auto &pair : old) {
-  //   _objectmanager->destroy(pair.second);
-  // }
-
-  // if (auto it = _onenter_mapping.find(name); it != _onenter_mapping.end()) {
-  //   it->second();
-  // }
+std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept {
+  return _scene_mapping.at(name);
 }
 
 void scenemanager::update(float_t delta) noexcept {
-  UNUSED(delta);
-  // if (auto it = _onloop_mapping.find(_current_scene); it != _onloop_mapping.end()) {
-  //   it->second(delta);
-  // }
+  _scene_mapping[_current_scene]->update(delta);
 }
 
 void scenemanager::draw() const noexcept {
-  // if (!_background) [[unlikely]] {
-  //   return;
-  // }
-
-  // static geometry::point point{0, 0};
-  // _background->draw({point, _size}, {point, _size});
-  //
   _scene_mapping.at(_current_scene)->draw();
-}
-
-// std::shared_ptr<object> scenemanager::grab(const std::string &name, const std::string &key) const noexcept {
-//   UNUSED(name);
-//   UNUSED(key);
-//   // if (const auto it = _objects.find(key); it != _objects.end()) {
-//   //   return it->second;
-//   // }
-
-//   // return nullptr;
-// }
-
-void scenemanager::set_onenter(std::string name, std::function<void()> fn) {
-  _onenter_mapping.insert_or_assign(std::move(name), std::move(fn));
-}
-
-void scenemanager::set_onloop(std::string name, std::function<void(float_t)> fn) {
-  _onloop_mapping.insert_or_assign(std::move(name), std::move(fn));
-}
-
-void scenemanager::set_onleave(std::string name, std::function<void()> fn) {
-  _onleave_mapping.insert_or_assign(std::move(name), std::move(fn));
 }
