@@ -331,26 +331,26 @@ void framework::scriptengine::run() {
       "SceneManager",
       sol::no_constructor,
       "register", [&lua](framework::scenemanager &manager, const std::string &name) {
+        const auto scene = manager.load(name);
+
         const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
         std::string script(buffer.begin(), buffer.end());
         const auto module = lua.script(script).get<sol::table>();
 
         if (module["on_enter"].valid()) {
           sol::function fn = module["on_enter"];
-          manager.set_onenter(name, fn.as<std::function<void()>>());
+          scene.set_onenter(fn.as<std::function<void()>>());
         }
 
         if (module["on_loop"].valid()) {
           sol::function fn = module["on_loop"];
-          manager.set_onloop(name, fn.as<std::function<void(float_t)>>());
+          scene.set_onloop(fn.as<std::function<void(float_t)>>());
         }
 
         if (module["on_leave"].valid()) {
           sol::function fn = module["on_leave"];
-          manager.set_onleave(name, fn.as<std::function<void()>>());
+          scene.set_onleave(fn.as<std::function<void()>>());
         }
-
-        manager.load(name);
       },
       "set", &framework::scenemanager::set
       // "grab", &framework::scenemanager::grab
