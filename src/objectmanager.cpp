@@ -1,6 +1,4 @@
 #include "objectmanager.hpp"
-#include "common.hpp"
-#include "objectprops.hpp"
 
 using namespace framework;
 
@@ -78,10 +76,10 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind) {
       animations,
   };
 
-  auto e = object::create(props);
-  fmt::println("[objectmanager] created {} {}", kind, e->id());
-  _objects.emplace_back(e);
-  return e;
+  auto o = std::make_shared<object>(props);
+  fmt::println("[objectmanager] created {} {}", kind, o->id());
+  _objects.emplace_back(o);
+  return o;
 }
 
 std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noexcept {
@@ -100,13 +98,13 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noe
   props.action = {};
   props.reflection = {graphics::reflection::none};
 
-  const auto e = object::create(props);
+  const auto o = std::make_shared<object>(props);
 
-  _objects.emplace_back(e);
+  _objects.emplace_back(o);
 
-  fmt::println("[objectmanager] clone {} from {}", matrix->id(), e->id());
+  fmt::println("[objectmanager] clone {} from {}", matrix->id(), o->id());
 
-  return e;
+  return o;
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) noexcept {

@@ -14,8 +14,6 @@ public:
   explicit object(const objectprops &props) noexcept;
   ~object() noexcept;
 
-  static std::shared_ptr<object> create(const objectprops &props);
-
   uint64_t id() const noexcept;
   void set_id(uint64_t id) noexcept;
 

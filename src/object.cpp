@@ -9,10 +9,6 @@ object::~object() noexcept {
   fmt::println("[object] destroyed {} {}", kind(), id());
 }
 
-std::shared_ptr<object> object::create(const objectprops &props) {
-  return std::make_shared<object>(props);
-}
-
 uint64_t object::id() const noexcept {
   return _props.id;
 }
