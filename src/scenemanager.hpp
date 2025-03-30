@@ -15,9 +15,9 @@ public:
 
   std::shared_ptr<object> grab(const std::string &key) const noexcept;
 
-  void set_onenter(const std::string &name, std::function<void()> fn);
-  void set_onloop(const std::string &name, std::function<void(float_t)> fn);
-  void set_onleave(const std::string &name, std::function<void()> fn);
+  void set_onenter(std::string name, std::function<void()> fn);
+  void set_onloop(std::string name, std::function<void(float_t)> fn);
+  void set_onleave(std::string name, std::function<void()> fn);
 
 private:
   std::shared_ptr<graphics::pixmappool> _pixmappool;

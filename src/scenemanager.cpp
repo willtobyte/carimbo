@@ -76,14 +76,14 @@ std::shared_ptr<object> scenemanager::grab(const std::string &key) const noexcep
   return nullptr;
 }
 
-void scenemanager::set_onenter(const std::string &name, std::function<void()> fn) {
-  _onenter_mapping[name] = std::move(fn);
+void scenemanager::set_onenter(std::string name, std::function<void()> fn) {
+  _onenter_mapping.insert_or_assign(std::move(name), std::move(fn));
 }
 
-void scenemanager::set_onloop(const std::string &name, std::function<void(float_t)> fn) {
-  _onloop_mapping[name] = std::move(fn);
+void scenemanager::set_onloop(std::string name, std::function<void(float_t)> fn) {
+  _onloop_mapping.insert_or_assign(std::move(name), std::move(fn));
 }
 
-void scenemanager::set_onleave(const std::string &name, std::function<void()> fn) {
-  _onleave_mapping[name] = std::move(fn);
+void scenemanager::set_onleave(std::string name, std::function<void()> fn) {
+  _onleave_mapping.insert_or_assign(std::move(name), std::move(fn));
 }

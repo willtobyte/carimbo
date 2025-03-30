@@ -328,11 +328,29 @@ void framework::scriptengine::run() {
   );
 
   lua.new_usertype<framework::scenemanager>(
-      "SceneManager", sol::no_constructor, "set", &framework::scenemanager::set,
-      "grab", &framework::scenemanager::grab,
-      "on_leave", &framework::scenemanager::set_onleave,
-      "on_loop", &framework::scenemanager::set_onloop,
-      "on_enter", &framework::scenemanager::set_onenter
+      "SceneManager",
+      sol::no_constructor,
+      "register", [&lua](framework::scenemanager &manager, const std::string &name) {
+        const auto module = require(lua, fmt::format("scenes/{}", name));
+
+        if (module["on_enter"].valid()) {
+          sol::function fn = module["on_enter"];
+          manager.set_onenter(name, fn.as<std::function<void()>>());
+        }
+
+        if (module["on_loop"].valid()) {
+          sol::function fn = module["on_loop"];
+          manager.set_onloop(name, fn.as<std::function<void(float_t)>>());
+        }
+
+        if (module["on_leave"].valid()) {
+          sol::function fn = module["on_leave"];
+          manager.set_onleave(name, fn.as<std::function<void()>>());
+        }
+
+        // stm.load();
+      },
+      "set", &framework::scenemanager::set, "grab", &framework::scenemanager::grab
   );
 
   lua.new_enum(
