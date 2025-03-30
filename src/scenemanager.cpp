@@ -7,10 +7,8 @@ scenemanager::scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std
     : _pixmappool(std::move(pixmappool)), _objectmanager(std::move(objectmanager)) {}
 
 void scenemanager::set(const std::string &name) noexcept {
-  if (!_current_scene.empty()) {
-    if (auto it = _onleave_mapping.find(_current_scene); it != _onleave_mapping.end()) {
-      it->second();
-    }
+  if (auto it = _onleave_mapping.find(_current_scene); it != _onleave_mapping.end()) {
+    it->second();
   }
 
   _current_scene = name;
@@ -56,10 +54,6 @@ void scenemanager::set(const std::string &name) noexcept {
 }
 
 void scenemanager::update(float_t delta) noexcept {
-  if (_current_scene.empty()) [[unlikely]] {
-    return;
-  }
-
   if (auto it = _onloop_mapping.find(_current_scene); it != _onloop_mapping.end()) {
     it->second(delta);
   }
