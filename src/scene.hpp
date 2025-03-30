@@ -13,7 +13,7 @@ public:
 
   void draw() const noexcept;
 
-  std::shared_ptr<object> get(const std::string &name) noexcept;
+  std::shared_ptr<object> get(const std::string &name) const noexcept;
 
   void on_enter() noexcept;
   void on_leave() noexcept;

@@ -22,8 +22,8 @@ void scene::draw() const noexcept {
   }
 }
 
-std::shared_ptr<object> scene::get(const std::string &name) noexcept {
-  return _objects[name];
+std::shared_ptr<object> scene::get(const std::string &name) const noexcept {
+  return _objects.at(name);
 }
 
 void scene::on_enter() noexcept {
