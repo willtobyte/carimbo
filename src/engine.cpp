@@ -68,6 +68,10 @@ std::shared_ptr<storage::cassete> engine::cassete() const noexcept {
   return _cassete;
 }
 
+std::shared_ptr<framework::timermanager> engine::timermanager() const noexcept {
+  return _timermanager;
+}
+
 int32_t engine::height() const noexcept {
   return _window->height();
 }

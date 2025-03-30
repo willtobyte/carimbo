@@ -7,7 +7,6 @@
 #include "point.hpp"
 #include "vector2d.hpp"
 #include "widget.hpp"
-#include <sol/raii.hpp>
 
 sol::table require(sol::state &lua, const std::string &module) {
   const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
@@ -398,6 +397,7 @@ void framework::scriptengine::run() {
       "soundmanager", &framework::engine::soundmanager,
       "statemanager", &framework::engine::statemanager,
       "scenemanager", &framework::engine::scenemanager,
+      "timermanager", &framework::engine::timermanager,
       "run", &framework::engine::run
   );
 
@@ -610,7 +610,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::timermanager>(
       "TimerManager",
-      sol::constructors<framework::timermanager()>(),
+      sol::no_constructor,
       "set", &framework::timermanager::set,
       "singleshot", &framework::timermanager::singleshot,
       "clear", &framework::timermanager::clear
