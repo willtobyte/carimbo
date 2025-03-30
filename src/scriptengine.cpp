@@ -332,7 +332,7 @@ void framework::scriptengine::run() {
       sol::no_constructor,
       "set", &framework::scenemanager::set,
       "register", [&lua](framework::scenemanager &manager, const std::string &name) {
-        const auto scene = manager.load(name);
+        manager.load(name);
 
         const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
         std::string script(buffer.begin(), buffer.end());
@@ -344,17 +344,17 @@ void framework::scriptengine::run() {
 
         if (module["on_enter"].valid()) {
           sol::function fn = module["on_enter"];
-          scene->set_onenter(fn.as<std::function<void()>>());
+          manager.get(name)->set_onenter(fn.as<std::function<void()>>());
         }
 
         if (module["on_loop"].valid()) {
           sol::function fn = module["on_loop"];
-          scene->set_onloop(fn.as<std::function<void(float_t)>>());
+          manager.get(name)->set_onloop(fn.as<std::function<void(float_t)>>());
         }
 
         if (module["on_leave"].valid()) {
           sol::function fn = module["on_leave"];
-          scene->set_onleave(fn.as<std::function<void()>>());
+          manager.get(name)->set_onleave(fn.as<std::function<void()>>());
         }
       }
   );
