@@ -56,7 +56,13 @@ void scenemanager::set(const std::string &name) noexcept {
 }
 
 void scenemanager::update(float_t delta) noexcept {
-  UNUSED(delta);
+  if (_current_scene.empty()) [[unlikely]] {
+    return;
+  }
+
+  if (auto it = _onloop_mapping.find(_current_scene); it != _onloop_mapping.end()) {
+    it->second(delta);
+  }
 }
 
 void scenemanager::draw() const noexcept {
@@ -78,6 +84,10 @@ std::shared_ptr<object> scenemanager::grab(const std::string &key) const noexcep
 
 void scenemanager::set_onenter(const std::string &name, std::function<void()> fn) {
   _onenter_mapping[name] = std::move(fn);
+}
+
+void scenemanager::set_onloop(const std::string &name, std::function<void(float_t)> fn) {
+  _onloop_mapping[name] = std::move(fn);
 }
 
 void scenemanager::set_onleave(const std::string &name, std::function<void()> fn) {

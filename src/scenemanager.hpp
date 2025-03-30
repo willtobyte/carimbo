@@ -16,6 +16,7 @@ public:
   std::shared_ptr<object> grab(const std::string &key) const noexcept;
 
   void set_onenter(const std::string &name, std::function<void()> fn);
+  void set_onloop(const std::string &name, std::function<void(float_t)> fn);
   void set_onleave(const std::string &name, std::function<void()> fn);
 
 private:
@@ -24,6 +25,7 @@ private:
   std::unordered_map<std::string, std::shared_ptr<object>> _objects;
   std::shared_ptr<graphics::pixmap> _background;
   std::unordered_map<std::string, std::function<void()>> _onenter_mapping;
+  std::unordered_map<std::string, std::function<void(float_t)>> _onloop_mapping;
   std::unordered_map<std::string, std::function<void()>> _onleave_mapping;
   geometry::size _size;
   std::string _current_scene{};

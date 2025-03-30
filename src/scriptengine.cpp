@@ -331,6 +331,7 @@ void framework::scriptengine::run() {
       "SceneManager", sol::no_constructor, "set", &framework::scenemanager::set,
       "grab", &framework::scenemanager::grab,
       "on_leave", &framework::scenemanager::set_onleave,
+      "on_loop", &framework::scenemanager::set_onloop,
       "on_enter", &framework::scenemanager::set_onenter
   );
 
