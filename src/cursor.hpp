@@ -10,7 +10,7 @@
 
 namespace graphics {
 namespace {
-constexpr auto ACTION_IDLE = "idle";
+constexpr auto ACTION_DEFAULT = "default";
 constexpr auto ACTION_LEFT = "left";
 constexpr auto ACTION_RIGHT = "right";
 }
@@ -32,7 +32,7 @@ public:
 
 private:
   geometry::point _position{0, 0};
-  std::string _action{ACTION_IDLE};
+  std::string _action{ACTION_DEFAULT};
   uint64_t _frame{0};
   uint64_t _last_frame{0};
   geometry::point _point{};

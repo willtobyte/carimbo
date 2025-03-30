@@ -72,7 +72,7 @@ void cursor::update(float_t) noexcept {
   _last_frame = now;
 
   if (animation.oneshot && (_frame + 1 >= animation.keyframes.size())) {
-    _action = std::exchange(_queued_action, std::nullopt).value_or(ACTION_IDLE);
+    _action = std::exchange(_queued_action, std::nullopt).value_or(ACTION_DEFAULT);
     _frame = 0;
     return;
   }
