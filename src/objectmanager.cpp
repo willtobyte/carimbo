@@ -22,7 +22,7 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager) n
     : _resourcemanager(resourcemanager) {
 }
 
-std::shared_ptr<object> objectmanager::spawn(const std::string &kind) {
+std::shared_ptr<object> objectmanager::create(const std::string &kind) {
   _dirty = true;
 
   if (const auto it = std::ranges::find_if(_objects, [&kind](const auto &o) { return o->kind() == kind; }); it != _objects.end()) {
@@ -79,7 +79,7 @@ std::shared_ptr<object> objectmanager::spawn(const std::string &kind) {
   };
 
   auto e = object::create(props);
-  fmt::println("[objectmanager] spawn {} {}", kind, e->id());
+  fmt::println("[objectmanager] created {} {}", kind, e->id());
   _objects.emplace_back(e);
   return e;
 }

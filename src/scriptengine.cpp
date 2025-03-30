@@ -272,7 +272,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::objectmanager>(
       "ObjectManager",
-      "spawn", &framework::objectmanager::spawn,
+      "create", &framework::objectmanager::create,
       "clone", &framework::objectmanager::clone,
       "destroy", &framework::objectmanager::destroy
   );

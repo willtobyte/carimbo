@@ -10,7 +10,7 @@ public:
   explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
   ~objectmanager() = default;
 
-  std::shared_ptr<object> spawn(const std::string &kind);
+  std::shared_ptr<object> create(const std::string &kind);
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix) noexcept;
 

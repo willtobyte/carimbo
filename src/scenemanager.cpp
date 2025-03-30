@@ -43,7 +43,7 @@ void scenemanager::set(const std::string &name) noexcept {
         const auto x = data.value("x", 0);
         const auto y = data.value("y", 0);
 
-        auto e = _objectmanager->spawn(kind);
+        auto e = _objectmanager->create(kind);
         e->set_placement(x, y);
         e->set_action(action);
         return {key, e};
