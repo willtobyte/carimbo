@@ -55,7 +55,7 @@ std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept
 }
 
 void scenemanager::update(float_t delta) noexcept {
-  _scene_mapping[_current_scene]->update(delta);
+  _scene_mapping.at(_current_scene)->update(delta);
 }
 
 void scenemanager::draw() const noexcept {
