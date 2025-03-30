@@ -585,7 +585,7 @@ void framework::scriptengine::run() {
   );
 
   lua.new_usertype<framework::timermanager>(
-      "TimeManager",
+      "TimerManager",
       sol::constructors<framework::timermanager()>(),
       "set", &framework::timermanager::set,
       "singleshot", &framework::timermanager::singleshot,
