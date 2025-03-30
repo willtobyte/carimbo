@@ -24,9 +24,6 @@ public:
 private:
   std::shared_ptr<graphics::pixmappool> _pixmappool;
   std::shared_ptr<objectmanager> _objectmanager;
-  // std::unordered_map<std::string, std::shared_ptr<object>> _objects;
-  // std::shared_ptr<graphics::pixmap> _background;
-  // geometry::size _size;
   std::unordered_map<std::string, std::shared_ptr<scene>> _scene_mapping;
   std::string _current_scene{};
 };
