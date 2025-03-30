@@ -10,7 +10,7 @@
 
 sol::table require(sol::state &lua, const std::string &module) {
   const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
-  std::string script(buffer.begin(), buffer.end());
+  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   return lua.script(script).get<sol::table>();
 }
 
@@ -334,7 +334,7 @@ void framework::scriptengine::run() {
         manager.load(name);
 
         const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
-        std::string script(buffer.begin(), buffer.end());
+        std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
         sol::table module = lua.script(script).get<sol::table>();
 
         module["get"] = [name, &manager](sol::table, const std::string &object) {
