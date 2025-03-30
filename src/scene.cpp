@@ -7,6 +7,11 @@ scene::scene(std::shared_ptr<graphics::pixmap> background, std::unordered_map<st
       _objects(std::move(objects)),
       _size(std::move(size)) {}
 
+scene::~scene() noexcept {
+  _background.reset();
+  _objects.clear();
+}
+
 void scene::update(float_t delta) noexcept {
   if (const auto fn = _onloop; fn) {
     fn(delta);

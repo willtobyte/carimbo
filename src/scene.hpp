@@ -7,7 +7,7 @@ class scene {
 public:
   scene() = delete;
   scene(std::shared_ptr<graphics::pixmap> background, std::unordered_map<std::string, std::shared_ptr<object>> objects, geometry::size size) noexcept;
-  ~scene() noexcept = default;
+  ~scene() noexcept;
 
   void update(float_t delta) noexcept;
 
