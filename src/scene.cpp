@@ -2,14 +2,19 @@
 
 using namespace framework;
 
-scene::scene(std::shared_ptr<graphics::pixmap> background, std::unordered_map<std::string, std::shared_ptr<object>> objects, geometry::size size) noexcept
-    : _background(std::move(background)),
+scene::scene(std::shared_ptr<objectmanager> objectmanager, std::shared_ptr<graphics::pixmap> background, std::unordered_map<std::string, std::shared_ptr<object>> objects, geometry::size size) noexcept
+    : _objectmanager(objectmanager),
+      _background(std::move(background)),
       _objects(std::move(objects)),
       _size(std::move(size)) {}
 
 scene::~scene() noexcept {
-  _background.reset();
+  for (const auto &o : _objects) {
+    _objectmanager->destroy(o.second);
+  }
+
   _objects.clear();
+  _background.reset();
 }
 
 void scene::update(float_t delta) noexcept {

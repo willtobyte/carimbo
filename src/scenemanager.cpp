@@ -35,7 +35,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
       }
   );
 
-  const auto s = std::make_shared<scene>(background, objects, size);
+  const auto s = std::make_shared<scene>(_objectmanager, background, objects, size);
   _scene_mapping[name] = s;
   return s;
 }
