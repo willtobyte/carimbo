@@ -9,11 +9,12 @@ scene::scene(std::shared_ptr<objectmanager> objectmanager, std::shared_ptr<graph
       _size(std::move(size)) {}
 
 scene::~scene() noexcept {
-  for (const auto &o : _objects) {
-    _objectmanager->destroy(o.second);
+  const auto objects = std::exchange(_objects, {});
+
+  for (const auto &[key, obj] : objects) {
+    _objectmanager->destroy(obj);
   }
 
-  _objects.clear();
   _background.reset();
 }
 
@@ -26,10 +27,6 @@ void scene::update(float_t delta) noexcept {
 void scene::draw() const noexcept {
   static geometry::point point{0, 0};
   _background->draw({point, _size}, {point, _size});
-
-  for (const auto &o : _objects) {
-    o.second->draw();
-  }
 }
 
 std::shared_ptr<object> scene::get(const std::string &name) const noexcept {
