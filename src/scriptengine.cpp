@@ -331,7 +331,9 @@ void framework::scriptengine::run() {
       "SceneManager",
       sol::no_constructor,
       "register", [&lua](framework::scenemanager &manager, const std::string &name) {
-        const auto module = require(lua, fmt::format("scenes/{}", name));
+        const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
+        std::string script(buffer.begin(), buffer.end());
+        const auto module = lua.script(script).get<sol::table>();
 
         if (module["on_enter"].valid()) {
           sol::function fn = module["on_enter"];
@@ -348,9 +350,10 @@ void framework::scriptengine::run() {
           manager.set_onleave(name, fn.as<std::function<void()>>());
         }
 
-        // stm.load();
+        manager.load(name);
       },
-      "set", &framework::scenemanager::set, "grab", &framework::scenemanager::grab
+      "set", &framework::scenemanager::set
+      // "grab", &framework::scenemanager::grab
   );
 
   lua.new_enum(

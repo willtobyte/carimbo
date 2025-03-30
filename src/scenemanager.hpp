@@ -2,10 +2,16 @@
 
 #include "common.hpp"
 
+#include "scene.hpp"
+
 namespace framework {
 class scenemanager {
 public:
-  explicit scenemanager(std::shared_ptr<graphics::pixmappool> pixmappool, std::shared_ptr<objectmanager> objectmanager) noexcept;
+  scenemanager() = delete;
+  scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager) noexcept;
+  ~scenemanager() noexcept = default;
+
+  void load(const std::string &name) noexcept;
 
   void set(const std::string &name) noexcept;
 
@@ -13,7 +19,7 @@ public:
 
   void draw() const noexcept;
 
-  std::shared_ptr<object> grab(const std::string &key) const noexcept;
+  // std::shared_ptr<object> grab(const std::string &name, const std::string &key) const noexcept;
 
   void set_onenter(std::string name, std::function<void()> fn);
   void set_onloop(std::string name, std::function<void(float_t)> fn);
@@ -22,12 +28,13 @@ public:
 private:
   std::shared_ptr<graphics::pixmappool> _pixmappool;
   std::shared_ptr<objectmanager> _objectmanager;
-  std::unordered_map<std::string, std::shared_ptr<object>> _objects;
-  std::shared_ptr<graphics::pixmap> _background;
+  // std::unordered_map<std::string, std::shared_ptr<object>> _objects;
+  // std::shared_ptr<graphics::pixmap> _background;
   std::unordered_map<std::string, std::function<void()>> _onenter_mapping;
   std::unordered_map<std::string, std::function<void(float_t)>> _onloop_mapping;
   std::unordered_map<std::string, std::function<void()>> _onleave_mapping;
-  geometry::size _size;
+  // geometry::size _size;
+  std::unordered_map<std::string, std::shared_ptr<scene>> _scene_mapping;
   std::string _current_scene{};
 };
 }
