@@ -44,7 +44,7 @@ public:
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
   void set_ontouch(std::function<void()> fn) noexcept;
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) noexcept;
-  void set_onntick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept;
+  void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
 
@@ -65,10 +65,11 @@ private:
 
   objectprops _props;
   memory::kv _kv;
+  uint64_t _tick_count{0};
+  std::function<void()> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onupdate;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onmail;
-  std::function<void()> _ontouch;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>> _collisionmapping;
   std::unordered_map<uint64_t, std::function<void(std::shared_ptr<object>)>> _tickinmapping;
 };

@@ -59,6 +59,13 @@ void object::update(float_t delta) noexcept {
     fn(shared_from_this());
   }
 
+  ++_tick_count;
+  for (const auto &[n, callback] : _tickinmapping) {
+    if (_tick_count % n == 0) {
+      callback(shared_from_this());
+    }
+  }
+
   if (_props.action.empty()) {
     _props.position.set(
         static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
@@ -177,7 +184,7 @@ void object::set_oncollision(const std::string &kind, std::function<void(std::sh
   _collisionmapping.emplace(kind, std::move(fn));
 }
 
-void object::set_onntick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept {
+void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept {
   _tickinmapping.emplace(n, std::move(fn));
 }
 

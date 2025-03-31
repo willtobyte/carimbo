@@ -261,7 +261,7 @@ void framework::scriptengine::run() {
       "on_mail", &framework::object::set_onmail,
       "on_touch", &framework::object::set_ontouch,
       "on_collision", &framework::object::set_oncollision,
-      "on_ntick", &framework::object::set_onntick,
+      "on_nthtick", &framework::object::set_onnthtick,
       "reflection", sol::property([](framework::object &e) -> reflectionproxy { return reflectionproxy{e}; }),
       "action", sol::property([](framework::object &e) -> actionproxy { return actionproxy{e}; }),
       "placement", sol::property([](framework::object &e) -> placementproxy { return placementproxy{e}; }),
