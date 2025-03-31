@@ -131,6 +131,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<audio::soundmanager>(
       "SoundManager",
+      sol::no_construction,
       "play", &audio::soundmanager::play,
       "stop", &audio::soundmanager::stop
   );
