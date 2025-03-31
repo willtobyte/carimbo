@@ -1,4 +1,5 @@
 #include "fontfactory.hpp"
+#include "deleters.hpp"
 
 using namespace graphics;
 
@@ -25,7 +26,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   geometry::size size;
   std::tie(output, size) = _load_png(j["spritesheet"].get_ref<const std::string &>());
 
-  auto surface = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>{
+  auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>{
       SDL_CreateRGBSurfaceWithFormatFrom(
           output.data(),
           size.width(),
@@ -34,7 +35,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
           size.width() * 4,
           SDL_PIXELFORMAT_ABGR8888
       ),
-      SDL_FreeSurface
+      SDL_Deleter{}
   };
 
   if (!surface) [[unlikely]] {

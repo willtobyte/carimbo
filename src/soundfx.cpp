@@ -24,8 +24,7 @@ static int ovPHYSFS_seek(void *source, ogg_int64_t offset, int whence) {
 }
 
 static int ovPHYSFS_close(void *source) {
-  PHYSFS_close(reinterpret_cast<PHYSFS_file *>(source));
-  return 0;
+  return PHYSFS_close(reinterpret_cast<PHYSFS_file *>(source)) ? 0 : -1;
 }
 
 static long ovPHYSFS_tell(void *source) {
@@ -80,6 +79,8 @@ soundfx::soundfx(const std::string &filename) {
   if (ov_open_callbacks(fp.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
     throw std::runtime_error("[ov_open_callbacks] error while opening file");
   }
+
+  [[maybe_unused]] auto *pointer = fp.release();
 
   const auto info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {

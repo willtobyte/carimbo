@@ -7,13 +7,11 @@
 #include "size.hpp"
 
 namespace graphics {
-typedef std::unique_ptr<SDL_Texture, SDL_Deleter> texture_ptr;
-
 class pixmap {
 public:
-  pixmap() = default;
+  pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
-  pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface);
+  pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface);
   ~pixmap() noexcept = default;
 
   void draw(
@@ -32,6 +30,6 @@ public:
 
 private:
   std::shared_ptr<renderer> _renderer;
-  texture_ptr _texture;
+  std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;
 };
 }

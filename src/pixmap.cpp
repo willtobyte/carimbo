@@ -8,34 +8,36 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
   geometry::size size;
   std::tie(output, size) = _load_png(filename);
 
-  std::unique_ptr<SDL_Surface, SDL_Deleter> surface{
-      SDL_CreateRGBSurfaceWithFormat(
-          0,
+  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTexture(
+          *_renderer,
+          SDL_PIXELFORMAT_ABGR8888,
+          SDL_TEXTUREACCESS_STATIC,
           size.width(),
-          size.height(),
-          0,
-          SDL_PIXELFORMAT_ABGR8888
+          size.height()
       ),
       SDL_Deleter{}
-  };
-  if (!surface) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormat] error while creating surface, file: {}, error: {}", filename, SDL_GetError()));
-  }
-
-  std::memcpy(surface->pixels, output.data(), output.size());
-
-  _texture = texture_ptr(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
+  );
   if (!_texture) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture from surface, file: {}", filename));
+    throw std::runtime_error(fmt::format("[SDL_CreateTexture] error creating texture, file: {}, error: {}", filename, SDL_GetError()));
   }
+
+  if (SDL_UpdateTexture(_texture.get(), nullptr, output.data(), size.width() * 4) != 0) [[unlikely]] {
+    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] error updating texture, file: {}, error: {}", filename, SDL_GetError()));
+  }
+
+  SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
 }
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)> surface)
+pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface)
     : _renderer(std::move(renderer)) {
-  _texture = texture_ptr(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
-  if (!_texture) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error while creating texture, SDL Error: {}", SDL_GetError()));
+  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
+
+  if (!_texture) {
+    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error creating texture from surface, error: {}", SDL_GetError()));
   }
+
+  SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
 }
 
 void pixmap::draw(
