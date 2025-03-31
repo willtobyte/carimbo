@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "size.hpp"
+
 namespace geometry {
 class point {
 public:

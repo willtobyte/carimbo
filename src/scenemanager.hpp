@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "objectmanager.hpp"
+#include "resourcemanager.hpp"
 #include "scene.hpp"
 
 namespace framework {

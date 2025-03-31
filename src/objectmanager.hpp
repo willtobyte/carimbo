@@ -1,8 +1,11 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "event.hpp"
 #include "eventreceiver.hpp"
+#include "object.hpp"
+#include "resourcemanager.hpp"
 
 namespace framework {
 class objectmanager : public input::eventreceiver {

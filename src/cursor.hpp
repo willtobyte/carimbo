@@ -2,10 +2,11 @@
 
 #include "common.hpp"
 
-#include "animation.hpp"
 #include "event.hpp"
 #include "eventreceiver.hpp"
-#include "pixmap.hpp"
+#include "point.hpp"
+#include "rect.hpp"
+#include "reflection.hpp"
 #include "resourcemanager.hpp"
 
 namespace graphics {
@@ -13,6 +14,19 @@ namespace {
 constexpr auto ACTION_DEFAULT = "default";
 constexpr auto ACTION_LEFT = "left";
 constexpr auto ACTION_RIGHT = "right";
+}
+
+namespace graphics {
+struct keyframe {
+  geometry::rect frame;
+  geometry::point offset;
+  uint64_t duration{0};
+};
+
+struct animation {
+  bool oneshot{false};
+  std::vector<keyframe> keyframes;
+};
 }
 
 class cursor : public input::eventreceiver {
@@ -37,7 +51,7 @@ private:
   uint64_t _last_frame{0};
   geometry::point _point{};
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
-  std::shared_ptr<graphics::pixmap> _spritesheet;
+  std::shared_ptr<pixmap> _spritesheet;
   std::unordered_map<std::string, graphics::animation> _animations;
   std::optional<std::string> _queued_action;
 };

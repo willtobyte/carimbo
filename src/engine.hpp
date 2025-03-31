@@ -1,7 +1,24 @@
 #pragma once
 
 #include "common.hpp"
+
+#include "audiodevice.hpp"
+#include "canvas.hpp"
+#include "cassette.hpp"
+#include "eventmanager.hpp"
 #include "eventreceiver.hpp"
+#include "fontfactory.hpp"
+#include "lifecycleobserver.hpp"
+#include "loopable.hpp"
+#include "objectmanager.hpp"
+#include "overlay.hpp"
+#include "renderer.hpp"
+#include "resourcemanager.hpp"
+#include "scenemanager.hpp"
+#include "soundmanager.hpp"
+#include "statemanager.hpp"
+#include "timermanager.hpp"
+#include "window.hpp"
 
 namespace framework {
 class engine : public input::eventreceiver {

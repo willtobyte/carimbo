@@ -2,6 +2,11 @@
 
 #include "common.hpp"
 
+#include "object.hpp"
+#include "objectmanager.hpp"
+#include "pixmap.hpp"
+#include "size.hpp"
+
 namespace framework {
 class scene {
 public:

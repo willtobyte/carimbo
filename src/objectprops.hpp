@@ -1,14 +1,27 @@
 #pragma once
 
-#include "animation.hpp"
 #include "common.hpp"
-#include "pixmap.hpp"
+
 #include "point.hpp"
-#include "reflection.hpp"
+#include "rect.hpp"
 #include "vector2d.hpp"
 
-namespace framework {
+namespace graphics {
+struct keyframe {
+  geometry::rect frame;
+  geometry::point offset;
+  uint64_t duration{0};
+};
 
+struct animation {
+  bool oneshot{false};
+  std::optional<std::string> next;
+  std::optional<geometry::rect> hitbox;
+  std::vector<keyframe> keyframes;
+};
+}
+
+namespace framework {
 struct objectprops {
   uint64_t id{};
   uint32_t frame{};

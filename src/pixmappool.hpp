@@ -2,6 +2,9 @@
 
 #include "common.hpp"
 
+#include "pixmap.hpp"
+#include "renderer.hpp"
+
 namespace graphics {
 using pixmap_ptr = std::shared_ptr<pixmap>;
 

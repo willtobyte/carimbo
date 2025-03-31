@@ -1,9 +1,11 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "cursor.hpp"
 #include "eventmanager.hpp"
 #include "eventreceiver.hpp"
+#include "label.hpp"
 #include "resourcemanager.hpp"
 #include "widget.hpp"
 

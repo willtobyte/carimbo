@@ -28,7 +28,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
 
     const auto oneshot = a.value("oneshot", false);
 
-    _animations.emplace(key, graphics::animation{oneshot, std::nullopt, std::nullopt, keyframes});
+    _animations.emplace(key, graphics::animation{oneshot, keyframes});
   }
 }
 
@@ -86,7 +86,7 @@ void cursor::draw() const noexcept {
       animation.frame,
       geometry::rect{_position - _point + animation.offset, animation.frame.size()},
       0,
-      graphics::reflection::none,
+      reflection::none,
       255
 #ifdef HITBOX
       ,

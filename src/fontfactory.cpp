@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-fontfactory::fontfactory(std::shared_ptr<graphics::renderer> renderer) noexcept
+fontfactory::fontfactory(std::shared_ptr<renderer> renderer) noexcept
     : _renderer(renderer) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {

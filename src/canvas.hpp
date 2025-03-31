@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "renderer.hpp"
+
 namespace graphics {
 class canvas {
 public:

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "common.hpp"
+
+#include "pixmap.hpp"
 #include "point.hpp"
 
 namespace graphics {
