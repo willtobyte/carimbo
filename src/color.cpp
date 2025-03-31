@@ -2,10 +2,6 @@
 
 using namespace graphics;
 
-// color::color(uint32_t pixel, const SDL_PixelFormat *format) noexcept {
-//   SDL_GetRGBA(pixel, format, &_r, &_g, &_b, &_a);
-// }
-
 color::color(uint32_t pixel) noexcept {
   _r = pixel >> 24;
   _g = pixel >> 16;

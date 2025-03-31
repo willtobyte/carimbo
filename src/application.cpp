@@ -11,7 +11,7 @@ application::application(int argc, char **argv) {
   PHYSFS_init(argv[0]);
 }
 
-int application::run() {
+int32_t application::run() {
   try {
 #if SANDBOX
     storage::filesystem::mount("../sandbox", "/");

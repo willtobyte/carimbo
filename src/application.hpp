@@ -8,6 +8,6 @@ public:
   application(int argc, char **argv);
   virtual ~application() noexcept;
 
-  int run();
+  int32_t run();
 };
 }
