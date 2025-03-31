@@ -100,9 +100,6 @@ jobs:
             echo "count=$(sysctl -n hw.logicalcpu)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Number of CPUs
-        run: echo "CPUs ${{ steps.cpus.outputs.count }}"
-
       - name: Build
         run: cmake --build . --parallel ${{ steps.cpus.outputs.count }} --config Release --verbose
         working-directory: build
