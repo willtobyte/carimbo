@@ -45,7 +45,7 @@ void scenemanager::set(const std::string &name) noexcept {
     _scene->on_leave();
   }
 
-  _scene = _scene_mapping[name];
+  _scene = _scene_mapping.at(name);
 
   _scene->on_enter();
 }
