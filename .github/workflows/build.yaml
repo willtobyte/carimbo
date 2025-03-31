@@ -88,18 +88,18 @@ jobs:
         run: cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
         working-directory: build
 
-      - name: Build on Ubuntu/WebAssembly
-        if: matrix.config.name == 'Ubuntu' || matrix.config.name == 'WebAssembly'
-        run: cmake --build . --parallel $(nproc) --config Release --verbose
-        working-directory: build
+      - name: Get CPU Count
+        id: ncpu
+        shell: bash
+        run: |
+          if [ "${RUNNER_OS}" = "Windows" ]; then
+            echo "ncpu=$NUMBER_OF_PROCESSORS" >> $GITHUB_OUTPUT
+          elif [ "${RUNNER_OS}" = "Linux" ]; then
+            echo "ncpu=$(nproc)" >> $GITHUB_OUTPUT
+          elif [ "${RUNNER_OS}" = "macOS" ]; then
+            echo "ncpu=$(sysctl -n hw.logicalcpu)" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Build on macOS
-        if: matrix.config.name == 'macOS'
-        run: cmake --build . --parallel $(sysctl -n hw.logicalcpu) --config Release --verbose
-        working-directory: build
-
-      - name: Build on Windows
-        if: matrix.config.name == 'Windows'
-        shell: powershell
-        run: cmake --build . --parallel $env:NUMBER_OF_PROCESSORS --config Release --verbose
+      - name: Build
+        run: cmake --build . --parallel ${{ steps.cpu_count.outputs.ncpu }} --config Release --verbose
         working-directory: build
