@@ -11,8 +11,8 @@ scene::scene(std::shared_ptr<objectmanager> objectmanager, std::shared_ptr<graph
 scene::~scene() noexcept {
   const auto objects = std::exchange(_objects, {});
 
-  for (const auto &[key, obj] : objects) {
-    _objectmanager->destroy(obj);
+  for (const auto &[_, o] : objects) {
+    _objectmanager->destroy(o);
   }
 
   _background.reset();

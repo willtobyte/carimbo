@@ -387,7 +387,6 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::engine>(
       "Engine",
-      "add_loopable", &framework::engine::add_loopable,
       "canvas", &framework::engine::canvas,
       "cassette", &framework::engine::cassette,
       "objectmanager", &framework::engine::objectmanager,
