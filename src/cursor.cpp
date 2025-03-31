@@ -28,7 +28,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
 
     const auto oneshot = a.value("oneshot", false);
 
-    _animations.emplace(key, graphics::animation{std::nullopt, oneshot, std::nullopt, keyframes});
+    _animations.emplace(key, graphics::animation{oneshot, std::nullopt, std::nullopt, keyframes});
   }
 }
 

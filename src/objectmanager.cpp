@@ -57,7 +57,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind) {
       };
     });
 
-    animations.emplace(key, graphics::animation{next, oneshot, hitbox, keyframes});
+    animations.emplace(key, graphics::animation{oneshot, next, hitbox, keyframes});
   }
 
   objectprops props{
