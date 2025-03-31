@@ -100,6 +100,9 @@ jobs:
             echo "ncpu=$(sysctl -n hw.logicalcpu)" >> $GITHUB_OUTPUT
           fi
 
+      - name: Number of CPUs
+        run: echo "CPUs ${{ steps.cpu_count.outputs.cpu_count }}"
+
       - name: Build
         run: cmake --build . --parallel ${{ steps.cpu_count.outputs.ncpu }} --config Release --verbose
         working-directory: build
