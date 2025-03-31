@@ -89,20 +89,20 @@ jobs:
         working-directory: build
 
       - name: Get CPU Count
-        id: ncpu
+        id: cpus
         shell: bash
         run: |
           if [ "${RUNNER_OS}" = "Windows" ]; then
-            echo "ncpu=$NUMBER_OF_PROCESSORS" >> $GITHUB_OUTPUT
+            echo "count=$NUMBER_OF_PROCESSORS" >> $GITHUB_OUTPUT
           elif [ "${RUNNER_OS}" = "Linux" ]; then
-            echo "ncpu=$(nproc)" >> $GITHUB_OUTPUT
+            echo "count=$(nproc)" >> $GITHUB_OUTPUT
           elif [ "${RUNNER_OS}" = "macOS" ]; then
-            echo "ncpu=$(sysctl -n hw.logicalcpu)" >> $GITHUB_OUTPUT
+            echo "count=$(sysctl -n hw.logicalcpu)" >> $GITHUB_OUTPUT
           fi
 
       - name: Number of CPUs
-        run: echo "CPUs ${{ steps.cpu_count.outputs.cpu_count }}"
+        run: echo "CPUs ${{ steps.cpus.outputs.count }}"
 
       - name: Build
-        run: cmake --build . --parallel ${{ steps.cpu_count.outputs.ncpu }} --config Release --verbose
+        run: cmake --build . --parallel ${{ steps.cpus.outputs.count }} --config Release --verbose
         working-directory: build
