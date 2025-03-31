@@ -1,6 +1,7 @@
 #include "kv.hpp"
 
 using namespace memory;
+
 sol::object observable::get() const noexcept {
   return _value;
 }

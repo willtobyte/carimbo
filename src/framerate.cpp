@@ -16,7 +16,8 @@ void framerate::loop(float_t delta) noexcept {
 
   if (_elapsed >= 1000) {
     fmt::println("{:.1f}", _frames / (_elapsed / 1000.0f));
-    _elapsed -= 1000;
+
+    _elapsed = 0;
     _frames = 0;
   }
 }
