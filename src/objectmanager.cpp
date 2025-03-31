@@ -40,12 +40,8 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind) {
     const auto &key = item.key();
     const auto &a = item.value();
     const auto oneshot = a.value("oneshot", false);
-    const auto hitbox = a.contains("hitbox")
-                            ? std::make_optional(a["hitbox"].template get<geometry::rect>())
-                            : std::nullopt;
-    std::optional<std::string> next = a.contains("next")
-                                          ? std::make_optional(a["next"].get<std::string>())
-                                          : std::nullopt;
+    const auto hitbox = a.contains("hitbox") ? std::make_optional(a["hitbox"].template get<geometry::rect>()) : std::nullopt;
+    const auto next = a.contains("next") ? std::make_optional(a["next"].get<std::string>()) : std::nullopt;
 
     const auto &f = a["frames"];
     std::vector<graphics::keyframe> keyframes(f.size());
