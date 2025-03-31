@@ -14,7 +14,7 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string &filename) noexcept
 
   assert(_audiodevice);
 
-  auto ptr = std::make_shared<soundfx>(_audiodevice, filename);
+  auto ptr = std::make_shared<soundfx>(filename);
   _pool.emplace(filename, ptr);
 
   return ptr;
