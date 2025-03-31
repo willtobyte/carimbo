@@ -131,7 +131,6 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<audio::soundmanager>(
       "SoundManager",
-      sol::no_construction,
       "play", &audio::soundmanager::play,
       "stop", &audio::soundmanager::stop
   );
@@ -390,7 +389,7 @@ void framework::scriptengine::run() {
       "Engine",
       "add_loopable", &framework::engine::add_loopable,
       "canvas", &framework::engine::canvas,
-      "cassete", &framework::engine::cassete,
+      "cassette", &framework::engine::cassette,
       "objectmanager", &framework::engine::objectmanager,
       "fontfactory", &framework::engine::fontfactory,
       "overlay", &framework::engine::overlay,
@@ -437,10 +436,10 @@ void framework::scriptengine::run() {
       "height", sol::property(&geometry::size::height, &geometry::size::set_height)
   );
 
-  lua.new_usertype<storage::cassete>(
-      "Cassete",
+  lua.new_usertype<storage::cassette>(
+      "Cassette",
       sol::no_constructor,
-      "set", [](storage::cassete &c, const std::string &key, sol::object object) {
+      "set", [](storage::cassette &c, const std::string &key, sol::object object) {
         if (object.is<int>())
           c.set<int>(key, object.as<int>());
         else if (object.is<double>())
@@ -514,7 +513,7 @@ void framework::scriptengine::run() {
           c.set<nlohmann::json>(key, j);
         } else
           throw std::runtime_error("Unsupported type for set"); },
-      "get", [](const storage::cassete &c, const std::string &key, sol::object default_value, sol::this_state ts) -> sol::object {
+      "get", [](const storage::cassette &c, const std::string &key, sol::object default_value, sol::this_state ts) -> sol::object {
         sol::state_view lua(ts);
         const nlohmann::json j = c.get<nlohmann::json>(key, _to_json(default_value));
 
@@ -542,7 +541,7 @@ void framework::scriptengine::run() {
           return sol::lua_nil;
         };
         return json2lua(j); },
-      "clear", &storage::cassete::clear
+      "clear", &storage::cassette::clear
   );
 
   lua.new_usertype<network::socket>(

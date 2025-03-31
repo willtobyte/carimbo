@@ -1,8 +1,8 @@
-#include "cassete.hpp"
+#include "cassette.hpp"
 
 using namespace storage;
 
-cassete::cassete() {
+cassette::cassette() {
 #ifdef EMSCRIPTEN
   const auto *raw = emscripten_run_script_string("document.cookie");
   const auto cookie = std::string(raw ? raw : "");
@@ -46,7 +46,7 @@ cassete::cassete() {
 #endif
 }
 
-void cassete::persist() const {
+void cassette::persist() const {
 #ifdef EMSCRIPTEN
   constexpr auto path = "; path=/";
   const auto value = fmt::format("{}{}{}", _cookiekey, _j.dump(), path);
@@ -58,7 +58,7 @@ void cassete::persist() const {
 #endif
 }
 
-void cassete::clear(const std::string &key) {
+void cassette::clear(const std::string &key) {
   if (key.empty()) {
     return;
   }

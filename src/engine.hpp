@@ -21,7 +21,7 @@ public:
   std::shared_ptr<graphics::window> window() const noexcept;
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
   std::shared_ptr<graphics::canvas> canvas() const noexcept;
-  std::shared_ptr<storage::cassete> cassete() const noexcept;
+  std::shared_ptr<storage::cassette> cassette() const noexcept;
   std::shared_ptr<framework::timermanager> timermanager() const noexcept;
 
   int32_t height() const noexcept;
@@ -61,7 +61,7 @@ private:
   std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::window> _window;
   std::vector<std::shared_ptr<lifecycleobserver>> _observers;
-  std::shared_ptr<storage::cassete> _cassete = std::make_shared<storage::cassete>();
+  std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();
   std::shared_ptr<framework::timermanager> _timermanager = std::make_shared<framework::timermanager>();
 };
 }

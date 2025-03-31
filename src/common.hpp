@@ -97,7 +97,7 @@ class timermanager;
 }
 
 namespace storage {
-class cassete;
+class cassette;
 class filesystem;
 }
 

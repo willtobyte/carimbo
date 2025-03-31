@@ -64,8 +64,8 @@ std::shared_ptr<graphics::canvas> engine::canvas() const noexcept {
   return _canvas;
 }
 
-std::shared_ptr<storage::cassete> engine::cassete() const noexcept {
-  return _cassete;
+std::shared_ptr<storage::cassette> engine::cassette() const noexcept {
+  return _cassette;
 }
 
 std::shared_ptr<framework::timermanager> engine::timermanager() const noexcept {

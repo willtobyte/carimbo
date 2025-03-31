@@ -3,9 +3,9 @@
 #include "common.hpp"
 
 namespace storage {
-class cassete {
+class cassette {
 public:
-  cassete();
+  cassette();
 
   template <typename T>
   void set(const std::string &key, const T &value);
@@ -18,13 +18,13 @@ public:
 private:
   nlohmann::json _j;
 #ifndef EMSCRIPTEN
-  static constexpr const char *_filename = "cassete.json";
+  static constexpr const char *_filename = "cassette.json";
 #else
-  static constexpr const char *_cookiekey = "cassete=";
+  static constexpr const char *_cookiekey = "cassette=";
 #endif
 
   void persist() const;
 };
 
-#include "cassete.tpp"
+#include "cassette.tpp"
 }
