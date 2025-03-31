@@ -41,13 +41,13 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
 }
 
 void scenemanager::set(const std::string &name) noexcept {
-  if (!_current_scene.empty()) {
-    _scene_mapping[_current_scene]->on_leave();
+  if (_scene) {
+    _scene->on_leave();
   }
 
-  _current_scene = name;
+  _scene = _scene_mapping[name];
 
-  _scene_mapping[_current_scene]->on_enter();
+  _scene->on_enter();
 }
 
 std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept {
@@ -55,9 +55,9 @@ std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept
 }
 
 void scenemanager::update(float_t delta) noexcept {
-  _scene_mapping.at(_current_scene)->update(delta);
+  _scene->update(delta);
 }
 
 void scenemanager::draw() const noexcept {
-  _scene_mapping.at(_current_scene)->draw();
+  _scene->draw();
 }
