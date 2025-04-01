@@ -111,7 +111,7 @@ jobs:
         working-directory: build
         run: |
           chmod -R a+rwx carimbo
-          tar -cpvf macOS.tar.gz --use-compress-program="gzip -9" carimbo
+          tar -cpzvf macOS.tar.gz carimbo
           mv macOS.tar.gz ../artifacts
 
       - name: Compress Artifacts
@@ -119,14 +119,14 @@ jobs:
         working-directory: build
         run: |
           chmod +x carimbo
-          tar -cvf Ubuntu.tar.gz --mode='a+rwx' -I 'gzip -9' carimbo
+          tar -czvf Ubuntu.tar.gz --mode='a+rwx' carimbo
           mv Ubuntu.tar.gz ../artifacts
 
       - name: Compress Artifacts
         if: matrix.config.name == 'WebAssembly'
         working-directory: build
         run: |
-          zip -9 -jr WebAssembly.zip carimbo.wasm carimbo.js
+          zip -jr WebAssembly.zip carimbo.wasm carimbo.js
           mv WebAssembly.zip ../artifacts
 
       - name: Compress Artifacts
