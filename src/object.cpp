@@ -13,10 +13,6 @@ uint64_t object::id() const noexcept {
   return _props.id;
 }
 
-void object::set_id(uint64_t id) noexcept {
-  _props.id = id;
-}
-
 std::string object::kind() const noexcept {
   return _props.kind;
 }

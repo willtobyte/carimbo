@@ -15,12 +15,12 @@ public:
   ~object() noexcept;
 
   uint64_t id() const noexcept;
-  void set_id(uint64_t id) noexcept;
 
   std::string kind() const noexcept;
 
-  virtual void update(float_t delta) noexcept;
-  virtual void draw() const noexcept;
+  void update(float_t delta) noexcept;
+
+  void draw() const noexcept;
 
   objectprops &props() noexcept;
   const objectprops &props() const noexcept;
