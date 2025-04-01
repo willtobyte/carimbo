@@ -52,18 +52,18 @@ void pixmap::draw(
     const std::optional<geometry::rectangle> &outline
 #endif
 ) const noexcept {
-  const SDL_rectangle &src = source;
-  const SDL_rectangle &dst = destination;
+  const SDL_Rect &src = source;
+  const SDL_Rect &dst = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderCopyEx(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_RendererFlip>(reflection));
 
 #ifdef HITBOX
   if (outline) {
-    const SDL_rectangle &debug = *outline;
+    const SDL_Rect &debug = *outline;
 
     SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
-    SDL_RenderDrawrectangle(*_renderer, &debug);
+    SDL_RenderDrawRect(*_renderer, &debug);
   }
 #endif
 }

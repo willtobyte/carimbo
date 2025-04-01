@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "point.hpp"
 #include "size.hpp"
 
@@ -25,7 +26,7 @@ public:
 
   bool contains(const geometry::point &point) const noexcept;
 
-  operator SDL_rectangle() const noexcept;
+  operator SDL_Rect() const noexcept;
 
   rectangle operator+(const geometry::point &offset) const noexcept;
 
