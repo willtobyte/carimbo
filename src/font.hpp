@@ -6,7 +6,7 @@
 #include "point.hpp"
 
 namespace graphics {
-using glyphmap = std::map<uint8_t, geometry::rect>;
+using glyphmap = std::map<uint8_t, geometry::rectangle>;
 
 class font {
 public:

@@ -18,7 +18,7 @@ void from_json(const nlohmann::json &j, point &m) noexcept {
   j.at("y").get_to(m._y);
 }
 
-void from_json(const nlohmann::json &j, rect &r) noexcept {
+void from_json(const nlohmann::json &j, rectangle &r) noexcept {
   r._position = point{j.at("x").get<int>(), j.at("y").get<int>()};
   r._size = geometry::size{j.at("width").get<int>(), j.at("height").get<int>()};
 }

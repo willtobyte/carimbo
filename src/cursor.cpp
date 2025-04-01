@@ -20,7 +20,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
     std::vector<graphics::keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
       return graphics::keyframe{
-          frame["rect"].template get<geometry::rect>(),
+          frame["rectangle"].template get<geometry::rectangle>(),
           frame.value("offset", geometry::point{}),
           frame["duration"].template get<uint64_t>(),
       };
@@ -84,7 +84,7 @@ void cursor::draw() const noexcept {
   const auto &animation = _animations.at(_action).keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
-      geometry::rect{_position - _point + animation.offset, animation.frame.size()},
+      geometry::rectangle{_position - _point + animation.offset, animation.frame.size()},
       0,
       reflection::none,
       255

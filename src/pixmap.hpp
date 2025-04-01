@@ -1,7 +1,7 @@
 #pragma once
 
 #include "common.hpp"
-#include "rect.hpp"
+#include "rectangle.hpp"
 #include "reflection.hpp"
 #include "renderer.hpp"
 #include "size.hpp"
@@ -15,14 +15,14 @@ public:
   ~pixmap() noexcept = default;
 
   void draw(
-      const geometry::rect &source,
-      const geometry::rect &destination,
+      const geometry::rectangle &source,
+      const geometry::rectangle &destination,
       double_t angle = 0.0f,
       reflection reflection = reflection::none,
       uint8_t alpha = 255
 #ifdef HITBOX
       ,
-      const std::optional<geometry::rect> &outline = std::nullopt
+      const std::optional<geometry::rectangle> &outline = std::nullopt
 #endif
   ) const noexcept;
 

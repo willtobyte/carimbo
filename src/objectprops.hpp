@@ -3,12 +3,12 @@
 #include "common.hpp"
 
 #include "point.hpp"
-#include "rect.hpp"
+#include "rectangle.hpp"
 #include "vector2d.hpp"
 
 namespace graphics {
 struct keyframe {
-  geometry::rect frame;
+  geometry::rectangle frame;
   geometry::point offset;
   uint64_t duration{0};
 };
@@ -16,7 +16,7 @@ struct keyframe {
 struct animation {
   bool oneshot{false};
   std::optional<std::string> next;
-  std::optional<geometry::rect> hitbox;
+  std::optional<geometry::rectangle> hitbox;
   std::vector<keyframe> keyframes;
 };
 }

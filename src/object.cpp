@@ -121,13 +121,13 @@ void object::draw() const noexcept {
   const auto &hitbox = _props.animations.at(_props.action).hitbox;
 #endif
 
-  geometry::rect destination{_props.position + offset, source.size()};
+  geometry::rectangle destination{_props.position + offset, source.size()};
 
   destination.scale(_props.scale);
 
 #ifdef HITBOX
   const auto debug = hitbox
-                         ? std::make_optional(geometry::rect{_props.position + hitbox->position(), hitbox->size() * _props.scale})
+                         ? std::make_optional(geometry::rectangle{_props.position + hitbox->position(), hitbox->size() * _props.scale})
                          : std::nullopt;
 #endif
 
@@ -221,12 +221,12 @@ bool object::intersects(const std::shared_ptr<object> other) const noexcept {
     return false;
   }
 
-  return geometry::rect(
+  return geometry::rectangle(
              position() + sit->second.hitbox->position() * _props.scale,
              sit->second.hitbox->size() * _props.scale
   )
       .intersects(
-          geometry::rect(
+          geometry::rectangle(
               other->position() + oit->second.hitbox->position() * other->_props.scale,
               oit->second.hitbox->size() * other->_props.scale
           )

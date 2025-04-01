@@ -40,14 +40,14 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind) {
     const auto &key = item.key();
     const auto &a = item.value();
     const auto oneshot = a.value("oneshot", false);
-    const auto hitbox = a.contains("hitbox") ? std::make_optional(a["hitbox"].template get<geometry::rect>()) : std::nullopt;
+    const auto hitbox = a.contains("hitbox") ? std::make_optional(a["hitbox"].template get<geometry::rectangle>()) : std::nullopt;
     const auto next = a.contains("next") ? std::make_optional(a["next"].get<std::string>()) : std::nullopt;
 
     const auto &f = a["frames"];
     std::vector<graphics::keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
       return graphics::keyframe{
-          frame["rect"].template get<geometry::rect>(),
+          frame["rectangle"].template get<geometry::rectangle>(),
           frame.value("offset", geometry::point{}),
           frame["duration"].template get<uint64_t>(),
       };
@@ -149,7 +149,7 @@ void objectmanager::update(float_t delta) noexcept {
     }
 
     const auto &ha = *aita->second.hitbox;
-    const auto has = geometry::rect{a->position() + ha.position() * ap.scale, ha.size() * ap.scale};
+    const auto has = geometry::rectangle{a->position() + ha.position() * ap.scale, ha.size() * ap.scale};
     for (auto jt = std::next(it); jt != _objects.end(); ++jt) {
       const auto &b = *jt;
 
@@ -160,7 +160,7 @@ void objectmanager::update(float_t delta) noexcept {
       }
 
       const auto &hb = *aitb->second.hitbox;
-      const auto hbs = geometry::rect{b->position() + hb.position() * bp.scale, hb.size() * bp.scale};
+      const auto hbs = geometry::rectangle{b->position() + hb.position() * bp.scale, hb.size() * bp.scale};
       if (hbs.position().x() > has.position().x() + has.size().width()) break;
       if (hbs.position().y() > has.position().y() + has.size().height()) continue;
       if (hbs.position().y() + hbs.size().height() < has.position().y()) continue;
@@ -219,7 +219,7 @@ void objectmanager::on_mousebuttondown(const input::mousebuttonevent &event) noe
       continue;
     }
 
-    const auto hitbox = geometry::rect{object->position() + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
+    const auto hitbox = geometry::rectangle{object->position() + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
 
     if (!hitbox.contains(point)) {
       continue;

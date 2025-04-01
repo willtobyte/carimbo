@@ -5,7 +5,7 @@
 #include "event.hpp"
 #include "eventreceiver.hpp"
 #include "point.hpp"
-#include "rect.hpp"
+#include "rectangle.hpp"
 #include "reflection.hpp"
 #include "resourcemanager.hpp"
 
@@ -18,7 +18,7 @@ constexpr auto ACTION_RIGHT = "right";
 
 namespace graphics {
 struct keyframe {
-  geometry::rect frame;
+  geometry::rectangle frame;
   geometry::point offset;
   uint64_t duration{0};
 };
