@@ -18,7 +18,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
   const auto &buffer = storage::io::read(key);
   const auto &j = nlohmann::json::parse(buffer);
-  const auto &alphabet = j["alphabet"].get_ref<const std::string &>();
+  const auto &glyphs = j["glyphs"].get_ref<const std::string &>();
   const auto spacing = j.value("spacing", int16_t{0});
   const auto scale = j.value("scale", float_t{1.0f});
 
@@ -50,7 +50,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto width = size.width();
   const auto height = size.height();
 
-  for (const char letter : alphabet) {
+  for (const char glyph : glyphs) {
     while (x < width && color(pixels[y * width + x]) == separator) {
       ++x;
     }
@@ -69,7 +69,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       ++h;
     }
 
-    map[letter] = {{x, y}, {w, h}};
+    map[glyph] = {{x, y}, {w, h}};
     x += w;
   }
 
