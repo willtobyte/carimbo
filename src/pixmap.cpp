@@ -22,7 +22,8 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
     throw std::runtime_error(fmt::format("[SDL_CreateTexture] error creating texture, file: {}, error: {}", filename, SDL_GetError()));
   }
 
-  if (SDL_UpdateTexture(_texture.get(), nullptr, output.data(), size.width() * 4) != 0) [[unlikely]] {
+  const auto pitch = size.width() * 4;
+  if (SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch) != 0) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_UpdateTexture] error updating texture, file: {}, error: {}", filename, SDL_GetError()));
   }
 
