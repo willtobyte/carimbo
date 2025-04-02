@@ -708,11 +708,11 @@ void framework::scriptengine::run() {
     )
   );
 
+  const auto start = std::chrono::high_resolution_clock::now();
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   lua.script(script);
 
-  const auto start = std::chrono::high_resolution_clock::now();
   lua["setup"]();
   const auto end = std::chrono::high_resolution_clock::now();
   const auto elapsed = std::chrono::duration<double, std::milli>(end - start).count();
