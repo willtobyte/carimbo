@@ -108,7 +108,9 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
 }
 
 void framework::scriptengine::run() {
+  const auto start = SDL_GetPerformanceCounter();
   sol::state lua;
+
   lua.open_libraries();
 
   lua["require"] = [&lua](const std::string &module) {
@@ -708,7 +710,6 @@ void framework::scriptengine::run() {
     )
   );
 
-  const auto start = SDL_GetPerformanceCounter();
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   lua.script(script);
