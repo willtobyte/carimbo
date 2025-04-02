@@ -25,16 +25,16 @@ std::vector<uint8_t> io::read(std::string_view filename) {
 
 std::vector<std::string> io::list(std::string_view directory) {
   auto deleter = [](char **list) { PHYSFS_freeList(list); };
-  std::unique_ptr<char *[], decltype(deleter)> entries(PHYSFS_enumerateFiles(directory.data()), deleter);
+  std::unique_ptr<char *[], decltype(deleter)> ptr(PHYSFS_enumerateFiles(directory.data()), deleter);
 
-  if (!entries) [[unlikely]] {
+  if (!ptr) [[unlikely]] {
     throw std::runtime_error(fmt::format(
         "[PHYSFS_enumerateFiles] error while enumerating directory: {}, error: {}",
         directory, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
     ));
   }
 
-  char *const *array = entries.get();
+  char *const *array = ptr.get();
   auto view = std::views::iota(0) | std::views::take_while([&](size_t i) { return array[i] != nullptr; });
 
   const auto count = std::ranges::distance(view);
