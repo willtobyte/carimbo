@@ -7,7 +7,6 @@
 #include "object.hpp"
 #include "point.hpp"
 #include "vector2d.hpp"
-#include "widget.hpp"
 
 sol::table require(sol::state &lua, const std::string &module) {
   const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
@@ -280,13 +279,12 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::resourcemanager>(
       "ResourceManager",
       "flush", &framework::resourcemanager::flush,
-      "prefetch", [](std::shared_ptr<resourcemanager> manager, sol::table table) {
+      "prefetch", sol::overload([](framework::resourcemanager &self) { self.prefetch(); }, [](framework::resourcemanager &self, sol::table table) {
         std::vector<std::string> filenames(table.size());
-        std::ranges::transform(table, filenames.begin(), [](const auto &item) {
+        std::ranges::transform(table, filenames.begin(), [](const auto &item) -> std::string {
           return item.second.template as<std::string>();
         });
-        manager->prefetch(filenames);
-      }
+        self.prefetch(filenames); })
   );
 
   struct playerwrapper {

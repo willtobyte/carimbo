@@ -21,6 +21,18 @@ void resourcemanager::flush() noexcept {
   _fontfactory->flush();
 }
 
+void resourcemanager::prefetch() noexcept {
+  const auto directory = "blobs";
+  const auto filenames = storage::io::list(directory);
+  std::vector<std::string> f;
+  f.reserve(filenames.size());
+  for (const auto &filename : filenames) {
+    f.emplace_back(fmt::format("{}/{}", directory, filename));
+  }
+
+  prefetch(f);
+}
+
 void resourcemanager::prefetch(const std::vector<std::string> &filenames) noexcept {
   for (const auto &filename : filenames) {
     if (const auto position = filename.rfind('.'); position != std::string::npos) {

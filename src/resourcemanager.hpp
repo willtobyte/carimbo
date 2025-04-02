@@ -15,6 +15,7 @@ public:
 
   void flush() noexcept;
 
+  void prefetch() noexcept;
   void prefetch(const std::vector<std::string> &filenames) noexcept;
 
   std::shared_ptr<graphics::renderer> renderer() const noexcept;

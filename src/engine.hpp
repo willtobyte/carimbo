@@ -56,6 +56,7 @@ public:
 
   void add_loopable(std::shared_ptr<loopable> loopable) noexcept;
   void flush() const noexcept;
+  void prefetch() noexcept;
   void prefetch(const std::vector<std::string> &filenames) noexcept;
   void run() noexcept;
 

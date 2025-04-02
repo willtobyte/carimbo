@@ -128,6 +128,10 @@ void engine::flush() const noexcept {
   _resourcemanager->flush();
 }
 
+void engine::prefetch() noexcept {
+  _resourcemanager->prefetch();
+}
+
 void engine::prefetch(const std::vector<std::string> &filenames) noexcept {
   _resourcemanager->prefetch(filenames);
 }
