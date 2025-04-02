@@ -279,12 +279,18 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::resourcemanager>(
       "ResourceManager",
       "flush", &framework::resourcemanager::flush,
-      "prefetch", sol::overload([](framework::resourcemanager &self) { self.prefetch(); }, [](framework::resourcemanager &self, sol::table table) {
-        std::vector<std::string> filenames(table.size());
-        std::ranges::transform(table, filenames.begin(), [](const auto &item) -> std::string {
-          return item.second.template as<std::string>();
-        });
-        self.prefetch(filenames); })
+      "prefetch", sol::overload(
+        [](framework::resourcemanager &self) {
+          self.prefetch();
+        },
+        [](framework::resourcemanager &self, sol::table table) {
+          std::vector<std::string> filenames(table.size());
+          std::ranges::transform(table, filenames.begin(), [](const auto &item) -> std::string {
+            return item.second.template as<std::string>();
+          });
+          self.prefetch(filenames);
+        }
+      )
   );
 
   struct playerwrapper {
