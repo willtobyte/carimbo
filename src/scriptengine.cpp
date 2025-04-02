@@ -708,14 +708,14 @@ void framework::scriptengine::run() {
     )
   );
 
-  const auto start = std::chrono::high_resolution_clock::now();
+  const auto start = SDL_GetPerformanceCounter();
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   lua.script(script);
 
   lua["setup"]();
-  const auto end = std::chrono::high_resolution_clock::now();
-  const auto elapsed = std::chrono::duration<double, std::milli>(end - start).count();
+  const auto end = SDL_GetPerformanceCounter();
+  const auto elapsed = (end - start) * 1000.0 / SDL_GetPerformanceFrequency();
   fmt::println("boot time {:.3f}ms", elapsed);
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
