@@ -1,6 +1,7 @@
 #include "scriptengine.hpp"
 
 #include "common.hpp"
+
 #include "event.hpp"
 #include "loopable.hpp"
 #include "object.hpp"

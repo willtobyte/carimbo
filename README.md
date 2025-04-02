@@ -1,5 +1,10 @@
 ## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
+![macOS Build](https://github.com/${{ github.repository }}/actions/workflows/build.yml/badge.svg?branch=main&label=macOS&event=push&query=matrix.config.name%3AmacOS)
+![Ubuntu Build](https://github.com/${{ github.repository }}/actions/workflows/build.yml/badge.svg?branch=main&label=Ubuntu&event=push&query=matrix.config.name%3AUbuntu)
+![WebAssembly Build](https://github.com/${{ github.repository }}/actions/workflows/build.yml/badge.svg?branch=main&label=WebAssembly&event=push&query=matrix.config.name%3AWebAssembly)
+![Windows Build](https://github.com/${{ github.repository }}/actions/workflows/build.yml/badge.svg?branch=main&label=Windows&event=push&query=matrix.config.name%3AWindows)
+
 <p align="center">
   <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">
 </p>
