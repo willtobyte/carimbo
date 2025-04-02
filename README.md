@@ -1,11 +1,11 @@
 ## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
-[![macOS](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=macOS&label=macOS)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
-[![Ubuntu](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Ubuntu&label=Ubuntu)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
-[![Windows](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Windows&label=Windows)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
-[![WebAssembly](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=WebAssembly&label=WebAssembly)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
-
 <p align="center">
+  [![macOS](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=macOS&label=macOS)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
+  [![Ubuntu](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Ubuntu&label=Ubuntu)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
+  [![Windows](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Windows&label=Windows)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
+  [![WebAssembly](https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=WebAssembly&label=WebAssembly)](https://github.com/willtobyte/carimbo/actions/workflows/build.yaml)
+
   <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">
 </p>
 
