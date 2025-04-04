@@ -17,6 +17,8 @@ class Carimbo(ConanFile):
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 
+        self.requires("libalsa/1.2.12", override=True)
+
         if str(self.settings.os).lower() not in {"emscripten"}:
             self.requires("boost/1.87.0")
             self.requires("openssl/3.4.1")
