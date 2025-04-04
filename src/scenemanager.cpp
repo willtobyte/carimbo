@@ -23,13 +23,18 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
         const auto &key = item.key();
         const auto &data = item.value();
         const auto &kind = data["kind"].template get_ref<const std::string &>();
-        const auto &action = data["action"].template get_ref<const std::string &>();
+        std::optional<std::string> action =
+            data.contains("action") && data["action"].is_string()
+                ? std::optional<std::string>{std::string(data["action"].template get_ref<const std::string &>())}
+                : std::nullopt;
         const auto x = data.value("x", 0);
         const auto y = data.value("y", 0);
 
         auto e = _objectmanager->create(kind);
         e->set_placement(x, y);
-        e->set_action(action);
+        if (action) {
+          e->set_action(*action);
+        }
 
         return {key, e};
       }
