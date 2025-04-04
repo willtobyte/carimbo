@@ -102,7 +102,8 @@ if(EMSCRIPTEN)
     -sWEBSOCKET_SUBPROTOCOL=text
     -sEXPORTED_RUNTIME_METHODS=['callMain']
     -lwebsocket.js
-    --use-port=sdl3
+    -sUSE_SDL=3
+    # --use-port=sdl3
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
