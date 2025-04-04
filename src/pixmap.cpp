@@ -39,19 +39,18 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface)
     : _renderer(std::move(renderer)) {
-  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
-      SDL_CreateTextureFromSurface(
-        *_renderer,
-        surface.get()
-      ),
-      SDL_Deleter{}
-  );
+  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
+
   if (!_texture) {
     throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] Error creating texture from surface: {}", SDL_GetError()));
   }
 
-  if (SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND) != 0) {
+  if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
     throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode for texture: {}", SDL_GetError()));
+  }
+
+  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
+    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] Error setting texture scale mode: {}", SDL_GetError()));
   }
 }
 
