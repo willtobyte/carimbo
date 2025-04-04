@@ -18,7 +18,7 @@ class Carimbo(ConanFile):
         self.requires("vorbis/1.3.7")
 
         if self.settings.os != "Emscripten":
-            self.requires("boost/1.86.0")
+            self.requires("boost/1.87.0")
             self.requires("openssl/3.4.1")
 
     def generate(self):
