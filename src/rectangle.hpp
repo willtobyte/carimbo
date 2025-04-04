@@ -26,7 +26,7 @@ public:
 
   bool contains(const geometry::point &point) const noexcept;
 
-  operator SDL_Rect() const noexcept;
+  operator SDL_FRect() const noexcept;
 
   rectangle operator+(const geometry::point &offset) const noexcept;
 

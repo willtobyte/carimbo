@@ -14,7 +14,7 @@ void label::set(const std::string &text) noexcept {
   _text = text;
 }
 
-void label::set_with_placement(const std::string &text, int32_t x, int32_t y) noexcept {
+void label::set_with_placement(const std::string &text, float_t x, float_t y) noexcept {
   _text = text;
   _position = {x, y};
 }

@@ -1,5 +1,4 @@
 #include "fontfactory.hpp"
-#include "deleters.hpp"
 
 using namespace graphics;
 
@@ -26,17 +25,19 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   geometry::size size;
   std::tie(output, size) = _load_png(j["spritesheet"].get_ref<const std::string &>());
 
+  const auto pitch = static_cast<int32_t>(size.width() * 4);
   auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>{
-      SDL_CreateRGBSurfaceWithFormatFrom(
-          output.data(),
+      SDL_CreateSurfaceFrom(
           size.width(),
           size.height(),
-          32,
-          size.width() * 4,
-          SDL_PIXELFORMAT_ABGR8888
+          SDL_PIXELFORMAT_ABGR8888,
+          output.data(),
+          pitch
       ),
       SDL_Deleter{}
   };
+
+  // const auto format = SDL_GetPixelFormatDetails(surface->format);
 
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormatFrom] error: {}", SDL_GetError()));
@@ -47,8 +48,8 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
   glyphmap map{};
   auto [x, y, w, h] = std::tuple{0, 0, 0, 0};
-  const auto width = size.width();
-  const auto height = size.height();
+  const auto width = static_cast<int>(size.width());
+  const auto height = static_cast<int>(size.height());
 
   for (const char glyph : glyphs) {
     while (x < width && color(pixels[y * width + x]) == separator) {
@@ -69,7 +70,8 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       ++h;
     }
 
-    map[glyph] = {{x, y}, {w, h}};
+    // map[glyph] = {{x, y}, {w, h}};
+    map[glyph] = {{static_cast<float_t>(x), static_cast<float_t>(y)}, {static_cast<float_t>(w), static_cast<float_t>(h)}};
     x += w;
   }
 

@@ -1,4 +1,5 @@
 #include "pixmap.hpp"
+#include "deleters.hpp"
 
 using namespace graphics;
 
@@ -10,24 +11,30 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
-          *_renderer,
-          SDL_PIXELFORMAT_ABGR8888,
-          SDL_TEXTUREACCESS_STATIC,
-          size.width(),
-          size.height()
+        *_renderer,
+        SDL_PIXELFORMAT_ABGR8888,
+        SDL_TEXTUREACCESS_STATIC,
+        size.width(),
+        size.height()
       ),
       SDL_Deleter{}
   );
-  if (!_texture) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateTexture] error creating texture, file: {}, error: {}", filename, SDL_GetError()));
+  if (!_texture) {
+    throw std::runtime_error(fmt::format("[SDL_CreateTexture] Error creating texture: {}", SDL_GetError()));
   }
 
-  const auto pitch = size.width() * 4;
-  if (SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch) != 0) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] error updating texture, file: {}, error: {}", filename, SDL_GetError()));
+  const auto pitch = static_cast<int32_t>(size.width() * 4);
+  if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) {
+    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] Error updating texture: {}", SDL_GetError()));
   }
 
-  SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
+  if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
+    throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode: {}", SDL_GetError()));
+  }
+
+  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
+    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] Error setting texture scale mode: {}", SDL_GetError()));
+  }
 }
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface)
@@ -35,10 +42,16 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, 
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
 
   if (!_texture) {
-    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error creating texture from surface, error: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] Error creating texture from surface: {}", SDL_GetError()));
   }
 
-  SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
+  if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
+    throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode for texture: {}", SDL_GetError()));
+  }
+
+  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
+    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] Error setting texture scale mode: {}", SDL_GetError()));
+  }
 }
 
 void pixmap::draw(
@@ -52,29 +65,21 @@ void pixmap::draw(
     const std::optional<geometry::rectangle> &outline
 #endif
 ) const noexcept {
-  const SDL_Rect &src = source;
-  const SDL_Rect &dst = destination;
+  const SDL_FRect &src = source;
+  const SDL_FRect &dst = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
-  SDL_RenderCopyEx(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_RendererFlip>(reflection));
+  SDL_RenderTextureRotated(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 
 #ifdef HITBOX
   if (outline) {
-    const SDL_Rect &debug = *outline;
+    const SDL_FRect &debug = *outline;
 
     SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
-    SDL_RenderDrawRect(*_renderer, &debug);
+    SDL_RenderRect(*_renderer, &debug);
   }
 #endif
 }
-
-// geometry::size pixmap::size() const noexcept {
-//   return _size;
-// }
-
-// void pixmap::set_size(const geometry::size &size) noexcept {
-//   _size = size;
-// }
 
 pixmap::operator SDL_Texture *() const noexcept {
   return _texture.get();

@@ -4,7 +4,7 @@ using namespace graphics;
 
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
-  SDL_ShowCursor(false);
+  // SDL_ShowCursor(false);
 
   const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));
   const auto j = nlohmann::json::parse(buffer);

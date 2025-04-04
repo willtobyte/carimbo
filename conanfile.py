@@ -13,7 +13,7 @@ class Carimbo(ConanFile):
         self.requires("ogg/1.3.5")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
-        self.requires("sdl/2.30.9")
+        self.requires("sdl/3.2.6")
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 

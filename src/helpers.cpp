@@ -23,7 +23,7 @@ std::pair<std::vector<uint8_t>, geometry::size> _load_png(const std::string &fil
     throw std::runtime_error(fmt::format("[spng_decode_image] error while decoding image: {}, error: {}", filename, spng_strerror(error)));
   }
 
-  const auto size = geometry::size{static_cast<int32_t>(ihdr.width), static_cast<int32_t>(ihdr.height)};
+  const auto size = geometry::size{static_cast<float_t>(ihdr.width), static_cast<float_t>(ihdr.height)};
 
   return std::make_pair(output, size);
 }

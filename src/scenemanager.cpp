@@ -10,7 +10,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
   const auto j = nlohmann::json::parse(buffer);
 
   const auto background = _pixmappool->get(j["background"].get_ref<const std::string &>());
-  geometry::size size{j.at("width").get<int32_t>(), j.at("height").get<int32_t>()};
+  geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
 
   const auto &os = j.value("objects", nlohmann::json::array());
   const auto &i = os.items();

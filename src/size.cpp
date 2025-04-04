@@ -5,22 +5,22 @@ using namespace geometry;
 size::size() noexcept
     : _width(0), _height(0) {}
 
-size::size(int32_t width, int32_t height) noexcept
+size::size(float_t width, float_t height) noexcept
     : _width(width), _height(height) {}
 
-void size::set_width(int32_t width) noexcept {
+void size::set_width(float_t width) noexcept {
   _width = width;
 }
 
-int32_t size::width() const noexcept {
+float_t size::width() const noexcept {
   return _width;
 }
 
-void size::set_height(int32_t height) noexcept {
+void size::set_height(float_t height) noexcept {
   _height = height;
 }
 
-int32_t size::height() const noexcept {
+float_t size::height() const noexcept {
   return _height;
 }
 
@@ -34,7 +34,7 @@ bool size::operator!=(const size &rhs) const noexcept {
 
 size size::operator*(float_t factor) const noexcept {
   return {
-      static_cast<int>(std::round(_width * factor)),
-      static_cast<int>(std::round(_height * factor))
+      _width * factor,
+      _height * factor
   };
 }

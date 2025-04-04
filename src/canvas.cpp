@@ -7,10 +7,11 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
 
   int32_t lw, lh;
-  SDL_RenderGetLogicalSize(*_renderer, &lw, &lh);
+  SDL_RendererLogicalPresentation mode;
+  SDL_GetRenderLogicalPresentation(*_renderer, &lw, &lh, &mode);
 
   float_t sx, sy;
-  SDL_RenderGetScale(*_renderer, &sx, &sy);
+  SDL_GetRenderScale(*_renderer, &sx, &sy);
 
   const auto width = static_cast<int32_t>(lw / sx);
   const auto height = static_cast<int32_t>(lh / sy);
@@ -43,5 +44,5 @@ void canvas::draw() {
     throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
   }
 
-  SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
+  SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }

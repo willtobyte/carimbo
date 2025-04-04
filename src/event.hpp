@@ -9,7 +9,7 @@ enum player : uint8_t {
 };
 
 enum eventtype : uint32_t {
-  collision = SDL_USEREVENT + 1,
+  collision = SDL_EVENT_USER + 1,
   mail,
   timer
 };
@@ -23,14 +23,14 @@ enum class keyevent : int32_t {
 };
 
 struct mousemotionevent {
-  int32_t x;
-  int32_t y;
+  float_t x;
+  float_t y;
 };
 
 struct mousebuttonevent {
   enum class type : uint32_t {
-    down = SDL_MOUSEBUTTONDOWN,
-    up = SDL_MOUSEBUTTONUP,
+    down = SDL_EVENT_MOUSE_BUTTON_DOWN,
+    up = SDL_EVENT_MOUSE_BUTTON_UP,
   };
 
   enum class button : uint8_t {
@@ -41,31 +41,31 @@ struct mousebuttonevent {
 
   type type;
   button button;
-  int32_t x;
-  int32_t y;
+  float_t x;
+  float_t y;
 };
 
 enum class joystickevent : int32_t {
-  up = SDL_CONTROLLER_BUTTON_DPAD_UP,
-  down = SDL_CONTROLLER_BUTTON_DPAD_DOWN,
-  left = SDL_CONTROLLER_BUTTON_DPAD_LEFT,
-  right = SDL_CONTROLLER_BUTTON_DPAD_RIGHT,
-  triangle = SDL_CONTROLLER_BUTTON_Y,
-  circle = SDL_CONTROLLER_BUTTON_B,
-  cross = SDL_CONTROLLER_BUTTON_A,
-  square = SDL_CONTROLLER_BUTTON_X,
+  up = SDL_GAMEPAD_BUTTON_DPAD_UP,
+  down = SDL_GAMEPAD_BUTTON_DPAD_DOWN,
+  left = SDL_GAMEPAD_BUTTON_DPAD_LEFT,
+  right = SDL_GAMEPAD_BUTTON_DPAD_RIGHT,
+  triangle = SDL_GAMEPAD_BUTTON_NORTH,
+  circle = SDL_GAMEPAD_BUTTON_EAST,
+  cross = SDL_GAMEPAD_BUTTON_SOUTH,
+  square = SDL_GAMEPAD_BUTTON_WEST,
 };
 
 struct joystickaxisevent {
   enum class axis : int8_t {
-    invalid = SDL_CONTROLLER_AXIS_INVALID,
-    leftx = SDL_CONTROLLER_AXIS_LEFTX,
-    lefty = SDL_CONTROLLER_AXIS_LEFTY,
-    rightx = SDL_CONTROLLER_AXIS_RIGHTX,
-    righty = SDL_CONTROLLER_AXIS_RIGHTY,
-    triggerleft = SDL_CONTROLLER_AXIS_TRIGGERLEFT,
-    triggerright = SDL_CONTROLLER_AXIS_TRIGGERRIGHT,
-    max = SDL_CONTROLLER_AXIS_MAX
+    invalid = SDL_GAMEPAD_AXIS_INVALID,
+    leftx = SDL_GAMEPAD_AXIS_LEFTX,
+    lefty = SDL_GAMEPAD_AXIS_LEFTY,
+    rightx = SDL_GAMEPAD_AXIS_RIGHTX,
+    righty = SDL_GAMEPAD_AXIS_RIGHTY,
+    triggerleft = SDL_GAMEPAD_AXIS_LEFT_TRIGGER,
+    triggerright = SDL_GAMEPAD_AXIS_RIGHT_TRIGGER,
+    max = SDL_GAMEPAD_AXIS_COUNT
   };
 
   axis kind;
