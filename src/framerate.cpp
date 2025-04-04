@@ -2,10 +2,6 @@
 
 using namespace framework;
 
-uint64_t framerate::per_second() const noexcept {
-  return _frames;
-}
-
 void framerate::loop(float_t delta) noexcept {
   UNUSED(delta);
   _frames++;
