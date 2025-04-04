@@ -18,15 +18,6 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
   if (_window == nullptr) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateWindow] failed to create window: {}", SDL_GetError()));
   }
-
-  // auto context = SDL_GL_CreateContext(_window.get());
-  // const auto context = SDL_CreateRenderer(_window.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  // if (!context) [[unlikely]] {
-  //   throw std::runtime_error(fmt::format("[SDL_GL_CreateContext] failed to create context: {}", SDL_GetError()));
-  // }
-
-  // SDL_GL_MakeCurrent(_window.get(), context);
-  // SDL_GL_SetSwapInterval(1);
 }
 
 window::operator SDL_Window *() noexcept {
