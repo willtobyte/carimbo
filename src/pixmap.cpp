@@ -1,15 +1,14 @@
 #include "pixmap.hpp"
+#include "deleters.hpp"
 
 using namespace graphics;
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
     : _renderer(std::move(renderer)) {
-  // Load PNG data into 'output' and retrieve image 'size'
   std::vector<uint8_t> output;
   geometry::size size;
   std::tie(output, size) = _load_png(filename);
 
-  // Create an SDL_Texture with the same dimensions as the image
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
         *_renderer,
@@ -24,27 +23,33 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
     throw std::runtime_error(fmt::format("[SDL_CreateTexture] Error creating texture: {}", SDL_GetError()));
   }
 
-  constexpr auto pitch = size.width() * 4;
-  if (SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch) != 0) {
+  const auto pitch = static_cast<int32_t>(size.width() * 4);
+  if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) {
     throw std::runtime_error(fmt::format("[SDL_UpdateTexture] Error updating texture: {}", SDL_GetError()));
   }
 
-  if (SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND) != 0) {
+  if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
     throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode: {}", SDL_GetError()));
+  }
+
+  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
+    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] Error setting texture scale mode: {}", SDL_GetError()));
   }
 }
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, decltype(&SDL_DestroySurface)> surface)
+pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface)
     : _renderer(std::move(renderer)) {
-  // Create an SDL_Texture from the provided SDL_Surface
-  _texture = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>(
-      SDL_CreateTextureFromSurface(*_renderer, surface.get()),
-      SDL_DestroyTexture);
+  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTextureFromSurface(
+        *_renderer,
+        surface.get()
+      ),
+      SDL_Deleter{}
+  );
   if (!_texture) {
     throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] Error creating texture from surface: {}", SDL_GetError()));
   }
 
-  // Set the texture blend mode to blend
   if (SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND) != 0) {
     throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode for texture: {}", SDL_GetError()));
   }

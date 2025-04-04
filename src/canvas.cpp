@@ -5,11 +5,13 @@ using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
+
   int32_t lw, lh;
-  SDL_RenderGetLogicalSize(*_renderer, &lw, &lh);
+  SDL_RendererLogicalPresentation mode;
+  SDL_GetRenderLogicalPresentation(*_renderer, &lw, &lh, &mode);
 
   float_t sx, sy;
-  SDL_RenderGetScale(*_renderer, &sx, &sy);
+  SDL_GetRenderScale(*_renderer, &sx, &sy);
 
   const auto width = static_cast<int32_t>(lw / sx);
   const auto height = static_cast<int32_t>(lh / sy);
@@ -40,12 +42,6 @@ void canvas::set_pixels(const std::vector<uint32_t> &pixels) noexcept {
 void canvas::draw() {
   if (!_framebuffer) [[unlikely]] {
     throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
-  }
-
-  SDL_RenderCopy(*_renderer, _framebuffer.get(), nullptr, nullptr);
-
-  if (SDL_UpdateTexture(_framebuffer.get(), nullptr, _pixels.data(), _width * sizeof(uint32_t)) != 0) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] failed: {}", SDL_GetError()));
   }
 
   SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);

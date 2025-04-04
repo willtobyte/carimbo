@@ -2,32 +2,32 @@
 
 using namespace geometry;
 
-point::point(int32_t x, int32_t y) noexcept
+point::point(float_t x, float_t y) noexcept
     : _x(x), _y(y) {}
 
-void point::set(int32_t x, int32_t y) noexcept {
+void point::set(float_t x, float_t y) noexcept {
   _x = x;
   _y = y;
 }
 
-int32_t point::x() const noexcept {
+float_t point::x() const noexcept {
   return _x;
 }
 
-void point::set_x(int32_t x) noexcept {
+void point::set_x(float_t x) noexcept {
   _x = x;
 }
 
-int32_t point::y() const noexcept {
+float_t point::y() const noexcept {
   return _y;
 }
 
-void point::set_y(int32_t y) noexcept {
+void point::set_y(float_t y) noexcept {
   _y = y;
 }
 
-point::operator SDL_Point() const noexcept {
-  return SDL_Point{_x, _y};
+point::operator SDL_FPoint() const noexcept {
+  return SDL_FPoint{_x, _y};
 }
 
 point point::operator+(const point &other) const noexcept {
@@ -41,7 +41,7 @@ point &point::operator+=(const point &other) noexcept {
   return *this;
 }
 
-point &point::operator+=(std::pair<char, int32_t> offset) noexcept {
+point &point::operator+=(std::pair<char, float_t> offset) noexcept {
   if (offset.first == 'x') {
     _x += offset.second;
   } else if (offset.first == 'y') {

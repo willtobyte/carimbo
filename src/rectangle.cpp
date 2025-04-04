@@ -41,12 +41,12 @@ bool rectangle::contains(const geometry::point &point) const noexcept {
   return point.x() >= x0 && point.x() < x1 && point.y() >= y0 && point.y() < y1;
 }
 
-rectangle::operator SDL_Rect() const noexcept {
-  return SDL_Rect{
-      .x = static_cast<int>(_position.x()),
-      .y = static_cast<int>(_position.y()),
-      .w = static_cast<int>(_size.width()),
-      .h = static_cast<int>(_size.height())
+rectangle::operator SDL_FRect() const noexcept {
+  return SDL_FRect{
+      .x = _position.x(),
+      .y = _position.y(),
+      .w = _size.width(),
+      .h = _size.height()
   };
 }
 

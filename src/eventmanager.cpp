@@ -3,7 +3,8 @@
 
 using namespace input;
 
-eventmanager::eventmanager() {
+eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
+  : _renderer(std::move(renderer)) {
   int32_t number = 0;
   SDL_GetGamepads(&number);
   for (auto id = 0; id < number; ++id) {
@@ -12,7 +13,8 @@ eventmanager::eventmanager() {
     }
 
     if (auto controller = SDL_OpenGamepad(id)) {
-      _controllers.emplace(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)), gamepad_ptr(controller));
+      _controllers.emplace(
+        SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)), std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
     }
   }
 }
@@ -22,6 +24,8 @@ void eventmanager::update(float_t delta) {
 
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
+    SDL_ConvertEventToRenderCoordinates(*_renderer, &event);
+
     switch (event.type) {
     case SDL_EVENT_QUIT: {
       for (const auto &receiver : _receivers) {
@@ -88,7 +92,7 @@ void eventmanager::update(float_t delta) {
       if (auto controller = SDL_OpenGamepad(event.cdevice.which)) {
         const auto joystick = SDL_GetGamepadJoystick(controller);
         const auto id = SDL_GetJoystickID(joystick);
-        _controllers[id] = std::unique_ptr<SDL_GameController, SDL_Deleter>(controller)
+        _controllers[id] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
       }
     } break;
 

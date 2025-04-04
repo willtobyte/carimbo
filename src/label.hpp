@@ -14,7 +14,7 @@ public:
   void set_placement(const geometry::point &position) noexcept;
 
   void set(const std::string &text) noexcept;
-  void set_with_placement(const std::string &text, int32_t x, int32_t y) noexcept;
+  void set_with_placement(const std::string &text, float_t x, float_t y) noexcept;
 
   void update(float_t delta) noexcept override;
   void draw() const noexcept override;
