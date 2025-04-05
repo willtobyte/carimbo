@@ -3,16 +3,17 @@
 #include "common.hpp"
 
 #include "object.hpp"
-#include "objectmanager.hpp"
 #include "pixmap.hpp"
 #include "size.hpp"
 
 namespace framework {
+class objectmanager;
+
 class scene {
 public:
   scene() = delete;
   scene(
-      std::shared_ptr<objectmanager> objectmanager,
+      std::shared_ptr<framework::objectmanager> objectmanager,
       std::shared_ptr<graphics::pixmap> background,
       std::unordered_map<std::string, std::shared_ptr<object>> objects,
       geometry::size size
@@ -28,13 +29,15 @@ public:
 
   void on_enter() noexcept;
   void on_leave() noexcept;
+  void on_click(float_t x, float_t y) noexcept;
 
   void set_onenter(std::function<void()> fn) noexcept;
   void set_onloop(std::function<void(float_t)> fn) noexcept;
   void set_onleave(std::function<void()> fn) noexcept;
+  void set_onclick(std::function<void(float_t, float_t)> fn) noexcept;
 
 private:
-  std::shared_ptr<objectmanager> _objectmanager;
+  std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::pixmap> _background;
   std::unordered_map<std::string, std::shared_ptr<object>> _objects;
   geometry::size _size;
@@ -42,5 +45,6 @@ private:
   std::function<void()> _onenter;
   std::function<void(float_t)> _onloop;
   std::function<void()> _onleave;
+  std::function<void(float_t, float_t)> _onclick;
 };
 }

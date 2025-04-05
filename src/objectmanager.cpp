@@ -120,6 +120,10 @@ std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
   return (it != _objects.end()) ? *it : nullptr;
 }
 
+void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) {
+  _scenemanager = std::move(scenemanager);
+}
+
 void objectmanager::update(float_t delta) noexcept {
   for (auto &o : _objects) {
     const auto old = o->x();
@@ -203,28 +207,37 @@ void objectmanager::on_mousebuttondown(const input::mousebuttonevent &event) noe
 
   const geometry::point point{event.x, event.y};
 
-  for (const auto &object : _objects) {
+  const auto clicked = std::ranges::any_of(_objects, [&](const auto &object) {
     const auto &props = object->props();
+
     if (props.action.empty()) {
-      continue;
+      return false;
     }
 
     const auto it = props.animations.find(props.action);
     if (it == props.animations.end()) {
-      continue;
+      return false;
     }
 
     const auto &animation = it->second;
     if (!animation.hitbox) {
-      continue;
+      return false;
     }
 
-    const auto hitbox = geometry::rectangle{object->position() + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
+    const auto hitbox = geometry::rectangle{
+      object->position() + animation.hitbox->position() * props.scale,
+      animation.hitbox->size() * props.scale
+    };
 
     if (!hitbox.contains(point)) {
-      continue;
+      return false;
     }
 
     object->on_touch();
+    return true;
+  });
+
+  if (!clicked) {
+    _scenemanager->on_click(event.x, event.y);
   }
 }

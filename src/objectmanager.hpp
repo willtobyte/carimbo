@@ -5,6 +5,7 @@
 #include "event.hpp"
 #include "eventreceiver.hpp"
 #include "object.hpp"
+#include "scenemanager.hpp"
 #include "resourcemanager.hpp"
 
 namespace framework {
@@ -21,6 +22,8 @@ public:
 
   std::shared_ptr<object> find(uint64_t id) const noexcept;
 
+  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
+
   void update(float_t delta) noexcept;
 
   void draw() noexcept;
@@ -31,6 +34,7 @@ protected:
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
+  std::shared_ptr<scenemanager> _scenemanager;
   std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
   bool _dirty{true};

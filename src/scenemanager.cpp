@@ -3,7 +3,8 @@
 using namespace framework;
 
 scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager) noexcept
-    : _pixmappool(resourcemanager->pixmappool()), _objectmanager(std::move(objectmanager)) {}
+    : _pixmappool(resourcemanager->pixmappool()), _objectmanager(std::move(objectmanager)) {
+}
 
 std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
   const auto buffer = storage::io::read("scenes/" + name + ".json");
@@ -57,6 +58,10 @@ void scenemanager::set(const std::string &name) noexcept {
 
 std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept {
   return _scene_mapping.at(name);
+}
+
+void scenemanager::on_click(float_t x, float_t y) const noexcept {
+  _scene->on_click(x, y);
 }
 
 void scenemanager::update(float_t delta) noexcept {
