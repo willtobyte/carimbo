@@ -77,8 +77,8 @@ void object::update(float_t delta) noexcept {
 
   if (frame.duration > 0 && now - _props.last_frame < frame.duration) {
     _props.position.set(
-        static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
-        static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
+        _props.position.x() + _props.velocity.x() * delta,
+        _props.position.y() + _props.velocity.y() * delta
     );
 
     return;
