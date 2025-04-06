@@ -373,9 +373,9 @@ void framework::scriptengine::run() {
         manager.get(name)->set_onleave(fn.as<std::function<void()>>());
       }
 
-      if (module["on_click"].valid()) {
-        sol::function fn = module["on_click"];
-        manager.get(name)->set_onclick(fn.as<std::function<void(float_t, float_t)>>());
+      if (module["on_touch"].valid()) {
+        sol::function fn = module["on_touch"];
+        manager.get(name)->set_ontouch(fn.as<std::function<void(float_t, float_t)>>());
       }
 
     }

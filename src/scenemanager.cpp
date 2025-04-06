@@ -60,8 +60,8 @@ std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept
   return _scene_mapping.at(name);
 }
 
-void scenemanager::on_click(float_t x, float_t y) const noexcept {
-  _scene->on_click(x, y);
+void scenemanager::on_touch(float_t x, float_t y) const noexcept {
+  _scene->on_touch(x, y);
 }
 
 void scenemanager::update(float_t delta) noexcept {

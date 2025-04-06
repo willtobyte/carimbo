@@ -19,7 +19,7 @@ public:
 
   std::shared_ptr<scene> get(const std::string &name) const noexcept;
 
-  void on_click(float_t x, float_t y) const noexcept;
+  void on_touch(float_t x, float_t y) const noexcept;
 
   void update(float_t delta) noexcept;
 

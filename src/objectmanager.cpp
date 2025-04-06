@@ -238,6 +238,6 @@ void objectmanager::on_mousebuttondown(const input::mousebuttonevent &event) noe
   });
 
   if (!clicked) {
-    _scenemanager->on_click(event.x, event.y);
+    _scenemanager->on_touch(event.x, event.y);
   }
 }
