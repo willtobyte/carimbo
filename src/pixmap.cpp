@@ -20,20 +20,20 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
       SDL_Deleter{}
   );
   if (!_texture) {
-    throw std::runtime_error(fmt::format("[SDL_CreateTexture] Error creating texture: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_CreateTexture] error creating texture: {}", SDL_GetError()));
   }
 
   const auto pitch = static_cast<int32_t>(size.width() * 4);
   if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) {
-    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] Error updating texture: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_UpdateTexture] error updating texture: {}", SDL_GetError()));
   }
 
   if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
-    throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] error setting blend mode: {}", SDL_GetError()));
   }
 
   if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
-    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] Error setting texture scale mode: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] error setting texture scale mode: {}", SDL_GetError()));
   }
 }
 
@@ -42,15 +42,15 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, 
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
 
   if (!_texture) {
-    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] Error creating texture from surface: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_CreateTextureFromSurface] error creating texture from surface: {}", SDL_GetError()));
   }
 
   if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
-    throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] Error setting blend mode for texture: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_SetTextureBlendMode] error setting blend mode for texture: {}", SDL_GetError()));
   }
 
   if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
-    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] Error setting texture scale mode: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_SetTextureScaleMode] error setting texture scale mode: {}", SDL_GetError()));
   }
 }
 

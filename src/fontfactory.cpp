@@ -57,7 +57,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
     }
 
     if (x >= width) [[unlikely]] {
-      throw std::runtime_error(fmt::format("Error: missing glyph for '{}'", glyph));
+      throw std::runtime_error(fmt::format("error: missing glyph for '{}'", glyph));
     }
 
     w = 0;

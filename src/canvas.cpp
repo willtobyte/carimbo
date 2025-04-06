@@ -28,8 +28,8 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
 
 void canvas::set_pixels(const std::vector<uint32_t> &pixels) noexcept {
   void *ptr = nullptr;
-  int pitch = 0;
-  if (SDL_LockTexture(_framebuffer.get(), nullptr, &ptr, &pitch) != 0) [[unlikely]] {
+  auto pitch = 0;
+  if (!SDL_LockTexture(_framebuffer.get(), nullptr, &ptr, &pitch)) [[unlikely]] {
     return;
   }
 

@@ -536,7 +536,7 @@ void framework::scriptengine::run() {
         nlohmann::json j = table2json(table);
         c.set<nlohmann::json>(key, j);
       } else {
-        throw std::runtime_error("Unsupported type for set");
+        throw std::runtime_error("unsupported type for set");
       }
     },
     "get", [](const storage::cassette &c, const std::string &key, sol::object default_value, sol::this_state ts) -> sol::object {
