@@ -24,9 +24,6 @@ int32_t application::run() {
   } catch (const std::exception &ex) {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Unexpected Error", ex.what(), nullptr);
     return 1;
-  } catch (...) {
-    fmt::println(stderr, "Unknown error occurred");
-    return 3;
   }
 
   return 0;
