@@ -1,5 +1,4 @@
 #include "canvas.hpp"
-#include <fmt/base.h>
 
 using namespace graphics;
 

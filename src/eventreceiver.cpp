@@ -1,5 +1,4 @@
 #include "eventreceiver.hpp"
-#include <fmt/base.h>
 
 using namespace input;
 
