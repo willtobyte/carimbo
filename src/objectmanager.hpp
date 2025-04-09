@@ -24,7 +24,7 @@ public:
 
   void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
 
-  void update(float_t delta) noexcept;
+  void update(float_t delta, uint64_t ticks) noexcept;
 
   void draw() noexcept;
 

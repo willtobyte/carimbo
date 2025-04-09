@@ -124,11 +124,11 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::update(float_t delta) noexcept {
+void objectmanager::update(float_t delta, uint64_t ticks) noexcept {
   for (auto &o : _objects) {
     const auto old = o->x();
 
-    o->update(delta);
+    o->update(delta, ticks);
 
     if (o->x() != old) {
       _dirty = true;

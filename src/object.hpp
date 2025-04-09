@@ -18,7 +18,7 @@ public:
 
   std::string kind() const noexcept;
 
-  void update(float_t delta) noexcept;
+  void update(float_t delta, uint64_t ticks) noexcept;
 
   void draw() const noexcept;
 
@@ -63,9 +63,10 @@ public:
 private:
   friend class objectmanager;
 
-  objectprops _props;
   memory::kv _kv;
+  objectprops _props;
   uint64_t _tick_count{0};
+  uint64_t _last_tick{0};
   std::function<void()> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onupdate;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onanimationfinished;

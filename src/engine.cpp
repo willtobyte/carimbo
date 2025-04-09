@@ -154,11 +154,10 @@ void engine::run() noexcept {
 }
 
 void engine::_loop() noexcept {
-  static auto prior = SDL_GetTicks();
-  const auto now = SDL_GetTicks();
-  const auto delta = std::min(static_cast<float_t>(now - prior) / 1000.0f, 1.0f / 60.0f);
-
-  prior = now;
+  const auto ticks = SDL_GetTicks();
+  static auto prior = ticks;
+  const auto delta = std::min(static_cast<float_t>(ticks - prior) / 1000.0f, 1.0f / 60.0f);
+  prior = ticks;
 
   for (const auto &observer : _observers) {
     observer->on_beginupdate();
@@ -167,7 +166,7 @@ void engine::_loop() noexcept {
   _eventmanager->update(delta);
   _overlay->update(delta);
   _scenemanager->update(delta);
-  _objectmanager->update(delta);
+  _objectmanager->update(delta, ticks);
 
   for (const auto &loopable : _loopables) {
     loopable->loop(delta);
