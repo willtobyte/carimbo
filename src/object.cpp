@@ -70,8 +70,8 @@ void object::update(float_t delta, uint64_t ticks) noexcept {
 
   if (_props.action.empty()) {
     _props.position.set(
-        static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
-        static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
+        _props.position.x() + _props.velocity.x() * delta,
+        _props.position.y() + _props.velocity.y() * delta
     );
 
     return;
@@ -109,8 +109,8 @@ void object::update(float_t delta, uint64_t ticks) noexcept {
   }
 
   _props.position.set(
-      static_cast<int32_t>(_props.position.x() + _props.velocity.x() * delta),
-      static_cast<int32_t>(_props.position.y() + _props.velocity.y() * delta)
+      _props.position.x() + _props.velocity.x() * delta,
+      _props.position.y() + _props.velocity.y() * delta
   );
 }
 
