@@ -95,15 +95,14 @@ if(EMSCRIPTEN)
   )
 
   target_link_options(${PROJECT_NAME} PRIVATE
+    -sUSE_SDL=3
     -sEVAL_CTORS=1
     -sWASM_BIGINT=1
     -sINITIAL_MEMORY=128MB
     -sALLOW_MEMORY_GROWTH=1
-    -sWEBSOCKET_SUBPROTOCOL=text
     -sEXPORTED_RUNTIME_METHODS=['callMain']
+    -sWEBSOCKET_SUBPROTOCOL=text
     -lwebsocket.js
-    -sUSE_SDL=3
-    # --use-port=sdl3
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
