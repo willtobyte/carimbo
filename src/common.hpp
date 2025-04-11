@@ -79,3 +79,5 @@
 #include "constants.hpp"
 #include "deleters.hpp"
 #include "helpers.hpp"
+
+static_assert(std::is_same_v<float_t, float>, "float_t is not float — check FLT_EVAL_METHOD or cast explicitly.");
