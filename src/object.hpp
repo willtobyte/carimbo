@@ -18,7 +18,7 @@ public:
 
   std::string kind() const noexcept;
 
-  void update(float_t delta, uint64_t ticks) noexcept;
+  void update(float_t delta) noexcept;
 
   void draw() const noexcept;
 

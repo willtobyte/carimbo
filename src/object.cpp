@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include <SDL3/SDL_timer.h>
 
 using namespace framework;
 
@@ -50,22 +51,9 @@ algebra::vector2d object::velocity() const noexcept {
   return _props.velocity;
 }
 
-void object::update(float_t delta, uint64_t ticks) noexcept {
+void object::update(float_t delta) noexcept {
   if (const auto fn = _onupdate; fn) {
     fn(shared_from_this());
-  }
-
-  constexpr const auto ticks_per_second = 10;
-  constexpr const auto tick_interval = 1000 / ticks_per_second;
-  if (ticks - _last_tick >= tick_interval) {
-    _last_tick = ticks;
-    ++_tick_count;
-
-    for (const auto &[n, callback] : _tickinmapping) {
-      if (_tick_count % n == 0) {
-        callback(shared_from_this());
-      }
-    }
   }
 
   if (_props.action.empty()) {
@@ -77,10 +65,11 @@ void object::update(float_t delta, uint64_t ticks) noexcept {
     return;
   }
 
+  const auto now = SDL_GetTicks();
   const auto &animation = _props.animations.at(_props.action);
   const auto &frame = animation.keyframes[_props.frame];
 
-  if (frame.duration > 0 && ticks - _props.last_frame < frame.duration) {
+  if (frame.duration > 0 && now - _props.last_frame < frame.duration) {
     _props.position.set(
         _props.position.x() + _props.velocity.x() * delta,
         _props.position.y() + _props.velocity.y() * delta
@@ -89,7 +78,7 @@ void object::update(float_t delta, uint64_t ticks) noexcept {
     return;
   }
 
-  _props.last_frame = ticks;
+  _props.last_frame = now;
   if (++_props.frame >= animation.keyframes.size()) {
     if (animation.oneshot) {
       auto finished = std::exchange(_props.action, "");
@@ -99,7 +88,7 @@ void object::update(float_t delta, uint64_t ticks) noexcept {
       if (animation.next.has_value()) {
         _props.action = animation.next.value();
         _props.frame = 0;
-        _props.last_frame = ticks;
+        _props.last_frame = 0;
       } else {
         return;
       }
