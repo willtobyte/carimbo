@@ -144,14 +144,14 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "Controller",
-    "up", input::joystickevent::up,
-    "down", input::joystickevent::down,
-    "left", input::joystickevent::left,
-    "right", input::joystickevent::right,
-    "triangle", input::joystickevent::triangle,
-    "circle", input::joystickevent::circle,
-    "cross", input::joystickevent::cross,
-    "square", input::joystickevent::square
+    "up", input::event::gamepad::button::up,
+    "down", input::event::gamepad::button::down,
+    "left", input::event::gamepad::button::left,
+    "right", input::event::gamepad::button::right,
+    "triangle", input::event::gamepad::button::triangle,
+    "circle", input::event::gamepad::button::circle,
+    "cross", input::event::gamepad::button::cross,
+    "square", input::event::gamepad::button::square
   );
 
   lua.new_enum(
@@ -311,10 +311,10 @@ void framework::scriptengine::run() {
     int32_t index;
     const framework::statemanager &e;
 
-    playerwrapper(input::player player, const framework::statemanager &state_manager)
+    playerwrapper(input::event::player player, const framework::statemanager &state_manager)
       : index(static_cast<int32_t>(player)), e(state_manager) {}
 
-    bool on(std::variant<input::joystickevent> type) {
+    bool on(std::variant<input::event::gamepad::button> type) {
       return e.on(index, type);
     }
   };
@@ -327,18 +327,18 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "Player",
-    "one", input::player::one,
-    "two", input::player::two
+    "one", input::event::player::one,
+    "two", input::event::player::two
   );
 
-  std::unordered_map<input::player, playerwrapper> player_mapping;
+  std::unordered_map<input::event::player, playerwrapper> player_mapping;
 
   lua.new_usertype<framework::statemanager>(
     "StateManager",
     sol::no_constructor,
     "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
-    "player", [&player_mapping](framework::statemanager &self, input::player player) -> playerwrapper & {
+    "player", [&player_mapping](framework::statemanager &self, input::event::player player) -> playerwrapper & {
       auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
 
       return iterator->second;
@@ -611,8 +611,8 @@ void framework::scriptengine::run() {
     "a", sol::property(&graphics::color::a, &graphics::color::set_a),
 
     sol::meta_function::equal_to,
-    &graphics::color::operator==
-    , // sol::meta_function::not_equal_to, &color::operator!=,
+    &graphics::color::operator==,
+    // sol::meta_function::not_equal_to, &color::operator!=,
 
     sol::meta_function::to_string, [](const graphics::color &c) {
       return fmt::format("color({}, {}, {}, {})", c.r(), c.g(), c.b(), c.a());
@@ -621,11 +621,11 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "KeyEvent",
-    "up", input::keyevent::up,
-    "left", input::keyevent::left,
-    "down", input::keyevent::down,
-    "right", input::keyevent::right,
-    "space", input::keyevent::space
+    "up", input::event::keyboard::key::up,
+    "left", input::event::keyboard::key::left,
+    "down", input::event::keyboard::key::down,
+    "right", input::event::keyboard::key::right,
+    "space", input::event::keyboard::key::space
   );
 
   lua.new_usertype<framework::mail>(

@@ -3,49 +3,55 @@
 #include "common.hpp"
 
 namespace input {
-enum player : uint8_t {
+namespace event {
+enum class player : uint8_t {
   one = 0,
   two
 };
 
-enum eventtype : uint32_t {
+enum class type : uint32_t {
   collision = SDL_EVENT_USER + 1,
   mail,
   timer
 };
 
-enum class keyevent : int32_t {
+namespace keyboard {
+enum class key : int32_t {
   up = SDLK_UP,
   left = SDLK_LEFT,
   down = SDLK_DOWN,
   right = SDLK_RIGHT,
   space = SDLK_SPACE,
 };
+}
 
-struct mousemotionevent {
+namespace mouse {
+struct motion {
   float_t x;
   float_t y;
 };
 
-struct mousebuttonevent {
+struct button {
   enum class type : uint32_t {
     down = SDL_EVENT_MOUSE_BUTTON_DOWN,
     up = SDL_EVENT_MOUSE_BUTTON_UP,
   };
 
-  enum class button : uint8_t {
+  enum class which : uint8_t {
     left = SDL_BUTTON_LEFT,
     middle = SDL_BUTTON_MIDDLE,
     right = SDL_BUTTON_RIGHT,
   };
 
   type type;
-  button button;
+  which button;
   float_t x;
   float_t y;
 };
+}
 
-enum class joystickevent : int32_t {
+namespace gamepad {
+enum class button : int32_t {
   up = SDL_GAMEPAD_BUTTON_DPAD_UP,
   down = SDL_GAMEPAD_BUTTON_DPAD_DOWN,
   left = SDL_GAMEPAD_BUTTON_DPAD_LEFT,
@@ -56,7 +62,7 @@ enum class joystickevent : int32_t {
   square = SDL_GAMEPAD_BUTTON_WEST,
 };
 
-struct joystickaxisevent {
+struct motion {
   enum class axis : int8_t {
     invalid = SDL_GAMEPAD_AXIS_INVALID,
     leftx = SDL_GAMEPAD_AXIS_LEFTX,
@@ -71,20 +77,22 @@ struct joystickaxisevent {
   axis kind;
   int16_t value;
 };
+}
 
-struct mailevent {
-  mailevent(uint64_t to, const std::string &body) noexcept
+struct mail {
+  mail(uint64_t to, const std::string &body) noexcept
       : to(to), body(body) {}
 
   uint64_t to;
   std::string body;
 };
-}
 
-struct collisionevent {
-  collisionevent(uint64_t a, uint64_t b)
+struct collision {
+  collision(uint64_t a, uint64_t b)
       : a(a), b(b) {}
 
   uint64_t a;
   uint64_t b;
 };
+}
+}

@@ -6,7 +6,6 @@
 #include "eventreceiver.hpp"
 #include "point.hpp"
 #include "rectangle.hpp"
-#include "reflection.hpp"
 #include "resourcemanager.hpp"
 
 namespace graphics {
@@ -34,9 +33,9 @@ public:
   explicit cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager);
   virtual ~cursor() = default;
 
-  virtual void on_mousemotion(const input::mousemotionevent &event) noexcept;
-  virtual void on_mousebuttondown(const input::mousebuttonevent &event) noexcept;
-  virtual void on_mousebuttonup(const input::mousebuttonevent &event) noexcept;
+  virtual void on_mousebuttondown(const input::event::mouse::button &event) noexcept;
+  virtual void on_mousebuttonup(const input::event::mouse::button &event) noexcept;
+  virtual void on_mousemotion(const input::event::mouse::motion &event) noexcept;
 
   void update(float_t delta) noexcept;
   void draw() const noexcept;

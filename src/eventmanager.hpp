@@ -4,6 +4,7 @@
 
 #include "eventreceiver.hpp"
 #include "noncopyable.hpp"
+#include "event.hpp"
 
 namespace input {
 class eventmanager : private framework::noncopyable {

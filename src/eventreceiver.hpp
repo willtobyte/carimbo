@@ -10,15 +10,15 @@ public:
   virtual ~eventreceiver() = default;
 
   virtual void on_quit() noexcept;
-  virtual void on_keydown(const keyevent &event) noexcept;
-  virtual void on_keyup(const keyevent &event) noexcept;
-  virtual void on_mousemotion(const mousemotionevent &event) noexcept;
-  virtual void on_mousebuttondown(const mousebuttonevent &event) noexcept;
-  virtual void on_mousebuttonup(const mousebuttonevent &event) noexcept;
-  virtual void on_joystickbuttondown(uint8_t who, const joystickevent &event) noexcept;
-  virtual void on_joystickbuttonup(uint8_t who, const joystickevent &event) noexcept;
-  virtual void on_joystickaxismotion(uint8_t who, const joystickaxisevent &event) noexcept;
-  virtual void on_mail(const mailevent &event) noexcept;
-  virtual void on_collision(const collisionevent &event) noexcept;
+  virtual void on_keydown(const event::keyboard::key &event) noexcept;
+  virtual void on_keyup(const event::keyboard::key &event) noexcept;
+  virtual void on_mousebuttondown(const event::mouse::button &event) noexcept;
+  virtual void on_mousebuttonup(const event::mouse::button &event) noexcept;
+  virtual void on_mousemotion(const event::mouse::motion &event) noexcept;
+  virtual void on_gamepadbuttondown(uint8_t who, const event::gamepad::button &event) noexcept;
+  virtual void on_gamepadbuttonup(uint8_t who, const event::gamepad::button &event) noexcept;
+  virtual void on_gamepadmotion(uint8_t who, const event::gamepad::motion &event) noexcept;
+  virtual void on_mail(const event::mail &event) noexcept;
+  virtual void on_collision(const event::collision &event) noexcept;
 };
 }

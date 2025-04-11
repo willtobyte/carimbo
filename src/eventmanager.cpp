@@ -1,7 +1,10 @@
 #include "eventmanager.hpp"
 #include "event.hpp"
+#include "collision.hpp"
 
 using namespace input;
+
+using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   : _renderer(std::move(renderer)) {
@@ -34,7 +37,7 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_EVENT_KEY_DOWN: {
-      const keyevent e{static_cast<keyevent>(event.key.key)};
+      const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
 
       for (const auto &receiver : _receivers) {
         receiver->on_keydown(e);
@@ -42,7 +45,7 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_EVENT_KEY_UP: {
-      const keyevent e{static_cast<keyevent>(event.key.key)};
+      const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
 
       for (const auto &receiver : _receivers) {
         receiver->on_keyup(e);
@@ -50,7 +53,7 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_EVENT_MOUSE_MOTION: {
-      const mousemotionevent e{event.motion.x, event.motion.y };
+      const mouse::motion e{event.motion.x, event.motion.y };
 
       for (const auto &receiver : _receivers) {
         receiver->on_mousemotion(e);
@@ -58,9 +61,9 @@ void eventmanager::update(float_t delta) {
     } break;
 
     case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-      const mousebuttonevent e{
-          .type = mousebuttonevent::type::down,
-          .button = static_cast<enum mousebuttonevent::button>(event.button.button),
+      const mouse::button e{
+          .type = mouse::button::type::down,
+          .button = static_cast<enum mouse::button::which>(event.button.button),
           .x = event.button.x,
           .y = event.button.y
       };
@@ -72,9 +75,9 @@ void eventmanager::update(float_t delta) {
     }
 
     case SDL_EVENT_MOUSE_BUTTON_UP: {
-      const mousebuttonevent e{
-          .type = mousebuttonevent::type::up,
-          .button = static_cast<enum mousebuttonevent::button>(event.button.button),
+      const mouse::button e{
+          .type = mouse::button::type::up,
+          .button = static_cast<enum mouse::button::which>(event.button.button),
           .x = event.button.x,
           .y = event.button.y
       };
@@ -101,54 +104,54 @@ void eventmanager::update(float_t delta) {
       break;
 
     case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
-      const joystickevent e{event.gbutton.button};
+      const gamepad::button e{event.gbutton.button};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickbuttondown(event.gbutton.which, e);
+        receiver->on_gamepadbuttondown(event.gbutton.which, e);
       }
     } break;
 
     case SDL_EVENT_GAMEPAD_BUTTON_UP: {
-      const joystickevent e{event.gbutton.button};
+      const gamepad::button e{event.gbutton.button};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickbuttonup(event.gbutton.which, e);
+        receiver->on_gamepadbuttonup(event.gbutton.which, e);
       }
     } break;
 
     case SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION: {
       const auto who = event.gaxis.which;
-      const auto axis = static_cast<input::joystickaxisevent::axis>(event.gaxis.axis);
+      const auto axis = static_cast<gamepad::motion::axis>(event.gaxis.axis);
       const auto value = event.gaxis.value;
-      const joystickaxisevent e{axis, value};
+      const gamepad::motion e{axis, value};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_joystickaxismotion(who, e);
+        receiver->on_gamepadmotion(who, e);
       }
     } break;
 
-    case input::eventtype::collision: {
+    case static_cast<uint32_t>(type::collision): {
       auto *ptr = static_cast<framework::collision *>(event.user.data1);
       if (ptr) {
         for (const auto &receiver : _receivers) {
-          receiver->on_collision(collisionevent(ptr->a, ptr->b));
+          receiver->on_collision(collision(ptr->a, ptr->b));
         }
         delete ptr;
       }
     } break;
 
-    case input::eventtype::mail: {
+    case static_cast<uint32_t>(type::mail): {
       auto *ptr = static_cast<framework::mail *>(event.user.data1);
       if (ptr) {
         for (const auto &receiver : _receivers) {
-          receiver->on_mail(mailevent(ptr->to, ptr->body));
+          receiver->on_mail(mail(ptr->to, ptr->body));
         }
 
         delete ptr;
       }
     } break;
 
-    case input::eventtype::timer: {
+    case static_cast<uint32_t>(type::timer): {
       const auto *fn = static_cast<std::function<void()> *>(event.user.data1);
       const auto *repeat = static_cast<bool *>(event.user.data2);
       if (fn) {

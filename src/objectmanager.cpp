@@ -2,6 +2,8 @@
 
 using namespace framework;
 
+using namespace input::event;
+
 template <typename T>
 std::optional<std::function<T>> operator||(const std::optional<std::function<T>> &lhs, const std::optional<std::function<T>> &rhs) {
   return lhs ? lhs : rhs;
@@ -180,7 +182,7 @@ void objectmanager::update(float_t delta, uint64_t ticks) noexcept {
       if (callback_b) (*callback_b)(b, a);
 
       SDL_Event event{};
-      event.type = input::eventtype::collision;
+      event.type = static_cast<uint32_t>(type::collision);
       auto ptr = std::make_unique<collision>(a->id(), b->id());
       event.user.data1 = ptr.release();
       SDL_PushEvent(&event);
@@ -194,14 +196,14 @@ void objectmanager::draw() noexcept {
   }
 }
 
-void objectmanager::on_mail(const input::mailevent &event) noexcept {
+void objectmanager::on_mail(const input::event::mail &event) noexcept {
   if (const auto object = find(event.to); object) {
     object->on_email(event.body);
   }
 }
 
-void objectmanager::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
-  if (event.button != input::mousebuttonevent::button::left) {
+void objectmanager::on_mousebuttondown(const mouse::button &event) noexcept {
+  if (event.button != mouse::button::which::left) {
     return;
   }
 

@@ -1,48 +1,49 @@
 #include "eventreceiver.hpp"
 
 using namespace input;
+using namespace event;
 
 void eventreceiver::on_quit() noexcept {}
 
-void eventreceiver::on_keydown(const keyevent &event) noexcept {
+void eventreceiver::on_keydown(const keyboard::key &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_keyup(const keyevent &event) noexcept {
+void eventreceiver::on_keyup(const keyboard::key &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_mousemotion(const mousemotionevent &event) noexcept {
+void eventreceiver::on_mousebuttondown(const mouse::button &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_mousebuttondown(const mousebuttonevent &event) noexcept {
+void eventreceiver::on_mousebuttonup(const mouse::button &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_mousebuttonup(const mousebuttonevent &event) noexcept {
+void eventreceiver::on_mousemotion(const mouse::motion &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_joystickbuttondown(uint8_t who, const joystickevent &event) noexcept {
+void eventreceiver::on_gamepadbuttondown(uint8_t who, const gamepad::button &event) noexcept {
   UNUSED(who);
   UNUSED(event);
 }
 
-void eventreceiver::on_joystickbuttonup(uint8_t who, const joystickevent &event) noexcept {
+void eventreceiver::on_gamepadbuttonup(uint8_t who, const gamepad::button &event) noexcept {
   UNUSED(who);
   UNUSED(event);
 }
 
-void eventreceiver::on_joystickaxismotion(uint8_t who, const joystickaxisevent &event) noexcept {
+void eventreceiver::on_gamepadmotion(uint8_t who, const gamepad::motion &event) noexcept {
   UNUSED(who);
   UNUSED(event);
 }
 
-void eventreceiver::on_mail(const mailevent &event) noexcept {
+void eventreceiver::on_mail(const mail &event) noexcept {
   UNUSED(event);
 }
 
-void eventreceiver::on_collision(const collisionevent &event) noexcept {
+void eventreceiver::on_collision(const collision &event) noexcept {
   UNUSED(event);
 }

@@ -2,6 +2,8 @@
 
 using namespace graphics;
 
+using namespace input::event;
+
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
@@ -32,15 +34,11 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   }
 }
 
-void cursor::on_mousemotion(const input::mousemotionevent &event) noexcept {
-  _position = geometry::point{event.x, event.y};
-}
-
-void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
+void cursor::on_mousebuttondown(const mouse::button &event) noexcept {
   // TODO FIX ME using enum input::mousebuttonevent::button;
 
-  constexpr auto left = input::mousebuttonevent::button::left;
-  constexpr auto right = input::mousebuttonevent::button::right;
+  constexpr auto left = mouse::button::which::left;
+  constexpr auto right = mouse::button::which::right;
   switch (event.button) {
   case left:
     _action = ACTION_LEFT;
@@ -56,8 +54,12 @@ void cursor::on_mousebuttondown(const input::mousebuttonevent &event) noexcept {
   _last_frame = SDL_GetTicks();
 }
 
-void cursor::on_mousebuttonup(const input::mousebuttonevent &event) noexcept {
+void cursor::on_mousebuttonup(const mouse::button &event) noexcept {
   UNUSED(event);
+}
+
+void cursor::on_mousemotion(const mouse::motion &event) noexcept {
+  _position = geometry::point{event.x, event.y};
 }
 
 void cursor::update(float_t) noexcept {

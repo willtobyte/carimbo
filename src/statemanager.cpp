@@ -1,9 +1,7 @@
 #include "statemanager.hpp"
 
-#include "event.hpp"
-#include "object.hpp"
-
 using namespace framework;
+using namespace input::event;
 
 static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) noexcept {
   return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
@@ -14,7 +12,7 @@ bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b
   return (it != _collision_mapping.end()) ? it->second : false;
 }
 
-bool statemanager::on(int player, const std::variant<input::joystickevent> &type) const noexcept {
+bool statemanager::on(int player, const std::variant<gamepad::button> &type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -28,52 +26,52 @@ int8_t statemanager::players() const noexcept {
   return _state.size();
 }
 
-constexpr std::optional<input::joystickevent> keytoctrl(const input::keyevent &event) {
+constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard::key &event) {
   using namespace input;
 
   switch (event) {
-  case keyevent::up:
-    return joystickevent::up;
-  case keyevent::down:
-    return joystickevent::down;
-  case keyevent::left:
-    return joystickevent::left;
-  case keyevent::right:
-    return joystickevent::right;
-  case keyevent::space:
-    return joystickevent::cross;
+  case keyboard::key::up:
+    return gamepad::button::up;
+  case keyboard::key::down:
+    return gamepad::button::down;
+  case keyboard::key::left:
+    return gamepad::button::left;
+  case keyboard::key::right:
+    return gamepad::button::right;
+  case keyboard::key::space:
+    return gamepad::button::cross;
   default:
     return std::nullopt;
   }
 }
 
-void statemanager::on_keydown(const input::keyevent &event) noexcept {
+void statemanager::on_keydown(const keyboard::key &event) noexcept {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = true;
   }
 }
 
-void statemanager::on_keyup(const input::keyevent &event) noexcept {
+void statemanager::on_keyup(const keyboard::key &event) noexcept {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = false;
   }
 }
 
-void statemanager::on_joystickbuttondown(uint8_t who, const input::joystickevent &event) noexcept {
+void statemanager::on_gamepadbuttondown(uint8_t who, const gamepad::button &event) noexcept {
   _state[who][event] = true;
 }
 
-void statemanager::on_joystickbuttonup(uint8_t who, const input::joystickevent &event) noexcept {
+void statemanager::on_gamepadbuttonup(uint8_t who, const gamepad::button &event) noexcept {
   _state[who][event] = false;
 }
 
-void statemanager::on_joystickaxismotion(uint8_t who, const input::joystickaxisevent &event) noexcept {
+void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion &event) noexcept {
   using namespace input;
 
   static constexpr auto threshold = 8000;
   static constexpr auto deadzone = 4000;
 
-  const auto process = [&](keyevent negative, keyevent positive) {
+  const auto process = [&](keyboard::key negative, keyboard::key positive) {
     if (event.value < -threshold) {
       if (auto ctrl = keytoctrl(negative)) {
         _state[who][*ctrl] = true;
@@ -93,12 +91,12 @@ void statemanager::on_joystickaxismotion(uint8_t who, const input::joystickaxise
   };
 
   switch (event.kind) {
-  case joystickaxisevent::axis::lefty:
-    process(keyevent::up, keyevent::down);
+  case gamepad::motion::axis::lefty:
+    process(keyboard::key::up, keyboard::key::down);
     break;
 
-  case joystickaxisevent::axis::leftx:
-    process(keyevent::left, keyevent::right);
+  case gamepad::motion::axis::leftx:
+    process(keyboard::key::left, keyboard::key::right);
     break;
 
   default:
@@ -106,7 +104,7 @@ void statemanager::on_joystickaxismotion(uint8_t who, const input::joystickaxise
   }
 }
 
-void statemanager::on_collision(const collisionevent &event) noexcept {
+void statemanager::on_collision(const input::event::collision &event) noexcept {
   _collision_mapping[make_key(event.a, event.b)] = true;
 }
 
