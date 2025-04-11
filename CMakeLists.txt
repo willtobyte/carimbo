@@ -113,12 +113,12 @@ else()
   if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:/Od;/Zi>
-      $<$<CONFIG:Release>:/O2>
+      $<$<CONFIG:Release>:/O3>
     )
   else()
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O2;-flto>
+      $<$<CONFIG:Release>:-O3;-flto>
     )
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
