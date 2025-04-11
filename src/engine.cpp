@@ -156,7 +156,7 @@ void engine::run() noexcept {
 void engine::_loop() noexcept {
   const auto ticks = SDL_GetTicks();
   static auto prior = ticks;
-  const auto delta = std::min(static_cast<float>(ticks - prior) * 0.001f, 1.0f / 60.0f);
+  const auto delta = std::min(static_cast<float_t>(ticks - prior) * 0.001f, 1.0f / 60.0f);
   prior = ticks;
 
   for (const auto &observer : _observers) {
