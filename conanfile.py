@@ -6,8 +6,12 @@ from conan.tools.cmake import CMakeToolchain
 class Carimbo(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
+    def configure(self):
+        self.options["sol2"].with_lua = "luajit"
+
     def requirements(self):
         self.requires("fmt/11.1.4")
+        self.requires("luajit/2.1.0-beta3")
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.11.3")
         self.requires("ogg/1.3.5")
