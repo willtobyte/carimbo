@@ -6,12 +6,15 @@ from conan.tools.cmake import CMakeToolchain
 class Carimbo(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
+    def _not_webassembly(self):
+        return str(self.settings.os).lower() not in {"emscripten"}
+
     def configure(self):
-        self.options["sol2"].with_lua = "luajit"
+        if self._not_webassembly():
+            self.options["sol2"].with_lua = "luajit"
 
     def requirements(self):
         self.requires("fmt/11.1.4")
-        self.requires("luajit/2.1.0-beta3")
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.11.3")
         self.requires("ogg/1.3.5")
@@ -23,8 +26,9 @@ class Carimbo(ConanFile):
 
         self.requires("libalsa/1.2.12", override=True)
 
-        if str(self.settings.os).lower() not in {"emscripten"}:
+        if self._not_webassembly():
             self.requires("boost/1.87.0")
+            self.requires("luajit/2.1.0-beta3")
             self.requires("openssl/3.4.1")
 
     def generate(self):

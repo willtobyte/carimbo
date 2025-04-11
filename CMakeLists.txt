@@ -14,11 +14,11 @@ endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
   find_package(Boost CONFIG REQUIRED)
+  find_package(luajit CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
 endif()
 find_package(fmt CONFIG REQUIRED)
-find_package(luajit CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
@@ -133,7 +133,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   fmt::fmt
-  luajit::luajit
   nlohmann_json::nlohmann_json
   Ogg::ogg
   physfs-static
@@ -146,6 +145,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
   target_link_libraries(${PROJECT_NAME} PRIVATE
     Boost::boost
+    luajit::luajit
     OpenAL::OpenAL
     openssl::openssl
   )

@@ -9,7 +9,9 @@
 #define SOL_PRINT_ERRORS 1
 #endif
 
+#ifndef EMSCRIPTEN
 #define SOL_LUAJIT 1
+#endif
 
 #define WEBSOCKET
 
