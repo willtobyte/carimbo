@@ -55,12 +55,13 @@ void timermanager::clear(int32_t id) noexcept {
 }
 
 int32_t timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
-  const auto ptr = new std::function<void()>(fn);
-  const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
+  auto ptr = std::make_shared<std::function<void()>>(std::move(fn));
+  const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr.get());
   if (id) [[likely]] {
+    _timers[id] = ptr;
     return id;
   }
 
-  delete ptr;
+  ptr.reset();
   throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
 }
