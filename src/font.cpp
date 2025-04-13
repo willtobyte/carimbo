@@ -2,18 +2,26 @@
 
 using namespace graphics;
 
-font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, float_t scale)
-    : _glyphs(glyphs), _pixmap(pixmap), _spacing(spacing), _scale(scale) {}
+font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale)
+    : _glyphs(glyphs), _pixmap(pixmap), _spacing(spacing), _leading(leading), _scale(scale) {}
 
 void font::draw(const std::string &text, const geometry::point &position) const noexcept {
   geometry::point cursor = position;
+  const auto lh = _glyphs.begin()->second.size().height() * _scale;
 
-  for (const auto &character : text) {
-    const auto &glyph = _glyphs.at(character);
-    auto size = glyph.size();
+  for (const char character : text) {
+    switch (character) {
+      case '\n':
+        cursor = geometry::point(position.x(), cursor.y() + lh);
+        break;
 
-    _pixmap->draw(glyph, {cursor, size * _scale});
-
-    cursor += std::make_pair('x', size.width() + _spacing);
+      default: {
+        const auto &glyph = _glyphs.at(static_cast<uint8_t>(character));
+        auto size = glyph.size();
+        _pixmap->draw(glyph, {cursor, size * _scale});
+        cursor += std::make_pair('x', size.width() + _spacing);
+        break;
+      }
+    }
   }
 }
