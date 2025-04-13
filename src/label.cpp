@@ -19,6 +19,10 @@ void label::set_with_placement(const std::string &text, float_t x, float_t y) no
   _position = {x, y};
 }
 
+void label::clear() noexcept {
+  _text.clear();
+}
+
 void label::update(float_t delta) noexcept {
   UNUSED(delta);
 }

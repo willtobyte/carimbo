@@ -16,6 +16,8 @@ public:
   void set(const std::string &text) noexcept;
   void set_with_placement(const std::string &text, float_t x, float_t y) noexcept;
 
+  void clear() noexcept;
+
   void update(float_t delta) noexcept override;
   void draw() const noexcept override;
 

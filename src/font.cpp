@@ -12,7 +12,7 @@ void font::draw(const std::string &text, const geometry::point &position) const 
   for (const char character : text) {
     switch (character) {
       case '\n':
-        cursor = geometry::point(position.x(), cursor.y() + lh);
+        cursor = geometry::point(position.x(), cursor.y() + lh + _leading);
         break;
 
       default: {

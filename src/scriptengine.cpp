@@ -686,7 +686,8 @@ void framework::scriptengine::run() {
       },
       [](graphics::label &self, const std::string &text, int32_t x, int32_t y) {
         self.set_with_placement(text, x, y);
-      })
+      }),
+    "clear", &graphics::label::clear
   );
 
   lua.new_usertype<graphics::widget>(
