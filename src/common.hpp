@@ -58,6 +58,7 @@
 #include <functional>
 #include <iterator>
 #include <limits>
+#include <unordered_set>
 #include <list>
 #include <map>
 #include <memory>

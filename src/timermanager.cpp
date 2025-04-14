@@ -31,14 +31,6 @@ uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, false);
 }
 
-timermanager::~timermanager() noexcept {
-  for (const auto &timer : _timers) {
-    SDL_RemoveTimer(timer.first);
-  }
-
-  _timers.clear();
-}
-
 int32_t timermanager::set(int32_t interval, std::function<void()> fn) {
   return add_timer(interval, fn, true);
 }
@@ -48,20 +40,16 @@ int32_t timermanager::singleshot(int32_t interval, std::function<void()> fn) {
 }
 
 void timermanager::clear(int32_t id) noexcept {
-  if (auto it = _timers.find(id); it != _timers.end()) {
-    SDL_RemoveTimer(id);
-    _timers.erase(it);
-  }
+  SDL_RemoveTimer(id);
 }
 
 int32_t timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
-  auto ptr = std::make_shared<std::function<void()>>(std::move(fn));
-  const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr.get());
-  if (id) [[likely]] {
-    _timers[id] = ptr;
-    return id;
+  auto* ptr = new std::function<void()>(std::move(fn));
+  const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
+  if (!id) [[unlikely]] {
+    delete ptr;
+    throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
   }
 
-  ptr.reset();
-  throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
+  return id;
 }
