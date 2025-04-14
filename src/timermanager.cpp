@@ -6,19 +6,12 @@ uint32_t generic_wrapper(void *userdata, SDL_TimerID id, uint32_t interval, bool
   UNUSED(id);
   const auto fn = static_cast<std::function<void()> *>(userdata);
 
-#ifdef EMSCRIPTEN
-  (*fn)();
-  if (!repeat) {
-    delete fn;
-  }
-#else
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::timer);
   event.user.data1 = fn;
   event.user.data2 = new bool(repeat);
 
   SDL_PushEvent(&event);
-#endif
 
   return repeat ? interval : 0;
 }
