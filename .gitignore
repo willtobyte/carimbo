@@ -27,3 +27,7 @@ tmp/
 
 # Misc
 cassette.json
+
+# Python
+.ropeproject/
+.ruff_cache/
