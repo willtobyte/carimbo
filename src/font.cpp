@@ -7,12 +7,12 @@ font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spaci
 
 void font::draw(const std::string &text, const geometry::point &position) const noexcept {
   geometry::point cursor = position;
-  const auto lh = _glyphs.begin()->second.size().height() * _scale;
+  const auto height = _glyphs.begin()->second.size().height() * _scale;
 
   for (const char character : text) {
     switch (character) {
       case '\n':
-        cursor = geometry::point(position.x(), cursor.y() + lh + _leading);
+        cursor = geometry::point(position.x(), cursor.y() + height + _leading);
         break;
 
       default: {
