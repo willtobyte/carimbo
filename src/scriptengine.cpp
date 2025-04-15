@@ -392,13 +392,16 @@ void framework::scriptengine::run() {
   struct cursorproxy {
     graphics::overlay &o;
 
-    void set(const std::string &name) { o.set_cursor(name); }
+    void set(const std::string &name) noexcept { o.set_cursor(name); }
+
+    void hide() noexcept { o.hide(); }
   };
 
   lua.new_usertype<cursorproxy>(
     "CursorProxy",
     sol::no_constructor,
-    "set", &cursorproxy::set
+    "set", &cursorproxy::set,
+    "hide", &cursorproxy::hide
   );
 
   lua.new_usertype<graphics::overlay>(

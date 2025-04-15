@@ -31,7 +31,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
         const auto x = data.value("x", 0);
         const auto y = data.value("y", 0);
 
-        auto e = _objectmanager->create(kind);
+        auto e = _objectmanager->create(kind, false);
         e->set_placement(x, y);
         if (action) {
           e->set_action(*action);

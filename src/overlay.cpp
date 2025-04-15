@@ -57,6 +57,10 @@ void overlay::set_cursor(const std::string &name) noexcept {
   _eventmanager->add_receiver(_cursor);
 }
 
+void overlay::hide() noexcept {
+  SDL_HideCursor();
+}
+
 void overlay::dispatch(widgettype type, const std::string &message) noexcept {
   UNUSED(message);
 

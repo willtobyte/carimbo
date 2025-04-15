@@ -40,6 +40,10 @@ std::shared_ptr<object> scene::get(const std::string &name) const noexcept {
 }
 
 void scene::on_enter() noexcept {
+  for (auto &[_, o] : _objects) {
+    _objectmanager->manage(o);
+  }
+
   if (const auto fn = _onenter; fn) {
     fn();
   }

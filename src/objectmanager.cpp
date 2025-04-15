@@ -22,7 +22,7 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager) n
     : _resourcemanager(resourcemanager) {
 }
 
-std::shared_ptr<object> objectmanager::create(const std::string &kind) {
+std::shared_ptr<object> objectmanager::create(const std::string &kind, bool manage) {
   _dirty = true;
 
   if (const auto it = std::ranges::find_if(_objects, [&kind](const auto &o) { return o->kind() == kind; }); it != _objects.end()) {
@@ -76,7 +76,10 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind) {
 
   auto o = std::make_shared<object>(props);
   fmt::println("[objectmanager] created {} {}", kind, o->id());
-  _objects.emplace_back(o);
+  if (manage) {
+    _objects.emplace_back(o);
+  }
+
   return o;
 }
 
@@ -103,6 +106,10 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noe
   fmt::println("[objectmanager] clone {} from {}", matrix->id(), o->id());
 
   return o;
+}
+
+void objectmanager::manage(std::shared_ptr<object> object) noexcept {
+  _objects.emplace_back(std::move(object));
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) noexcept {

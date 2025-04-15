@@ -25,6 +25,8 @@ public:
 
   void set_cursor(const std::string &name) noexcept;
 
+  void hide() noexcept;
+
   void dispatch(widgettype type, const std::string &message) noexcept;
 
 private:

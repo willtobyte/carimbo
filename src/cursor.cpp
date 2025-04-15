@@ -6,10 +6,7 @@ using namespace input::event;
 
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
-#ifndef SANDBOX
   SDL_HideCursor();
-#endif
-
   const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));
   const auto j = nlohmann::json::parse(buffer);
 
