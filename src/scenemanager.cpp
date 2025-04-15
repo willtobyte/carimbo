@@ -64,6 +64,10 @@ void scenemanager::on_touch(float_t x, float_t y) const noexcept {
   _scene->on_touch(x, y);
 }
 
+void scenemanager::on_motion(float_t x, float_t y) const noexcept {
+  _scene->on_motion(x, y);
+}
+
 void scenemanager::update(float_t delta) noexcept {
   _scene->update(delta);
 }

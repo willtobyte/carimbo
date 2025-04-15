@@ -29,12 +29,14 @@ public:
 
   void on_enter() noexcept;
   void on_leave() noexcept;
-  void on_touch(float_t x, float_t y) noexcept;
+  void on_touch(float_t x, float_t y) const noexcept;
+  void on_motion(float_t x, float_t y) const noexcept;
 
   void set_onenter(std::function<void()> fn) noexcept;
   void set_onloop(std::function<void(float_t)> fn) noexcept;
   void set_onleave(std::function<void()> fn) noexcept;
   void set_ontouch(std::function<void(float_t, float_t)> fn) noexcept;
+  void set_onmotion(std::function<void(float_t, float_t)> fn) noexcept;
 
 private:
   std::shared_ptr<framework::objectmanager> _objectmanager;
@@ -46,5 +48,6 @@ private:
   std::function<void(float_t)> _onloop;
   std::function<void()> _onleave;
   std::function<void(float_t, float_t)> _ontouch;
+  std::function<void(float_t, float_t)> _onmotion;
 };
 }

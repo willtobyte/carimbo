@@ -21,6 +21,8 @@ public:
 
   void on_touch(float_t x, float_t y) const noexcept;
 
+  void on_motion(float_t x, float_t y) const noexcept;
+
   void update(float_t delta) noexcept;
 
   void draw() const noexcept;

@@ -59,8 +59,14 @@ void scene::on_leave() noexcept {
   }
 }
 
-void scene::on_touch(float_t x, float_t y) noexcept {
+void scene::on_touch(float_t x, float_t y) const noexcept {
   if (const auto fn = _ontouch; fn) {
+    fn(x, y);
+  }
+}
+
+void scene::on_motion(float_t x, float_t y) const noexcept {
+  if (const auto fn = _onmotion; fn) {
     fn(x, y);
   }
 }
@@ -79,4 +85,8 @@ void scene::set_onleave(std::function<void()> fn) noexcept {
 
 void scene::set_ontouch(std::function<void(float_t, float_t)> fn) noexcept {
   _ontouch = std::move(fn);
+}
+
+void scene::set_onmotion(std::function<void(float_t, float_t)> fn) noexcept {
+  _onmotion = std::move(fn);
 }

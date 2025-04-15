@@ -380,6 +380,10 @@ void framework::scriptengine::run() {
         manager.get(name)->set_ontouch(fn.as<std::function<void(float_t, float_t)>>());
       }
 
+      if (module["on_motion"].valid()) {
+        sol::function fn = module["on_motion"];
+        manager.get(name)->set_onmotion(fn.as<std::function<void(float_t, float_t)>>());
+      }
     }
   );
 
