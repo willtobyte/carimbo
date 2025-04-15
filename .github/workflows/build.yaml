@@ -55,8 +55,8 @@ jobs:
       - name: Detect Conan Profile
         run: conan profile detect --force
 
-      - name: Set Conan Center
-        run: conan remote update conancenter --url https://center2.conan.io
+      - name: Install Conan configuration
+        run: conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Detect WebAssembly Conan Profile
         if: matrix.config.name == 'WebAssembly'
