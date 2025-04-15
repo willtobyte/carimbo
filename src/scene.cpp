@@ -53,6 +53,10 @@ void scene::on_leave() noexcept {
   if (const auto fn = _onleave; fn) {
     fn();
   }
+
+  for (auto &[_, o] : _objects) {
+    _objectmanager->unmanage(o);
+  }
 }
 
 void scene::on_touch(float_t x, float_t y) noexcept {

@@ -109,7 +109,25 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noe
 }
 
 void objectmanager::manage(std::shared_ptr<object> object) noexcept {
+  if (!object) {
+    return;
+  }
+
   _objects.emplace_back(std::move(object));
+  _dirty = true;
+}
+
+void objectmanager::unmanage(std::shared_ptr<object> object) noexcept {
+  if (!object) {
+    return;
+  }
+
+  _objects.erase(
+    std::remove(_objects.begin(), _objects.end(), object),
+    _objects.end()
+  );
+
+  _dirty = true;
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) noexcept {
