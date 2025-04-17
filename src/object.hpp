@@ -56,7 +56,7 @@ public:
   void on_email(const std::string &message);
 
   void on_touch() noexcept;
-  void on_motion() noexcept;
+  void on_motion(float_t x, float_t y) noexcept;
 
   memory::kv &kv() noexcept;
 

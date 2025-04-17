@@ -243,9 +243,9 @@ void object::on_touch() noexcept {
   }
 }
 
-void object::on_motion() noexcept {
+void object::on_motion(float_t x, float_t y) noexcept {
   if (const auto fn = _onmotion; fn) {
-    fn();
+    fn(x, y);
   }
 }
 
