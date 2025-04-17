@@ -275,6 +275,7 @@ void framework::scriptengine::run() {
     "on_animationfinished", &framework::object::set_onanimationfinished,
     "on_mail", &framework::object::set_onmail,
     "on_touch", &framework::object::set_ontouch,
+    "on_motion", &framework::object::set_onmotion,
     "on_collision", &framework::object::set_oncollision,
     "on_nthtick", &framework::object::set_onnthtick,
     "reflection", sol::property([](framework::object &e) -> reflectionproxy { return reflectionproxy{e}; }),

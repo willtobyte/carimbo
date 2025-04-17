@@ -2,11 +2,9 @@
 
 #include "common.hpp"
 #include "kv.hpp"
-#include "objectmanager.hpp"
 #include "objectprops.hpp"
 #include "reflection.hpp"
 #include "vector2d.hpp"
-#include <cstdint>
 
 namespace framework {
 class object : public std::enable_shared_from_this<object> {
@@ -43,6 +41,7 @@ public:
   void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
   void set_ontouch(std::function<void()> fn) noexcept;
+  void set_onmotion(std::function<void(float_t, float_t)> fn) noexcept;
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) noexcept;
   void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept;
 
@@ -57,6 +56,7 @@ public:
   void on_email(const std::string &message);
 
   void on_touch() noexcept;
+  void on_motion() noexcept;
 
   memory::kv &kv() noexcept;
 
@@ -68,6 +68,7 @@ private:
   uint64_t _tick_count{0};
   uint64_t _last_tick{0};
   std::function<void()> _ontouch;
+  std::function<void(float_t, float_t)> _onmotion;
   std::function<void(std::shared_ptr<object>)> _onupdate;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onmail;

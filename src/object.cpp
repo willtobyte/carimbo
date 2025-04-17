@@ -170,6 +170,10 @@ void object::set_ontouch(std::function<void()> fn) noexcept {
   _ontouch = std::move(fn);
 }
 
+void object::set_onmotion(std::function<void(float_t, float_t)> fn) noexcept {
+    _onmotion = std::move(fn);
+}
+
 void object::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) noexcept {
   _collisionmapping.emplace(kind, std::move(fn));
 }
@@ -235,6 +239,12 @@ void object::on_email(const std::string &message) {
 
 void object::on_touch() noexcept {
   if (const auto fn = _ontouch; fn) {
+    fn();
+  }
+}
+
+void object::on_motion() noexcept {
+  if (const auto fn = _onmotion; fn) {
     fn();
   }
 }

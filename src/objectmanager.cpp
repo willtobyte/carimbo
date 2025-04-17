@@ -271,4 +271,8 @@ void objectmanager::on_mousebuttondown(const mouse::button &event) noexcept {
 
 void objectmanager::on_mousemotion(const input::event::mouse::motion &event) noexcept {
   _scenemanager->on_motion(event.x, event.y);
+
+  for (const auto &o : _objects) {
+    o->on_motion(event.x, event.y);
+  }
 }
