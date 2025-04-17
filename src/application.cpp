@@ -22,7 +22,7 @@ int32_t application::run() {
     auto se = scriptengine();
     se.run();
   } catch (const std::exception &ex) {
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Unexpected Error", ex.what(), nullptr);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", ex.what(), nullptr);
     return 1;
   }
 
