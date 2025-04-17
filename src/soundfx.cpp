@@ -124,8 +124,8 @@ soundfx::~soundfx() noexcept {
   alDeleteSources(1, &_source);
 }
 
-void soundfx::play() const noexcept {
-  alSourcei(_source, AL_LOOPING, /* loop */ AL_FALSE);
+void soundfx::play(bool loop) const noexcept {
+  alSourcei(_source, AL_LOOPING, loop);
   alSourcePlay(_source);
 }
 

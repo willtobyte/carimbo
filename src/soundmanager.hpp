@@ -10,7 +10,7 @@ public:
   ~soundmanager() noexcept = default;
 
   std::shared_ptr<soundfx> get(const std::string &filename) noexcept;
-  void play(const std::string &filename) noexcept;
+  void play(const std::string &filename, bool loop = false) noexcept;
   void stop(const std::string &filename) noexcept;
   void flush() noexcept;
 

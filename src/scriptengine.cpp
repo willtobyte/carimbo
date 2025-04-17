@@ -138,7 +138,10 @@ void framework::scriptengine::run() {
   lua.new_usertype<audio::soundmanager>(
     "SoundManager",
     sol::no_constructor,
-    "play", &audio::soundmanager::play,
+    "play", [](audio::soundmanager& manager, const std::string& filename, std::optional<bool> loop_opt) {
+      auto loop = loop_opt.value_or(false);
+      manager.play(filename, loop);
+    },
     "stop", &audio::soundmanager::stop
   );
 

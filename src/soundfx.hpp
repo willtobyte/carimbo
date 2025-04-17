@@ -8,7 +8,7 @@ public:
   soundfx(const std::string &filename);
   ~soundfx() noexcept;
 
-  void play() const noexcept;
+  void play(bool loop) const noexcept;
   void stop() const noexcept;
 
 private:
