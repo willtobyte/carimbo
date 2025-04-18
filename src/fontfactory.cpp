@@ -3,7 +3,7 @@
 using namespace graphics;
 
 fontfactory::fontfactory(std::shared_ptr<renderer> renderer) noexcept
-    : _renderer(renderer) {}
+    : _renderer(std::move(renderer)) {}
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
   std::filesystem::path p{family};
