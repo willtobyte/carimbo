@@ -40,8 +40,8 @@ public:
   void set_onupdate(std::function<void(std::shared_ptr<object>)> fn) noexcept;
   void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
-  void set_ontouch(std::function<void()> fn) noexcept;
-  void set_onmotion(std::function<void(float_t, float_t)> fn) noexcept;
+  void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) noexcept;
+  void set_onmotion(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) noexcept;
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) noexcept;
   void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept;
 
@@ -55,7 +55,7 @@ public:
 
   void on_email(const std::string &message);
 
-  void on_touch() noexcept;
+  void on_touch(float_t x, float_t y) noexcept;
   void on_motion(float_t x, float_t y) noexcept;
 
   memory::kv &kv() noexcept;
@@ -67,8 +67,8 @@ private:
   objectprops _props;
   uint64_t _tick_count{0};
   uint64_t _last_tick{0};
-  std::function<void()> _ontouch;
-  std::function<void(float_t, float_t)> _onmotion;
+  std::function<void(std::shared_ptr<object>, float_t, float_t)> _ontouch;
+  std::function<void(std::shared_ptr<object>, float_t, float_t)> _onmotion;
   std::function<void(std::shared_ptr<object>)> _onupdate;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onmail;

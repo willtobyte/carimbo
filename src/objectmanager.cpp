@@ -260,7 +260,7 @@ void objectmanager::on_mousebuttondown(const mouse::button &event) noexcept {
       return false;
     }
 
-    object->on_touch();
+    object->on_touch(event.x, event.y);
     return true;
   });
 

@@ -166,11 +166,11 @@ void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::s
   _onmail = std::move(fn);
 }
 
-void object::set_ontouch(std::function<void()> fn) noexcept {
+void object::set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) noexcept {
   _ontouch = std::move(fn);
 }
 
-void object::set_onmotion(std::function<void(float_t, float_t)> fn) noexcept {
+void object::set_onmotion(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) noexcept {
     _onmotion = std::move(fn);
 }
 
@@ -237,15 +237,15 @@ void object::on_email(const std::string &message) {
   }
 }
 
-void object::on_touch() noexcept {
+void object::on_touch(float_t x, float_t y) noexcept {
   if (const auto fn = _ontouch; fn) {
-    fn();
+    fn(shared_from_this(), x, y);
   }
 }
 
 void object::on_motion(float_t x, float_t y) noexcept {
   if (const auto fn = _onmotion; fn) {
-    fn(x, y);
+    fn(shared_from_this(), x, y);
   }
 }
 
