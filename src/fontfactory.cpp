@@ -86,8 +86,8 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 }
 
 void fontfactory::flush() noexcept {
-  const auto count = _pool.size();
-  fmt::println("[fontfactory] actual size {}", count);
-  _pool.clear();
+  fmt::println("[fontfactory] actual size {}", _pool.size());
+
+  const auto count = std::erase_if(_pool, [](const auto &pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
   fmt::println("[fontfactory] {} objects have been flushed", count);
 }
