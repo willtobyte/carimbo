@@ -10,6 +10,7 @@ class rectangle {
 public:
   rectangle() noexcept = default;
   rectangle(const rectangle &other) noexcept = default;
+  rectangle(float_t x, float_t y, float_t width, float_t height) noexcept;
   rectangle(const geometry::point &position, const geometry::size &size) noexcept;
 
   ~rectangle() noexcept = default;

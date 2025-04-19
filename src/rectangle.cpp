@@ -2,6 +2,9 @@
 
 using namespace geometry;
 
+rectangle::rectangle(float_t x, float_t y, float_t w, float_t h) noexcept
+  : _position{ x, y }, _size{ w, h } {}
+
 rectangle::rectangle(const geometry::point &position, const geometry::size &size) noexcept
     : _position(position), _size(size) {}
 
