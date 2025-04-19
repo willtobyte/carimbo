@@ -3,15 +3,28 @@
 using namespace framework;
 
 scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager) noexcept
-    : _pixmappool(resourcemanager->pixmappool()), _objectmanager(std::move(objectmanager)) {
+    : _resourcemanager(std::move(resourcemanager)), _objectmanager(std::move(objectmanager)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
   const auto buffer = storage::io::read("scenes/" + name + ".json");
   const auto j = nlohmann::json::parse(buffer);
 
-  const auto background = _pixmappool->get(j["background"].get_ref<const std::string &>());
+  const auto pixmappool = _resourcemanager->pixmappool();
+  const auto background = pixmappool->get(j["background"].get_ref<const std::string &>());
   geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
+
+  const auto &es = j.value("effects", nlohmann::json::array());
+  auto view = es
+      | std::views::transform([](auto& e) {
+          return std::format("blobs/{}.ogg", e.template get<std::string>());
+        });
+
+  std::vector<std::string> assets;
+  assets.reserve(std::ranges::distance(view));
+  std::ranges::copy(view, std::back_inserter(assets));
+
+  _resourcemanager->prefetch(assets);
 
   const auto &os = j.value("objects", nlohmann::json::array());
   const auto &i = os.items();

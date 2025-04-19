@@ -28,7 +28,7 @@ public:
   void draw() const noexcept;
 
 private:
-  std::shared_ptr<graphics::pixmappool> _pixmappool;
+  std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::unordered_map<std::string, std::shared_ptr<scene>> _scene_mapping;
   std::shared_ptr<scene> _scene;

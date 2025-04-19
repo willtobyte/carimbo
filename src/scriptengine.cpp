@@ -298,17 +298,28 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "flush", &framework::resourcemanager::flush,
     "prefetch", sol::overload(
-      [](framework::resourcemanager &self) {
-        self.prefetch();
-      },
-      [](framework::resourcemanager &self, sol::table table) {
-        std::vector<std::string> filenames(table.size());
-        std::ranges::transform(table, filenames.begin(), [](const auto &item) -> std::string {
-          return item.second.template as<std::string>();
-        });
-        self.prefetch(filenames);
-      }
-    )
+        [](framework::resourcemanager &self) {
+          self.prefetch();
+        },
+
+        [](framework::resourcemanager &self, sol::table t) {
+          std::vector<std::string> filenames;
+          filenames.reserve(t.size());
+          for (auto &kv : t) {
+            filenames.push_back(kv.second.as<std::string>());
+          }
+          self.prefetch(filenames);
+        },
+
+        [](framework::resourcemanager &self, sol::variadic_args va) {
+          std::vector<std::string> filenames;
+          filenames.reserve(va.size());
+          for (auto v : va) {
+            filenames.push_back(v.as<std::string>());
+          }
+          self.prefetch(filenames);
+        }
+      )
   );
 
   struct playerwrapper {

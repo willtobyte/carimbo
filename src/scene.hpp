@@ -12,7 +12,7 @@ class objectmanager;
 class scene {
 public:
   scene() = delete;
-  scene(
+  explicit scene(
       std::shared_ptr<framework::objectmanager> objectmanager,
       std::shared_ptr<graphics::pixmap> background,
       std::unordered_map<std::string, std::shared_ptr<object>> objects,
