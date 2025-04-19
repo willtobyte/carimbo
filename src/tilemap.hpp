@@ -8,7 +8,7 @@
 namespace framework {
 class tilemap {
   public:
-    explicit tilemap(const std::string &name) noexcept;
+    explicit tilemap(std::shared_ptr<resourcemanager> resourcemanager, const std::string &name) noexcept;
     tilemap() noexcept = default;
 
   private:
