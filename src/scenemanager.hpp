@@ -19,6 +19,8 @@ public:
 
   std::shared_ptr<scene> get(const std::string &name) const noexcept;
 
+  void destroy(const std::string &name) noexcept;
+
   void on_touch(float_t x, float_t y) const noexcept;
 
   void on_motion(float_t x, float_t y) const noexcept;

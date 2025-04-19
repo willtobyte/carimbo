@@ -1,13 +1,5 @@
 #include "scriptengine.hpp"
 
-#include "common.hpp"
-
-#include "event.hpp"
-#include "loopable.hpp"
-#include "object.hpp"
-#include "point.hpp"
-#include "vector2d.hpp"
-
 sol::table require(sol::state &lua, const std::string &module) {
   const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
@@ -366,6 +358,7 @@ void framework::scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "set", &framework::scenemanager::set,
+    "destroy", &framework::scenemanager::destroy,
     "register", [&lua](framework::scenemanager &manager, const std::string &name) {
       manager.load(name);
 
