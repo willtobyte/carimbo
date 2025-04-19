@@ -62,6 +62,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
 void scenemanager::set(const std::string &name) noexcept {
   if (_scene) {
     _scene->on_leave();
+    // _resourcemanager->flush();
   }
 
   _scene = _scene_mapping.at(name);
