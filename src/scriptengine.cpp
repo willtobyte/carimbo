@@ -117,6 +117,8 @@ void framework::scriptengine::run() {
 
   lua["ticks"] = ticks;
 
+  lua["openurl"] = SDL_OpenURL;
+
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string &json_str, sol::this_state state) {
       auto j = nlohmann::json::parse(json_str);
