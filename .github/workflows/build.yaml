@@ -31,15 +31,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache Dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.conan2/p
-            C:/Users/runneradmin/.conan2/p
-          key: ${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py') }}
-          restore-keys: |
-            ${{ matrix.config.name }}-
+      # - name: Cache Dependencies
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       ~/.conan2/p
+      #       C:/Users/runneradmin/.conan2/p
+      #     key: ${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py') }}
+      #     restore-keys: |
+      #       ${{ matrix.config.name }}-
 
       - name: Prepare Build Directory
         run: mkdir build
