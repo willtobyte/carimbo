@@ -40,7 +40,7 @@ public:
   bool zero() const noexcept;
 
 private:
-  float_t _x;
-  float_t _y;
+  float_t _x{.0f};
+  float_t _y{.0f};
 };
 }

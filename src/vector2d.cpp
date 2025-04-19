@@ -2,6 +2,8 @@
 
 using namespace algebra;
 
+static constexpr float_t epsilon = std::numeric_limits<float_t>::epsilon();
+
 vector2d::vector2d() noexcept
     : _x(0), _y(0) {}
 
@@ -42,6 +44,7 @@ vector2d vector2d::operator*(float_t scalar) const noexcept {
 }
 
 vector2d vector2d::operator/(float_t scalar) const noexcept {
+  assert(std::abs(scalar) > std::numeric_limits<float_t>::epsilon());
   return vector2d(_x / scalar, _y / scalar);
 }
 
@@ -64,6 +67,7 @@ vector2d &vector2d::operator*=(float_t scalar) noexcept {
 }
 
 vector2d &vector2d::operator/=(float_t scalar) noexcept {
+  assert(std::abs(scalar) > std::numeric_limits<float_t>::epsilon());
   _x /= scalar;
   _y /= scalar;
   return *this;
@@ -103,5 +107,5 @@ bool vector2d::left() const noexcept {
 }
 
 bool vector2d::zero() const noexcept {
-  return _x == 0 && _y == 0;
+  return std::abs(_x) < epsilon && std::abs(_y) < epsilon;
 }
