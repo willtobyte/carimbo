@@ -30,11 +30,11 @@ void tilemap::update(float_t delta) noexcept {
   const auto vw  = _view.size().width();
   const auto vh  = _view.size().height();
 
-  float_t dx = position.x() - vw  * 0.5f;
+  float_t dx = position.x() - vw * 0.5f;
   float_t dy = position.y() - vh * 0.5f;
   float_t damping = 1.0f - std::exp(-smooth * delta);
 
-  _view.set_size({
+  _view.set_position({
     (dx - _view.position().x()) * damping,
     (dy - _view.position().y()) * damping
   });
@@ -45,7 +45,7 @@ void tilemap::draw() const noexcept {
     return;
   }
 
-  TODO _tileset->draw(const geometry::rectangle &source, const geometry::rectangle &destination)
+  // TODO _tileset->draw(const geometry::rectangle &source, const geometry::rectangle &destination)
 }
 
 void tilemap::set_target(std::shared_ptr<object> object) noexcept {
