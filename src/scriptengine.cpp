@@ -219,13 +219,13 @@ void framework::scriptengine::run() {
   struct velocityproxy {
     object &e;
 
-    void set(int32_t x, int32_t y) { e.set_velocity({x, y}); }
+    void set(float_t x, float_t y) { e.set_velocity({x, y}); }
 
     algebra::vector2d get() { return e.velocity(); }
 
     double_t get_x() const { return e.velocity().x(); }
 
-    void set_x(double_t x) {
+    void set_x(float_t x) {
       auto velocity = e.velocity();
       velocity.set_x(x);
       e.set_velocity(velocity);
@@ -233,7 +233,7 @@ void framework::scriptengine::run() {
 
     double_t get_y() const { return e.velocity().y(); }
 
-    void set_y(double_t y) {
+    void set_y(float_t y) {
       auto velocity = e.velocity();
       velocity.set_y(y);
       e.set_velocity(velocity);

@@ -5,26 +5,26 @@ using namespace algebra;
 vector2d::vector2d() noexcept
     : _x(0), _y(0) {}
 
-vector2d::vector2d(int32_t x, int32_t y) noexcept
+vector2d::vector2d(float_t x, float_t y) noexcept
     : _x(x), _y(y) {}
 
-int32_t vector2d::x() const noexcept {
+float_t vector2d::x() const noexcept {
   return _x;
 }
 
-int32_t vector2d::y() const noexcept {
+float_t vector2d::y() const noexcept {
   return _y;
 }
 
-void vector2d::set_x(int32_t x) noexcept {
+void vector2d::set_x(float_t x) noexcept {
   _x = x;
 }
 
-void vector2d::set_y(int32_t y) noexcept {
+void vector2d::set_y(float_t y) noexcept {
   _y = y;
 }
 
-void vector2d::set(int32_t x, int32_t y) noexcept {
+void vector2d::set(float_t x, float_t y) noexcept {
   _x = x;
   _y = y;
 }
@@ -37,11 +37,11 @@ vector2d vector2d::operator-(const vector2d &other) const noexcept {
   return vector2d(_x - other._x, _y - other._y);
 }
 
-vector2d vector2d::operator*(int32_t scalar) const noexcept {
+vector2d vector2d::operator*(float_t scalar) const noexcept {
   return vector2d(_x * scalar, _y * scalar);
 }
 
-vector2d vector2d::operator/(int32_t scalar) const noexcept {
+vector2d vector2d::operator/(float_t scalar) const noexcept {
   return vector2d(_x / scalar, _y / scalar);
 }
 
@@ -57,13 +57,13 @@ vector2d &vector2d::operator-=(const vector2d &other) noexcept {
   return *this;
 }
 
-vector2d &vector2d::operator*=(int32_t scalar) noexcept {
+vector2d &vector2d::operator*=(float_t scalar) noexcept {
   _x *= scalar;
   _y *= scalar;
   return *this;
 }
 
-vector2d &vector2d::operator/=(int32_t scalar) noexcept {
+vector2d &vector2d::operator/=(float_t scalar) noexcept {
   _x /= scalar;
   _y /= scalar;
   return *this;
@@ -77,16 +77,16 @@ bool vector2d::operator!=(const vector2d &other) const noexcept {
   return !(*this == other);
 }
 
-int32_t vector2d::magnitude() const noexcept {
+float_t vector2d::magnitude() const noexcept {
   return std::sqrt(_x * _x + _y * _y);
 }
 
 vector2d vector2d::unit() const noexcept {
   const auto m = magnitude();
-  return (m < std::numeric_limits<int32_t>::epsilon()) ? vector2d(0, 0) : *this / m;
+  return (m < std::numeric_limits<float_t>::epsilon()) ? vector2d(0, 0) : *this / m;
 }
 
-int32_t vector2d::dot(const vector2d &other) const noexcept {
+float_t vector2d::dot(const vector2d &other) const noexcept {
   return _x * other._x + _y * other._y;
 }
 
