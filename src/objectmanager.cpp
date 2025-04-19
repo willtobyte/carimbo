@@ -33,9 +33,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &scope, const st
   const auto j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float_t{1.f});
-  const auto spritesheet = j.contains("spritesheet")
-                               ? _resourcemanager->pixmappool()->get(fmt::format("blobs/{}/{}.png", scope, j["spritesheet"].get_ref<const std::string &>()))
-                               : nullptr;
+  const auto spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}/{}.png", scope, kind));
 
   std::unordered_map<std::string, graphics::animation> animations(j["animations"].size());
   for (const auto &item : j["animations"].items()) {
