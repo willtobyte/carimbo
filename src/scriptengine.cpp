@@ -290,7 +290,11 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::resourcemanager>(
     "ResourceManager",
     sol::no_constructor,
-    "flush", &framework::resourcemanager::flush,
+    "flush", [&lua](framework::resourcemanager &self) {
+      const auto gc = lua["collectgarbage"].get<sol::function>();
+      gc("collect");
+      self.flush();
+    },
     "prefetch", sol::overload(
         [](framework::resourcemanager &self) {
           self.prefetch();

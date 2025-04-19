@@ -75,13 +75,7 @@ std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept
 }
 
 void scenemanager::destroy(const std::string &name) noexcept {
-  const auto it = _scene_mapping.find(name);
-  if (it == _scene_mapping.end()) {
-    return;
-  }
-
-  _scene_mapping.erase(it);
-  _resourcemanager->flush();
+  _scene_mapping.erase(name);
 }
 
 void scenemanager::on_touch(float_t x, float_t y) const noexcept {
