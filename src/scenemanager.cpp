@@ -11,13 +11,13 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
   const auto j = nlohmann::json::parse(buffer);
 
   const auto pixmappool = _resourcemanager->pixmappool();
-  const auto background = pixmappool->get(j["background"].get_ref<const std::string &>());
+  const auto background = pixmappool->get(fmt::format("blobs/{}/{}.png", name, j["background"].get_ref<const std::string &>()));
   geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
 
   const auto &es = j.value("effects", nlohmann::json::array());
   auto view = es
-      | std::views::transform([](auto& e) {
-          return std::format("blobs/{}.ogg", e.template get<std::string>());
+      | std::views::transform([&name](auto& e) {
+          return std::format("blobs/{}/{}.ogg", name, e.template get<std::string>());
         });
 
   std::vector<std::string> assets;
@@ -44,7 +44,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
         const auto x = data.value("x", 0);
         const auto y = data.value("y", 0);
 
-        auto e = _objectmanager->create(kind, false);
+        auto e = _objectmanager->create(name, kind, false);
         e->set_placement(x, y);
         if (action) {
           e->set_action(*action);

@@ -14,7 +14,7 @@ public:
   explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
   ~objectmanager() = default;
 
-  std::shared_ptr<object> create(const std::string &kind, bool manage = true);
+  std::shared_ptr<object> create(const std::string &scope, const std::string &kind, bool manage = true);
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix) noexcept;
 
