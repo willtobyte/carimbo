@@ -16,15 +16,16 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
 
   const auto &es = j.value("effects", nlohmann::json::array());
   auto view = es
-      | std::views::transform([&name](auto& e) {
-          return std::format("blobs/{}/{}.ogg", name, e.template get<std::string>());
-        });
+      | std::views::transform([&](const auto& e) {
+          auto path = std::format("blobs/{}/{}.ogg",
+                                    name,
+                                    e.template get<std::string>());
+          return _resourcemanager->soundmanager()->get(path);
+      });
 
-  std::vector<std::string> assets;
-  assets.reserve(std::ranges::distance(view));
-  std::ranges::copy(view, std::back_inserter(assets));
-
-  _resourcemanager->prefetch(assets);
+  std::vector<std::shared_ptr<audio::soundfx>> effects;
+  effects.reserve(std::ranges::distance(view));
+  std::ranges::copy(view, std::back_inserter(effects));
 
   const auto &os = j.value("objects", nlohmann::json::array());
   const auto &i = os.items();
@@ -54,7 +55,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
       }
   );
 
-  const auto s = std::make_shared<scene>(_objectmanager, background, objects, size);
+  const auto s = std::make_shared<scene>(_objectmanager, background, objects, effects, size);
   _scene_mapping[name] = s;
   return s;
 }
