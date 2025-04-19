@@ -24,7 +24,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
   std::vector<uint8_t> output;
   geometry::size size;
-  std::tie(output, size) = _load_png(j["spritesheet"].get_ref<const std::string &>());
+  std::tie(output, size) = _load_png(fmt::format("blobs/overlay/{}.png", family));
 
   const auto pitch = static_cast<int32_t>(size.width() * 4);
   auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>{
@@ -37,8 +37,6 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       ),
       SDL_Deleter{}
   };
-
-  // const auto format = SDL_GetPixelFormatDetails(surface->format);
 
   if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateRGBSurfaceWithFormatFrom] error: {}", SDL_GetError()));
@@ -71,7 +69,6 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       ++h;
     }
 
-    // map[glyph] = {{x, y}, {w, h}};
     map[glyph] = {{static_cast<float_t>(x), static_cast<float_t>(y)}, {static_cast<float_t>(w), static_cast<float_t>(h)}};
     x += w;
   }
