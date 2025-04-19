@@ -9,6 +9,9 @@ on:
     branches:
       - main
 
+env:
+  CONAN_HOME: ${{ runner.temp }}/conan
+
 jobs:
   build:
     runs-on: ${{ matrix.config.os }}
@@ -31,17 +34,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache dependencies
+      - name: Cache Conan
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.conan2/data
-            ~/.conan2/p
-            ${{ env.USERPROFILE }}\\.conan2\\data
-            ${{ env.USERPROFILE }}\\.conan2\\p
-          key: conan-${{ runner.os }}-${{ hashFiles('**/conanfile.py','**/conanfile.txt','**/conan.lock') }}
+          path: ${{ runner.temp }}/conan
+          key: conan-${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py','**/conanfile.txt','**/conan.lock') }}
           restore-keys: |
-            conan-${{ runner.os }}-
+            conan-${{ matrix.config.name }}-
+            conan-
 
       - name: Setup Python
         uses: actions/setup-python@v5
