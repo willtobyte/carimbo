@@ -30,18 +30,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Cache Dependencies
+      - name: Cache dependencies
         uses: actions/cache@v4
         with:
           path: |
+            ~/.conan2/data
             ~/.conan2/p
-            C:/Users/runneradmin/.conan2/p
-          key: ${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py') }}
+            ${{ env.USERPROFILE }}\\.conan2\\data
+            ${{ env.USERPROFILE }}\\.conan2\\p
+          key: conan-${{ runner.os }}-${{ hashFiles('**/conanfile.py','**/conanfile.txt','**/conan.lock') }}
           restore-keys: |
-            ${{ matrix.config.name }}-
-
-      - name: Prepare Build Directory
-        run: mkdir build
+            conan-${{ runner.os }}-
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -51,13 +50,13 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
-      - name: Detect Conan Profile
+      - name: Detect Conan profile
         run: conan profile detect --force
 
       - name: Install Conan configuration
         run: conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Detect WebAssembly Conan Profile
+      - name: Detect WebAssembly Conan profile
         if: matrix.config.name == 'WebAssembly'
         run: |
           cat > ~/.conan2/profiles/webassembly <<EOF
@@ -71,15 +70,15 @@ jobs:
           *: emsdk/3.1.73
           EOF
 
-      - name: Install Windows Or macOS Dependencies
+      - name: Install Windows or macOS dependencies
         if: matrix.config.name == 'Windows' || matrix.config.name == 'macOS'
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
 
-      - name: Install Ubuntu Dependencies
+      - name: Install Ubuntu dependencies
         if: matrix.config.name == 'Ubuntu'
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
-      - name: Install WebAssembly Dependencies
+      - name: Install WebAssembly dependencies
         if: matrix.config.name == 'WebAssembly'
         run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
 
@@ -87,7 +86,7 @@ jobs:
         run: cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
         working-directory: build
 
-      - name: Get CPU Count
+      - name: Get CPU count
         id: cpus
         shell: bash
         run: |
@@ -103,10 +102,10 @@ jobs:
         run: cmake --build . --parallel ${{ steps.cpus.outputs.count }} --config Release --verbose
         working-directory: build
 
-      - name: Create Artifacts Directory
+      - name: Create artifacts directory
         run: mkdir artifacts
 
-      - name: Compress Artifacts
+      - name: Compress artifacts
         if: matrix.config.name == 'macOS'
         working-directory: build
         run: |
@@ -114,7 +113,7 @@ jobs:
           tar -cpzvf macOS.tar.gz carimbo
           mv macOS.tar.gz ../artifacts
 
-      - name: Compress Artifacts
+      - name: Compress artifacts
         if: matrix.config.name == 'Ubuntu'
         working-directory: build
         run: |
@@ -122,14 +121,14 @@ jobs:
           tar -czvf Ubuntu.tar.gz --mode='a+rwx' carimbo
           mv Ubuntu.tar.gz ../artifacts
 
-      - name: Compress Artifacts
+      - name: Compress artifacts
         if: matrix.config.name == 'WebAssembly'
         working-directory: build
         run: |
           zip -jr WebAssembly.zip carimbo.wasm carimbo.js
           mv WebAssembly.zip ../artifacts
 
-      - name: Compress Artifacts
+      - name: Compress artifacts
         if: matrix.config.name == 'Windows'
         working-directory: build
         shell: powershell
