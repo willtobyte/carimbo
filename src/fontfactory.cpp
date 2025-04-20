@@ -26,7 +26,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
   const auto pixmap = _pixmappool->get(fmt::format("blobs/overlay/{}.png", family));
 
-  float width, height;
+  float_t width, height;
   if (!SDL_GetTextureSize(*pixmap, &width, &height)) {
     panic("[SDL_GetTextureSize] failed to query texture size: {}", SDL_GetError());
   }
@@ -60,6 +60,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   SDL_SetRenderTarget(*_renderer, origin);
 
   auto *pixels = static_cast<uint32_t *>(surface->pixels);
+
   const auto separator = color(pixels[0]);
 
   glyphmap map;
