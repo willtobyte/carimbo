@@ -119,11 +119,11 @@ else()
   else()
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O3;-flto>
+      $<$<CONFIG:Release>:-O3;-fno-exceptions;-flto>
     )
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-flto>
+      $<$<CONFIG:Release>:-flto;-fno-exceptions>
     )
   endif()
 endif()

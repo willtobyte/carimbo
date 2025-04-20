@@ -16,12 +16,12 @@ audiodevice::audiodevice()
       }) {
   device.reset(alcOpenDevice(nullptr));
   if (!device || alcGetError(device.get()) != ALC_NO_ERROR) [[unlikely]] {
-    throw std::runtime_error("[audiodevice] failed to open ALC device");
+    panic("[audiodevice] failed to open ALC device");
   }
 
   context.reset(alcCreateContext(device.get(), nullptr));
   if (!context || alcGetError(device.get()) != ALC_NO_ERROR) [[unlikely]] {
-    throw std::runtime_error("[audiodevice] failed to create ALC context");
+    panic("[audiodevice] failed to create ALC context");
   }
 
   alcMakeContextCurrent(context.get());

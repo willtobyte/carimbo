@@ -24,6 +24,7 @@
 
 #ifndef EMSCRIPTEN
 #ifdef WEBSOCKET
+#define BOOST_NO_EXCEPTIONS 1
 #include <boost/asio.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ssl.hpp>

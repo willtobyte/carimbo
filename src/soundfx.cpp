@@ -72,19 +72,19 @@ const char *ov_strerror(int code) {
 soundfx::soundfx(const std::string &filename) {
   std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> fp{PHYSFS_openRead(filename.c_str()), PHYSFS_close};
   if (!fp) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    panic("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
   if (ov_open_callbacks(fp.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
-    throw std::runtime_error("[ov_open_callbacks] error while opening file");
+    panic("[ov_open_callbacks] error while opening file");
   }
 
   [[maybe_unused]] auto *pointer = fp.release();
 
   const auto info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
-    throw std::runtime_error("[ov_info] failed to retrieve OggVorbis info");
+    panic("[ov_info] failed to retrieve OggVorbis info");
   }
 
   const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
@@ -106,7 +106,7 @@ soundfx::soundfx(const std::string &filename) {
   do {
     offset = ov_read(vf.get(), reinterpret_cast<char *>(array.data()), length, bigendian, 2, 1, nullptr);
     if (offset < 0) [[unlikely]] {
-      throw std::runtime_error(fmt::format("[ov_read] error while reading file: {}, error: {}", filename, ov_strerror(offset)));
+      panic("[ov_read] error while reading file: {}, error: {}", filename, ov_strerror(offset));
     }
     data.insert(data.end(), array.begin(), std::ranges::next(array.begin(), offset));
   } while (offset > 0);

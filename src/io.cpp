@@ -6,18 +6,18 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.data()), PHYSFS_close);
 
   if (!ptr) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    panic("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
   const auto length = PHYSFS_fileLength(ptr.get());
   if (length <= 0) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[PHYSFS_fileLength] invalid file length, file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    panic("[PHYSFS_fileLength] invalid file length, file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
   std::vector<uint8_t> buffer(length);
   const auto result = PHYSFS_readBytes(ptr.get(), buffer.data(), length);
   if (result != length) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes but read {}, error: {}", filename, length, result, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    panic("[PHYSFS_readBytes] error reading file: {}, expected {} bytes but read {}, error: {}", filename, length, result, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
   return buffer;
@@ -28,10 +28,7 @@ std::vector<std::string> io::list(std::string_view directory) {
   std::unique_ptr<char *[], decltype(deleter)> ptr(PHYSFS_enumerateFiles(directory.data()), deleter);
 
   if (!ptr) [[unlikely]] {
-    throw std::runtime_error(fmt::format(
-        "[PHYSFS_enumerateFiles] error while enumerating directory: {}, error: {}",
-        directory, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
-    ));
+    panic("[PHYSFS_enumerateFiles] error while enumerating directory: {}, error: {}", directory, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
   }
 
   char *const *array = ptr.get();
