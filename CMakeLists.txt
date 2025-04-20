@@ -100,6 +100,8 @@ if(EMSCRIPTEN)
     -sUSE_SDL=3
     -sEVAL_CTORS=1
     -sWASM_BIGINT=1
+    -sFILESYSTEM=0
+    -sEXIT_RUNTIME=0
     -sINITIAL_MEMORY=128MB
     -sALLOW_MEMORY_GROWTH=1
     -sEXPORTED_RUNTIME_METHODS=['callMain']
@@ -119,12 +121,14 @@ else()
   else()
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O3;-fno-exceptions;-flto>
+      $<$<CONFIG:Release>:-O3;-flto>
     )
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-flto;-fno-exceptions>
+      $<$<CONFIG:Release>:-flto>
     )
+
+    target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:NDEBUG>)
   endif()
 endif()
 
