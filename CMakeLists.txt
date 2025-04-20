@@ -98,11 +98,14 @@ if(EMSCRIPTEN)
   )
 
   target_link_options(${PROJECT_NAME} PRIVATE
+    -sUSE_OPENAL=1
     -sUSE_SDL=3
     -sEVAL_CTORS=1
     -sWASM_BIGINT=1
     -sFILESYSTEM=1
     -sINVOKE_RUN=0
+    -sASYNCIFY=1
+    -sUSE_GL=1
     -sMINIMAL_RUNTIME=2
     -sEXIT_RUNTIME=0
     -sINITIAL_MEMORY=128MB
