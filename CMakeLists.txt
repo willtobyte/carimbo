@@ -99,6 +99,7 @@ if(EMSCRIPTEN)
 
   target_link_options(${PROJECT_NAME} PRIVATE
     -sUSE_SDL=3
+    -sUSE_WEBGL2=1
     -sEVAL_CTORS=1
     -sWASM_BIGINT=1
     -sFILESYSTEM=1
@@ -110,6 +111,8 @@ if(EMSCRIPTEN)
     -sEXPORTED_RUNTIME_METHODS=['callMain']
     -sWEBSOCKET_SUBPROTOCOL=text
     -lwebsocket.js
+    -lhtml5
+    -lopenal
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
