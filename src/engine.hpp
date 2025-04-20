@@ -24,7 +24,7 @@ namespace framework {
 class engine : public input::eventreceiver {
 public:
   engine() noexcept;
-  virtual ~engine() = default;
+  virtual ~engine() noexcept = default;
 
   std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
   std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;

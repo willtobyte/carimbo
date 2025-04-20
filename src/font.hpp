@@ -8,7 +8,7 @@
 namespace graphics {
 using glyphmap = std::map<uint8_t, geometry::rectangle>;
 
-class font {
+class font final {
 public:
   font() = delete;
   explicit font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale);

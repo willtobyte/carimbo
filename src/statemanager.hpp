@@ -8,7 +8,7 @@
 #include "lifecycleobserver.hpp"
 
 namespace framework {
-struct pairhash {
+struct pairhash final {
   size_t operator()(const std::pair<uint64_t, uint64_t> &p) const noexcept {
     const auto h1 = std::hash<uint64_t>{}(p.first);
     const auto h2 = std::hash<uint64_t>{}(p.second);

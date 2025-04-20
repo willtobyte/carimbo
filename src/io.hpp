@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace storage {
-class io {
+class io final {
 public:
   io() = delete;
   ~io() = delete;

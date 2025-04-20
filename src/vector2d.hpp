@@ -3,10 +3,11 @@
 #include "common.hpp"
 
 namespace algebra {
-class vector2d {
+class vector2d final {
 public:
   vector2d() noexcept;
   vector2d(float_t x, float_t y) noexcept;
+  ~vector2d() noexcept = default;
 
   float_t x() const noexcept;
   float_t y() const noexcept;

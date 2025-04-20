@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace geometry {
-class margin {
+class margin final {
 public:
   margin() noexcept = default;
   ~margin() noexcept = default;

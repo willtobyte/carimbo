@@ -6,7 +6,7 @@
 #include "size.hpp"
 
 namespace geometry {
-class rectangle {
+class rectangle final {
 public:
   rectangle() noexcept = default;
   rectangle(const rectangle &other) noexcept = default;

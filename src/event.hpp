@@ -79,7 +79,7 @@ struct motion {
 };
 }
 
-struct mail {
+struct mail final {
   mail(uint64_t to, const std::string &body) noexcept
       : to(to), body(body) {}
 
@@ -87,7 +87,7 @@ struct mail {
   std::string body;
 };
 
-struct collision {
+struct collision final {
   collision(uint64_t a, uint64_t b)
       : a(a), b(b) {}
 

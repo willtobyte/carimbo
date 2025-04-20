@@ -10,7 +10,7 @@ namespace framework {
 class object : public std::enable_shared_from_this<object> {
 public:
   explicit object(const objectprops &props) noexcept;
-  ~object() noexcept;
+  virtual ~object() noexcept;
 
   uint64_t id() const noexcept;
 

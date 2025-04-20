@@ -11,7 +11,7 @@ namespace ssl = net::ssl;
 using tcp = net::ip::tcp;
 #endif
 
-class socket {
+class socket final {
 public:
   socket() noexcept;
   ~socket() noexcept;

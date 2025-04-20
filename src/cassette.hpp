@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace storage {
-class cassette {
+class cassette final {
 public:
   cassette();
 

@@ -16,13 +16,13 @@ constexpr auto ACTION_RIGHT = "right";
 }
 
 namespace graphics {
-struct keyframe {
+struct keyframe final {
   geometry::rectangle frame;
   geometry::point offset;
   uint64_t duration{0};
 };
 
-struct animation {
+struct animation final {
   bool oneshot{false};
   std::vector<keyframe> keyframes;
 };

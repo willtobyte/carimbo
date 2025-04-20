@@ -12,7 +12,7 @@ namespace framework {
 class objectmanager : public input::eventreceiver {
 public:
   explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
-  ~objectmanager() = default;
+  virtual ~objectmanager() = default;
 
   std::shared_ptr<object> create(const std::string &scope, const std::string &kind, bool manage = true);
 

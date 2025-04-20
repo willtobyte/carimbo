@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace audio {
-class soundfx {
+class soundfx final {
 public:
   soundfx(const std::string &filename);
   ~soundfx() noexcept;

@@ -6,7 +6,7 @@
 #include "renderer.hpp"
 
 namespace graphics {
-class fontfactory {
+class fontfactory final {
 public:
   fontfactory() noexcept = delete;
   explicit fontfactory(std::shared_ptr<renderer> renderer) noexcept;

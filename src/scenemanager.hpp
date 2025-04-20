@@ -8,7 +8,7 @@
 namespace framework {
 class objectmanager;
 
-class scenemanager {
+class scenemanager final {
 public:
   scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<framework::objectmanager> objectmanager) noexcept;
   ~scenemanager() noexcept = default;

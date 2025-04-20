@@ -8,7 +8,7 @@
 namespace graphics {
 using pixmap_ptr = std::shared_ptr<pixmap>;
 
-class pixmappool {
+class pixmappool final {
 public:
   explicit pixmappool(std::shared_ptr<renderer> renderer) noexcept;
   ~pixmappool() noexcept = default;

@@ -5,7 +5,7 @@
 #include "size.hpp"
 
 namespace geometry {
-class point {
+class point final {
 public:
   point() = default;
   point(const point &) noexcept = default;

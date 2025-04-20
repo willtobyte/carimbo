@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace framework {
-struct collision {
+struct collision final {
   constexpr collision(uint64_t a, uint64_t b)
       : a(a), b(b) {}
 

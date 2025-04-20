@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace audio {
-class audiodevice {
+class audiodevice final {
 public:
   audiodevice();
   ~audiodevice() noexcept = default;

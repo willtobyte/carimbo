@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace framework {
-struct mail {
+struct mail final {
   uint64_t to;
   std::string kind;
   std::string body;
@@ -15,7 +15,7 @@ struct mail {
       : to(other.to), kind(other.kind), body(other.body) {}
 };
 
-class postalservice {
+class postalservice final {
 public:
   postalservice() noexcept = default;
 

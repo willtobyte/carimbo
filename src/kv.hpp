@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace memory {
-class observable {
+class observable final {
 public:
   sol::object get() const noexcept;
   void set(const sol::object &new_value);
@@ -14,7 +14,7 @@ private:
   std::vector<sol::function> _subscribers;
 };
 
-class kv {
+class kv final {
 public:
   sol::object get(const std::string &key, sol::this_state state);
   void set(const std::string &key, const sol::object &new_value, sol::this_state state);

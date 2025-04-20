@@ -7,13 +7,13 @@
 #include "vector2d.hpp"
 
 namespace graphics {
-struct keyframe {
+struct keyframe final {
   geometry::rectangle frame;
   geometry::point offset;
   uint64_t duration{0};
 };
 
-struct animation {
+struct animation final {
   bool oneshot{false};
   std::optional<std::string> next;
   std::optional<geometry::rectangle> hitbox;
@@ -22,7 +22,7 @@ struct animation {
 }
 
 namespace framework {
-struct objectprops {
+struct objectprops final {
   uint64_t id{};
   uint64_t frame{};
   uint64_t last_frame{};

@@ -8,7 +8,7 @@
 #include "size.hpp"
 
 namespace graphics {
-class pixmap {
+class pixmap final {
 public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);

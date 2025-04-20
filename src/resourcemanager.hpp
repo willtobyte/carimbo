@@ -7,7 +7,7 @@
 #include "soundmanager.hpp"
 
 namespace framework {
-class resourcemanager {
+class resourcemanager final {
 public:
   resourcemanager() = delete;
   resourcemanager(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<audio::audiodevice> audiodevice) noexcept;

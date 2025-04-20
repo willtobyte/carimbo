@@ -8,7 +8,7 @@ namespace framework {
 class framerate : public loopable {
 public:
   framerate() noexcept = default;
-  ~framerate() noexcept override = default;
+  virtual ~framerate() noexcept = default;
 
   void loop(float_t delta) noexcept override;
 

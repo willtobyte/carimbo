@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace graphics {
-class renderer {
+class renderer final {
 public:
   explicit renderer(SDL_Window *window);
   ~renderer() noexcept = default;

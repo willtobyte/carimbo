@@ -5,7 +5,7 @@
 #include "renderer.hpp"
 
 namespace graphics {
-class canvas {
+class canvas final {
 public:
   explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() noexcept = default;

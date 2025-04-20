@@ -5,7 +5,8 @@
 namespace framework {
 class lifecycleobserver {
 public:
-  virtual ~lifecycleobserver() = default;
+  lifecycleobserver() noexcept = default;
+  virtual ~lifecycleobserver() noexcept = default;
 
   virtual void on_beginupdate() noexcept;
   virtual void on_endupdate() noexcept;

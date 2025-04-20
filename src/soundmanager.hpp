@@ -4,7 +4,7 @@
 #include "soundfx.hpp"
 
 namespace audio {
-class soundmanager {
+class soundmanager final {
 public:
   soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept;
   ~soundmanager() noexcept = default;

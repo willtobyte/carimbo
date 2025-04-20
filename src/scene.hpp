@@ -9,7 +9,7 @@
 namespace framework {
 class objectmanager;
 
-class scene {
+class scene final {
 public:
   scene() = delete;
   explicit scene(

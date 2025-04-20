@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace geometry {
-class size {
+class size final {
 public:
   size() noexcept;
   size(const size &) noexcept = default;
@@ -12,14 +12,16 @@ public:
   ~size() = default;
 
   void set_width(float_t width) noexcept;
-  float_t width() const noexcept;
+  [[nodiscard]] float_t width() const noexcept;
+
   void set_height(float_t height) noexcept;
-  float_t height() const noexcept;
+  [[nodiscard]] float_t height() const noexcept;
 
   bool operator==(const size &rhs) const noexcept;
   bool operator!=(const size &rhs) const noexcept;
 
   size operator*(float_t factor) const noexcept;
+  size operator/(float_t factor) const noexcept;
 
   auto operator<=>(const size &) const = default;
 

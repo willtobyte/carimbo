@@ -7,7 +7,7 @@
 #include "resourcemanager.hpp"
 
 namespace framework {
-class tilemap {
+class tilemap final {
   public:
     tilemap() = delete;
     explicit tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string &name) noexcept;

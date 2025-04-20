@@ -13,7 +13,7 @@ namespace graphics {
 class overlay : public input::eventreceiver {
 public:
   explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager);
-  ~overlay() = default;
+  virtual ~overlay() = default;
 
   std::variant<std::shared_ptr<label>> create(widgettype type) noexcept;
 

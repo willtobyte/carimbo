@@ -3,9 +3,9 @@
 #include "common.hpp"
 
 namespace framework {
-class timermanager {
+class timermanager final {
 public:
-  timermanager() noexcept = default;
+  explicit timermanager() noexcept = default;
   ~timermanager() noexcept = default;
 
   int32_t set(int32_t interval, std::function<void()> fn);

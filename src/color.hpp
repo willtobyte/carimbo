@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace graphics {
-class color {
+class color final {
 public:
   color() = default;
   explicit color(uint32_t pixel) noexcept;

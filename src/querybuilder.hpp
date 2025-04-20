@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace network {
-class querybuilder {
+class querybuilder final {
 public:
   querybuilder &add(const std::string &key, const std::string &value) noexcept;
 
