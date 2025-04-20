@@ -109,7 +109,14 @@ void framework::scriptengine::run() {
 
   lua["ticks"] = ticks;
 
-  lua["openurl"] = SDL_OpenURL;
+  lua["openurl"] = [](const std::string& url) {
+#ifdef EMSCRIPTEN
+    const auto script = fmt::format(R"(window.open("{}", "_blank");)", url);
+    emscripten_run_script(script.c_str());
+#else
+    SDL_OpenURL(url.c_str());
+#endif
+  };
 
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string &json_str, sol::this_state state) {
