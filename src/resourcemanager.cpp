@@ -2,17 +2,22 @@
 
 using namespace framework;
 
+static std::map<std::string, std::function<void(const std::string &)>> handlers;
+
 resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<audio::audiodevice> audiodevice) noexcept
     : _renderer(std::move(renderer)),
       _audiodevice(std::move(audiodevice)),
       _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
       _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
       _fontfactory(std::make_shared<graphics::fontfactory>(_renderer)) {
-  _handlers = {
-      {".png", [this](const std::string &filename) { _pixmappool->get(filename); }},
-      {".ogg", [this](const std::string &filename) { _soundmanager->get(filename); }},
-      {".json", [this](const std::string &filename) { _fontfactory->get(filename); }}
-  };
+
+  if (handlers.empty()) {
+    handlers = {
+        {".png", [this](const std::string &filename) { _pixmappool->get(filename); }},
+        {".ogg", [this](const std::string &filename) { _soundmanager->get(filename); }},
+        {".json", [this](const std::string &filename) { _fontfactory->get(filename); }}
+    };
+  }
 }
 
 void resourcemanager::flush() noexcept {
@@ -37,7 +42,7 @@ void resourcemanager::prefetch(const std::vector<std::string> &filenames) noexce
   for (const auto &filename : filenames) {
     if (const auto position = filename.rfind('.'); position != std::string::npos) {
       const auto extension = filename.substr(position);
-      if (const auto it = _handlers.find(extension); it != _handlers.end()) {
+      if (const auto it = handlers.find(extension); it != handlers.end()) {
         it->second(filename);
       }
     }

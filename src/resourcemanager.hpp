@@ -29,6 +29,5 @@ private:
   std::shared_ptr<graphics::pixmappool> _pixmappool;
   std::shared_ptr<audio::soundmanager> _soundmanager;
   std::shared_ptr<graphics::fontfactory> _fontfactory;
-  std::map<std::string, std::function<void(const std::string &)>> _handlers;
 };
 }
