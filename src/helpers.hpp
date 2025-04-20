@@ -1,9 +1,9 @@
 #pragma once
 
-#include <boost/config.hpp>
-
 #ifndef EMSCRIPTEN
 #ifdef WEBSOCKET
+#include <boost/config.hpp>
+
 namespace boost {
 BOOST_NORETURN inline void throw_exception(std::exception const& e) {
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", e.what(), nullptr);
