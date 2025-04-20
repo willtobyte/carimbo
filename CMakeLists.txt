@@ -78,6 +78,7 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
+    -fno-rtti
     -fno-exceptions
     -fexperimental-library
   )
@@ -117,13 +118,17 @@ else()
 
   if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:/Od;/Zi>
-      $<$<CONFIG:Release>:/O3>
+      $<$<CONFIG:Debug>:/Od;/Zi;/W4>
+      $<$<CONFIG:Release>:/O2;/GL;/GR-;/EHs-c-;/DNDEBUG;/W4>
+    )
+
+    target_link_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Release>:/LTCG>
     )
   else()
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O3;-flto>
+      $<$<CONFIG:Release>:-O3;-fno-rtti;-fno-exceptions;-flto>
     )
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
