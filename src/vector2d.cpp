@@ -109,3 +109,38 @@ bool vector2d::left() const noexcept {
 bool vector2d::zero() const noexcept {
   return std::abs(_x) < epsilon && std::abs(_y) < epsilon;
 }
+
+vector2d vector2d::rotated(float_t angle) const noexcept {
+  const auto cos_a = std::cos(angle);
+  const auto sin_a = std::sin(angle);
+  return vector2d(_x * cos_a - _y * sin_a, _x * sin_a + _y * cos_a);
+}
+
+float_t vector2d::cross(const vector2d &other) const noexcept {
+  return _x * other._y - _y * other._x;
+}
+
+void vector2d::normalize() noexcept {
+  const auto m = magnitude();
+  if (m >= epsilon) {
+    _x /= m;
+    _y /= m;
+  }
+}
+
+float_t vector2d::angle_between(const vector2d &other) const noexcept {
+  float_t dot_product = this->dot(other);
+  float_t mags = this->magnitude() * other.magnitude();
+  return (mags < epsilon) ? 0.0f : std::acos(dot_product / mags);
+}
+
+vector2d vector2d::clamped(float_t max) const noexcept {
+  const auto m = magnitude();
+  return (m > max && m > epsilon) ? *this * (max / m) : *this;
+}
+
+float_t vector2d::distance_to(const vector2d &other) const noexcept {
+  const auto dx = _x - other._x;
+  const auto dy = _y - other._y;
+  return std::sqrt(dx * dx + dy * dy);
+}

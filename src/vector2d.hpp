@@ -39,6 +39,14 @@ public:
   bool left() const noexcept;
   bool zero() const noexcept;
 
+  vector2d rotated(float_t angle) const noexcept;
+  float_t cross(const vector2d &other) const noexcept;
+  void normalize() noexcept;
+  float_t angle_between(const vector2d &other) const noexcept;
+  vector2d clamped(float_t max) const noexcept;
+
+  float_t distance_to(const vector2d &other) const noexcept;
+
 private:
   float_t _x{.0f};
   float_t _y{.0f};
