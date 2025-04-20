@@ -23,47 +23,47 @@
 namespace framework {
 class engine : public input::eventreceiver {
 public:
-  engine() noexcept;
-  virtual ~engine() noexcept = default;
+  engine();
+  virtual ~engine() = default;
 
-  std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
-  std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;
-  std::shared_ptr<input::eventmanager> eventmanager() const noexcept;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
-  std::shared_ptr<graphics::overlay> overlay() const noexcept;
-  std::shared_ptr<framework::resourcemanager> resourcemanager() const noexcept;
-  std::shared_ptr<framework::scenemanager> scenemanager() const noexcept;
-  std::shared_ptr<framework::statemanager> statemanager() const noexcept;
-  std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
-  std::shared_ptr<graphics::window> window() const noexcept;
-  std::shared_ptr<graphics::renderer> renderer() const noexcept;
-  std::shared_ptr<graphics::canvas> canvas() const noexcept;
-  std::shared_ptr<storage::cassette> cassette() const noexcept;
-  std::shared_ptr<framework::timermanager> timermanager() const noexcept;
+  std::shared_ptr<audio::audiodevice> audiodevice() const;
+  std::shared_ptr<framework::objectmanager> objectmanager() const;
+  std::shared_ptr<input::eventmanager> eventmanager() const;
+  std::shared_ptr<graphics::fontfactory> fontfactory() const;
+  std::shared_ptr<graphics::overlay> overlay() const;
+  std::shared_ptr<framework::resourcemanager> resourcemanager() const;
+  std::shared_ptr<framework::scenemanager> scenemanager() const;
+  std::shared_ptr<framework::statemanager> statemanager() const;
+  std::shared_ptr<audio::soundmanager> soundmanager() const;
+  std::shared_ptr<graphics::window> window() const;
+  std::shared_ptr<graphics::renderer> renderer() const;
+  std::shared_ptr<graphics::canvas> canvas() const;
+  std::shared_ptr<storage::cassette> cassette() const;
+  std::shared_ptr<framework::timermanager> timermanager() const;
 
-  int32_t height() const noexcept;
-  int32_t width() const noexcept;
+  int32_t height() const;
+  int32_t width() const;
 
-  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept;
-  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) noexcept;
-  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept;
-  void set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept;
-  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
-  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept;
-  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept;
-  void set_window(std::shared_ptr<graphics::window> window) noexcept;
-  void set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept;
+  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
+  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);
+  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager);
+  void set_overlay(std::shared_ptr<graphics::overlay> overlay);
+  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager);
+  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager);
+  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager);
+  void set_window(std::shared_ptr<graphics::window> window);
+  void set_renderer(std::shared_ptr<graphics::renderer> renderer);
 
-  void add_loopable(std::shared_ptr<loopable> loopable) noexcept;
-  void flush() const noexcept;
-  void prefetch() noexcept;
-  void prefetch(const std::vector<std::string> &filenames) noexcept;
-  void run() noexcept;
+  void add_loopable(std::shared_ptr<loopable> loopable);
+  void flush() const;
+  void prefetch();
+  void prefetch(const std::vector<std::string> &filenames);
+  void run();
 
-  void _loop() noexcept;
+  void _loop();
 
 protected:
-  virtual void on_quit() noexcept override;
+  virtual void on_quit() override;
 
 private:
   bool _running{true};

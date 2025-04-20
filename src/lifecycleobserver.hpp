@@ -5,12 +5,12 @@
 namespace framework {
 class lifecycleobserver {
 public:
-  lifecycleobserver() noexcept = default;
-  virtual ~lifecycleobserver() noexcept = default;
+  lifecycleobserver() = default;
+  virtual ~lifecycleobserver() = default;
 
-  virtual void on_beginupdate() noexcept;
-  virtual void on_endupdate() noexcept;
-  virtual void on_begindraw() noexcept;
-  virtual void on_enddraw() noexcept;
+  virtual void on_beginupdate();
+  virtual void on_endupdate();
+  virtual void on_begindraw();
+  virtual void on_enddraw();
 };
 }

@@ -21,15 +21,15 @@ int32_t application::run() {
 
     auto se = scriptengine();
     se.run();
-  } catch (const std::exception &ex) {
-    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", ex.what(), nullptr);
+  } catch (const std::exception &e) {
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", e.what(), nullptr);
     return 1;
   }
 
   return 0;
 }
 
-application::~application() noexcept {
+application::~application() {
   PHYSFS_deinit();
   SDL_Quit();
 }

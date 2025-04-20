@@ -3,16 +3,16 @@
 using namespace framework;
 using namespace input::event;
 
-static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) noexcept {
+static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) {
   return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
 }
 
-bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept {
+bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const {
   auto it = _collision_mapping.find(make_key(a->id(), b->id()));
   return (it != _collision_mapping.end()) ? it->second : false;
 }
 
-bool statemanager::on(int player, const std::variant<gamepad::button> &type) const noexcept {
+bool statemanager::on(int player, const std::variant<gamepad::button> &type) const {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -22,7 +22,7 @@ bool statemanager::on(int player, const std::variant<gamepad::button> &type) con
   return false;
 }
 
-int8_t statemanager::players() const noexcept {
+int8_t statemanager::players() const {
   return _state.size();
 }
 
@@ -45,27 +45,27 @@ constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard:
   }
 }
 
-void statemanager::on_keydown(const keyboard::key &event) noexcept {
+void statemanager::on_keydown(const keyboard::key &event) {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = true;
   }
 }
 
-void statemanager::on_keyup(const keyboard::key &event) noexcept {
+void statemanager::on_keyup(const keyboard::key &event) {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = false;
   }
 }
 
-void statemanager::on_gamepadbuttondown(uint8_t who, const gamepad::button &event) noexcept {
+void statemanager::on_gamepadbuttondown(uint8_t who, const gamepad::button &event) {
   _state[who][event] = true;
 }
 
-void statemanager::on_gamepadbuttonup(uint8_t who, const gamepad::button &event) noexcept {
+void statemanager::on_gamepadbuttonup(uint8_t who, const gamepad::button &event) {
   _state[who][event] = false;
 }
 
-void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion &event) noexcept {
+void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion &event) {
   using namespace input;
 
   static constexpr auto threshold = 8000;
@@ -104,10 +104,10 @@ void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion &event) n
   }
 }
 
-void statemanager::on_collision(const input::event::collision &event) noexcept {
+void statemanager::on_collision(const input::event::collision &event) {
   _collision_mapping[make_key(event.a, event.b)] = true;
 }
 
-void statemanager::on_endupdate() noexcept {
+void statemanager::on_endupdate() {
   _collision_mapping.clear();
 }

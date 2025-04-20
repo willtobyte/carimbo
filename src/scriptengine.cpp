@@ -8,11 +8,11 @@ sol::table require(sol::state &lua, const std::string &module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state &lua, sol::function function) noexcept
+  explicit lua_loopable(const sol::state &lua, sol::function function)
       : _gc(lua["collectgarbage"].get<sol::function>()),
         _function(std::exchange(function, {})) {}
 
-  void loop(float_t delta) noexcept override {
+  void loop(float_t delta) override {
     _function(delta);
 
     const auto memory = _gc("count").get<double>() / 1024.0;
@@ -204,9 +204,9 @@ void framework::scriptengine::run() {
   struct placementproxy {
     object &e;
 
-    void set(int32_t x, int32_t y) noexcept { e.set_placement(x, y); }
+    void set(int32_t x, int32_t y) { e.set_placement(x, y); }
 
-    geometry::point get() const noexcept { return e.get_placement(); }
+    geometry::point get() const { return e.get_placement(); }
   };
 
   lua.new_usertype<placementproxy>(
@@ -410,9 +410,9 @@ void framework::scriptengine::run() {
   struct cursorproxy {
     graphics::overlay &o;
 
-    void set(const std::string &name) noexcept { o.set_cursor(name); }
+    void set(const std::string &name) { o.set_cursor(name); }
 
-    void hide() noexcept { o.hide(); }
+    void hide() { o.hide(); }
   };
 
   lua.new_usertype<cursorproxy>(

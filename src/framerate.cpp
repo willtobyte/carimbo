@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-void framerate::loop(float_t delta) noexcept {
+void framerate::loop(float_t delta) {
   UNUSED(delta);
   _frames++;
 

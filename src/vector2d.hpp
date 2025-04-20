@@ -5,48 +5,48 @@
 namespace algebra {
 class vector2d final {
 public:
-  vector2d() noexcept;
-  vector2d(float_t x, float_t y) noexcept;
-  ~vector2d() noexcept = default;
+  vector2d();
+  vector2d(float_t x, float_t y);
+  ~vector2d() = default;
 
-  float_t x() const noexcept;
-  float_t y() const noexcept;
+  float_t x() const;
+  float_t y() const;
 
-  void set_x(float_t x) noexcept;
-  void set_y(float_t y) noexcept;
-  void set(float_t x, float_t y) noexcept;
+  void set_x(float_t x);
+  void set_y(float_t y);
+  void set(float_t x, float_t y);
 
-  vector2d operator+(const vector2d &other) const noexcept;
-  vector2d operator-(const vector2d &other) const noexcept;
-  vector2d operator*(float_t scalar) const noexcept;
-  vector2d operator/(float_t scalar) const noexcept;
+  vector2d operator+(const vector2d &other) const;
+  vector2d operator-(const vector2d &other) const;
+  vector2d operator*(float_t scalar) const;
+  vector2d operator/(float_t scalar) const;
 
-  vector2d &operator+=(const vector2d &other) noexcept;
-  vector2d &operator-=(const vector2d &other) noexcept;
-  vector2d &operator*=(float_t scalar) noexcept;
-  vector2d &operator/=(float_t scalar) noexcept;
+  vector2d &operator+=(const vector2d &other);
+  vector2d &operator-=(const vector2d &other);
+  vector2d &operator*=(float_t scalar);
+  vector2d &operator/=(float_t scalar);
 
-  bool operator==(const vector2d &other) const noexcept;
-  bool operator!=(const vector2d &other) const noexcept;
+  bool operator==(const vector2d &other) const;
+  bool operator!=(const vector2d &other) const;
 
-  float_t magnitude() const noexcept;
+  float_t magnitude() const;
 
-  vector2d unit() const noexcept;
+  vector2d unit() const;
 
-  float_t dot(const vector2d &other) const noexcept;
+  float_t dot(const vector2d &other) const;
 
-  bool moving() const noexcept;
-  bool right() const noexcept;
-  bool left() const noexcept;
-  bool zero() const noexcept;
+  bool moving() const;
+  bool right() const;
+  bool left() const;
+  bool zero() const;
 
-  vector2d rotated(float_t angle) const noexcept;
-  float_t cross(const vector2d &other) const noexcept;
-  void normalize() noexcept;
-  float_t angle_between(const vector2d &other) const noexcept;
-  vector2d clamped(float_t max) const noexcept;
+  vector2d rotated(float_t angle) const;
+  float_t cross(const vector2d &other) const;
+  void normalize();
+  float_t angle_between(const vector2d &other) const;
+  vector2d clamped(float_t max) const;
 
-  float_t distance_to(const vector2d &other) const noexcept;
+  float_t distance_to(const vector2d &other) const;
 
 private:
   float_t _x{.0f};

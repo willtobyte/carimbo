@@ -7,7 +7,7 @@ inline constexpr bool always_false = false;
 
 struct SDL_Deleter {
   template <typename T>
-  void operator()(T *ptr) const noexcept {
+  void operator()(T *ptr) const {
     if (ptr) {
       if constexpr (std::is_same_v<T, SDL_Condition>) {
         SDL_DestroyCond(ptr);

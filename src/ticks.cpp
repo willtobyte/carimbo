@@ -1,3 +1,3 @@
 #include "ticks.hpp"
 
-uint64_t ticks() noexcept { return SDL_GetTicks(); }
+uint64_t ticks() { return SDL_GetTicks(); }

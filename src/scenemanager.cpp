@@ -2,11 +2,11 @@
 
 using namespace framework;
 
-scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager) noexcept
+scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager)
     : _resourcemanager(std::move(resourcemanager)), _objectmanager(std::move(objectmanager)) {
 }
 
-std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
+std::shared_ptr<scene> scenemanager::load(const std::string &name) {
   const auto buffer = storage::io::read("scenes/" + name + ".json");
   const auto j = nlohmann::json::parse(buffer);
 
@@ -60,7 +60,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) noexcept {
   return s;
 }
 
-void scenemanager::set(const std::string &name) noexcept {
+void scenemanager::set(const std::string &name) {
   if (_scene) {
     _scene->on_leave();
   }
@@ -70,26 +70,26 @@ void scenemanager::set(const std::string &name) noexcept {
   _scene->on_enter();
 }
 
-std::shared_ptr<scene> scenemanager::get(const std::string &name) const noexcept {
+std::shared_ptr<scene> scenemanager::get(const std::string &name) const {
   return _scene_mapping.at(name);
 }
 
-void scenemanager::destroy(const std::string &name) noexcept {
+void scenemanager::destroy(const std::string &name) {
   _scene_mapping.erase(name);
 }
 
-void scenemanager::on_touch(float_t x, float_t y) const noexcept {
+void scenemanager::on_touch(float_t x, float_t y) const {
   _scene->on_touch(x, y);
 }
 
-void scenemanager::on_motion(float_t x, float_t y) const noexcept {
+void scenemanager::on_motion(float_t x, float_t y) const {
   _scene->on_motion(x, y);
 }
 
-void scenemanager::update(float_t delta) noexcept {
+void scenemanager::update(float_t delta) {
   _scene->update(delta);
 }
 
-void scenemanager::draw() const noexcept {
+void scenemanager::draw() const {
   _scene->draw();
 }

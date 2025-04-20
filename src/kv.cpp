@@ -2,7 +2,7 @@
 
 using namespace memory;
 
-sol::object observable::get() const noexcept {
+sol::object observable::get() const {
   return _value;
 }
 

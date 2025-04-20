@@ -33,14 +33,14 @@ public:
   explicit cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager);
   virtual ~cursor() = default;
 
-  virtual void on_mousebuttondown(const input::event::mouse::button &event) noexcept;
-  virtual void on_mousebuttonup(const input::event::mouse::button &event) noexcept;
-  virtual void on_mousemotion(const input::event::mouse::motion &event) noexcept;
+  virtual void on_mousebuttondown(const input::event::mouse::button &event);
+  virtual void on_mousebuttonup(const input::event::mouse::button &event);
+  virtual void on_mousemotion(const input::event::mouse::motion &event);
 
-  void update(float_t delta) noexcept;
-  void draw() const noexcept;
+  void update(float_t delta);
+  void draw() const;
 
-  void handle(const std::string &message) noexcept;
+  void handle(const std::string &message);
 
 private:
   geometry::point _position{0, 0};

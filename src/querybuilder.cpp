@@ -17,12 +17,12 @@ static std::string encode(const std::string &value) {
   return encoded;
 }
 
-querybuilder &querybuilder::add(const std::string &key, const std::string &value) noexcept {
+querybuilder &querybuilder::add(const std::string &key, const std::string &value) {
   _parameters.emplace(std::string(key), std::string(value));
   return *this;
 }
 
-std::string querybuilder::build() const noexcept {
+std::string querybuilder::build() const {
   if (_parameters.empty()) {
     return {};
   }

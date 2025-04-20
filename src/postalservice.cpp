@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-void postalservice::post(const mail &message) noexcept {
+void postalservice::post(const mail &message) {
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::mail);
   event.user.data1 = new mail(message);

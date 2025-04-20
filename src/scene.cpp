@@ -8,7 +8,7 @@ scene::scene(
     std::unordered_map<std::string, std::shared_ptr<object>> objects,
     std::vector<std::shared_ptr<audio::soundfx>> effects,
     geometry::size size
-) noexcept
+)
     : _objectmanager(objectmanager),
       _background(std::move(background)),
       _objects(std::move(objects)),
@@ -16,7 +16,7 @@ scene::scene(
       _size(std::move(size)) {
 }
 
-scene::~scene() noexcept {
+scene::~scene() {
   const auto objects = std::exchange(_objects, {});
 
   for (const auto &[_, o] : objects) {
@@ -26,22 +26,22 @@ scene::~scene() noexcept {
   _background.reset();
 }
 
-void scene::update(float_t delta) noexcept {
+void scene::update(float_t delta) {
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
 }
 
-void scene::draw() const noexcept {
+void scene::draw() const {
   static geometry::point point{0, 0};
   _background->draw({point, _size}, {point, _size});
 }
 
-std::shared_ptr<object> scene::get(const std::string &name) const noexcept {
+std::shared_ptr<object> scene::get(const std::string &name) const {
   return _objects.at(name);
 }
 
-void scene::on_enter() noexcept {
+void scene::on_enter() {
   for (auto &[_, o] : _objects) {
     _objectmanager->manage(o);
   }
@@ -51,7 +51,7 @@ void scene::on_enter() noexcept {
   }
 }
 
-void scene::on_leave() noexcept {
+void scene::on_leave() {
   if (const auto fn = _onleave; fn) {
     fn();
   }
@@ -61,34 +61,34 @@ void scene::on_leave() noexcept {
   }
 }
 
-void scene::on_touch(float_t x, float_t y) const noexcept {
+void scene::on_touch(float_t x, float_t y) const {
   if (const auto fn = _ontouch; fn) {
     fn(x, y);
   }
 }
 
-void scene::on_motion(float_t x, float_t y) const noexcept {
+void scene::on_motion(float_t x, float_t y) const {
   if (const auto fn = _onmotion; fn) {
     fn(x, y);
   }
 }
 
-void scene::set_onenter(std::function<void()> fn) noexcept {
+void scene::set_onenter(std::function<void()> fn) {
   _onenter = std::move(fn);
 }
 
-void scene::set_onloop(std::function<void(float_t)> fn) noexcept {
+void scene::set_onloop(std::function<void(float_t)> fn) {
   _onloop = std::move(fn);
 }
 
-void scene::set_onleave(std::function<void()> fn) noexcept {
+void scene::set_onleave(std::function<void()> fn) {
   _onleave = std::move(fn);
 }
 
-void scene::set_ontouch(std::function<void(float_t, float_t)> fn) noexcept {
+void scene::set_ontouch(std::function<void(float_t, float_t)> fn) {
   _ontouch = std::move(fn);
 }
 
-void scene::set_onmotion(std::function<void(float_t, float_t)> fn) noexcept {
+void scene::set_onmotion(std::function<void(float_t, float_t)> fn) {
   _onmotion = std::move(fn);
 }

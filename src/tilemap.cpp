@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string &name) noexcept
+tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string &name)
   : _resourcemanager(std::move(resourcemanager)) {
   UNUSED(name);
 
@@ -18,7 +18,7 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   _view = {.0f, .0f, width, height};
 }
 
-void tilemap::update(float_t delta) noexcept {
+void tilemap::update(float_t delta) {
   UNUSED(delta);
   if (!_target || !_tileset) {
     return;
@@ -40,7 +40,7 @@ void tilemap::update(float_t delta) noexcept {
   });
 }
 
-void tilemap::draw() const noexcept {
+void tilemap::draw() const {
   if (!_tileset) {
     return;
   }
@@ -48,6 +48,6 @@ void tilemap::draw() const noexcept {
   // TODO _tileset->draw(const geometry::rectangle &source, const geometry::rectangle &destination)
 }
 
-void tilemap::set_target(std::shared_ptr<object> object) noexcept {
+void tilemap::set_target(std::shared_ptr<object> object) {
   _target = std::move(object);
 }

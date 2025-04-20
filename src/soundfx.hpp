@@ -6,10 +6,10 @@ namespace audio {
 class soundfx final {
 public:
   soundfx(const std::string &filename);
-  ~soundfx() noexcept;
+  ~soundfx();
 
-  void play(bool loop) const noexcept;
-  void stop() const noexcept;
+  void play(bool loop) const;
+  void stop() const;
 
 private:
   ALuint _source;

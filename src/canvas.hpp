@@ -8,9 +8,9 @@ namespace graphics {
 class canvas final {
 public:
   explicit canvas(std::shared_ptr<renderer> renderer);
-  ~canvas() noexcept = default;
+  ~canvas() = default;
 
-  void set_pixels(const std::vector<uint32_t> &pixels) noexcept;
+  void set_pixels(const std::vector<uint32_t> &pixels);
 
   void draw();
 

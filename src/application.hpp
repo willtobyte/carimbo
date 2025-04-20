@@ -6,7 +6,7 @@ namespace framework {
 class application : private noncopyable {
 public:
   application(int argc, char **argv);
-  virtual ~application() noexcept;
+  virtual ~application();
 
   int32_t run();
 };

@@ -32,7 +32,7 @@ int32_t timermanager::singleshot(int32_t interval, std::function<void()> fn) {
   return add_timer(interval, fn, false);
 }
 
-void timermanager::clear(int32_t id) noexcept {
+void timermanager::clear(int32_t id) {
   SDL_RemoveTimer(id);
 }
 

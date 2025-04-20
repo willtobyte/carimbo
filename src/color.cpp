@@ -2,17 +2,17 @@
 
 using namespace graphics;
 
-color::color(uint32_t pixel) noexcept {
+color::color(uint32_t pixel) {
   _r = pixel >> 24;
   _g = pixel >> 16;
   _b = pixel >> 8;
   _a = pixel;
 }
 
-color::color(const SDL_Color &scolor) noexcept
+color::color(const SDL_Color &scolor)
     : color(scolor.r, scolor.g, scolor.b, scolor.a) {}
 
-color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
+color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
     : _r(r), _g(g), _b(b), _a(a) {}
 
 color::color(const std::string &hex)
@@ -33,46 +33,46 @@ color::color(const std::string &hex)
   }
 }
 
-uint8_t color::r() const noexcept {
+uint8_t color::r() const {
   return _r;
 }
 
-uint8_t color::g() const noexcept {
+uint8_t color::g() const {
   return _g;
 }
 
-uint8_t color::b() const noexcept {
+uint8_t color::b() const {
   return _b;
 }
 
-uint8_t color::a() const noexcept {
+uint8_t color::a() const {
   return _a;
 }
 
-void color::set_r(uint8_t r) noexcept {
+void color::set_r(uint8_t r) {
   _r = r;
 }
 
-void color::set_g(uint8_t g) noexcept {
+void color::set_g(uint8_t g) {
   _g = g;
 }
 
-void color::set_b(uint8_t b) noexcept {
+void color::set_b(uint8_t b) {
   _b = b;
 }
 
-void color::set_a(uint8_t a) noexcept {
+void color::set_a(uint8_t a) {
   _a = a;
 }
 
-bool color::operator==(const color &other) const noexcept {
+bool color::operator==(const color &other) const {
   return std::tie(_r, _g, _b, _a) == std::tie(other._r, other._g, other._b, other._a);
 }
 
-bool color::operator!=(const color &other) const noexcept {
+bool color::operator!=(const color &other) const {
   return !(*this == other);
 }
 
-color::operator SDL_Color() const noexcept {
+color::operator SDL_Color() const {
   return SDL_Color{_r, _g, _b, _a};
 }

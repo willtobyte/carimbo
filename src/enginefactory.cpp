@@ -11,37 +11,37 @@
 
 using namespace framework;
 
-enginefactory &enginefactory::with_title(const std::string &title) noexcept {
+enginefactory &enginefactory::with_title(const std::string &title) {
   _title = title;
   return *this;
 }
 
-enginefactory &enginefactory::with_width(int32_t width) noexcept {
+enginefactory &enginefactory::with_width(int32_t width) {
   _width = width;
   return *this;
 }
 
-enginefactory &enginefactory::with_height(int32_t height) noexcept {
+enginefactory &enginefactory::with_height(int32_t height) {
   _height = height;
   return *this;
 }
 
-enginefactory &enginefactory::with_scale(float_t scale) noexcept {
+enginefactory &enginefactory::with_scale(float_t scale) {
   _scale = scale;
   return *this;
 }
 
-enginefactory &enginefactory::with_gravity(float_t gravity) noexcept {
+enginefactory &enginefactory::with_gravity(float_t gravity) {
   _gravity = gravity;
   return *this;
 }
 
-enginefactory &enginefactory::with_fullscreen(bool fullscreen) noexcept {
+enginefactory &enginefactory::with_fullscreen(bool fullscreen) {
   _fullscreen = fullscreen;
   return *this;
 }
 
-std::shared_ptr<engine> enginefactory::create() const noexcept {
+std::shared_ptr<engine> enginefactory::create() const {
   const auto audiodevice = std::make_shared<audio::audiodevice>();
   const auto engine = std::make_shared<framework::engine>();
   const auto window = std::make_shared<graphics::window>(_title, _width, _height, _fullscreen);

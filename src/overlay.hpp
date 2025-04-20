@@ -15,19 +15,19 @@ public:
   explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager);
   virtual ~overlay() = default;
 
-  std::variant<std::shared_ptr<label>> create(widgettype type) noexcept;
+  std::variant<std::shared_ptr<label>> create(widgettype type);
 
-  void destroy(const std::variant<std::shared_ptr<label>> &widget) noexcept;
+  void destroy(const std::variant<std::shared_ptr<label>> &widget);
 
-  void update(float_t delta) noexcept;
+  void update(float_t delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
-  void set_cursor(const std::string &name) noexcept;
+  void set_cursor(const std::string &name);
 
-  void hide() noexcept;
+  void hide();
 
-  void dispatch(widgettype type, const std::string &message) noexcept;
+  void dispatch(widgettype type, const std::string &message);
 
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;

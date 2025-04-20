@@ -5,7 +5,7 @@
 namespace memory {
 class observable final {
 public:
-  sol::object get() const noexcept;
+  sol::object get() const;
   void set(const sol::object &new_value);
   void subscribe(const sol::function &callback);
 

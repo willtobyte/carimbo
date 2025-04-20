@@ -14,7 +14,7 @@ public:
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
   pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface);
 
-  ~pixmap() noexcept = default;
+  ~pixmap() = default;
 
   void draw(
       const geometry::rectangle &source,
@@ -26,9 +26,9 @@ public:
       ,
       const std::optional<geometry::rectangle> &outline = std::nullopt
 #endif
-  ) const noexcept;
+  ) const;
 
-  operator SDL_Texture *() const noexcept;
+  operator SDL_Texture *() const;
 
 private:
   std::shared_ptr<renderer> _renderer;

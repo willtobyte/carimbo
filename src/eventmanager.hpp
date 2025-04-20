@@ -14,9 +14,9 @@ public:
 
   void update(float_t delta);
 
-  void add_receiver(std::shared_ptr<eventreceiver> receiver) noexcept;
+  void add_receiver(std::shared_ptr<eventreceiver> receiver);
 
-  void remove_receiver(std::shared_ptr<eventreceiver> receiver) noexcept;
+  void remove_receiver(std::shared_ptr<eventreceiver> receiver);
 
 private:
   std::shared_ptr<graphics::renderer> _renderer;

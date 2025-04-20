@@ -9,14 +9,14 @@ renderer::renderer(SDL_Window *window)
   }
 }
 
-renderer::operator SDL_Renderer *() noexcept {
+renderer::operator SDL_Renderer *() {
   return _renderer.get();
 }
 
-void renderer::begin() noexcept {
+void renderer::begin() {
   SDL_RenderClear(*this);
 }
 
-void renderer::end() noexcept {
+void renderer::end() {
   SDL_RenderPresent(*this);
 }

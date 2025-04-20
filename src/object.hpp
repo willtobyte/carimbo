@@ -9,56 +9,56 @@
 namespace framework {
 class object : public std::enable_shared_from_this<object> {
 public:
-  explicit object(const objectprops &props) noexcept;
-  virtual ~object() noexcept;
+  explicit object(const objectprops &props);
+  virtual ~object();
 
-  uint64_t id() const noexcept;
+  uint64_t id() const;
 
-  std::string kind() const noexcept;
+  std::string kind() const;
 
-  void update(float_t delta) noexcept;
+  void update(float_t delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
-  objectprops &props() noexcept;
-  const objectprops &props() const noexcept;
-  void set_props(const objectprops &props) noexcept;
+  objectprops &props();
+  const objectprops &props() const;
+  void set_props(const objectprops &props);
 
-  void hide() noexcept;
+  void hide();
 
-  geometry::point position() const noexcept;
-  int32_t x() const noexcept;
-  int32_t y() const noexcept;
+  geometry::point position() const;
+  int32_t x() const;
+  int32_t y() const;
 
-  void move(float_t x_velocity, float_t y_velocity) noexcept;
-  void set_velocity(const algebra::vector2d &velocity) noexcept;
-  algebra::vector2d velocity() const noexcept;
+  void move(float_t x_velocity, float_t y_velocity);
+  void set_velocity(const algebra::vector2d &velocity);
+  algebra::vector2d velocity() const;
 
-  void set_placement(int32_t x, int32_t y) noexcept;
-  geometry::point get_placement() const noexcept;
+  void set_placement(int32_t x, int32_t y);
+  geometry::point get_placement() const;
 
-  void set_onupdate(std::function<void(std::shared_ptr<object>)> fn) noexcept;
-  void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
-  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn) noexcept;
-  void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) noexcept;
-  void set_onmotion(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) noexcept;
-  void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) noexcept;
-  void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) noexcept;
+  void set_onupdate(std::function<void(std::shared_ptr<object>)> fn);
+  void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
+  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
+  void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn);
+  void set_onmotion(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn);
+  void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn);
+  void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn);
 
-  void set_reflection(graphics::reflection reflection) noexcept;
+  void set_reflection(graphics::reflection reflection);
 
-  void set_action(const std::string &action) noexcept;
-  void unset_action() noexcept;
-  std::string action() const noexcept;
+  void set_action(const std::string &action);
+  void unset_action();
+  std::string action() const;
 
-  bool intersects(std::shared_ptr<object> other) const noexcept;
+  bool intersects(std::shared_ptr<object> other) const;
 
   void on_email(const std::string &message);
 
-  void on_touch(float_t x, float_t y) noexcept;
-  void on_motion(float_t x, float_t y) noexcept;
+  void on_touch(float_t x, float_t y);
+  void on_motion(float_t x, float_t y);
 
-  memory::kv &kv() noexcept;
+  memory::kv &kv();
 
 private:
   friend class objectmanager;

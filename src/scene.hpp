@@ -18,26 +18,26 @@ public:
       std::unordered_map<std::string, std::shared_ptr<object>> objects,
       std::vector<std::shared_ptr<audio::soundfx>> effects,
       geometry::size size
-  ) noexcept;
+  );
 
-  ~scene() noexcept;
+  ~scene();
 
-  void update(float_t delta) noexcept;
+  void update(float_t delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
-  std::shared_ptr<object> get(const std::string &name) const noexcept;
+  std::shared_ptr<object> get(const std::string &name) const;
 
-  void on_enter() noexcept;
-  void on_leave() noexcept;
-  void on_touch(float_t x, float_t y) const noexcept;
-  void on_motion(float_t x, float_t y) const noexcept;
+  void on_enter();
+  void on_leave();
+  void on_touch(float_t x, float_t y) const;
+  void on_motion(float_t x, float_t y) const;
 
-  void set_onenter(std::function<void()> fn) noexcept;
-  void set_onloop(std::function<void(float_t)> fn) noexcept;
-  void set_onleave(std::function<void()> fn) noexcept;
-  void set_ontouch(std::function<void(float_t, float_t)> fn) noexcept;
-  void set_onmotion(std::function<void(float_t, float_t)> fn) noexcept;
+  void set_onenter(std::function<void()> fn);
+  void set_onloop(std::function<void(float_t)> fn);
+  void set_onleave(std::function<void()> fn);
+  void set_ontouch(std::function<void(float_t, float_t)> fn);
+  void set_onmotion(std::function<void(float_t, float_t)> fn);
 
 private:
   std::shared_ptr<framework::objectmanager> _objectmanager;

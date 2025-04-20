@@ -78,6 +78,7 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
+    -fno-exceptions
     -fexperimental-library
   )
 

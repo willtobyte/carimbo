@@ -8,32 +8,32 @@
 namespace geometry {
 class rectangle final {
 public:
-  rectangle() noexcept = default;
-  rectangle(const rectangle &other) noexcept = default;
-  rectangle(float_t x, float_t y, float_t width, float_t height) noexcept;
-  rectangle(const geometry::point &position, const geometry::size &size) noexcept;
+  rectangle() = default;
+  rectangle(const rectangle &other) = default;
+  rectangle(float_t x, float_t y, float_t width, float_t height);
+  rectangle(const geometry::point &position, const geometry::size &size);
 
-  ~rectangle() noexcept = default;
+  ~rectangle() = default;
 
-  void set_position(const geometry::point &position) noexcept;
-  geometry::point position() const noexcept;
+  void set_position(const geometry::point &position);
+  geometry::point position() const;
 
-  void set_size(const geometry::size &size) noexcept;
-  geometry::size size() const noexcept;
+  void set_size(const geometry::size &size);
+  geometry::size size() const;
 
-  void scale(float_t factor) noexcept;
+  void scale(float_t factor);
 
-  bool intersects(const rectangle &other) const noexcept;
+  bool intersects(const rectangle &other) const;
 
-  bool contains(const geometry::point &point) const noexcept;
+  bool contains(const geometry::point &point) const;
 
-  operator SDL_FRect() const noexcept;
+  operator SDL_FRect() const;
 
-  rectangle operator+(const geometry::point &offset) const noexcept;
+  rectangle operator+(const geometry::point &offset) const;
 
   auto operator<=>(const rectangle &) const = default;
 
-  friend void from_json(const nlohmann::json &j, rectangle &r) noexcept;
+  friend void from_json(const nlohmann::json &j, rectangle &r);
 
 private:
   point _position{};

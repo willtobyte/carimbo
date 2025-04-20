@@ -46,7 +46,7 @@ EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void
 }
 #endif
 
-socket::socket() noexcept {
+socket::socket() {
   _queue.reserve(64);
 #ifndef EMSCRIPTEN
 #ifndef LOCAL
@@ -56,7 +56,7 @@ socket::socket() noexcept {
 #endif
 }
 
-socket::~socket() noexcept {
+socket::~socket() {
 #ifdef EMSCRIPTEN
   constexpr int code = 1000;
   constexpr const char *reason = "Client disconnecting";
@@ -73,7 +73,7 @@ socket::~socket() noexcept {
 #endif
 }
 
-void socket::connect() noexcept {
+void socket::connect() {
 #ifdef EMSCRIPTEN
   const std::string url =
 #ifdef SANDBOX
@@ -112,16 +112,16 @@ void socket::connect() noexcept {
 #endif
 }
 
-void socket::emit(const std::string &topic, const std::string &data) noexcept {
+void socket::emit(const std::string &topic, const std::string &data) {
   send(fmt::format(fmt::runtime(R"({"event": {"topic": "{}", "data": {}}})"), topic, data));
 }
 
-void socket::on(const std::string &topic, std::function<void(const std::string &)> callback) noexcept {
+void socket::on(const std::string &topic, std::function<void(const std::string &)> callback) {
   send(fmt::format(R"({{"subscribe": "{}"}})", topic));
   _callbacks[topic].emplace_back(callback);
 }
 
-void socket::rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) noexcept {
+void socket::rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) {
   send(fmt::format(fmt::runtime(R"({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})"), ++counter, method, arguments));
   _callbacks[method].emplace_back(callback);
 }
@@ -158,7 +158,7 @@ void socket::handle_close(const EmscriptenWebSocketCloseEvent *event) {
 #endif
 
 #ifndef EMSCRIPTEN
-void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type results) noexcept {
+void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type results) {
   UNUSED(results);
 
   if (ec) {
@@ -176,7 +176,7 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
   );
 }
 
-void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept {
+void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) {
   UNUSED(endpoint);
 
   if (ec) {
@@ -198,7 +198,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
   );
 }
 
-void socket::on_ssl_handshake(beast::error_code ec) noexcept {
+void socket::on_ssl_handshake(beast::error_code ec) {
   if (ec) {
     fmt::println(stderr, "[socket] ssl handshake error: {}", ec.message());
     return;
@@ -214,7 +214,7 @@ void socket::on_ssl_handshake(beast::error_code ec) noexcept {
   );
 }
 
-void socket::on_handshake(beast::error_code ec) noexcept {
+void socket::on_handshake(beast::error_code ec) {
   if (ec) {
     fmt::println(stderr, "[socket] handshake error: {}", ec.message());
     return;
@@ -223,7 +223,7 @@ void socket::on_handshake(beast::error_code ec) noexcept {
   do_read();
 }
 
-void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) noexcept {
+void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   UNUSED(bytes_transferred);
 
   if (ec) {
@@ -249,7 +249,7 @@ void socket::do_read() {
 }
 #endif
 
-void socket::on_message(const std::string &buffer) noexcept {
+void socket::on_message(const std::string &buffer) {
   const auto j = json::parse(buffer, nullptr, false);
   if (j.is_discarded()) {
     return;
@@ -293,7 +293,7 @@ void socket::on_message(const std::string &buffer) noexcept {
   }
 }
 
-void socket::send(const std::string &message) noexcept {
+void socket::send(const std::string &message) {
   if (!_connected) {
     _queue.emplace_back(message);
     return;
@@ -318,7 +318,7 @@ void socket::send(const std::string &message) noexcept {
 #endif
 }
 
-void socket::invoke(const std::string &event, const std::string &data) const noexcept {
+void socket::invoke(const std::string &event, const std::string &data) const {
   if (const auto it = _callbacks.find(event); it != _callbacks.end()) {
     const auto &callbacks = it->second;
 

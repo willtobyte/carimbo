@@ -33,7 +33,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   }
 }
 
-void cursor::on_mousebuttondown(const mouse::button &event) noexcept {
+void cursor::on_mousebuttondown(const mouse::button &event) {
   // TODO FIX ME using enum input::mousebuttonevent::button;
 
   constexpr auto left = mouse::button::which::left;
@@ -53,15 +53,15 @@ void cursor::on_mousebuttondown(const mouse::button &event) noexcept {
   _last_frame = SDL_GetTicks();
 }
 
-void cursor::on_mousebuttonup(const mouse::button &event) noexcept {
+void cursor::on_mousebuttonup(const mouse::button &event) {
   UNUSED(event);
 }
 
-void cursor::on_mousemotion(const mouse::motion &event) noexcept {
+void cursor::on_mousemotion(const mouse::motion &event) {
   _position = geometry::point{event.x, event.y};
 }
 
-void cursor::update(float_t) noexcept {
+void cursor::update(float_t) {
   const auto now = SDL_GetTicks();
   const auto &animation = _animations.at(_action);
   const auto &frame = animation.keyframes[_frame];
@@ -81,7 +81,7 @@ void cursor::update(float_t) noexcept {
   _frame = (_frame + 1) % animation.keyframes.size();
 }
 
-void cursor::draw() const noexcept {
+void cursor::draw() const {
   const auto &animation = _animations.at(_action).keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
@@ -96,6 +96,6 @@ void cursor::draw() const noexcept {
   );
 }
 
-void cursor::handle(const std::string &message) noexcept {
+void cursor::handle(const std::string &message) {
   _queued_action = message;
 }

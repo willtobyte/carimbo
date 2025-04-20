@@ -8,13 +8,13 @@
 namespace graphics {
 class fontfactory final {
 public:
-  fontfactory() noexcept = delete;
-  explicit fontfactory(std::shared_ptr<renderer> renderer) noexcept;
-  ~fontfactory() noexcept = default;
+  fontfactory() = delete;
+  explicit fontfactory(std::shared_ptr<renderer> renderer);
+  ~fontfactory() = default;
 
   std::shared_ptr<font> get(const std::string &family);
 
-  void flush() noexcept;
+  void flush();
 
 private:
   std::unordered_map<std::string, std::shared_ptr<font>> _pool;

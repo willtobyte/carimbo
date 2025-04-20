@@ -17,8 +17,8 @@ struct mail final {
 
 class postalservice final {
 public:
-  postalservice() noexcept = default;
+  postalservice() = default;
 
-  void post(const mail &message) noexcept;
+  void post(const mail &message);
 };
 }

@@ -2,4 +2,4 @@
 
 #include "common.hpp"
 
-uint64_t ticks() noexcept;
+uint64_t ticks();

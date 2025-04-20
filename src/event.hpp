@@ -80,7 +80,7 @@ struct motion {
 }
 
 struct mail final {
-  mail(uint64_t to, const std::string &body) noexcept
+  mail(uint64_t to, const std::string &body)
       : to(to), body(body) {}
 
   uint64_t to;

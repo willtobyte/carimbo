@@ -18,11 +18,11 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
   }
 }
 
-window::operator SDL_Window *() noexcept {
+window::operator SDL_Window *() {
   return _window.get();
 }
 
-std::shared_ptr<renderer> window::create_renderer(float_t scale) const noexcept {
+std::shared_ptr<renderer> window::create_renderer(float_t scale) const {
   const auto ptr = std::make_shared<renderer>(_window.get());
   UNUSED(scale);
   SDL_SetRenderLogicalPresentation(*ptr, _width, _height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
@@ -31,10 +31,10 @@ std::shared_ptr<renderer> window::create_renderer(float_t scale) const noexcept 
   return ptr;
 }
 
-int32_t window::width() const noexcept {
+int32_t window::width() const {
   return _width;
 }
 
-int32_t window::height() const noexcept {
+int32_t window::height() const {
   return _height;
 }

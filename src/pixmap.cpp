@@ -64,7 +64,7 @@ void pixmap::draw(
     ,
     const std::optional<geometry::rectangle> &outline
 #endif
-) const noexcept {
+) const {
   const SDL_FRect &src = source;
   const SDL_FRect &dst = destination;
 
@@ -81,6 +81,6 @@ void pixmap::draw(
 #endif
 }
 
-pixmap::operator SDL_Texture *() const noexcept {
+pixmap::operator SDL_Texture *() const {
   return _texture.get();
 }

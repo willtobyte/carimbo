@@ -18,7 +18,7 @@ auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optio
   return fallback;
 }
 
-objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept
+objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager) {
 }
 
@@ -81,7 +81,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &scope, const st
   return o;
 }
 
-std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noexcept {
+std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   if (!matrix) {
     return nullptr;
   }
@@ -106,7 +106,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noe
   return o;
 }
 
-void objectmanager::manage(std::shared_ptr<object> object) noexcept {
+void objectmanager::manage(std::shared_ptr<object> object) {
   if (!object) {
     return;
   }
@@ -115,7 +115,7 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   _dirty = true;
 }
 
-void objectmanager::unmanage(std::shared_ptr<object> object) noexcept {
+void objectmanager::unmanage(std::shared_ptr<object> object) {
   if (!object) {
     return;
   }
@@ -128,7 +128,7 @@ void objectmanager::unmanage(std::shared_ptr<object> object) noexcept {
   _dirty = true;
 }
 
-void objectmanager::destroy(std::shared_ptr<object> object) noexcept {
+void objectmanager::destroy(std::shared_ptr<object> object) {
   if (!object) {
     return;
   }
@@ -137,7 +137,7 @@ void objectmanager::destroy(std::shared_ptr<object> object) noexcept {
   _objects.erase(std::remove(_objects.begin(), _objects.end(), object), _objects.end());
 }
 
-std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
+std::shared_ptr<object> objectmanager::find(uint64_t id) const {
   auto it = std::ranges::find_if(_objects, [id](const auto &object) {
     return object->id() == id;
   });
@@ -149,7 +149,7 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::update(float_t delta) noexcept {
+void objectmanager::update(float_t delta) {
   for (auto &o : _objects) {
     const auto old = o->x();
 
@@ -213,19 +213,19 @@ void objectmanager::update(float_t delta) noexcept {
   }
 }
 
-void objectmanager::draw() noexcept {
+void objectmanager::draw() {
   for (const auto &object : _objects) {
     object->draw();
   }
 }
 
-void objectmanager::on_mail(const input::event::mail &event) noexcept {
+void objectmanager::on_mail(const input::event::mail &event) {
   if (const auto object = find(event.to); object) {
     object->on_email(event.body);
   }
 }
 
-void objectmanager::on_mousebuttondown(const mouse::button &event) noexcept {
+void objectmanager::on_mousebuttondown(const mouse::button &event) {
   if (event.button != mouse::button::which::left) {
     return;
   }
@@ -267,7 +267,7 @@ void objectmanager::on_mousebuttondown(const mouse::button &event) noexcept {
   }
 }
 
-void objectmanager::on_mousemotion(const input::event::mouse::motion &event) noexcept {
+void objectmanager::on_mousemotion(const input::event::mouse::motion &event) {
   _scenemanager->on_motion(event.x, event.y);
 
   for (const auto &o : _objects) {

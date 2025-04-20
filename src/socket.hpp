@@ -13,14 +13,14 @@ using tcp = net::ip::tcp;
 
 class socket final {
 public:
-  socket() noexcept;
-  ~socket() noexcept;
+  socket();
+  ~socket();
 
-  void connect() noexcept;
+  void connect();
 
-  void emit(const std::string &topic, const std::string &data) noexcept;
-  void on(const std::string &topic, std::function<void(const std::string &)> callback) noexcept;
-  void rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) noexcept;
+  void emit(const std::string &topic, const std::string &data);
+  void on(const std::string &topic, std::function<void(const std::string &)> callback);
+  void rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback);
 
 #ifdef EMSCRIPTEN
   void handle_open(const EmscriptenWebSocketOpenEvent *event);
@@ -30,16 +30,16 @@ public:
 #endif
 private:
 #ifndef EMSCRIPTEN
-  void on_resolve(beast::error_code ec, tcp::resolver::results_type results) noexcept;
-  void on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) noexcept;
-  void on_ssl_handshake(beast::error_code ec) noexcept;
-  void on_handshake(beast::error_code ec) noexcept;
-  void on_read(beast::error_code ec, std::size_t bytes_transferred) noexcept;
+  void on_resolve(beast::error_code ec, tcp::resolver::results_type results);
+  void on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint);
+  void on_ssl_handshake(beast::error_code ec);
+  void on_handshake(beast::error_code ec);
+  void on_read(beast::error_code ec, std::size_t bytes_transferred);
   void do_read();
 #endif
-  void on_message(const std::string &buffer) noexcept;
-  void send(const std::string &message) noexcept;
-  void invoke(const std::string &event, const std::string &data = "{}") const noexcept;
+  void on_message(const std::string &buffer);
+  void send(const std::string &message);
+  void invoke(const std::string &event, const std::string &data = "{}") const;
 
   bool _connected{false};
   std::atomic<uint64_t> counter{0};

@@ -14,7 +14,7 @@ public:
   explicit font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale);
   ~font() = default;
 
-  void draw(const std::string &text, const geometry::point &position) const noexcept;
+  void draw(const std::string &text, const geometry::point &position) const;
 
 private:
   glyphmap _glyphs;

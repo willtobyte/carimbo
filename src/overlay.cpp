@@ -7,8 +7,8 @@ using namespace graphics;
 overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager)
     : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
-std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
-  auto widget = [&]() noexcept {
+std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
+  auto widget = [&]() {
     switch (type) {
     case widgettype::label:
       return std::make_shared<label>();
@@ -22,7 +22,7 @@ std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
   return widget;
 }
 
-void overlay::destroy(const std::variant<std::shared_ptr<label>> &widget) noexcept {
+void overlay::destroy(const std::variant<std::shared_ptr<label>> &widget) {
   std::erase_if(_widgets, [&widget](const auto &existing) {
     if (const auto ptr = std::get_if<std::shared_ptr<label>>(&widget)) {
       return existing == *ptr;
@@ -32,7 +32,7 @@ void overlay::destroy(const std::variant<std::shared_ptr<label>> &widget) noexce
   });
 }
 
-void overlay::update(float_t delta) noexcept {
+void overlay::update(float_t delta) {
   for (const auto &widget : _widgets) {
     widget->update(delta);
   }
@@ -42,7 +42,7 @@ void overlay::update(float_t delta) noexcept {
   }
 }
 
-void overlay::draw() const noexcept {
+void overlay::draw() const {
   for (const auto &widget : _widgets) {
     widget->draw();
   }
@@ -52,16 +52,16 @@ void overlay::draw() const noexcept {
   }
 }
 
-void overlay::set_cursor(const std::string &name) noexcept {
+void overlay::set_cursor(const std::string &name) {
   _cursor = std::make_shared<cursor>(name, _resourcemanager);
   _eventmanager->add_receiver(_cursor);
 }
 
-void overlay::hide() noexcept {
+void overlay::hide() {
   SDL_HideCursor();
 }
 
-void overlay::dispatch(widgettype type, const std::string &message) noexcept {
+void overlay::dispatch(widgettype type, const std::string &message) {
   UNUSED(message);
 
   switch (type) {

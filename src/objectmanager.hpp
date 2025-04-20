@@ -11,31 +11,31 @@
 namespace framework {
 class objectmanager : public input::eventreceiver {
 public:
-  explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
+  explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager);
   virtual ~objectmanager() = default;
 
   std::shared_ptr<object> create(const std::string &scope, const std::string &kind, bool manage = true);
 
-  std::shared_ptr<object> clone(std::shared_ptr<object> matrix) noexcept;
+  std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
 
-  void manage(std::shared_ptr<object> object) noexcept;
+  void manage(std::shared_ptr<object> object);
 
-  void unmanage(std::shared_ptr<object> object) noexcept;
+  void unmanage(std::shared_ptr<object> object);
 
-  void destroy(std::shared_ptr<object> object) noexcept;
+  void destroy(std::shared_ptr<object> object);
 
-  std::shared_ptr<object> find(uint64_t id) const noexcept;
+  std::shared_ptr<object> find(uint64_t id) const;
 
   void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
 
-  void update(float_t delta) noexcept;
+  void update(float_t delta);
 
-  void draw() noexcept;
+  void draw();
 
 protected:
-  virtual void on_mail(const input::event::mail &event) noexcept override;
-  virtual void on_mousebuttondown(const input::event::mouse::button &event) noexcept override;
-  virtual void on_mousemotion(const input::event::mouse::motion &event) noexcept override;
+  virtual void on_mail(const input::event::mail &event) override;
+  virtual void on_mousebuttondown(const input::event::mouse::button &event) override;
+  virtual void on_mousemotion(const input::event::mouse::motion &event) override;
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
