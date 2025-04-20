@@ -129,9 +129,9 @@ void vector2d::normalize() noexcept {
 }
 
 float_t vector2d::angle_between(const vector2d &other) const noexcept {
-  float_t dot_product = this->dot(other);
-  float_t mags = this->magnitude() * other.magnitude();
-  return (mags < epsilon) ? 0.0f : std::acos(dot_product / mags);
+  float_t dot = this->dot(other);
+  float_t ms = this->magnitude() * other.magnitude();
+  return (ms < epsilon) ? 0.0f : std::acos(dot / ms);
 }
 
 vector2d vector2d::clamped(float_t max) const noexcept {
