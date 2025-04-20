@@ -12,7 +12,7 @@ class pixmap final {
 public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
-  ~pixmap();
+  ~pixmap() = default;
 
   void draw(
       const geometry::rectangle &source,
