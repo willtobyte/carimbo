@@ -4,7 +4,6 @@ using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
-
   int32_t lw, lh;
   SDL_RendererLogicalPresentation mode;
   SDL_GetRenderLogicalPresentation(*_renderer, &lw, &lh, &mode);

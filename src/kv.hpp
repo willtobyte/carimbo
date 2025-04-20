@@ -20,9 +20,10 @@ public:
   void set(const std::string &key, const sol::object &new_value, sol::this_state state);
   void subscribe(const std::string &key, const sol::function &callback, sol::this_state state);
 
+protected:
+  std::shared_ptr<observable> ensure(const std::string &key, lua_State *L);
+
 private:
   std::unordered_map<std::string, std::shared_ptr<observable>> _values;
-
-  std::shared_ptr<observable> ensure_observable(const std::string &key, lua_State *L);
 };
 }
