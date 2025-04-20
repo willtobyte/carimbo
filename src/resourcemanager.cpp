@@ -31,7 +31,7 @@ resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, s
       _audiodevice(std::move(audiodevice)),
       _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
       _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
-      _fontfactory(std::make_shared<graphics::fontfactory>(_renderer)) {
+      _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
 }
 
 void resourcemanager::flush() {

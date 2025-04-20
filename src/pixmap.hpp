@@ -12,9 +12,7 @@ class pixmap final {
 public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
-  pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface);
-
-  ~pixmap() = default;
+  ~pixmap();
 
   void draw(
       const geometry::rectangle &source,

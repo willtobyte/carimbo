@@ -37,23 +37,6 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
   }
 }
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, std::unique_ptr<SDL_Surface, SDL_Deleter> surface)
-    : _renderer(std::move(renderer)) {
-  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(SDL_CreateTextureFromSurface(*_renderer, surface.get()), SDL_Deleter{});
-
-  if (!_texture) {
-    panic("[SDL_CreateTextureFromSurface] error creating texture from surface: {}", SDL_GetError());
-  }
-
-  if (!SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND)) {
-    panic("[SDL_SetTextureBlendMode] error setting blend mode for texture: {}", SDL_GetError());
-  }
-
-  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
-    panic("[SDL_SetTextureScaleMode] error setting texture scale mode: {}", SDL_GetError());
-  }
-}
-
 void pixmap::draw(
     const geometry::rectangle &source,
     const geometry::rectangle &destination,
@@ -79,6 +62,14 @@ void pixmap::draw(
     SDL_RenderRect(*_renderer, &debug);
   }
 #endif
+}
+
+pixmap::~pixmap() {
+  // TODO
+  // auto* ptr = static_cast<std::pair<int, int>*>(SDL_GetTextureUserData(texture));
+  // delete ptr;
+  // SDL_SetTextureUserData(texture, nullptr);
+  // SDL_DestroyTexture(texture);
 }
 
 pixmap::operator SDL_Texture *() const {
