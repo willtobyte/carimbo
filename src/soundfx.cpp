@@ -98,9 +98,9 @@ soundfx::soundfx(const std::string &filename) {
   data.reserve(static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * info->channels * 2);
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
-  constexpr auto bigendian = 0;
+  constexpr const auto bigendian = 0;
 #else
-  constexpr auto bigendian = 1;
+  constexpr const auto bigendian = 1;
 #endif
 
   do {
