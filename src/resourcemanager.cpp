@@ -2,7 +2,29 @@
 
 using namespace framework;
 
-static std::map<std::string, std::function<void(const std::string &)>> handlers;
+static const std::map<std::string, std::function<void(const std::string &,
+                                                      graphics::pixmappool &,
+                                                      audio::soundmanager &,
+                                                      graphics::fontfactory &)>> handlers = {
+    {".png", [](const std::string &filename,
+                graphics::pixmappool &pixmap,
+                audio::soundmanager &,
+                graphics::fontfactory &) {
+       pixmap.get(filename);
+    }},
+    {".ogg", [](const std::string &filename,
+                graphics::pixmappool &,
+                audio::soundmanager &sound,
+                graphics::fontfactory &) {
+       sound.get(filename);
+    }},
+    {".json", [](const std::string &filename,
+                 graphics::pixmappool &,
+                 audio::soundmanager &,
+                 graphics::fontfactory &font) {
+       font.get(filename);
+    }}
+};
 
 resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<audio::audiodevice> audiodevice) noexcept
     : _renderer(std::move(renderer)),
@@ -10,14 +32,6 @@ resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, s
       _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
       _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
       _fontfactory(std::make_shared<graphics::fontfactory>(_renderer)) {
-
-  if (handlers.empty()) {
-    handlers = {
-        {".png", [this](const std::string &filename) { _pixmappool->get(filename); }},
-        {".ogg", [this](const std::string &filename) { _soundmanager->get(filename); }},
-        {".json", [this](const std::string &filename) { _fontfactory->get(filename); }}
-    };
-  }
 }
 
 void resourcemanager::flush() noexcept {
@@ -43,7 +57,7 @@ void resourcemanager::prefetch(const std::vector<std::string> &filenames) noexce
     if (const auto position = filename.rfind('.'); position != std::string::npos) {
       const auto extension = filename.substr(position);
       if (const auto it = handlers.find(extension); it != handlers.end()) {
-        it->second(filename);
+        it->second(filename, *_pixmappool, *_soundmanager, *_fontfactory);
       }
     }
   }
