@@ -111,10 +111,18 @@ void framework::scriptengine::run() {
 
   lua["openurl"] = [](std::string_view url) {
 #ifdef EMSCRIPTEN
-    const auto script = fmt::format(R"(window.open("{}", "_blank");)", url);
-    emscripten_run_script(script.c_str());
+  const auto script = fmt::format(R"(var a = document.createElement('a');
+    a.href = "{}";
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);)",
+  url);
+
+  emscripten_run_script(script.c_str());
 #else
-    SDL_OpenURL(url.data());
+  SDL_OpenURL(url.data());
 #endif
   };
 
