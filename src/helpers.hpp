@@ -25,6 +25,8 @@ BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::sourc
 #endif
 #endif
 
+
+
 template <typename... Ts>
 constexpr void UNUSED(const Ts &...) {}
 
