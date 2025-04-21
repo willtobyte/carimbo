@@ -116,7 +116,6 @@ else()
     target_compile_definitions(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Release>:NDEBUG>
     )
-    endif()
   endif()
 endif()
 
