@@ -9,10 +9,6 @@ class Carimbo(ConanFile):
     def _not_webassembly(self):
         return str(self.settings.os).lower() not in {"emscripten"}
 
-    def configure(self):
-        if self._not_webassembly():
-            self.options["sol2"].with_lua = "luajit"
-
     def requirements(self):
         self.requires("fmt/11.1.4")
         self.requires("libspng/0.7.4")
@@ -30,6 +26,23 @@ class Carimbo(ConanFile):
             self.requires("boost/1.87.0")
             self.requires("luajit/2.1.0-beta3")
             self.requires("openssl/3.4.1")
+
+    def configure(self):
+        self.options["boost"].header_only = True
+
+        self.options["physfs"].sevenzip = True
+        self.options["physfs"].zip = False
+        self.options["physfs"].grp = False
+        self.options["physfs"].wad = False
+        self.options["physfs"].hog = False
+        self.options["physfs"].mvl = False
+        self.options["physfs"].qpak = False
+        self.options["physfs"].slb = False
+        self.options["physfs"].iso9660 = False
+        self.options["physfs"].vdf = False
+
+        if self._not_webassembly():
+            self.options["sol2"].with_lua = "luajit"
 
     def generate(self):
         tc = CMakeToolchain(self)

@@ -101,7 +101,7 @@ BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::sourc
 #define panic(...) do { \
   const auto e = fmt::format(__VA_ARGS__); \
   fmt::println(stderr, "{}", e); \
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", e.c_str(), nullptr); \
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", e.c_str(), nullptr); \
   std::abort(); \
 } while (0)
 
