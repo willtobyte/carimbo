@@ -110,8 +110,6 @@ if(EMSCRIPTEN)
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
 else()
-  set(SANITIZER_FLAGS -fsanitize=address,undefined)
-
   if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:/Od;/Zi;/W4>
@@ -122,13 +120,16 @@ else()
       $<$<CONFIG:Release>:/LTCG>
     )
   else()
+    set(SANITIZER_FLAGS -fsanitize=address,undefined)
+    set(RELEASE_FLAGS -fno-rtti;-fno-exceptions)
+
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O3;-fno-rtti;-fno-exceptions;-flto>
+      $<$<CONFIG:Release>:-O3;-flto;${RELEASE_FLAGS}>
     )
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-flto>
+      $<$<CONFIG:Release>:-flto;${RELEASE_FLAGS}>
     )
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:NDEBUG>)
