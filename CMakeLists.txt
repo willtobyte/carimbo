@@ -6,18 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 set(SDL3_DIR "${CMAKE_BINARY_DIR}")
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Build type (Debug or Release)" FORCE)
-endif()
+file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
+file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
-  find_package(Boost CONFIG REQUIRED)
-  find_package(luajit CONFIG REQUIRED)
-  find_package(OpenAL CONFIG REQUIRED)
-  find_package(OpenSSL CONFIG REQUIRED)
-endif()
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
+
 find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
@@ -27,14 +28,15 @@ find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 
-file(GLOB SOURCE_FILES "src/*.cpp")
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
-
-file(GLOB HEADER_FILES "src/*.hpp")
-target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
-
-file(GLOB TEMPLATE_FILES "src/*.tpp")
-target_sources(${PROJECT_NAME} PRIVATE ${TEMPLATE_FILES})
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+  set(EMSCRIPTEN TRUE)
+else()
+  set(EMSCRIPTEN FALSE)
+  find_package(Boost CONFIG REQUIRED)
+  find_package(luajit CONFIG REQUIRED)
+  find_package(OpenAL CONFIG REQUIRED)
+  find_package(OpenSSL CONFIG REQUIRED)
+endif()
 
 if(MSVC)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
@@ -42,60 +44,27 @@ else()
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror -pedantic)
 endif()
 
-option(HITBOX "Enable HITBOX flag" OFF)
-if(HITBOX)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE HITBOX)
-endif()
+foreach(flag HITBOX LOCAL SANDBOX)
+  option(${flag} "Enable ${flag} flag" OFF)
+  if(${flag})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
+  endif()
+endforeach()
 
-option(LOCAL "Enable LOCAL flag" OFF)
-if(LOCAL)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE LOCAL)
-endif()
-
-option(SANDBOX "Enable SANDBOX flag" OFF)
-if(SANDBOX)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE SANDBOX)
-endif()
-
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten" AND NOT MSVC)
-  add_custom_command(TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
-  )
-endif()
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
 if(EMSCRIPTEN)
-  set(EMSDK_COMPILE_DEBUG_FLAGS
-    -O0
-    -g3
-    -gsource-map
-  )
-
+  set(EMSDK_COMPILE_DEBUG_FLAGS -O0 -g3 -gsource-map)
   set(EMSDK_LINK_DEBUG_FLAGS
-    -g3
-    -gsource-map
-    -sASSERTIONS=2
-    -sSAFE_HEAP=1
-    -sSTACK_OVERFLOW_CHECK=2
+    -g3 -gsource-map
+    -sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
 
-  set(EMSDK_COMPILE_RELEASE_FLAGS
-    -Oz
-    -g0
-    -flto
-    -fno-rtti
-    -fno-exceptions
-  )
-
+  set(EMSDK_COMPILE_RELEASE_FLAGS -Oz -g0 -flto -fno-rtti -fno-exceptions)
   set(EMSDK_LINK_RELEASE_FLAGS
-    -Oz
-    -g0
-    -flto
-    --strip-all
-    --ignore-external-input
-    -sASSERTIONS=0
-    -sDISABLE_EXCEPTION_CATCHING=1
+    -Oz -g0 -flto --strip-all --ignore-external-input
+    -sASSERTIONS=0 -sDISABLE_EXCEPTION_CATCHING=1
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
@@ -120,35 +89,36 @@ if(EMSCRIPTEN)
 else()
   if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
+    set(DEBUG_FLAGS /Od;/Zi;/W4)
+    set(RELEASE_FLAGS /O2;/GL;/GR-;/EHs-c-;/DNDEBUG;/W4)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:/Od;/Zi;/W4>
-      $<$<CONFIG:Release>:/O2;/GL;/GR-;/EHs-c-;/DNDEBUG;/W4>
+      $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_FLAGS}>
     )
-
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Release>:/LTCG>
     )
   else()
-    set(SANITIZER_FLAGS -fsanitize=address,undefined)
-    set(RELEASE_FLAGS -fno-rtti;-fno-exceptions)
+    set(SANITIZER_FLAGS -fno-rtti -fno-exceptions -fsanitize=address,undefined)
+    set(RELEASE_FLAGS -flto -fno-rtti -fno-exceptions)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O3;-flto;${RELEASE_FLAGS}>
+      $<$<CONFIG:Debug>:-O0 -g ${SANITIZER_FLAGS}>
+      $<$<CONFIG:Release>:-O3 -flto ${RELEASE_FLAGS}>
     )
+
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-flto;${RELEASE_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_FLAGS}>
     )
 
-    target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Release>:NDEBUG>)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Release>:NDEBUG>
+    )
+    endif()
   endif()
 endif()
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-  $<$<CONFIG:Debug>:DEBUG>
-)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   fmt::fmt
@@ -161,13 +131,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   vorbis::vorbis
 )
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES "Emscripten")
+if(NOT EMSCRIPTEN)
   target_link_libraries(${PROJECT_NAME} PRIVATE
     Boost::boost
     luajit::luajit
     OpenAL::OpenAL
     openssl::openssl
   )
-else()
-  target_link_libraries(${PROJECT_NAME} PRIVATE al)
 endif()
