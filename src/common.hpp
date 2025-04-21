@@ -87,27 +87,28 @@
 #include "helpers.hpp"
 
 template <typename... Args>
-[[noreturn]] inline void panic(std::string_view format_str, Args&&... args) {
-  const auto message = fmt::format(fmt::runtime(format_str), std::forward<Args>(args)...);
+[[noreturn]] inline void panic(std::string_view format, Args&&... args) noexcept {
+  const auto message = fmt::format(fmt::runtime(format), std::forward<Args>(args)...);
+
   fmt::println(stderr, "{}", message);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", message.c_str(), nullptr);
   std::abort();
 }
 
-[[noreturn]] inline void panic(const std::exception& e) {
+[[noreturn]] inline void panic(const std::exception& e) noexcept {
   panic("{}", e.what());
 }
 
-[[noreturn]] inline void panic(const sol::optional<std::string> &maybe_message) {
-  std::string_view message = maybe_message
-    ? std::string_view{*maybe_message}
-    : std::string_view{};
-
-  panic(
-    "Lua is in a panic state and will now abort() the application{}{}",
-    message.empty() ? "" : "\nerror message: ",
-    message
-  );
+[[noreturn]] inline void panic(const sol::optional<std::string>& maybe_msg) noexcept {
+  if (maybe_msg) {
+    panic(
+      "Lua is in a panic state and will now abort() the application\n"
+      "error message: {}",
+      *maybe_msg
+    );
+  } else {
+    panic("Lua is in a panic state and will now abort() the application");
+  }
 }
 
 #ifdef BOOST_NO_EXCEPTIONS
