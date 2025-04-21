@@ -4,19 +4,19 @@
 #define NOMINMAX
 #endif
 
-#define SOL_NO_EXCEPTIONS
+#define SOL_NO_EXCEPTIONS 1
 
-#define JSON_NOEXCEPTION
+#define JSON_NOEXCEPTION 1
 
 #ifdef DEBUG
-#define SOL_ALL_SAFETIES_ON
+#define SOL_ALL_SAFETIES_ON 1
 #endif
 
 #ifndef EMSCRIPTEN
-#define SOL_LUAJIT
+#define SOL_LUAJIT 1
 #endif
 
-#define WEBSOCKET
+#define WEBSOCKET 1
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -29,7 +29,7 @@
 
 #ifndef EMSCRIPTEN
 #ifdef WEBSOCKET
-#define BOOST_NO_EXCEPTIONS
+#define BOOST_NO_EXCEPTIONS 1
 #include <boost/asio.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ssl.hpp>
