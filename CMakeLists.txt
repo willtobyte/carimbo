@@ -54,17 +54,39 @@ endforeach()
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
 if(EMSCRIPTEN)
-  set(EMSDK_COMPILE_DEBUG_FLAGS -O0 -g3 -gsource-map)
+  set(EMSDK_COMPILE_DEBUG_FLAGS
+    -O0
+    -g3
+    -gsource-map
+  )
+
   set(EMSDK_LINK_DEBUG_FLAGS
-    -g3 -gsource-map
-    -sASSERTIONS=2 -sSAFE_HEAP=1 -sSTACK_OVERFLOW_CHECK=2
+    -g3
+    -gsource-map
+    -fno-rtti
+    -fno-exceptions
+    -sASSERTIONS=2
+    -sSAFE_HEAP=1
+    -sSTACK_OVERFLOW_CHECK=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
 
-  set(EMSDK_COMPILE_RELEASE_FLAGS -Oz -g0 -flto -fno-rtti -fno-exceptions)
+  set(EMSDK_COMPILE_RELEASE_FLAGS
+    -Oz
+    -g0
+    -flto
+    -fno-rtti
+    -fno-exceptions
+  )
+
   set(EMSDK_LINK_RELEASE_FLAGS
-    -Oz -g0 -flto --strip-all --ignore-external-input
-    -sASSERTIONS=0 -sDISABLE_EXCEPTION_CATCHING=1
+    -Oz
+    -g0
+    -flto
+    --strip-all
+    --ignore-external-input
+    -sASSERTIONS=0
+    -sDISABLE_EXCEPTION_CATCHING=1
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
@@ -100,12 +122,12 @@ else()
       $<$<CONFIG:Release>:/LTCG>
     )
   else()
-    set(SANITIZER_FLAGS -fno-rtti -fno-exceptions -fsanitize=address,undefined)
-    set(RELEASE_FLAGS -flto -fno-rtti -fno-exceptions)
+    set(DEBUG_FLAGS -O0 -g -fno-rtti -fno-exceptions -fsanitize=address,undefined)
+    set(RELEASE_FLAGS -O3 -flto -fno-rtti -fno-exceptions)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:-O0 -g ${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:-O3 -flto ${RELEASE_FLAGS}>
+      $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_FLAGS}>
     )
 
     target_link_options(${PROJECT_NAME} PRIVATE
