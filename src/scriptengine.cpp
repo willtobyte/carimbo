@@ -130,7 +130,7 @@ void framework::scriptengine::run() {
 
   const auto inject = fmt::format(R"lua(
     local list = package.searchers or package.loaders
-    table.insert(list, 2, searcher)
+    table.insert(list, searcher)
   )lua");
 
   lua.script(inject);
