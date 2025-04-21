@@ -111,6 +111,8 @@ if(EMSCRIPTEN)
   )
 else()
   if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
+
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:/Od;/Zi;/W4>
       $<$<CONFIG:Release>:/O2;/GL;/GR-;/EHs-c-;/DNDEBUG;/W4>
@@ -121,7 +123,7 @@ else()
     )
   else()
     set(SANITIZER_FLAGS -fsanitize=address,undefined)
-    set(RELEASE_FLAGS -fno-rtti;-fno-exceptions)
+    set(RELEASE_FLAGS -fno-rtti;-fno-exceptions;-s)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
