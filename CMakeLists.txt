@@ -61,7 +61,6 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_custom_command(TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
-    COMMENT "Stripping symbols from release binary: $<TARGET_FILE:${PROJECT_NAME}>"
   )
 endif()
 
@@ -93,6 +92,7 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
+    --ignore-external-input
     --strip-all
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
