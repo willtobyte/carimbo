@@ -86,24 +86,6 @@
 #include "deleters.hpp"
 #include "helpers.hpp"
 
-// #ifdef __EMSCRIPTEN__
-// #define PANIC_PLATFORM(message) \
-//   EM_ASM({ alert(UTF8ToString($0)); }, message.c_str());
-// #else
-// #define PANIC_PLATFORM(message) \
-//   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", message.c_str(), nullptr);
-// #endif
-
-// #define PANIC_COMMON(format, ...) \
-//   const auto __panic_msg = fmt::format(fmt::runtime(format), __VA_ARGS__); \
-//   fmt::println(stderr, "{}", __panic_msg);
-
-// #define panic(...) do {      \
-//   PANIC_COMMON(__VA_ARGS__); \
-//   PANIC_PLATFORM(__panic_msg)         \
-//   std::abort();              \
-// } while (0)
-
 template <typename... Args>
 [[noreturn]] inline void panic(std::string_view format_str, Args&&... args) {
   const auto message = fmt::format(fmt::runtime(format_str), std::forward<Args>(args)...);
@@ -113,9 +95,7 @@ template <typename... Args>
 }
 
 [[noreturn]] inline void panic(const std::exception& e) {
-  fmt::println(stderr, "{}", e.what());
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", e.what(), nullptr);
-  std::abort();
+  panic("{}", e.what());
 }
 
 [[noreturn]] inline void panic(const sol::optional<std::string> &maybe_message) {
@@ -133,11 +113,11 @@ template <typename... Args>
 #ifdef BOOST_NO_EXCEPTIONS
 namespace boost {
 BOOST_NORETURN inline void throw_exception(std::exception const& e) {
-  panic(e.what());
+  panic(e);
 }
 
 BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::source_location const&) {
-  panic(e.what());
+  panic(e);
 }
 }
 #endif
@@ -147,8 +127,3 @@ BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::sourc
 #define JSON_THROW_USER(exception) panic(exception)
 
 #include <nlohmann/json.hpp>
-
-#undef JSON_NOEXCEPTION
-#undef JSON_TRY_USER
-#undef JSON_CATCH_USER
-#undef JSON_THROW_USER
