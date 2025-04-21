@@ -57,6 +57,14 @@ if(SANDBOX)
   target_compile_definitions(${PROJECT_NAME} PRIVATE SANDBOX)
 endif()
 
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_custom_command(TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
+    COMMENT "Stripping symbols from release binary: $<TARGET_FILE:${PROJECT_NAME}>"
+  )
+endif()
+
 if(EMSCRIPTEN)
   set(EMSDK_COMPILE_DEBUG_FLAGS
     -O0
@@ -123,7 +131,7 @@ else()
     )
   else()
     set(SANITIZER_FLAGS -fsanitize=address,undefined)
-    set(RELEASE_FLAGS -fno-rtti;-fno-exceptions;-s)
+    set(RELEASE_FLAGS -fno-rtti;-fno-exceptions)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:-O0;-g;${SANITIZER_FLAGS}>
