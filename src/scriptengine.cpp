@@ -9,6 +9,11 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   const auto result = lua.load(script, filename);
 
+  if (!result.valid()) {
+    sol::error err = result;
+    panic("Failed to compile Lua script '{}': {}", filename, err.what());
+  }
+
   return sol::make_object(lua, result.get<sol::protected_function>());
 }
 
