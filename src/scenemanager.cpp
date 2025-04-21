@@ -7,8 +7,12 @@ scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcem
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string &name) {
-  const auto buffer = storage::io::read("scenes/" + name + ".json");
-  const auto j = nlohmann::json::parse(buffer);
+  const auto &filename = fmt::format("scenes/{}.json", name);
+  const auto &buffer = storage::io::read(filename);
+  const auto &j = nlohmann::json::parse(buffer);
+  if (j.is_discarded()) {
+    panic("[nlohmann::json::parse] invalid JSON: {}", filename);
+  }
 
   const auto pixmappool = _resourcemanager->pixmappool();
   const auto background = pixmappool->get(fmt::format("blobs/{}/background.png", name));

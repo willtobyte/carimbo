@@ -7,8 +7,12 @@ using namespace input::event;
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
-  const auto buffer = storage::io::read(fmt::format("cursors/{}.json", name));
-  const auto j = nlohmann::json::parse(buffer);
+  const auto &filename = fmt::format("cursors/{}.json", name);
+  const auto &buffer = storage::io::read(filename);
+  const auto &j = nlohmann::json::parse(buffer);
+  if (j.is_discarded()) {
+    panic("[nlohmann::json::parse] invalid JSON: {}", filename);
+  }
 
   _point = j["point"].get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/overlay/{}.png", name));

@@ -250,7 +250,7 @@ void socket::do_read() {
 #endif
 
 void socket::on_message(const std::string &buffer) {
-  const auto j = json::parse(buffer, nullptr, false);
+  const auto &j = json::parse(buffer, nullptr, false);
   if (j.is_discarded()) {
     return;
   }

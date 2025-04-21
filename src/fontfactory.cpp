@@ -9,16 +9,20 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
   std::filesystem::path p{family};
-  const auto key = p.has_extension() ? family : ("fonts/" + family + ".json");
+  const auto filename = p.has_extension() ? family : ("fonts/" + family + ".json");
 
-  if (auto it = _pool.find(key); it != _pool.end()) {
+  if (auto it = _pool.find(filename); it != _pool.end()) {
     return it->second;
   }
 
-  fmt::println("[fontfactory] cache miss {}", key);
+  fmt::println("[fontfactory] cache miss {}", filename);
 
-  const auto &buffer = storage::io::read(key);
+  const auto &buffer = storage::io::read(filename);
   const auto &j = nlohmann::json::parse(buffer);
+  if (j.is_discarded()) {
+    panic("[nlohmann::json::parse] invalid JSON: {}", filename);
+  }
+
   const auto &glyphs  = j["glyphs"].get_ref<const std::string &>();
   const auto  spacing = j.value("spacing", int16_t{0});
   const auto  leading = j.value("leading", int16_t{0});
@@ -36,8 +40,8 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
       *_renderer,
       SDL_PIXELFORMAT_ARGB8888,
       SDL_TEXTUREACCESS_TARGET,
-      static_cast<int16_t>(width),
-      static_cast<int16_t>(height)
+      static_cast<int32_t>(width),
+      static_cast<int32_t>(height)
     )
   };
   if (!target) {
@@ -102,7 +106,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
     scale
   );
 
-  _pool.emplace(key, ptr);
+  _pool.emplace(filename, ptr);
 
   return ptr;
 }
