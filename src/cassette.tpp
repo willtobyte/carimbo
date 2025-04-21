@@ -18,9 +18,5 @@ T cassette::get(const std::string &key, const T &default_value) const {
 
   const auto &entry = _j.at(key);
 
-  if (entry.is_discarded()) {
-    panic("JSON entry for key '{}' is discarded", key);
-  }
-
   return entry.get<T>();
 }
