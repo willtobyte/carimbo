@@ -13,7 +13,7 @@
 #define SOL_LUAJIT 1
 #endif
 
-#define WEBSOCKET
+#define WEBSOCKET 1
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -32,6 +32,7 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/websocket.hpp>
 #include <boost/beast/websocket/ssl.hpp>
+#define BOOST 1
 #endif
 #endif
 

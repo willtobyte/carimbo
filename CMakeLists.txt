@@ -62,7 +62,6 @@ if(EMSCRIPTEN)
     -O0
     -g3
     -gsource-map
-    -fexperimental-library
   )
 
   set(EMSDK_LINK_DEBUG_FLAGS
@@ -80,7 +79,6 @@ if(EMSCRIPTEN)
     -flto
     -fno-rtti
     -fno-exceptions
-    -fexperimental-library
   )
 
   set(EMSDK_LINK_RELEASE_FLAGS

@@ -7,8 +7,7 @@
   std::abort(); \
 } while (0)
 
-#ifndef EMSCRIPTEN
-#ifdef WEBSOCKET
+#ifdef BOOST
 #include <boost/config.hpp>
 
 namespace boost {
@@ -23,9 +22,6 @@ BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::sourc
 }
 }
 #endif
-#endif
-
-
 
 template <typename... Ts>
 constexpr void UNUSED(const Ts &...) {}
