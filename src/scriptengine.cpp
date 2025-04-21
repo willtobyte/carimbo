@@ -6,25 +6,10 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   const auto filename = fmt::format("scripts/{}.lua", module);
   const auto buffer = storage::io::read(filename);
 
-  if (buffer.empty()) {
-    return sol::make_object(lua, fmt::format("\n\tno custom loader for '{}'", filename));
-  }
-
-  std::string script(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   const auto result = lua.load(script, filename);
 
-  if (!result.valid()) {
-    sol::error err = result;
-    return sol::make_object(lua, fmt::format("\n\terror loading '{}': {}", filename, err.what()));
-  }
-
   return sol::make_object(lua, result.get<sol::protected_function>());
-}
-
-sol::table require(sol::state &lua, const std::string &module) {
-  const auto buffer = storage::io::read(fmt::format("scripts/{}.lua", module));
-  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-  return lua.script(script).get<sol::table>();
 }
 
 class lua_loopable : public framework::loopable {
