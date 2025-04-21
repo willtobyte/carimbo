@@ -57,7 +57,7 @@ if(SANDBOX)
   target_compile_definitions(${PROJECT_NAME} PRIVATE SANDBOX)
 endif()
 
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
   add_custom_command(TARGET ${PROJECT_NAME}
     POST_BUILD
     COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
@@ -92,8 +92,8 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    --ignore-external-input
     --strip-all
+    --ignore-external-input
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
   )
