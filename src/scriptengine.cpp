@@ -106,7 +106,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
 }
 
 void framework::scriptengine::run() {
-  sol::state lua(sol::c_call<decltype(&sol_panic), &sol_panic>);
+  sol::state lua(sol::c_call<void(const sol::optional<std::string>&), &panic>);
   lua.open_libraries();
 
   lua["ticks"] = &ticks;

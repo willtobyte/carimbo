@@ -118,7 +118,7 @@ template <typename... Args>
   std::abort();
 }
 
-inline void sol_panic(const sol::optional<std::string> &maybe_message) {
+[[noreturn]] inline void panic(const sol::optional<std::string> &maybe_message) {
   std::string_view message = maybe_message
     ? std::string_view{*maybe_message}
     : std::string_view{};
