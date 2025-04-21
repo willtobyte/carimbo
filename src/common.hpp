@@ -105,7 +105,7 @@ BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::sourc
   std::abort(); \
 } while (0)
 
-void sol_panic(const sol::optional<std::string> &maybe_message) {
+inline void sol_panic(const sol::optional<std::string> &maybe_message) {
   std::string_view message = maybe_message
     ? std::string_view{*maybe_message}
     : std::string_view{};
