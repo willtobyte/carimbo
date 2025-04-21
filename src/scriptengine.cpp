@@ -155,9 +155,6 @@ void framework::scriptengine::run() {
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string &json, sol::this_state state) {
       const auto &j = nlohmann::json::parse(json);
-      if (j.is_discarded()) {
-        panic("[nlohmann::json::parse] invalid JSON: {}", json);
-      }
 
       sol::state_view lua(state);
 
@@ -651,9 +648,6 @@ void framework::scriptengine::run() {
       sol::state_view lua(state);
       sio.on(event, [callback, lua](const std::string &json) {
         const auto &j = nlohmann::json::parse(json);
-        if (j.is_discarded()) {
-          panic("[nlohmann::json::parse] invalid JSON: {}", json);
-        }
 
         callback(_to_lua(j, lua));
       });
@@ -665,9 +659,6 @@ void framework::scriptengine::run() {
           method, args_json.dump(),
           [callback, lua](const std::string &response) {
             const auto &j = nlohmann::json::parse(response);
-            if (j.is_discarded()) {
-              panic("[nlohmann::json::parse] invalid JSON: {}", response);
-            }
 
             callback(_to_lua(j, lua));
           }

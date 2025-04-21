@@ -251,9 +251,6 @@ void socket::do_read() {
 
 void socket::on_message(const std::string &buffer) {
   const auto &j = json::parse(buffer, nullptr, false);
-  if (j.is_discarded()) {
-    return;
-  }
 
   if (j.value("command", "") == "ping") {
     send(R"json({"command": "pong"})json");
