@@ -38,18 +38,6 @@
 #include <boost/beast/websocket.hpp>
 #include <boost/beast/websocket/ssl.hpp>
 #include <boost/config.hpp>
-
-namespace boost {
-BOOST_NORETURN inline void throw_exception(std::exception const& e) {
-  fmt::println(stderr, "{}", e.what());
-  std::abort();
-}
-
-BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::source_location const&) {
-  fmt::println(stderr, "{}", e.what());
-  std::abort();
-}
-}
 #endif
 #endif
 
@@ -98,11 +86,22 @@ BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::sourc
 #include "deleters.hpp"
 #include "helpers.hpp"
 
-#define panic(...) do { \
-  const auto e = fmt::format(__VA_ARGS__); \
-  fmt::println(stderr, "{}", e); \
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", e.c_str(), nullptr); \
-  std::abort(); \
+#ifdef __EMSCRIPTEN__
+#define PANIC_PLATFORM(message) \
+  EM_ASM({ alert(UTF8ToString($0)); }, message.c_str());
+#else
+#define PANIC_PLATFORM(message) \
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", message.c_str(), nullptr);
+#endif
+
+#define PANIC_COMMON(...)                             \
+  const auto _m = fmt::format(__VA_ARGS__);           \
+  fmt::println(stderr, "{}", _m);
+
+#define panic(...) do {      \
+  PANIC_COMMON(__VA_ARGS__); \
+  PANIC_PLATFORM(_m)         \
+  std::abort();              \
 } while (0)
 
 inline void sol_panic(const sol::optional<std::string> &maybe_message) {
@@ -116,6 +115,18 @@ inline void sol_panic(const sol::optional<std::string> &maybe_message) {
     message
   );
 }
+
+#ifdef BOOST_NO_EXCEPTIONS
+namespace boost {
+BOOST_NORETURN inline void throw_exception(std::exception const& e) {
+  panic(e.what());
+}
+
+BOOST_NORETURN inline void throw_exception(std::exception const& e, boost::source_location const&) {
+  panic(e.what());
+}
+}
+#endif
 
 #define JSON_TRY_USER if(true)
 #define JSON_CATCH_USER(exception) if(false)
