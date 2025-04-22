@@ -5,7 +5,7 @@ using namespace graphics;
 renderer::renderer(SDL_Window *window)
     : _renderer(SDL_CreateRenderer(window, nullptr), SDL_Deleter{}) {
   if (!_renderer) [[unlikely]] {
-    panic("[SDL_CreateRenderer] failed to create renderer: {}", SDL_GetError());
+    throw std::runtime_error(fmt::format("[SDL_CreateRenderer] failed to create renderer: {}", SDL_GetError()));
   }
 }
 

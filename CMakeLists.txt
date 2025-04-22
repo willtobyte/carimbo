@@ -63,11 +63,7 @@ if(EMSCRIPTEN)
   set(EMSDK_LINK_DEBUG_FLAGS
     -g3
     -gsource-map
-    -fno-rtti
-    -fno-exceptions
     -sASSERTIONS=2
-    -sSAFE_HEAP=1
-    -sSTACK_OVERFLOW_CHECK=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
 
@@ -75,8 +71,6 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    -fno-rtti
-    -fno-exceptions
   )
 
   set(EMSDK_LINK_RELEASE_FLAGS
@@ -85,8 +79,8 @@ if(EMSCRIPTEN)
     -flto
     --strip-all
     --ignore-external-input
-    -sASSERTIONS=0
-    -sDISABLE_EXCEPTION_CATCHING=1
+    -sASSERTIONS=1
+    -sDISABLE_EXCEPTION_CATCHING=0
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
@@ -112,7 +106,7 @@ else()
   if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
     set(DEBUG_FLAGS /Od;/Zi;/W4)
-    set(RELEASE_FLAGS /O2;/GL;/GR-;/EHs-c-;/DNDEBUG;/W4)
+    set(RELEASE_FLAGS /O2;/GL;/GR;/EHsc;/DNDEBUG;/W4)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
@@ -122,8 +116,8 @@ else()
       $<$<CONFIG:Release>:/LTCG>
     )
   else()
-    set(DEBUG_FLAGS -O0 -g -fno-rtti -fno-exceptions -fsanitize=address,undefined)
-    set(RELEASE_FLAGS -O3 -flto -fno-rtti -fno-exceptions)
+    set(DEBUG_FLAGS -O0 -g -fsanitize=address,undefined)
+    set(RELEASE_FLAGS -O3 -flto)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>

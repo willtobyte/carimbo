@@ -16,7 +16,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
 
   SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
   if (!texture) [[unlikely]] {
-    panic("[SDL_CreateTexture] failed to create texture: {}", SDL_GetError());
+    throw std::runtime_error(fmt::format("[SDL_CreateTexture] failed to create texture: {}", SDL_GetError()));
   }
 
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
@@ -39,7 +39,7 @@ void canvas::set_pixels(const std::vector<uint32_t> &pixels) {
 
 void canvas::draw() {
   if (!_framebuffer) [[unlikely]] {
-    panic("[SDL_CreateTexture] framebuffer is null");
+    throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
   }
 
   SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);

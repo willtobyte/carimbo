@@ -1,5 +1,9 @@
 #include "scriptengine.hpp"
 
+[[noreturn]] void panic(sol::optional<std::string> maybe_message) {
+  throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
+}
+
 sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
@@ -7,14 +11,15 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   const auto buffer = storage::io::read(filename);
 
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-  const auto result = lua.load(script, filename);
-
+  auto result = lua.script(script);
   if (!result.valid()) {
-    sol::error err = result;
-    panic("Failed to compile Lua script '{}': {}", filename, err.what());
+    const sol::error err = result;
+    throw std::runtime_error(fmt::format("Lua load error: failed to load script '{}': {}", filename, err.what()));
   }
 
-  return sol::make_object(lua, result.get<sol::protected_function>());
+  const auto func = static_cast<sol::protected_function>(result);
+
+  return sol::make_object(lua, func);
 }
 
 class lua_loopable : public framework::loopable {
@@ -111,7 +116,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
 }
 
 void framework::scriptengine::run() {
-  sol::state lua(sol::c_call<void(const sol::optional<std::string>&), &panic>);
+  sol::state lua(sol::c_call<decltype(&panic), &panic>);
   lua.open_libraries();
 
   lua["ticks"] = &ticks;
@@ -400,7 +405,9 @@ void framework::scriptengine::run() {
 
       const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-      sol::table module = lua.script(script).get<sol::table>();
+      auto result = lua.script(script);
+      sol::table module = result;
+      // auto module = result.get<sol::table>();
 
       module["get"] = [name, &manager](sol::table, const std::string &object) {
         return manager.get(name)->get(object);
@@ -591,7 +598,7 @@ void framework::scriptengine::run() {
         nlohmann::json j = table2json(table);
         c.set<nlohmann::json>(key, j);
       } else {
-        panic("unsupported type for set");
+        throw std::runtime_error("unsupported type for set");
       }
     },
     "get", [](const storage::cassette &c, const std::string &key, sol::object default_value, sol::this_state ts) -> sol::object {
@@ -774,7 +781,11 @@ void framework::scriptengine::run() {
 
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-  lua.script(script);
+  auto result = lua.script(script);
+  if (!result.valid()) {
+    const sol::error err = result;
+    throw std::runtime_error(fmt::format("Lua load error: failed to load script: {}", err.what()));
+  }
 
   const auto start = SDL_GetPerformanceCounter();
   lua["setup"]();

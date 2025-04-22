@@ -2,9 +2,28 @@
 
 using namespace framework;
 
+[[noreturn]] void fail() {
+  const char* error = nullptr;
+
+  try {
+    std::rethrow_exception(std::current_exception());
+  } catch (const std::exception& e) {
+    error = e.what();
+  } catch (...) {
+    error = "Unhandled unknown exception";
+  }
+
+  fmt::println(stderr, "{}", error);
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", error, nullptr);
+
+  std::abort();
+}
+
 application::application(int argc, char **argv) {
   UNUSED(argc);
   UNUSED(argv);
+
+  std::set_terminate(fail);
 
   SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
@@ -13,9 +32,9 @@ application::application(int argc, char **argv) {
 
 int32_t application::run() {
 #if SANDBOX
-  storage::filesystem::mount("../sandbox", "/");
+    storage::filesystem::mount("../sandbox", "/");
 #else
-  storage::filesystem::mount("bundle.7z", "/");
+    storage::filesystem::mount("bundle.7z", "/");
 #endif
 
   auto se = scriptengine();
