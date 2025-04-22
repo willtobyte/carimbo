@@ -760,15 +760,17 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
     "Canvas",
     sol::no_constructor,
-    "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, sol::table t) {
-          const auto n = t.size();
-          std::vector<uint32_t> p(n);
+    "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &c, sol::table table) {
+          const auto n = table.size();
+          std::vector<uint32_t> pixels(n);
           std::ranges::transform(
-              std::views::iota(1u, n + 1u), p.begin(),
-              [&t](auto i) { return t[i].template get<uint32_t>(); }
+              std::views::iota(1u, n + 1u), pixels.begin(),
+              [&table](auto index) {
+                return table[index].template get<uint32_t>();
+              }
           );
 
-          c.set_pixels(p);
+          c.set_pixels(pixels);
       }
     )
   );
