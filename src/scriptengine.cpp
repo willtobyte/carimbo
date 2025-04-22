@@ -777,11 +777,8 @@ void framework::scriptengine::run() {
 
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+
   auto result = lua.script(script);
-  if (!result.valid()) {
-    const sol::error err = result;
-    throw std::runtime_error(fmt::format("Lua load error: failed to load script: {}", err.what()));
-  }
 
   const auto start = SDL_GetPerformanceCounter();
   lua["setup"]();
