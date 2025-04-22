@@ -14,7 +14,7 @@ using namespace framework;
   }
 
   fmt::println(stderr, "{}", error);
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal error", error, nullptr);
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
 
   std::abort();
 }
