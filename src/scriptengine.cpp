@@ -9,16 +9,11 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
   const auto filename = fmt::format("scripts/{}.lua", module);
   const auto buffer = storage::io::read(filename);
-
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-  auto result = lua.script(script);
-  if (!result.valid()) {
-    const sol::error err = result;
-    throw std::runtime_error(fmt::format("Lua load error: failed to load script '{}': {}", filename, err.what()));
-  }
 
-  const auto func = static_cast<sol::protected_function>(result);
+  const auto loader = lua.load(script, filename);
 
+  sol::protected_function func = loader;
   return sol::make_object(lua, func);
 }
 
@@ -406,8 +401,7 @@ void framework::scriptengine::run() {
       const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
       auto result = lua.script(script);
-      sol::table module = result;
-      // auto module = result.get<sol::table>();
+      auto module = result.get<sol::table>();
 
       module["get"] = [name, &manager](sol::table, const std::string &object) {
         return manager.get(name)->get(object);
