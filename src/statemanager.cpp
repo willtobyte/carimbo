@@ -7,6 +7,10 @@ static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint6
   return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
 }
 
+statemanager::statemanager() {
+  _collision_mapping.reserve(64);
+}
+
 bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const {
   auto it = _collision_mapping.find(make_key(a->id(), b->id()));
   return (it != _collision_mapping.end()) ? it->second : false;

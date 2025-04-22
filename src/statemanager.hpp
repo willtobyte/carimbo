@@ -17,7 +17,7 @@ struct pairhash final {
 
 class statemanager : public input::eventreceiver, public lifecycleobserver {
 public:
-  statemanager() = default;
+  statemanager();
   virtual ~statemanager() = default;
 
   bool collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const;
@@ -44,6 +44,6 @@ protected:
 private:
   std::unordered_map<int8_t, std::unordered_map<std::variant<input::event::gamepad::button>, bool>> _state;
 
-  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, pairhash> _collision_mapping{64};
+  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, pairhash> _collision_mapping;
 };
 }
