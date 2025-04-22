@@ -4,7 +4,6 @@
 
 #include "event.hpp"
 #include "eventreceiver.hpp"
-#include "collision.hpp"
 #include "lifecycleobserver.hpp"
 
 namespace framework {
@@ -12,7 +11,7 @@ struct pairhash final {
   size_t operator()(const std::pair<uint64_t, uint64_t> &p) const {
     const auto h1 = std::hash<uint64_t>{}(p.first);
     const auto h2 = std::hash<uint64_t>{}(p.second);
-    return h1 ^ (h2 << 1);
+    return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
   }
 };
 
@@ -45,6 +44,6 @@ protected:
 private:
   std::unordered_map<int8_t, std::unordered_map<std::variant<input::event::gamepad::button>, bool>> _state;
 
-  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, pairhash> _collision_mapping{1024};
+  std::unordered_map<std::pair<uint64_t, uint64_t>, bool, pairhash> _collision_mapping{64};
 };
 }
