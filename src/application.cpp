@@ -7,7 +7,7 @@ using namespace framework;
 
   try {
     std::rethrow_exception(std::current_exception());
-  } catch (const std::exception& e) {
+  } catch (const std::exception &e) {
     error = e.what();
   } catch (...) {
     error = "Unhandled unknown exception";
