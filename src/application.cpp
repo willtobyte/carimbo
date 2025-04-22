@@ -32,9 +32,9 @@ application::application(int argc, char **argv) {
 
 int32_t application::run() {
 #if SANDBOX
-    storage::filesystem::mount("../sandbox", "/");
+  storage::filesystem::mount("../sandbox", "/");
 #else
-    storage::filesystem::mount("bundle.7z", "/");
+  storage::filesystem::mount("bundle.7z", "/");
 #endif
 
   auto se = scriptengine();
