@@ -65,7 +65,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto separator = color(pixels[0]);
 
   glyphmap map;
-  int32_t x{0}, y{0}, tw{static_cast<int32_t>(width)};
+  int32_t x{0}, y{0}, tw{static_cast<int32_t>(width)}, th{static_cast<int32_t>(height)};
   for (char glyph : glyphs) {
     while (x < tw && color(pixels[y * tw + x]) == separator) {
       ++x;
@@ -82,7 +82,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
     }
 
     int32_t h = 0;
-    while (y + h < height
+    while (y + h < th
            && color(pixels[(y + h) * tw + x]) != separator) {
       ++h;
     }
