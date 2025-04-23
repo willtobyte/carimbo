@@ -687,7 +687,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::mail>(
     "Mail",
-    sol::constructors<framework::mail(std::shared_ptr<framework::object>, std::shared_ptr<framework::object>, const std::string &)>()
+    sol::constructors<framework::mail(std::shared_ptr<framework::object>, std::optional<std::shared_ptr<framework::object>>, const std::string &)>()
   );
 
   lua.new_usertype<framework::postalservice>(
