@@ -37,6 +37,9 @@ public:
   void set_placement(int32_t x, int32_t y);
   geometry::point get_placement() const;
 
+  void set_alpha(uint8_t alpha);
+  uint8_t alpha() const;
+
   void set_onupdate(std::function<void(std::shared_ptr<object>)> fn);
   void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn);

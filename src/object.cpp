@@ -154,6 +154,14 @@ geometry::point object::get_placement() const {
   return _props.position;
 }
 
+void object::set_alpha(uint8_t alpha) {
+  _props.alpha = alpha;
+}
+
+uint8_t object::alpha() const {
+  return _props.alpha;
+}
+
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) {
   _onupdate = std::move(fn);
 }

@@ -295,6 +295,7 @@ void framework::scriptengine::run() {
     "id", sol::property(&framework::object::id),
     "x", sol::property(&framework::object::x),
     "y", sol::property(&framework::object::y),
+    "alpha", sol::property(&framework::object::alpha, &framework::object::set_alpha),
     "hide", &framework::object::hide,
     "move", &framework::object::move,
     "on_update", &framework::object::set_onupdate,
