@@ -5,18 +5,23 @@ using namespace framework;
 [[noreturn]] void fail() {
   const char* error = nullptr;
 
-  try {
-    std::rethrow_exception(std::current_exception());
-  } catch (const std::exception &e) {
-    error = e.what();
-  } catch (...) {
-    error = "Unhandled unknown exception";
+  if (const auto ptr = std::current_exception()) {
+    try {
+      std::rethrow_exception(ptr);
+    } catch (const std::bad_exception&) {
+    } catch (const std::exception &e) {
+      error = e.what();
+    } catch (...) {
+      error = "Unhandled unknown exception";
+    }
+
+    if (error) {
+      fmt::println(stderr, "{}", error);
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
+    }
   }
 
-  fmt::println(stderr, "{}", error);
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
-
-  std::abort();
+  std::exit(-1);
 }
 
 application::application(int argc, char **argv) {
