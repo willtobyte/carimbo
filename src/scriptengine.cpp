@@ -384,7 +384,7 @@ void framework::scriptengine::run() {
     "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
     "player", [&player_mapping](framework::statemanager &self, input::event::player player) -> playerwrapper & {
-      auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
+      const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
 
       return iterator->second;
     }
@@ -403,33 +403,35 @@ void framework::scriptengine::run() {
       auto result = lua.script(script);
       auto module = result.get<sol::table>();
 
-      module["get"] = [name, &manager](sol::table, const std::string &object) {
-        return manager.get(name)->get(object);
+      const auto scene = manager.get(name);
+
+      module["get"] = [scene](sol::table, const std::string &object) {
+        return scene->get(object);
       };
 
       if (module["on_enter"].valid()) {
         sol::function fn = module["on_enter"];
-        manager.get(name)->set_onenter(fn.as<std::function<void()>>());
+        scene->set_onenter(fn.as<std::function<void()>>());
       }
 
       if (module["on_loop"].valid()) {
         sol::function fn = module["on_loop"];
-        manager.get(name)->set_onloop(fn.as<std::function<void(float_t)>>());
+        scene->set_onloop(fn.as<std::function<void(float_t)>>());
       }
 
       if (module["on_leave"].valid()) {
         sol::function fn = module["on_leave"];
-        manager.get(name)->set_onleave(fn.as<std::function<void()>>());
+        scene->set_onleave(fn.as<std::function<void()>>());
       }
 
       if (module["on_touch"].valid()) {
         sol::function fn = module["on_touch"];
-        manager.get(name)->set_ontouch(fn.as<std::function<void(float_t, float_t)>>());
+        scene->set_ontouch(fn.as<std::function<void(float_t, float_t)>>());
       }
 
       if (module["on_motion"].valid()) {
         sol::function fn = module["on_motion"];
-        manager.get(name)->set_onmotion(fn.as<std::function<void(float_t, float_t)>>());
+        scene->set_onmotion(fn.as<std::function<void(float_t, float_t)>>());
       }
     }
   );

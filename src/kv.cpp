@@ -8,7 +8,7 @@ sol::object observable::get() const {
 
 void observable::set(const sol::object &new_value) {
   _value = new_value;
-  for (auto &callback : _subscribers) {
+  for (const auto &callback : _subscribers) {
     callback(new_value);
   }
 }
@@ -30,7 +30,7 @@ void kv::subscribe(const std::string &key, const sol::function &callback, sol::t
 }
 
 std::shared_ptr<observable> kv::ensure(const std::string &key, lua_State *L) {
-  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  const auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
   if (inserted) {
     it->second->set(sol::make_object(L, sol::lua_nil));
   }
