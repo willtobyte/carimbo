@@ -24,19 +24,19 @@ uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, false);
 }
 
-int32_t timermanager::set(int32_t interval, std::function<void()> fn) {
+uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {
   return add_timer(interval, fn, true);
 }
 
-int32_t timermanager::singleshot(int32_t interval, std::function<void()> fn) {
+uint32_t timermanager::singleshot(uint32_t interval, std::function<void()> fn) {
   return add_timer(interval, fn, false);
 }
 
-void timermanager::clear(int32_t id) {
+void timermanager::clear(uint32_t id) {
   SDL_RemoveTimer(id);
 }
 
-int32_t timermanager::add_timer(int32_t interval, std::function<void()> fn, bool repeat) {
+uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bool repeat) {
   auto* ptr = new std::function<void()>(std::move(fn));
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (!id) [[unlikely]] {

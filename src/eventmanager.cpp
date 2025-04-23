@@ -11,11 +11,11 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   int32_t number = 0;
   SDL_GetGamepads(&number);
   for (auto id = 0; id < number; ++id) {
-    if (!SDL_IsGamepad(id)) {
+    if (!SDL_IsGamepad(static_cast<SDL_JoystickID>(id))) {
       continue;
     }
 
-    if (auto controller = SDL_OpenGamepad(id)) {
+    if (auto controller = SDL_OpenGamepad(static_cast<SDL_JoystickID>(id))) {
       _controllers.emplace(
         SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)), std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
     }
@@ -107,7 +107,7 @@ void eventmanager::update(float_t delta) {
       const gamepad::button e{event.gbutton.button};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_gamepadbuttondown(event.gbutton.which, e);
+        receiver->on_gamepadbuttondown(static_cast<uint8_t>(event.gbutton.which), e);
       }
     } break;
 
@@ -115,7 +115,7 @@ void eventmanager::update(float_t delta) {
       const gamepad::button e{event.gbutton.button};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_gamepadbuttonup(event.gbutton.which, e);
+        receiver->on_gamepadbuttonup(static_cast<uint8_t>(event.gbutton.which), e);
       }
     } break;
 
@@ -126,7 +126,7 @@ void eventmanager::update(float_t delta) {
       const gamepad::motion e{axis, value};
 
       for (const auto &receiver : _receivers) {
-        receiver->on_gamepadmotion(who, e);
+        receiver->on_gamepadmotion(static_cast<uint8_t>(who), e);
       }
     } break;
 

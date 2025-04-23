@@ -27,8 +27,8 @@ public:
   void hide();
 
   geometry::point position() const;
-  int32_t x() const;
-  int32_t y() const;
+  float_t x() const;
+  float_t y() const;
 
   void move(float_t x_velocity, float_t y_velocity);
   void set_velocity(const algebra::vector2d &velocity);

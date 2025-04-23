@@ -10,17 +10,31 @@ static size_t ovPHYSFS_read(void *ptr, size_t size, size_t nmemb, void *source) 
 
 static int ovPHYSFS_seek(void *source, ogg_int64_t offset, int whence) {
   auto file = reinterpret_cast<PHYSFS_file *>(source);
+  PHYSFS_sint64 target = 0;
+
   switch (whence) {
-  case SEEK_SET:
-    return PHYSFS_seek(file, static_cast<PHYSFS_uint64>(offset)) ? 0 : -1;
-  case SEEK_CUR:
-    return PHYSFS_seek(file, PHYSFS_tell(file) + offset) ? 0 : -1;
-  case SEEK_END:
-    return PHYSFS_seek(file, PHYSFS_fileLength(file) + offset) ? 0 : -1;
-  default:
-    assert(false);
-    return -1;
+    case SEEK_SET:
+      target = offset;
+      break;
+    case SEEK_CUR:
+      target = PHYSFS_tell(file);
+      if (target < 0) return -1;
+      target += offset;
+      break;
+    case SEEK_END:
+      target = PHYSFS_fileLength(file);
+      if (target < 0) return -1;
+      target += offset;
+      break;
+    default:
+      assert(false);
+      return -1;
   }
+
+  if (target < 0)
+    return -1;
+
+  return PHYSFS_seek(file, static_cast<PHYSFS_uint64>(target)) ? 0 : -1;
 }
 
 static int ovPHYSFS_close(void *source) {
@@ -28,7 +42,13 @@ static int ovPHYSFS_close(void *source) {
 }
 
 static long ovPHYSFS_tell(void *source) {
-  return static_cast<long>(PHYSFS_tell(reinterpret_cast<PHYSFS_file *>(source)));
+  auto file = reinterpret_cast<PHYSFS_file *>(source);
+  PHYSFS_sint64 pos = PHYSFS_tell(file);
+  if (pos > std::numeric_limits<long>::max() || pos < std::numeric_limits<long>::min()) {
+    return -1;
+  }
+
+  return static_cast<long>(pos);
 }
 
 static ov_callbacks PHYSFS_callbacks = {
@@ -90,12 +110,12 @@ soundfx::soundfx(const std::string &filename) {
   const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(info->rate);
 
-  auto offset = 0;
+  auto offset = 0L;
   constexpr auto length = 2014 * 8;
   std::array<uint8_t, length> array{};
 
   std::vector<uint8_t> data;
-  data.reserve(static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * info->channels * 2);
+  data.reserve(static_cast<size_t>(ov_pcm_total(vf.get(), -1) * info->channels * 2));
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
   constexpr const auto bigendian = 0;
@@ -106,7 +126,7 @@ soundfx::soundfx(const std::string &filename) {
   do {
     offset = ov_read(vf.get(), reinterpret_cast<char *>(array.data()), length, bigendian, 2, 1, nullptr);
     if (offset < 0) [[unlikely]] {
-      throw std::runtime_error(fmt::format("[ov_read] error while reading file: {}, error: {}", filename, ov_strerror(offset)));
+      throw std::runtime_error(fmt::format("[ov_read] error while reading file: {}, error: {}", filename, ov_strerror(static_cast<int32_t>(offset))));
     }
     data.insert(data.end(), array.begin(), std::ranges::next(array.begin(), offset));
   } while (offset > 0);
@@ -116,7 +136,7 @@ soundfx::soundfx(const std::string &filename) {
   alBufferData(buffer, format, data.data(), static_cast<ALsizei>(data.size()), frequency);
 
   alGenSources(1, &_source);
-  alSourcei(_source, AL_BUFFER, buffer);
+  alSourcei(_source, AL_BUFFER, static_cast<ALint>(buffer));
   alDeleteBuffers(1, &buffer);
 }
 

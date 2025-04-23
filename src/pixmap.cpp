@@ -33,8 +33,8 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
         *_renderer,
         SDL_PIXELFORMAT_ABGR8888,
         SDL_TEXTUREACCESS_STATIC,
-        ihdr.width,
-        ihdr.height
+        static_cast<int32_t>(ihdr.width),
+        static_cast<int32_t>(ihdr.height)
       ),
       SDL_Deleter{}
   );
@@ -42,7 +42,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
     throw std::runtime_error(fmt::format("[SDL_CreateTexture] error creating texture: {}", SDL_GetError()));
   }
 
-  const auto pitch = ihdr.width * 4;
+  const auto pitch = static_cast<int32_t>(ihdr.width * 4);
   if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) {
     throw std::runtime_error(fmt::format("[SDL_UpdateTexture] error updating texture: {}", SDL_GetError()));
   }

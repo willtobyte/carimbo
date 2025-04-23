@@ -14,10 +14,11 @@ std::vector<uint8_t> io::read(std::string_view filename) {
     throw std::runtime_error(fmt::format("[PHYSFS_fileLength] invalid file length, file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
-  std::vector<uint8_t> buffer(length);
-  const auto result = PHYSFS_readBytes(ptr.get(), buffer.data(), length);
+  const auto amount = static_cast<std::size_t>(length);
+  std::vector<uint8_t> buffer(amount);
+  const auto result = PHYSFS_readBytes(ptr.get(), buffer.data(), amount);
   if (result != length) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes but read {}, error: {}", filename, length, result, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    throw std::runtime_error(fmt::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes but read {}, error: {}", filename, amount, result, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
   return buffer;
@@ -36,8 +37,9 @@ std::vector<std::string> io::list(std::string_view directory) {
 
   const auto count = std::ranges::distance(view);
   std::vector<std::string> files;
-  files.reserve(count);
-  for (size_t i : view) {
+  files.reserve(std::max<size_t>(0, static_cast<size_t>(count)));
+
+  for (const auto &i : view) {
     files.emplace_back(array[i]);
   }
 

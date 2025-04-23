@@ -38,11 +38,11 @@ else()
   find_package(OpenSSL CONFIG REQUIRED)
 endif()
 
-if(MSVC)
-  target_compile_options(${PROJECT_NAME} PRIVATE /W4)
-else()
-  target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror -pedantic)
-endif()
+# if(MSVC)
+#   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+# else()
+#   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror -pedantic)
+# endif()
 
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
@@ -71,12 +71,23 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
+    -fno-plt
+    -fstrict-aliasing
+    -ffast-math
+    -fomit-frame-pointer
+    -DNDEBUG
+    -Wall
+    -Werror
+    -Wextra
+    -Wconversion
+    -Wpedantic
   )
 
   set(EMSDK_LINK_RELEASE_FLAGS
     -Oz
     -g0
     -flto
+    -fno-plt
     --strip-all
     --ignore-external-input
     -sASSERTIONS=1
@@ -105,7 +116,7 @@ if(EMSCRIPTEN)
 else()
   if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
-    set(DEBUG_FLAGS /Od;/Zi;/W4)
+    set(DEBUG_FLAGS /Od;/Zi;/W4;/bigobj)
     set(RELEASE_FLAGS /O2;/GL;/GR;/EHsc;/DNDEBUG;/W4)
 
     target_compile_options(${PROJECT_NAME} PRIVATE
@@ -116,8 +127,32 @@ else()
       $<$<CONFIG:Release>:/LTCG>
     )
   else()
-    set(DEBUG_FLAGS -O0 -g -fsanitize=address,undefined)
-    set(RELEASE_FLAGS -O3 -flto)
+    set(DEBUG_FLAGS
+      -O0
+      -g
+      -fsanitize=address,undefined
+    )
+
+    set(RELEASE_FLAGS
+      -O3
+      -flto
+      -fno-plt
+      -fstrict-aliasing
+      -ffast-math
+      -funroll-loops
+      -fomit-frame-pointer
+      -DNDEBUG
+      -Wall
+      -Werror
+      -Wextra
+      -Wconversion
+      -Wpedantic
+    )
+
+    set(RELEASE_LINKER_FLAGS
+      -fno-plt
+      -flto
+    )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
@@ -126,7 +161,7 @@ else()
 
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
-      $<$<CONFIG:Release>:${RELEASE_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_LINKER_FLAGS}>
     )
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE

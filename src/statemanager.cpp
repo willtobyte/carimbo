@@ -16,7 +16,7 @@ bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b
   return (it != _collision_mapping.end()) ? it->second : false;
 }
 
-bool statemanager::on(int player, const std::variant<gamepad::button> &type) const {
+bool statemanager::on(uint8_t player, const std::variant<gamepad::button> &type) const {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -26,8 +26,8 @@ bool statemanager::on(int player, const std::variant<gamepad::button> &type) con
   return false;
 }
 
-int8_t statemanager::players() const {
-  return _state.size();
+uint8_t statemanager::players() const {
+  return static_cast<uint8_t>(_state.size());
 }
 
 constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard::key &event) {

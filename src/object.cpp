@@ -30,11 +30,11 @@ geometry::point object::position() const {
   return _props.position;
 }
 
-int32_t object::x() const {
+float_t object::x() const {
   return _props.position.x();
 }
 
-int32_t object::y() const {
+float_t object::y() const {
   return _props.position.y();
 }
 

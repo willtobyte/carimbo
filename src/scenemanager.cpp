@@ -25,7 +25,8 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
       });
 
   std::vector<std::shared_ptr<audio::soundfx>> effects;
-  effects.reserve(std::ranges::distance(view));
+  const auto distance = std::ranges::distance(view);
+  effects.reserve(std::max<size_t>(0, static_cast<size_t>(distance)));
   std::ranges::copy(view, std::back_inserter(effects));
 
   const auto &os = j.value("objects", nlohmann::json::array());
