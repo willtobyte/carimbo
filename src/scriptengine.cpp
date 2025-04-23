@@ -396,14 +396,12 @@ void framework::scriptengine::run() {
     "set", &framework::scenemanager::set,
     "destroy", &framework::scenemanager::destroy,
     "register", [&lua](framework::scenemanager &manager, const std::string &name) {
-      manager.load(name);
+      const auto scene = manager.load(name);
 
       const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
       auto result = lua.script(script);
       auto module = result.get<sol::table>();
-
-      const auto scene = manager.get(name);
 
       module["get"] = [scene](sol::table, const std::string &object) {
         return scene->get(object);
