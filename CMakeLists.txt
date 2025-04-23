@@ -79,7 +79,6 @@ if(EMSCRIPTEN)
     -Wall
     -Werror
     -Wextra
-    -Wconversion
     -Wpedantic
   )
 
@@ -145,7 +144,6 @@ else()
       -Wall
       -Werror
       -Wextra
-      -Wconversion
       -Wpedantic
     )
 
