@@ -161,14 +161,6 @@ void objectmanager::update(float_t delta) {
     }
   }
 
-  if (_dirty) {
-    std::sort(_objects.begin(), _objects.end(), [](const auto &a, const auto &b) {
-      return a->position().x() < b->position().x();
-    });
-
-    _dirty = false;
-  }
-
   for (auto it = _objects.begin(); it != _objects.end(); ++it) {
     const auto &a = *it;
     const auto &ap = a->props();
