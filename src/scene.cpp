@@ -45,6 +45,8 @@ std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::ge
     case scenetype::effect:
       return _effects.at(name);
   }
+
+  throw std::invalid_argument(fmt::format("scene::get(): invalid scenetype ({})", static_cast<int>(type)));
 }
 
 void scene::on_enter() {
