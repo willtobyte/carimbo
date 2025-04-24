@@ -8,7 +8,7 @@ public:
   soundfx(const std::string &filename);
   ~soundfx();
 
-  void play(bool loop) const;
+  void play(bool loop = false) const;
   void stop() const;
 
 private:

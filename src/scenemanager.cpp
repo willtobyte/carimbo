@@ -17,17 +17,18 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
 
   const auto &es = j.value("effects", nlohmann::json::array());
   const auto eview = es
-      | std::views::transform([&](const auto& e) {
-          auto path = std::format("blobs/{}/{}.ogg",
-                                    name,
-                                    e.template get<std::string>());
-          return _resourcemanager->soundmanager()->get(path);
-      });
+    | std::views::transform([&](const auto& e) {
+      const auto& basename = e.template get<std::string>();
+      auto path = std::format("blobs/{}/{}.ogg", name, basename);
+      return std::pair{
+        basename,
+        _resourcemanager->soundmanager()->get(path)
+      };
+    });
 
-  std::vector<std::shared_ptr<audio::soundfx>> effects;
-  const auto distance = std::ranges::distance(eview);
-  effects.reserve(std::max<size_t>(0, static_cast<size_t>(distance)));
-  std::ranges::copy(eview, std::back_inserter(effects));
+  std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> effects;
+  effects.reserve(es.size());
+  std::ranges::copy(eview, std::inserter(effects, effects.end()));
 
   const auto& os = j.value("objects", nlohmann::json::array());
   const auto oview = os
@@ -53,34 +54,6 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
   std::unordered_map<std::string, std::shared_ptr<object>> objects;
   objects.reserve(os.size());
   std::ranges::copy(oview, std::inserter(objects, objects.end()));
-
-  // const auto &os = j.value("objects", nlohmann::json::array());
-  // const auto &i = os.items();
-  // std::unordered_map<std::string, std::shared_ptr<object>> objects(os.size());
-  // std::transform(
-  //     i.begin(),
-  //     i.end(),
-  //     std::inserter(objects, objects.end()),
-  //     [&](const auto &item) -> std::pair<std::string, std::shared_ptr<object>> {
-  //       const auto &key = item.key();
-  //       const auto &data = item.value();
-  //       const auto &kind = data["kind"].template get_ref<const std::string &>();
-  //       std::optional<std::string> action =
-  //           data.contains("action") && data["action"].is_string()
-  //               ? std::optional<std::string>{std::string(data["action"].template get_ref<const std::string &>())}
-  //               : std::nullopt;
-  //       const auto x = data.value("x", 0);
-  //       const auto y = data.value("y", 0);
-
-  //       auto e = _objectmanager->create(name, kind, false);
-  //       e->set_placement(x, y);
-  //       if (action) {
-  //         e->set_action(*action);
-  //       }
-
-  //       return {key, e};
-  //     }
-  // );
 
   const auto s = std::make_shared<scene>(_objectmanager, background, objects, effects, size);
   _scene_mapping[name] = s;

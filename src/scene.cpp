@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include "soundfx.hpp"
 
 using namespace framework;
 
@@ -6,7 +7,7 @@ scene::scene(
     std::shared_ptr<objectmanager> objectmanager,
     std::shared_ptr<graphics::pixmap> background,
     std::unordered_map<std::string, std::shared_ptr<object>> objects,
-    std::vector<std::shared_ptr<audio::soundfx>> effects,
+    std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> effects,
     geometry::size size
 )
     : _objectmanager(objectmanager),
@@ -37,8 +38,13 @@ void scene::draw() const {
   _background->draw({point, _size}, {point, _size});
 }
 
-std::shared_ptr<object> scene::get(const std::string &name) const {
-  return _objects.at(name);
+std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string &name, scenetype type) const {
+  switch (type) {
+    case scenetype::object:
+      return _objects.at(name);
+    case scenetype::effect:
+      return _effects.at(name);
+  }
 }
 
 void scene::on_enter() {

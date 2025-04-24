@@ -9,6 +9,11 @@
 namespace framework {
 class objectmanager;
 
+enum class scenetype : uint8_t {
+  object = 0,
+  effect
+};
+
 class scene final {
 public:
   scene() = delete;
@@ -16,7 +21,7 @@ public:
       std::shared_ptr<framework::objectmanager> objectmanager,
       std::shared_ptr<graphics::pixmap> background,
       std::unordered_map<std::string, std::shared_ptr<object>> objects,
-      std::vector<std::shared_ptr<audio::soundfx>> effects,
+      std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> effects,
       geometry::size size
   );
 
@@ -26,7 +31,7 @@ public:
 
   void draw() const;
 
-  std::shared_ptr<object> get(const std::string &name) const;
+  std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> get(const std::string &name, scenetype type) const;
 
   void on_enter();
   void on_leave();
@@ -43,7 +48,7 @@ private:
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::pixmap> _background;
   std::unordered_map<std::string, std::shared_ptr<object>> _objects;
-  std::vector<std::shared_ptr<audio::soundfx>> _effects;
+  std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> _effects;
   geometry::size _size;
 
   std::function<void()> _onenter;

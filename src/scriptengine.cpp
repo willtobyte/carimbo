@@ -1,4 +1,6 @@
 #include "scriptengine.hpp"
+#include "scene.hpp"
+#include <sol/raii.hpp>
 
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
@@ -161,14 +163,30 @@ void framework::scriptengine::run() {
     }
   );
 
+  lua.new_usertype<audio::soundfx>(
+    "SoundFX",
+    sol::no_constructor,
+     "play", [](audio::soundfx& sfx, std::optional<bool> loop_opt) {
+       auto loop = loop_opt.value_or(false);
+       sfx.play(loop);
+     },
+     "stop", &audio::soundfx::stop
+  );
+
   lua.new_usertype<audio::soundmanager>(
     "SoundManager",
     sol::no_constructor,
-    "play", [](audio::soundmanager& manager, const std::string& filename, std::optional<bool> loop_opt) {
+    "play", [](audio::soundmanager& manager, const std::string& name, std::optional<bool> loop_opt) {
       auto loop = loop_opt.value_or(false);
-      manager.play(filename, loop);
+      manager.play(name, loop);
     },
     "stop", &audio::soundmanager::stop
+  );
+
+  lua.new_enum(
+    "SceneType",
+    "object", framework::scenetype::object,
+    "effect", framework::scenetype::effect
   );
 
   lua.new_enum(
@@ -404,8 +422,8 @@ void framework::scriptengine::run() {
       auto result = lua.script(script);
       auto module = result.get<sol::table>();
 
-      module["get"] = [scene](sol::table, const std::string &object) {
-        return scene->get(object);
+      module["get"] = [scene](sol::table, const std::string &object, framework::scenetype type) {
+        return scene->get(object, type);
       };
 
       if (module["on_enter"].valid()) {
