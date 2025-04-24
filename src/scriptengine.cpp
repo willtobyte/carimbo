@@ -668,12 +668,7 @@ void framework::scriptengine::run() {
     "a", sol::property(&graphics::color::a, &graphics::color::set_a),
 
     sol::meta_function::equal_to,
-    &graphics::color::operator==,
-    // sol::meta_function::not_equal_to, &color::operator!=,
-
-    sol::meta_function::to_string, [](const graphics::color &c) {
-      return fmt::format("color({}, {}, {}, {})", c.r(), c.g(), c.b(), c.a());
-    }
+    &graphics::color::operator==
   );
 
   lua.new_enum(
@@ -687,7 +682,11 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<framework::mail>(
     "Mail",
-    sol::constructors<framework::mail(std::shared_ptr<framework::object>, std::optional<std::shared_ptr<framework::object>>, const std::string &)>()
+    sol::constructors<framework::mail(
+      std::shared_ptr<framework::object>,
+      std::optional<std::shared_ptr<framework::object>>,
+      const std::string &
+    )>()
   );
 
   lua.new_usertype<framework::postalservice>(
@@ -761,7 +760,9 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
     "Canvas",
     sol::no_constructor,
-    "pixels", sol::property([](graphics::canvas &) -> sol::object { return sol::lua_nil; }, [](graphics::canvas &canvas, sol::table table) {
+    "pixels", sol::property([](graphics::canvas &) -> sol::object {
+      return sol::lua_nil;
+    }, [](graphics::canvas &canvas, sol::table table) {
           const auto n = table.size();
           static std::vector<uint32_t> pixels(n);
           std::ranges::transform(
