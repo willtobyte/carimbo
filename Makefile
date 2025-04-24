@@ -33,5 +33,4 @@ help:
 
 .PHONY: bump
 bump: ## Bump git tag
-	@tag=$$(git tag | sort -V | tail -n1 | sed 's/^v//' | awk -F. '{print "v"$$1"."$$2"."($$3+1)}'); \
-	git tag "$$tag" && git push origin --tags && gh browse
+	@tag=$$(git tag | sort -V | tail -n1 | sed 's/^v//' | awk -F. '{print "v"$$1"."$$2"."($$3+1)}') && git tag "$$tag" && git push origin --tags
