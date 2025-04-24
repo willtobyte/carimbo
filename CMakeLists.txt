@@ -89,8 +89,8 @@ if(EMSCRIPTEN)
     -fno-plt
     --strip-all
     --ignore-external-input
-    -sASSERTIONS=1
-    -sDISABLE_EXCEPTION_CATCHING=0
+    -sASSERTIONS=0
+    -sDISABLE_EXCEPTION_CATCHING=1
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE

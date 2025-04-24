@@ -98,5 +98,6 @@ void cursor::draw() const {
 }
 
 void cursor::handle(const std::string &message) {
+  fmt::println("Messageg is {}", message);
   _queued_action = message;
 }
