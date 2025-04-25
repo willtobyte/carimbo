@@ -41,7 +41,7 @@ uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bo
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (!id) [[unlikely]] {
     delete ptr;
-    throw std::runtime_error(fmt::format("[SDL_AddTimer] failed to set timer. reason: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_AddTimer] {}", SDL_GetError()));
   }
 
   return id;

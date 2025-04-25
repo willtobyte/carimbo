@@ -29,7 +29,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
   float_t width, height;
   if (!SDL_GetTextureSize(*pixmap, &width, &height)) {
-    throw std::runtime_error(fmt::format("[SDL_GetTextureSize] failed to query texture size: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_GetTextureSize] {}", SDL_GetError()));
   }
 
   std::unique_ptr<SDL_Texture, SDL_Deleter> target{
@@ -42,7 +42,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
     )
   };
   if (!target) {
-    throw std::runtime_error(fmt::format("[SDL_CreateTexture] failed to create texture: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
 
   SDL_Texture *origin = SDL_GetRenderTarget(*_renderer);
@@ -55,7 +55,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
 
   std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
   if (!surface) {
-    throw std::runtime_error(fmt::format("[SDL_RenderReadPixels] failed ti read pixels: {}", SDL_GetError()));
+    throw std::runtime_error(fmt::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
   }
 
   SDL_SetRenderTarget(*_renderer, origin);
