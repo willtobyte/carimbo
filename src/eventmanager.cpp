@@ -1,25 +1,33 @@
 #include "eventmanager.hpp"
 #include "event.hpp"
 #include "collision.hpp"
+#include <fmt/base.h>
 
 using namespace input;
 
 using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
-  : _renderer(std::move(renderer)) {
-  int32_t number = 0;
-  SDL_GetGamepads(&number);
-  for (auto id = 0; id < number; ++id) {
-    if (!SDL_IsGamepad(static_cast<SDL_JoystickID>(id))) {
+    : _renderer(std::move(renderer)) {
+  int32_t number;
+  SDL_JoystickID* joysticks = SDL_GetGamepads(&number);
+  if (!joysticks) {
+    return;
+  }
+
+  for (auto index = 0; index < number; ++index) {
+    const auto gamepad_id = joysticks[index];
+    if (!SDL_IsGamepad(gamepad_id)) {
       continue;
     }
 
-    if (auto controller = SDL_OpenGamepad(static_cast<SDL_JoystickID>(id))) {
+    if (const auto controller = SDL_OpenGamepad(gamepad_id)) {
       _controllers.emplace(
         SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)), std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
     }
   }
+
+  SDL_free(joysticks);
 }
 
 void eventmanager::update(float_t delta) {
@@ -119,7 +127,7 @@ void eventmanager::update(float_t delta) {
       }
     } break;
 
-    case SDL_EVENT_GAMEPAD_TOUCHPAD_MOTION: {
+    case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
       const auto who = event.gaxis.which;
       const auto axis = static_cast<gamepad::motion::axis>(event.gaxis.axis);
       const auto value = event.gaxis.value;

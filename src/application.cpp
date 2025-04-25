@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include <SDL3/SDL_init.h>
 
 using namespace framework;
 
@@ -30,7 +31,7 @@ application::application(int argc, char **argv) {
 
   std::set_terminate(fail);
 
-  SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
+  SDL_Init(SDL_INIT_EVENTS | SDL_INIT_JOYSTICK | SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
   PHYSFS_init(argv[0]);
 }
