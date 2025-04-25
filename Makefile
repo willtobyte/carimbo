@@ -19,7 +19,7 @@ clean: ## Clean
 
 .PHONY: conan
 conan: ## Install dependencies
-	 conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
+	 conan install . --output-folder=build --build="*" --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
 
 .PHONY: build
 build: ## Build

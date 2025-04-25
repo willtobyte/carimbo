@@ -129,7 +129,6 @@ else()
     set(DEBUG_FLAGS
       -O0
       -g
-      -fsanitize=address,undefined
     )
 
     set(RELEASE_FLAGS
@@ -158,7 +157,7 @@ else()
     )
 
     target_link_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:${SANITIZER_FLAGS}>
+      $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_LINKER_FLAGS}>
     )
 
