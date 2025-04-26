@@ -22,6 +22,14 @@ using namespace framework;
     }
   }
 
+  #ifdef DEBUG
+    #if defined(_MSC_VER)
+      __debugbreak();
+    #else
+      raise(SIGTRAP);
+    #endif
+  #endif
+
   std::exit(-1);
 }
 
