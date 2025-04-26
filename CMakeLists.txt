@@ -31,9 +31,15 @@ target_precompile_headers(${PROJECT_NAME}
     src/*.tpp
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE src)
+target_include_directories(${PROJECT_NAME}
+  PRIVATE
+    src
+)
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+target_compile_features(${PROJECT_NAME}
+  PRIVATE
+    cxx_std_20
+)
 
 set(WARNINGS
   -Wall
@@ -47,7 +53,6 @@ if(EMSCRIPTEN)
     -g3
     -gsource-map
   )
-
   set(RELEASE_FLAGS
     -Oz
     -g0
@@ -60,20 +65,17 @@ if(EMSCRIPTEN)
     ${WARNINGS}
     -Werror
   )
-
   target_compile_options(${PROJECT_NAME}
     PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_FLAGS}>
   )
-
   set(LINK_DEBUG
     -g3
     -gsource-map
     -sASSERTIONS=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
-
   set(LINK_RELEASE
     -Oz
     -g0
@@ -84,7 +86,6 @@ if(EMSCRIPTEN)
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
   )
-
   target_link_options(${PROJECT_NAME}
     PRIVATE
       -sUSE_SDL=3
@@ -108,14 +109,12 @@ else()
       /W4
       /bigobj
     )
-
     set(RELEASE_FLAGS
       /O2
       /GL
       /DNDEBUG
       /W4
     )
-
     set(RELEASE_LINK_FLAGS
       /LTCG
     )
@@ -125,7 +124,6 @@ else()
       -g
       ${WARNINGS}
     )
-
     set(RELEASE_FLAGS
       -O3
       -flto
@@ -136,24 +134,20 @@ else()
       -DNDEBUG
       ${WARNINGS}
     )
-
     set(RELEASE_LINK_FLAGS
       -flto
       -fno-plt
     )
   endif()
-
   target_compile_options(${PROJECT_NAME}
     PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_FLAGS}>
   )
-
   target_link_options(${PROJECT_NAME}
     PRIVATE
       $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}>
   )
-
   target_compile_definitions(${PROJECT_NAME}
     PRIVATE
       $<$<CONFIG:Release>:NDEBUG>
@@ -172,7 +166,9 @@ foreach(flag IN ITEMS
 )
   option(${flag} "" OFF)
   if(${flag})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
+    target_compile_definitions(${PROJECT_NAME}
+      PRIVATE ${flag}
+    )
   endif()
 endforeach()
 
@@ -202,8 +198,14 @@ target_link_libraries(${PROJECT_NAME}
     sol2::sol2
     spng::spng_static
     vorbis::vorbis
-    $<$<NOT:EMSCRIPTEN>:Boost::boost>
-    $<$<NOT:EMSCRIPTEN>:luajit::luajit>
-    $<$<NOT:EMSCRIPTEN>:OpenAL::OpenAL>
-    $<$<NOT:EMSCRIPTEN>:openssl::openssl>
 )
+
+if(NOT EMSCRIPTEN)
+  target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+      Boost::boost
+      luajit::luajit
+      OpenAL::OpenAL
+      openssl::openssl
+  )
+endif()
