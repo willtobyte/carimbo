@@ -116,8 +116,6 @@ void framework::scriptengine::run() {
   sol::state lua(sol::c_call<decltype(&panic), &panic>);
   lua.open_libraries();
 
-  lua["ticks"] = &ticks;
-
   lua["searcher"] = &searcher;
 
   const auto inject = fmt::format(R"lua(
@@ -126,6 +124,8 @@ void framework::scriptengine::run() {
   )lua");
 
   lua.script(inject);
+
+  lua["ticks"] = &ticks;
 
   lua["openurl"] = [](std::string_view url) {
 #ifdef EMSCRIPTEN
