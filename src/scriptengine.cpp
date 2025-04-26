@@ -314,6 +314,7 @@ void framework::scriptengine::run() {
     "x", sol::property(&framework::object::x),
     "y", sol::property(&framework::object::y),
     "alpha", sol::property(&framework::object::alpha, &framework::object::set_alpha),
+    "scale", sol::property(&framework::object::scale, &framework::object::set_scale),
     "hide", &framework::object::hide,
     "move", &framework::object::move,
     "on_update", &framework::object::set_onupdate,

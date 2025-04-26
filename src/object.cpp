@@ -162,6 +162,14 @@ uint8_t object::alpha() const {
   return _props.alpha;
 }
 
+void object::set_scale(float_t scale) {
+  _props.scale = scale;
+}
+
+float_t object::scale() const {
+  return _props.scale;
+}
+
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) {
   _onupdate = std::move(fn);
 }

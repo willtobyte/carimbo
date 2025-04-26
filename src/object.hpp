@@ -40,6 +40,9 @@ public:
   void set_alpha(uint8_t alpha);
   uint8_t alpha() const;
 
+  void set_scale(float_t scale);
+  float_t scale() const;
+
   void set_onupdate(std::function<void(std::shared_ptr<object>)> fn);
   void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
