@@ -38,12 +38,6 @@ else()
   find_package(OpenSSL CONFIG REQUIRED)
 endif()
 
-# if(MSVC)
-#   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
-# else()
-#   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Werror -pedantic)
-# endif()
-
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})
