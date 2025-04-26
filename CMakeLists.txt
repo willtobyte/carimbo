@@ -1,62 +1,67 @@
 cmake_minimum_required(VERSION 3.15)
-project(carimbo VERSION 1.0 LANGUAGES CXX)
-
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
-endif()
+project(carimbo LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL Emscripten)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
+set(SDL3_DIR "${CMAKE_BINARY_DIR}")
+
+file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
+file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
+file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
+
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
+
+find_package(fmt CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(Ogg CONFIG REQUIRED)
+find_package(PhysFS CONFIG REQUIRED)
+find_package(SDL3 CONFIG REQUIRED)
+find_package(sol2 CONFIG REQUIRED)
+find_package(SPNG CONFIG REQUIRED)
+find_package(Vorbis CONFIG REQUIRED)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   set(EMSCRIPTEN TRUE)
 else()
   set(EMSCRIPTEN FALSE)
+  find_package(Boost CONFIG REQUIRED)
+  find_package(luajit CONFIG REQUIRED)
+  find_package(OpenAL CONFIG REQUIRED)
+  find_package(OpenSSL CONFIG REQUIRED)
 endif()
 
-file(GLOB_RECURSE SRC_FILES
-  src/*.cpp
-)
-file(GLOB_RECURSE HDR_FILES
-  src/*.hpp
-  src/*.tpp
-)
+foreach(flag HITBOX LOCAL SANDBOX)
+  option(${flag} "Enable ${flag} flag" OFF)
+  if(${flag})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
+  endif()
+endforeach()
 
-add_executable(${PROJECT_NAME}
-  ${SRC_FILES}
-  ${HDR_FILES}
-)
-
-target_precompile_headers(
-  ${PROJECT_NAME}
-  PRIVATE
-    ${HDR_FILES}
-)
-
-target_include_directories(
-  ${PROJECT_NAME}
-  PRIVATE src
-)
-
-target_compile_features(
-  ${PROJECT_NAME}
-  PRIVATE cxx_std_20
-)
-
-set(WARNINGS
-  -Wall
-  -Wextra
-  -Wpedantic
-)
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
 if(EMSCRIPTEN)
-  set(DEBUG_FLAGS
+  set(EMSDK_COMPILE_DEBUG_FLAGS
     -O0
     -g3
     -gsource-map
   )
-  set(RELEASE_FLAGS
+
+  set(EMSDK_LINK_DEBUG_FLAGS
+    -g3
+    -gsource-map
+    -sASSERTIONS=2
+    -sDISABLE_EXCEPTION_CATCHING=0
+  )
+
+  set(EMSDK_COMPILE_RELEASE_FLAGS
     -Oz
     -g0
     -flto
@@ -65,22 +70,13 @@ if(EMSCRIPTEN)
     -ffast-math
     -fomit-frame-pointer
     -DNDEBUG
-    ${WARNINGS}
+    -Wall
     -Werror
+    -Wextra
+    -Wpedantic
   )
-  target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE
-      $<CONFIG:Debug>:${DEBUG_FLAGS}
-      $<CONFIG:Release>:${RELEASE_FLAGS}
-  )
-  set(LINK_DEBUG
-    -g3
-    -gsource-map
-    -sASSERTIONS=2
-    -sDISABLE_EXCEPTION_CATCHING=0
-  )
-  set(LINK_RELEASE
+
+  set(EMSDK_LINK_RELEASE_FLAGS
     -Oz
     -g0
     -flto
@@ -90,7 +86,13 @@ if(EMSCRIPTEN)
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
   )
-  set(EM_LINK_FLAGS
+
+  target_compile_options(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Debug>:${EMSDK_COMPILE_DEBUG_FLAGS}>
+    $<$<CONFIG:Release>:${EMSDK_COMPILE_RELEASE_FLAGS}>
+  )
+
+  target_link_options(${PROJECT_NAME} PRIVATE
     -sUSE_SDL=3
     -sEVAL_CTORS=1
     -sWASM_BIGINT=1
@@ -101,91 +103,65 @@ if(EMSCRIPTEN)
     -sEXPORTED_RUNTIME_METHODS=['callMain']
     -sWEBSOCKET_SUBPROTOCOL=text
     -lwebsocket.js
-  )
-  target_link_options(
-    ${PROJECT_NAME}
-    PRIVATE
-      ${EM_LINK_FLAGS}
-      $<CONFIG:Debug>:${LINK_DEBUG}
-      $<CONFIG:Release>:${LINK_RELEASE}
+    $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
+    $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
 else()
   if(MSVC)
-    set(DEBUG_FLAGS
-      /Od
-      /Zi
-      /W4
-      /bigobj
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
+    set(DEBUG_FLAGS /Od;/Zi;/W4;/bigobj)
+    set(RELEASE_FLAGS /O2;/GL;/GR;/EHsc;/DNDEBUG;/W4)
+
+    target_compile_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_FLAGS}>
     )
-    set(RELEASE_FLAGS
-      /O2
-      /GL
-      /DNDEBUG
-      /W4
-    )
-    set(RELEASE_LINK_FLAGS
-      /LTCG
+    target_link_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Release>:/LTCG>
     )
   else()
     set(DEBUG_FLAGS
       -O0
       -g
-      ${WARNINGS}
     )
+
     set(RELEASE_FLAGS
       -O3
       -flto
+      -fno-plt
       -fstrict-aliasing
       -ffast-math
       -funroll-loops
       -fomit-frame-pointer
       -DNDEBUG
-      ${WARNINGS}
+      -Wall
+      -Werror
+      -Wextra
+      -Wpedantic
     )
-    set(RELEASE_LINK_FLAGS
-      -flto
+
+    set(RELEASE_LINKER_FLAGS
       -fno-plt
+      -flto
+    )
+
+    target_compile_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_FLAGS}>
+    )
+
+    target_link_options(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_LINKER_FLAGS}>
+    )
+
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+      $<$<CONFIG:Release>:NDEBUG>
     )
   endif()
-  target_compile_options(
-    ${PROJECT_NAME}
-    PRIVATE
-      $<CONFIG:Debug>:${DEBUG_FLAGS}
-      $<CONFIG:Release>:${RELEASE_FLAGS}
-  )
-  target_link_options(
-    ${PROJECT_NAME}
-    PRIVATE
-      $<CONFIG:Release>:${RELEASE_LINK_FLAGS}
-  )
-  target_compile_definitions(
-    ${PROJECT_NAME}
-    PRIVATE
-      $<CONFIG:Release>:NDEBUG
-  )
 endif()
 
-target_compile_definitions(
-  ${PROJECT_NAME}
-  PRIVATE
-    $<CONFIG:Debug>:DEBUG
-)
-
-foreach(flag IN ITEMS
-  HITBOX
-  LOCAL
-  SANDBOX
-)
-  option(${flag} "" OFF)
-  if(${flag})
-    target_compile_definitions(
-      ${PROJECT_NAME}
-      PRIVATE ${flag}
-    )
-  endif()
-endforeach()
-
-set(DEPS_COMMON
+target_link_libraries(${PROJECT_NAME} PRIVATE
   fmt::fmt
   nlohmann_json::nlohmann_json
   Ogg::ogg
@@ -196,37 +172,11 @@ set(DEPS_COMMON
   vorbis::vorbis
 )
 
-target_link_libraries(
-  ${PROJECT_NAME}
-  PRIVATE
-    ${DEPS_COMMON}
-)
-
 if(NOT EMSCRIPTEN)
-  set(DEPS_NATIVE
+  target_link_libraries(${PROJECT_NAME} PRIVATE
     Boost::boost
     luajit::luajit
     OpenAL::OpenAL
     openssl::openssl
   )
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE
-      ${DEPS_NATIVE}
-  )
-endif()
-
-find_package(fmt CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(Ogg CONFIG REQUIRED)
-find_package(PhysFS CONFIG REQUIRED)
-find_package(SDL3 CONFIG REQUIRED)
-find_package(sol2 CONFIG REQUIRED)
-find_package(SPNG CONFIG REQUIRED)
-find_package(Vorbis CONFIG REQUIRED)
-if(NOT EMSCRIPTEN)
-  find_package(Boost CONFIG REQUIRED)
-  find_package(luajit CONFIG REQUIRED)
-  find_package(OpenAL CONFIG REQUIRED)
-  find_package(OpenSSL CONFIG REQUIRED)
 endif()
