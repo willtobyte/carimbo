@@ -812,8 +812,4 @@ void framework::scriptengine::run() {
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
   lua["run"]();
-
-  // XXX
-  // sol::unsafe_function run = lua["run"];
-  // run();
 }
