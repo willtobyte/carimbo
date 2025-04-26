@@ -1,5 +1,4 @@
 #include "application.hpp"
-#include <SDL3/SDL_init.h>
 
 using namespace framework;
 
