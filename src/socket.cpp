@@ -162,6 +162,9 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
   UNUSED(results);
 
   if (ec) {
+    if (ec == boost::asio::error::operation_aborted)
+      return;
+
     fmt::println(stderr, "[error] resolve error: {}", ec.message());
     return;
   }
@@ -180,6 +183,9 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
   UNUSED(endpoint);
 
   if (ec) {
+    if (ec == boost::asio::error::operation_aborted)
+      return;
+
     fmt::println(stderr, "[socket] connect error: {}", ec.message());
     return;
   }
@@ -200,6 +206,9 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
 
 void socket::on_ssl_handshake(beast::error_code ec) {
   if (ec) {
+    if (ec == boost::asio::error::operation_aborted)
+      return;
+
     fmt::println(stderr, "[socket] ssl handshake error: {}", ec.message());
     return;
   }
@@ -216,6 +225,9 @@ void socket::on_ssl_handshake(beast::error_code ec) {
 
 void socket::on_handshake(beast::error_code ec) {
   if (ec) {
+    if (ec == boost::asio::error::operation_aborted)
+      return;
+
     fmt::println(stderr, "[socket] handshake error: {}", ec.message());
     return;
   }
@@ -227,6 +239,9 @@ void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) {
   UNUSED(bytes_transferred);
 
   if (ec) {
+    if (ec == boost::asio::error::operation_aborted)
+      return;
+
     fmt::println(stderr, "[socket] read error: {}", ec.message());
     return;
   }
