@@ -15,19 +15,19 @@ using namespace framework;
       error = "Unhandled unknown exception";
     }
 
+    #ifdef DEBUG
+      #if defined(_MSC_VER)
+        __debugbreak();
+      #else
+        raise(SIGTRAP);
+      #endif
+    #endif
+
     if (error) {
       fmt::println(stderr, "{}", error);
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
     }
   }
-
-  #ifdef DEBUG
-    #if defined(_MSC_VER)
-      __debugbreak();
-    #else
-      raise(SIGTRAP);
-    #endif
-  #endif
 
   std::exit(-1);
 }
