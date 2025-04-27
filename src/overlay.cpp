@@ -53,7 +53,7 @@ void overlay::draw() const {
 }
 
 void overlay::set_cursor(const std::string &name) {
-  _cursor = std::make_shared<cursor>(name, _resourcemanager);
+  _cursor = std::make_shared<cursor>(std::move(name), _resourcemanager);
   _eventmanager->add_receiver(_cursor);
 }
 
