@@ -35,7 +35,7 @@ else()
   find_package(Boost CONFIG REQUIRED)
   find_package(luajit CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
-  find_package(OpenSSL CONFIG REQUIRED)
+  find_package(LibreSSL CONFIG REQUIRED)
 endif()
 
 foreach(flag HITBOX LOCAL SANDBOX)
@@ -177,6 +177,6 @@ if(NOT EMSCRIPTEN)
     Boost::boost
     luajit::luajit
     OpenAL::OpenAL
-    openssl::openssl
+    libressl::libressl
   )
 endif()

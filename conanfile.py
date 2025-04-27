@@ -24,8 +24,8 @@ class Carimbo(ConanFile):
 
         if self._not_webassembly():
             self.requires("boost/1.87.0")
+            self.requires("libressl/3.9.1")
             self.requires("luajit/2.1.0-beta3")
-            self.requires("openssl/3.4.1")
 
     def configure(self):
         self.options["boost"].header_only = True
