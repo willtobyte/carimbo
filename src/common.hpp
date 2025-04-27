@@ -23,7 +23,6 @@
 
 #ifndef EMSCRIPTEN
 #ifdef WEBSOCKET
-#define BOOST_BEAST_USE_LIBRESSL
 #include <boost/asio.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/ssl.hpp>
