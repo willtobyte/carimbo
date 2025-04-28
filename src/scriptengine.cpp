@@ -29,14 +29,13 @@ public:
         _function(std::move(function)) {}
 
   void loop(float_t delta) override {
-    sol::protected_function_result result = _function(delta);
+    const auto result = _function(delta);
     if (!result.valid()) {
       sol::error err = result;
       throw std::runtime_error(err.what());
     }
 
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0) / 1024.0;
-
     if (memory <= 8.0) [[likely]] {
       lua_gc(_L, LUA_GCSTEP, 8);
       return;
