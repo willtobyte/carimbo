@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include <stdexcept>
 
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
@@ -12,6 +13,10 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
 
   const auto loader = lua.load(script, filename);
+  if (!loader.valid()) {
+    sol::error err = loader;
+    throw std::runtime_error(err.what());
+  }
 
   sol::protected_function func = loader;
   return sol::make_object(lua, func);
@@ -19,12 +24,16 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state &lua, sol::function function)
+  explicit lua_loopable(const sol::state_view &lua, sol::function function)
       : _gc(lua["collectgarbage"].get<sol::function>()),
-        _function(std::exchange(function, {})) {}
+        _function(std::move(function)) {}
 
   void loop(float_t delta) override {
-    _function(delta);
+    sol::protected_function_result result = _function(delta);
+    if (!result.valid()) {
+      sol::error err = result;
+      throw std::runtime_error(err.what());
+    }
 
     const auto memory = _gc("count").get<double>() / 1024.0;
     if (memory <= 8.0) [[likely]] {
@@ -36,7 +45,7 @@ public:
 
 private:
   sol::function _gc;
-  sol::function _function;
+  sol::protected_function _function;
 };
 
 auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
@@ -418,7 +427,12 @@ void framework::scriptengine::run() {
 
       const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-      auto result = lua.script(script);
+      auto result = lua.safe_script(script, &sol::script_pass_on_error);
+      if (!result.valid()) {
+        sol::error err = result;
+        throw std::runtime_error(err.what());
+      }
+
       auto module = result.get<sol::table>();
 
       module["get"] = [scene](sol::table, const std::string &object, framework::scenetype type) {
@@ -794,19 +808,41 @@ void framework::scriptengine::run() {
     )
   );
 
-  const auto buffer = storage::io::read("scripts/main.lua");
-  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-  lua.script(script);
+  {
+    const auto buffer = storage::io::read("scripts/main.lua");
+    std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+    const auto result = lua.safe_script(script, &sol::script_pass_on_error);
+    if (!result.valid()) {
+      sol::error err = result;
+      throw std::runtime_error(err.what());
+    }
+  }
 
-  const auto start = SDL_GetPerformanceCounter();
-  lua["setup"]();
-  const auto end = SDL_GetPerformanceCounter();
-  const auto elapsed = (end - start) * 1000.0 / SDL_GetPerformanceFrequency();
-  fmt::println("boot time {:.3f}ms", elapsed);
+  {
+    const auto start = SDL_GetPerformanceCounter();
+    sol::protected_function func = lua["setup"];
+    sol::protected_function_result result = func();
+    if (!result.valid()) {
+      sol::error err = result;
+      throw std::runtime_error(err.what());
+    }
+    const auto end = SDL_GetPerformanceCounter();
+    const auto elapsed = (end - start) * 1000.0 / SDL_GetPerformanceFrequency();
+    fmt::println("boot time {:.3f}ms", elapsed);
+  }
 
-  const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
-  const auto loop = lua["loop"].get<sol::function>();
-  engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
+  {
+    const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
+    const auto loop = lua["loop"].get<sol::function>();
+    engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
+  }
 
-  lua["run"]();
+  {
+    sol::protected_function func = lua["run"];
+    sol::protected_function_result result = func();
+    if (!result.valid()) {
+      sol::error err = result;
+      throw std::runtime_error(err.what());
+    }
+  }
 }

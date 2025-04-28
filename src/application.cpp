@@ -53,7 +53,7 @@ int32_t application::run() {
   auto se = scriptengine();
   se.run();
 
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 application::~application() {
