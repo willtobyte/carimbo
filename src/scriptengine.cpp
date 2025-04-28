@@ -715,12 +715,12 @@ void framework::scriptengine::run() {
       sol::state_view lua(state);
       const auto args_json = _to_json(arguments);
       sio.rpc(
-          method, args_json.dump(),
-          [callback, lua](const std::string &response) {
-            const auto &j = nlohmann::json::parse(response);
+        method, args_json.dump(),
+        [callback, lua](const std::string &response) {
+          const auto &j = nlohmann::json::parse(response);
 
-            callback(_to_lua(j, lua));
-          }
+          callback(_to_lua(j, lua));
+        }
       );
     }
   );
@@ -807,7 +807,7 @@ void framework::scriptengine::run() {
       [](graphics::label &self, const std::string &text) {
         self.set(text);
       },
-      [](graphics::label &self, const std::string &text, int32_t x, int32_t y) {
+      [](graphics::label &self, const std::string &text, float_t x, float_t y) {
         self.set_with_placement(text, x, y);
       }),
     "clear", &graphics::label::clear
@@ -830,16 +830,16 @@ void framework::scriptengine::run() {
     "pixels", sol::property([](graphics::canvas &) -> sol::object {
       return sol::lua_nil;
     }, [](graphics::canvas &canvas, sol::table table) {
-          const auto n = table.size();
-          static std::vector<uint32_t> pixels(n);
-          std::ranges::transform(
-              std::views::iota(1u, n + 1u), pixels.begin(),
-              [&table](auto index) {
-                return table[index].template get<uint32_t>();
-              }
-          );
+        const auto n = table.size();
+        static std::vector<uint32_t> pixels(n);
+        std::ranges::transform(
+          std::views::iota(1u, n + 1u), pixels.begin(),
+          [&table](auto index) {
+            return table[index].template get<uint32_t>();
+          }
+        );
 
-          canvas.set_pixels(pixels);
+        canvas.set_pixels(pixels);
       }
     )
   );
