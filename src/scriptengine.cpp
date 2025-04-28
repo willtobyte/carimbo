@@ -359,20 +359,20 @@ void framework::scriptengine::run() {
           self.prefetch();
         },
 
-        [](framework::resourcemanager &self, sol::table t) {
+        [](framework::resourcemanager &self, sol::table table) {
           std::vector<std::string> filenames;
-          filenames.reserve(t.size());
-          for (auto&& [key, value] : t) {
+          filenames.reserve(table.size());
+          for (auto &&[key, value] : table) {
             filenames.emplace_back(value.as<std::string>());
           }
           self.prefetch(std::move(filenames));
-        }
+        },
 
-        [](framework::resourcemanager &self, sol::variadic_args va) {
+        [](framework::resourcemanager &self, sol::variadic_args arguments) {
           std::vector<std::string> filenames;
-          filenames.reserve(va.size());
-          for (auto &&v : va) {
-            filenames.push_back(v.as<std::string&>());
+          filenames.reserve(arguments.size());
+          for (auto &&v : arguments) {
+            filenames.push_back(v.as<std::string>());
           }
           self.prefetch(std::move(filenames));
         }
