@@ -135,20 +135,20 @@ void framework::scriptengine::run() {
   lua["ticks"] = &ticks;
 
   lua["openurl"] = [](std::string_view url) {
-#ifdef EMSCRIPTEN
-  const auto script = fmt::format(R"javascript(var a = document.createElement('a');
-    a.href = "{}";
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);)javascript",
-  url);
+    #ifdef EMSCRIPTEN
+      const auto script = fmt::format(R"javascript(var a = document.createElement('a');
+        a.href = "{}";
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);)javascript",
+      url);
 
-  emscripten_run_script(script.c_str());
-#else
-  SDL_OpenURL(url.data());
-#endif
+      emscripten_run_script(script.c_str());
+    #else
+      SDL_OpenURL(url.data());
+    #endif
   };
 
   lua["JSON"] = lua.create_table_with(
@@ -362,19 +362,19 @@ void framework::scriptengine::run() {
         [](framework::resourcemanager &self, sol::table t) {
           std::vector<std::string> filenames;
           filenames.reserve(t.size());
-          for (auto &kv : t) {
-            filenames.push_back(kv.second.as<std::string>());
+          for (auto&& [key, value] : t) {
+            filenames.emplace_back(value.as<std::string>());
           }
-          self.prefetch(filenames);
-        },
+          self.prefetch(std::move(filenames));
+        }
 
         [](framework::resourcemanager &self, sol::variadic_args va) {
           std::vector<std::string> filenames;
           filenames.reserve(va.size());
-          for (auto v : va) {
-            filenames.push_back(v.as<std::string>());
+          for (auto &&v : va) {
+            filenames.push_back(v.as<std::string&>());
           }
-          self.prefetch(filenames);
+          self.prefetch(std::move(filenames));
         }
       )
   );
