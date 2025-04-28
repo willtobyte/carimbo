@@ -25,7 +25,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 class lua_loopable : public framework::loopable {
 public:
   explicit lua_loopable(const sol::state_view &lua, sol::protected_function function)
-      : _gc(lua["collectgarbage"].get<sol::function>()),
+      : _L(lua.lua_state()),
         _function(std::move(function)) {}
 
   void loop(float_t delta) override {
@@ -35,16 +35,19 @@ public:
       throw std::runtime_error(err.what());
     }
 
-    const auto memory = _gc("count").get<double>() / 1024.0;
+    const auto memory = lua_gc(_L, LUA_GCCOUNT, 0) / 1024.0;
+
     if (memory <= 8.0) [[likely]] {
-      _gc("step", 8);
+      lua_gc(_L, LUA_GCSTEP, 8);
       return;
     }
-    _gc("collect");
+
+    lua_gc(_L, LUA_GCCOLLECT, 0);
+    lua_gc(_L, LUA_GCCOLLECT, 0);
   }
 
 private:
-  sol::function _gc;
+  lua_State* _L;
   sol::protected_function _function;
 };
 
@@ -350,8 +353,7 @@ void framework::scriptengine::run() {
     "ResourceManager",
     sol::no_constructor,
     "flush", [&lua](framework::resourcemanager &self) {
-      const auto gc = lua["collectgarbage"].get<sol::function>();
-      gc("collect");
+      lua.collect_garbage();
       self.flush();
     },
     "prefetch", sol::overload(
