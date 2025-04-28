@@ -21,7 +21,7 @@
 
 #include <fmt/format.h>
 
-#if defined(WEBSOCKET) && !defined(EMSCRIPTEN)
+#ifdef HAVE_BOOST
   #include <boost/asio.hpp>
   #include <boost/asio/connect.hpp>
   #include <boost/asio/ssl.hpp>
@@ -30,6 +30,9 @@
   #include <boost/beast/websocket.hpp>
   #include <boost/beast/websocket/ssl.hpp>
   #include <boost/config.hpp>
+
+  #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
+  #include <boost/stacktrace.hpp>
 #endif
 
 #include <AL/al.h>

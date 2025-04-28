@@ -32,10 +32,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   set(EMSCRIPTEN TRUE)
 else()
   set(EMSCRIPTEN FALSE)
+
   find_package(Boost CONFIG REQUIRED)
   find_package(luajit CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
+
+  add_compile_definitions(HAVE_BOOST)
 endif()
 
 foreach(flag HITBOX LOCAL SANDBOX)
