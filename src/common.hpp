@@ -5,6 +5,7 @@
 #endif
 
 #define SOL_ALL_SAFETIES_ON 1
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 
 #ifndef EMSCRIPTEN
 #define SOL_LUAJIT 1
