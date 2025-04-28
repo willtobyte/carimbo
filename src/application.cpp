@@ -1,5 +1,4 @@
 #include "application.hpp"
-#include <cstdlib>
 
 using namespace framework;
 

@@ -1,38 +1,35 @@
 #pragma once
 
 #ifdef _WIN32
-#define NOMINMAX
+  #define NOMINMAX
 #endif
 
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
-
 #ifndef EMSCRIPTEN
-#define SOL_LUAJIT 1
+  #define SOL_LUAJIT 1
 #endif
 
 #define WEBSOCKET 1
 
 #ifdef EMSCRIPTEN
-#include <emscripten.h>
-#ifdef WEBSOCKET
-#include <emscripten/websocket.h>
-#endif
+  #include <emscripten.h>
+  #ifdef WEBSOCKET
+    #include <emscripten/websocket.h>
+  #endif
 #endif
 
 #include <fmt/format.h>
 
-#ifndef EMSCRIPTEN
-#ifdef WEBSOCKET
-#include <boost/asio.hpp>
-#include <boost/asio/connect.hpp>
-#include <boost/asio/ssl.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/beast/core.hpp>
-#include <boost/beast/websocket.hpp>
-#include <boost/beast/websocket/ssl.hpp>
-#include <boost/config.hpp>
-#endif
+#if defined(WEBSOCKET) && !defined(EMSCRIPTEN)
+  #include <boost/asio.hpp>
+  #include <boost/asio/connect.hpp>
+  #include <boost/asio/ssl.hpp>
+  #include <boost/asio/strand.hpp>
+  #include <boost/beast/core.hpp>
+  #include <boost/beast/websocket.hpp>
+  #include <boost/beast/websocket/ssl.hpp>
+  #include <boost/config.hpp>
 #endif
 
 #include <AL/al.h>
