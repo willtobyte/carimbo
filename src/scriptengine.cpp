@@ -13,7 +13,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
 
   const auto loader = lua.load(script, filename);
-  if (!loader.valid()) {
+  if (!loader.valid()) [[unlikely]] {
     sol::error err = loader;
     throw std::runtime_error(err.what());
   }
@@ -30,7 +30,7 @@ public:
 
   void loop(float_t delta) override {
     const auto result = _function(delta);
-    if (!result.valid()) {
+    if (!result.valid()) [[unlikely]] {
       sol::error err = result;
       throw std::runtime_error(err.what());
     }
@@ -429,7 +429,7 @@ void framework::scriptengine::run() {
       const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
       auto result = lua.safe_script(script, &sol::script_pass_on_error);
-      if (!result.valid()) {
+      if (!result.valid()) [[unlikely]] {
         sol::error err = result;
         throw std::runtime_error(err.what());
       }
@@ -443,7 +443,7 @@ void framework::scriptengine::run() {
       if (sol::protected_function fn = module["on_enter"]; fn.valid()) {
         auto safe_fn = [fn]() mutable {
           sol::protected_function_result result = fn();
-          if (!result.valid()) {
+          if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
@@ -455,7 +455,7 @@ void framework::scriptengine::run() {
       if (sol::protected_function fn = module["on_loop"]; fn.valid()) {
         auto safe_fn = [fn](float_t delta) mutable {
           sol::protected_function_result result = fn(delta);
-          if (!result.valid()) {
+          if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
@@ -467,7 +467,7 @@ void framework::scriptengine::run() {
       if (sol::protected_function fn = module["on_leave"]; fn.valid()) {
         auto safe_fn = [fn]() mutable {
           sol::protected_function_result result = fn();
-          if (!result.valid()) {
+          if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
@@ -479,7 +479,7 @@ void framework::scriptengine::run() {
       if (sol::protected_function fn = module["on_touch"]; fn.valid()) {
         auto safe_fn = [fn](float_t x, float_t y) mutable {
           sol::protected_function_result result = fn(x, y);
-          if (!result.valid()) {
+          if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
@@ -491,7 +491,7 @@ void framework::scriptengine::run() {
       if (sol::protected_function fn = module["on_motion"]; fn.valid()) {
         auto safe_fn = [fn](float_t x, float_t y) mutable {
           sol::protected_function_result result = fn(x, y);
-          if (!result.valid()) {
+          if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
@@ -847,7 +847,7 @@ void framework::scriptengine::run() {
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   const auto scr = lua.safe_script(script, &sol::script_pass_on_error);
-  if (!scr.valid()) {
+  if (!scr.valid()) [[unlikely]] {
     sol::error err = scr;
     throw std::runtime_error(err.what());
   }
@@ -855,7 +855,7 @@ void framework::scriptengine::run() {
   const auto start = SDL_GetPerformanceCounter();
   sol::protected_function setup = lua["setup"];
   sol::protected_function_result sr = setup();
-  if (!sr.valid()) {
+  if (!sr.valid()) [[unlikely]] {
     sol::error err = sr;
     throw std::runtime_error(err.what());
   }
@@ -869,7 +869,7 @@ void framework::scriptengine::run() {
 
   sol::protected_function run = lua["run"];
   sol::protected_function_result rr = run();
-  if (!rr.valid()) {
+  if (!rr.valid()) [[unlikely]] {
     sol::error err = rr;
     throw std::runtime_error(err.what());
   }
