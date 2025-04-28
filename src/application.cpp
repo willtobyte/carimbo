@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include <cstdlib>
 
 using namespace framework;
 
@@ -15,21 +16,21 @@ using namespace framework;
       error = "Unhandled unknown exception";
     }
 
-    #ifdef DEBUG
-      #if defined(_MSC_VER)
-        __debugbreak();
-      #else
-        raise(SIGTRAP);
-      #endif
-    #endif
-
     if (error) {
+      #ifdef DEBUG
+        #if defined(_MSC_VER)
+          __debugbreak();
+        #else
+          raise(SIGTRAP);
+        #endif
+      #endif
+
       fmt::println(stderr, "{}", error);
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
     }
   }
 
-  std::exit(-1);
+  std::exit(EXIT_FAILURE);
 }
 
 application::application(int argc, char **argv) {
@@ -53,7 +54,7 @@ int32_t application::run() {
   auto se = scriptengine();
   se.run();
 
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 application::~application() {
