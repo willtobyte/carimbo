@@ -26,7 +26,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
       };
     });
 
-  std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> effects;
+  std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects;
   effects.reserve(es.size());
   std::ranges::copy(eview, std::inserter(effects, effects.end()));
 
@@ -51,11 +51,18 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
           return std::pair<std::string, std::shared_ptr<object>>{key, e};
       });
 
-  std::unordered_map<std::string, std::shared_ptr<object>> objects;
+  std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
   objects.reserve(os.size());
   std::ranges::copy(oview, std::inserter(objects, objects.end()));
 
-  const auto s = std::make_shared<scene>(_objectmanager, background, objects, effects, size);
+  const auto s = std::make_shared<scene>(
+    _objectmanager,
+    background,
+    std::move(objects),
+    std::move(effects),
+    size
+  );
+
   _scene_mapping[name] = s;
   return s;
 }

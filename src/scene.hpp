@@ -20,8 +20,8 @@ public:
   explicit scene(
       std::shared_ptr<framework::objectmanager> objectmanager,
       std::shared_ptr<graphics::pixmap> background,
-      std::unordered_map<std::string, std::shared_ptr<object>> objects,
-      std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> effects,
+      std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
+      std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
       geometry::size size
   );
 
@@ -47,8 +47,8 @@ public:
 private:
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::pixmap> _background;
-  std::unordered_map<std::string, std::shared_ptr<object>> _objects;
-  std::unordered_map<std::string, std::shared_ptr<audio::soundfx>> _effects;
+  std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
+  std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
   geometry::size _size;
 
   std::function<void()> _onenter;
