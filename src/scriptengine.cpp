@@ -24,7 +24,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state_view &lua, sol::function function)
+  explicit lua_loopable(const sol::state_view &lua, sol::protected_function function)
       : _gc(lua["collectgarbage"].get<sol::function>()),
         _function(std::move(function)) {}
 
@@ -439,29 +439,64 @@ void framework::scriptengine::run() {
         return scene->get(object, type);
       };
 
-      if (module["on_enter"].valid()) {
-        sol::function fn = module["on_enter"];
-        scene->set_onenter(fn.as<std::function<void()>>());
+      if (sol::protected_function fn = module["on_enter"]; fn.valid()) {
+        auto safe_fn = [fn]() mutable {
+          sol::protected_function_result result = fn();
+          if (!result.valid()) {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_onenter(std::move(safe_fn));
       }
 
-      if (module["on_loop"].valid()) {
-        sol::function fn = module["on_loop"];
-        scene->set_onloop(fn.as<std::function<void(float_t)>>());
+      if (sol::protected_function fn = module["on_loop"]; fn.valid()) {
+        auto safe_fn = [fn](float_t delta) mutable {
+          sol::protected_function_result result = fn(delta);
+          if (!result.valid()) {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_onloop(std::move(safe_fn));
       }
 
-      if (module["on_leave"].valid()) {
-        sol::function fn = module["on_leave"];
-        scene->set_onleave(fn.as<std::function<void()>>());
+      if (sol::protected_function fn = module["on_leave"]; fn.valid()) {
+        auto safe_fn = [fn]() mutable {
+          sol::protected_function_result result = fn();
+          if (!result.valid()) {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_onleave(std::move(safe_fn));
       }
 
-      if (module["on_touch"].valid()) {
-        sol::function fn = module["on_touch"];
-        scene->set_ontouch(fn.as<std::function<void(float_t, float_t)>>());
+      if (sol::protected_function fn = module["on_touch"]; fn.valid()) {
+        auto safe_fn = [fn](float_t x, float_t y) mutable {
+          sol::protected_function_result result = fn(x, y);
+          if (!result.valid()) {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_ontouch(std::move(safe_fn));
       }
 
-      if (module["on_motion"].valid()) {
-        sol::function fn = module["on_motion"];
-        scene->set_onmotion(fn.as<std::function<void(float_t, float_t)>>());
+      if (sol::protected_function fn = module["on_motion"]; fn.valid()) {
+        auto safe_fn = [fn](float_t x, float_t y) mutable {
+          sol::protected_function_result result = fn(x, y);
+          if (!result.valid()) {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_onmotion(std::move(safe_fn));
       }
     }
   );
@@ -808,41 +843,33 @@ void framework::scriptengine::run() {
     )
   );
 
-  {
-    const auto buffer = storage::io::read("scripts/main.lua");
-    std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
-    const auto result = lua.safe_script(script, &sol::script_pass_on_error);
-    if (!result.valid()) {
-      sol::error err = result;
-      throw std::runtime_error(err.what());
-    }
+  const auto buffer = storage::io::read("scripts/main.lua");
+  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+  const auto scr = lua.safe_script(script, &sol::script_pass_on_error);
+  if (!scr.valid()) {
+    sol::error err = scr;
+    throw std::runtime_error(err.what());
   }
 
-  {
-    const auto start = SDL_GetPerformanceCounter();
-    sol::protected_function func = lua["setup"];
-    sol::protected_function_result result = func();
-    if (!result.valid()) {
-      sol::error err = result;
-      throw std::runtime_error(err.what());
-    }
-    const auto end = SDL_GetPerformanceCounter();
-    const auto elapsed = (end - start) * 1000.0 / SDL_GetPerformanceFrequency();
-    fmt::println("boot time {:.3f}ms", elapsed);
+  const auto start = SDL_GetPerformanceCounter();
+  sol::protected_function setup = lua["setup"];
+  sol::protected_function_result sr = setup();
+  if (!sr.valid()) {
+    sol::error err = sr;
+    throw std::runtime_error(err.what());
   }
+  const auto end = SDL_GetPerformanceCounter();
+  const auto elapsed = (end - start) * 1000.0 / SDL_GetPerformanceFrequency();
+  fmt::println("boot time {:.3f}ms", elapsed);
 
-  {
-    const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
-    const auto loop = lua["loop"].get<sol::function>();
-    engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
-  }
+  const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
+  const auto loop = lua["loop"].get<sol::protected_function>();
+  engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
-  {
-    sol::protected_function func = lua["run"];
-    sol::protected_function_result result = func();
-    if (!result.valid()) {
-      sol::error err = result;
-      throw std::runtime_error(err.what());
-    }
+  sol::protected_function run = lua["run"];
+  sol::protected_function_result rr = run();
+  if (!rr.valid()) {
+    sol::error err = rr;
+    throw std::runtime_error(err.what());
   }
 }
