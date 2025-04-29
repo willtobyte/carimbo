@@ -34,8 +34,16 @@ float_t object::x() const {
   return _props.position.x();
 }
 
+void object::set_x(float_t x) {
+  _props.position.set_x(x);
+}
+
 float_t object::y() const {
   return _props.position.y();
+}
+
+void object::set_y(float_t y) {
+  _props.position.set_y(y);
 }
 
 void object::move(float_t x_velocity, float_t y_velocity) {

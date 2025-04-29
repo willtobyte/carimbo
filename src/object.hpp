@@ -28,7 +28,9 @@ public:
 
   geometry::point position() const;
   float_t x() const;
+  void set_x(float_t x);
   float_t y() const;
+  void set_y(float_t y);
 
   void move(float_t x_velocity, float_t y_velocity);
   void set_velocity(const algebra::vector2d &velocity);
