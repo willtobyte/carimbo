@@ -207,8 +207,8 @@ void objectmanager::update(float_t delta) {
 }
 
 void objectmanager::draw() {
-  for (const auto &object : _objects) {
-    object->draw();
+  for (const auto &o : _objects) {
+    o->draw();
   }
 }
 
