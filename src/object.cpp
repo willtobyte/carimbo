@@ -90,9 +90,11 @@ void object::update(float_t delta) {
   if (++_props.frame >= animation.keyframes.size()) {
     if (animation.oneshot) {
       auto finished = std::exchange(_props.action, "");
+
       if (const auto fn = _onanimationfinished; fn) {
         fn(shared_from_this(), finished);
       }
+
       if (animation.next.has_value()) {
         _props.action = animation.next.value();
         _props.frame = 0;
@@ -100,6 +102,7 @@ void object::update(float_t delta) {
       } else {
         return;
       }
+
     } else {
       _props.frame = 0;
     }
