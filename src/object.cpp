@@ -65,11 +65,6 @@ void object::update(float_t delta) {
   }
 
   if (_props.action.empty()) {
-    _props.position.set(
-        _props.position.x() + _props.velocity.x() * delta,
-        _props.position.y() + _props.velocity.y() * delta
-    );
-
     return;
   }
 
