@@ -21,9 +21,9 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   const auto &j = nlohmann::json::parse(buffer);
 
   const auto &glyphs  = j["glyphs"].get_ref<const std::string &>();
-  const auto  spacing = j.value("spacing", int16_t{0});
-  const auto  leading = j.value("leading", int16_t{0});
-  const auto  scale   = j.value("scale", float_t{1.0f});
+  const auto spacing = j.value("spacing", int16_t{0});
+  const auto leading = j.value("leading", int16_t{0});
+  const auto scale   = j.value("scale", float_t{1.0f});
 
   const auto pixmap = _pixmappool->get(fmt::format("blobs/overlay/{}.png", family));
 
