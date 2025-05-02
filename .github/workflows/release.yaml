@@ -117,7 +117,8 @@ jobs:
         working-directory: build
         run: |
           chmod +x carimbo
-          tar -czvf Ubuntu.tar.gz --mode='a+rwx' carimbo LICENSES
+          chmod -x LICENSES
+          tar -czvf Ubuntu.tar.gz carimbo LICENSES
           mv Ubuntu.tar.gz ../artifacts
 
       - name: Compress artifacts
