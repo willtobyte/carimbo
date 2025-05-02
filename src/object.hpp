@@ -50,6 +50,9 @@ public:
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
   void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn);
   void set_onmotion(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn);
+  void set_onhover(std::function<void(std::shared_ptr<object>)> fn);
+  void set_onunhover(std::function<void(std::shared_ptr<object>)> fn);
+
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn);
   void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn);
 
@@ -65,6 +68,8 @@ public:
 
   void on_touch(float_t x, float_t y);
   void on_motion(float_t x, float_t y);
+  void on_hover();
+  void on_unhover();
 
   memory::kv &kv();
 
@@ -77,6 +82,8 @@ private:
   uint64_t _last_tick{0};
   std::function<void(std::shared_ptr<object>, float_t, float_t)> _ontouch;
   std::function<void(std::shared_ptr<object>, float_t, float_t)> _onmotion;
+  std::function<void(std::shared_ptr<object>)> _onhover;
+  std::function<void(std::shared_ptr<object>)> _onunhover;
   std::function<void(std::shared_ptr<object>)> _onupdate;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onanimationfinished;
   std::function<void(std::shared_ptr<object>, const std::string &)> _onmail;

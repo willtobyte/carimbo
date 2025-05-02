@@ -196,6 +196,14 @@ void object::set_onmotion(std::function<void(std::shared_ptr<object>, float_t, f
     _onmotion = std::move(fn);
 }
 
+void object::set_onhover(std::function<void(std::shared_ptr<object>)> fn) {
+  _onhover = std::move(fn);
+}
+
+void object::set_onunhover(std::function<void(std::shared_ptr<object>)> fn) {
+  _onunhover = std::move(fn);
+}
+
 void object::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) {
   _collisionmapping.emplace(kind, std::move(fn));
 }
@@ -268,6 +276,18 @@ void object::on_touch(float_t x, float_t y) {
 void object::on_motion(float_t x, float_t y) {
   if (const auto fn = _onmotion; fn) {
     fn(shared_from_this(), x, y);
+  }
+}
+
+void object::on_hover() {
+  if (const auto fn = _onhover; fn) {
+    fn(shared_from_this());
+  }
+}
+
+void object::on_unhover() {
+  if (const auto fn = _onunhover; fn) {
+    fn(shared_from_this());
   }
 }
 

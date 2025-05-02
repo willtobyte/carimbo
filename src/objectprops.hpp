@@ -33,6 +33,7 @@ struct objectprops final {
   algebra::vector2d velocity{};
   std::string kind{};
   std::string action{};
+  bool hover{false};
   graphics::reflection reflection{graphics::reflection::none};
   std::shared_ptr<graphics::pixmap> spritesheet{};
   std::unordered_map<std::string, graphics::animation> animations{};

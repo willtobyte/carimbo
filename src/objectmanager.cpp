@@ -68,6 +68,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &scope, const st
       {},
       kind,
       "",
+      false,
       graphics::reflection::none,
       spritesheet,
       animations,
@@ -263,7 +264,27 @@ void objectmanager::on_mousebuttondown(const mouse::button &event) {
 void objectmanager::on_mousemotion(const input::event::mouse::motion &event) {
   _scenemanager->on_motion(event.x, event.y);
 
+  const geometry::point point{event.x, event.y};
+
   for (const auto &o : _objects) {
     o->on_motion(event.x, event.y);
+
+    auto &props = o->props();
+
+    const auto it = props.animations.find(props.action);
+    if (it == props.animations.end() || !it->second.hitbox) {
+      continue;
+    }
+
+    const auto &animation = it->second;
+    const auto hitbox = geometry::rectangle{props.position + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
+
+    const bool inside = hitbox.contains(point);
+    const bool was = props.hover;
+
+    if (inside != was) {
+      props.hover = inside;
+      inside ? o->on_hover() : o->on_unhover();
+    }
   }
 }
