@@ -279,8 +279,7 @@ void objectmanager::on_mousemotion(const input::event::mouse::motion &event) {
     const auto &animation = it->second;
     const auto hitbox = geometry::rectangle{props.position + animation.hitbox->position() * props.scale, animation.hitbox->size() * props.scale};
     const bool inside = hitbox.contains(point);
-    const bool was = props.hover;
-    if (inside != was) {
+    if (inside != props.hover) {
       props.hover = inside;
       inside ? o->on_hover() : o->on_unhover();
     }
