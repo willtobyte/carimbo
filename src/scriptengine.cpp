@@ -1,5 +1,4 @@
 #include "scriptengine.hpp"
-#include <stdexcept>
 
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
@@ -133,6 +132,8 @@ void framework::scriptengine::run() {
   )lua");
 
   lua.script(inject);
+
+  lua["_"] = &text;
 
   lua["ticks"] = &ticks;
 
