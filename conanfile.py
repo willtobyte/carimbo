@@ -1,6 +1,7 @@
 from conan import ConanFile
 from conan.tools.cmake import CMakeDeps
 from conan.tools.cmake import CMakeToolchain
+from pathlib import Path
 
 
 class Carimbo(ConanFile):
@@ -45,6 +46,20 @@ class Carimbo(ConanFile):
             self.options["sol2"].with_lua = "luajit"
 
     def generate(self):
+        path = Path(self.build_folder) / "LICENSES"
+        with path.open("w", encoding="utf-8") as out:
+            for dependecy in self.dependencies.values():
+                if dependecy.is_build_context:
+                    continue
+                package_id = f"{dependecy.ref.name}/{dependecy.ref.version}"
+                for path in Path(dependecy.package_folder).rglob("*"):
+                    if not path.is_file():
+                        continue
+                    name = path.name.lower()
+                    if name.startswith(("license", "copying", "copyright")):
+                        text = path.read_text(encoding="utf-8", errors="ignore").strip()
+                        out.write(f"{package_id}\n{text}\n\n")
+
         tc = CMakeToolchain(self)
         tc.generate()
         deps = CMakeDeps(self)
