@@ -49,7 +49,7 @@ class Carimbo(ConanFile):
         path = Path(self.build_folder) / "LICENSES"
         with path.open("w", encoding="utf-8") as out:
             for dependecy in self.dependencies.values():
-                if dependecy.is_build_context:
+                if dependecy.is_build_context or dependecy.package_folder is None:
                     continue
                 package_id = f"{dependecy.ref.name}/{dependecy.ref.version}"
                 for path in Path(dependecy.package_folder).rglob("*"):
