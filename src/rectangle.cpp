@@ -5,14 +5,14 @@ using namespace geometry;
 rectangle::rectangle(float_t x, float_t y, float_t w, float_t h)
   : _position{ x, y }, _size{ w, h } {}
 
-rectangle::rectangle(const geometry::point &position, const geometry::size &size)
-    : _position(position), _size(size) {}
+rectangle::rectangle(const point &position, const class geometry::size &size)
+  : _position(position), _size(size) {}
 
-void rectangle::set_position(const geometry::point &position) {
+void rectangle::set_position(const point &position) {
   _position = position;
 }
 
-geometry::point rectangle::position() const {
+point rectangle::position() const {
   return _position;
 }
 
@@ -20,7 +20,7 @@ void rectangle::set_size(const geometry::size &size) {
   _size = size;
 }
 
-geometry::size rectangle::size() const {
+size rectangle::size() const {
   return _size;
 }
 
@@ -30,29 +30,38 @@ void rectangle::scale(float_t factor) {
 }
 
 bool rectangle::intersects(const rectangle &other) const {
-  const auto ax1 = _position.x(), ay1 = _position.y();
-  const auto ax2 = ax1 + _size.width(), ay2 = ay1 + _size.height();
-  const auto bx1 = other._position.x(), by1 = other._position.y();
-  const auto bx2 = bx1 + other._size.width(), by2 = by1 + other._size.height();
+  const auto [ax, ay] = std::pair{ _position.x(), _position.y() };
+  const auto [aw, ah] = std::pair{ _size.width(), _size.height() };
+  const auto [bx, by] = std::pair{ other._position.x(), other._position.y() };
+  const auto [bw, bh] = std::pair{ other._size.width(), other._size.height() };
 
-  return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+  return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
-bool rectangle::contains(const geometry::point &point) const {
-  const auto x0 = _position.x(), y0 = _position.y();
-  const auto x1 = x0 + _size.width(), y1 = y0 + _size.height();
-  return point.x() >= x0 && point.x() < x1 && point.y() >= y0 && point.y() < y1;
+bool rectangle::contains(const point &pt) const {
+  const auto [x, y] = std::pair{ pt.x(), pt.y() };
+  const auto [left, top] = std::pair{ _position.x(), _position.y() };
+  const auto [right, bottom] = std::pair{ left + _size.width(), top + _size.height() };
+
+  return x >= left && x < right && y >= top && y < bottom;
+}
+
+bool rectangle::contains(float_t x, float_t y) const {
+  const auto [left, top] = std::pair{ _position.x(), _position.y() };
+  const auto [right, bottom] = std::pair{ left + _size.width(), top + _size.height() };
+
+  return x >= left && x < right && y >= top && y < bottom;
 }
 
 rectangle::operator SDL_FRect() const {
   return SDL_FRect{
-      .x = _position.x(),
-      .y = _position.y(),
-      .w = _size.width(),
-      .h = _size.height()
+    .x = _position.x(),
+    .y = _position.y(),
+    .w = _size.width(),
+    .h = _size.height()
   };
 }
 
-rectangle rectangle::operator+(const geometry::point &offset) const {
+rectangle rectangle::operator+(const point &offset) const {
   return rectangle(_position + offset, _size);
 }

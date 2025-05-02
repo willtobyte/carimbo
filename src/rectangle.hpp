@@ -26,6 +26,7 @@ public:
   bool intersects(const rectangle &other) const;
 
   bool contains(const geometry::point &point) const;
+  bool contains(float_t x, float_t y) const;
 
   operator SDL_FRect() const;
 

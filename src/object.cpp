@@ -277,6 +277,19 @@ void object::on_motion(float_t x, float_t y) {
   if (const auto fn = _onmotion; fn) {
     fn(shared_from_this(), x, y);
   }
+
+  const auto it = _props.animations.find(_props.action);
+  if (it == _props.animations.end() || !it->second.hitbox) {
+    return;
+  }
+
+  const auto &animation = it->second;
+  const auto hitbox = geometry::rectangle{_props.position + animation.hitbox->position() * _props.scale, animation.hitbox->size() * _props.scale};
+  const bool inside = hitbox.contains(x, y);
+  if (inside != _props.hover) {
+    _props.hover = inside;
+    inside ? on_hover() : on_unhover();
+  }
 }
 
 void object::on_hover() {
