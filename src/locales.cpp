@@ -26,7 +26,7 @@ static const nlohmann::json& mapping() {
     try {
       return parse(language());
     } catch (...) {
-      return parse("en");
+      return nlohmann::json{};
     }
   }();
   return j;
