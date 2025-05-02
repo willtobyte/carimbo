@@ -33,12 +33,12 @@ static const nlohmann::json& mapping() {
 }
 
 namespace framework {
-std::string text(std::string_view key) {
+std::string text(const std::string &key) {
   const auto& j = mapping();
-  const auto it = j.find(std::string(key));
+  const auto it = j.find(key);
 
   if (it == j.end()) {
-    return std::string(key);
+    return key;
   }
 
   return it.value().get<std::string>();
