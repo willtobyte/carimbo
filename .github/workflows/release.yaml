@@ -109,6 +109,7 @@ jobs:
         working-directory: build
         run: |
           chmod -R a+rwx carimbo
+          chmod -x LICENSES
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
