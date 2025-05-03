@@ -135,7 +135,7 @@ void framework::scriptengine::run() {
 
   lua["_"] = &text;
 
-  lua["ticks"] = &ticks;
+  lua["millis"] = &millis;
 
   lua["openurl"] = [](std::string_view url) {
     #ifdef EMSCRIPTEN
