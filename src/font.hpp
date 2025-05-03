@@ -8,6 +8,34 @@
 namespace graphics {
 using glyphmap = std::map<uint8_t, geometry::rectangle>;
 
+class fonteffect {
+  public:
+    enum class type: uint8_t {
+      fadein,
+    };
+
+    virtual ~fonteffect() = default;
+
+    virtual void update(float_t delta) = 0;
+
+    virtual void reset() = 0;
+
+    virtual void alpha() = 0;
+
+    // TODO add more font props
+};
+
+class fadeineffect : public fonteffect {
+  public:
+    virtual ~fadeineffect() = default;
+
+    virtual void update(float_t delta) override;
+
+    virtual void reset() override;
+
+    virtual void alpha() override;
+};
+
 class font final {
 public:
   font() = delete;
@@ -15,6 +43,7 @@ public:
   ~font() = default;
 
   void update(float_t delta);
+
   void draw(const std::string &text, const geometry::point &position) const;
 
 private:
