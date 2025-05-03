@@ -14,6 +14,7 @@ public:
   explicit font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale);
   ~font() = default;
 
+  void update(float_t delta);
   void draw(const std::string &text, const geometry::point &position) const;
 
 private:
@@ -22,5 +23,12 @@ private:
   int16_t _spacing{0};
   int16_t _leading{0};
   float_t _scale{1.0f};
+
+  // TODO move to effect class
+  float_t _fade_duration;
+
+  mutable float_t _fade_time = 0.0f;
+  mutable bool _animating = false;
+  mutable char _last_char = '\0';
 };
 }

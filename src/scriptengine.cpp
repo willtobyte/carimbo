@@ -804,15 +804,10 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::label>(
     "Label",
     sol::constructors<graphics::label()>(),
-    sol::base_classes, sol::bases<graphics::widget>(),
+    sol::base_classes,
+    sol::bases<graphics::widget>(),
     "font", sol::property(&graphics::label::set_font),
-    "set", sol::overload(
-      [](graphics::label &self, const std::string &text) {
-        self.set(text);
-      },
-      [](graphics::label &self, const std::string &text, float_t x, float_t y) {
-        self.set_with_placement(text, x, y);
-      }),
+    "set", &graphics::label::set,
     "clear", &graphics::label::clear
   );
 

@@ -11,10 +11,8 @@ public:
   virtual ~label() = default;
 
   void set_font(std::shared_ptr<font> font);
-  void set_placement(const geometry::point &position);
 
-  void set(const std::string &text);
-  void set_with_placement(const std::string &text, float_t x, float_t y);
+  void set(const std::string &text, float_t x, float_t y);
 
   void clear();
 
@@ -23,6 +21,7 @@ public:
 
 private:
   std::shared_ptr<font> _font;
+
   std::string _text;
   geometry::point _position;
 };
