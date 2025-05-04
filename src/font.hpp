@@ -37,11 +37,8 @@ class fadeineffect : public fonteffect {
 
     virtual void update(float_t delta) override;
 
-    virtual float_t scale() override;
-
-    virtual enum reflection reflection() override;
-
     virtual uint8_t alpha() override;
+
   private:
     std::string _text;
     geometry::point _position;
@@ -50,6 +47,8 @@ class fadeineffect : public fonteffect {
     float_t _fade_time = 0.0f;
     bool _animating = false;
     char _last_char = '\0';
+    size_t _last_length = 0;
+    size_t _draw_calls = 0;
 };
 
 class font final {

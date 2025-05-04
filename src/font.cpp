@@ -3,27 +3,46 @@
 using namespace graphics;
 
 void fadeineffect::set(const std::string &text, geometry::point position) {
-  _text = text;
-  _position = position;
+  size_t new_len = text.size();
+  if (new_len != _last_length) {
+    _last_length = new_len;
+    _text = text;
+    _position = position;
+    _fade_time = 0.0f;
+    _animating = true;
+    _alpha = 0;
+  }
+
+   _draw_calls = 0;
 }
 
 void fadeineffect::update(float_t delta) {
-  const auto new_last = _text.back();
-  if (new_last != _last_char) {
-    _last_char = new_last;
-    _fade_time = 0.0f;
-    _animating = true;
+  if (_text.empty()) {
+    return;
   }
 
-  _alpha = 255;
-  if (_animating && _index + 1 == _text.size()) {
-    float_t progress = _fade_time / _fade_duration;
-    _alpha = progress < 1.0f ? static_cast<uint8_t>(progress * 255) : 255;
+  if (!_animating) {
+    return;
   }
+
+  _fade_time += delta;
+  if (_fade_time >= _fade_duration) {
+    _fade_time = _fade_duration;
+    _animating = false;
+  }
+
+  float_t progress = _fade_time / _fade_duration;
+  _alpha = static_cast<uint8_t>(progress * 255);
 }
 
 uint8_t fadeineffect::alpha() {
-  return _alpha;
+  ++_draw_calls;
+
+  if (_draw_calls == _text.size()) {
+    return _alpha;
+  }
+
+  return 255;
 }
 
 font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale)
@@ -55,7 +74,9 @@ void font::draw(const std::string& text, const geometry::point& position) const 
     return;
   }
 
-  _effect->set(text, position);
+  if (auto* e = _effect.get()) {
+    e->set(text, position);
+  }
 
   geometry::point cursor = position;
 
@@ -73,16 +94,19 @@ void font::draw(const std::string& text, const geometry::point& position) const 
     auto size = glyph.size();
 
     float_t scale = 1.f;
-    if (auto* e = _effect.get())
-        alpha = e->scale();
+    if (auto* e = _effect.get()) {
+      scale = e->scale();
+    }
 
     reflection reflection = reflection::none;
-    if (auto* e = _effect.get())
-        reflection = e->reflection();
+    if (auto* e = _effect.get()) {
+      reflection = e->reflection();
+    }
 
     uint8_t alpha = 255;
-    if (auto* e = _effect.get())
-        alpha = e->alpha();
+    if (auto* e = _effect.get()) {
+      alpha = e->alpha();
+    }
 
     _pixmap->draw(
       glyph,
@@ -95,24 +119,3 @@ void font::draw(const std::string& text, const geometry::point& position) const 
     cursor += std::make_pair('x', size.width() + _spacing);
   }
 }
-
-// void font::draw(const std::string &text, const geometry::point &position) const {
-//   geometry::point cursor = position;
-//   const auto height = _glyphs.begin()->second.size().height() * _scale;
-
-//   for (const char character : text) {
-//     switch (character) {
-//       case '\n':
-//         cursor = geometry::point(position.x(), cursor.y() + height + _leading);
-//         break;
-
-//       default: {
-//         const auto &glyph = _glyphs.at(static_cast<uint8_t>(character));
-//         auto size = glyph.size();
-//         _pixmap->draw(glyph, {cursor, size * _scale});
-//         cursor += std::make_pair('x', size.width() + _spacing);
-//         break;
-//       }
-//     }
-//   }
-// }

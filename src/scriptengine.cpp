@@ -135,7 +135,7 @@ void framework::scriptengine::run() {
 
   lua["_"] = &text;
 
-  lua["millis"] = &millis;
+  lua["moment"] = &moment;
 
   lua["openurl"] = [](std::string_view url) {
     #ifdef EMSCRIPTEN
@@ -551,9 +551,15 @@ void framework::scriptengine::run() {
     "run", &framework::engine::run
   );
 
+  lua.new_enum(
+    "FontEffect",
+    "fadein", graphics::fonteffect::type::fadein
+  );
+
   lua.new_usertype<graphics::font>(
     "Font",
-    sol::no_constructor
+    sol::no_constructor,
+    "effect", sol::property(&graphics::font::set_effect)
   );
 
   lua.new_usertype<framework::enginefactory>(
