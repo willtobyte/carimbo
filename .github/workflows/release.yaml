@@ -52,14 +52,6 @@ jobs:
       - name: Detect Conan profile
         run: conan profile detect --force
 
-      - name: Dedup download of tools
-        run: |
-          cat >> ~/.conan2/profiles/default <<EOF
-          [replace_tool_requires]
-          meson/*: meson/[*]
-          pkgconf/*: pkgconf/[*]
-          EOF
-
       - name: Install Conan configuration
         run: conan config install https://github.com/willtobyte/conan-configs.git --type git
 
