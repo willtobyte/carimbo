@@ -82,14 +82,14 @@ void font::draw(const std::string& text, const geometry::point& position) const 
 
   const auto height = _glyphs.begin()->second.size().height() * _scale;
 
-  for (size_t index = 0; index < text.size(); ++index) {
+  for (auto index = 0u; index < text.size(); ++index) {
     const auto ch = text[index];
     if (ch == '\n') {
       cursor = geometry::point(position.x(), cursor.y() + height + _leading);
       continue;
     }
 
-    const auto& glyph = _glyphs.at(static_cast<uint8_t>(c));
+    const auto& glyph = _glyphs.at(static_cast<uint8_t>(ch));
 
     auto size = glyph.size();
 
