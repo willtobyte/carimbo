@@ -3,9 +3,9 @@
 using namespace graphics;
 
 void fadeineffect::set(const std::string &text, geometry::point position) {
-  size_t new_len = text.size();
-  if (new_len != _last_length) {
-    _last_length = new_len;
+  const auto length = text.size();
+  if (length != _last_length) {
+    _last_length = length;
     _text = text;
     _position = position;
     _fade_time = 0.0f;
@@ -31,7 +31,7 @@ void fadeineffect::update(float_t delta) {
     _animating = false;
   }
 
-  float_t progress = _fade_time / _fade_duration;
+  const auto progress = _fade_time / _fade_duration;
   _alpha = static_cast<uint8_t>(progress * 255);
 }
 
