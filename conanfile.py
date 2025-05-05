@@ -13,7 +13,7 @@ class Carimbo(ConanFile):
     def requirements(self):
         self.requires("fmt/11.1.4")
         self.requires("libspng/0.7.4")
-        self.requires("nlohmann_json/3.11.3")
+        self.requires("nlohmann_json/3.12.0")
         self.requires("ogg/1.3.5")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
@@ -21,7 +21,7 @@ class Carimbo(ConanFile):
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 
-        self.requires("libalsa/1.2.12", override=True)
+        # self.requires("libalsa/1.2.12", override=True)
 
         if self._not_webassembly():
             self.requires("boost/1.87.0")
