@@ -21,7 +21,7 @@ class Carimbo(ConanFile):
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 
-        # self.requires("libalsa/1.2.12", override=True)
+        self.requires("libalsa/1.2.12", override=True)
 
         if self._not_webassembly():
             self.requires("boost/1.87.0")
