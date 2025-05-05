@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*"
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   release:
     runs-on: ${{ matrix.config.os }}
@@ -49,8 +53,17 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
-      - name: Detect Conan profile
-        run: conan profile detect --force
+      - name: Configure default Conan profile
+        run: |
+          conan profile detect --force
+
+          PROFILE="$HOME/.conan2/profiles/default"
+          {
+            echo ""
+            echo "[replace_tool_requires]"
+            echo "meson/*: meson/*"
+            echo "pkgconf/*: pkgconf/*"
+          } >> "$PROFILE"
 
       - name: Install Conan configuration
         run: conan config install https://github.com/willtobyte/conan-configs.git --type git

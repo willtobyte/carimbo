@@ -9,6 +9,10 @@ on:
     branches:
       - main
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ${{ matrix.config.os }}
@@ -51,7 +55,6 @@ jobs:
         run: pip install conan
 
       - name: Configure default Conan profile
-        shell: bash
         run: |
           conan profile detect --force
 
