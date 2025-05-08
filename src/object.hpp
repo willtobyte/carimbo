@@ -37,7 +37,7 @@ public:
   void set_velocity(const algebra::vector2d &velocity);
   algebra::vector2d velocity() const;
 
-  void set_placement(int32_t x, int32_t y);
+  void set_placement(float_t x, float_t y);
   geometry::point get_placement() const;
 
   void set_alpha(uint8_t alpha);

@@ -151,7 +151,7 @@ void object::hide() {
   unset_action();
 }
 
-void object::set_placement(int32_t x, int32_t y) {
+void object::set_placement(float_t x, float_t y) {
   _props.position.set(x, y);
 }
 
