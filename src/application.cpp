@@ -66,9 +66,9 @@ int32_t application::run() {
       []() {}
     );
 
-  class DebounceListener : public efsw::FileWatchListener {
+  class Listener : public efsw::FileWatchListener {
     public:
-      DebounceListener(rxcpp::subjects::subject<std::monostate>& subject)
+      Listener(rxcpp::subjects::subject<std::monostate>& subject)
         : _subject(subject) {}
 
       void handleFileAction(
@@ -85,7 +85,7 @@ int32_t application::run() {
       rxcpp::subjects::subject<std::monostate>& _subject;
   };
 
-  DebounceListener listener(events);
+  Listener listener(events);
 
   efsw::FileWatcher watcher;
 
