@@ -172,6 +172,7 @@ void eventmanager::update(float_t delta) {
         }
 
         (*fn)();
+
         return;
       }
 
@@ -182,6 +183,11 @@ void eventmanager::update(float_t delta) {
       }
 
       return;
+    }
+
+    case static_cast<uint32_t>(type::filesystem): {
+
+      return
     }
 
     default:

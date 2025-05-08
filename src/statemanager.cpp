@@ -43,7 +43,7 @@ constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard:
   case keyboard::key::right:
     return gamepad::button::right;
   case keyboard::key::space:
-    return gamepad::button::cross;
+    return gamepad::button::south;
   default:
     return std::nullopt;
   }

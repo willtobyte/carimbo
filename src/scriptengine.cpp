@@ -205,10 +205,10 @@ void framework::scriptengine::run() {
     "down", input::event::gamepad::button::down,
     "left", input::event::gamepad::button::left,
     "right", input::event::gamepad::button::right,
-    "triangle", input::event::gamepad::button::triangle,
-    "circle", input::event::gamepad::button::circle,
-    "cross", input::event::gamepad::button::cross,
-    "square", input::event::gamepad::button::square
+    "north", input::event::gamepad::button::north,
+    "east", input::event::gamepad::button::east,
+    "south", input::event::gamepad::button::south,
+    "west", input::event::gamepad::button::west
   );
 
   lua.new_enum(

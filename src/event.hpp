@@ -12,7 +12,8 @@ enum class player : uint8_t {
 enum class type : uint32_t {
   collision = SDL_EVENT_USER + 1,
   mail,
-  timer
+  timer,
+  filesystem
 };
 
 namespace keyboard {
@@ -56,10 +57,10 @@ enum class button : int32_t {
   down = SDL_GAMEPAD_BUTTON_DPAD_DOWN,
   left = SDL_GAMEPAD_BUTTON_DPAD_LEFT,
   right = SDL_GAMEPAD_BUTTON_DPAD_RIGHT,
-  triangle = SDL_GAMEPAD_BUTTON_NORTH,
-  circle = SDL_GAMEPAD_BUTTON_EAST,
-  cross = SDL_GAMEPAD_BUTTON_SOUTH,
-  square = SDL_GAMEPAD_BUTTON_WEST,
+  north = SDL_GAMEPAD_BUTTON_NORTH,
+  east = SDL_GAMEPAD_BUTTON_EAST,
+  south = SDL_GAMEPAD_BUTTON_SOUTH,
+  west = SDL_GAMEPAD_BUTTON_WEST,
 };
 
 struct motion {

@@ -28,6 +28,9 @@ class Carimbo(ConanFile):
             self.requires("luajit/2.1.0-beta3")
             self.requires("openssl/3.4.1")
 
+            self.requires("efsw/1.4.1")
+            self.requires("rxcpp/4.1.1")
+
     def configure(self):
         self.options["boost"].header_only = True
 

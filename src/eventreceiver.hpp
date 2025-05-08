@@ -20,5 +20,6 @@ public:
   virtual void on_gamepadmotion(uint8_t who, const event::gamepad::motion &event);
   virtual void on_mail(const event::mail &event);
   virtual void on_collision(const event::collision &event);
+  virtual void on_filesystem();
 };
 }

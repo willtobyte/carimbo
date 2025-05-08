@@ -50,6 +50,31 @@ application::application(int argc, char **argv) {
 
 int32_t application::run() {
 #if SANDBOX
+  rxcpp::subjects::subject<std::monostate> events;
+
+  auto subscription = events
+    .get_observable()
+    .debounce(std::chrono::seconds(3))
+    .observe_on(rxcpp::observe_on_new_thread())
+    .subscribe(
+      [](std::monostate) {
+        SDL_Event event{};
+        event.type = static_cast<uint32_t>(input::event::type::filesystem);
+        SDL_PushEvent(&event);
+      },
+      [](std::exception_ptr) {},
+      []() {}
+    );
+
+  DebounceListener listener(events);
+
+  efsw::FileWatcher watcher;
+
+  watcher.addWatch("../sandbox", &listener, true);
+
+  std::thread([&watcher](){ watcher.watch(); })
+    .detach();
+
   storage::filesystem::mount("../sandbox", "/");
 #else
   storage::filesystem::mount("bundle.7z", "/");

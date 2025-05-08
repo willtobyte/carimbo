@@ -47,3 +47,6 @@ void eventreceiver::on_mail(const mail &event) {
 void eventreceiver::on_collision(const collision &event) {
   UNUSED(event);
 }
+
+void eventreceiver::on_filesystem() {
+}

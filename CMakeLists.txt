@@ -17,6 +17,14 @@ file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+
+foreach(flag HITBOX LOCAL SANDBOX)
+  option(${flag} "Enable ${flag} flag" OFF)
+  if(${flag})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
+  endif()
+endforeach()
+
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
 find_package(fmt CONFIG REQUIRED)
@@ -39,14 +47,12 @@ else()
   find_package(OpenSSL CONFIG REQUIRED)
 
   add_compile_definitions(HAVE_BOOST)
-endif()
 
-foreach(flag HITBOX LOCAL SANDBOX)
-  option(${flag} "Enable ${flag} flag" OFF)
-  if(${flag})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
+  if(SANDBOX)
+    find_package(efsw CONFIG REQUIRED)
+    find_package(rxcpp CONFIG REQUIRED)
   endif()
-endforeach()
+endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
@@ -183,4 +189,11 @@ if(NOT EMSCRIPTEN)
     OpenAL::OpenAL
     openssl::openssl
   )
+
+  if(SANDBOX)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+      efsw::efsw
+      rxcpp::rxcpp
+    )
+  endif()
 endif()
