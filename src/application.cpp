@@ -52,7 +52,7 @@ int32_t application::run() {
 #if SANDBOX
   rxcpp::subjects::subject<std::monostate> events;
 
-  auto subscription = events
+  events
     .get_observable()
     .debounce(std::chrono::seconds(3))
     .observe_on(rxcpp::observe_on_new_thread())
@@ -65,6 +65,25 @@ int32_t application::run() {
       [](std::exception_ptr) {},
       []() {}
     );
+
+  class DebounceListener : public efsw::FileWatchListener {
+    public:
+      DebounceListener(rxcpp::subjects::subject<std::monostate>& subject)
+        : _subject(subject) {}
+
+      void handleFileAction(
+          efsw::WatchID,
+          const std::string&,
+          const std::string&,
+          efsw::Action,
+          std::string
+      ) override {
+        _subject.get_subscriber().on_next(std::monostate{});
+      }
+
+    private:
+      rxcpp::subjects::subject<std::monostate>& _subject;
+  };
 
   DebounceListener listener(events);
 
