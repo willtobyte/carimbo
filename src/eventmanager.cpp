@@ -187,7 +187,7 @@ void eventmanager::update(float_t delta) {
 
     case static_cast<uint32_t>(type::filesystem): {
 
-      return
+      return;
     }
 
     default:
