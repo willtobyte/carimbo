@@ -66,7 +66,7 @@ protected:
   virtual void on_quit() override;
 
 private:
-  bool _running{true};
+  std::atomic<bool> _running{true};
   std::shared_ptr<audio::audiodevice> _audiodevice;
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<input::eventmanager> _eventmanager;
