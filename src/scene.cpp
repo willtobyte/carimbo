@@ -1,5 +1,4 @@
 #include "scene.hpp"
-#include "soundfx.hpp"
 
 using namespace framework;
 
@@ -22,6 +21,11 @@ scene::~scene() {
 
   for (const auto &[_, o] : objects) {
     _objectmanager->destroy(o);
+  }
+
+  const auto effects = std::exchange(_effects, {});
+  for (const auto &[_, e] : effects) {
+    e->stop();
   }
 
   _background.reset();
@@ -64,6 +68,10 @@ void scene::on_leave() {
   if (const auto fn = _onleave) fn();
   for (const auto& [_, o] : _objects) {
     _objectmanager->unmanage(o);
+  }
+
+  for (const auto &[_, e] : _effects) {
+    e->stop();
   }
 }
 
