@@ -91,7 +91,6 @@ void eventmanager::update(float_t delta) {
         }
 
         if (auto controller = SDL_OpenGamepad(event.cdevice.which)) {
-          fmt::println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> SDL_EVENT_GAMEPAD_ADDED");
           const auto joystick = SDL_GetGamepadJoystick(controller);
           const auto id = SDL_GetJoystickID(joystick);
           _controllers[id] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
