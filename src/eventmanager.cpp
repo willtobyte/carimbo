@@ -6,7 +6,7 @@ using namespace event;
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   : _renderer(std::move(renderer)) {
   int32_t number;
-  SDL_JoystickID* joysticks = SDL_GetGamepads(&number);
+  std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
   if (!joysticks) {
     return;
   }
@@ -24,8 +24,6 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
       );
     }
   }
-
-  SDL_free(joysticks);
 }
 
 void eventmanager::update(float_t delta) {
