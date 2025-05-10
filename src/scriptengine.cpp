@@ -871,10 +871,5 @@ void framework::scriptengine::run() {
   const auto loop = lua["loop"].get<sol::protected_function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
-  sol::protected_function run = lua["run"];
-  sol::protected_function_result rr = run();
-  if (!rr.valid()) [[unlikely]] {
-    sol::error err = rr;
-    throw std::runtime_error(err.what());
-  }
+  engine->run();
 }
