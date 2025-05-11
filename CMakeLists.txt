@@ -58,6 +58,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
 if(EMSCRIPTEN)
   set(EMSDK_COMPILE_DEBUG_FLAGS
+    -s
     -O0
     -g3
     -gsource-map
@@ -71,7 +72,6 @@ if(EMSCRIPTEN)
   )
 
   set(EMSDK_COMPILE_RELEASE_FLAGS
-    -s
     -Oz
     -g0
     -flto
