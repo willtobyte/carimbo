@@ -857,8 +857,8 @@ void framework::scriptengine::run() {
   }
 
   const auto start = SDL_GetPerformanceCounter();
-  sol::protected_function setup = lua["setup"];
-  sol::protected_function_result sr = setup();
+  const auto setup = lua["setup"].get<sol::protected_function>();
+  const auto sr = setup();
   if (!sr.valid()) [[unlikely]] {
     sol::error err = sr;
     throw std::runtime_error(err.what());
