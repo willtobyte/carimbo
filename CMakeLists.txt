@@ -71,6 +71,7 @@ if(EMSCRIPTEN)
   )
 
   set(EMSDK_COMPILE_RELEASE_FLAGS
+    -s
     -Oz
     -g0
     -flto
