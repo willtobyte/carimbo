@@ -42,7 +42,7 @@ void resourcemanager::flush() {
 
 void resourcemanager::prefetch() {
   const auto directory = "blobs";
-  const auto filenames = storage::io::list(directory);
+  const auto filenames = storage::io::enumerate(directory);
   std::vector<std::string> f;
   f.reserve(filenames.size());
   for (const auto &filename : filenames) {

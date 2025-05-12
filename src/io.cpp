@@ -24,7 +24,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   return buffer;
 }
 
-std::vector<std::string> io::list(std::string_view directory) {
+std::vector<std::string> io::enumerate(std::string_view directory) {
   auto deleter = [](char **list) { PHYSFS_freeList(list); };
   std::unique_ptr<char *[], decltype(deleter)> ptr(PHYSFS_enumerateFiles(directory.data()), deleter);
 
