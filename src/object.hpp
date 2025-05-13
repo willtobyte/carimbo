@@ -38,7 +38,7 @@ public:
   algebra::vector2d velocity() const;
 
   void set_placement(float_t x, float_t y);
-  geometry::point get_placement() const;
+  geometry::point placement() const;
 
   void set_alpha(uint8_t alpha);
   uint8_t alpha() const;
@@ -58,6 +58,7 @@ public:
   void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn);
 
   void set_reflection(graphics::reflection reflection);
+  graphics::reflection reflection() const;
 
   void set_action(const std::string &action);
   void unset_action();

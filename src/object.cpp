@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "reflection.hpp"
 
 using namespace framework;
 
@@ -155,7 +156,7 @@ void object::set_placement(float_t x, float_t y) {
   _props.position.set(x, y);
 }
 
-geometry::point object::get_placement() const {
+geometry::point object::placement() const {
   return _props.position;
 }
 
@@ -213,6 +214,10 @@ void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object
 
 void object::set_reflection(graphics::reflection reflection) {
   _props.reflection = reflection;
+}
+
+graphics::reflection object::reflection() const {
+  return _props.reflection;
 }
 
 void object::set_action(const std::string &action) {

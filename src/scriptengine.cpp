@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include "reflection.hpp"
 
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
@@ -228,87 +229,6 @@ void framework::scriptengine::run() {
     "both", graphics::reflection::both
   );
 
-  struct reflectionproxy {
-    object &e;
-
-    void set(graphics::reflection value) { e.set_reflection(value); }
-
-    void unset() { e.set_reflection(graphics::reflection::none); }
-  };
-
-  lua.new_usertype<reflectionproxy>(
-    "ReflectionProxy",
-    sol::no_constructor,
-    "set", &reflectionproxy::set,
-    "unset", &reflectionproxy::unset
-  );
-
-  struct actionproxy {
-    object &e;
-
-    void set(const std::string &value) { e.set_action(value); }
-
-    std::string get() const { return e.action(); }
-
-    void unset() { e.unset_action(); }
-  };
-
-  lua.new_usertype<actionproxy>(
-    "ActionProxy",
-    sol::no_constructor,
-    "set", &actionproxy::set,
-    "get", &actionproxy::get,
-    "unset", &actionproxy::unset
-  );
-
-  struct placementproxy {
-    object &e;
-
-    void set(int32_t x, int32_t y) { e.set_placement(x, y); }
-
-    geometry::point get() const { return e.get_placement(); }
-  };
-
-  lua.new_usertype<placementproxy>(
-    "PlacementProxy",
-    sol::no_constructor,
-    "set", &placementproxy::set,
-    "get", &placementproxy::get
-  );
-
-  struct velocityproxy {
-    object &e;
-
-    void set(float_t x, float_t y) { e.set_velocity({x, y}); }
-
-    algebra::vector2d get() { return e.velocity(); }
-
-    double_t get_x() const { return e.velocity().x(); }
-
-    void set_x(float_t x) {
-      auto velocity = e.velocity();
-      velocity.set_x(x);
-      e.set_velocity(velocity);
-    }
-
-    double_t get_y() const { return e.velocity().y(); }
-
-    void set_y(float_t y) {
-      auto velocity = e.velocity();
-      velocity.set_y(y);
-      e.set_velocity(velocity);
-    }
-  };
-
-  lua.new_usertype<velocityproxy>(
-    "VelocityProxy",
-    sol::no_constructor,
-    "set", &velocityproxy::set,
-    "get", &velocityproxy::get,
-    "x", sol::property(&velocityproxy::get_x, &velocityproxy::set_x),
-    "y", sol::property(&velocityproxy::get_y, &velocityproxy::set_y)
-  );
-
   lua.new_usertype<memory::kv>(
     "KeyValue",
     sol::no_constructor,
@@ -336,11 +256,60 @@ void framework::scriptengine::run() {
     "on_unhover", &framework::object::set_onunhover,
     "on_collision", &framework::object::set_oncollision,
     "on_nthtick", &framework::object::set_onnthtick,
-    "reflection", sol::property([](framework::object &e) -> reflectionproxy { return reflectionproxy{e}; }),
-    "action", sol::property([](framework::object &e) -> actionproxy { return actionproxy{e}; }),
-    "placement", sol::property([](framework::object &e) -> placementproxy { return placementproxy{e}; }),
-    "velocity", sol::property([](framework::object &e) -> velocityproxy { return velocityproxy{e}; }),
-    "kv", sol::property([](framework::object &e) -> memory::kv & { return e.kv(); })
+    "reflection", sol::property(
+      [](framework::object &o) {
+        return o.reflection();
+      },
+      [](framework::object &o, graphics::reflection r) {
+        o.set_reflection(r);
+      }
+    ),
+    "action", sol::property(
+      [](framework::object &o) {
+        return o.action();
+      },
+      [](framework::object &o, std::optional<std::string> v) {
+        if (v.has_value()) {
+          o.set_action(*v);
+          return;
+        }
+
+        o.unset_action();
+      }
+    ),
+    "placement", sol::property(
+      [](framework::object &o) {
+        return o.placement();
+      },
+      [](framework::object &o, sol::table table) {
+        const auto x = table[1].get<float_t>();
+        const auto y = table[2].get<float_t>();
+        o.set_placement(x, y);
+      }
+    ),
+    "velocity", sol::property(
+      [](framework::object &o) {
+        return o.velocity();
+      },
+      [](framework::object &o, const sol::object &v) {
+        if (v.is<algebra::vector2d>()) {
+          o.set_velocity(v.as<algebra::vector2d>());
+          return;
+        }
+
+        if (v.is<sol::table>()) {
+          sol::table table = v.as<sol::table>();
+
+          auto x = table.get_or<float_t>("x", table.get_or(1, 0.0));
+          auto y = table.get_or<float_t>("y", table.get_or(2, 0.0));
+          o.set_velocity(algebra::vector2d{x, y});
+          return;
+        }
+
+        throw std::runtime_error("Invalid type for velocity. Must be Vector2D or table with x and y.");
+      }
+    ),
+    "kv", sol::property([](framework::object &o) -> memory::kv & { return o.kv(); })
   );
 
   lua.new_usertype<framework::objectmanager>(

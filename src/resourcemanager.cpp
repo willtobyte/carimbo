@@ -2,10 +2,12 @@
 
 using namespace framework;
 
-static const std::map<std::string, std::function<void(const std::string &,
-                                                      graphics::pixmappool &,
-                                                      audio::soundmanager &,
-                                                      graphics::fontfactory &)>> handlers = {
+static const std::map<std::string, std::function<void(
+  const std::string &,
+  graphics::pixmappool &,
+  audio::soundmanager &,
+  graphics::fontfactory &)>>
+handlers = {
     {".png", [](const std::string &filename,
                 graphics::pixmappool &pixmap,
                 audio::soundmanager &,
