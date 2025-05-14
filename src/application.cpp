@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-[[noreturn]] void fail() {
+void fail() {
   const char* error = nullptr;
 
   if (const auto ptr = std::current_exception()) {
@@ -34,7 +34,7 @@ using namespace framework;
     }
   }
 
-  std::exit(EXIT_FAILURE);
+  // std::exit(EXIT_FAILURE);
 }
 
 application::application(int argc, char **argv) {
