@@ -40,6 +40,8 @@
   #include <rxcpp/rx.hpp>
 #endif
 
+#define SDL_MAIN_HANDLED 1
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
