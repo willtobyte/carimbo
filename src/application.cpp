@@ -30,7 +30,7 @@ using namespace framework;
       fmt::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
 
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
+      // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
     }
   }
 
