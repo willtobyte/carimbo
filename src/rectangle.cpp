@@ -25,8 +25,8 @@ size rectangle::size() const {
 }
 
 void rectangle::scale(float_t factor) {
-  _size.set_width(static_cast<int>(_size.width() * factor));
-  _size.set_height(static_cast<int>(_size.height() * factor));
+  _size.set_width(_size.width() * factor);
+  _size.set_height(_size.height() * factor);
 }
 
 bool rectangle::intersects(const rectangle &other) const {
