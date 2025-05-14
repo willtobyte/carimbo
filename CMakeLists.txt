@@ -54,11 +54,6 @@ else()
   find_package(OpenSSL CONFIG REQUIRED)
 
   add_compile_definitions(HAVE_BOOST)
-
-  if(SANDBOX)
-    find_package(efsw CONFIG REQUIRED)
-    find_package(rxcpp CONFIG REQUIRED)
-  endif()
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
@@ -197,11 +192,4 @@ if(NOT EMSCRIPTEN)
     OpenAL::OpenAL
     openssl::openssl
   )
-
-  if(SANDBOX)
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-      efsw::efsw
-      rxcpp::rxcpp
-    )
-  endif()
 endif()

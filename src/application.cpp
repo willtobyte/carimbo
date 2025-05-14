@@ -2,46 +2,9 @@
 
 using namespace framework;
 
-void fail() {
-  const char* error = nullptr;
-
-  if (const auto ptr = std::current_exception()) {
-    try {
-      std::rethrow_exception(ptr);
-    } catch (const std::bad_exception&) {
-    } catch (const std::exception &e) {
-      error = e.what();
-    } catch (...) {
-      error = "Unhandled unknown exception";
-    }
-
-    if (error) {
-      #ifdef DEBUG
-        #if defined(_MSC_VER)
-          __debugbreak();
-        #else
-          raise(SIGTRAP);
-        #endif
-      #endif
-
-      fmt::println(stderr, "{}", error);
-      #ifdef HAVE_BOOST
-      boost::stacktrace::stacktrace st;
-      fmt::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
-      #endif
-
-      // SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
-    }
-  }
-
-  // std::exit(EXIT_FAILURE);
-}
-
 application::application(int argc, char **argv) {
   UNUSED(argc);
   UNUSED(argv);
-
-  std::set_terminate(fail);
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
@@ -50,57 +13,22 @@ application::application(int argc, char **argv) {
 
 int32_t application::run() {
 #if SANDBOX
-  rxcpp::subjects::subject<std::monostate> events;
-
-  events
-    .get_observable()
-    .debounce(std::chrono::seconds(3))
-    .observe_on(rxcpp::observe_on_new_thread())
-    .subscribe(
-      [](std::monostate) {
-        SDL_Event event{};
-        event.type = static_cast<uint32_t>(input::event::type::filesystem);
-        SDL_PushEvent(&event);
-      },
-      [](std::exception_ptr) {},
-      []() {}
-    );
-
-  class Listener : public efsw::FileWatchListener {
-    public:
-      Listener(rxcpp::subjects::subject<std::monostate>& subject)
-        : _subject(subject) {}
-
-      void handleFileAction(
-          efsw::WatchID,
-          const std::string&,
-          const std::string&,
-          efsw::Action,
-          std::string
-      ) override {
-        _subject.get_subscriber().on_next(std::monostate{});
-      }
-
-    private:
-      rxcpp::subjects::subject<std::monostate>& _subject;
-  };
-
-  Listener listener(events);
-
-  efsw::FileWatcher watcher;
-
-  watcher.addWatch("../sandbox", &listener, true);
-
-  std::thread([&watcher](){ watcher.watch(); })
-    .detach();
-
   storage::filesystem::mount("../sandbox", "/");
 #else
   storage::filesystem::mount("bundle.7z", "/");
 #endif
 
-  auto se = scriptengine();
-  se.run();
+  try {
+    auto se = scriptengine();
+    se.run();
+  } catch (const std::exception &e) {
+    const auto error = e.what();
+
+    fmt::println(stderr, "{}", error);
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
+
+    return -1;
+  }
 
   return 0;
 }
