@@ -38,8 +38,8 @@ bool rectangle::intersects(const rectangle &other) const {
   return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
 }
 
-bool rectangle::contains(const point &pt) const {
-  const auto [x, y] = std::pair{ pt.x(), pt.y() };
+bool rectangle::contains(const point &point) const {
+  const auto [x, y] = std::pair{ point.x(), point.y() };
   const auto [left, top] = std::pair{ _position.x(), _position.y() };
   const auto [right, bottom] = std::pair{ left + _size.width(), top + _size.height() };
 
