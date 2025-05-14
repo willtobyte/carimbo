@@ -40,8 +40,8 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
         data.contains("action") && data["action"].is_string()
           ? std::optional<std::string>{data["action"].template get_ref<const std::string&>()}
           : std::nullopt;
-      const auto x = data.value("x", 0);
-      const auto y = data.value("y", 0);
+      const auto x = data.value("x", .0f);
+      const auto y = data.value("y", .0f);
 
       auto e = _objectmanager->create(name, kind, false);
       e->set_placement(x, y);
