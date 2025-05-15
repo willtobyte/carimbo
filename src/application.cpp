@@ -2,10 +2,15 @@
 
 using namespace framework;
 
-[[noreturn]] void fail() {
-  const char* error = nullptr;
+void cleanup() noexcept {
+  PHYSFS_deinit();
+  SDL_Quit();
+}
 
+[[noreturn]] void fail() {
   if (const auto ptr = std::current_exception()) {
+    const char* error = nullptr;
+
     try {
       std::rethrow_exception(ptr);
     } catch (const std::bad_exception&) {
@@ -34,7 +39,8 @@ using namespace framework;
     }
   }
 
-  std::abort();
+  cleanup();
+  std::exit(EXIT_FAILURE);
 }
 
 application::application(int argc, char **argv) {
@@ -62,6 +68,5 @@ int32_t application::run() {
 }
 
 application::~application() {
-  PHYSFS_deinit();
-  SDL_Quit();
+  cleanup();
 }
