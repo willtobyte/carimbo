@@ -34,7 +34,7 @@ using namespace framework;
     }
   }
 
-  std::exit(EXIT_FAILURE);
+  std::abort();
 }
 
 application::application(int argc, char **argv) {
