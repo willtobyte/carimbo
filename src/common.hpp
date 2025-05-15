@@ -50,6 +50,7 @@
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <csignal>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>

@@ -2,11 +2,6 @@
 
 using namespace framework;
 
-void cleanup() noexcept {
-  PHYSFS_deinit();
-  SDL_Quit();
-}
-
 [[noreturn]] void fail() {
   if (const auto ptr = std::current_exception()) {
     const char* error = nullptr;
@@ -39,7 +34,6 @@ void cleanup() noexcept {
     }
   }
 
-  cleanup();
   std::exit(EXIT_FAILURE);
 }
 
@@ -48,6 +42,16 @@ application::application(int argc, char **argv) {
   UNUSED(argv);
 
   std::set_terminate(fail);
+
+  constexpr auto handler = [](int) {
+    std::exit(EXIT_SUCCESS);
+  };
+
+  std::signal(SIGINT, handler);
+  std::signal(SIGTERM, handler);
+
+  std::atexit([] { PHYSFS_deinit(); });
+  std::atexit([] { SDL_Quit(); });
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
@@ -65,8 +69,4 @@ int32_t application::run() {
   se.run();
 
   return 0;
-}
-
-application::~application() {
-  cleanup();
 }
