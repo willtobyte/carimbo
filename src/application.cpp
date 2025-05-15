@@ -44,12 +44,12 @@ application::application(int argc, char **argv) {
 
   std::set_terminate(fail);
 
-  constexpr const auto handler = [](int) {
+  constexpr const auto fn = [](int) {
     std::exit(EXIT_SUCCESS);
   };
 
-  std::signal(SIGINT, handler);
-  std::signal(SIGTERM, handler);
+  std::signal(SIGINT, fn);
+  std::signal(SIGTERM, fn);
 
   std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });
