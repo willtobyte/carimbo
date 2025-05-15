@@ -35,11 +35,6 @@
   #include <boost/stacktrace.hpp>
 #endif
 
-#ifdef SANDBOX
-  #include <efsw/efsw.hpp>
-  #include <rxcpp/rx.hpp>
-#endif
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
