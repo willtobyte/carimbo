@@ -43,7 +43,7 @@ application::application(int argc, char **argv) {
 
   std::set_terminate(fail);
 
-  constexpr auto handler = [](int) {
+  constexpr const auto handler = [](int) {
     std::exit(EXIT_SUCCESS);
   };
 
