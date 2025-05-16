@@ -18,9 +18,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
     throw std::runtime_error(err.what());
   }
 
-  auto func = loader.get<sol::protected_function>();
-
-  return sol::make_object(lua, func);
+  return sol::make_object(lua, loader.get<sol::protected_function>());
 }
 
 class lua_loopable : public framework::loopable {
