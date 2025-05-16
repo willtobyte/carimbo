@@ -803,9 +803,11 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
     "Canvas",
     sol::no_constructor,
-    "pixels", sol::property([](graphics::canvas &) -> sol::object {
-      return sol::lua_nil;
-    }, [](graphics::canvas &canvas, sol::table table) {
+    "pixels", sol::property(
+      [](graphics::canvas &) -> sol::object {
+        return sol::lua_nil;
+      },
+      [](graphics::canvas &canvas, sol::table table) {
         const auto n = table.size();
         static std::vector<uint32_t> pixels(n);
         std::ranges::transform(
