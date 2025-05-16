@@ -753,7 +753,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<algebra::vector2d>(
     "Vector2D",
-    sol::constructors<algebra::vector2d(), algebra::vector2d(double_t, double_t)>(),
+    sol::constructors<algebra::vector2d(), algebra::vector2d(float_t, float_t)>(),
 
     "x", sol::property(&algebra::vector2d::x, &algebra::vector2d::set_x),
     "y", sol::property(&algebra::vector2d::y, &algebra::vector2d::set_y),
