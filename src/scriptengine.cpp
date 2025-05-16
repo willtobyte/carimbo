@@ -18,7 +18,8 @@ sol::object searcher(sol::this_state state, const std::string& module) {
     throw std::runtime_error(err.what());
   }
 
-  sol::protected_function func = loader;
+  auto func = sol::protected_function(loader);
+
   return sol::make_object(lua, func);
 }
 
