@@ -13,8 +13,8 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   float_t sx, sy;
   SDL_GetRenderScale(*renderer, &sx, &sy);
 
-  const auto width = lw / sx;
-  const auto height = lh / sy;
+  const auto width = static_cast<float_t>(lw) / sx;
+  const auto height = static_cast<float_t>(lh) / sy;
   _view = {.0f, .0f, width, height};
 }
 
