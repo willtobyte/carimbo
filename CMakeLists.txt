@@ -137,13 +137,6 @@ else()
       -Wfloat-equal
     )
 
-    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-      list(APPEND GENERIC_WARNINGS
-        -Wimplicit-int-conversion
-        -Wshorten-64-to-32
-      )
-    endif()
-
     set(DEBUG_FLAGS
       -O0
       -g
