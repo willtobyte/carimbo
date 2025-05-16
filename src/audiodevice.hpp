@@ -9,7 +9,7 @@ public:
   ~audiodevice() = default;
 
 private:
-  std::unique_ptr<ALCdevice, void (*)(ALCdevice *)> device;
-  std::unique_ptr<ALCcontext, void (*)(ALCcontext *)> context;
+  std::unique_ptr<ALCdevice, void (*)(ALCdevice *)> _device;
+  std::unique_ptr<ALCcontext, void (*)(ALCcontext *)> _context;
 };
 }
