@@ -11,7 +11,7 @@ void framerate::loop(float_t delta) {
   _start = now;
 
   if (_elapsed >= 1000) {
-    fmt::println("{:.1f}", static_cast<double>(_frames * _elapsed) * 0.001);;
+    fmt::println("{:.1f}", static_cast<double_t>(_frames * _elapsed) * 0.001);;
 
     _elapsed = 0;
     _frames = 0;
