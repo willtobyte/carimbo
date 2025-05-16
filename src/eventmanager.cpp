@@ -12,7 +12,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   }
 
   for (auto index = 0; index < number; ++index) {
-    const auto gamepad_id = joysticks[index];
+    const auto gamepad_id = joysticks[static_cast<size_t>(index)];
     if (!SDL_IsGamepad(gamepad_id)) {
       continue;
     }

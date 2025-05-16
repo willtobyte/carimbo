@@ -25,7 +25,8 @@ float_t size::height() const {
 }
 
 bool size::operator==(const size &rhs) const {
-  return _width == rhs._width && _height == rhs._height;
+  constexpr float_t epsilon = std::numeric_limits<float_t>::epsilon();
+  return std::abs(_width - rhs._width) < epsilon && std::abs(_height - rhs._height) < epsilon;
 }
 
 bool size::operator!=(const size &rhs) const {

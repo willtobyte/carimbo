@@ -98,6 +98,11 @@ void font::draw(const std::string& text, const geometry::point& position) const 
       scale = e->scale();
     }
 
+    double_t angle = .0L;
+    if (auto* e = _effect.get()) {
+      angle = e->angle();
+    }
+
     reflection reflection = reflection::none;
     if (auto* e = _effect.get()) {
       reflection = e->reflection();
@@ -110,8 +115,8 @@ void font::draw(const std::string& text, const geometry::point& position) const 
 
     _pixmap->draw(
       glyph,
-      {cursor, size * _scale},
-      scale,
+      {cursor, size * (_scale + scale)},
+      angle,
       reflection,
       alpha
     );

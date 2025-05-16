@@ -126,6 +126,19 @@ else()
       $<$<CONFIG:Release>:/LTCG>
     )
   else()
+    set(GENERIC_WARNINGS
+      -Wall
+      -Wextra
+      -Wpedantic
+      -Wconversion
+      -Wsign-conversion
+      -Wimplicit-int-conversion
+      -Wshorten-64-to-32
+      -Wnarrowing
+      -Wdouble-promotion
+      -Wfloat-equal
+    )
+
     set(DEBUG_FLAGS
       -O0
       -g
@@ -140,10 +153,8 @@ else()
       -funroll-loops
       -fomit-frame-pointer
       -DNDEBUG
-      -Wall
       -Werror
-      -Wextra
-      -Wpedantic
+      ${GENERIC_WARNINGS}
     )
 
     set(RELEASE_LINKER_FLAGS

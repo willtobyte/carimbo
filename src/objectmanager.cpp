@@ -157,7 +157,8 @@ void objectmanager::update(float_t delta) {
 
     o->update(delta);
 
-    if (o->x() != old) {
+    constexpr float_t epsilon = std::numeric_limits<float_t>::epsilon();
+    if (std::abs(o->x() - old) > epsilon) {
       _dirty = true;
     }
   }

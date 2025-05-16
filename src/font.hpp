@@ -24,6 +24,8 @@ class fonteffect {
 
     virtual float_t scale() { return 1.f; };
 
+    virtual double_t angle() { return .0L; };
+
     virtual enum reflection reflection() { return reflection::none; };
 
     virtual uint8_t alpha() { return 255; };

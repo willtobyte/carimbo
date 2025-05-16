@@ -74,7 +74,8 @@ vector2d &vector2d::operator/=(float_t scalar) {
 }
 
 bool vector2d::operator==(const vector2d &other) const {
-  return _x == other._x && _y == other._y;
+  constexpr float_t epsilon = std::numeric_limits<float_t>::epsilon();
+  return std::abs(_x - other._x) < epsilon && std::abs(_y - other._y) < epsilon;
 }
 
 bool vector2d::operator!=(const vector2d &other) const {
