@@ -833,7 +833,7 @@ void framework::scriptengine::run() {
     throw std::runtime_error(err.what());
   }
   const auto end = SDL_GetPerformanceCounter();
-  const auto elapsed = (end - start) * 1000.0 / SDL_GetPerformanceFrequency();
+  const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
   fmt::println("boot time {:.3f}ms", elapsed);
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
