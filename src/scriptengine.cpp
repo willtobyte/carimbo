@@ -548,7 +548,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<geometry::point>(
     "Point",
-    sol::constructors<geometry::point(), geometry::point(int32_t, int32_t)>(),
+    sol::constructors<geometry::point(), geometry::point(float_t, float_t)>(),
     "set", &geometry::point::set,
     "x", sol::property(&geometry::point::x, &geometry::point::set_x),
     "y", sol::property(&geometry::point::y, &geometry::point::set_y),
@@ -559,7 +559,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<geometry::size>(
     "Size",
-    sol::constructors<geometry::size(), geometry::size(int32_t, int32_t), geometry::size(const geometry::size &)>(),
+    sol::constructors<geometry::size(), geometry::size(float_t, float_t), geometry::size(const geometry::size &)>(),
     "width", sol::property(&geometry::size::width, &geometry::size::set_width),
     "height", sol::property(&geometry::size::height, &geometry::size::set_height)
   );
