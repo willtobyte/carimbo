@@ -12,13 +12,13 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   const auto buffer = storage::io::read(filename);
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
 
-  auto loader = lua.load(script, filename);
+  const auto loader = lua.load(script, filename);
   if (!loader.valid()) [[unlikely]] {
     sol::error err = loader;
     throw std::runtime_error(err.what());
   }
 
-  auto func = sol::protected_function(static_cast<sol::load_result&>(loader));
+  auto func = loader.get<sol::protected_function>();
 
   return sol::make_object(lua, func);
 }
