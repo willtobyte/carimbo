@@ -416,7 +416,7 @@ void framework::scriptengine::run() {
         return scene->get(object, type);
       };
 
-      if (sol::protected_function fn = module["on_enter"]; fn.valid()) {
+      if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
         auto safe_fn = [fn]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
@@ -428,7 +428,7 @@ void framework::scriptengine::run() {
         scene->set_onenter(std::move(safe_fn));
       }
 
-      if (sol::protected_function fn = module["on_loop"]; fn.valid()) {
+      if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
         auto safe_fn = [fn](float_t delta) mutable {
           sol::protected_function_result result = fn(delta);
           if (!result.valid()) [[unlikely]] {
@@ -440,7 +440,7 @@ void framework::scriptengine::run() {
         scene->set_onloop(std::move(safe_fn));
       }
 
-      if (sol::protected_function fn = module["on_leave"]; fn.valid()) {
+      if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
         auto safe_fn = [fn]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
@@ -452,7 +452,7 @@ void framework::scriptengine::run() {
         scene->set_onleave(std::move(safe_fn));
       }
 
-      if (sol::protected_function fn = module["on_touch"]; fn.valid()) {
+      if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
         auto safe_fn = [fn](float_t x, float_t y) mutable {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
@@ -464,7 +464,7 @@ void framework::scriptengine::run() {
         scene->set_ontouch(std::move(safe_fn));
       }
 
-      if (sol::protected_function fn = module["on_motion"]; fn.valid()) {
+      if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {
         auto safe_fn = [fn](float_t x, float_t y) mutable {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
