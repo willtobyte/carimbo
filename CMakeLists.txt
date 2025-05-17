@@ -18,6 +18,10 @@ file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
 
+if(WIN32)
+  set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})
