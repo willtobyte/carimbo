@@ -38,7 +38,6 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
 #include <ogg/ogg.h>
 #include <physfs.h>
 #include <sol/sol.hpp>
