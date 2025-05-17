@@ -4,6 +4,8 @@
   #define NOMINMAX
 #endif
 
+#define SDL_MAIN_HANDLED
+
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #ifndef EMSCRIPTEN
@@ -38,6 +40,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
 #include <ogg/ogg.h>
 #include <physfs.h>
 #include <sol/sol.hpp>
