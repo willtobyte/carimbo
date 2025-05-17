@@ -16,15 +16,9 @@ static std::string_view language() {
 }
 
 static nlohmann::json parse(std::string_view code) {
-  #ifdef SANDBOX
-    const auto &filename = fmt::format("locales/{}.json", code);
-    const auto &buffer = storage::io::read(filename);
-    return nlohmann::json::parse(buffer);
-  #else
-    const auto &filename = fmt::format("locales/{}.cbor", code);
-    const auto &buffer = storage::io::read(filename);
-    return nlohmann::json::from_cbor(buffer);
-  #endif
+  const auto &filename = fmt::format("locales/{}.json", code);
+  const auto &buffer = storage::io::read(filename);
+  return nlohmann::json::parse(buffer);
 }
 
 static const nlohmann::json& mapping() {

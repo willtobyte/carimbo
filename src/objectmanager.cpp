@@ -29,15 +29,9 @@ std::shared_ptr<object> objectmanager::create(const std::string &scope, const st
     return clone(*it);
   }
 
-  #ifdef SANDBOX
-    const auto &filename = fmt::format("objects/{}/{}.json", scope, kind);
-    const auto &buffer = storage::io::read(filename);
-    const auto &j = nlohmann::json::parse(buffer);
-  #else
-    const auto &filename = fmt::format("objects/{}/{}.cbor", scope, kind);
-    const auto &buffer = storage::io::read(filename);
-    const auto &j = nlohmann::json::from_cbor(buffer);
-  #endif
+  const auto &filename = fmt::format("objects/{}/{}.json", scope, kind);
+  const auto &buffer = storage::io::read(filename);
+  const auto &j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float_t{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}/{}.png", scope, kind));

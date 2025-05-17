@@ -7,15 +7,10 @@ using namespace input::event;
 cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
-  #ifdef SANDBOX
-    const auto &filename = fmt::format("cursors/{}.json", name);
-    const auto &buffer = storage::io::read(filename);
-    const auto &j = nlohmann::json::parse(buffer);
-  #else
-    const auto &filename = fmt::format("cursors/{}.cbor", name);
-    const auto &buffer = storage::io::read(filename);
-    const auto &j = nlohmann::json::from_cbor(buffer);
-  #endif
+
+  const auto &filename = fmt::format("cursors/{}.json", name);
+  const auto &buffer = storage::io::read(filename);
+  const auto &j = nlohmann::json::parse(buffer);
 
   _point = j["point"].get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/overlay/{}.png", name));

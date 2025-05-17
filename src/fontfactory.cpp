@@ -10,13 +10,7 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
   std::filesystem::path p{family};
 
-  #ifdef SANDBOX
-    constexpr const char* extension = "json";
-  #else
-    constexpr const char* extension = "cbor";
-  #endif
-
-  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.{}", family, extension);
+  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.json", family);
 
   if (auto it = _pool.find(filename); it != _pool.end()) {
     return it->second;
@@ -25,12 +19,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   fmt::println("[fontfactory] cache miss {}", filename);
 
   const auto &buffer = storage::io::read(filename);
-
-  #ifdef SANDBOX
-    const auto &j = nlohmann::json::parse(buffer);
-  #else
-    const auto &j = nlohmann::json::from_cbor(buffer);
-  #endif
+  const auto &j = nlohmann::json::parse(buffer);
 
   const auto &glyphs  = j["glyphs"].get_ref<const std::string &>();
   const auto spacing = j.value("spacing", int16_t{0});

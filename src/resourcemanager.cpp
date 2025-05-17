@@ -20,11 +20,7 @@ handlers = {
                 graphics::fontfactory &) {
        sound.get(filename);
     }},
-    #ifdef SANDBOX
       {".json", [](const std::string &filename,
-    #else
-      {".json", [](const std::string &filename,
-    #endif
                  graphics::pixmappool &,
                  audio::soundmanager &,
                  graphics::fontfactory &font) {
