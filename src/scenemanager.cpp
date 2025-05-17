@@ -8,9 +8,15 @@ scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcem
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string &name) {
-  const auto &filename = fmt::format("scenes/{}.json", name);
-  const auto &buffer = storage::io::read(filename);
-  const auto &j = nlohmann::json::parse(buffer);
+  #ifdef SANDBOX
+    const auto &filename = fmt::format("scenes/{}.json", name);
+    const auto &buffer = storage::io::read(filename);
+    const auto &j = nlohmann::json::parse(buffer);
+  #else
+    const auto &filename = fmt::format("scenes/{}.cbor", name);
+    const auto &buffer = storage::io::read(filename);
+    const auto &j = nlohmann::json::from_cbor(buffer);
+  #endif
 
   const auto pixmappool = _resourcemanager->pixmappool();
   const auto background = pixmappool->get(fmt::format("blobs/{}/background.png", name));

@@ -1,6 +1,12 @@
 #include "scriptengine.hpp"
 #include "reflection.hpp"
 
+#ifdef SANDBOX
+constexpr const char* extension = "lua";
+#else
+constexpr const char* extension = "luac";
+#endif
+
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
 }
@@ -8,7 +14,7 @@
 sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
-  const auto filename = fmt::format("scripts/{}.lua", module);
+  const auto filename = fmt::format("scripts/{}.{}", module, extension);
   const auto buffer = storage::io::read(filename);
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
 
@@ -401,7 +407,7 @@ void framework::scriptengine::run() {
     "register", [&lua](framework::scenemanager &manager, const std::string &name) {
       const auto scene = manager.load(name);
 
-      const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
+      const auto buffer = storage::io::read(fmt::format("scenes/{}.{}", name, extension));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
       auto result = lua.safe_script(script, &sol::script_pass_on_error);
       if (!result.valid()) [[unlikely]] {
@@ -822,7 +828,7 @@ void framework::scriptengine::run() {
     )
   );
 
-  const auto buffer = storage::io::read("scripts/main.lua");
+  const auto buffer = storage::io::read(fmt::format("scripts/main.{}", extension));
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
   const auto scr = lua.safe_script(script, &sol::script_pass_on_error);
   if (!scr.valid()) [[unlikely]] {
