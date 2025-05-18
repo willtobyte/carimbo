@@ -21,6 +21,8 @@ jobs:
 
       matrix:
         config:
+          - name: Android
+            os: ubuntu-latest
           - name: macOS
             os: macos-latest
           - name: Ubuntu
@@ -68,7 +70,26 @@ jobs:
       - name: Install Conan configuration
         run: conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Detect WebAssembly Conan profile
+      - name: Set Android Conan profile
+        if: matrix.config.name == 'Android'
+        run: |
+          cat > ~/.conan2/profiles/android <<EOF
+          include(default)
+
+          [settings]
+          os=Android
+          os.api_level=30
+          arch=armv8
+          compiler.libcxx=c++_shared
+
+          [tool_requires]
+          android-ndk/[*]
+
+          [conf]
+          user.sdl:android=True
+          EOF
+
+      - name: Set WebAssembly Conan profile
         if: matrix.config.name == 'WebAssembly'
         run: |
           cat > ~/.conan2/profiles/webassembly <<EOF
@@ -89,6 +110,10 @@ jobs:
       - name: Install Ubuntu dependencies
         if: matrix.config.name == 'Ubuntu'
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+
+      - name: Install Android dependencies
+        if: matrix.config.name == 'Android'
+        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
 
       - name: Install WebAssembly dependencies
         if: matrix.config.name == 'WebAssembly'
