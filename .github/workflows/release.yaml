@@ -73,6 +73,8 @@ jobs:
       - name: Set Android Conan profile
         if: matrix.config.name == 'Android'
         run: |
+          sudo apt update
+          sudo apt install -y cmake
           cat > ~/.conan2/profiles/android <<EOF
           include(default)
 
