@@ -66,10 +66,10 @@ class Carimbo(ConanFile):
         tc = CMakeToolchain(self)
 
         if self._not_webassembly():
-            tc.preprocessor_definitions["HAVE_BOOST"] = "1"
+            tc.preprocessor_definitions["HAVE_BOOST"] = None
 
         if self._not_webassembly() and self._jit_capable():
-            tc.preprocessor_definitions["HAVE_LUAJIT"] = "1"
+            tc.preprocessor_definitions["HAVE_LUAJIT"] = None
 
         tc.generate()
         deps = CMakeDeps(self)

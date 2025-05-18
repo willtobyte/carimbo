@@ -38,13 +38,13 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
+#include <nlohmann/json.hpp>
 #include <ogg/ogg.h>
 #include <physfs.h>
 #include <sol/sol.hpp>
 #include <spng.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
-#include <nlohmann/json.hpp>
 
 #include <algorithm>
 #include <array>
@@ -52,13 +52,12 @@
 #include <chrono>
 #include <cmath>
 #include <cstdint>
-#include <cstdio>
+#include <csignal>
 #include <filesystem>
 #include <fstream>
 #include <functional>
 #include <iterator>
 #include <limits>
-#include <unordered_set>
 #include <list>
 #include <map>
 #include <memory>
@@ -73,6 +72,7 @@
 #include <thread>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <variant>
 #include <vector>
