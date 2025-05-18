@@ -114,7 +114,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
     double intpart;
     const double frac = std::modf(number, &intpart);
     return std::abs(frac) < std::numeric_limits<double>::epsilon()
-        ? static_cast<int64_t>(intpart)
+        ? static_cast<double>(static_cast<int64_t>(intpart))
         : number;
   }
 

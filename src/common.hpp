@@ -6,7 +6,7 @@
 
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
-#ifndef EMSCRIPTEN
+#ifdef HAVE_LUAJIT
   #define SOL_LUAJIT 1
 #endif
 
@@ -50,7 +50,6 @@
 #include <array>
 #include <atomic>
 #include <chrono>
-#include <csignal>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>

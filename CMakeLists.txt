@@ -25,6 +25,12 @@ foreach(flag HITBOX LOCAL SANDBOX)
   endif()
 endforeach()
 
+foreach(flag HAVE_BOOST HAVE_LUAJIT)
+  if(${flag})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
+  endif()
+endforeach()
+
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
 find_package(fmt CONFIG REQUIRED)
@@ -42,11 +48,12 @@ else()
   set(EMSCRIPTEN FALSE)
 
   find_package(Boost CONFIG REQUIRED)
-  find_package(luajit CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
 
-  add_compile_definitions(HAVE_BOOST)
+  if(HAVE_LUAJIT)
+    find_package(luajit CONFIG REQUIRED)
+  endif()
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
@@ -190,8 +197,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 if(NOT EMSCRIPTEN)
   target_link_libraries(${PROJECT_NAME} PRIVATE
     Boost::boost
-    luajit::luajit
     OpenAL::OpenAL
     openssl::openssl
   )
+
+  if(HAVE_LUAJIT)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+      luajit::luajit
+    )
+  endif()
 endif()

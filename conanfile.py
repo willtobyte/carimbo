@@ -10,6 +10,9 @@ class Carimbo(ConanFile):
     def _not_webassembly(self):
         return str(self.settings.os).lower() not in {"emscripten"}
 
+    def _jit_capable(self):
+        return str(self.settings.os).lower() in {"windows", "macos", "linux"}
+
     def requirements(self):
         self.requires("fmt/11.1.4")
         self.requires("libspng/0.7.4")
@@ -23,8 +26,10 @@ class Carimbo(ConanFile):
 
         if self._not_webassembly():
             self.requires("boost/1.87.0")
-            self.requires("luajit/2.1.0-beta3")
             self.requires("openssl/3.4.1")
+
+            if self._jit_capable():
+              self.requires("luajit/2.1.0-beta3")
 
     def configure(self):
         self.options["boost"].header_only = True
@@ -40,7 +45,7 @@ class Carimbo(ConanFile):
         self.options["physfs"].iso9660 = False
         self.options["physfs"].vdf = False
 
-        if self._not_webassembly():
+        if self._not_webassembly() and self._jit_capable():
             self.options["sol2"].with_lua = "luajit"
 
     def generate(self):
@@ -59,6 +64,13 @@ class Carimbo(ConanFile):
                         out.write(f"{package_id}\n{text}\n\n")
 
         tc = CMakeToolchain(self)
+
+        if self._not_webassembly():
+            tc.preprocessor_definitions["HAVE_BOOST"] = "1"
+
+        if self._not_webassembly() and self._jit_capable():
+            tc.preprocessor_definitions["HAVE_LUAJIT"] = "1"
+
         tc.generate()
         deps = CMakeDeps(self)
         deps.generate()

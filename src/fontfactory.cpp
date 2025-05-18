@@ -2,6 +2,100 @@
 
 using namespace graphics;
 
+glyphmap parse(const std::string& filename) {
+  const auto& buffer = storage::io::read(filename);
+  std::string_view file(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+
+  glyphmap map;
+  size_t start = 0;
+
+  while (start < file.size()) {
+    const size_t end = file.find('\n', start);
+    const std::string_view line = file.substr(start, (end == std::string_view::npos ? file.size() : end) - start);
+
+    if (line.starts_with("char ")) {
+      int32_t id = 0;
+      int32_t x = 0;
+      int32_t y = 0;
+      int32_t width = 0;
+      int32_t height = 0;
+      int32_t xoffset = 0;
+      int32_t yoffset = 0;
+      int32_t xadvance = 0;
+
+      size_t position = 5;
+      while (position < line.size()) {
+        while (position < line.size() && line[position] == ' ') {
+          ++position;
+        }
+
+        const size_t equals = line.find('=', position);
+        if (equals == std::string_view::npos) {
+          break;
+        }
+
+        const auto key = line.substr(position, equals - position);
+        position = equals + 1;
+
+        size_t endval = position;
+        while (endval < line.size() && line[endval] != ' ') {
+          ++endval;
+        }
+
+        const auto value = line.substr(position, endval - position);
+        position = endval;
+
+        int32_t v = 0;
+        std::from_chars(value.data(), value.data() + value.size(), v);
+
+        if (key == "id") {
+          id = v;
+        }
+        if (key == "x") {
+          x = v;
+        }
+        if (key == "y") {
+          y = v;
+        }
+        if (key == "width") {
+          width = v;
+        }
+        if (key == "height") {
+          height = v;
+        }
+        if (key == "xoffset") {
+          xoffset = v;
+        }
+        if (key == "yoffset") {
+          yoffset = v;
+        }
+        if (key == "xadvance") {
+          xadvance = v;
+        }
+      }
+
+      UNUSED(xoffset);
+      UNUSED(yoffset);
+      UNUSED(xadvance);
+
+      if (id >= 32 && id <= 126) {
+        map[static_cast<uint8_t>(id)] = {
+          { static_cast<float_t>(x), static_cast<float_t>(y) },
+          { static_cast<float_t>(width), static_cast<float_t>(height) },
+        };
+      }
+    }
+
+    if (end == std::string_view::npos) {
+      break;
+    }
+
+    start = end + 1;
+  }
+
+  return map;
+}
+
 fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool)
   : _renderer(std::move(renderer))
   , _pixmappool(std::move(pixmappool))
@@ -9,104 +103,129 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
   std::filesystem::path p{family};
-
-  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.json", family);
-
+  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.fnt", family);
   if (auto it = _pool.find(filename); it != _pool.end()) {
     return it->second;
   }
 
   fmt::println("[fontfactory] cache miss {}", filename);
 
-  const auto &buffer = storage::io::read(filename);
-  const auto &j = nlohmann::json::parse(buffer);
-
-  const auto &glyphs  = j["glyphs"].get_ref<const std::string &>();
-  const auto spacing = j.value("spacing", int16_t{0});
-  const auto leading = j.value("leading", int16_t{0});
-  const auto scale   = j.value("scale", float_t{1.0f});
+  const auto map = parse(filename);
 
   const auto pixmap = _pixmappool->get(fmt::format("blobs/overlay/{}.png", family));
-
-  float_t width, height;
-  if (!SDL_GetTextureSize(*pixmap, &width, &height)) {
-    throw std::runtime_error(fmt::format("[SDL_GetTextureSize] {}", SDL_GetError()));
-  }
-
-  std::unique_ptr<SDL_Texture, SDL_Deleter> target{
-    SDL_CreateTexture(
-      *_renderer,
-      SDL_PIXELFORMAT_ARGB8888,
-      SDL_TEXTUREACCESS_TARGET,
-      static_cast<int32_t>(width),
-      static_cast<int32_t>(height)
-    )
-  };
-  if (!target) {
-    throw std::runtime_error(fmt::format("[SDL_CreateTexture] {}", SDL_GetError()));
-  }
-
-  SDL_Texture *origin = SDL_GetRenderTarget(*_renderer);
-
-  SDL_SetRenderTarget(*_renderer, target.get());
-  SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
-  SDL_RenderClear(*_renderer);
-  SDL_RenderTexture(*_renderer, *pixmap, nullptr, nullptr);
-  SDL_RenderPresent(*_renderer);
-
-  std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
-  if (!surface) {
-    throw std::runtime_error(fmt::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
-  }
-
-  SDL_SetRenderTarget(*_renderer, origin);
-
-  auto *pixels = static_cast<uint32_t *>(surface->pixels);
-
-  const auto separator = color(pixels[0]);
-
-  glyphmap map;
-  auto [x, y, tw, th] = std::tuple{0, 0, int32_t(width), int32_t(height)};
-  for (char glyph : glyphs) {
-    while (x < tw && color(pixels[y * tw + x]) == separator) {
-      ++x;
-    }
-
-    if (x >= tw) [[unlikely]] {
-      throw std::runtime_error(fmt::format("missing glyph for '{}'", glyph));
-    }
-
-    int32_t w = 0;
-    while (x + w < tw
-           && color(pixels[y * tw + x + w]) != separator) {
-      ++w;
-    }
-
-    int32_t h = 0;
-    while (y + h < th
-           && color(pixels[(y + h) * tw + x]) != separator) {
-      ++h;
-    }
-
-    map[static_cast<uint8_t>(glyph)] = {
-      { static_cast<float_t>(x), static_cast<float_t>(y) },
-      { static_cast<float_t>(w), static_cast<float_t>(h) }
-    };
-
-    x += w;
-  }
 
   auto ptr = std::make_shared<font>(
     map,
     pixmap,
-    spacing,
-    leading,
-    scale
+    0.0f,
+    1.0f,
+    1.0f
   );
 
-  _pool.emplace(filename, ptr);
+  _pool.emplace(family, ptr);
 
   return ptr;
+
+
+  // std::filesystem::path p{family};
+
+  // const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.json", family);
+
+  // if (auto it = _pool.find(filename); it != _pool.end()) {
+  //   return it->second;
+  // }
+
+  // fmt::println("[fontfactory] cache miss {}", filename);
+
+  // const auto &buffer = storage::io::read(filename);
+  // const auto &j = nlohmann::json::parse(buffer);
+
+  // const auto &glyphs  = j["glyphs"].get_ref<const std::string &>();
+  // const auto spacing = j.value("spacing", int16_t{0});
+  // const auto leading = j.value("leading", int16_t{0});
+  // const auto scale   = j.value("scale", float_t{1.0f});
+
+  // const auto pixmap = _pixmappool->get(fmt::format("blobs/overlay/{}.png", family));
+
+  // float_t width, height;
+  // if (!SDL_GetTextureSize(*pixmap, &width, &height)) {
+  //   throw std::runtime_error(fmt::format("[SDL_GetTextureSize] {}", SDL_GetError()));
+  // }
+
+  // std::unique_ptr<SDL_Texture, SDL_Deleter> target{
+  //   SDL_CreateTexture(
+  //     *_renderer,
+  //     SDL_PIXELFORMAT_ARGB8888,
+  //     SDL_TEXTUREACCESS_TARGET,
+  //     static_cast<int32_t>(width),
+  //     static_cast<int32_t>(height)
+  //   )
+  // };
+  // if (!target) {
+  //   throw std::runtime_error(fmt::format("[SDL_CreateTexture] {}", SDL_GetError()));
+  // }
+
+  // SDL_Texture *origin = SDL_GetRenderTarget(*_renderer);
+
+  // SDL_SetRenderTarget(*_renderer, target.get());
+  // SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
+  // SDL_RenderClear(*_renderer);
+  // SDL_RenderTexture(*_renderer, *pixmap, nullptr, nullptr);
+  // SDL_RenderPresent(*_renderer);
+
+  // std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
+  // if (!surface) {
+  //   throw std::runtime_error(fmt::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
+  // }
+
+  // SDL_SetRenderTarget(*_renderer, origin);
+
+  // auto *pixels = static_cast<uint32_t *>(surface->pixels);
+
+  // const auto separator = color(pixels[0]);
+
+  // glyphmap map;
+  // auto [x, y, tw, th] = std::tuple{0, 0, int32_t(width), int32_t(height)};
+  // for (char glyph : glyphs) {
+  //   while (x < tw && color(pixels[y * tw + x]) == separator) {
+  //     ++x;
+  //   }
+
+  //   if (x >= tw) [[unlikely]] {
+  //     throw std::runtime_error(fmt::format("missing glyph for '{}'", glyph));
+  //   }
+
+  //   int32_t w = 0;
+  //   while (x + w < tw
+  //          && color(pixels[y * tw + x + w]) != separator) {
+  //     ++w;
+  //   }
+
+  //   int32_t h = 0;
+  //   while (y + h < th
+  //          && color(pixels[(y + h) * tw + x]) != separator) {
+  //     ++h;
+  //   }
+
+  //   map[static_cast<uint8_t>(glyph)] = {
+  //     { static_cast<float_t>(x), static_cast<float_t>(y) },
+  //     { static_cast<float_t>(w), static_cast<float_t>(h) }
+  //   };
+
+  //   x += w;
+  // }
+
+  // auto ptr = std::make_shared<font>(
+  //   map,
+  //   pixmap,
+  //   spacing,
+  //   leading,
+  //   scale
+  // );
+
+  // _pool.emplace(filename, ptr);
+
+  // return ptr;
 }
 
 void fontfactory::flush() {
