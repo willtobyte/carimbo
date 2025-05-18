@@ -78,7 +78,7 @@ jobs:
 
           [settings]
           os=Android
-          os.api_level=30
+          os.api_level=34
           arch=armv8
           compiler.libcxx=c++_shared
 
