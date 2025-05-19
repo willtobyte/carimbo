@@ -13,6 +13,9 @@ class Carimbo(ConanFile):
     def _jit_capable(self):
         return str(self.settings.os).lower() in {"windows", "macos", "linux"}
 
+    def _ios(self):
+        return str(self.settings.os).lower() in {"ios"}
+
     def requirements(self):
         self.requires("fmt/11.1.4")
         self.requires("libspng/0.7.4")
@@ -70,6 +73,9 @@ class Carimbo(ConanFile):
 
         if self._not_webassembly() and self._jit_capable():
             tc.preprocessor_definitions["HAVE_LUAJIT"] = None
+
+        if self._ios():
+            tc.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
 
         tc.generate()
         deps = CMakeDeps(self)

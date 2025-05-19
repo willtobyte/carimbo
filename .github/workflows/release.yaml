@@ -129,7 +129,7 @@ jobs:
         if: matrix.config.name == 'Android'
         run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
 
-      - name: Install Android dependencies
+      - name: Install iOS dependencies
         if: matrix.config.name == 'iOS'
         run: conan install . --output-folder=build --build=missing --profile=iOS --settings compiler.cppstd=20 --settings build_type=Release
 
