@@ -5,6 +5,10 @@ on:
     tags:
       - "v*.*.*"
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   android:
     runs-on: ubuntu-latest

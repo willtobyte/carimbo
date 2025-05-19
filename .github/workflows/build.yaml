@@ -8,8 +8,11 @@ on:
     branches:
       - main
 
-jobs:
+defaults:
+  run:
+    shell: bash
 
+jobs:
   android:
     runs-on: ubuntu-latest
     steps:
