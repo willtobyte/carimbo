@@ -13,7 +13,7 @@ defaults:
     shell: bash
 
 jobs:
-  android:
+  Android:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -60,7 +60,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  ios:
+  iOS:
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -96,7 +96,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  macos:
+  macOS:
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -116,7 +116,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  ubuntu:
+  Ubuntu:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -137,7 +137,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  webassembly:
+  WebAssembly:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -170,7 +170,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  windows:
+  Windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
