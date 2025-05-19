@@ -115,6 +115,7 @@ jobs:
       - name: Compress artifacts
         working-directory: build
         run: |
+          mkdir -p ../artifacts
           chmod -R a+rwx carimbo
           chmod -x LICENSES
           tar -cpzvf macOS.tar.gz carimbo LICENSES
@@ -144,6 +145,7 @@ jobs:
       - name: Compress artifacts
         working-directory: build
         run: |
+          mkdir -p ../artifacts
           chmod +x carimbo
           chmod -x LICENSES
           tar -czvf Ubuntu.tar.gz carimbo LICENSES
@@ -185,6 +187,7 @@ jobs:
       - name: Compress artifacts
         working-directory: build
         run: |
+          mkdir -p ../artifacts
           zip -jr WebAssembly.zip carimbo.wasm carimbo.js
           mv WebAssembly.zip ../artifacts
 
@@ -212,6 +215,7 @@ jobs:
         working-directory: build
         shell: powershell
         run: |
+          New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
   release:
