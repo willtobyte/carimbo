@@ -1,20 +1,22 @@
 from conan import ConanFile
-from conan.tools.cmake import CMakeDeps
-from conan.tools.cmake import CMakeToolchain
+from conan.tools.cmake import CMakeDeps, CMakeToolchain
 from pathlib import Path
 
 
 class Carimbo(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
-    def _webassembly(self):
-        return str(self.settings.os).lower() not in {"emscripten"}
+    def _os_name(self):
+        return str(self.settings.os).lower()
 
-    def _jit_capable(self):
-        return str(self.settings.os).lower() in {"windows", "macos", "linux"}
+    def _is_webassembly(self):
+        return self._os_name() == "emscripten"
 
-    def _ios(self):
-        return str(self.settings.os).lower() in {"ios"}
+    def _is_jit_capable(self):
+        return self._os_name() in {"windows", "macos", "linux"}
+
+    def _is_ios(self):
+        return self._os_name() == "ios"
 
     def requirements(self):
         self.requires("fmt/11.1.4")
@@ -27,56 +29,59 @@ class Carimbo(ConanFile):
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 
-        if self._not_webassembly():
-            self.requires("boost/1.87.0")
-            self.requires("openssl/3.4.1")
+        if self._is_webassembly():
+            return
 
-            if self._jit_capable():
-              self.requires("luajit/2.1.0-beta3")
+        self.requires("boost/1.87.0")
+        self.requires("openssl/3.4.1")
+
+        if self._is_jit_capable():
+            self.requires("luajit/2.1.0-beta3")
 
     def configure(self):
         self.options["boost"].header_only = True
 
-        self.options["physfs"].sevenzip = True
-        self.options["physfs"].zip = False
-        self.options["physfs"].grp = False
-        self.options["physfs"].wad = False
-        self.options["physfs"].hog = False
-        self.options["physfs"].mvl = False
-        self.options["physfs"].qpak = False
-        self.options["physfs"].slb = False
-        self.options["physfs"].iso9660 = False
-        self.options["physfs"].vdf = False
+        physfs = self.options["physfs"]
+        physfs.sevenzip = True
+        physfs.zip = False
+        physfs.grp = False
+        physfs.wad = False
+        physfs.hog = False
+        physfs.mvl = False
+        physfs.qpak = False
+        physfs.slb = False
+        physfs.iso9660 = False
+        physfs.vdf = False
 
-        if not self._webassembly() and self._jit_capable():
+        if not self._is_webassembly() and self._is_jit_capable():
             self.options["sol2"].with_lua = "luajit"
 
     def generate(self):
-        path = Path(self.build_folder) / "LICENSES"
-        with path.open("w", encoding="utf-8") as out:
-            for dependecy in self.dependencies.values():
-                if dependecy.is_build_context or dependecy.package_folder is None:
+        license_output = Path(self.build_folder) / "LICENSES"
+        with license_output.open("w", encoding="utf-8") as out:
+            for dep in self.dependencies.values():
+                if dep.is_build_context or not dep.package_folder:
                     continue
-                package_id = f"{dependecy.ref.name}/{dependecy.ref.version}"
-                for path in Path(dependecy.package_folder).rglob("*"):
-                    if not path.is_file():
+
+                package_id = f"{dep.ref.name}/{dep.ref.version}"
+                for file in Path(dep.package_folder).rglob("*"):
+                    if not file.is_file():
                         continue
-                    name = path.name.lower()
+
+                    name = file.name.lower()
                     if name.startswith(("license", "copying", "copyright")):
-                        text = path.read_text(encoding="utf-8", errors="ignore").strip()
+                        text = file.read_text(encoding="utf-8", errors="ignore").strip()
                         out.write(f"{package_id}\n{text}\n\n")
 
-        tc = CMakeToolchain(self)
+        toolchain = CMakeToolchain(self)
 
-        if not self._webassembly():
-            tc.preprocessor_definitions["HAVE_BOOST"] = None
+        if not self._is_webassembly():
+            toolchain.preprocessor_definitions["HAVE_BOOST"] = None
+            if self._is_jit_capable():
+                toolchain.preprocessor_definitions["HAVE_LUAJIT"] = None
 
-        if not self._webassembly() and self._jit_capable():
-            tc.preprocessor_definitions["HAVE_LUAJIT"] = None
+        if self._is_ios():
+            toolchain.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
 
-        if self._ios():
-            tc.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
-
-        tc.generate()
-        deps = CMakeDeps(self)
-        deps.generate()
+        toolchain.generate()
+        CMakeDeps(self).generate()
