@@ -1,23 +1,23 @@
 ## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
 <p align="center">
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Android&label=Android" alt="Android">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yml">
+    <img alt="Build - Android" src="https://github.com/willtobyte/carimbo/actions/workflows/build.yml/badge.svg?branch=main&event=push&job=android">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=iOS&label=iOS" alt="iOS">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yml">
+    <img alt="Build - iOS" src="https://github.com/willtobyte/carimbo/actions/workflows/build.yml/badge.svg?branch=main&event=push&job=ios">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=macOS&label=macOS" alt="macOS">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yml">
+    <img alt="Build - macOS" src="https://github.com/willtobyte/carimbo/actions/workflows/build.yml/badge.svg?branch=main&event=push&job=macos">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Ubuntu&label=Ubuntu" alt="Ubuntu">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yml">
+    <img alt="Build - Ubuntu" src="https://github.com/willtobyte/carimbo/actions/workflows/build.yml/badge.svg?branch=main&event=push&job=ubuntu">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Windows&label=Windows" alt="Windows">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yml">
+    <img alt="Build - WebAssembly" src="https://github.com/willtobyte/carimbo/actions/workflows/build.yml/badge.svg?branch=main&event=push&job=webassembly">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=WebAssembly&label=WebAssembly" alt="WebAssembly">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yml">
+    <img alt="Build - Windows" src="https://github.com/willtobyte/carimbo/actions/workflows/build.yml/badge.svg?branch=main&event=push&job=windows">
   </a>
 
   <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">

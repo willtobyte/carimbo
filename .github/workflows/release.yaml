@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
 
-      - name: Configure & Build
+      - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
@@ -87,7 +87,7 @@ jobs:
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=20 --settings build_type=Release
 
-      - name: Configure & Build
+      - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
