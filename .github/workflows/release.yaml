@@ -121,6 +121,12 @@ jobs:
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macOS
+          path: artifacts/*
+
   Ubuntu:
     runs-on: ubuntu-latest
     steps:
@@ -150,6 +156,12 @@ jobs:
           chmod -x LICENSES
           tar -czvf Ubuntu.tar.gz carimbo LICENSES
           mv Ubuntu.tar.gz ../artifacts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ubuntu
+          path: artifacts/*
 
   WebAssembly:
     runs-on: ubuntu-latest
@@ -191,6 +203,12 @@ jobs:
           zip -jr WebAssembly.zip carimbo.wasm carimbo.js
           mv WebAssembly.zip ../artifacts
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebAssembly
+          path: artifacts/*
+
   Windows:
     runs-on: windows-latest
     steps:
@@ -218,6 +236,12 @@ jobs:
           New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Windows
+          path: artifacts/*
+
   Release:
     if: always()
     needs:
@@ -231,6 +255,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
       - name: Upload release
         uses: softprops/action-gh-release@v2
         with:
