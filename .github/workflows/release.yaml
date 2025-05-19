@@ -10,7 +10,7 @@ defaults:
     shell: bash
 
 jobs:
-  android:
+  Android:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -57,7 +57,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  ios:
+  iOS:
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -92,7 +92,7 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel --config Release --verbose
 
-  macos:
+  macOS:
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -120,7 +120,7 @@ jobs:
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
-  ubuntu:
+  Ubuntu:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -149,7 +149,7 @@ jobs:
           tar -czvf Ubuntu.tar.gz carimbo LICENSES
           mv Ubuntu.tar.gz ../artifacts
 
-  webassembly:
+  WebAssembly:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -188,7 +188,7 @@ jobs:
           zip -jr WebAssembly.zip carimbo.wasm carimbo.js
           mv WebAssembly.zip ../artifacts
 
-  windows:
+  Windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
