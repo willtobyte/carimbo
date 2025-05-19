@@ -83,7 +83,7 @@ jobs:
           os.api_level=34
           arch=armv8
           # compiler.version=17
-          compiler.libcxx=c++_static
+          compiler.libcxx=libstdc++11
 
           [tool_requires]
           android-ndk/[*]
