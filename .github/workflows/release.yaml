@@ -1,23 +1,20 @@
-name: Release
+name: Build
 
 on:
   push:
-    tags:
-      - "v*.*.*"
-
-defaults:
-  run:
-    shell: bash
-
-permissions:
-  contents: write
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  setup:
+
+  android:
     runs-on: ubuntu-latest
-    outputs:
-      python-version: "3.13"
     steps:
+      - uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -26,25 +23,10 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
-      - name: Configure default Conan profile
+      - name: Configure Conan
         run: |
           conan profile detect --force
-          PROFILE="$HOME/.conan2/profiles/default"
-          {
-            echo ""
-            echo "[replace_tool_requires]"
-            echo "meson/*: meson/*"
-            echo "pkgconf/*: pkgconf/*"
-          } >> "$PROFILE"
-
-      - name: Install Conan configuration
-        run: conan config install https://github.com/willtobyte/conan-configs.git --type git
-
-  android:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Conan profile
         run: |
@@ -73,10 +55,17 @@ jobs:
           cmake --build build --parallel $(nproc) --config Release --verbose
 
   ios:
-    needs: setup
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          brew install python
+          python3 -m pip install --upgrade pip
+          pip3 install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Conan profile
         run: |
@@ -102,10 +91,17 @@ jobs:
           cmake --build build --parallel $(sysctl -n hw.logicalcpu) --config Release --verbose
 
   macos:
-    needs: setup
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          brew install python
+          python3 -m pip install --upgrade pip
+          pip3 install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
@@ -124,10 +120,16 @@ jobs:
           mv macOS.tar.gz ../artifacts
 
   ubuntu:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
@@ -146,10 +148,15 @@ jobs:
           mv Ubuntu.tar.gz ../artifacts
 
   webassembly:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Conan profile
         run: |
@@ -177,10 +184,17 @@ jobs:
           mv WebAssembly.zip ../artifacts
 
   windows:
-    needs: setup
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release

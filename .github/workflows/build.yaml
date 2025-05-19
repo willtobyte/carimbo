@@ -4,17 +4,17 @@ on:
   push:
     branches:
       - "*"
-
   pull_request:
     branches:
       - main
 
 jobs:
-  setup:
+
+  android:
     runs-on: ubuntu-latest
-    outputs:
-      python-version: "3.13"
     steps:
+      - uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -23,25 +23,10 @@ jobs:
       - name: Install Conan
         run: pip install conan
 
-      - name: Configure default Conan profile
+      - name: Configure Conan
         run: |
           conan profile detect --force
-          PROFILE="$HOME/.conan2/profiles/default"
-          {
-            echo ""
-            echo "[replace_tool_requires]"
-            echo "meson/*: meson/*"
-            echo "pkgconf/*: pkgconf/*"
-          } >> "$PROFILE"
-
-      - name: Install Conan configuration
-        run: conan config install https://github.com/willtobyte/conan-configs.git --type git
-
-  android:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Conan profile
         run: |
@@ -55,8 +40,10 @@ jobs:
           compiler.version=19
           compiler.libcxx=c++_static
           compiler.cppstd=20
+
           [tool_requires]
           android-ndk/[*]
+
           [conf]
           user.sdl:android=True
           EOF
@@ -70,15 +57,23 @@ jobs:
           cmake --build build --parallel $(nproc) --config Release --verbose
 
   ios:
-    needs: setup
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          brew install python
+          python3 -m pip install --upgrade pip
+          pip3 install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Conan profile
         run: |
           cat > ~/.conan2/profiles/ios <<EOF
           include(default)
+
           [settings]
           os=iOS
           os.version=16.0
@@ -99,10 +94,17 @@ jobs:
           cmake --build build --parallel $(sysctl -n hw.logicalcpu) --config Release --verbose
 
   macos:
-    needs: setup
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          brew install python
+          python3 -m pip install --upgrade pip
+          pip3 install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
@@ -112,19 +114,17 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(sysctl -n hw.logicalcpu) --config Release --verbose
 
-      - name: Compress artifacts
-        working-directory: build
-        run: |
-          chmod -R a+rwx carimbo
-          chmod -x LICENSES
-          tar -cpzvf macOS.tar.gz carimbo LICENSES
-          mv macOS.tar.gz ../artifacts
-
   ubuntu:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
@@ -134,19 +134,16 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(nproc) --config Release --verbose
 
-      - name: Compress artifacts
-        working-directory: build
-        run: |
-          chmod +x carimbo
-          chmod -x LICENSES
-          tar -czvf Ubuntu.tar.gz carimbo LICENSES
-          mv Ubuntu.tar.gz ../artifacts
-
   webassembly:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        run: |
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Conan profile
         run: |
@@ -167,17 +164,18 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $(nproc) --config Release --verbose
 
-      - name: Compress artifacts
-        working-directory: build
-        run: |
-          zip -jr WebAssembly.zip carimbo.wasm carimbo.js
-          mv WebAssembly.zip ../artifacts
-
   windows:
-    needs: setup
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Python & Conan
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
@@ -186,26 +184,3 @@ jobs:
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $Env:NUMBER_OF_PROCESSORS --config Release --verbose
-
-      - name: Compress artifacts
-        working-directory: build
-        shell: powershell
-        run: |
-          Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
-
-  release:
-    needs:
-      - android
-      - ios
-      - macos
-      - ubuntu
-      - webassembly
-      - windows
-    runs-on: ubuntu-latest
-    steps:
-      - name: Upload release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref_name }}
-          prerelease: false
-          files: artifacts/*
