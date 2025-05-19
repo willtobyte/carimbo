@@ -189,5 +189,5 @@ jobs:
         run: |
           ls -lah build
           ls -lah build/generators
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=build/generators/conan_toolchain.cmak -DCMAKE_BUILD_TYPE=Release
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmak -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel $Env:NUMBER_OF_PROCESSORS --config Release --verbose

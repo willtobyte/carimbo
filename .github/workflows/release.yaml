@@ -63,7 +63,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python & Conan
+      - name: Setup Conan
         run: |
           brew install conan
           conan profile detect --force
@@ -98,7 +98,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python & Conan
+      - name: Setup Conan
         run: |
           brew install conan
           conan profile detect --force
@@ -126,7 +126,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python & Conan
+      - name: Setup Conan
         run: |
           python3 -m pip install --upgrade pip
           pip install conan
@@ -155,7 +155,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python & Conan
+      - name: Setup Conan
         run: |
           pip install conan
           conan profile detect --force
@@ -192,7 +192,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python & Conan
+      - name: Setup Conan
         shell: powershell
         run: |
           python -m pip install --upgrade pip
@@ -227,7 +227,7 @@ jobs:
       contents: write
     steps:
       - name: Upload release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           prerelease: false
