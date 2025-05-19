@@ -269,4 +269,4 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           prerelease: false
-          files: artifacts/*
+          files: artifacts/**/*
