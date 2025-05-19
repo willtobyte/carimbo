@@ -9,46 +9,15 @@ defaults:
   run:
     shell: bash
 
+permissions:
+  contents: write
+
 jobs:
-  release:
-    runs-on: ${{ matrix.config.os }}
-
-    permissions:
-      contents: write
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        config:
-          - name: Android
-            os: ubuntu-latest
-          - name: iOS
-            os: macos-latest
-          - name: macOS
-            os: macos-latest
-          - name: Ubuntu
-            os: ubuntu-latest
-          - name: WebAssembly
-            os: ubuntu-latest
-          - name: Windows
-            os: windows-latest
-
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      python-version: "3.13"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Cache Conan
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.conan2
-            ${{ env.USERPROFILE }}\.conan2
-          key: conan-${{ matrix.config.name }}-${{ hashFiles('**/conanfile.py','**/conanfile.txt','**/conan.lock') }}
-          restore-keys: |
-            conan-${{ matrix.config.name }}-
-            conan-
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -60,7 +29,6 @@ jobs:
       - name: Configure default Conan profile
         run: |
           conan profile detect --force
-
           PROFILE="$HOME/.conan2/profiles/default"
           {
             echo ""
@@ -72,12 +40,16 @@ jobs:
       - name: Install Conan configuration
         run: conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Set Android Conan profile
-        if: matrix.config.name == 'Android'
+  android:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conan profile
         run: |
           cat > ~/.conan2/profiles/android <<EOF
           include(default)
-
           [settings]
           os=Android
           os.api_level=34
@@ -86,20 +58,30 @@ jobs:
           compiler.version=19
           compiler.libcxx=c++_static
           compiler.cppstd=20
-
           [tool_requires]
           android-ndk/[*]
-
           [conf]
           user.sdl:android=True
           EOF
 
-      - name: Set iOS Conan profile
-        if: matrix.config.name == 'iOS'
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
+
+      - name: Configure & Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc) --config Release --verbose
+
+  ios:
+    needs: setup
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conan profile
         run: |
           cat > ~/.conan2/profiles/ios <<EOF
           include(default)
-
           [settings]
           os=iOS
           os.version=16.0
@@ -111,65 +93,29 @@ jobs:
           build_type=Release
           EOF
 
-      - name: Set WebAssembly Conan profile
-        if: matrix.config.name == 'WebAssembly'
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=20 --settings build_type=Release
+
+      - name: Configure & Build
         run: |
-          cat > ~/.conan2/profiles/webassembly <<EOF
-          include(default)
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(sysctl -n hw.logicalcpu) --config Release --verbose
 
-          [settings]
-          arch=wasm
-          os=Emscripten
+  macos:
+    needs: setup
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
 
-          [tool_requires]
-          *: emsdk/3.1.73
-          EOF
-
-      - name: Install Android dependencies
-        if: matrix.config.name == 'Android'
-        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
-
-      - name: Install iOS dependencies
-        if: matrix.config.name == 'iOS'
-        run: conan install . --output-folder=build --build=missing --profile=iOS --settings compiler.cppstd=20 --settings build_type=Release
-
-      - name: Install Windows or macOS dependencies
-        if: matrix.config.name == 'Windows' || matrix.config.name == 'macOS'
+      - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
 
-      - name: Install Ubuntu dependencies
-        if: matrix.config.name == 'Ubuntu'
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
-
-      - name: Install WebAssembly dependencies
-        if: matrix.config.name == 'WebAssembly'
-        run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
-
-      - name: Configure
-        run: cmake .. -DCMAKE_TOOLCHAIN_FILE="conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=Release
-        working-directory: build
-
-      - name: Get CPU count
-        id: cpus
-        shell: bash
-        run: |
-          if [ "${RUNNER_OS}" = "Windows" ]; then
-            echo "count=$NUMBER_OF_PROCESSORS" >> $GITHUB_OUTPUT
-          elif [ "${RUNNER_OS}" = "Linux" ]; then
-            echo "count=$(nproc)" >> $GITHUB_OUTPUT
-          elif [ "${RUNNER_OS}" = "macOS" ]; then
-            echo "count=$(sysctl -n hw.logicalcpu)" >> $GITHUB_OUTPUT
-          fi
-
       - name: Build
-        run: cmake --build . --parallel ${{ steps.cpus.outputs.count }} --config Release --verbose
-        working-directory: build
-
-      - name: Create artifacts directory
-        run: mkdir artifacts
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(sysctl -n hw.logicalcpu) --config Release --verbose
 
       - name: Compress artifacts
-        if: matrix.config.name == 'macOS'
         working-directory: build
         run: |
           chmod -R a+rwx carimbo
@@ -177,8 +123,21 @@ jobs:
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
+  ubuntu:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc) --config Release --verbose
+
       - name: Compress artifacts
-        if: matrix.config.name == 'Ubuntu'
         working-directory: build
         run: |
           chmod +x carimbo
@@ -186,23 +145,70 @@ jobs:
           tar -czvf Ubuntu.tar.gz carimbo LICENSES
           mv Ubuntu.tar.gz ../artifacts
 
+  webassembly:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conan profile
+        run: |
+          cat > ~/.conan2/profiles/webassembly <<EOF
+          include(default)
+          [settings]
+          arch=wasm
+          os=Emscripten
+          [tool_requires]
+          *: emsdk/3.1.73
+          EOF
+
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=20 --settings build_type=Release
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $(nproc) --config Release --verbose
+
       - name: Compress artifacts
-        if: matrix.config.name == 'WebAssembly'
         working-directory: build
         run: |
           zip -jr WebAssembly.zip carimbo.wasm carimbo.js
           mv WebAssembly.zip ../artifacts
 
+  windows:
+    needs: setup
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=20 --settings build_type=Release
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --parallel $Env:NUMBER_OF_PROCESSORS --config Release --verbose
+
       - name: Compress artifacts
-        if: matrix.config.name == 'Windows'
         working-directory: build
         shell: powershell
         run: |
           Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
-      - name: Release
+  release:
+    needs:
+      - android
+      - ios
+      - macos
+      - ubuntu
+      - webassembly
+      - windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Upload release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.event.inputs.tagName }}
-          prerelease: ${{ github.events.inputs.prerelease }}
+          tag_name: ${{ github.ref_name }}
+          prerelease: false
           files: artifacts/*
