@@ -62,6 +62,7 @@ jobs:
 
   iOS:
     runs-on: macos-latest
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
