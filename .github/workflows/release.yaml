@@ -74,7 +74,7 @@ jobs:
         if: matrix.config.name == 'Android'
         run: |
           sudo apt update
-          sudo apt install -y cmake
+          sudo apt install -y build-essential
           cat > ~/.conan2/profiles/android <<EOF
           include(default)
 
@@ -82,6 +82,8 @@ jobs:
           os=Android
           os.api_level=34
           arch=armv8
+          # compiler.version=17
+          compiler.libcxx=c++_static
 
           [tool_requires]
           android-ndk/[*]
