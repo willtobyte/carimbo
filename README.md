@@ -1,17 +1,23 @@
 ## Carimbo: A Modern, Cross-Platform 2D Game Engine
 
 <p align="center">
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=macOS&label=macOS" alt="macOS">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/release.yaml">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/release.yaml?branch=main&job=iOS&label=iOS" alt="iOS">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Ubuntu&label=Ubuntu" alt="Ubuntu">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/release.yaml">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/release.yaml?branch=main&job=Android&label=Android" alt="Android">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Windows&label=Windows" alt="Windows">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/release.yaml">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/release.yaml?branch=main&job=macOS&label=macOS" alt="macOS">
   </a>
-  <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=WebAssembly&label=WebAssembly" alt="WebAssembly">
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/release.yaml">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/release.yaml?branch=main&job=Ubuntu&label=Ubuntu" alt="Ubuntu">
+  </a>
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/release.yaml">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/release.yaml?branch=main&job=Windows&label=Windows" alt="Windows">
+  </a>
+  <a href="https://github.com/willtobyte/carimbo/actions/workflows/release.yaml">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/release.yaml?branch=main&job=WebAssembly&label=WebAssembly" alt="WebAssembly">
   </a>
 
   <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine">
