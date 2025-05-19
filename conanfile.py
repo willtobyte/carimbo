@@ -7,7 +7,7 @@ from pathlib import Path
 class Carimbo(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
-    def _not_webassembly(self):
+    def _webassembly(self):
         return str(self.settings.os).lower() not in {"emscripten"}
 
     def _jit_capable(self):
@@ -48,7 +48,7 @@ class Carimbo(ConanFile):
         self.options["physfs"].iso9660 = False
         self.options["physfs"].vdf = False
 
-        if self._not_webassembly() and self._jit_capable():
+        if not self._webassembly() and self._jit_capable():
             self.options["sol2"].with_lua = "luajit"
 
     def generate(self):
@@ -68,10 +68,10 @@ class Carimbo(ConanFile):
 
         tc = CMakeToolchain(self)
 
-        if self._not_webassembly():
+        if not self._webassembly():
             tc.preprocessor_definitions["HAVE_BOOST"] = None
 
-        if self._not_webassembly() and self._jit_capable():
+        if not self._webassembly() and self._jit_capable():
             tc.preprocessor_definitions["HAVE_LUAJIT"] = None
 
         if self._ios():
