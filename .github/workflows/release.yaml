@@ -59,6 +59,7 @@ jobs:
 
   iOS:
     runs-on: macos-latest
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -245,12 +246,12 @@ jobs:
   Release:
     if: always()
     needs:
-      - android
-      - ios
-      - macos
-      - ubuntu
-      - webassembly
-      - windows
+      - Android
+      - iOS
+      - macOS
+      - Ubuntu
+      - WebAssembly
+      - Windows
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -259,6 +260,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: Debug artifacts
+        run: ls -lah artifacts
 
       - name: Upload release
         uses: softprops/action-gh-release@v2
