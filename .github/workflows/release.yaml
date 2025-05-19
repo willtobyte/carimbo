@@ -80,6 +80,10 @@ jobs:
           os=Android
           os.api_level=34
           arch=armv8
+          compiler=clang
+          compiler.version=12
+          compiler.libcxx=c++_shared
+          compiler.cppstd=17
 
           [tool_requires]
           android-ndk/[*]
