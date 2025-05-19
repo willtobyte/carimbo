@@ -9,6 +9,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 8
+
 jobs:
   Android:
     runs-on: ubuntu-latest
@@ -55,7 +58,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel --config Release --verbose
+          cmake --build build --config Release --verbose
 
   iOS:
     runs-on: macos-latest
@@ -91,7 +94,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel --config Release --verbose
+          cmake --build build --config Release --verbose
 
   macOS:
     runs-on: macos-latest
@@ -111,7 +114,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel --config Release --verbose
+          cmake --build build --config Release --verbose
 
       - name: Compress artifacts
         working-directory: build
@@ -147,7 +150,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel --config Release --verbose
+          cmake --build build --config Release --verbose
 
       - name: Compress artifacts
         working-directory: build
@@ -195,7 +198,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel --config Release --verbose
+          cmake --build build --config Release --verbose
 
       - name: Compress artifacts
         working-directory: build
@@ -228,7 +231,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel --config Release --verbose
+          cmake --build build --config Release --verbose
 
       - name: Compress artifacts
         working-directory: build
