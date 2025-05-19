@@ -2,10 +2,10 @@
 
 <p align="center">
   <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=iOS&label=iOS" alt="iOS">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Android&label=Android" alt="Android">
   </a>
   <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
-    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=Android&label=Android" alt="Android">
+    <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=iOS&label=iOS" alt="iOS">
   </a>
   <a href="https://github.com/willtobyte/carimbo/actions/workflows/build.yaml">
     <img src="https://img.shields.io/github/actions/workflow/status/willtobyte/carimbo/build.yaml?branch=main&job=macOS&label=macOS" alt="macOS">
