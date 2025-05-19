@@ -218,7 +218,8 @@ jobs:
           New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
-  release:
+  Release:
+    if: always()
     needs:
       - android
       - ios
