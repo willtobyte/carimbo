@@ -85,6 +85,7 @@ class Carimbo(ConanFile):
 
         if self._is_ios():
             toolchain.preprocessor_definitions["LUA_USE_IOS"] = True
+            toolchain.extra_cmake_vars["CMAKE_FRAMEWORK_PATH"] = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks"
 
         toolchain.generate()
         CMakeDeps(self).generate()
