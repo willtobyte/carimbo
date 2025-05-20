@@ -82,7 +82,7 @@ jobs:
 
           [settings]
           os=iOS
-          os.version=16.0
+          os.version=18.0
           os.sdk=iphoneos
           arch=armv8
           compiler=apple-clang
