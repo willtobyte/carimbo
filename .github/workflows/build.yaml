@@ -64,7 +64,7 @@ jobs:
           cmake --build build --config Release --verbose
 
   iOS:
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
