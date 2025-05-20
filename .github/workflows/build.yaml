@@ -92,7 +92,6 @@ jobs:
 
           [conf]
           tools.build:cflags=["-DLUA_USE_IOS=1"]
-          tools.build:cxxflags=["-DLUA_USE_IOS=1"]
           EOF
 
       - name: Install dependencies
