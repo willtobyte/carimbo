@@ -80,9 +80,13 @@ class Carimbo(ConanFile):
             if self._is_jit_capable():
                 toolchain.preprocessor_definitions["HAVE_LUAJIT"] = None
 
-        if self._is_ios():
-            toolchain.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
-            toolchain.preprocessor_definitions["LUA_USE_IOS"] = None
+            if self._is_ios():
+                toolchain.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
 
         toolchain.generate()
-        CMakeDeps(self).generate()
+        deps = CMakeDeps(self)
+
+        if self._is_ios():
+          deps.configure_cmake_define("sol2::sol2", "LUA_USE_IOS", "ON")
+
+        deps.generate()
