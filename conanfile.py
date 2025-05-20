@@ -80,12 +80,9 @@ class Carimbo(ConanFile):
 
         if not self._is_webassembly():
             toolchain.preprocessor_definitions["HAVE_BOOST"] = True
-            if self._is_jit_capable():
-                toolchain.preprocessor_definitions["HAVE_LUAJIT"] = True
 
-        if self._is_ios():
-            toolchain.preprocessor_definitions["LUA_USE_IOS"] = True
-            toolchain.extra_cmake_vars["CMAKE_FRAMEWORK_PATH"] = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks"
+        if self._is_jit_capable():
+            toolchain.preprocessor_definitions["HAVE_LUAJIT"] = True
 
         toolchain.generate()
         CMakeDeps(self).generate()
