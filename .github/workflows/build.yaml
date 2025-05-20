@@ -94,9 +94,7 @@ jobs:
           build_type=Release
 
           [conf]
-          tools.apple:sdk_path=/Applications/Xcode_16.2.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
           tools.build:cflags=["-DLUA_USE_IOS=1"]
-          tools.apple:enable_bitcode=False
           EOF
 
       - name: Install dependencies
