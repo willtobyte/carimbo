@@ -89,6 +89,10 @@ jobs:
           compiler.version=17.0
           compiler.libcxx=libc++
           build_type=Release
+
+          [conf]
+          tools.build:cflags=["-DLUA_USE_IOS"]
+          tools.build:cxxflags=["-DLUA_USE_IOS"]
           EOF
 
       - name: Install dependencies
