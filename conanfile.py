@@ -84,9 +84,4 @@ class Carimbo(ConanFile):
                 toolchain.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
 
         toolchain.generate()
-        deps = CMakeDeps(self)
-
-        if self._is_ios():
-          deps.configure_cmake_define("sol2::sol2", "LUA_USE_IOS", "ON")
-
-        deps.generate()
+        CMakeDeps(self).generate()
