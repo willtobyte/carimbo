@@ -76,12 +76,12 @@ class Carimbo(ConanFile):
         toolchain = CMakeToolchain(self)
 
         if not self._is_webassembly():
-            toolchain.preprocessor_definitions["HAVE_BOOST"] = None
+            toolchain.preprocessor_definitions["HAVE_BOOST"] = True
             if self._is_jit_capable():
-                toolchain.preprocessor_definitions["HAVE_LUAJIT"] = None
+                toolchain.preprocessor_definitions["HAVE_LUAJIT"] = True
 
-            if self._is_ios():
-                toolchain.preprocessor_definitions["LUA_DISABLE_SYSTEM"] = None
+        if self._is_ios():
+            toolchain.preprocessor_definitions["LUA_USE_IOS"] = True
 
         toolchain.generate()
         CMakeDeps(self).generate()
