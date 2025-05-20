@@ -69,6 +69,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Debug
+        run: |
+          ls /Applications/
+          ls /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/System/Library/Frameworks/AudioUnit.framework
+
       - name: Setup Conan
         run: |
           brew install conan
