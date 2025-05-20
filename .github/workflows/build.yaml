@@ -69,10 +69,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug
-        run: |
-          ls /Applications/
-          ls /Applications/Xcode_15.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.5.sdk/System/Library/Frameworks/AudioUnit.framework
+      - name: Select Xcode 16.2
+        run: sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
 
       - name: Setup Conan
         run: |
@@ -98,6 +96,7 @@ jobs:
           [conf]
           tools.apple:sdk_path=/Applications/Xcode_16.2.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk
           tools.build:cflags=["-DLUA_USE_IOS=1"]
+          tools.apple:enable_bitcode=False
           EOF
 
       - name: Install dependencies
