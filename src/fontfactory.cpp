@@ -117,7 +117,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   auto ptr = std::make_shared<font>(
     map,
     pixmap,
-    0.0f,
+    -11.0f,
     1.0f,
     1.0f
   );
