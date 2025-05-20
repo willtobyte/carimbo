@@ -95,7 +95,7 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=26 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build
         run: |
@@ -115,7 +115,7 @@ jobs:
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=26 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build
         run: |
@@ -136,7 +136,7 @@ jobs:
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=26 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build
         run: |
@@ -169,7 +169,7 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=26 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build
         run: |
@@ -189,7 +189,7 @@ jobs:
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=26 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build
         run: |
