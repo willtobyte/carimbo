@@ -56,6 +56,9 @@ class Carimbo(ConanFile):
         if not self._is_webassembly() and self._is_jit_capable():
             self.options["sol2"].with_lua = "luajit"
 
+        if self._is_ios():
+          self.options["sdl"].opengl = False
+
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
         with license_output.open("w", encoding="utf-8") as out:
