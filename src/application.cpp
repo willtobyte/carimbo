@@ -1,5 +1,9 @@
 #include "application.hpp"
 
+#ifdef ANDROID
+# include <android/asset_manager.h>
+#endif
+
 using namespace framework;
 
 [[noreturn]] void fail() {
@@ -67,10 +71,16 @@ int32_t application::run() {
 #if SANDBOX
   storage::filesystem::mount("../sandbox", "/");
 #else
-  std::unique_ptr<char, SDLDeleter> base(SDL_GetBasePath(), SDL_free);
-  const auto path = fmt::format("{}bundle.7z", base.get());
-  SDL_free(base);
-  storage::filesystem::mount(path.c_str(), "/");
+  #if ANDROID
+    AAsset* asset = AAssetManager_open(g_asset_manager, "bundle.7z", AASSET_MODE_BUFFER);
+    off_t length = AAsset_getLength(asset);
+    const void* buffer = AAsset_getBuffer(asset);
+
+    PHYSFS_Io* io = PHYSFS_createMemoryIo(buffer, length, false);
+    PHYSFS_mountHandle(io, "bundle.7z", "/", 1);
+  #else
+    storage::filesystem::mount("bundle.7z", "/");
+  #endif
 #endif
 
   auto se = scriptengine();
