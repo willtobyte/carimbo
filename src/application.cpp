@@ -77,6 +77,8 @@ int32_t application::run() {
 
     const char* cpath = env->GetStringUTFChars(jpath, nullptr);
 
+    __android_log_print(ANDROID_LOG_INFO, "App", "Package code path: %s", cpath);
+
     storage::filesystem::mount(cpath, "/");
 
     env->ReleaseStringUTFChars(jpath, cpath);
