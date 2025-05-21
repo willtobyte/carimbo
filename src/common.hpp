@@ -51,6 +51,8 @@
 
 #ifdef ANDROID
  #include <jni.h>
+ #include <android/log.h>
+ #include <android/native_activity.h>
 #endif
 
 #include <algorithm>
