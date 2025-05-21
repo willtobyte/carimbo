@@ -9,7 +9,7 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 
 std::shared_ptr<font> fontfactory::get(const std::string &family) {
   std::filesystem::path p{family};
-  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.fnt", family);
+  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.json", family);
   if (auto it = _pool.find(filename); it != _pool.end()) {
     return it->second;
   }
