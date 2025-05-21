@@ -60,6 +60,24 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --verbose
 
+      - name: Debug
+        run: ls -lah build
+
+      # - name: Compress artifacts
+      #   working-directory: build
+      #   run: |
+      #     mkdir -p ../artifacts
+      #     chmod -R a+rwx carimbo
+      #     chmod -x LICENSES
+      #     tar -cpzvf macOS.tar.gz carimbo LICENSES
+      #     mv macOS.tar.gz ../artifacts
+
+      # - name: Upload artifacts
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: Android
+      #     path: artifacts/*
+
   iOS:
     runs-on: macos-latest
     if: false
