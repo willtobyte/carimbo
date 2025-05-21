@@ -71,9 +71,34 @@ int32_t application::run() {
     JNIEnv* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
     jobject activity = static_cast<jobject>(SDL_GetAndroidActivity());
 
+    if (!env || !activity) {
+      __android_log_print(ANDROID_LOG_ERROR, "App", "JNI env or activity is null!");
+      return -1;
+    }
+
     jclass activityClass = env->GetObjectClass(activity);
+    if (!activityClass) {
+      __android_log_print(ANDROID_LOG_ERROR, "App", "activityClass is null!");
+      return -1;
+    }
+
     jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
+    if (!getPackageCodePath) {
+      __android_log_print(ANDROID_LOG_ERROR, "App", "getPackageCodePath method not found!");
+      return -1;
+    }
+
     jstring jpath = static_cast<jstring>(env->CallObjectMethod(activity, getPackageCodePath));
+    if (!jpath) {
+      __android_log_print(ANDROID_LOG_ERROR, "App", "jpath is null!");
+      return -1;
+    }
+
+    const char* cpath = env->GetStringUTFChars(jpath, nullptr);
+    if (!cpath) {
+      __android_log_print(ANDROID_LOG_ERROR, "App", "Failed to get string from jpath!");
+      return -1;
+    }
 
     const char* cpath = env->GetStringUTFChars(jpath, nullptr);
 
