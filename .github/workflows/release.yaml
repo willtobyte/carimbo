@@ -42,7 +42,7 @@ jobs:
           arch=armv8
           compiler=clang
           compiler.version=19
-          compiler.libcxx=static
+          compiler.libcxx=c++_static
           compiler.cppstd=20
 
           [tool_requires]
