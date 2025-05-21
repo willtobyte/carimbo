@@ -69,7 +69,7 @@ int32_t application::run() {
 #else
   #ifdef ANDROID
     JNIEnv* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
-    jobject activity = SDL_GetAndroidActivity();
+    jobject activity = static_cast<jobject>(SDL_GetAndroidActivity());
 
     jclass activityClass = env->GetObjectClass(activity);
     jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
