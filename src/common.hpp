@@ -49,6 +49,10 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
+#ifdef ANDROID
+ #include <jni.h>
+#endif
+
 #include <algorithm>
 #include <array>
 #include <atomic>

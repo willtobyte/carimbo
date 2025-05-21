@@ -57,7 +57,7 @@ application::application(int argc, char **argv) {
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
   #ifdef ANDROID
-  PHYSFS_init(SDL_GetAndroidInternalStoragePath());
+  PHYSFS_init(nullptr);
   #else
   PHYSFS_init(argv[0]);
   #endif
@@ -67,7 +67,24 @@ int32_t application::run() {
 #if SANDBOX
   storage::filesystem::mount("../sandbox", "/");
 #else
-  storage::filesystem::mount("bundle.7z", "/");
+  #ifdef ANDROID
+    JNIEnv* env = static_cast<JNIEnv*>(SDL_AndroidGetJNIEnv());
+    jobject activity = SDL_AndroidGetActivity();
+
+    jclass activityClass = env->GetObjectClass(activity);
+    jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
+    jstring jpath = static_cast<jstring>(env->CallObjectMethod(activity, getPackageCodePath));
+
+    const char* path = env->GetStringUTFChars(jpath, nullptr);
+
+    storage::filesystem::mount(path, "/");
+
+    env->ReleaseStringUTFChars(jpath, cpath);
+    env->DeleteLocalRef(jpath);
+    env->DeleteLocalRef(activityClass);
+  #else
+    storage::filesystem::mount("bundle.7z", "/");
+  #endif
 #endif
 
   auto se = scriptengine();
