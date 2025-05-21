@@ -62,23 +62,22 @@ jobs:
 
       - name: Strip binary
         run: |
-          arm-linux-androideabi-strip build/carimbo
           ls -lah build
 
-      # - name: Compress artifacts
-      #   working-directory: build
-      #   run: |
-      #     mkdir -p ../artifacts
-      #     chmod -R a+rwx carimbo
-      #     chmod -x LICENSES
-      #     tar -cpzvf macOS.tar.gz carimbo LICENSES
-      #     mv macOS.tar.gz ../artifacts
+      - name: Compress artifacts
+        working-directory: build
+        run: |
+          mkdir -p ../artifacts
+          chmod -R a+rwx carimbo
+          chmod -x LICENSES
+          tar -cpzvf Android.tar.gz carimbo LICENSES
+          mv Android.tar.gz ../artifacts
 
-      # - name: Upload artifacts
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: Android
-      #     path: artifacts/*
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android
+          path: artifacts/*
 
   iOS:
     runs-on: macos-latest
