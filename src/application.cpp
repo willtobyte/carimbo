@@ -75,9 +75,9 @@ int32_t application::run() {
     jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
     jstring jpath = static_cast<jstring>(env->CallObjectMethod(activity, getPackageCodePath));
 
-    const char* path = env->GetStringUTFChars(jpath, nullptr);
+    const char* cpath = env->GetStringUTFChars(jpath, nullptr);
 
-    storage::filesystem::mount(path, "/");
+    storage::filesystem::mount(cpath, "/");
 
     env->ReleaseStringUTFChars(jpath, cpath);
     env->DeleteLocalRef(jpath);
