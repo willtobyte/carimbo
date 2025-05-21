@@ -56,14 +56,21 @@ application::application(int argc, char **argv) {
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
+  #ifdef ANDROID
+  PHYSFS_init(SDL_AndroidGetInternalStoragePath());
+  #else
   PHYSFS_init(argv[0]);
+  #endif
 }
 
 int32_t application::run() {
 #if SANDBOX
   storage::filesystem::mount("../sandbox", "/");
 #else
-  storage::filesystem::mount("bundle.7z", "/");
+  std::unique_ptr<char, SDLDeleter> base(SDL_GetBasePath(), SDL_free);
+  const auto path = fmt::format("{}bundle.7z", base.get());
+  SDL_free(base);
+  storage::filesystem::mount(path.c_str(), "/");
 #endif
 
   auto se = scriptengine();
