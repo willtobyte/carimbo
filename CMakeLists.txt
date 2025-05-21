@@ -207,12 +207,3 @@ if(NOT EMSCRIPTEN)
     )
   endif()
 endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    "-framework AudioUnit"
-    "-framework AudioToolbox"
-    "-framework CoreAudio"
-    "-framework AVFoundation"
-  )
-endif()

@@ -42,7 +42,7 @@ jobs:
           arch=armv8
           compiler=clang
           compiler.version=19
-          compiler.libcxx=c++_static
+          compiler.libcxx=c++_shared
           compiler.cppstd=20
 
           [tool_requires]
@@ -60,8 +60,10 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --verbose
 
-      - name: Debug
-        run: ls -lah build
+      - name: Strip binary
+        run: |
+          arm-linux-androideabi-strip build/carimbo
+          ls -lah build
 
       # - name: Compress artifacts
       #   working-directory: build
