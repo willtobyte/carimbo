@@ -70,7 +70,7 @@ jobs:
         run: |
           mkdir -p ../artifacts
           chmod -x LICENSES
-          tar -cpzvf Android.tar.gz carimbo.so LICENSES
+          tar -cpzvf Android.tar.gz libcarimbo.so LICENSES
           mv Android.tar.gz ../artifacts
 
       - name: Upload artifacts
