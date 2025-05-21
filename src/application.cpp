@@ -68,8 +68,8 @@ int32_t application::run() {
   storage::filesystem::mount("../sandbox", "/");
 #else
   #ifdef ANDROID
-    JNIEnv* env = static_cast<JNIEnv*>(SDL_AndroidGetJNIEnv());
-    jobject activity = SDL_AndroidGetActivity();
+    JNIEnv* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
+    jobject activity = SDL_GetAndroidActivity();
 
     jclass activityClass = env->GetObjectClass(activity);
     jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
