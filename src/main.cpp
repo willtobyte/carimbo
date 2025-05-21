@@ -14,8 +14,6 @@ extern "C" __attribute__((visibility("default"))) void ANativeActivity_onCreate(
   static char* argv[] = { const_cast<char*>(arg0), nullptr };
 
   framework::application app(argc, argv);
-
-  UNUSED(app);
-  // app.run();
+  app.run();
 }
 #endif
