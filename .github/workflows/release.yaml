@@ -36,6 +36,7 @@ jobs:
         run: |
           cat > ~/.conan2/profiles/android <<EOF
           include(default)
+
           [settings]
           os=Android
           os.api_level=34
@@ -50,6 +51,7 @@ jobs:
 
           [conf]
           user.sdl:android=True
+          tools.build:cxxflags=["-DANDROID"]
           EOF
 
       - name: Install dependencies
@@ -57,7 +59,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-DANDROID"
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --verbose
 
       - name: Strip binary
@@ -96,6 +98,7 @@ jobs:
         run: |
           cat > ~/.conan2/profiles/ios <<EOF
           include(default)
+
           [settings]
           os=iOS
           os.version=16.0

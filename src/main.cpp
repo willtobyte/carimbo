@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 #if defined(ANDROID)
 #include <android/native_activity.h>
 
-extern "C" void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_t savedStateSize) {
+extern "C" __attribute__((visibility("default"))) void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_t savedStateSize) {
   UNUSED(activity);
   UNUSED(savedState);
   UNUSED(savedStateSize);
