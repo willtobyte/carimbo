@@ -51,7 +51,6 @@ jobs:
 
           [conf]
           user.sdl:android=True
-          tools.cmake.cmaketoolchain:user_toolchain+={{profile_dir}}/android_flags.cmake
           EOF
 
       - name: Install dependencies
