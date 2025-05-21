@@ -50,6 +50,9 @@ jobs:
 
           [conf]
           user.sdl:android=True
+
+          [options]
+          *:shared=False
           EOF
 
       - name: Install dependencies
