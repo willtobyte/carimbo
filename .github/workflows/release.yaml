@@ -51,7 +51,7 @@ jobs:
 
           [conf]
           user.sdl:android=True
-          tools.build:cxxflags=["-DANDROID"]
+          tools.cmake.cmaketoolchain:user_toolchain=["android_flags.cmake"]
           EOF
 
       - name: Install dependencies
