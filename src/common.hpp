@@ -34,6 +34,7 @@
   #ifdef DEBUG
     #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
     #include <boost/stacktrace.hpp>
+    #define HAVE_STACKSTRACE 1
   #endif
 #endif
 

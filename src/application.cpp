@@ -24,7 +24,7 @@ using namespace framework;
         #endif
       #endif
 
-      #if defined(HAVE_BOOST) && defined(DEBUG)
+      #ifdef HAVE_STACKSTRACE
         boost::stacktrace::stacktrace st;
         fmt::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
