@@ -17,6 +17,7 @@ extern "C" void ANativeActivity_onCreate(ANativeActivity* activity, void* savedS
   static constexpr char arg0[] = "android_app";
   static char* argv[] = { const_cast<char*>(arg0), nullptr };
 
-  main(argc, argv);
+  framework::application app(argc, argv);
+  app.run();
 }
 #endif
