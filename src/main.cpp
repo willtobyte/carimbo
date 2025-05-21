@@ -5,7 +5,7 @@ int main(int argc, char** argv) {
   return app.run();
 }
 
-#if defined(__ANDROID__)
+#if defined(ANDROID)
 #include <android/native_activity.h>
 
 extern "C" void ANativeActivity_onCreate(ANativeActivity* activity, void* savedState, size_t savedStateSize) {
