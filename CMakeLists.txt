@@ -16,7 +16,11 @@ file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+  add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${TEMPLATE_FILES})
+else()
+  add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+endif()
 
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)

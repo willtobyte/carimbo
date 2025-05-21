@@ -15,7 +15,7 @@ extern "C" __attribute__((visibility("default"))) void ANativeActivity_onCreate(
 
   static constexpr int argc = 1;
   static constexpr char arg0[] = "android_app";
-  static char* argv[] = { const_cast<char*>(arg0), nullptr };sss
+  static char* argv[] = { const_cast<char*>(arg0), nullptr };
 
   framework::application app(argc, argv);
   app.run();
