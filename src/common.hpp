@@ -31,8 +31,10 @@
   #include <boost/beast/websocket/ssl.hpp>
   #include <boost/config.hpp>
 
-  #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
-  #include <boost/stacktrace.hpp>
+  #ifdef DEBUG
+    #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
+    #include <boost/stacktrace.hpp>
+  #endif
 #endif
 
 #include <AL/al.h>
