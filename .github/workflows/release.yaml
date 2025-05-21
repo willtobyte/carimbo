@@ -42,7 +42,7 @@ jobs:
           arch=armv8
           compiler=clang
           compiler.version=19
-          compiler.libcxx=c++_shared
+          compiler.libcxx=static
           compiler.cppstd=20
 
           [tool_requires]
@@ -50,9 +50,6 @@ jobs:
 
           [conf]
           user.sdl:android=True
-
-          [options]
-          *:shared=False
           EOF
 
       - name: Install dependencies
