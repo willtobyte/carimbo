@@ -5,7 +5,7 @@ int main(int argc, char** argv) {
   return app.run();
 }
 
-#if defined(ANDROID)
+#ifdef ANDROID
 extern "C" __attribute__((visibility("default"))) void ANativeActivity_onCreate(ANativeActivity*, void*, size_t) {
   static constexpr int argc = 1;
   static constexpr char arg0[] = "android_app";
