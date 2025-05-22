@@ -71,7 +71,9 @@ int32_t application::run() {
     JNIEnv* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
     jobject activity = static_cast<jobject>(SDL_GetAndroidActivity());
 
-    __android_log_print(ANDROID_LOG_INFO, "App", "env: %p, activity: %p", env, activity);
+    __android_log_print(ANDROID_LOG_INFO, "App", "env: 0x%" PRIxPTR ", activity: 0x%" PRIxPTR,
+                        reinterpret_cast<uintptr_t>(env),
+                        reinterpret_cast<uintptr_t>(activity));
 
     if (!env || !activity) {
       __android_log_print(ANDROID_LOG_ERROR, "App", "JNI env or activity is null!");
