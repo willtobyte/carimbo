@@ -71,10 +71,14 @@ int32_t application::run() {
     JNIEnv* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
     jobject activity = static_cast<jobject>(SDL_GetAndroidActivity());
 
+    __android_log_print(ANDROID_LOG_INFO, "App", "env: %p, activity: %p", env, activity);
+
     if (!env || !activity) {
       __android_log_print(ANDROID_LOG_ERROR, "App", "JNI env or activity is null!");
       return -1;
     }
+
+    __android_log_print(ANDROID_LOG_INFO, "App", "Got env and activity");
 
     jclass activityClass = env->GetObjectClass(activity);
     if (!activityClass) {
@@ -82,11 +86,15 @@ int32_t application::run() {
       return -1;
     }
 
+    __android_log_print(ANDROID_LOG_INFO, "App", "Got activity class");
+
     jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
     if (!getPackageCodePath) {
       __android_log_print(ANDROID_LOG_ERROR, "App", "getPackageCodePath method not found!");
       return -1;
     }
+
+    __android_log_print(ANDROID_LOG_INFO, "App", "Got method ID for getPackageCodePath");
 
     jstring jpath = static_cast<jstring>(env->CallObjectMethod(activity, getPackageCodePath));
     if (!jpath) {
