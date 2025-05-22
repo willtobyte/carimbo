@@ -29,10 +29,6 @@ using namespace framework;
         fmt::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
 
-      #ifdef ANDROID
-        __android_log_print(ANDROID_LOG_ERROR, "App", "%s", error);
-      #endif
-
       fmt::println(stderr, "{}", error);
 
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
@@ -60,70 +56,14 @@ application::application(int argc, char **argv) {
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
 
-  #ifdef ANDROID
-  PHYSFS_init(nullptr);
-  #else
   PHYSFS_init(argv[0]);
-  #endif
 }
 
 int32_t application::run() {
 #if SANDBOX
   storage::filesystem::mount("../sandbox", "/");
 #else
-  #ifdef ANDROID
-    JNIEnv* env = static_cast<JNIEnv*>(SDL_GetAndroidJNIEnv());
-    jobject activity = static_cast<jobject>(SDL_GetAndroidActivity());
-
-    __android_log_print(ANDROID_LOG_INFO, "App", "env: 0x%" PRIxPTR ", activity: 0x%" PRIxPTR,
-                        reinterpret_cast<uintptr_t>(env),
-                        reinterpret_cast<uintptr_t>(activity));
-
-    if (!env || !activity) {
-      __android_log_print(ANDROID_LOG_ERROR, "App", "JNI env or activity is null!");
-      return -1;
-    }
-
-    __android_log_print(ANDROID_LOG_INFO, "App", "Got env and activity");
-
-    jclass activityClass = env->GetObjectClass(activity);
-    if (!activityClass) {
-      __android_log_print(ANDROID_LOG_ERROR, "App", "activityClass is null!");
-      return -1;
-    }
-
-    __android_log_print(ANDROID_LOG_INFO, "App", "Got activity class");
-
-    jmethodID getPackageCodePath = env->GetMethodID(activityClass, "getPackageCodePath", "()Ljava/lang/String;");
-    if (!getPackageCodePath) {
-      __android_log_print(ANDROID_LOG_ERROR, "App", "getPackageCodePath method not found!");
-      return -1;
-    }
-
-    __android_log_print(ANDROID_LOG_INFO, "App", "Got method ID for getPackageCodePath");
-
-    jstring jpath = static_cast<jstring>(env->CallObjectMethod(activity, getPackageCodePath));
-    if (!jpath) {
-      __android_log_print(ANDROID_LOG_ERROR, "App", "jpath is null!");
-      return -1;
-    }
-
-    const char* cpath = env->GetStringUTFChars(jpath, nullptr);
-    if (!cpath) {
-      __android_log_print(ANDROID_LOG_ERROR, "App", "Failed to get string from jpath!");
-      return -1;
-    }
-
-    __android_log_print(ANDROID_LOG_INFO, "App", "Package code path: %s", cpath);
-
-    storage::filesystem::mount(cpath, "/");
-
-    env->ReleaseStringUTFChars(jpath, cpath);
-    env->DeleteLocalRef(jpath);
-    env->DeleteLocalRef(activityClass);
-  #else
-    storage::filesystem::mount("bundle.7z", "/");
-  #endif
+  storage::filesystem::mount("bundle.7z", "/");
 #endif
 
   auto se = scriptengine();

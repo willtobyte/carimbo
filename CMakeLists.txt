@@ -16,21 +16,7 @@ file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Android")
-  add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${TEMPLATE_FILES})
-
-  set(NATIVE_APP_GLUE_DIR "${ANDROID_NDK}/sources/android/native_app_glue")
-
-  include_directories(${NATIVE_APP_GLUE_DIR})
-
-  add_library(android_native_app_glue STATIC
-    ${NATIVE_APP_GLUE_DIR}/android_native_app_glue.c
-  )
-
-  target_link_libraries(${PROJECT_NAME} PRIVATE android_native_app_glue android log)
-else()
-  add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
-endif()
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
 
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
