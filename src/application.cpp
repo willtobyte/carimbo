@@ -29,6 +29,10 @@ using namespace framework;
         fmt::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
 
+      #ifdef ANDROID
+        __android_log_print(ANDROID_LOG_ERROR, "App", "%s", error);
+      #endif
+
       fmt::println(stderr, "{}", error);
 
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
