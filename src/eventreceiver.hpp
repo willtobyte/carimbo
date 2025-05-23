@@ -10,16 +10,15 @@ public:
   virtual ~eventreceiver() = default;
 
   virtual void on_quit();
-  virtual void on_keydown(const event::keyboard::key &event);
-  virtual void on_keyup(const event::keyboard::key &event);
-  virtual void on_mousebuttondown(const event::mouse::button &event);
-  virtual void on_mousebuttonup(const event::mouse::button &event);
-  virtual void on_mousemotion(const event::mouse::motion &event);
-  virtual void on_gamepadbuttondown(uint8_t who, const event::gamepad::button &event);
-  virtual void on_gamepadbuttonup(uint8_t who, const event::gamepad::button &event);
-  virtual void on_gamepadmotion(uint8_t who, const event::gamepad::motion &event);
+  virtual void on_key_press(const event::keyboard::key &event);
+  virtual void on_key_release(const event::keyboard::key &event);
+  virtual void on_mouse_press(const event::mouse::button &event);
+  virtual void on_mouse_release(const event::mouse::button &event);
+  virtual void on_mouse_motion(const event::mouse::motion &event);
+  virtual void on_gamepad_press(uint8_t who, const event::gamepad::button &event);
+  virtual void on_gamepad_release(uint8_t who, const event::gamepad::button &event);
+  virtual void on_gamepad_motion(uint8_t who, const event::gamepad::motion &event);
   virtual void on_mail(const event::mail &event);
   virtual void on_collision(const event::collision &event);
-  virtual void on_filesystem();
 };
 }

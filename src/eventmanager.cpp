@@ -43,21 +43,21 @@ void eventmanager::update(float_t delta) {
       case SDL_EVENT_KEY_DOWN: {
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
         for (const auto& receiver : _receivers) {
-          receiver->on_keydown(e);
+          receiver->on_key_press(e);
         }
       } break;
 
       case SDL_EVENT_KEY_UP: {
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
         for (const auto& receiver : _receivers) {
-          receiver->on_keyup(e);
+          receiver->on_key_release(e);
         }
       } break;
 
       case SDL_EVENT_MOUSE_MOTION: {
         const mouse::motion e{event.motion.x, event.motion.y};
         for (const auto& receiver : _receivers) {
-          receiver->on_mousemotion(e);
+          receiver->on_mouse_motion(e);
         }
       } break;
 
@@ -69,7 +69,7 @@ void eventmanager::update(float_t delta) {
           .y = event.button.y
         };
         for (const auto& receiver : _receivers) {
-          receiver->on_mousebuttondown(e);
+          receiver->on_mouse_press(e);
         }
       } break;
 
@@ -81,7 +81,7 @@ void eventmanager::update(float_t delta) {
           .y = event.button.y
         };
         for (const auto& receiver : _receivers) {
-          receiver->on_mousebuttonup(e);
+          receiver->on_mouse_release(e);
         }
       } break;
 
@@ -104,7 +104,7 @@ void eventmanager::update(float_t delta) {
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
         const gamepad::button e{event.gbutton.button};
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepadbuttondown(
+          receiver->on_gamepad_press(
             static_cast<uint8_t>(event.gbutton.which), e
           );
         }
@@ -113,7 +113,7 @@ void eventmanager::update(float_t delta) {
       case SDL_EVENT_GAMEPAD_BUTTON_UP: {
         const gamepad::button e{event.gbutton.button};
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepadbuttonup(
+          receiver->on_gamepad_release(
             static_cast<uint8_t>(event.gbutton.which), e
           );
         }
@@ -125,7 +125,7 @@ void eventmanager::update(float_t delta) {
         const auto value = event.gaxis.value;
         const gamepad::motion e{axis, value};
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepadmotion(
+          receiver->on_gamepad_motion(
             static_cast<uint8_t>(who), e
           );
         }
@@ -170,12 +170,6 @@ void eventmanager::update(float_t delta) {
         };
         if (fn) {
           (*fn)();
-        }
-      } break;
-
-      case static_cast<uint32_t>(type::filesystem): {
-        for (const auto& receiver : _receivers) {
-          receiver->on_filesystem();
         }
       } break;
 

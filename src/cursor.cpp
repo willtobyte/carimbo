@@ -35,7 +35,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   }
 }
 
-void cursor::on_mousebuttondown(const mouse::button &event) {
+void cursor::on_mouse_press(const mouse::button &event) {
   // TODO FIX ME using enum input::mousebuttonevent::button;
 
   constexpr auto left = mouse::button::which::left;
@@ -55,11 +55,11 @@ void cursor::on_mousebuttondown(const mouse::button &event) {
   _last_frame = SDL_GetTicks();
 }
 
-void cursor::on_mousebuttonup(const mouse::button &event) {
+void cursor::on_mouse_release(const mouse::button &event) {
   UNUSED(event);
 }
 
-void cursor::on_mousemotion(const mouse::motion &event) {
+void cursor::on_mouse_motion(const mouse::motion &event) {
   _position = geometry::point{event.x, event.y};
 }
 

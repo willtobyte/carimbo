@@ -68,6 +68,8 @@ public:
 
   void on_email(const std::string &message);
 
+  void on_key_press(int32_t key);
+  void on_key_release(int32_t key);
   void on_touch(float_t x, float_t y);
   void on_motion(float_t x, float_t y);
   void on_hover();

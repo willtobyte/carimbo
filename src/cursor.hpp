@@ -33,9 +33,9 @@ public:
   explicit cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager);
   virtual ~cursor() = default;
 
-  virtual void on_mousebuttondown(const input::event::mouse::button &event);
-  virtual void on_mousebuttonup(const input::event::mouse::button &event);
-  virtual void on_mousemotion(const input::event::mouse::motion &event);
+  virtual void on_mouse_press(const input::event::mouse::button &event) override;
+  virtual void on_mouse_release(const input::event::mouse::button &event) override;
+  virtual void on_mouse_motion(const input::event::mouse::motion &event) override;
 
   void update(float_t delta);
   void draw() const;

@@ -271,6 +271,14 @@ void object::on_email(const std::string &message) {
   }
 }
 
+void object::on_key_press(int32_t key) {
+  UNUSED(key);
+}
+
+void object::on_key_release(int32_t key) {
+  UNUSED(key);
+}
+
 void object::on_touch(float_t x, float_t y) {
   if (const auto fn = _ontouch; fn) {
     fn(shared_from_this(), x, y);

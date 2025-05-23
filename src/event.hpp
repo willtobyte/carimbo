@@ -12,8 +12,7 @@ enum class player : uint8_t {
 enum class type : uint32_t {
   collision = SDL_EVENT_USER + 1,
   mail,
-  timer,
-  filesystem
+  timer
 };
 
 namespace keyboard {

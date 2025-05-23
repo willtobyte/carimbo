@@ -214,13 +214,19 @@ void objectmanager::draw() {
   }
 }
 
-void objectmanager::on_mail(const input::event::mail &event) {
-  if (const auto object = find(event.to); object) {
-    object->on_email(event.body);
+void objectmanager::on_key_press(const input::event::keyboard::key &event) {
+  for (const auto &o : _objects) {
+    o->on_key_press(static_cast<int32_t>(event));
   }
 }
 
-void objectmanager::on_mousebuttondown(const mouse::button &event) {
+void objectmanager::on_key_release(const input::event::keyboard::key &event) {
+  for (const auto &o : _objects) {
+    o->on_key_release(static_cast<int32_t>(event));
+  }
+}
+
+void objectmanager::on_mouse_press(const mouse::button &event) {
   if (event.button != mouse::button::which::left) {
     return;
   }
@@ -262,10 +268,16 @@ void objectmanager::on_mousebuttondown(const mouse::button &event) {
   }
 }
 
-void objectmanager::on_mousemotion(const input::event::mouse::motion &event) {
+void objectmanager::on_mouse_motion(const input::event::mouse::motion &event) {
   _scenemanager->on_motion(event.x, event.y);
 
   for (const auto &o : _objects) {
     o->on_motion(event.x, event.y);
+  }
+}
+
+void objectmanager::on_mail(const input::event::mail &event) {
+  if (const auto object = find(event.to); object) {
+    object->on_email(event.body);
   }
 }
