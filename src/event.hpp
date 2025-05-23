@@ -23,7 +23,9 @@ enum class key : int32_t {
   right = SDLK_RIGHT,
   space = SDLK_SPACE,
 
+  backspace = SDLK_BACKSPACE,
   enter = SDLK_RETURN,
+  escape = SDLK_ESCAPE
 };
 }
 
