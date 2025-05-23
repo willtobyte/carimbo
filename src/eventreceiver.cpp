@@ -13,6 +13,10 @@ void eventreceiver::on_key_release(const keyboard::key &event) {
   UNUSED(event);
 }
 
+void eventreceiver::on_text(const std::string &text) {
+  UNUSED(text);
+}
+
 void eventreceiver::on_mouse_press(const mouse::button &event) {
   UNUSED(event);
 }

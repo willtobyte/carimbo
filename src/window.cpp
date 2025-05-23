@@ -16,6 +16,11 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
   if (_window == nullptr) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateWindow] {}", SDL_GetError()));
   }
+
+  const SDL_Rect area = { 0, 0, width, height };
+  const auto cursor = 0;
+  SDL_SetTextInputArea(_window.get(), &area, cursor);
+  SDL_StartTextInput(_window.get());
 }
 
 window::operator SDL_Window *() {
