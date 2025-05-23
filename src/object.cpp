@@ -204,6 +204,15 @@ void object::set_onunhover(std::function<void(std::shared_ptr<object>)> fn) {
   _onunhover = std::move(fn);
 }
 
+void object::set_onkeypress(std::function<void(std::shared_ptr<object>, int32_t)> fn) {
+  _onkeypress = std::move(fn);
+}
+
+void object::set_onkeyrelease(std::function<void(std::shared_ptr<object>, int32_t)> fn) {
+  _onkeyrelease = std::move(fn);
+}
+
+
 void object::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) {
   _collisionmapping.emplace(kind, std::move(fn));
 }
@@ -272,11 +281,15 @@ void object::on_email(const std::string &message) {
 }
 
 void object::on_key_press(int32_t key) {
-  UNUSED(key);
+  if (const auto fn = _onkeypress; fn) {
+    fn(shared_from_this(), key);
+  }
 }
 
 void object::on_key_release(int32_t key) {
-  UNUSED(key);
+  if (const auto fn = _onkeyrelease; fn) {
+    fn(shared_from_this(), key);
+  }
 }
 
 void object::on_touch(float_t x, float_t y) {

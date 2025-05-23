@@ -251,6 +251,8 @@ void framework::scriptengine::run() {
     "move", &framework::object::move,
     "on_update", &framework::object::set_onupdate,
     "on_animationfinished", &framework::object::set_onanimationfinished,
+    "on_keypress", &framework::object::set_onkeypress,
+    "on_keyrelease", &framework::object::set_onkeyrelease,
     "on_mail", &framework::object::set_onmail,
     "on_touch", &framework::object::set_ontouch,
     "on_motion", &framework::object::set_onmotion,
