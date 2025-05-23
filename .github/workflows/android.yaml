@@ -12,6 +12,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 8
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -59,4 +62,4 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --parallel 8 --verbose
+          cmake --build build --config Release --verbose
