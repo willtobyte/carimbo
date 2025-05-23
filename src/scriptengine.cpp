@@ -727,6 +727,10 @@ void framework::scriptengine::run() {
     "down", input::event::keyboard::key::down,
     "right", input::event::keyboard::key::right,
     "space", input::event::keyboard::key::space
+
+    "backspace", input::event::keyboard::key::backspace,
+    "enter", input::event::keyboard::key::enter,
+    "escape", input::event::keyboard::key::escape
   );
 
   lua.new_usertype<framework::mail>(
