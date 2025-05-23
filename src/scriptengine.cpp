@@ -729,8 +729,6 @@ void framework::scriptengine::run() {
     "space", input::event::keyboard::key::space
   );
 
-  lua["keyname"] = SDL_GetKeyName;
-
   lua.new_usertype<framework::mail>(
     "Mail",
     sol::constructors<framework::mail(

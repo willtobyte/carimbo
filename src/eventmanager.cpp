@@ -54,6 +54,14 @@ void eventmanager::update(float_t delta) {
         }
       } break;
 
+      case SDL_EVENT_TEXT_INPUT: {
+        std::string t = event.text.text;
+
+        for (const auto& receiver : _receivers) {
+          receiver->on_text(t);
+        }
+      }
+
       case SDL_EVENT_MOUSE_MOTION: {
         const mouse::motion e{event.motion.x, event.motion.y};
         for (const auto& receiver : _receivers) {
