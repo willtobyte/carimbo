@@ -1,4 +1,4 @@
-name: Windows
+name: WebAssembly
 
 on:
   push:
@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,8 +28,21 @@ jobs:
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
+      - name: Conan profile
+        run: |
+          cat > ~/.conan2/profiles/webassembly <<EOF
+          include(default)
+
+          [settings]
+          arch=wasm
+          os=Emscripten
+
+          [tool_requires]
+          *: emsdk/3.1.73
+          EOF
+
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build
         run: |

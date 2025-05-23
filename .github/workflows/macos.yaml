@@ -1,4 +1,4 @@
-name: Windows
+name: macOS
 
 on:
   push:
@@ -17,14 +17,14 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Conan
         run: |
-          pip install conan
+          brew install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 

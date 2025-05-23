@@ -1,4 +1,4 @@
-name: Windows
+name: Ubuntu
 
 on:
   push:
@@ -17,19 +17,20 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Conan
         run: |
+          python3 -m pip install --upgrade pip
           pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build
         run: |

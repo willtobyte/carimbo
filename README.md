@@ -2,10 +2,12 @@
 
 <p align="center">
   <span>
-    <img src="https://github.com/willtobyte/carimbo/actions/workflows/android.yml/badge.svg?branch=main" alt="Android" />
-    <img src="https://github.com/willtobyte/carimbo/actions/workflows/android.yml/badge.svg?branch=main" alt="Android" />
-    <img src="https://github.com/willtobyte/carimbo/actions/workflows/android.yml/badge.svg?branch=main" alt="Android" />
-    <img src="https://github.com/willtobyte/carimbo/actions/workflows/android.yml/badge.svg?branch=main" alt="Android" />
+    <img src="https://github.com/willtobyte/carimbo/actions/workflows/android.yaml/badge.svg?branch=main" alt="Android" />
+    <img src="https://github.com/willtobyte/carimbo/actions/workflows/ios.yaml/badge.svg?branch=main" alt="iOS" />
+    <img src="https://github.com/willtobyte/carimbo/actions/workflows/macos.yaml/badge.svg?branch=main" alt="macOS" />
+    <img src="https://github.com/willtobyte/carimbo/actions/workflows/ubuntu.yaml/badge.svg?branch=main" alt="Ubuntu" />
+    <img src="https://github.com/willtobyte/carimbo/actions/workflows/webassembly.yaml/badge.svg?branch=main" alt="WebAssembly" />
+    <img src="https://github.com/willtobyte/carimbo/actions/workflows/windows.yaml/badge.svg?branch=main" alt="Windows" />
   </span>
   <br />
   <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine" />
