@@ -22,6 +22,8 @@ enum class key : int32_t {
   down = SDLK_DOWN,
   right = SDLK_RIGHT,
   space = SDLK_SPACE,
+
+  a = SDLK_A
 };
 }
 
