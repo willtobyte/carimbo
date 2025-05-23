@@ -1,0 +1,62 @@
+name: Android
+
+on:
+  push:
+    branches:
+      - "*"
+  pull_request:
+    branches:
+      - main
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Configure Conan
+        run: |
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
+
+      - name: Create Conan profile
+        run: |
+          cat > ~/.conan2/profiles/android <<EOF
+          include(default)
+
+          [settings]
+          os=Android
+          os.api_level=34
+          arch=armv8
+          compiler=clang
+          compiler.version=19
+          compiler.libcxx=c++_shared
+          compiler.cppstd=20
+
+          [tool_requires]
+          android-ndk/[*]
+
+          [conf]
+          user.sdl:android=True
+          EOF
+
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --parallel 8 --verbose
