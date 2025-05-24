@@ -91,10 +91,9 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    # --strip-all
-    # --ignore-external-input
-    -sASSERTIONS=2
-    -sDISABLE_EXCEPTION_CATCHING=0
+    --strip-all
+    -sASSERTIONS=0
+    -sDISABLE_EXCEPTION_CATCHING=1
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
