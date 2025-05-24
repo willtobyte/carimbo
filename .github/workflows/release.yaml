@@ -286,9 +286,6 @@ jobs:
         with:
           path: artifacts
 
-      - name: Debug artifacts
-        run: ls -lah artifacts
-
       - name: Upload release
         uses: softprops/action-gh-release@v2
         with:
