@@ -119,5 +119,5 @@ void scenemanager::on_mouse_release(const input::event::mouse::button &event) {
 }
 
 void scenemanager::on_mouse_motion(const input::event::mouse::motion &event) {
-  UNUSED(event);
+  _scene->on_motion(event.x, event.y);
 }
