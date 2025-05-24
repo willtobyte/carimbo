@@ -77,7 +77,6 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    -fno-plt
     -fstrict-aliasing
     -ffast-math
     -fomit-frame-pointer
@@ -92,7 +91,6 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    -fno-plt
     # --strip-all
     # --ignore-external-input
     -sASSERTIONS=2
@@ -152,7 +150,6 @@ else()
     set(RELEASE_FLAGS
       -O3
       -flto
-      -fno-plt
       -fstrict-aliasing
       -ffast-math
       -funroll-loops
@@ -163,7 +160,6 @@ else()
     )
 
     set(RELEASE_LINKER_FLAGS
-      -fno-plt
       -flto
     )
 
