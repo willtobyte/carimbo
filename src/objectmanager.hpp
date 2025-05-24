@@ -9,7 +9,7 @@
 #include "resourcemanager.hpp"
 
 namespace framework {
-class objectmanager : public input::eventreceiver {
+class objectmanager final : public input::eventreceiver {
 public:
   explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager);
   virtual ~objectmanager() = default;

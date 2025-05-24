@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace framework {
-class scriptengine : private noncopyable {
+class scriptengine final : private noncopyable {
 public:
   scriptengine() = default;
   virtual ~scriptengine() = default;

@@ -86,16 +86,16 @@ void scenemanager::destroy(const std::string &name) {
   _scene_mapping.erase(name);
 }
 
-void scenemanager::on_touch(float_t x, float_t y) const {
-  _scene->on_touch(x, y);
-}
-
 void scenemanager::update(float_t delta) {
   _scene->update(delta);
 }
 
 void scenemanager::draw() const {
   _scene->draw();
+}
+
+void scenemanager::on_touch(float_t x, float_t y) const {
+  _scene->on_touch(x, y);
 }
 
 void scenemanager::on_key_press(const input::event::keyboard::key &event) {

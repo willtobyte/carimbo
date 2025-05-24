@@ -8,7 +8,7 @@
 #include "vector2d.hpp"
 
 namespace framework {
-class object : public std::enable_shared_from_this<object> {
+class object final : public std::enable_shared_from_this<object> {
 public:
   explicit object(const objectprops &props);
   virtual ~object();

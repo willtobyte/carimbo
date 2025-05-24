@@ -9,7 +9,7 @@
 namespace framework {
 class objectmanager;
 
-class scenemanager : public input::eventreceiver {
+class scenemanager final  : public input::eventreceiver {
 public:
   scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<framework::objectmanager> objectmanager);
   ~scenemanager() = default;
@@ -22,11 +22,11 @@ public:
 
   void destroy(const std::string &name);
 
-  void on_touch(float_t x, float_t y) const;
-
   void update(float_t delta);
 
   void draw() const;
+
+  void on_touch(float_t x, float_t y) const;
 
 protected:
   virtual void on_key_press(const input::event::keyboard::key &event) override;
