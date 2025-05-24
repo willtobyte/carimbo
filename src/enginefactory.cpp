@@ -67,6 +67,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->eventmanager()->add_receiver(engine);
   engine->eventmanager()->add_receiver(engine->statemanager());
   engine->eventmanager()->add_receiver(overlay);
+  engine->eventmanager()->add_receiver(std::static_pointer_cast<input::eventreceiver>(scenemanager));
 
   objectmanager->set_scenemanager(scenemanager);
 

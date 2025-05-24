@@ -3,12 +3,13 @@
 #include "common.hpp"
 
 #include "resourcemanager.hpp"
+#include "eventreceiver.hpp"
 #include "scene.hpp"
 
 namespace framework {
 class objectmanager;
 
-class scenemanager final {
+class scenemanager : public input::eventreceiver {
 public:
   scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<framework::objectmanager> objectmanager);
   ~scenemanager() = default;
@@ -23,11 +24,17 @@ public:
 
   void on_touch(float_t x, float_t y) const;
 
-  void on_motion(float_t x, float_t y) const;
-
   void update(float_t delta);
 
   void draw() const;
+
+protected:
+  virtual void on_key_press(const input::event::keyboard::key &event) override;
+  virtual void on_key_release(const input::event::keyboard::key &event) override;
+  virtual void on_text(const std::string &text) override;
+  virtual void on_mouse_press(const input::event::mouse::button &event) override;
+  virtual void on_mouse_release(const input::event::mouse::button &event) override;
+  virtual void on_mouse_motion(const input::event::mouse::motion &event) override;
 
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;

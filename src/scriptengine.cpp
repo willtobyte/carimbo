@@ -251,11 +251,8 @@ void framework::scriptengine::run() {
     "move", &framework::object::move,
     "on_update", &framework::object::set_onupdate,
     "on_animationfinished", &framework::object::set_onanimationfinished,
-    "on_keypress", &framework::object::set_onkeypress,
-    "on_keyrelease", &framework::object::set_onkeyrelease,
     "on_mail", &framework::object::set_onmail,
     "on_touch", &framework::object::set_ontouch,
-    "on_motion", &framework::object::set_onmotion,
     "on_hover", &framework::object::set_onhover,
     "on_unhover", &framework::object::set_onunhover,
     "on_collision", &framework::object::set_oncollision,
@@ -450,6 +447,42 @@ void framework::scriptengine::run() {
         };
 
         scene->set_onleave(std::move(safe_fn));
+      }
+
+      if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
+        auto safe_fn = [fn](const std::string &text) mutable {
+          sol::protected_function_result result = fn(text);
+          if (!result.valid()) [[unlikely]] {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_ontext(std::move(safe_fn));
+      }
+
+      if (auto fn = module["on_keypress"].get<sol::protected_function>(); fn.valid()) {
+        auto safe_fn = [fn](int32_t code) mutable {
+          sol::protected_function_result result = fn(code);
+          if (!result.valid()) [[unlikely]] {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_onkeypress(std::move(safe_fn));
+      }
+
+      if (auto fn = module["on_keyrelease"].get<sol::protected_function>(); fn.valid()) {
+        auto safe_fn = [fn](int32_t code) mutable {
+          sol::protected_function_result result = fn(code);
+          if (!result.valid()) [[unlikely]] {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+        };
+
+        scene->set_onkeyrelease(std::move(safe_fn));
       }
 
       if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
@@ -726,7 +759,7 @@ void framework::scriptengine::run() {
     "left", input::event::keyboard::key::left,
     "down", input::event::keyboard::key::down,
     "right", input::event::keyboard::key::right,
-    "space", input::event::keyboard::key::space
+    "space", input::event::keyboard::key::space,
 
     "backspace", input::event::keyboard::key::backspace,
     "enter", input::event::keyboard::key::enter,

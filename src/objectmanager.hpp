@@ -33,8 +33,6 @@ public:
   void draw();
 
 protected:
-  virtual void on_key_press(const input::event::keyboard::key &event) override;
-  virtual void on_key_release(const input::event::keyboard::key &event) override;
   virtual void on_mouse_press(const input::event::mouse::button &event) override;
   virtual void on_mouse_motion(const input::event::mouse::motion &event) override;
   virtual void on_mail(const input::event::mail &event) override;

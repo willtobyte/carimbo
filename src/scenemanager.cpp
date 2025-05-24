@@ -90,14 +90,34 @@ void scenemanager::on_touch(float_t x, float_t y) const {
   _scene->on_touch(x, y);
 }
 
-void scenemanager::on_motion(float_t x, float_t y) const {
-  _scene->on_motion(x, y);
-}
-
 void scenemanager::update(float_t delta) {
   _scene->update(delta);
 }
 
 void scenemanager::draw() const {
   _scene->draw();
+}
+
+void scenemanager::on_key_press(const input::event::keyboard::key &event) {
+  UNUSED(event);
+}
+
+void scenemanager::on_key_release(const input::event::keyboard::key &event) {
+  UNUSED(event);
+}
+
+void scenemanager::on_text(const std::string &text) {
+  _scene->on_text(text);
+}
+
+void scenemanager::on_mouse_press(const input::event::mouse::button &event) {
+  UNUSED(event);
+}
+
+void scenemanager::on_mouse_release(const input::event::mouse::button &event) {
+  UNUSED(event);
+}
+
+void scenemanager::on_mouse_motion(const input::event::mouse::motion &event) {
+  UNUSED(event);
 }

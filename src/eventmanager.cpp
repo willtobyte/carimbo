@@ -57,7 +57,6 @@ void eventmanager::update(float_t delta) {
       case SDL_EVENT_TEXT_INPUT: {
         const std::string t{event.text.text};
 
-        fmt::println(">>> {}", t);
         for (const auto& receiver : _receivers) {
           receiver->on_text(t);
         }
