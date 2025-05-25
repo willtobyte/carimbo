@@ -449,16 +449,16 @@ void framework::scriptengine::run() {
         scene->set_onleave(std::move(safe_fn));
       }
 
-      if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](const std::string &text) mutable {
-          sol::protected_function_result result = fn(text);
+      if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
+        auto safe_fn = [fn](float_t x, float_t y) mutable {
+          sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
         };
 
-        scene->set_ontext(std::move(safe_fn));
+        scene->set_ontouch(std::move(safe_fn));
       }
 
       if (auto fn = module["on_keypress"].get<sol::protected_function>(); fn.valid()) {
@@ -483,18 +483,6 @@ void framework::scriptengine::run() {
         };
 
         scene->set_onkeyrelease(std::move(safe_fn));
-      }
-
-      if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](float_t x, float_t y) mutable {
-          sol::protected_function_result result = fn(x, y);
-          if (!result.valid()) [[unlikely]] {
-            sol::error err = result;
-            throw std::runtime_error(err.what());
-          }
-        };
-
-        scene->set_ontouch(std::move(safe_fn));
       }
 
       if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {

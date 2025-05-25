@@ -99,11 +99,11 @@ void scenemanager::on_touch(float_t x, float_t y) const {
 }
 
 void scenemanager::on_key_press(const input::event::keyboard::key &event) {
-  UNUSED(event);
+  _scene->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const input::event::keyboard::key &event) {
-  UNUSED(event);
+  _scene->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(const std::string &text) {
@@ -112,10 +112,12 @@ void scenemanager::on_text(const std::string &text) {
 
 void scenemanager::on_mouse_press(const input::event::mouse::button &event) {
   UNUSED(event);
+  // _scene->on_mouse_press(event.x, event.y);
 }
 
 void scenemanager::on_mouse_release(const input::event::mouse::button &event) {
   UNUSED(event);
+  // _scene->on_mouse_relese(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const input::event::mouse::motion &event) {

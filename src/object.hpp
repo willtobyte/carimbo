@@ -50,12 +50,8 @@ public:
   void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
   void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn);
-  void set_onmotion(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn);
   void set_onhover(std::function<void(std::shared_ptr<object>)> fn);
   void set_onunhover(std::function<void(std::shared_ptr<object>)> fn);
-  void set_onkeypress(std::function<void(std::shared_ptr<object>, int32_t)> fn);
-  void set_onkeyrelease(std::function<void(std::shared_ptr<object>, int32_t)> fn);
-
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn);
   void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn);
 
@@ -70,8 +66,6 @@ public:
 
   void on_email(const std::string &message);
 
-  void on_key_press(int32_t key);
-  void on_key_release(int32_t key);
   void on_touch(float_t x, float_t y);
   void on_motion(float_t x, float_t y);
   void on_hover();
@@ -86,10 +80,7 @@ private:
   objectprops _props;
   uint64_t _tick_count{0};
   uint64_t _last_tick{0};
-  std::function<void(std::shared_ptr<object>, int32_t)> _onkeypress;
-  std::function<void(std::shared_ptr<object>, int32_t)> _onkeyrelease;
   std::function<void(std::shared_ptr<object>, float_t, float_t)> _ontouch;
-  std::function<void(std::shared_ptr<object>, float_t, float_t)> _onmotion;
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
   std::function<void(std::shared_ptr<object>)> _onupdate;
