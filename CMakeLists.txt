@@ -19,12 +19,12 @@ file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
 
 execute_process(
-  COMMAND git describe --tags --always
-  OUTPUT_VARIABLE GIT_TAG
+  COMMAND git rev-parse --short HEAD
+  OUTPUT_VARIABLE commit_hash
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-add_compile_definitions(GIT_TAG="${GIT_TAG}")
+add_compile_definitions(COMMIT_HASH="${commit_hash}")
 
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
