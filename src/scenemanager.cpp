@@ -43,7 +43,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
       const auto x = data.value("x", .0f);
       const auto y = data.value("y", .0f);
 
-      auto e = _objectmanager->create(name, kind, false);
+      auto e = _objectmanager->create(kind, name, false);
       e->set_placement(x, y);
       if (action) {
         e->set_action(*action);

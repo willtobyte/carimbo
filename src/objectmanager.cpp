@@ -22,19 +22,26 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager) {
 }
 
-std::shared_ptr<object> objectmanager::create(const std::string &scope, const std::string &kind, bool manage) {
+std::shared_ptr<object> objectmanager::create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
   _dirty = true;
 
+  // TODO scope also should be computed
   if (const auto it = std::ranges::find_if(_objects, [&kind](const auto &o) { return o->kind() == kind; }); it != _objects.end()) {
     return clone(*it);
   }
 
-  const auto &filename = fmt::format("objects/{}/{}.json", scope, kind);
+  const auto scoped = scope ? std::string_view{scope->get()} : std::string_view{};
+  fmt::println(">>> scoped {}", scoped);
+  const auto qualifier = scoped.empty()
+      ? std::string{kind}
+      : fmt::format("{}/{}", scoped, kind);
+  const auto &filename = fmt::format("objects/{}.json", qualifier);
+
   const auto &buffer = storage::io::read(filename);
   const auto &j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float_t{1.f});
-  const auto spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}/{}.png", scope, kind));
+  const auto spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}.png", qualifier));
 
   std::unordered_map<std::string, graphics::animation> animations(j["animations"].size());
   for (const auto &item : j["animations"].items()) {

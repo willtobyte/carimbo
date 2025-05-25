@@ -14,7 +14,7 @@ public:
   explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager);
   virtual ~objectmanager() = default;
 
-  std::shared_ptr<object> create(const std::string &scope, const std::string &kind, bool manage = true);
+  std::shared_ptr<object> create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage = true);
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
 
