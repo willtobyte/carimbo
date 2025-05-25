@@ -18,6 +18,14 @@ file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
 
+execute_process(
+  COMMAND git describe --tags --always
+  OUTPUT_VARIABLE GIT_TAG
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_compile_definitions(GIT_TAG="${GIT_TAG}")
+
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})

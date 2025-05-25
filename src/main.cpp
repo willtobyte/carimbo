@@ -1,6 +1,11 @@
 #include "application.hpp"
 
 int main(int argc, char** argv) {
+  fmt::println("https://github.com/willtobyte/carimbo");
+  fmt::println("Compiled: " __DATE__ ", " __TIME__);
+  fmt::println("Version: {}", GIT_TAG);
+  fmt::println("MIT License (c) Rodrigo Delduca - https://rodrigodelduca.org/");
+
   framework::application app(argc, argv);
   return app.run();
 }
