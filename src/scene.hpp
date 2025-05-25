@@ -37,12 +37,11 @@ public:
   void on_leave() const;
   void on_text(const std::string &text) const;
   void on_touch(float_t x, float_t y) const;
-  void on_key_press(int32_t code);
-  void on_key_release(int32_t code);
-  void on_text(const std::string &text);
-  // void on_mouse_press(float_t x, float_t y);
-  // void on_mouse_relese(float_t x, float_t y);
-  void on_motion(float_t x, float_t y);
+  void on_key_press(int32_t code) const;
+  void on_key_release(int32_t code) const;
+  // void on_mouse_press(float_t x, float_t y) const;
+  // void on_mouse_relese(float_t x, float_t y) const;
+  void on_motion(float_t x, float_t y) const;
 
   void set_onenter(std::function<void()> fn);
   void set_onloop(std::function<void(float_t)> fn);

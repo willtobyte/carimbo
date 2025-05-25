@@ -79,15 +79,15 @@ void scene::on_touch(float_t x, float_t y) const {
   if (const auto fn = _ontouch) fn(x, y);
 }
 
-void scene::on_key_press(int32_t code) {
+void scene::on_key_press(int32_t code) const {
   if (const auto fn = _onkeypress) fn(code);
 }
 
-void scene::on_key_release(int32_t code) {
+void scene::on_key_release(int32_t code) const {
   if (const auto fn = _onkeyrelease) fn(code);
 }
 
-void scene::on_text(const std::string &text) {
+void scene::on_text(const std::string &text) const {
   if (const auto fn = _ontext) fn(text);
 }
 
@@ -99,7 +99,7 @@ void scene::on_text(const std::string &text) {
 //   if (const auto fn = _onmouserelease) fn(x, y);
 // }
 
-void scene::on_motion(float_t x, float_t y) {
+void scene::on_motion(float_t x, float_t y) const {
   if (const auto fn = _onmotion) fn(x, y);
 }
 
