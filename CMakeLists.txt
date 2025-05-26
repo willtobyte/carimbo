@@ -41,7 +41,6 @@ endforeach()
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
-find_package(absl REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
@@ -56,6 +55,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 else()
   set(EMSCRIPTEN FALSE)
 
+  find_package(absl REQUIRED)
   find_package(Boost CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
@@ -188,7 +188,6 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  abseil::abseil
   fmt::fmt
   nlohmann_json::nlohmann_json
   Ogg::ogg
@@ -201,6 +200,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 if(NOT EMSCRIPTEN)
   target_link_libraries(${PROJECT_NAME} PRIVATE
+    abseil::abseil
     Boost::boost
     OpenAL::OpenAL
     openssl::openssl
