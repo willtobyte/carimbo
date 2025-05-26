@@ -87,8 +87,8 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
       "",
       false,
       graphics::reflection::none,
-      spritesheet,
-      animations,
+      std::move(spritesheet),
+      std::move(animations),
   };
 
   auto o = std::make_shared<object>(props);
