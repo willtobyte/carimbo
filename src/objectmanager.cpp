@@ -26,19 +26,23 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
   _dirty = true;
 
   const auto scoped = scope ? scope->get() : "";
-  const auto qualifier = scoped.empty()
-      ? kind
-      : fmt::format("{}/{}", scoped, kind);
+  const auto &qualifier = scoped.empty() ? kind : fmt::format("{}/{}", scoped, kind);
 
-  if (const auto it = std::ranges::find_if(_objects, [&qualifier](const auto &o) {
-        const auto q = o->scope().empty() ? o->kind() : fmt::format("{}/{}", o->scope(), o->kind());
-        return q == qualifier;
-      }); it != _objects.end()) {
-    return clone(*it);
+  for (const auto& o : _objects) {
+    const auto& p = o->props();
+
+    if (p.kind != kind) continue;
+
+    if (scoped.empty()) {
+      if (!p.scope.empty()) continue;
+    } else {
+      if (p.scope != scoped) continue;
+    }
+
+    return clone(o);
   }
 
   const auto &filename = fmt::format("objects/{}.json", qualifier);
-
   const auto &buffer = storage::io::read(filename);
   const auto &j = nlohmann::json::parse(buffer);
 
@@ -154,6 +158,7 @@ void objectmanager::destroy(std::shared_ptr<object> object) {
 
   _dirty = true;
   _objects.erase(std::remove(_objects.begin(), _objects.end(), object), _objects.end());
+  _objects.shrink_to_fit();
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const {
@@ -185,7 +190,7 @@ void objectmanager::update(float_t delta) {
     const auto &ap = a->props();
 
     const auto aita = ap.animations.find(ap.action);
-    if (aita == ap.animations.end() || !aita->second.hitbox) {
+    if (aita == ap.animations.end() || !aita->second.hitbox) [[likely]] {
       continue;
     }
 
