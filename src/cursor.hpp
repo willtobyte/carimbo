@@ -50,7 +50,11 @@ private:
   geometry::point _point{};
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<pixmap> _spritesheet;
+  #ifdef EMSCRIPTEN
   std::unordered_map<std::string, graphics::animation> _animations;
+  #else
+  absl::flat_hash_map<std::string, graphics::animation> _animations;
+  #endif
   std::optional<std::string> _queued_action;
 };
 }

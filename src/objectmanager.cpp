@@ -65,7 +65,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
     std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
       return graphics::keyframe{
           frame["rectangle"].template get<geometry::rectangle>(),
-          frame.value("offset", geometry::point{}),
+          frame["offset"].template get<geometry::point>(),
           frame["duration"].template get<uint64_t>(),
       };
     });

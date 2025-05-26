@@ -24,7 +24,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
     std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
       return graphics::keyframe{
           frame["rectangle"].template get<geometry::rectangle>(),
-          frame.value("offset", geometry::point{}),
+          frame["offset"].template get<geometry::point>(),
           frame["duration"].template get<uint64_t>(),
       };
     });
