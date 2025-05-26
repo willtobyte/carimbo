@@ -32,10 +32,15 @@ struct objectprops final {
   float_t scale{1.f};
   algebra::vector2d velocity{};
   std::string kind{};
+  std::string scope{};
   std::string action{};
   bool hover{false};
   graphics::reflection reflection{graphics::reflection::none};
   std::shared_ptr<graphics::pixmap> spritesheet{};
+  #ifdef EMSCRIPTEN
   std::unordered_map<std::string, graphics::animation> animations{};
+  #else
+  absl::flat_hash_map<std::string, graphics::animation> animations{};
+  #endif
 };
 }

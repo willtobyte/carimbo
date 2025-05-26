@@ -87,39 +87,75 @@ void scenemanager::destroy(const std::string &name) {
 }
 
 void scenemanager::update(float_t delta) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->update(delta);
 }
 
 void scenemanager::draw() const {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->draw();
 }
 
 void scenemanager::on_touch(float_t x, float_t y) const {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->on_touch(x, y);
 }
 
 void scenemanager::on_key_press(const input::event::keyboard::key &event) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const input::event::keyboard::key &event) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(const std::string &text) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->on_text(text);
 }
 
 void scenemanager::on_mouse_press(const input::event::mouse::button &event) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   UNUSED(event);
   // _scene->on_mouse_press(event.x, event.y);
 }
 
 void scenemanager::on_mouse_release(const input::event::mouse::button &event) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   UNUSED(event);
   // _scene->on_mouse_relese(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const input::event::mouse::motion &event) {
+  if (!_scene) [[unlikely]] {
+    return;
+  }
+
   _scene->on_motion(event.x, event.y);
 }

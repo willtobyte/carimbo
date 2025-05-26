@@ -283,8 +283,21 @@ void framework::scriptengine::run() {
         return o.placement();
       },
       [](framework::object &o, sol::table table) {
-        const auto x = table[1].get<float_t>();
-        const auto y = table[2].get<float_t>();
+        float x = 0.0f;
+        float y = 0.0f;
+
+        if (table["x"].valid()) {
+          x = table["x"].get<float>();
+        } else if (table[1].valid()) {
+          x = table[1].get<float>();
+        }
+
+        if (table["y"].valid()) {
+          y = table["y"].get<float>();
+        } else if (table[2].valid()) {
+          y = table[2].get<float>();
+        }
+
         o.set_placement(x, y);
       }
     ),
@@ -316,8 +329,8 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::objectmanager>(
     "ObjectManager",
     sol::no_constructor,
-    "create", [](framework::objectmanager &self, const std::string& kind) {
-      self.create(kind, std::nullopt, true);
+    "create", [](framework::objectmanager &om, const std::string &kind) {
+      return om.create(kind, std::nullopt, true);
     },
     "clone", &framework::objectmanager::clone,
     "destroy", &framework::objectmanager::destroy

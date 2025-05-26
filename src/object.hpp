@@ -17,6 +17,8 @@ public:
 
   std::string kind() const;
 
+  std::string scope() const;
+
   void update(float_t delta);
 
   void draw() const;

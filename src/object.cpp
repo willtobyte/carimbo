@@ -18,6 +18,10 @@ std::string object::kind() const {
   return _props.kind;
 }
 
+std::string object::scope() const {
+  return _props.scope;
+}
+
 objectprops &object::props() {
   return _props;
 }
@@ -250,15 +254,15 @@ bool object::intersects(const std::shared_ptr<object> other) const {
   }
 
   return geometry::rectangle(
-             position() + sit->second.hitbox->position() * _props.scale,
-             sit->second.hitbox->size() * _props.scale
+    position() + sit->second.hitbox->position() * _props.scale,
+    sit->second.hitbox->size() * _props.scale
   )
-      .intersects(
-          geometry::rectangle(
-              other->position() + oit->second.hitbox->position() * other->_props.scale,
-              oit->second.hitbox->size() * other->_props.scale
-          )
-      );
+  .intersects(
+    geometry::rectangle(
+      other->position() + oit->second.hitbox->position() * other->_props.scale,
+      oit->second.hitbox->size() * other->_props.scale
+    )
+  );
 }
 
 void object::on_email(const std::string &message) {

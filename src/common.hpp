@@ -1,43 +1,46 @@
 #pragma once
 
 #ifdef _WIN32
-  #define NOMINMAX
+ #define NOMINMAX
 #endif
 
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #ifdef HAVE_LUAJIT
-  #define SOL_LUAJIT 1
+ #define SOL_LUAJIT 1
 #endif
 
 #define WEBSOCKET 1
 
 #ifdef EMSCRIPTEN
-  #include <emscripten.h>
-  #ifdef WEBSOCKET
-    #include <emscripten/websocket.h>
-  #endif
+ #include <emscripten.h>
+ #ifdef WEBSOCKET
+  #include <emscripten/websocket.h>
+ #endif
 #endif
 
 #include <fmt/format.h>
 
 #ifdef HAVE_BOOST
-  #include <boost/asio.hpp>
-  #include <boost/asio/connect.hpp>
-  #include <boost/asio/ssl.hpp>
-  #include <boost/asio/strand.hpp>
-  #include <boost/beast/core.hpp>
-  #include <boost/beast/websocket.hpp>
-  #include <boost/beast/websocket/ssl.hpp>
-  #include <boost/config.hpp>
+ #include <boost/asio.hpp>
+ #include <boost/asio/connect.hpp>
+ #include <boost/asio/ssl.hpp>
+ #include <boost/asio/strand.hpp>
+ #include <boost/beast/core.hpp>
+ #include <boost/beast/websocket.hpp>
+ #include <boost/beast/websocket/ssl.hpp>
+ #include <boost/config.hpp>
 
-  #ifdef DEBUG
-    #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
-    #include <boost/stacktrace.hpp>
-    #define HAVE_STACKSTRACE 1
-  #endif
+ #ifdef DEBUG
+  #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
+  #include <boost/stacktrace.hpp>
+  #define HAVE_STACKSTRACE 1
+ #endif
 #endif
 
+#ifndef EMSCRIPTEN
+ #include <absl/container/flat_hash_map.h>
+#endif
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
