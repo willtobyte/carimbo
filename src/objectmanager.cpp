@@ -25,9 +25,9 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
 std::shared_ptr<object> objectmanager::create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
   _dirty = true;
 
-  const auto scoped = scope ? std::string_view{scope->get()} : std::string_view{};
+  const auto scoped = scope ? scope->get() : "";
   const auto qualifier = scoped.empty()
-      ? std::string{kind}
+      ? kind
       : fmt::format("{}/{}", scoped, kind);
 
   if (const auto it = std::ranges::find_if(_objects, [&qualifier](const auto &o) {
@@ -83,7 +83,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
       scale,
       {},
       kind,
-      scoped.empty() ? "" : std::string{scoped},
+      scoped,
       "",
       false,
       graphics::reflection::none,
@@ -92,7 +92,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
   };
 
   auto o = std::make_shared<object>(props);
-  fmt::println("[objectmanager] created {} {}", kind, o->id());
+  fmt::println("[objectmanager] created {} {}", qualifier, o->id());
   if (manage) {
     _objects.emplace_back(o);
   }
