@@ -50,6 +50,7 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
   #else
   absl::flat_hash_map<std::string, graphics::animation> animations;
   #endif
+
   animations.reserve(j["animations"].size());
 
   for (const auto &item : j["animations"].items()) {

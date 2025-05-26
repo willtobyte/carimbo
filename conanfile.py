@@ -19,7 +19,6 @@ class Carimbo(ConanFile):
         return self._os_name() == "ios"
 
     def requirements(self):
-        self.requires("abseil/20250127.0")
         self.requires("fmt/11.1.4")
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.12.0")
@@ -33,6 +32,7 @@ class Carimbo(ConanFile):
         if self._is_webassembly():
             return
 
+        self.requires("abseil/20250127.0")
         self.requires("boost/1.87.0")
         self.requires("openssl/3.4.1")
 
