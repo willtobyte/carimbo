@@ -77,10 +77,6 @@ void font::draw(const std::string& text, const geometry::point& position) const 
     return;
   }
 
-  // if (auto* e = _effect.get()) {
-  //   e->set(text, position);
-  // }
-
   if (_effect && (text != _last_text || position != _last_position)) {
     _effect->set(text, position);
     _last_text = text;
