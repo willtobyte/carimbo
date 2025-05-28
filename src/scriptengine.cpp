@@ -897,13 +897,14 @@ void framework::scriptengine::run() {
     sol::error err = sr;
     throw std::runtime_error(err.what());
   }
-  const auto end = SDL_GetPerformanceCounter();
-  const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
-  fmt::println("boot time {:.3f}ms", elapsed);
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   const auto loop = lua["loop"].get<sol::protected_function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
+
+  const auto end = SDL_GetPerformanceCounter();
+  const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
+  fmt::println("boot time {:.3f}ms", elapsed);
 
   engine->run();
 }
