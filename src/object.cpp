@@ -64,8 +64,8 @@ algebra::vector2d object::velocity() const {
 }
 
 void object::update(float_t delta) {
-  if (const auto fn = _onupdate; fn) {
-    fn(shared_from_this());
+  if (_onupdate) {
+    _onupdate(shared_from_this());
   }
 
   if (_props.action.empty()) {
@@ -73,43 +73,53 @@ void object::update(float_t delta) {
   }
 
   const auto now = SDL_GetTicks();
-  const auto &animation = _props.animations.at(_props.action);
-  const auto &frame = animation.keyframes[_props.frame];
-
-  if (frame.duration > 0 && now - _props.last_frame < frame.duration) {
-    _props.position.set(
-        _props.position.x() + _props.velocity.x() * delta,
-        _props.position.y() + _props.velocity.y() * delta
-    );
-
+  const auto it = _props.animations.find(_props.action);
+  if (it == _props.animations.end()) {
     return;
   }
 
-  _props.last_frame = now;
-  if (++_props.frame >= animation.keyframes.size()) {
-    if (animation.oneshot) {
-      auto finished = std::exchange(_props.action, "");
+  auto &animation = it->second;
+  auto &keyframes = animation.keyframes;
+  if (_props.frame >= keyframes.size()) {
+    return;
+  }
 
-      if (const auto fn = _onanimationfinished; fn) {
-        fn(shared_from_this(), finished);
-      }
+  const auto &frame = keyframes[_props.frame];
+  const bool expired = frame.duration > 0 && (now - _props.last_frame >= frame.duration);
 
-      if (animation.next.has_value()) {
-        _props.action = animation.next.value();
+  if (expired) {
+    _props.last_frame = now;
+    ++_props.frame;
+
+    if (_props.frame >= keyframes.size()) {
+      if (animation.oneshot) {
+        const std::string finished = std::exchange(_props.action, "");
+
+        if (_onanimationfinished) {
+          _onanimationfinished(shared_from_this(), finished);
+        }
+
+        if (!animation.next) return;
+
+        _props.action = *animation.next;
         _props.frame = 0;
         _props.last_frame = 0;
-      } else {
-        return;
-      }
 
-    } else {
-      _props.frame = 0;
+        const auto ait = _props.animations.find(_props.action);
+        if (ait == _props.animations.end()) return;
+
+        animation = ait->second;
+        keyframes = animation.keyframes;
+        if (keyframes.empty()) return;
+      } else {
+        _props.frame = 0;
+      }
     }
   }
 
   _props.position.set(
-      _props.position.x() + _props.velocity.x() * delta,
-      _props.position.y() + _props.velocity.y() * delta
+    _props.position.x() + _props.velocity.x() * delta,
+    _props.position.y() + _props.velocity.y() * delta
   );
 }
 
