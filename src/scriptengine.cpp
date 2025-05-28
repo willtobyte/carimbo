@@ -124,7 +124,10 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
 }
 
 void framework::scriptengine::run() {
+  const auto start = SDL_GetPerformanceCounter();
+
   sol::state lua(sol::c_call<decltype(&panic), &panic>);
+
   lua.open_libraries();
 
   lua["searcher"] = &searcher;
@@ -888,7 +891,6 @@ void framework::scriptengine::run() {
     throw std::runtime_error(err.what());
   }
 
-  const auto start = SDL_GetPerformanceCounter();
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto sr = setup();
   if (!sr.valid()) [[unlikely]] {
