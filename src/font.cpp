@@ -55,6 +55,9 @@ font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spaci
 
 void font::set_effect(fonteffect::type type) {
   switch (type) {
+    case fonteffect::type::cursor:
+      _effect = std::make_unique<cursoreffect>();
+      return;
     case fonteffect::type::fadein:
       _effect = std::make_unique<fadeineffect>();
       break;
@@ -74,16 +77,26 @@ void font::draw(const std::string& text, const geometry::point& position) const 
     return;
   }
 
-  if (auto* e = _effect.get()) {
-    e->set(text, position);
+  // if (auto* e = _effect.get()) {
+  //   e->set(text, position);
+  // }
+
+  if (_effect && (text != _last_text || position != _last_position)) {
+    _effect->set(text, position);
+    _last_text = text;
+    _last_position = position;
   }
 
   geometry::point cursor = position;
 
   const auto height = _glyphs.begin()->second.size().height() * _scale;
 
-  for (auto index = 0u; index < text.size(); ++index) {
-    const auto ch = text[index];
+  std::string t = text;
+  if (auto* e = _effect.get()) {
+    t = e->text();
+  }
+
+  for (const auto ch : t) {
     if (ch == '\n') {
       cursor = geometry::point(position.x(), cursor.y() + height + _leading);
       continue;

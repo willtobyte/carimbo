@@ -11,7 +11,8 @@ using glyphmap = std::map<uint8_t, geometry::rectangle>;
 class fonteffect {
   public:
     enum class type: uint8_t {
-      fadein,
+      cursor,
+      fadein
     };
 
     virtual ~fonteffect() = default;
@@ -29,6 +30,12 @@ class fonteffect {
     virtual enum reflection reflection() { return reflection::none; };
 
     virtual uint8_t alpha() { return 255; };
+
+    virtual std::string text() { return _text; };
+
+    protected:
+      std::string _text;
+      geometry::point _position;
 };
 
 class fadeineffect : public fonteffect {
@@ -42,8 +49,6 @@ class fadeineffect : public fonteffect {
     virtual uint8_t alpha() override;
 
   private:
-    std::string _text;
-    geometry::point _position;
     uint8_t _alpha;
     const float_t _fade_duration = .2f;
     float_t _fade_time = 0.0f;
@@ -51,6 +56,32 @@ class fadeineffect : public fonteffect {
     char _last_char = '\0';
     size_t _last_length = 0;
     size_t _draw_calls = 0;
+};
+
+class cursoreffect : public fonteffect {
+  public:
+    ~cursoreffect() override = default;
+
+    void set(const std::string& text, geometry::point position) override {
+      _base_text = text;
+      _show_cursor = true;
+      _last_toggle = SDL_GetTicks();
+      _position = position;
+      _text = _base_text + '?';
+    }
+
+    void update(float_t /*delta*/) override {
+      const uint32_t now = SDL_GetTicks();
+      if (now - _last_toggle < 500) return;
+      _last_toggle = now;
+      _show_cursor = !_show_cursor;
+      _text = _show_cursor ? (_base_text + '?') : _base_text;
+    }
+
+  private:
+    std::string _base_text;
+    bool _show_cursor = true;
+    uint32_t _last_toggle = 0;
 };
 
 class font final {
@@ -71,6 +102,9 @@ private:
   int16_t _spacing{0};
   int16_t _leading{0};
   float_t _scale{1.0f};
+
+  mutable std::string _last_text;
+  mutable geometry::point _last_position;
 
   std::unique_ptr<fonteffect> _effect;
 };
