@@ -577,7 +577,6 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "FontEffect",
-    "cursor", graphics::fonteffect::type::cursor,
     "fadein", graphics::fonteffect::type::fadein
   );
 
