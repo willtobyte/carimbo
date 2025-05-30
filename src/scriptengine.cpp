@@ -582,8 +582,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<graphics::font>(
     "Font",
-    sol::no_constructor,
-    "effect", sol::property(&graphics::font::set_effect)
+    sol::no_constructor
   );
 
   lua.new_usertype<framework::enginefactory>(
@@ -842,6 +841,7 @@ void framework::scriptengine::run() {
     sol::bases<graphics::widget>(),
     "font", sol::property(&graphics::label::set_font),
     "set", &graphics::label::set,
+    "effect", sol::property(&graphics::label::set_effect),
     "clear", &graphics::label::clear
   );
 

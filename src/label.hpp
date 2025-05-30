@@ -14,15 +14,18 @@ public:
 
   void set(const std::string &text, float_t x, float_t y);
 
+  void set_effect(fonteffect::type type);
+
   void clear();
 
-  void update(float_t delta) override;
-  void draw() const override;
+  virtual void update(float_t delta) override;
+
+  virtual void draw() const override;
 
 private:
   std::shared_ptr<font> _font;
-
   std::string _text;
   geometry::point _position;
+  std::shared_ptr<fonteffect> _effect;
 };
 }

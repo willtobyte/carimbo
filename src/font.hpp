@@ -57,11 +57,7 @@ public:
   explicit font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale);
   ~font() = default;
 
-  void set_effect(fonteffect::type type);
-
-  void update(float_t delta);
-
-  void draw(const std::string &text, const geometry::point &position) const;
+  void draw(const std::string &text, const geometry::point &position, const std::weak_ptr<fonteffect> &effect) const;
 
 private:
   glyphmap _glyphs;
@@ -69,10 +65,5 @@ private:
   int16_t _spacing{0};
   int16_t _leading{0};
   float_t _scale{1.0f};
-
-  mutable std::string _last_text;
-  mutable geometry::point _last_position;
-
-  std::unique_ptr<fonteffect> _effect;
 };
 }

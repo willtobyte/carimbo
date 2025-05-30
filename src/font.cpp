@@ -53,29 +53,13 @@ font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spaci
     _scale(scale)
 {}
 
-void font::set_effect(fonteffect::type type) {
-  switch (type) {
-    case fonteffect::type::fadein:
-      _effect = std::make_unique<fadeineffect>();
-      break;
-    default:
-      break;
-  }
-}
-
-void font::update(float_t delta) {
-  if (_effect) {
-    _effect->update(delta);
-  }
-}
-
-void font::draw(const std::string& text, const geometry::point& position) const {
+void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect> &effect) const {
   if (text.empty()) {
     return;
   }
 
-  if (_effect) {
-    _effect->set(text, position);
+  if (const auto e = effect.lock()) {
+    e->set(text, position);
   }
 
   geometry::point cursor = position;
@@ -90,7 +74,7 @@ void font::draw(const std::string& text, const geometry::point& position) const 
 
     const auto& glyph = _glyphs.at(static_cast<uint8_t>(ch));
 
-    auto size = glyph.size();
+    const auto size = glyph.size();
 
     // TODO
     // float_t scale = .0f;
@@ -99,17 +83,17 @@ void font::draw(const std::string& text, const geometry::point& position) const 
     // }
 
     double_t angle = .0L;
-    if (auto* e = _effect.get()) {
+    if (const auto e = effect.lock()) {
       angle = e->angle();
     }
 
     reflection reflection = reflection::none;
-    if (auto* e = _effect.get()) {
+    if (const auto e = effect.lock()) {
       reflection = e->reflection();
     }
 
     uint8_t alpha = 255;
-    if (auto* e = _effect.get()) {
+    if (const auto e = effect.lock()) {
       alpha = e->alpha();
     }
 
