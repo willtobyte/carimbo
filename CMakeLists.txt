@@ -106,16 +106,13 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    -fuse-ld=lld
-    -Wl,--icf=all
-    -Wl,--gc-sections
-    -Wl,--as-needed
-    -Wl,-O2
-    -s
-    -Wl,-z,noexecstack
-    -Wl,-z,relro -Wl,-z,now
+    --strip-debug
+    --strip-producers
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
+    -sFILESYSTEM=1
+    -sALLOW_MEMORY_GROWTH=1
+    -sINVOKE_RUN=0
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
@@ -238,13 +235,11 @@ else()
 
     set(RELEASE_LINKER_FLAGS
       -flto
-      -Wl,--icf=all
-      -Wl,--gc-sections
-      -Wl,--as-needed
+      -Wl,-dead_strip
+      -Wl,-x
+      -Wl,-S
+      -Wl,-no_deduplicate
       -Wl,-O2
-      -s
-      -Wl,-z,noexecstack
-      -Wl,-z,relro -Wl,-z,now
     )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
