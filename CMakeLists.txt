@@ -16,7 +16,13 @@ file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+if(CMAKE_SYSTEM_NAME STREQUAL "Android")
+  add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${TEMPLATE_FILES})
+elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+  add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES} ${TEMPLATE_FILES})
+else()
+  add_executable(${PROJECT_NAME} ${SOURCE_FILES} ${TEMPLATE_FILES})
+endif()
 
 execute_process(
   COMMAND git rev-parse --short HEAD
