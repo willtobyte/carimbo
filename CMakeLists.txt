@@ -129,7 +129,20 @@ else()
   if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
     set(DEBUG_FLAGS /Od;/Zi;/W4;/bigobj)
-    set(RELEASE_FLAGS /O2;/GL;/GR;/EHsc;/DNDEBUG;/W4)
+    set(RELEASE_FLAGS
+      /O2
+      /GL
+      /fp:fast
+      /Gw
+      /Gy
+      /GR
+      /EHsc
+      /DNDEBUG
+      /W4
+      /permissive-
+      /Zc:inline
+      /Zc:__cplusplus
+    )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>

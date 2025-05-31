@@ -210,10 +210,7 @@ void objectmanager::update(float_t delta) {
       if (hbs.position().x() > has.position().x() + has.size().width()) break;
       if (hbs.position().y() > has.position().y() + has.size().height()) continue;
       if (hbs.position().y() + hbs.size().height() < has.position().y()) continue;
-
-      if (!has.intersects(hbs)) {
-        continue;
-      }
+      if (!has.intersects(hbs)) continue;
 
       const auto callback_a = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt);
       const auto callback_b = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt);
