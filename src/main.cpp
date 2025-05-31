@@ -1,11 +1,6 @@
 #include "application.hpp"
 
 int main(int argc, char** argv) {
-  fmt::println("Powered by Carimbo: https://github.com/willtobyte/carimbo");
-  fmt::println("Version: {}", COMMIT_HASH);
-  fmt::println("Compiled: " __DATE__ ", " __TIME__);
-  fmt::println("MIT License (c) Rodrigo Delduca - https://rodrigodelduca.org/");
-
   framework::application app(argc, argv);
   return app.run();
 }

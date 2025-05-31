@@ -878,6 +878,11 @@ void framework::scriptengine::run() {
     )
   );
 
+  fmt::println("Powered by Carimbo: https://github.com/willtobyte/carimbo");
+  fmt::println("Version: {}", COMMIT_HASH);
+  fmt::println("Compiled: " __DATE__ ", " __TIME__);
+  fmt::println("MIT License (c) Rodrigo Delduca - https://rodrigodelduca.org/");
+
   const auto jit = lua["jit"];
   if (jit.valid()) {
     fmt::println("{}", jit["version"].get<std::string>());

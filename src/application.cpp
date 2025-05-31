@@ -63,7 +63,6 @@ application::application(int argc, char **argv) {
 
   #ifdef HAVE_STEAM
   [[maybe_unused]] const bool ok = SteamAPI_Init();
-  SteamUserStats()->RequestCurrentStats();
   #endif
 }
 
