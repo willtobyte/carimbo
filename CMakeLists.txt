@@ -106,7 +106,14 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    --strip-all
+    -fuse-ld=lld
+    -Wl,--icf=all
+    -Wl,--gc-sections
+    -Wl,--as-needed
+    -Wl,-O2
+    -s
+    -Wl,-z,noexecstack
+    -Wl,-z,relro -Wl,-z,now
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
   )
@@ -133,8 +140,22 @@ if(EMSCRIPTEN)
   )
 else()
   if(MSVC)
-    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /INCREMENTAL:NO /OPT:REF /OPT:ICF")
-    set(DEBUG_FLAGS /Od;/Zi;/W4;/bigobj)
+    set(DEBUG_FLAGS
+      /Od
+      /Zi
+      /RTC1
+      /GS
+      /fp:precise
+      /Zc:inline
+      /Zc:__cplusplus
+      /GR
+      /EHsc
+      /DDEBUG
+      /W4
+      /wd4100
+      /bigobj
+    )
+
     set(RELEASE_FLAGS
       /O2
       /GL
@@ -150,12 +171,34 @@ else()
       /Zc:__cplusplus
     )
 
+    set(DEBUG_LINK_FLAGS
+      /DEBUG
+      /INCREMENTAL
+      /OPT:NOREF
+      /OPT:NOICF
+      /SAFESEH
+      /NXCOMPAT
+      /DYNAMICBASE
+    )
+
+    set(RELEASE_LINK_FLAGS
+      /LTCG
+      /OPT:REF
+      /OPT:ICF
+      /INCREMENTAL:NO
+      /RELEASE
+      /NXCOMPAT
+      /DYNAMICBASE
+    )
+
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_FLAGS}>
     )
+
     target_link_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Release>:/LTCG>
+      $<$<CONFIG:Debug>:${DEBUG_LINK_FLAGS}
+      $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}
     )
   else()
     set(GENERIC_WARNINGS
@@ -171,7 +214,14 @@ else()
 
     set(DEBUG_FLAGS
       -O0
-      -g
+      -g3
+      -fno-omit-frame-pointer
+      -fno-inline
+      -fstack-protector-strong
+      -DDEBUG
+      -Wall -Wextra -Wpedantic
+      -Wno-unused-parameter
+      ${GENERIC_WARNINGS}
     )
 
     set(RELEASE_FLAGS
@@ -188,6 +238,14 @@ else()
 
     set(RELEASE_LINKER_FLAGS
       -flto
+      -fuse-ld=lld
+      -Wl,--icf=all
+      -Wl,--gc-sections
+      -Wl,--as-needed
+      -Wl,-O2
+      -s
+      -Wl,-z,noexecstack
+      -Wl,-z,relro -Wl,-z,now
     )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
@@ -198,10 +256,6 @@ else()
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_LINKER_FLAGS}>
-    )
-
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Release>:NDEBUG>
     )
   endif()
 endif()
