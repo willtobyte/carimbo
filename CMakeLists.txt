@@ -95,6 +95,8 @@ if(EMSCRIPTEN)
     -fstrict-aliasing
     -ffast-math
     -fomit-frame-pointer
+    -fdata-sections
+    -ffunction-sections
     -DNDEBUG
     -Wall
     -Werror
@@ -111,8 +113,10 @@ if(EMSCRIPTEN)
     -sASSERTIONS=0
     -sDISABLE_EXCEPTION_CATCHING=1
     -sFILESYSTEM=1
+    -sEXPORTED_RUNTIME_METHODS=[]
     -sALLOW_MEMORY_GROWTH=1
     -sINVOKE_RUN=0
+    -sENVIRONMENT=web
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
