@@ -47,7 +47,7 @@ private:
   std::string _action{ACTION_DEFAULT};
   uint64_t _frame{0};
   uint64_t _last_frame{0};
-  geometry::point _point{};
+  geometry::point _point;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<pixmap> _spritesheet;
   #ifdef EMSCRIPTEN

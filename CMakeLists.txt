@@ -93,7 +93,6 @@ if(EMSCRIPTEN)
     -g0
     -flto
     -fstrict-aliasing
-    -ffast-math
     -fomit-frame-pointer
     -fdata-sections
     -ffunction-sections
@@ -164,7 +163,6 @@ else()
     set(RELEASE_FLAGS
       /O2
       /GL
-      /fp:fast
       /Gw
       /Gy
       /GR
@@ -233,7 +231,6 @@ else()
       -O3
       -flto
       -fstrict-aliasing
-      -ffast-math
       -funroll-loops
       -fomit-frame-pointer
       -DNDEBUG
