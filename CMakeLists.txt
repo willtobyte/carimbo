@@ -197,8 +197,8 @@ else()
     )
 
     target_link_options(${PROJECT_NAME} PRIVATE
-      $<$<CONFIG:Debug>:${DEBUG_LINK_FLAGS}
-      $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}
+      $<$<CONFIG:Debug>:${DEBUG_LINK_FLAGS}>
+      $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}>
     )
   else()
     set(GENERIC_WARNINGS
