@@ -110,13 +110,6 @@ if(EMSCRIPTEN)
     -flto
     --strip-debug
     --strip-producers
-    -sASSERTIONS=0
-    -sDISABLE_EXCEPTION_CATCHING=1
-    -sFILESYSTEM=1
-    -sEXPORTED_RUNTIME_METHODS=[]
-    -sALLOW_MEMORY_GROWTH=1
-    -sINVOKE_RUN=0
-    -sENVIRONMENT=web
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
@@ -125,18 +118,28 @@ if(EMSCRIPTEN)
   )
 
   target_link_options(${PROJECT_NAME} PRIVATE
-    -sUSE_SDL=3
-    -sEVAL_CTORS=1
-    -sWASM_BIGINT=1
+    -sENVIRONMENT=web
+
     -sINVOKE_RUN=0
     -sEXIT_RUNTIME=0
+    -sEVAL_CTORS=1
+
     -sINITIAL_MEMORY=128MB
     -sALLOW_MEMORY_GROWTH=1
+
+    -sFILESYSTEM=1
+
+    -sASSERTIONS=0
+    -sDISABLE_EXCEPTION_CATCHING=1
+
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
-    -sENVIRONMENT=web
+
+    -sUSE_SDL=3
+    -sWASM_BIGINT=1
     -sWEBSOCKET_SUBPROTOCOL=text
     -lwebsocket.js
+
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
