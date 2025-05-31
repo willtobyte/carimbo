@@ -239,10 +239,8 @@ else()
 
     set(RELEASE_LINKER_FLAGS
       -flto
-      -Wl,-dead_strip
       -Wl,-x
       -Wl,-S
-      -Wl,-no_deduplicate
       -Wl,-O2
     )
 
