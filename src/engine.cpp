@@ -190,6 +190,10 @@ void engine::_loop() {
   for (const auto &observer : _observers) {
     observer->on_enddraw();
   }
+
+  #ifdef HAVE_STEAM
+  SteamAPI_RunCallbacks();
+  #endif
 }
 
 void engine::on_quit() {
