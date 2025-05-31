@@ -238,7 +238,6 @@ else()
 
     set(RELEASE_LINKER_FLAGS
       -flto
-      -fuse-ld=lld
       -Wl,--icf=all
       -Wl,--gc-sections
       -Wl,--as-needed
