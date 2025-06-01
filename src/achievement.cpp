@@ -16,6 +16,6 @@ void achievement::unlock(std::string id) {
   SteamUserStats()->StoreStats();
 }
 #else
-void achievement::unlock(const std::string &) {}
+void achievement::unlock(std::string) {}
 #endif
 }
