@@ -180,7 +180,7 @@ jobs:
 
       - name: Conan x86_64 profile
         run: |
-          cat > ~/.conan2/profiles/armv8 <<EOF
+          cat > ~/.conan2/profiles/x86_64 <<EOF
           include(default)
 
           [settings]
