@@ -169,25 +169,43 @@ jobs:
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Conan profile
+      - name: Conan armv8 profile
         run: |
-          cat > ~/.conan2/profiles/universal <<EOF
+          cat > ~/.conan2/profiles/armv8 <<EOF
           include(default)
 
           [settings]
-          arch=armv8|x86_64
+          arch=armv8
           EOF
 
-      - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --profile=universal --settings compiler.cppstd=23 --settings build_type=Release
-
-      - name: Build
+      - name: Conan x86_64 profile
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DSTEAM=True
-          cmake --build build --config Release --verbose
+          cat > ~/.conan2/profiles/armv8 <<EOF
+          include(default)
+
+          [settings]
+          arch=x86_64
+          EOF
+
+      - name: Build x86_64
+        run: |
+          conan install . --output-folder=x86_64 --build=missing --profile=x86_64
+          cmake -Bx86_64 -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DSTEAM=True
+          cmake --build x86_64 --config Release --verbose
+
+      - name: Build arm64
+        run: |
+          conan install . --output-folder=arm64 --build=missing --profile=arm64
+          cmake -Barm64 -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DSTEAM=True
+          cmake --build arm64 --config Release --verbose
+
+      - name: Create universal binary
+        run: |
+          mkdir -p build_universal
+          lipo -create x86_64/carimbo arm64/carimbo -output output/carimbo
 
       - name: Compress artifacts
-        working-directory: build
+        working-directory: output
         run: |
           mkdir -p ../artifacts
           chmod -R a+rwx carimbo
