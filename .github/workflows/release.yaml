@@ -152,7 +152,47 @@ jobs:
           name: macOS
           path: artifacts/*
 
-  Steam:
+  Steam-macOS:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Clone Steam SDK
+        run: gh repo clone willtobyte/steamworks steamworks
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Setup Conan
+        run: |
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
+
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DSTEAM=True
+          cmake --build build --config Release --verbose
+
+      - name: Compress artifacts
+        working-directory: build
+        run: |
+          mkdir -p ../artifacts
+          chmod -R a+rwx carimbo
+          chmod -x LICENSES
+          tar -cpzvf Steam-macOS.tar.gz carimbo LICENSES
+          mv Steam-macOS.tar.gz ../artifacts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Steam macOS
+          path: artifacts/*
+
+  Steam-Windows:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -182,7 +222,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
-          Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/SteamWindows.zip"
+          Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Steam-Windows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -312,7 +352,8 @@ jobs:
       - Android
       - iOS
       - macOS
-      - Steam
+      - Steam-macOS
+      - Steam-Windows
       - Ubuntu
       - WebAssembly
       - Windows
