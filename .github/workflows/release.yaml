@@ -184,6 +184,12 @@ jobs:
           New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Steam.zip"
 
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Steam
+          path: artifacts/*
+
   Ubuntu:
     runs-on: ubuntu-latest
     if: false
