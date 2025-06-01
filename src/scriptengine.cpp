@@ -162,7 +162,7 @@ void framework::scriptengine::run() {
 
   steam::achievement achievement;
 
-  lua.new_usertype<steam::Achievement>(
+  lua.new_usertype<steam::achievement>(
     "Achievement",
     "unlock", &steam::achievement::unlock
   );

@@ -4,13 +4,15 @@ using namespace steam;
 
 #ifdef STEAM
 void achievement::unlock(std::string id) {
-  if (!SteamUserStats())
+  if (!SteamUserStats()) {
     return;
+  }
 
-  auto achieved = false;
+  auto achieved;
   SteamUserStats()->GetAchievement(id.c_str(), &achieved);
-  if (achieved)
+  if (achieved) {
     return;
+  }
 
   SteamUserStats()->SetAchievement(id.c_str());
   SteamUserStats()->StoreStats();
@@ -18,4 +20,3 @@ void achievement::unlock(std::string id) {
 #else
 void achievement::unlock(std::string) {}
 #endif
-}

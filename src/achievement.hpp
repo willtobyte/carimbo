@@ -6,7 +6,7 @@ namespace steam {
   class achievement {
   public:
       achievement() = default;
-      ~achievement() = delete;
+      ~achievement() = default;
 
       void unlock(std::string id);
   };
