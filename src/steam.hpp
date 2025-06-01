@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-bool SteamAPI_Init();
+bool SteamAPI_InitSafe();
 void SteamAPI_Shutdown();
 void SteamAPI_RunCallbacks();
 void* SteamUserStats();

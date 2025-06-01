@@ -9,21 +9,21 @@
 
 static const HMODULE steamdll = LoadLibraryA("steam_api64.dll");
 
-bool SteamAPI_Init() {
+bool SteamAPI_InitSafe() {
   fmt::println("SteamAPI_Init");
   if (!steamdll) {
     fmt::println("Not steamdll");
     return false;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_Init");
+  const auto address = GetProcAddress(steamdll, "SteamAPI_InitSafe");
   if (!address) {
-    fmt::println("Not GetProcAddress SteamAPI_Init");
+    fmt::println("Not SteamAPI_InitSafe");
     return false;
   }
 
-  using SteamAPI_Init_t = bool(S_CALLTYPE *)();
-  return reinterpret_cast<SteamAPI_Init_t>(address)();
+  using SteamAPI_InitSafe_t = bool(S_CALLTYPE *)();
+  return reinterpret_cast<SteamAPI_InitSafe_t>(address)();
 }
 
 void SteamAPI_Shutdown() {
@@ -102,10 +102,14 @@ bool SetAchievement(const char* name) {
 
 bool StoreStats() {
   const auto stats = SteamUserStats();
-  if (!stats) return false;
+  if (!stats) {
+    return false;
+  }
 
   const auto address = GetProcAddress(steamdll, "SteamAPI_ISteamUserStats_StoreStats");
-  if (!address) return false;
+  if (!address) {
+    return false;
+  }
 
   using StoreStats_t = bool(S_CALLTYPE *)(void*);
   return reinterpret_cast<StoreStats_t>(address)(stats);
@@ -113,7 +117,7 @@ bool StoreStats() {
 
 #else
 
-bool SteamAPI_Init() { return false; }
+bool SteamAPI_InitSafe() { return false; }
 void SteamAPI_Shutdown() {}
 void SteamAPI_RunCallbacks() {}
 void* SteamUserStats() { return nullptr; }
