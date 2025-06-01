@@ -58,11 +58,9 @@ application::application(int argc, char **argv) {
   std::atexit([] { SDL_Quit(); });
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
-
   PHYSFS_init(argv[0]);
-
   #ifdef HAVE_STEAM
-  [[maybe_unused]] const bool ok = SteamAPI_Init();
+  SteamAPI_Init();
   #endif
 }
 
