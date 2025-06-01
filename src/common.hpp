@@ -2,6 +2,7 @@
 
 #ifdef _WIN32
  #define NOMINMAX
+ #define HAVE_STEAM
 #endif
 
 #define SOL_ALL_SAFETIES_ON 1
