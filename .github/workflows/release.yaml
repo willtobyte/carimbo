@@ -201,7 +201,7 @@ jobs:
 
       - name: Create universal binary
         run: |
-          mkdir -p build_universal
+          mkdir -p output
           lipo -create x86_64/carimbo arm64/carimbo -output output/carimbo
 
       - name: Compress artifacts
