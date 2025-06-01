@@ -259,8 +259,6 @@ else()
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_LINKER_FLAGS}>
-      $<$<PLATFORM_ID:Darwin>:-Wl,-pagezero_size,10000>
-      $<$<PLATFORM_ID:Darwin>:-Wl,-image_base,100000000>
     )
   endif()
 endif()
