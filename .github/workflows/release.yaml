@@ -152,7 +152,7 @@ jobs:
           name: macOS
           path: artifacts/*
 
-  Steam-macOS:
+  SteamMacOS:
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -183,7 +183,7 @@ jobs:
           mkdir -p ../artifacts
           chmod -R a+rwx carimbo
           chmod -x LICENSES
-          tar -cpzvf Steam-macOS.tar.gz carimbo LICENSES
+          tar -cpzvf SteamMacOS.tar.gz carimbo LICENSES
           mv Steam-macOS.tar.gz ../artifacts
 
       - name: Upload artifacts
@@ -192,7 +192,7 @@ jobs:
           name: Steam macOS
           path: artifacts/*
 
-  Steam-Windows:
+  SteamWindows:
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -222,7 +222,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
-          Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Steam-Windows.zip"
+          Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/SteamWindows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -352,8 +352,8 @@ jobs:
       - Android
       - iOS
       - macOS
-      - Steam-macOS
-      - Steam-Windows
+      - SteamMacOS
+      - SteamWindows
       - Ubuntu
       - WebAssembly
       - Windows
