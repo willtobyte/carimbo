@@ -38,7 +38,7 @@ execute_process(
 
 add_compile_definitions(COMMIT_HASH="${commit_hash}")
 
-foreach(flag HITBOX LOCAL SANDBOX STEAM)
+foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})
     target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
@@ -61,26 +61,6 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
-
-if(STEAM)
-  if(MSVC)
-    set(STEAM_SDK_ROOT "${CMAKE_SOURCE_DIR}/steamworks")
-    set(STEAM_API_LIB "${STEAM_SDK_ROOT}/redistributable_bin/win64/steam_api64.lib")
-    set(STEAM_API_HEADER "${STEAM_SDK_ROOT}/public")
-
-    target_include_directories(${PROJECT_NAME} PRIVATE ${STEAM_API_HEADER})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${STEAM_API_LIB})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_STEAM)
-  elseif(APPLE)
-    set(STEAM_SDK_ROOT "${CMAKE_SOURCE_DIR}/steamworks")
-    set(STEAM_API_LIB "${STEAM_SDK_ROOT}/redistributable_bin/osx/libsteam_api.dylib")
-    set(STEAM_API_HEADER "${STEAM_SDK_ROOT}/public")
-
-    target_include_directories(${PROJECT_NAME} PRIVATE ${STEAM_API_HEADER})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${STEAM_API_LIB})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_STEAM)
-  endif()
-endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   set(EMSCRIPTEN TRUE)

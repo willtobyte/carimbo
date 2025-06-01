@@ -10,7 +10,7 @@
 static const HMODULE steamdll = LoadLibraryA("steam_api64.dll");
 
 bool SteamAPI_InitSafe() {
-  fmt::println("SteamAPI_Init");
+  fmt::println("SteamAPI_InitSafe >>> ");
   if (!steamdll) {
     fmt::println("Not steamdll");
     return false;
