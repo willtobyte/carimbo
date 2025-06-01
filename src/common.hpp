@@ -52,10 +52,6 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#ifdef HAVE_STEAM
-  #include <steam/steam_api.h>
-#endif
-
 #include <algorithm>
 #include <array>
 #include <atomic>
