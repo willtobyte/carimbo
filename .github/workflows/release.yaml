@@ -175,7 +175,7 @@ jobs:
           include(default)
 
           [settings]
-          arch=universal2
+          arch=armv8|x86_64
           EOF
 
       - name: Install dependencies
