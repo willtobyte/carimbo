@@ -169,8 +169,17 @@ jobs:
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
+      - name: Conan profile
+        run: |
+          cat > ~/.conan2/profiles/universal <<EOF
+          include(default)
+
+          [settings]
+          arch=universal2
+          EOF
+
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --profile=universal --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build
         run: |
@@ -184,7 +193,7 @@ jobs:
           chmod -R a+rwx carimbo
           chmod -x LICENSES
           tar -cpzvf SteamMacOS.tar.gz carimbo LICENSES
-          mv Steam-macOS.tar.gz ../artifacts
+          mv SteamMacOS.tar.gz ../artifacts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
