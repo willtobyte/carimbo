@@ -8,13 +8,15 @@ void achievement::unlock(std::string id) {
     return;
   }
 
-  auto achieved = false;
-  SteamUserStats()->GetAchievement(id.c_str(), &achieved);
+  const auto* ptr = id.c_str();
+
+  bool achieved;
+  SteamUserStats()->GetAchievement(ptr, &achieved);
   if (achieved) {
     return;
   }
 
-  SteamUserStats()->SetAchievement(id.c_str());
+  SteamUserStats()->SetAchievement(ptr);
   SteamUserStats()->StoreStats();
 }
 #else
