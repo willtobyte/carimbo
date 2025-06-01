@@ -160,6 +160,10 @@ void framework::scriptengine::run() {
     #endif
   };
 
+  sol::table achievement = lua.create_table();
+  achievement["unlock"] = &unlockachievement;
+  lua["achievement"] = achievement;
+
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string &json, sol::this_state state) {
       const auto &j = nlohmann::json::parse(json);

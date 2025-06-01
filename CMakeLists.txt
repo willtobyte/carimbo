@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.15)
 project(carimbo LANGUAGES C CXX)
 
+foreach(flag
+  CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_DEBUG
+  CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)
+  string(REPLACE "/MT" "/MD" ${flag} "${${flag}}")
+endforeach()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -57,21 +63,15 @@ find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 
 if(STEAM)
-  set(STEAM_SDK_ROOT "${CMAKE_SOURCE_DIR}/steamworks")
-  set(STEAM_API_LIB "${STEAM_SDK_ROOT}/redistributable_bin/win64/steam_api64.lib")
-  set(STEAM_API_DLL "${STEAM_SDK_ROOT}/redistributable_bin/win64/steam_api64.dll")
-  set(STEAM_API_HEADER "${STEAM_SDK_ROOT}/public")
+  if(MSVC)
+    set(STEAM_SDK_ROOT "${CMAKE_SOURCE_DIR}/steamworks")
+    set(STEAM_API_LIB "${STEAM_SDK_ROOT}/redistributable_bin/win64/steam_api64.lib")
+    set(STEAM_API_HEADER "${STEAM_SDK_ROOT}/public")
 
-  target_include_directories(${PROJECT_NAME} PRIVATE ${STEAM_API_HEADER})
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${STEAM_API_LIB})
-
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      ${STEAM_API_DLL}
-      $<TARGET_FILE_DIR:${PROJECT_NAME}>
-  )
-
-  target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_STEAM)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${STEAM_API_HEADER})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${STEAM_API_LIB})
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_STEAM)
+  endif()
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
