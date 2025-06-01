@@ -25,7 +25,7 @@ jobs:
       - name: Clone Steam SDK
         run: gh repo clone willtobyte/steamworks steamworks
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Setup Conan
         run: |
