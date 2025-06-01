@@ -352,7 +352,8 @@ jobs:
       - Android
       - iOS
       - macOS
-      - Steam
+      - SteammacOS
+      - SteamWindows
       - Ubuntu
       - WebAssembly
       - Windows
