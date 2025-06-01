@@ -8,7 +8,7 @@ void achievement::unlock(std::string id) {
     return;
   }
 
-  auto achieved;
+  auto achieved = false;
   SteamUserStats()->GetAchievement(id.c_str(), &achieved);
   if (achieved) {
     return;
