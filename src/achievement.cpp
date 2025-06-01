@@ -7,11 +7,11 @@ void unlockachievement(const std::string &id) {
     return;
 
   auto achieved = false;
-  SteamUserStats()->GetAchievement(id, &achieved);
+  SteamUserStats()->GetAchievement(id.c_str(), &achieved);
   if (achieved)
     return;
 
-  SteamUserStats()->SetAchievement(id);
+  SteamUserStats()->SetAchievement(id.c_str());
   SteamUserStats()->StoreStats();
 }
 #else
