@@ -1,8 +1,9 @@
 #include "achievement.hpp"
 
-namespace framework {
+using namespace steam;
+
 #ifdef STEAM
-void unlockachievement(const std::string &id) {
+void achievement::unlock(std::string id) {
   if (!SteamUserStats())
     return;
 
@@ -15,6 +16,6 @@ void unlockachievement(const std::string &id) {
   SteamUserStats()->StoreStats();
 }
 #else
-void unlockachievement(const std::string &) {}
+void achievement::unlock(const std::string &) {}
 #endif
 }

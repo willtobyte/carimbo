@@ -2,6 +2,12 @@
 
 #include "common.hpp"
 
-namespace framework {
-void unlockachievement(const std::string &id);
+namespace steam {
+  class achievement {
+  public:
+      achievement() = default;
+      ~achievement() = delete;
+
+      void unlock(std::string id);
+  };
 }

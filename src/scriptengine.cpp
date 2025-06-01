@@ -160,9 +160,14 @@ void framework::scriptengine::run() {
     #endif
   };
 
-  sol::table achievement = lua.create_table();
-  achievement["unlock"] = &unlockachievement;
-  lua["achievement"] = achievement;
+  steam::achievement achievement;
+
+  lua.new_usertype<steam::Achievement>(
+    "Achievement",
+    "unlock", &steam::achievement::unlock
+  );
+
+  lua["achievement"] = &achievement;
 
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string &json, sol::this_state state) {
