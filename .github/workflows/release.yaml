@@ -134,7 +134,7 @@ jobs:
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES=arm64
           cmake --build build --config Release --verbose
 
       - name: Compress artifacts
@@ -142,7 +142,8 @@ jobs:
         run: |
           mkdir -p ../artifacts
           chmod -R a+rwx carimbo
-          chmod -x LICENSES
+          chmod 644 LICENSES
+          chmod +x carimbo
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
@@ -179,7 +180,7 @@ jobs:
         run: |
           mkdir -p ../artifacts
           chmod +x carimbo
-          chmod -x LICENSES
+          chmod 644 LICENSES
           tar -czvf Ubuntu.tar.gz carimbo LICENSES
           mv Ubuntu.tar.gz ../artifacts
 
