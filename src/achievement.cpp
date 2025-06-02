@@ -5,7 +5,7 @@ using namespace steam;
 #ifdef HAVE_STEAM
 void achievement::unlock(std::string id) {
   if (!SteamUserStats()) {
-    fmt::print("NOT SteamUserStats")
+    fmt::print("NOT SteamUserStats");
     return;
   }
 
@@ -14,7 +14,7 @@ void achievement::unlock(std::string id) {
   bool achieved;
   SteamUserStats()->GetAchievement(ptr, &achieved);
   if (achieved) {
-    fmt::println("achieved!")
+    fmt::println("achieved!");
     return;
   }
 
