@@ -11,7 +11,7 @@ static const HMODULE hSteamApi = LoadLibraryA("steam_api64.dll");
 
 bool SteamAPI_InitSafe() {
   if (!hSteamApi) {
-    return false;
+    return true;
   }
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_InitSafe");
