@@ -2,9 +2,10 @@
 
 using namespace steam;
 
-#ifdef STEAM
+#ifdef HAVE_STEAM
 void achievement::unlock(std::string id) {
   if (!SteamUserStats()) {
+    fmt::print("NOT SteamUserStats")
     return;
   }
 
@@ -13,11 +14,13 @@ void achievement::unlock(std::string id) {
   bool achieved;
   SteamUserStats()->GetAchievement(ptr, &achieved);
   if (achieved) {
+    fmt::println("achieved!")
     return;
   }
 
   SteamUserStats()->SetAchievement(ptr);
   SteamUserStats()->StoreStats();
+  fmt::print("DONE");
 }
 #else
 void achievement::unlock(std::string) {}
