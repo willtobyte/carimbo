@@ -17,7 +17,7 @@ public:
   void draw(
       const geometry::rectangle &source,
       const geometry::rectangle &destination,
-      double_t angle = 0.0f,
+      double_t angle = 0.0L,
       reflection reflection = reflection::none,
       uint8_t alpha = 255
 #ifdef HITBOX
