@@ -8,7 +8,6 @@
   #define STEAM_LIB_NAME "steam_api64.dll"
 #elif defined(__APPLE__) && defined(__aarch64__)
   #include <dlfcn.h>
-  #include <cstdint>
   #define DYNLIB_HANDLE void*
   #define DYNLIB_LOAD(name) dlopen(name, RTLD_LAZY)
   #define DYNLIB_SYM(lib, name) dlsym(lib, name)
@@ -29,17 +28,17 @@ using GetAchievement_t        = bool(S_CALLTYPE *)(void*, const char*, bool*);
 using SetAchievement_t        = bool(S_CALLTYPE *)(void*, const char*);
 using StoreStats_t            = bool(S_CALLTYPE *)(void*);
 
-static const DYNLIB_HANDLE hSteamApi = DYNLIB_LOAD(STEAM_LIB_NAME);
+static DYNLIB_HANDLE hSteamApi = DYNLIB_LOAD(STEAM_LIB_NAME);
 
-#define LOAD_SYMBOL(name) reinterpret_cast<name##_t>(reinterpret_cast<uintptr_t>(DYNLIB_SYM(hSteamApi, #name)))
+#define LOAD_SYMBOL(name, sym) reinterpret_cast<name>(reinterpret_cast<void*>(DYNLIB_SYM(hSteamApi, sym)))
 
-static const auto pSteamAPI_InitSafe     = LOAD_SYMBOL(SteamAPI_InitSafe);
-static const auto pSteamAPI_Shutdown     = LOAD_SYMBOL(SteamAPI_Shutdown);
-static const auto pSteamAPI_RunCallbacks = LOAD_SYMBOL(SteamAPI_RunCallbacks);
-static const auto pSteamUserStats        = LOAD_SYMBOL(SteamAPI_SteamUserStats_v013);
-static const auto pGetAchievement        = LOAD_SYMBOL(SteamAPI_ISteamUserStats_GetAchievement);
-static const auto pSetAchievement        = LOAD_SYMBOL(SteamAPI_ISteamUserStats_SetAchievement);
-static const auto pStoreStats            = LOAD_SYMBOL(SteamAPI_ISteamUserStats_StoreStats);
+static const auto pSteamAPI_InitSafe     = LOAD_SYMBOL(SteamAPI_InitSafe_t, "SteamAPI_InitSafe");
+static const auto pSteamAPI_Shutdown     = LOAD_SYMBOL(SteamAPI_Shutdown_t, "SteamAPI_Shutdown");
+static const auto pSteamAPI_RunCallbacks = LOAD_SYMBOL(SteamAPI_RunCallbacks_t, "SteamAPI_RunCallbacks");
+static const auto pSteamUserStats        = LOAD_SYMBOL(SteamUserStats_t, "SteamAPI_SteamUserStats_v013");
+static const auto pGetAchievement        = LOAD_SYMBOL(GetAchievement_t, "SteamAPI_ISteamUserStats_GetAchievement");
+static const auto pSetAchievement        = LOAD_SYMBOL(SetAchievement_t, "SteamAPI_ISteamUserStats_SetAchievement");
+static const auto pStoreStats            = LOAD_SYMBOL(StoreStats_t, "SteamAPI_ISteamUserStats_StoreStats");
 
 bool SteamAPI_InitSafe() {
   return pSteamAPI_InitSafe();
