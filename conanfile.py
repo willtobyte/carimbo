@@ -18,6 +18,9 @@ class Carimbo(ConanFile):
     def _is_ios(self):
         return self._os_name() == "ios"
 
+    def _have_steam(self):
+        return self._os_name() in {"windows"}
+
     def requirements(self):
         self.requires("fmt/11.1.4")
         self.requires("libspng/0.7.4")
@@ -84,6 +87,9 @@ class Carimbo(ConanFile):
 
         if self._is_jit_capable():
             toolchain.preprocessor_definitions["HAVE_LUAJIT"] = None
+
+        if self._have_steam():
+            toolchain.preprocessor_definitions["HAVE_STEAM"] = None
 
         toolchain.generate()
         CMakeDeps(self).generate()

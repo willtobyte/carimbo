@@ -45,7 +45,7 @@ foreach(flag HITBOX LOCAL SANDBOX)
   endif()
 endforeach()
 
-foreach(flag HAVE_BOOST HAVE_LUAJIT)
+foreach(flag HAVE_BOOST HAVE_LUAJIT HAVE_STEAM)
   if(${flag})
     target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
   endif()
