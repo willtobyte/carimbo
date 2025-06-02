@@ -13,13 +13,13 @@ class Carimbo(ConanFile):
         return self._os_name() == "emscripten"
 
     def _is_jit_capable(self):
-        return self._os_name() in {"windows", "macos", "linux"}
+        return self._os_name() in {"linux", "macos", "windows"}
 
     def _is_ios(self):
         return self._os_name() == "ios"
 
     def _have_steam(self):
-        return self._os_name() in {"windows"}
+        return self._os_name() in {"macos", "windows"}
 
     def requirements(self):
         self.requires("fmt/11.1.4")
