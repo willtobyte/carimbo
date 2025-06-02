@@ -60,9 +60,7 @@ application::application(int argc, char **argv) {
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
   #ifdef HAVE_STEAM
-  if (!SteamAPI_InitSafe()) {
-    fmt::println("Failed SteamAPI_InitSafe");
-  }
+  SteamAPI_InitSafe();
   #endif
 }
 

@@ -41,32 +41,32 @@ static const auto pSetAchievement        = LOAD_SYMBOL(SetAchievement_t, "SteamA
 static const auto pStoreStats            = LOAD_SYMBOL(StoreStats_t, "SteamAPI_ISteamUserStats_StoreStats");
 
 bool SteamAPI_InitSafe() {
-  return pSteamAPI_InitSafe();
+  return pSteamAPI_InitSafe ? pSteamAPI_InitSafe() : false;
 }
 
 void SteamAPI_Shutdown() {
-  pSteamAPI_Shutdown();
+  pSteamAPI_Shutdown ? pSteamAPI_Shutdown() : void();
 }
 
 void SteamAPI_RunCallbacks() {
-  pSteamAPI_RunCallbacks();
+  pSteamAPI_RunCallbacks ? pSteamAPI_RunCallbacks() : void();
 }
 
 void* SteamUserStats() {
-  return pSteamUserStats();
+  return pSteamUserStats ? pSteamUserStats() : nullptr;
 }
 
 bool GetAchievement(const char* name) {
   bool achieved = false;
-  return pGetAchievement(SteamUserStats(), name, &achieved) && achieved;
+  return pGetAchievement ? (pGetAchievement(SteamUserStats(), name, &achieved) && achieved) : false;
 }
 
 bool SetAchievement(const char* name) {
-  return pSetAchievement(SteamUserStats(), name);
+  return pSetAchievement ? pSetAchievement(SteamUserStats(), name) : false;
 }
 
 bool StoreStats() {
-  return pStoreStats(SteamUserStats());
+  return pStoreStats ? pStoreStats(SteamUserStats()) : false;
 }
 
 #else
