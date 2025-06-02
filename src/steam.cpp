@@ -58,9 +58,9 @@ void* SteamUserStats() {
     return nullptr;
   }
 
-  const auto address = GetProcAddress(hSteamApi, "SteamUserStats");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_SteamUserStats_v013");
   if (!address) {
-    fmt::println(">>> Not SteamUserStats");
+    fmt::println(">>> Not SteamAPI_SteamUserStats_v013");
     return nullptr;
   }
 
