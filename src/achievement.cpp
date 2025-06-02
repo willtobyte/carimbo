@@ -11,15 +11,13 @@ void achievement::unlock(std::string id) {
 
   const auto* ptr = id.c_str();
 
-  bool achieved;
-  SteamUserStats()->GetAchievement(ptr, &achieved);
-  if (achieved) {
+  if (GetAchievement(ptr)) {
     fmt::println("achieved!");
     return;
   }
 
-  SteamUserStats()->SetAchievement(ptr);
-  SteamUserStats()->StoreStats();
+  SetAchievement(ptr);
+  StoreStats();
   fmt::print("DONE");
 }
 #else
