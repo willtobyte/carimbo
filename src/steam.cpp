@@ -44,13 +44,13 @@ void SteamAPI_RunCallbacks() {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_RunCallbacks");
   if (!address) {
-    fmt::println("Not address SteamAPI_RunCallbacks")
+    fmt::println("Not address SteamAPI_RunCallbacks");
     return;
   }
 
   using SteamAPI_RunCallbacks_t = void(S_CALLTYPE *)();
   reinterpret_cast<SteamAPI_RunCallbacks_t>(address)();
-  fmt::println(">>> SteamAPI_RunCallbacks")
+  fmt::println(">>> SteamAPI_RunCallbacks");
 }
 
 // ---
