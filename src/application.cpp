@@ -51,9 +51,6 @@ application::application(int argc, char **argv) {
   std::signal(SIGINT, fn);
   std::signal(SIGTERM, fn);
 
-  #ifdef HAVE_STEAM
-  std::atexit([] { SteamAPI_Shutdown(); });
-  #endif
   std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });
 
