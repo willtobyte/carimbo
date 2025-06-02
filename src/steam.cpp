@@ -62,6 +62,7 @@ void* SteamUserStats() {
 
   const auto address = GetProcAddress(hSteamApi, "SteamUserStats");
   if (!address) {
+    fmt::println(">>> Not SteamUserStats");
     return nullptr;
   }
 
@@ -94,6 +95,7 @@ bool SetAchievement(const char* name) {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_SetAchievement");
   if (!address) {
+    fmt::println(">>> Not SteamAPI_ISteamUserStats_SetAchievement");
     return false;
   }
 
@@ -109,6 +111,7 @@ bool StoreStats() {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_StoreStats");
   if (!address) {
+    fmt::println(">>> Not SteamAPI_ISteamUserStats_StoreStats");
     return false;
   }
 
