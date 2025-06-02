@@ -6,7 +6,7 @@
   #define DYNLIB_LOAD(name) LoadLibraryA(name)
   #define DYNLIB_SYM(lib, name) GetProcAddress(lib, name)
   #define STEAM_LIB_NAME "steam_api64.dll"
-#elif defined(__APPLE__) && defined(__aarch64__)
+#elif defined(__APPLE__)
   #include <dlfcn.h>
   #define DYNLIB_HANDLE void*
   #define DYNLIB_LOAD(name) dlopen(name, RTLD_LAZY)
