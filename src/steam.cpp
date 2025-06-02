@@ -7,18 +7,15 @@
 #define S_CALLTYPE __cdecl
 #endif
 
-static const HMODULE steamdll = LoadLibraryA("steam_api64.dll");
+static const HMODULE hSteamApi = LoadLibraryA("steam_api64.dll");
 
 bool SteamAPI_InitSafe() {
-  fmt::println("SteamAPI_InitSafe >>> ");
-  if (!steamdll) {
-    fmt::println("Not steamdll");
+  if (!hSteamApi) {
     return false;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_InitSafe");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_InitSafe");
   if (!address) {
-    fmt::println("Not SteamAPI_InitSafe");
     return false;
   }
 
@@ -27,11 +24,11 @@ bool SteamAPI_InitSafe() {
 }
 
 void SteamAPI_Shutdown() {
-  if (!steamdll) {
+  if (!hSteamApi) {
     return;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_Shutdown");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_Shutdown");
   if (!address) {
     return;
   }
@@ -41,25 +38,29 @@ void SteamAPI_Shutdown() {
 }
 
 void SteamAPI_RunCallbacks() {
-  if (!steamdll) {
+  if (!hSteamApi) {
     return;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_RunCallbacks");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_RunCallbacks");
   if (!address) {
+    fmt::println("Not address SteamAPI_RunCallbacks")
     return;
   }
 
   using SteamAPI_RunCallbacks_t = void(S_CALLTYPE *)();
   reinterpret_cast<SteamAPI_RunCallbacks_t>(address)();
+  fmt::println(">>> SteamAPI_RunCallbacks")
 }
 
+// ---
+//
 void* SteamUserStats() {
-  if (!steamdll) {
+  if (!hSteamApi) {
     return nullptr;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamUserStats");
+  const auto address = GetProcAddress(hSteamApi, "SteamUserStats");
   if (!address) {
     return nullptr;
   }
@@ -74,7 +75,7 @@ bool GetAchievement(const char* name) {
     return false;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_ISteamUserStats_GetAchievement");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_GetAchievement");
   if (!address) {
     fmt::println("Not GetProcAddress SteamAPI_ISteamUserStats_GetAchievement");
     return false;
@@ -91,7 +92,7 @@ bool SetAchievement(const char* name) {
     return false;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_ISteamUserStats_SetAchievement");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_SetAchievement");
   if (!address) {
     return false;
   }
@@ -106,7 +107,7 @@ bool StoreStats() {
     return false;
   }
 
-  const auto address = GetProcAddress(steamdll, "SteamAPI_ISteamUserStats_StoreStats");
+  const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_StoreStats");
   if (!address) {
     return false;
   }
