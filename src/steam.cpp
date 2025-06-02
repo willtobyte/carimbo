@@ -51,8 +51,6 @@ void SteamAPI_RunCallbacks() {
   reinterpret_cast<SteamAPI_RunCallbacks_t>(address)();
 }
 
-// ---
-//
 void* SteamUserStats() {
   if (!hSteamApi) {
     return nullptr;
@@ -60,7 +58,6 @@ void* SteamUserStats() {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_SteamUserStats_v013");
   if (!address) {
-    fmt::println(">>> Not SteamAPI_SteamUserStats_v013");
     return nullptr;
   }
 
@@ -76,7 +73,6 @@ bool GetAchievement(const char* name) {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_GetAchievement");
   if (!address) {
-    fmt::println("Not GetProcAddress SteamAPI_ISteamUserStats_GetAchievement");
     return false;
   }
 
@@ -93,7 +89,6 @@ bool SetAchievement(const char* name) {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_SetAchievement");
   if (!address) {
-    fmt::println(">>> Not SteamAPI_ISteamUserStats_SetAchievement");
     return false;
   }
 
@@ -109,7 +104,6 @@ bool StoreStats() {
 
   const auto address = GetProcAddress(hSteamApi, "SteamAPI_ISteamUserStats_StoreStats");
   if (!address) {
-    fmt::println(">>> Not SteamAPI_ISteamUserStats_StoreStats");
     return false;
   }
 
