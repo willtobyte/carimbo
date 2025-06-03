@@ -41,32 +41,74 @@ static const auto pSetAchievement        = LOAD_SYMBOL(SetAchievement_t, "SteamA
 static const auto pStoreStats            = LOAD_SYMBOL(StoreStats_t, "SteamAPI_ISteamUserStats_StoreStats");
 
 bool SteamAPI_InitSafe() {
-  return pSteamAPI_InitSafe ? pSteamAPI_InitSafe() : false;
+  if (pSteamAPI_InitSafe) {
+    return pSteamAPI_InitSafe();
+  }
+
+  return false;
 }
 
 void SteamAPI_Shutdown() {
-  pSteamAPI_Shutdown ? pSteamAPI_Shutdown() : void();
+  if (pSteamAPI_Shutdown) {
+    pSteamAPI_Shutdown();
+  }
 }
 
 void SteamAPI_RunCallbacks() {
-  pSteamAPI_RunCallbacks ? pSteamAPI_RunCallbacks() : void();
+  if (pSteamAPI_RunCallbacks) {
+    pSteamAPI_RunCallbacks();
+  }
 }
 
 void* SteamUserStats() {
-  return pSteamUserStats ? pSteamUserStats() : nullptr;
+  if (pSteamUserStats) {
+    return pSteamUserStats();
+  }
+
+  return nullptr;
 }
 
 bool GetAchievement(const char* name) {
-  bool achieved = false;
-  return pGetAchievement ? (pGetAchievement(SteamUserStats(), name, &achieved) && achieved) : false;
+  if (pGetAchievement) {
+    bool achieved = false;
+    return pGetAchievement(SteamUserStats(), name, &achieved) && achieved;
+  }
+
+  return false;
 }
 
 bool SetAchievement(const char* name) {
-  return pSetAchievement ? pSetAchievement(SteamUserStats(), name) : false;
+  if (pSetAchievement) {
+    return pSetAchievement(SteamUserStats(), name);
+  }
+
+  return false;
 }
 
 bool StoreStats() {
-  return pStoreStats ? pStoreStats(SteamUserStats()) : false;
+  if (pStoreStats) {
+    pStoreStats(SteamUserStats());
+  }
+
+  return false;
+}
+
+#if defined(_WIN32)
+  #include <windows.h>
+  #pragma section(".CRT$XCU", read)
+  static void __cdecl _steam_shutdown();
+  extern "C" __declspec(allocate(".CRT$XCU")) void (__cdecl* _steam_shutdown_hook)() = _steam_shutdown;
+#elif defined(__GNUC__)
+  __attribute__((destructor))
+  static void _steam_shutdown();
+#endif
+
+static void _steam_shutdown() {
+  static bool once{};
+  if (once) return;
+  once = true;
+
+  if (pSteamAPI_Shutdown) pSteamAPI_Shutdown();
 }
 
 #else
