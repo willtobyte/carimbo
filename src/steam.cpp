@@ -93,24 +93,6 @@ bool StoreStats() {
   return false;
 }
 
-#if defined(_WIN32)
-  #include <windows.h>
-  #pragma section(".CRT$XCU", read)
-  static void __cdecl _steam_shutdown();
-  extern "C" __declspec(allocate(".CRT$XCU")) void (__cdecl* _steam_shutdown_hook)() = _steam_shutdown;
-#elif defined(__GNUC__)
-  __attribute__((destructor))
-  static void _steam_shutdown();
-#endif
-
-static void _steam_shutdown() {
-  static bool once{};
-  if (once) return;
-  once = true;
-
-  if (pSteamAPI_Shutdown) pSteamAPI_Shutdown();
-}
-
 #else
 
 bool SteamAPI_InitSafe()            { return false; }
