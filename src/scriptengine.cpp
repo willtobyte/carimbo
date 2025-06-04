@@ -160,40 +160,22 @@ void framework::scriptengine::run() {
     #endif
   };
 
-  lua["queryparam"] = [&lua](std::string_view key) -> sol::object {
+  lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) -> sol::object {
     #ifdef EMSCRIPTEN
-      EM_ASM({
-          if (!Module.__queryParams) {
-              Module.__queryParams = new URLSearchParams(window.location.search);
-          }
-      });
+      std::string js = fmt::format(R"(
+        (function(){{
+          var p = new URLSearchParams(window.location.search);
+          var v = p.get("{}");
+          return v !== null ? v : "{}";
+        }})()
+      )", key, defval);
 
-      const auto* cstr = reinterpret_cast<const char*>(EM_ASM_PTR({
-        const key = UTF8ToString($0);
-        const value = Module.__queryParams.get(key);
-
-        if (!value) {
-          return nullptr;
-        }
-
-        const len = lengthBytesUTF8(value) + 1;
-        const ptr = _malloc(len);
-
-        stringToUTF8(value, ptr, len);
-
-        return ptr;
-      }, key.data()));
-
-      if (!cstr) {
-        return sol::nil;
-      }
-
-      std::string result(cstr);
-      free(const_cast<char*>(cstr));
-      return sol::make_object(lua, result);
+      const char* result = emscripten_run_script_string(js.c_str());
+      if (!result || !*result) return sol::make_object(lua, defval);
+      return sol::make_object(lua, std::string(result));
     #else
       UNUSED(key);
-      return sol::make_object(lua, sol::lua_nil);
+      return sol::make_object(lua, defval);
     #endif
   };
 
