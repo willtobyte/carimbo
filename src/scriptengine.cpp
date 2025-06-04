@@ -160,6 +160,43 @@ void framework::scriptengine::run() {
     #endif
   };
 
+  lua["queryparam"] = [&lua](std::string_view key) -> sol::object {
+    #ifdef EMSCRIPTEN
+      EM_ASM({
+          if (!Module.__queryParams) {
+              Module.__queryParams = new URLSearchParams(window.location.search);
+          }
+      });
+
+      const auto* cstr = reinterpret_cast<const char*>(EM_ASM_PTR({
+        const key = UTF8ToString($0);
+        const value = Module.__queryParams.get(key);
+
+        if (!value) {
+          return nullptr;
+        }
+
+        const len = lengthBytesUTF8(value) + 1;
+        const ptr = _malloc(len);
+
+        stringToUTF8(value, ptr, len);
+
+        return ptr;
+      }, key.data()));
+
+      if (!cstr) {
+        return sol::nil;
+      }
+
+      std::string result(cstr);
+      free(const_cast<char*>(cstr));
+      return sol::make_object(lua, result);
+    #else
+      UNUSED(key);
+      return sol::make_object(lua, sol::lua_nil);
+    #endif
+  };
+
   steam::achievement achievement;
 
   lua.new_usertype<steam::achievement>(
