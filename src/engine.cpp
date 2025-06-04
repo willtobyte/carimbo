@@ -2,7 +2,6 @@
 
 #include "audiodevice.hpp"
 #include "eventmanager.hpp"
-#include "framerate.hpp"
 #include "loopable.hpp"
 #include "objectmanager.hpp"
 #include "renderer.hpp"
@@ -11,10 +10,6 @@
 #include "window.hpp"
 
 using namespace framework;
-
-engine::engine() {
-  add_loopable(std::make_shared<framerate>());
-}
 
 std::shared_ptr<audio::audiodevice> engine::audiodevice() const {
   return _audiodevice;

@@ -29,8 +29,21 @@ public:
   void loop(float_t delta) override {
     _function(delta);
 
-    const auto memory = lua_gc(_L, LUA_GCCOUNT, 0) / 1024.0;
-    if (memory <= 8.0) [[likely]] {
+    _frames++;
+    const auto now = SDL_GetTicks();
+    _elapsed += now - _start;
+    _start = now;
+
+    const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
+
+    if (_elapsed >= 1000) {
+      fmt::println("{:.1f} {}KB", static_cast<double_t>(_frames * _elapsed) * 0.001, memory);
+
+      _elapsed = 0;
+      _frames = 0;
+    }
+
+    if (memory <= 8'192) [[likely]] {
       lua_gc(_L, LUA_GCSTEP, 8);
       return;
     }
@@ -40,8 +53,11 @@ public:
   }
 
 private:
-  lua_State* _L;
+  lua_State *_L;
   sol::function _function;
+  uint64_t _frames{0};
+  uint64_t _elapsed{0};
+  uint64_t _start{SDL_GetTicks()};
 };
 
 auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {

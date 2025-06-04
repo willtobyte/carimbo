@@ -23,7 +23,7 @@
 namespace framework {
 class engine : public input::eventreceiver {
 public:
-  engine();
+  engine() = default;
   virtual ~engine() = default;
 
   std::shared_ptr<audio::audiodevice> audiodevice() const;
