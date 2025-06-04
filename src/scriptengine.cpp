@@ -22,16 +22,12 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state_view &lua, sol::protected_function function)
+  explicit lua_loopable(const sol::state_view &lua, sol::function function)
       : _L(lua.lua_state()),
         _function(std::move(function)) {}
 
   void loop(float_t delta) override {
-    const auto result = _function(delta);
-    if (!result.valid()) [[unlikely]] {
-      sol::error err = result;
-      throw std::runtime_error(err.what());
-    }
+    _function(delta);
 
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0) / 1024.0;
     if (memory <= 8.0) [[likely]] {
@@ -45,7 +41,7 @@ public:
 
 private:
   lua_State* _L;
-  sol::protected_function _function;
+  sol::function _function;
 };
 
 auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
@@ -932,11 +928,11 @@ void framework::scriptengine::run() {
   }
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
-  const auto loop = lua["loop"].get<sol::protected_function>();
+  const auto loop = lua["loop"].get<sol::function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
   const auto end = SDL_GetPerformanceCounter();
-  const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
+  const auto elapsed = (end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
   fmt::println("boot time {:.3f}ms", elapsed);
 
   engine->run();
