@@ -88,7 +88,7 @@ auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
   case nlohmann::json::value_t::number_unsigned:
     return sol::make_object(lua, value.get<uint64_t>());
   case nlohmann::json::value_t::number_float:
-    return sol::make_object(lua, value.get<double>());
+    return sol::make_object(lua, value.get<double_t>());
   default:
     return sol::lua_nil;
   }
@@ -122,11 +122,11 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
   case sol::type::boolean:
     return value.as<bool>();
   case sol::type::number: {
-    const auto number = value.as<double>();
-    double intpart;
-    const double frac = std::modf(number, &intpart);
-    return std::abs(frac) < std::numeric_limits<double>::epsilon()
-        ? static_cast<double>(static_cast<int64_t>(intpart))
+    const auto number = value.as<double_t>();
+    double_t intpart;
+    const double_t frac = std::modf(number, &intpart);
+    return std::abs(frac) < std::numeric_limits<double_t>::epsilon()
+        ? static_cast<double_t>(static_cast<int64_t>(intpart))
         : number;
   }
 
@@ -662,8 +662,8 @@ void framework::scriptengine::run() {
     "set", [](storage::cassette &c, const std::string &key, sol::object object) {
       if (object.is<int>())
         c.set<int>(key, object.as<int>());
-      else if (object.is<double>())
-        c.set<double>(key, object.as<double>());
+      else if (object.is<double_t>())
+        c.set<double_t>(key, object.as<double_t>());
       else if (object.is<bool>())
         c.set<bool>(key, object.as<bool>());
       else if (object.is<std::string>())
@@ -684,17 +684,17 @@ void framework::scriptengine::run() {
             for (size_t i = 1, n = tbl.size(); i <= n; ++i) {
               sol::optional<sol::object> opt = tbl[i];
               if (opt) {
-                sol::object obj = opt.value();
-                if (obj.is<int>())
-                  tmp.push_back(obj.as<int>());
-                else if (obj.is<double>())
-                  tmp.push_back(obj.as<double>());
-                else if (obj.is<bool>())
-                  tmp.push_back(obj.as<bool>());
-                else if (obj.is<std::string>())
-                  tmp.push_back(obj.as<std::string>());
-                else if (obj.is<sol::table>())
-                  tmp.push_back(table2json(obj.as<sol::table>()));
+                sol::object o = opt.value();
+                if (o.is<int>())
+                  tmp.push_back(o.as<int>());
+                else if (o.is<double_t>())
+                  tmp.push_back(o.as<double_t>());
+                else if (o.is<bool>())
+                  tmp.push_back(o.as<bool>());
+                else if (o.is<std::string>())
+                  tmp.push_back(o.as<std::string>());
+                else if (o.is<sol::table>())
+                  tmp.push_back(table2json(o.as<sol::table>()));
                 else
                   tmp.push_back(nullptr);
               } else {
@@ -715,8 +715,8 @@ void framework::scriptengine::run() {
                 continue;
               if (valueo.is<int>())
                 tmp[k] = valueo.as<int>();
-              else if (valueo.is<double>())
-                tmp[k] = valueo.as<double>();
+              else if (valueo.is<double_t>())
+                tmp[k] = valueo.as<double_t>();
               else if (valueo.is<bool>())
                 tmp[k] = valueo.as<bool>();
               else if (valueo.is<std::string>())
@@ -755,7 +755,7 @@ void framework::scriptengine::run() {
         } else if (js.is_number_integer())
           return sol::make_object(lua, js.get<int>());
         else if (js.is_number_float())
-          return sol::make_object(lua, js.get<double>());
+          return sol::make_object(lua, js.get<double_t>());
         else if (js.is_boolean())
           return sol::make_object(lua, js.get<bool>());
         else if (js.is_string())
@@ -948,7 +948,7 @@ void framework::scriptengine::run() {
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
   const auto end = SDL_GetPerformanceCounter();
-  const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
+  const auto elapsed = static_cast<double_t>(end - start) * 1000.0 / static_cast<double_t>(SDL_GetPerformanceFrequency());
   fmt::println("boot time {:.3f}ms", elapsed);
 
   engine->run();
