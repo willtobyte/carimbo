@@ -36,7 +36,7 @@ public:
 
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
 
-    if (_elapsed >= 1000) {
+    if (_elapsed >= 1000) [[unlikely]] {
       fmt::println("{:.1f} {}KB", static_cast<double_t>(_frames * _elapsed) * 0.001, memory);
 
       _elapsed = 0;
