@@ -70,6 +70,7 @@ auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
 
     return t;
   }
+
   case nlohmann::json::value_t::array: {
     auto t = lua.create_table();
     for (size_t i = 0; i < value.size(); ++i) {
@@ -107,6 +108,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
       for (const auto &pair : lua_table) {
         j.push_back(_to_json(pair.second));
       }
+
       return j;
     }
 
@@ -114,6 +116,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
     for (const auto &pair : lua_table) {
       j[pair.first.as<std::string>()] = _to_json(pair.second);
     }
+
     return j;
   }
 
