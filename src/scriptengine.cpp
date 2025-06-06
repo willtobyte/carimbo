@@ -738,8 +738,8 @@ void framework::scriptengine::run() {
         throw std::runtime_error("unsupported type for set");
       }
     },
-    "get", [](const storage::cassette &c, const std::string &key, sol::object default_value, sol::this_state ts) -> sol::object {
-      sol::state_view lua(ts);
+    "get", [](const storage::cassette &c, const std::string &key, sol::object default_value, sol::this_state state) -> sol::object {
+      sol::state_view lua(state);
       const nlohmann::json j = c.get<nlohmann::json>(key, _to_json(default_value));
 
       std::function<sol::object(const nlohmann::json &)> json2lua =
