@@ -43,7 +43,7 @@ public:
       _frames = 0;
     }
 
-    if (memory <= 8'192) [[likely]] {
+    if (memory <= 8192) [[likely]] {
       lua_gc(_L, LUA_GCSTEP, 8);
       return;
     }
