@@ -773,30 +773,27 @@ void framework::scriptengine::run() {
     "Socket",
     sol::constructors<network::socket()>(),
     "connect", &network::socket::connect,
-    "emit", [](network::socket &sio, const std::string &event, sol::table data, sol::this_state state) {
+    "emit", [](network::socket &sio, const std::string &event, const sol::table &data, sol::this_state state) {
       sol::state_view lua(state);
       const auto j = _to_json(data);
       sio.emit(event, j.dump());
     },
-    "on", [](network::socket &sio, const std::string &event, sol::function callback, sol::this_state state) {
+    "on", [](network::socket &sio, const std::string &event, const sol::function &callback, sol::this_state state) {
       sol::state_view lua(state);
+
       sio.on(event, [callback, lua](const std::string &json) {
         const auto &j = nlohmann::json::parse(json);
-
         callback(_to_lua(j, lua));
       });
     },
-    "rpc", [](network::socket &sio, const std::string &method, sol::table arguments, sol::function callback, sol::this_state state) {
+    "rpc", [](network::socket &sio, const std::string &method, const sol::table &arguments, const sol::function &callback, sol::this_state state) {
       sol::state_view lua(state);
-      const auto args_json = _to_json(arguments);
-      sio.rpc(
-        method, args_json.dump(),
-        [callback, lua](const std::string &response) {
-          const auto &j = nlohmann::json::parse(response);
+      const auto j = _to_json(arguments);
 
-          callback(_to_lua(j, lua));
-        }
-      );
+      sio.rpc(method, j.dump(), [callback, lua](const std::string &response) {
+        const auto &j = nlohmann::json::parse(response);
+        callback(_to_lua(j, lua));
+      });
     }
   );
 
