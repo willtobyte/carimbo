@@ -31,5 +31,17 @@ help:
 	 @awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 .PHONY: bump
-bump: ## Bump git tag
-	@tag=$$(git tag | sort -V | tail -n1 | sed 's/^v//' | awk -F. '{print "v"$$1"."$$2"."($$3+1)}') && git tag "$$tag" && git push origin --tags
+bump: ## Bump git tag if there are new commits
+	@latest_tag=$$(git describe --tags --abbrev=0 2>/dev/null || echo "") ; \
+	if [ -z "$$latest_tag" ]; then \
+		echo "No tags found. Creating initial tag v0.0.1"; \
+		git tag v0.0.1 && git push origin v0.0.1 ; \
+	else \
+		if git rev-list "$$latest_tag"..HEAD --quiet; then \
+			new_tag=$$(echo "$$latest_tag" | sed 's/^v//' | awk -F. '{print "v"$$1"."$$2"."($$3+1)}') ; \
+			echo "New commits found. Tagging as $$new_tag"; \
+			git tag "$$new_tag" && git push origin "$$new_tag" ; \
+		else \
+			echo "No new commits since $$latest_tag. Skipping bump."; \
+		fi ; \
+	fi
