@@ -31,19 +31,25 @@ help:
 	 @awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 .PHONY: bump
-bump: ## Bump git tag
-	@latest_tag=$$(git describe --tags --abbrev=0 2>/dev/null || echo "") ; \
+bump: ## Bump git
+	@set -e; \
+	latest_tag=$$(git describe --tags --abbrev=0 2>/dev/null || echo ""); \
 	if [ -z "$$latest_tag" ]; then \
 		echo "No tags found. Creating initial tag v0.0.1"; \
-		git tag v0.0.1 && git push origin v0.0.1 ; \
+		git tag v0.0.1; \
+		git push origin v0.0.1; \
+	elif [ "$$(git rev-parse HEAD)" = "$$(git rev-list -n1 $$latest_tag)" ]; then \
+		echo "HEAD is already tagged with $$latest_tag. No new tag needed."; \
 	else \
-		if git rev-list "$$latest_tag"..HEAD --quiet; then \
-			base_version=$$(echo "$$latest_tag" | sed 's/^v//' | cut -d. -f1,2) ; \
-			next_patch=$$(git tag | grep "^v$$base_version\." | sed "s/^v$$base_version\.//" | sort -n | tail -n1 | awk '{print $$1+1}') ; \
-			new_tag="v$$base_version.$$next_patch" ; \
-			echo "New commits found. Tagging as $$new_tag"; \
-			git tag "$$new_tag" && git push origin "$$new_tag" ; \
-		else \
-			echo "No new commits since $$latest_tag. Skipping bump."; \
-		fi ; \
+		base_version=$$(echo "$$latest_tag" | sed 's/^v//' | cut -d. -f1,2); \
+		last_patch=$$(git tag | grep -E "^v$$base_version\\.[0-9]+$$" | sed "s/^v$$base_version\.//" | sort -n | tail -n1); \
+		if [ -z "$$last_patch" ]; then next_patch=0; else next_patch=$$((last_patch + 1)); fi; \
+		new_tag="v$$base_version.$$next_patch"; \
+		while git rev-parse "$$new_tag" >/dev/null 2>&1; do \
+			next_patch=$$((next_patch + 1)); \
+			new_tag="v$$base_version.$$next_patch"; \
+		done; \
+		echo "Tagging new release: $$new_tag"; \
+		git tag "$$new_tag"; \
+		git push origin "$$new_tag"; \
 	fi
