@@ -25,7 +25,7 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 ### Games
 
-Games and demos created with the Carimbo engine are hosted at [carimbo.run](https://carimbo.run). They can be tested or played online without installation, thanks to WebAssembly technology supported by all modern browsers.
+Games and demos created with the Carimbo engine are hosted at [carimbo.games](https://carimbo.games). They can be tested or played online without installation, thanks to WebAssembly technology supported by all modern browsers.
 
 ### License
 
