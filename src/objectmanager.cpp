@@ -61,17 +61,17 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
     const auto &key = item.key();
     const auto &a = item.value();
     const auto oneshot = a.value("oneshot", false);
-    const auto hitbox = a.contains("hitbox") ? std::make_optional(a["hitbox"].template get<geometry::rectangle>()) : std::nullopt;
-    const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(fmt::format("blobs/{}/{}.ogg", scope, a["effect"].template get<std::string>())) : nullptr;
-    const auto next = a.contains("next") ? std::make_optional(a["next"].template get<std::string>()) : std::nullopt;
+    const auto hitbox = a.contains("hitbox") ? std::make_optional(a.at("hitbox").template get<geometry::rectangle>()) : std::nullopt;
+    const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(fmt::format("blobs/{}/{}.ogg", scope ? scope->get() : "", a.at("effect").template get_ref<const std::string&>())) : nullptr;
+    const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
 
-    const auto &f = a["frames"];
+    const auto &f = a.at("frames");
     std::vector<graphics::keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
       return graphics::keyframe{
-          frame["rectangle"].template get<geometry::rectangle>(),
-          frame["offset"].template get<geometry::point>(),
-          frame["duration"].template get<uint64_t>(),
+          frame.at("rectangle").template get<geometry::rectangle>(),
+          frame.at("offset").template get<geometry::point>(),
+          frame.at("duration").template get<uint64_t>(),
       };
     });
 
