@@ -235,9 +235,9 @@ graphics::reflection object::reflection() const {
 }
 
 void object::set_action(const std::string& action) {
-  if (_props.action == action) {
-    return;
-  }
+  // if (_props.action == action) {
+  //   return;
+  // }
 
   _props.action = action;
   _props.frame = 0;
