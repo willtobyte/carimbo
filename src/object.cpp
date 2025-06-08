@@ -230,11 +230,21 @@ graphics::reflection object::reflection() const {
   return _props.reflection;
 }
 
-void object::set_action(const std::string &action) {
-  if (_props.action != action) {
-    _props.action = action;
-    _props.frame = 0;
-    _props.last_frame = SDL_GetTicks();
+void object::set_action(const std::string& action) {
+  if (_props.action == action) return;
+
+  _props.action = action;
+  _props.frame = 0;
+  _props.last_frame = SDL_GetTicks();
+
+  const auto it = _props.animations.find(_props.action);
+  if (it == _props.animations.end()) {
+    return;
+  }
+
+  const auto& e = it->second.effect;
+  if (e) {
+    e->play();
   }
 }
 
