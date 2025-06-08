@@ -99,7 +99,9 @@ void object::update(float_t delta) {
           _onanimationfinished(shared_from_this(), finished);
         }
 
-        if (!animation.next) return;
+        if (!animation.next) {
+          return;
+        }
 
         _props.action = *animation.next;
         _props.frame = 0;
@@ -110,7 +112,9 @@ void object::update(float_t delta) {
 
         animation = ait->second;
         keyframes = animation.keyframes;
-        if (keyframes.empty()) return;
+        if (keyframes.empty()) {
+          return;
+        }
       } else {
         _props.frame = 0;
       }
@@ -231,7 +235,9 @@ graphics::reflection object::reflection() const {
 }
 
 void object::set_action(const std::string& action) {
-  if (_props.action == action) return;
+  if (_props.action == action) {
+    return;
+  }
 
   _props.action = action;
   _props.frame = 0;

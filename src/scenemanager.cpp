@@ -20,10 +20,10 @@ std::shared_ptr<scene> scenemanager::load(const std::string &name) {
   const auto eview = es
     | std::views::transform([&](const auto& e) {
       const auto& basename = e.template get<std::string>();
-      auto path = std::format("blobs/{}/{}.ogg", name, basename);
+      const auto f = fmt::format("blobs/{}/{}.ogg", name, basename);
       return std::pair{
         basename,
-        _resourcemanager->soundmanager()->get(path)
+        _resourcemanager->soundmanager()->get(f)
       };
     });
 
