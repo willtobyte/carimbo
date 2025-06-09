@@ -235,10 +235,6 @@ graphics::reflection object::reflection() const {
 }
 
 void object::set_action(const std::string& action) {
-  // if (_props.action == action) {
-  //   return;
-  // }
-
   _props.action = action;
   _props.frame = 0;
   _props.last_frame = SDL_GetTicks();
