@@ -243,8 +243,8 @@ void object::set_action(const std::string& action) {
   _props.frame = 0;
   _props.last_frame = SDL_GetTicks();
 
-  const auto& a = _props.animations.at(_props.action);
-  if (const auto& e = a.effect; e) {
+  const auto &a = _props.animations.at(_props.action);
+  if (const auto &e = a.effect; e) {
     e->play();
   }
 }
