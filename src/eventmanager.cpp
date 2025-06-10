@@ -112,18 +112,14 @@ void eventmanager::update(float_t delta) {
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
         const gamepad::button e{event.gbutton.button};
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepad_press(
-            static_cast<uint8_t>(event.gbutton.which), e
-          );
+          receiver->on_gamepad_press(static_cast<uint8_t>(event.gbutton.which), e);
         }
       } break;
 
       case SDL_EVENT_GAMEPAD_BUTTON_UP: {
         const gamepad::button e{event.gbutton.button};
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepad_release(
-            static_cast<uint8_t>(event.gbutton.which), e
-          );
+          receiver->on_gamepad_release(static_cast<uint8_t>(event.gbutton.which), e);
         }
       } break;
 
@@ -133,9 +129,7 @@ void eventmanager::update(float_t delta) {
         const auto value = event.gaxis.value;
         const gamepad::motion e{axis, value};
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepad_motion(
-            static_cast<uint8_t>(who), e
-          );
+          receiver->on_gamepad_motion(static_cast<uint8_t>(who), e);
         }
       } break;
 
