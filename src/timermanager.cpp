@@ -2,14 +2,15 @@
 
 using namespace framework;
 
-uint32_t generic_wrapper(void *userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
+uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
   UNUSED(id);
-  const auto fn = static_cast<std::function<void()> *>(userdata);
+
+  auto* fn = new std::function<void()>(*static_cast<std::function<void()>*>(userdata));
 
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::timer);
-  event.user.data1 = fn;
-  event.user.data2 = new bool(repeat);
+  event.user.data1 = static_cast<void*>(fn);
+  event.user.data2 = static_cast<void*>(new bool(repeat));
 
   SDL_PushEvent(&event);
 

@@ -154,26 +154,25 @@ void eventmanager::update(float_t delta) {
       } break;
 
       case static_cast<uint32_t>(type::timer): {
-        const auto* repeat = static_cast<bool*>(event.user.data2);
+        std::unique_ptr<bool> repeat{static_cast<bool*>(event.user.data2)};
         if (!repeat) {
           break;
         }
-        if (*repeat) {
-          const auto* fn = static_cast<std::function<void()>*>(
-            event.user.data1
-          );
-          if (fn) {
-            (*fn)();
-          }
+
+        auto* rfn = static_cast<std::function<void()>*>(event.user.data1);
+        if (!rfn) {
           break;
         }
-        std::unique_ptr<std::function<void()>> fn{
-          static_cast<std::function<void()>*>(event.user.data1)
-        };
-        if (fn) {
-          (*fn)();
+
+        if (*repeat) {
+          (*rfn)();
+          break;
         }
-      } break;
+
+        std::unique_ptr<std::function<void()>> fn{rfn};
+        (*fn)();
+        break;
+      }
 
       default:
         return;
