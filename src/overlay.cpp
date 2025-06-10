@@ -1,6 +1,4 @@
 #include "overlay.hpp"
-#include "helpers.hpp"
-#include "widget.hpp"
 
 using namespace graphics;
 
