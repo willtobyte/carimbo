@@ -33,12 +33,12 @@ std::vector<std::string> io::enumerate(std::string_view directory) {
   }
 
   char *const *array = ptr.get();
+
   auto view = std::views::iota(0) | std::views::take_while([&](size_t i) { return array[i] != nullptr; });
 
   const auto count = std::ranges::distance(view);
   std::vector<std::string> files;
   files.reserve(std::max<size_t>(0, static_cast<size_t>(count)));
-
   for (const auto &i : view) {
     files.emplace_back(array[i]);
   }
