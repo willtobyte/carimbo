@@ -33,7 +33,7 @@ help:
 .PHONY: bump
 bump: ## Bump git
 	@set -e; \
-	latest_tag=$$(git describe --tags --abbrev=0 2>/dev/null || echo ""); \
+	latest_tag=$$(git tag --list 'v*' | sort -V | tail -n1); \
 	if [ -z "$$latest_tag" ]; then \
 		echo "No tags found. Creating initial tag v0.0.1"; \
 		git tag v0.0.1; \
