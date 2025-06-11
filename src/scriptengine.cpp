@@ -316,12 +316,12 @@ void framework::scriptengine::run() {
         return o.action();
       },
       [](framework::object &o, std::optional<std::string> v) {
-        if (v.has_value()) {
-          o.set_action(*v);
+        if (!v.has_value()) {
+          o.unset_action();
           return;
         }
 
-        o.unset_action();
+        o.set_action(*v);
       }
     ),
     "placement", sol::property(

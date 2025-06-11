@@ -5,7 +5,7 @@ using namespace framework;
 uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
   UNUSED(id);
 
-  auto* fn = new std::function<void()>(*static_cast<std::function<void()>*>(userdata));
+  auto* fn = static_cast<std::function<void()>*>(userdata);
 
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::timer);
@@ -26,11 +26,11 @@ uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
 }
 
 uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {
-  return add_timer(interval, fn, true);
+  return add_timer(interval, std::move(fn), true);
 }
 
 uint32_t timermanager::singleshot(uint32_t interval, std::function<void()> fn) {
-  return add_timer(interval, fn, false);
+  return add_timer(interval, std::move(fn), false);
 }
 
 void timermanager::clear(uint32_t id) {

@@ -105,16 +105,7 @@ void object::update(float_t delta) {
 
         _props.action = *animation.next;
         _props.frame = 0;
-        _props.last_frame = 0;
-
-        const auto ait = _props.animations.find(_props.action);
-        if (ait == _props.animations.end()) return;
-
-        animation = ait->second;
-        keyframes = animation.keyframes;
-        if (keyframes.empty()) {
-          return;
-        }
+        _props.last_frame = SDL_GetTicks();
       } else {
         _props.frame = 0;
       }
