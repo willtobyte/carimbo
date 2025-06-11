@@ -27,7 +27,6 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
 
   const auto n = scope ? scope->get() : "";
   const auto &qualifier = n.empty() ? kind : fmt::format("{}/{}", n, kind);
-
   for (const auto& o : _objects) {
     if (o->_kind != kind) {
       continue;

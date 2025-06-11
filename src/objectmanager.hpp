@@ -4,7 +4,6 @@
 
 #include "event.hpp"
 #include "eventreceiver.hpp"
-#include "object.hpp"
 #include "scenemanager.hpp"
 #include "resourcemanager.hpp"
 
