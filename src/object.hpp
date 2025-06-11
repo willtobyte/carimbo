@@ -98,6 +98,7 @@ private:
   double_t _angle;
   uint8_t _alpha;
   float_t _scale;
+  graphics::reflection _reflection;
   bool _hover;
 
   geometry::point _position;
@@ -105,7 +106,6 @@ private:
   std::string _kind;
   std::string _scope;
   std::string _action;
-  graphics::reflection _reflection;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   animation_map _animations;
 

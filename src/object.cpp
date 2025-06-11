@@ -1,5 +1,4 @@
 #include "object.hpp"
-#include "reflection.hpp"
 
 using namespace framework;
 
@@ -9,6 +8,7 @@ object::object()
     _angle(.0),
     _alpha(255),
     _scale(.0),
+    _reflection(graphics::reflection::none),
     _hover(false)
 {}
 
