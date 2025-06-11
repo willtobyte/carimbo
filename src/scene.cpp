@@ -42,18 +42,19 @@ void scene::draw() const {
   _background->draw({point, _size}, {point, _size});
 }
 
-std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>>
-scene::get(const std::string& name, scenetype type) const {
+std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& name, scenetype type) const {
   if (type == scenetype::object) {
     for (const auto& [key, obj] : _objects) {
       if (key == name) return obj;
     }
   }
+
   if (type == scenetype::effect) {
     for (const auto& [key, fx] : _effects) {
       if (key == name) return fx;
     }
   }
+
   throw std::out_of_range("scene::get(): '" + name + "' not found");
 }
 
@@ -61,11 +62,17 @@ void scene::on_enter() const {
   for (const auto& [_, o] : _objects) {
     _objectmanager->manage(o);
   }
-  if (const auto fn = _onenter) fn();
+
+  if (const auto fn = _onenter) {
+    fn();
+  }
 }
 
 void scene::on_leave() const {
-  if (const auto fn = _onleave) fn();
+  if (const auto fn = _onleave) {
+    fn();
+  }
+
   for (const auto& [_, o] : _objects) {
     _objectmanager->unmanage(o);
   }
