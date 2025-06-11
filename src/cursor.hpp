@@ -9,13 +9,10 @@
 #include "resourcemanager.hpp"
 
 namespace graphics {
-namespace {
 constexpr auto ACTION_DEFAULT = "default";
 constexpr auto ACTION_LEFT = "left";
 constexpr auto ACTION_RIGHT = "right";
-}
 
-namespace graphics {
 struct keyframe final {
   geometry::rectangle frame;
   geometry::point offset;
@@ -26,7 +23,12 @@ struct animation final {
   bool oneshot{false};
   std::vector<keyframe> keyframes;
 };
-}
+
+#ifdef EMSCRIPTEN
+using animation_map = std::unordered_map<std::string, animation>;
+#else
+using animation_map = absl::flat_hash_map<std::string, animation>;
+#endif
 
 class cursor : public input::eventreceiver {
 public:
@@ -50,11 +52,7 @@ private:
   geometry::point _point;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<pixmap> _spritesheet;
-  #ifdef EMSCRIPTEN
-  std::unordered_map<std::string, graphics::animation> _animations;
-  #else
-  absl::flat_hash_map<std::string, graphics::animation> _animations;
-  #endif
+  animation_map _animations;
   std::optional<std::string> _queued_action;
 };
 }

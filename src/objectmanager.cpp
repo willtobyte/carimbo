@@ -25,18 +25,22 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
 std::shared_ptr<object> objectmanager::create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
   _dirty = true;
 
-  const auto scoped = scope ? scope->get() : "";
-  const auto &qualifier = scoped.empty() ? kind : fmt::format("{}/{}", scoped, kind);
+  const auto n = scope ? scope->get() : "";
+  const auto &qualifier = n.empty() ? kind : fmt::format("{}/{}", n, kind);
 
   for (const auto& o : _objects) {
-    const auto& p = o->props();
+    if (o->_kind != kind) {
+      continue;
+    }
 
-    if (p.kind != kind) continue;
-
-    if (scoped.empty()) {
-      if (!p.scope.empty()) continue;
+    if (n.empty()) {
+      if (!o->_scope.empty()) {
+        continue;
+      }
     } else {
-      if (p.scope != scoped) continue;
+      if (o->_scope != n) {
+        continue;
+      }
     }
 
     return clone(o);
@@ -49,14 +53,8 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
   const auto scale = j.value("scale", float_t{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}.png", qualifier));
 
-  #ifdef EMSCRIPTEN
-  std::unordered_map<std::string, graphics::animation> animations;
-  #else
-  absl::flat_hash_map<std::string, graphics::animation> animations;
-  #endif
-
+  animation_map animations;
   animations.reserve(j["animations"].size());
-
   for (const auto &item : j["animations"].items()) {
     const auto &key = item.key();
     const auto &a = item.value();
@@ -66,37 +64,26 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
     const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
 
     const auto &f = a.at("frames");
-    std::vector<graphics::keyframe> keyframes(f.size());
+    std::vector<keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
-      return graphics::keyframe{
+      return keyframe{
           frame.at("rectangle").template get<geometry::rectangle>(),
           frame.at("offset").template get<geometry::point>(),
           frame.at("duration").template get<uint64_t>(),
       };
     });
 
-    animations.emplace(key, graphics::animation{oneshot, next, hitbox, effect, keyframes});
+    animations.emplace(key, animation{oneshot, next, hitbox, effect, keyframes});
   }
 
-  objectprops props{
-      _counter++,
-      0,
-      SDL_GetTicks(),
-      0.,
-      255,
-      {},
-      scale,
-      {},
-      kind,
-      scoped,
-      "",
-      false,
-      graphics::reflection::none,
-      std::move(spritesheet),
-      std::move(animations),
-  };
+  auto o = std::make_shared<object>();
+  o->_id = _counter++;
+  o->_scale = scale;
+  o->_kind = kind;
+  o->_scope = n;
+  o->_animations = std::move(animations);
+  o->_spritesheet = std::move(spritesheet);
 
-  auto o = std::make_shared<object>(props);
   fmt::println("[objectmanager] created {} {}", qualifier, o->id());
   if (manage) {
     _objects.emplace_back(o);
@@ -106,22 +93,19 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
 }
 
 std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
-  if (!matrix) {
+  if (!matrix) [[unlikely]] {
     return nullptr;
   }
 
-  auto props = matrix->props();
-  props.id = _counter++;
-  props.frame = {};
-  props.last_frame = SDL_GetTicks();
-  props.angle = {};
-  props.alpha = {255};
-  props.position = {};
-  props.velocity = {};
-  props.action = {};
-  props.reflection = {graphics::reflection::none};
-
-  const auto o = std::make_shared<object>(props);
+  const auto o = std::make_shared<object>();
+  o->_id = _counter++;
+  o->_angle = matrix->_angle;
+  o->_position = matrix->_position;
+  o->_kind = matrix->_kind;
+  o->_scope = matrix->_scope;
+  o->_action = matrix->_action;
+  o->_spritesheet = matrix->_spritesheet;
+  o->_animations = matrix->_animations;
 
   _objects.emplace_back(o);
 
@@ -188,26 +172,23 @@ void objectmanager::update(float_t delta) {
 
   for (auto it = _objects.begin(); it != _objects.end(); ++it) {
     const auto &a = *it;
-    const auto &ap = a->props();
-
-    const auto aita = ap.animations.find(ap.action);
-    if (aita == ap.animations.end() || !aita->second.hitbox) [[likely]] {
+    const auto aita = a->_animations.find(a->_action);
+    if (aita == a->_animations.end() || !aita->second.hitbox) [[likely]] {
       continue;
     }
 
     const auto &ha = *aita->second.hitbox;
-    const auto has = geometry::rectangle{a->position() + ha.position() * ap.scale, ha.size() * ap.scale};
+    const auto has = geometry::rectangle{a->position() + ha.position() * a->_scale, ha.size() * a->_scale};
     for (auto jt = std::next(it); jt != _objects.end(); ++jt) {
       const auto &b = *jt;
 
-      const auto &bp = b->props();
-      const auto aitb = bp.animations.find(bp.action);
-      if (aitb == bp.animations.end() || !aitb->second.hitbox) {
+      const auto aitb = b->_animations.find(b->_action);
+      if (aitb == b->_animations.end() || !aitb->second.hitbox) {
         continue;
       }
 
       const auto &hb = *aitb->second.hitbox;
-      const auto hbs = geometry::rectangle{b->position() + hb.position() * bp.scale, hb.size() * bp.scale};
+      const auto hbs = geometry::rectangle{b->position() + hb.position() * b->_scale, hb.size() * b->_scale};
       if (hbs.position().x() > has.position().x() + has.size().width()) break;
       if (hbs.position().y() > has.position().y() + has.size().height()) continue;
       if (hbs.position().y() + hbs.size().height() < has.position().y()) continue;
@@ -241,15 +222,13 @@ void objectmanager::on_mouse_press(const mouse::button &event) {
 
   const geometry::point point{event.x, event.y};
 
-  const auto clicked = std::ranges::any_of(_objects, [&](const auto &object) {
-    const auto &props = object->props();
-
-    if (props.action.empty()) {
+  const auto clicked = std::ranges::any_of(_objects, [&](const auto &o) {
+    if (o->_action.empty()) {
       return false;
     }
 
-    const auto it = props.animations.find(props.action);
-    if (it == props.animations.end()) {
+    const auto it = o->_animations.find(o->_action);
+    if (it == o->_animations.end()) {
       return false;
     }
 
@@ -259,15 +238,15 @@ void objectmanager::on_mouse_press(const mouse::button &event) {
     }
 
     const auto hitbox = geometry::rectangle{
-      object->position() + animation.hitbox->position() * props.scale,
-      animation.hitbox->size() * props.scale
+      o->_position + animation.hitbox->position() * o->_scale,
+      animation.hitbox->size() * o->_scale
     };
 
     if (!hitbox.contains(point)) {
       return false;
     }
 
-    object->on_touch(event.x, event.y);
+    o->on_touch(event.x, event.y);
     return true;
   });
 

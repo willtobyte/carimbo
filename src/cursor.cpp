@@ -12,7 +12,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   const auto &buffer = storage::io::read(filename);
   const auto &j = nlohmann::json::parse(buffer);
 
-  _point = j["point"].get<geometry::point>();
+  _point = j["point"].template get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/overlay/{}.png", name));
   _animations.reserve(j["animations"].size());
 

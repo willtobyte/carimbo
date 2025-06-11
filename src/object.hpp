@@ -3,14 +3,33 @@
 #include "common.hpp"
 
 #include "kv.hpp"
-#include "objectprops.hpp"
 #include "reflection.hpp"
 #include "vector2d.hpp"
 
 namespace framework {
+struct keyframe final {
+  geometry::rectangle frame;
+  geometry::point offset;
+  uint64_t duration{0};
+};
+
+struct animation final {
+  bool oneshot{false};
+  std::optional<std::string> next;
+  std::optional<geometry::rectangle> hitbox;
+  std::shared_ptr<audio::soundfx> effect;
+  std::vector<keyframe> keyframes;
+};
+
+#ifdef EMSCRIPTEN
+using animation_map = std::unordered_map<std::string, animation>;
+#else
+using animation_map = absl::flat_hash_map<std::string, animation>;
+#endif
+
 class object final : public std::enable_shared_from_this<object> {
 public:
-  explicit object(const objectprops &props);
+  object();
   virtual ~object();
 
   uint64_t id() const;
@@ -22,12 +41,6 @@ public:
   void update(float_t delta);
 
   void draw() const;
-
-  objectprops &props();
-  const objectprops &props() const;
-  void set_props(const objectprops &props);
-
-  void hide();
 
   geometry::point position() const;
   float_t x() const;
@@ -62,6 +75,7 @@ public:
 
   void set_action(const std::string &action);
   void unset_action();
+  void hide();
   std::string action() const;
 
   bool intersects(std::shared_ptr<object> other) const;
@@ -78,8 +92,24 @@ public:
 private:
   friend class objectmanager;
 
+  uint64_t _id;
+  uint64_t _frame;
+  uint64_t _last_frame;
+  double_t _angle;
+  uint8_t _alpha;
+  float_t _scale;
+  bool _hover;
+
+  geometry::point _position;
+  algebra::vector2d _velocity;
+  std::string _kind;
+  std::string _scope;
+  std::string _action;
+  graphics::reflection _reflection;
+  std::shared_ptr<graphics::pixmap> _spritesheet;
+  animation_map _animations;
+
   memory::kv _kv;
-  objectprops _props;
   uint64_t _tick_count{0};
   uint64_t _last_tick{0};
   std::function<void(std::shared_ptr<object>, float_t, float_t)> _ontouch;

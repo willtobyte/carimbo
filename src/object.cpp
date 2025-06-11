@@ -3,51 +3,49 @@
 
 using namespace framework;
 
-object::object(const objectprops &props)
-    : _props(props) {}
+object::object()
+  : _frame(0),
+    _last_frame(SDL_GetTicks()),
+    _angle(.0),
+    _alpha(255),
+    _scale(.0),
+    _hover(false)
+{}
 
 object::~object() {
   fmt::println("[object] destroyed {} {}", kind(), id());
 }
 
 uint64_t object::id() const {
-  return _props.id;
+  return _id;
 }
 
 std::string object::kind() const {
-  return _props.kind;
+  return _kind;
 }
 
 std::string object::scope() const {
-  return _props.scope;
-}
-
-objectprops &object::props() {
-  return _props;
-}
-
-const objectprops &object::props() const {
-  return _props;
+  return _scope;
 }
 
 geometry::point object::position() const {
-  return _props.position;
+  return _position;
 }
 
 float_t object::x() const {
-  return _props.position.x();
+  return _position.x();
 }
 
 void object::set_x(float_t x) {
-  _props.position.set_x(x);
+  _position.set_x(x);
 }
 
 float_t object::y() const {
-  return _props.position.y();
+  return _position.y();
 }
 
 void object::set_y(float_t y) {
-  _props.position.set_y(y);
+  _position.set_y(y);
 }
 
 void object::move(float_t x_velocity, float_t y_velocity) {
@@ -56,11 +54,11 @@ void object::move(float_t x_velocity, float_t y_velocity) {
 }
 
 void object::set_velocity(const algebra::vector2d &velocity) {
-  _props.velocity = velocity;
+  _velocity = velocity;
 }
 
 algebra::vector2d object::velocity() const {
-  return _props.velocity;
+  return _velocity;
 }
 
 void object::update(float_t delta) {
@@ -68,47 +66,47 @@ void object::update(float_t delta) {
     _onupdate(shared_from_this());
   }
 
-  if (_props.action.empty()) {
+  if (_action.empty()) {
     return;
   }
 
   const auto now = SDL_GetTicks();
-  const auto it = _props.animations.find(_props.action);
-  if (it == _props.animations.end()) {
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) {
     return;
   }
 
   const auto &animation = it->second;
   const auto &keyframes = animation.keyframes;
-  if (_props.frame >= keyframes.size()) {
+  if (_frame >= keyframes.size()) {
     return;
   }
 
-  const auto &frame = keyframes[_props.frame];
-  const bool expired = frame.duration > 0 && (now - _props.last_frame >= frame.duration);
+  const auto &frame = keyframes[_frame];
+  const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
   if (!expired) {
-    _props.position.set(
-      _props.position.x() + _props.velocity.x() * delta,
-      _props.position.y() + _props.velocity.y() * delta
+    _position.set(
+      _position.x() + _velocity.x() * delta,
+      _position.y() + _velocity.y() * delta
     );
 
     return;
   }
 
-  _props.last_frame = now;
-  ++_props.frame;
+  _last_frame = now;
+  ++_frame;
 
-  if (_props.frame < keyframes.size()) {
-    _props.position.set(
-      _props.position.x() + _props.velocity.x() * delta,
-      _props.position.y() + _props.velocity.y() * delta
+  if (_frame < keyframes.size()) {
+    _position.set(
+      _position.x() + _velocity.x() * delta,
+      _position.y() + _velocity.y() * delta
     );
 
     return;
   }
 
   if (animation.oneshot) {
-    const std::string finished = std::exchange(_props.action, "");
+    const std::string finished = std::exchange(_action, "");
 
     if (_onanimationfinished) {
       _onanimationfinished(shared_from_this(), finished);
@@ -118,47 +116,47 @@ void object::update(float_t delta) {
       return;
     }
 
-    _props.action = *animation.next;
-    _props.frame = 0;
-    _props.last_frame = SDL_GetTicks();
+    _action = *animation.next;
+    _frame = 0;
+    _last_frame = SDL_GetTicks();
   } else {
-    _props.frame = 0;
+    _frame = 0;
   }
 
-  _props.position.set(
-    _props.position.x() + _props.velocity.x() * delta,
-    _props.position.y() + _props.velocity.y() * delta
+  _position.set(
+    _position.x() + _velocity.x() * delta,
+    _position.y() + _velocity.y() * delta
   );
 }
 
 void object::draw() const {
-  if (_props.action.empty()) [[unlikely]] {
+  if (_action.empty()) [[unlikely]] {
     return;
   }
 
-  const auto &animation = _props.animations.at(_props.action).keyframes.at(_props.frame);
+  const auto &animation = _animations.at(_action).keyframes.at(_frame);
   const auto &source = animation.frame;
   const auto &offset = animation.offset;
 #ifdef HITBOX
-  const auto &hitbox = _props.animations.at(_props.action).hitbox;
+  const auto &hitbox = _animations.at(_action).hitbox;
 #endif
 
-  geometry::rectangle destination{_props.position + offset, source.size()};
+  geometry::rectangle destination{_position + offset, source.size()};
 
-  destination.scale(_props.scale);
+  destination.scale(_scale);
 
 #ifdef HITBOX
   const auto debug = hitbox
-                         ? std::make_optional(geometry::rectangle{_props.position + hitbox->position(), hitbox->size() * _props.scale})
+                         ? std::make_optional(geometry::rectangle{_position + hitbox->position(), hitbox->size() * _scale})
                          : std::nullopt;
 #endif
 
-  _props.spritesheet->draw(
+  _spritesheet->draw(
       source,
       destination,
-      _props.angle,
-      _props.reflection,
-      _props.alpha
+      _angle,
+      _reflection,
+      _alpha
 #ifdef HITBOX
       ,
       debug
@@ -166,36 +164,32 @@ void object::draw() const {
   );
 }
 
-void object::set_props(const objectprops &props) {
-  _props = props;
-}
-
 void object::hide() {
   unset_action();
 }
 
 void object::set_placement(float_t x, float_t y) {
-  _props.position.set(x, y);
+  _position.set(x, y);
 }
 
 geometry::point object::placement() const {
-  return _props.position;
+  return _position;
 }
 
 void object::set_alpha(uint8_t alpha) {
-  _props.alpha = alpha;
+  _alpha = alpha;
 }
 
 uint8_t object::alpha() const {
-  return _props.alpha;
+  return _alpha;
 }
 
 void object::set_scale(float_t scale) {
-  _props.scale = scale;
+  _scale = scale;
 }
 
 float_t object::scale() const {
-  return _props.scale;
+  return _scale;
 }
 
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) {
@@ -231,57 +225,57 @@ void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object
 }
 
 void object::set_reflection(graphics::reflection reflection) {
-  _props.reflection = reflection;
+  _reflection = reflection;
 }
 
 graphics::reflection object::reflection() const {
-  return _props.reflection;
+  return _reflection;
 }
 
 void object::set_action(const std::string& action) {
-  _props.action = action;
-  _props.frame = 0;
-  _props.last_frame = SDL_GetTicks();
+  _action = action;
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
 
-  const auto &a = _props.animations.at(_props.action);
+  const auto &a = _animations.at(_action);
   if (const auto &e = a.effect; e) {
     e->play();
   }
 }
 
 void object::unset_action() {
-  _props.action.clear();
-  _props.frame = 0;
-  _props.last_frame = SDL_GetTicks();
+  _action.clear();
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
 }
 
 std::string object::action() const {
-  return _props.action;
+  return _action;
 }
 
 bool object::intersects(const std::shared_ptr<object> other) const {
-  if (_props.action.empty() || other->_props.action.empty()) [[likely]] {
+  if (_action.empty() || other->_action.empty()) [[likely]] {
     return false;
   }
 
-  const auto sit = _props.animations.find(_props.action);
-  if (sit == _props.animations.end() || !sit->second.hitbox) [[likely]] {
+  const auto sit = _animations.find(_action);
+  if (sit == _animations.end() || !sit->second.hitbox) [[likely]] {
     return false;
   }
 
-  const auto oit = other->_props.animations.find(other->_props.action);
-  if (oit == other->_props.animations.end() || !oit->second.hitbox) [[likely]] {
+  const auto oit = other->_animations.find(other->_action);
+  if (oit == other->_animations.end() || !oit->second.hitbox) [[likely]] {
     return false;
   }
 
   return geometry::rectangle(
-    position() + sit->second.hitbox->position() * _props.scale,
-    sit->second.hitbox->size() * _props.scale
+    position() + sit->second.hitbox->position() * _scale,
+    sit->second.hitbox->size() * _scale
   )
   .intersects(
     geometry::rectangle(
-      other->position() + oit->second.hitbox->position() * other->_props.scale,
-      oit->second.hitbox->size() * other->_props.scale
+      other->position() + oit->second.hitbox->position() * other->_scale,
+      oit->second.hitbox->size() * other->_scale
     )
   );
 }
@@ -299,16 +293,16 @@ void object::on_touch(float_t x, float_t y) {
 }
 
 void object::on_motion(float_t x, float_t y) {
-  const auto it = _props.animations.find(_props.action);
-  if (it == _props.animations.end() || !it->second.hitbox) {
+  const auto it = _animations.find(_action);
+  if (it == _animations.end() || !it->second.hitbox) {
     return;
   }
 
   const auto &animation = it->second;
-  const auto hitbox = geometry::rectangle{_props.position + animation.hitbox->position() * _props.scale, animation.hitbox->size() * _props.scale};
+  const auto hitbox = geometry::rectangle{_position + animation.hitbox->position() * _scale, animation.hitbox->size() * _scale};
   const bool inside = hitbox.contains(x, y);
-  if (inside != _props.hover) {
-    _props.hover = inside;
+  if (inside != _hover) {
+    _hover = inside;
     inside ? on_hover() : on_unhover();
   }
 }
