@@ -78,38 +78,49 @@ void object::update(float_t delta) {
     return;
   }
 
-  auto &animation = it->second;
-  auto &keyframes = animation.keyframes;
+  auto& animation = it->second;
+  auto& keyframes = animation.keyframes;
   if (_props.frame >= keyframes.size()) {
     return;
   }
 
-  const auto &frame = keyframes[_props.frame];
+  const auto& frame = keyframes[_props.frame];
   const bool expired = frame.duration > 0 && (now - _props.last_frame >= frame.duration);
+  if (!expired) {
+    _props.position.set(
+      _props.position.x() + _props.velocity.x() * delta,
+      _props.position.y() + _props.velocity.y() * delta
+    );
+    return;
+  }
 
-  if (expired) {
-    _props.last_frame = now;
-    ++_props.frame;
+  _props.last_frame = now;
+  ++_props.frame;
 
-    if (_props.frame >= keyframes.size()) {
-      if (animation.oneshot) {
-        const std::string finished = std::exchange(_props.action, "");
+  if (_props.frame < keyframes.size()) {
+    _props.position.set(
+      _props.position.x() + _props.velocity.x() * delta,
+      _props.position.y() + _props.velocity.y() * delta
+    );
+    return;
+  }
 
-        if (_onanimationfinished) {
-          _onanimationfinished(shared_from_this(), finished);
-        }
+  if (animation.oneshot) {
+    const std::string finished = std::exchange(_props.action, "");
 
-        if (!animation.next) {
-          return;
-        }
-
-        _props.action = *animation.next;
-        _props.frame = 0;
-        _props.last_frame = SDL_GetTicks();
-      } else {
-        _props.frame = 0;
-      }
+    if (_onanimationfinished) {
+      _onanimationfinished(shared_from_this(), finished);
     }
+
+    if (!animation.next) {
+      return;
+    }
+
+    _props.action = *animation.next;
+    _props.frame = 0;
+    _props.last_frame = SDL_GetTicks();
+  } else {
+    _props.frame = 0;
   }
 
   _props.position.set(
