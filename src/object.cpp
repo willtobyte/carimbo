@@ -78,13 +78,13 @@ void object::update(float_t delta) {
     return;
   }
 
-  auto& animation = it->second;
-  auto& keyframes = animation.keyframes;
+  const auto &animation = it->second;
+  const auto &keyframes = animation.keyframes;
   if (_props.frame >= keyframes.size()) {
     return;
   }
 
-  const auto& frame = keyframes[_props.frame];
+  const auto &frame = keyframes[_props.frame];
   const bool expired = frame.duration > 0 && (now - _props.last_frame >= frame.duration);
   if (!expired) {
     _props.position.set(
