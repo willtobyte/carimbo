@@ -160,18 +160,15 @@ void eventmanager::update(float_t delta) {
         }
 
         if (*repeat) {
-          const auto* fn = static_cast<std::function<void()>*>(event.user.data1);
-
-          if (fn) {
-            (*fn)();
+          if (auto* fn = static_cast<std::function<void()>*>(event.user.data1); fn) [[likely]] {
+            std::invoke(*fn);
           }
 
           break;
         }
 
-        std::unique_ptr<std::function<void()>> fn{static_cast<std::function<void()>*>(event.user.data1)};
-        if (fn) [[likely]] {
-          (*fn)();
+        if (std::unique_ptr<std::function<void()>> fn{static_cast<std::function<void()>*>(event.user.data1)}; fn) [[likely]] {
+          std::invoke(*fn);
         }
       } break;
 
