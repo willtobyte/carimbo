@@ -625,7 +625,8 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<graphics::font>(
     "Font",
-    sol::no_constructor
+    sol::no_constructor,
+    "glyphs", sol::property(&graphics::font::glyphs)
   );
 
   lua.new_usertype<framework::enginefactory>(

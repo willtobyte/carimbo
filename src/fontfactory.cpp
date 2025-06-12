@@ -95,6 +95,7 @@ std::shared_ptr<font> fontfactory::get(const std::string &family) {
   }
 
   auto ptr = std::make_shared<font>(
+    glyphs,
     map,
     pixmap,
     spacing,

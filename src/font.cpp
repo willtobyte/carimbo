@@ -45,8 +45,16 @@ uint8_t fadeineffect::alpha() {
   return 255;
 }
 
-font::font(const glyphmap &glyphs, std::shared_ptr<pixmap> pixmap, int16_t spacing, int16_t leading, float_t scale)
+font::font(
+  const std::string &glyphs,
+  const glyphmap &map,
+  std::shared_ptr<pixmap> pixmap,
+  int16_t spacing,
+  int16_t leading,
+  float_t scale
+)
   : _glyphs(glyphs),
+    _map(map),
     _pixmap(pixmap),
     _spacing(spacing),
     _leading(leading),
@@ -64,7 +72,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
 
   geometry::point cursor = position;
 
-  const auto height = _glyphs.begin()->second.size().height() * _scale;
+  const auto height = _map.begin()->second.size().height() * _scale;
 
   for (const auto ch : text) {
     if (ch == '\n') {
@@ -72,7 +80,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
       continue;
     }
 
-    const auto& glyph = _glyphs.at(static_cast<uint8_t>(ch));
+    const auto& glyph = _map.at(static_cast<uint8_t>(ch));
 
     const auto size = glyph.size();
 
@@ -107,4 +115,8 @@ void font::draw(const std::string& text, const geometry::point& position, const 
 
     cursor += std::make_pair('x', size.width() + _spacing);
   }
+}
+
+std::string font::glyphs() const {
+  return _glyphs;
 }
