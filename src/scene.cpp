@@ -3,17 +3,17 @@
 using namespace framework;
 
 scene::scene(
-    std::shared_ptr<objectmanager> objectmanager,
-    std::shared_ptr<graphics::pixmap> background,
-    std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
-    std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
-    geometry::size size
+  std::shared_ptr<objectmanager> objectmanager,
+  std::shared_ptr<graphics::pixmap> background,
+  std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
+  std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+  geometry::size size
 )
-    : _objectmanager(objectmanager),
-      _background(std::move(background)),
-      _objects(std::move(objects)),
-      _effects(std::move(effects)),
-      _size(std::move(size)) {
+  : _objectmanager(objectmanager),
+    _background(std::move(background)),
+    _objects(std::move(objects)),
+    _effects(std::move(effects)),
+    _size(std::move(size)) {
 }
 
 scene::~scene() {
