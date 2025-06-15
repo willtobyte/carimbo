@@ -81,8 +81,6 @@ void socket::connect() {
 #else
       "https://" + std::string(emscripten_run_script_string("window.location.hostname")) + "/socket";
 #endif
-  fmt::println(">>> socket addr {}", url);
-
   EmscriptenWebSocketCreateAttributes attrs = {
       url.c_str(),
       nullptr,
