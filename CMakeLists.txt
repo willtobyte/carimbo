@@ -109,6 +109,9 @@ if(EMSCRIPTEN)
     -flto
     --strip-debug
     --strip-producers
+
+    -sASSERTIONS=0
+    -sDISABLE_EXCEPTION_CATCHING=1
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
@@ -127,9 +130,6 @@ if(EMSCRIPTEN)
     -sALLOW_MEMORY_GROWTH=1
 
     -sFILESYSTEM=1
-
-    -sASSERTIONS=0
-    -sDISABLE_EXCEPTION_CATCHING=1
 
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']

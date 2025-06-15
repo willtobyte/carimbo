@@ -62,11 +62,11 @@ application::application(int argc, char **argv) {
 }
 
 int32_t application::run() {
-#if SANDBOX
-  storage::filesystem::mount("../sandbox", "/");
-#else
+  #if defined(EMSCRIPTEN) || !defined(SANDBOX)
   storage::filesystem::mount("bundle.7z", "/");
-#endif
+  #else
+  storage::filesystem::mount("../sandbox", "/");
+  #endif
 
   auto se = scriptengine();
   se.run();
