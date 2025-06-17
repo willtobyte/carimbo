@@ -3,9 +3,9 @@
 namespace framework {
 class loopable {
 public:
-  loopable() = default;
-  virtual ~loopable() = default;
+  loopable() noexcept = default;
+  virtual ~loopable() noexcept = default;
 
-  virtual void loop(float_t delta) = 0;
+  virtual void loop(float_t delta) noexcept = 0;
 };
 }

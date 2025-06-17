@@ -236,7 +236,8 @@ void objectmanager::on_mouse_press(const mouse::button &event) {
       return false;
     }
 
-    const auto hitbox = geometry::rectangle{
+    const auto hitbox = geometry::rectangle
+    {
       o->_position + animation.hitbox->position() * o->_scale,
       animation.hitbox->size() * o->_scale
     };
@@ -246,6 +247,7 @@ void objectmanager::on_mouse_press(const mouse::button &event) {
     }
 
     o->on_touch(event.x, event.y);
+
     return true;
   });
 

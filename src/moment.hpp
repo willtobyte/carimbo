@@ -3,5 +3,5 @@
 #include "common.hpp"
 
 namespace framework {
-uint64_t moment();
+uint64_t moment() noexcept;
 }

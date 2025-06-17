@@ -20,13 +20,13 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   return sol::make_object(lua, loader.get<sol::protected_function>());
 }
 
-class lua_loopable : public framework::loopable {
+class lua_loopable final : public framework::loopable {
 public:
   explicit lua_loopable(const sol::state_view &lua, sol::function function)
       : _L(lua.lua_state()),
         _function(std::move(function)) {}
 
-  void loop(float_t delta) override {
+  void loop(float_t delta) noexcept override {
     _function(delta);
 
     _frames++;
