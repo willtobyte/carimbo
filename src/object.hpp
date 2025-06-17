@@ -38,9 +38,9 @@ public:
 
   std::string scope() const;
 
-  void update(float_t delta);
+  void update(float_t delta) noexcept;
 
-  void draw() const;
+  void draw() const noexcept;
 
   geometry::point position() const;
   float_t x() const;

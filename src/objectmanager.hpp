@@ -27,9 +27,9 @@ public:
 
   void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
 
-  void update(float_t delta);
+  void update(float_t delta) noexcept;
 
-  void draw();
+  void draw() const noexcept;
 
 protected:
   virtual void on_mouse_press(const input::event::mouse::button &event) override;

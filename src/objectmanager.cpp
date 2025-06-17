@@ -157,7 +157,7 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::update(float_t delta) {
+void objectmanager::update(float_t delta) noexcept {
   for (auto &o : _objects) {
     const auto old = o->x();
 
@@ -208,7 +208,7 @@ void objectmanager::update(float_t delta) {
   }
 }
 
-void objectmanager::draw() {
+void objectmanager::draw() const noexcept {
   for (const auto &o : _objects) {
     o->draw();
   }

@@ -61,7 +61,7 @@ algebra::vector2d object::velocity() const {
   return _velocity;
 }
 
-void object::update(float_t delta) {
+void object::update(float_t delta) noexcept {
   if (_onupdate) {
     _onupdate(shared_from_this());
   }
@@ -129,7 +129,7 @@ void object::update(float_t delta) {
   );
 }
 
-void object::draw() const {
+void object::draw() const noexcept {
   if (_action.empty()) [[unlikely]] {
     return;
   }
