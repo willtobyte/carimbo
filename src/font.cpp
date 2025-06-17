@@ -72,7 +72,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
 
   geometry::point cursor = position;
 
-  const auto height = _map.begin()->second.size().height() * _scale;
+  const auto height = _map.begin()->second.height() * _scale;
 
   for (const auto ch : text) {
     if (ch == '\n') {

@@ -15,6 +15,11 @@ public:
 
   ~rectangle() = default;
 
+  float_t x() const noexcept;
+  float_t y() const noexcept;
+  float_t width() const noexcept;
+  float_t height() const noexcept;
+
   void set_position(const geometry::point &position);
   geometry::point position() const;
 

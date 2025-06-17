@@ -140,9 +140,18 @@ void object::draw() const {
 #ifdef HITBOX
   const auto &hitbox = _animations.at(_action).hitbox;
 #endif
-
   geometry::rectangle destination{_position + offset, source.size()};
 
+  const auto ow = destination.width();
+  const auto oh = destination.height();
+
+  const auto sw = ow * _scale;
+  const auto sh = oh * _scale;
+
+  const auto dx = (ow - sw) * 0.5f;
+  const auto dy = (oh - sh) * 0.5f;
+
+  destination.set_position({destination.x() + dx, destination.y() + dy});
   destination.scale(_scale);
 
 #ifdef HITBOX

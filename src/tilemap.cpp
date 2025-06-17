@@ -27,16 +27,16 @@ void tilemap::update(float_t delta) {
   const constexpr auto smooth = 3.0f;
 
   const auto position = _target->position();
-  const auto vw  = _view.size().width();
-  const auto vh  = _view.size().height();
+  const auto vw  = _view.width();
+  const auto vh  = _view.height();
 
   const auto dx = position.x() - vw * 0.5f;
   const auto dy = position.y() - vh * 0.5f;
   const auto damping = 1.0f - std::exp(-smooth * delta);
 
   _view.set_position({
-    (dx - _view.position().x()) * damping,
-    (dy - _view.position().y()) * damping
+    (dx - _view.x()) * damping,
+    (dy - _view.y()) * damping
   });
 }
 

@@ -188,9 +188,9 @@ void objectmanager::update(float_t delta) {
 
       const auto &hb = *aitb->second.hitbox;
       const auto hbs = geometry::rectangle{b->position() + hb.position() * b->_scale, hb.size() * b->_scale};
-      if (hbs.position().x() > has.position().x() + has.size().width()) break;
-      if (hbs.position().y() > has.position().y() + has.size().height()) continue;
-      if (hbs.position().y() + hbs.size().height() < has.position().y()) continue;
+      if (hbs.x() > has.x() + has.width()) break;
+      if (hbs.y() > has.y() + has.height()) continue;
+      if (hbs.y() + hbs.height() < has.y()) continue;
       if (!has.intersects(hbs)) continue;
 
       const auto callback_a = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt);

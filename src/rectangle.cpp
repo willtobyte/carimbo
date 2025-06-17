@@ -16,6 +16,22 @@ point rectangle::position() const {
   return _position;
 }
 
+float_t rectangle::x() const noexcept {
+  return _position.x();
+}
+
+float_t rectangle::y() const noexcept {
+  return _position.y();
+}
+
+float_t rectangle::width() const noexcept {
+  return _size.width();
+}
+
+float_t rectangle::height() const noexcept {
+  return _size.height();
+}
+
 void rectangle::set_size(const geometry::size &size) {
   _size = size;
 }
