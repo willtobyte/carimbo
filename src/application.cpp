@@ -54,6 +54,8 @@ application::application(int argc, char **argv) {
   std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });
 
+  SDL_SetMainReady();
+
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
   #ifdef HAVE_STEAM
