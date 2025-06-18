@@ -210,6 +210,8 @@ else()
     )
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
+
+    target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT.lib")
   else()
     set(GENERIC_WARNINGS
       -Wall
