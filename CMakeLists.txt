@@ -208,6 +208,8 @@ else()
       PROPERTIES
         WIN32_EXECUTABLE TRUE
     )
+
+    target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
   else()
     set(GENERIC_WARNINGS
       -Wall
