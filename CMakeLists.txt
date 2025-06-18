@@ -204,12 +204,7 @@ else()
       $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}>
     )
 
-    set_target_properties(${PROJECT_NAME}
-      PROPERTIES
-        WIN32_EXECUTABLE TRUE
-    )
-
-    target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
+    set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 
     target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT.lib")
   else()
