@@ -205,8 +205,6 @@ else()
     )
 
     set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-
-    target_link_options(${PROJECT_NAME} PRIVATE "/NODEFAULTLIB:LIBCMT.lib")
   else()
     set(GENERIC_WARNINGS
       -Wall
