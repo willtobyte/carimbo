@@ -204,8 +204,9 @@ else()
       $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}>
     )
 
-    set_target_properties(${PROJECT_NAME} PRIVATE
-      PROPERTIES WIN32_EXECUTABLE TRUE
+    set_target_properties(${PROJECT_NAME}
+      PROPERTIES
+        WIN32_EXECUTABLE TRUE
     )
   else()
     set(GENERIC_WARNINGS
