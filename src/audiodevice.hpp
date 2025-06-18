@@ -6,7 +6,7 @@ namespace audio {
 class audiodevice final {
 public:
   audiodevice();
-  ~audiodevice() = default;
+  ~audiodevice() noexcept = default;
 
 private:
   std::unique_ptr<ALCdevice, void (*)(ALCdevice *)> _device;

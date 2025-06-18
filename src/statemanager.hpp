@@ -15,16 +15,16 @@ struct pairhash final {
   }
 };
 
-class statemanager : public input::eventreceiver, public lifecycleobserver {
+class statemanager final : public input::eventreceiver, public lifecycleobserver {
 public:
-  statemanager();
-  virtual ~statemanager() = default;
+  statemanager() noexcept;
+  virtual ~statemanager() noexcept = default;
 
-  bool collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const;
+  bool collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept;
 
-  bool on(uint8_t player, const std::variant<input::event::gamepad::button> &type) const;
+  bool on(uint8_t player, const std::variant<input::event::gamepad::button> &type) const noexcept;
 
-  uint8_t players() const;
+  uint8_t players() const noexcept;
 
 protected:
   virtual void on_keydown(const input::event::keyboard::key &event);

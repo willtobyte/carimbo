@@ -3,10 +3,10 @@
 #include "common.hpp"
 
 namespace steam {
-  class achievement {
+  class achievement final {
   public:
-      achievement() = default;
-      ~achievement() = default;
+      achievement() noexcept = default;
+      ~achievement() noexcept = default;
 
       void unlock(std::string id);
   };

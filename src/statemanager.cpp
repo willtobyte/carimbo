@@ -3,20 +3,20 @@
 using namespace framework;
 using namespace input::event;
 
-static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) {
+static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) noexcept {
   return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
 }
 
-statemanager::statemanager() {
+statemanager::statemanager() noexcept {
   _collision_mapping.reserve(64);
 }
 
-bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const {
+bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept {
   auto it = _collision_mapping.find(make_key(a->id(), b->id()));
   return (it != _collision_mapping.end()) ? it->second : false;
 }
 
-bool statemanager::on(uint8_t player, const std::variant<gamepad::button> &type) const {
+bool statemanager::on(uint8_t player, const std::variant<gamepad::button> &type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -26,7 +26,7 @@ bool statemanager::on(uint8_t player, const std::variant<gamepad::button> &type)
   return false;
 }
 
-uint8_t statemanager::players() const {
+uint8_t statemanager::players() const noexcept {
   return static_cast<uint8_t>(_state.size());
 }
 

@@ -12,7 +12,7 @@ class pixmap final {
 public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
-  ~pixmap() = default;
+  ~pixmap() noexcept = default;
 
   void draw(
       const geometry::rectangle &source,
@@ -24,9 +24,9 @@ public:
       ,
       const std::optional<geometry::rectangle> &outline = std::nullopt
 #endif
-  ) const;
+  ) const noexcept;
 
-  operator SDL_Texture *() const;
+  operator SDL_Texture *() const noexcept;
 
 private:
   std::shared_ptr<renderer> _renderer;

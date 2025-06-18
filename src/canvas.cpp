@@ -24,7 +24,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   _framebuffer.reset(texture);
 }
 
-void canvas::set_pixels(const std::vector<uint32_t> &pixels) {
+void canvas::set_pixels(const std::vector<uint32_t> &pixels) noexcept {
   void *ptr = nullptr;
   auto pitch = 0;
   if (!SDL_LockTexture(_framebuffer.get(), nullptr, &ptr, &pitch)) [[unlikely]] {
@@ -37,9 +37,9 @@ void canvas::set_pixels(const std::vector<uint32_t> &pixels) {
   SDL_UnlockTexture(_framebuffer.get());
 }
 
-void canvas::draw() {
+void canvas::draw() const noexcept {
   if (!_framebuffer) [[unlikely]] {
-    throw std::runtime_error("[SDL_CreateTexture] framebuffer is null");
+    return;
   }
 
   SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);

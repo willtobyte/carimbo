@@ -21,28 +21,28 @@
 #include "window.hpp"
 
 namespace framework {
-class engine : public input::eventreceiver {
+class engine final : public input::eventreceiver {
 public:
   engine() = default;
-  virtual ~engine() = default;
+  virtual ~engine() noexcept = default;
 
-  std::shared_ptr<audio::audiodevice> audiodevice() const;
-  std::shared_ptr<framework::objectmanager> objectmanager() const;
-  std::shared_ptr<input::eventmanager> eventmanager() const;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const;
-  std::shared_ptr<graphics::overlay> overlay() const;
-  std::shared_ptr<framework::resourcemanager> resourcemanager() const;
-  std::shared_ptr<framework::scenemanager> scenemanager() const;
-  std::shared_ptr<framework::statemanager> statemanager() const;
-  std::shared_ptr<audio::soundmanager> soundmanager() const;
-  std::shared_ptr<graphics::window> window() const;
-  std::shared_ptr<graphics::renderer> renderer() const;
-  std::shared_ptr<graphics::canvas> canvas() const;
-  std::shared_ptr<storage::cassette> cassette() const;
-  std::shared_ptr<framework::timermanager> timermanager() const;
+  std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
+  std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;
+  std::shared_ptr<input::eventmanager> eventmanager() const noexcept;
+  std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
+  std::shared_ptr<graphics::overlay> overlay() const noexcept;
+  std::shared_ptr<framework::resourcemanager> resourcemanager() const noexcept;
+  std::shared_ptr<framework::scenemanager> scenemanager() const noexcept;
+  std::shared_ptr<framework::statemanager> statemanager() const noexcept;
+  std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
+  std::shared_ptr<graphics::window> window() const noexcept;
+  std::shared_ptr<graphics::renderer> renderer() const noexcept;
+  std::shared_ptr<graphics::canvas> canvas() const noexcept;
+  std::shared_ptr<storage::cassette> cassette() const noexcept;
+  std::shared_ptr<framework::timermanager> timermanager() const noexcept;
 
-  int32_t height() const;
-  int32_t width() const;
+  int32_t height() const noexcept;
+  int32_t width() const noexcept;
 
   void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
   void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);

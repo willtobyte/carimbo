@@ -16,7 +16,7 @@ void fadeineffect::set(const std::string &text, geometry::point position) {
    _draw_calls = 0;
 }
 
-void fadeineffect::update(float_t delta) {
+void fadeineffect::update(float_t delta) noexcept {
   if (_text.empty()) {
     return;
   }
@@ -35,7 +35,7 @@ void fadeineffect::update(float_t delta) {
   _alpha = static_cast<uint8_t>(progress * 255);
 }
 
-uint8_t fadeineffect::alpha() {
+uint8_t fadeineffect::alpha() noexcept {
   ++_draw_calls;
 
   if (_draw_calls == _text.size()) {
@@ -61,7 +61,7 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect> &effect) const {
+void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect> &effect) const noexcept {
   if (text.empty()) {
     return;
   }
@@ -80,8 +80,12 @@ void font::draw(const std::string& text, const geometry::point& position, const 
       continue;
     }
 
-    const auto& glyph = _map.at(static_cast<uint8_t>(ch));
+    const auto it = _map.find(static_cast<uint8_t>(ch));
+    if (it == _map.end()) {
+      continue;
+    }
 
+    const auto &glyph = it->second;
     const auto size = glyph.size();
 
     // TODO

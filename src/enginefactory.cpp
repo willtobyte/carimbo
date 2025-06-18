@@ -11,32 +11,32 @@
 
 using namespace framework;
 
-enginefactory &enginefactory::with_title(const std::string &title) {
+enginefactory &enginefactory::with_title(const std::string &title) noexcept {
   _title = title;
   return *this;
 }
 
-enginefactory &enginefactory::with_width(int32_t width) {
+enginefactory &enginefactory::with_width(int32_t width) noexcept {
   _width = width;
   return *this;
 }
 
-enginefactory &enginefactory::with_height(int32_t height) {
+enginefactory &enginefactory::with_height(int32_t height) noexcept {
   _height = height;
   return *this;
 }
 
-enginefactory &enginefactory::with_scale(float_t scale) {
+enginefactory &enginefactory::with_scale(float_t scale) noexcept {
   _scale = scale;
   return *this;
 }
 
-enginefactory &enginefactory::with_gravity(float_t gravity) {
+enginefactory &enginefactory::with_gravity(float_t gravity) noexcept {
   _gravity = gravity;
   return *this;
 }
 
-enginefactory &enginefactory::with_fullscreen(bool fullscreen) {
+enginefactory &enginefactory::with_fullscreen(bool fullscreen) noexcept {
   _fullscreen = fullscreen;
   return *this;
 }

@@ -2,10 +2,10 @@
 
 using namespace audio;
 
-soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
+soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept
     : _audiodevice(std::move(audiodevice)) {}
 
-std::shared_ptr<soundfx> soundmanager::get(const std::string &filename) {
+std::shared_ptr<soundfx> soundmanager::get(const std::string &filename) noexcept {
   if (auto it = _pool.find(filename); it != _pool.end()) [[likely]] {
     return it->second;
   }
@@ -20,19 +20,19 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string &filename) {
   return ptr;
 }
 
-void soundmanager::play(const std::string &filename, bool loop) {
+void soundmanager::play(const std::string &filename, bool loop) noexcept {
   if (const auto &sound = get("blobs/" + filename + ".ogg"); sound) {
     sound->play(loop);
   }
 }
 
-void soundmanager::stop(const std::string &filename) {
+void soundmanager::stop(const std::string &filename) noexcept {
   if (const auto &sound = get(filename); sound) {
     sound->stop();
   }
 }
 
-void soundmanager::flush() {
+void soundmanager::flush() noexcept {
   fmt::println("[soundmanager] actual size {}", _pool.size());
 
   const auto count = std::erase_if(_pool, [](const auto &pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });

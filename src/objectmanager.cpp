@@ -99,12 +99,18 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   const auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_angle = matrix->_angle;
-  o->_position = matrix->_position;
   o->_kind = matrix->_kind;
   o->_scope = matrix->_scope;
   o->_action = matrix->_action;
   o->_spritesheet = matrix->_spritesheet;
   o->_animations = matrix->_animations;
+
+  o->_position = matrix->_position;
+  o->_velocity = matrix->_velocity;
+  o->_scale = matrix->_scale;
+  o->_reflection = matrix->_reflection;
+  o->_alpha = matrix->_alpha;
+  o->_hover = matrix->_hover;
 
   _objects.emplace_back(o);
 

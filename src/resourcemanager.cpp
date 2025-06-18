@@ -36,7 +36,7 @@ resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, s
       _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
 }
 
-void resourcemanager::flush() {
+void resourcemanager::flush() noexcept {
   _pixmappool->flush();
   _soundmanager->flush();
   _fontfactory->flush();
@@ -65,18 +65,18 @@ void resourcemanager::prefetch(const std::vector<std::string> &filenames) {
   }
 }
 
-std::shared_ptr<graphics::renderer> resourcemanager::renderer() const {
+std::shared_ptr<graphics::renderer> resourcemanager::renderer() const noexcept {
   return _renderer;
 }
 
-std::shared_ptr<graphics::pixmappool> resourcemanager::pixmappool() const {
+std::shared_ptr<graphics::pixmappool> resourcemanager::pixmappool() const noexcept {
   return _pixmappool;
 }
 
-std::shared_ptr<audio::soundmanager> resourcemanager::soundmanager() const {
+std::shared_ptr<audio::soundmanager> resourcemanager::soundmanager() const noexcept {
   return _soundmanager;
 }
 
-std::shared_ptr<graphics::fontfactory> resourcemanager::fontfactory() const {
+std::shared_ptr<graphics::fontfactory> resourcemanager::fontfactory() const noexcept {
   return _fontfactory;
 }

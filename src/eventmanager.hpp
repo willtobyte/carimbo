@@ -7,10 +7,10 @@
 #include "event.hpp"
 
 namespace input {
-class eventmanager : private framework::noncopyable {
+class eventmanager final : private framework::noncopyable {
 public:
   explicit eventmanager(std::shared_ptr<graphics::renderer> renderer);
-  virtual ~eventmanager() = default;
+  virtual ~eventmanager() noexcept = default;
 
   void update(float_t delta);
 

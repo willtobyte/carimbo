@@ -3,5 +3,5 @@
 #include "common.hpp"
 
 namespace framework {
-void delay(uint32_t interval);
+void delay(uint32_t interval) noexcept;
 }

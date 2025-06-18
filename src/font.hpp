@@ -18,26 +18,26 @@ class fonteffect {
 
     virtual void set(const std::string &text, geometry::point position) = 0;
 
-    virtual void update(float_t delta) = 0;
+    virtual void update(float_t delta) noexcept = 0;
 
-    virtual float_t scale() { return 1.f; };
+    virtual float_t scale() noexcept { return 1.f; };
 
-    virtual double_t angle() { return .0L; };
+    virtual double_t angle() noexcept { return .0L; };
 
-    virtual enum reflection reflection() { return reflection::none; };
+    virtual enum reflection reflection() noexcept { return reflection::none; };
 
-    virtual uint8_t alpha() { return 255; };
+    virtual uint8_t alpha() noexcept { return 255; };
 };
 
-class fadeineffect : public fonteffect {
+class fadeineffect final : public fonteffect {
   public:
     virtual ~fadeineffect() = default;
 
     virtual void set(const std::string &text, geometry::point position) override;
 
-    virtual void update(float_t delta) override;
+    virtual void update(float_t delta) noexcept override;
 
-    virtual uint8_t alpha() override;
+    virtual uint8_t alpha() noexcept override;
 
   private:
     std::string _text;
@@ -66,7 +66,7 @@ public:
 
   ~font() = default;
 
-  void draw(const std::string &text, const geometry::point &position, const std::weak_ptr<fonteffect> &effect) const;
+  void draw(const std::string &text, const geometry::point &position, const std::weak_ptr<fonteffect> &effect) const noexcept;
 
   std::string glyphs() const;
 

@@ -11,17 +11,17 @@ class resourcemanager final {
 public:
   resourcemanager() = delete;
   resourcemanager(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<audio::audiodevice> audiodevice);
-  ~resourcemanager() = default;
+  ~resourcemanager() noexcept = default;
 
-  void flush();
+  void flush() noexcept;
 
   void prefetch();
   void prefetch(const std::vector<std::string> &filenames);
 
-  std::shared_ptr<graphics::renderer> renderer() const;
-  std::shared_ptr<graphics::pixmappool> pixmappool() const;
-  std::shared_ptr<audio::soundmanager> soundmanager() const;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const;
+  std::shared_ptr<graphics::renderer> renderer() const noexcept;
+  std::shared_ptr<graphics::pixmappool> pixmappool() const noexcept;
+  std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
+  std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
 
 private:
   std::shared_ptr<graphics::renderer> _renderer;

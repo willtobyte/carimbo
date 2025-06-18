@@ -140,15 +140,15 @@ soundfx::soundfx(const std::string &filename) {
   alDeleteBuffers(1, &buffer);
 }
 
-soundfx::~soundfx() {
+soundfx::~soundfx() noexcept {
   alDeleteSources(1, &_source);
 }
 
-void soundfx::play(bool loop) const {
+void soundfx::play(bool loop) const noexcept {
   alSourcei(_source, AL_LOOPING, loop);
   alSourcePlay(_source);
 }
 
-void soundfx::stop() const {
+void soundfx::stop() const noexcept {
   alSourceStop(_source);
 }

@@ -8,36 +8,36 @@
 namespace geometry {
 class rectangle final {
 public:
-  rectangle() = default;
-  rectangle(const rectangle &other) = default;
-  rectangle(float_t x, float_t y, float_t width, float_t height);
-  rectangle(const geometry::point &position, const geometry::size &size);
+  rectangle() noexcept = default;
+  rectangle(const rectangle &other) noexcept = default;
+  rectangle(float_t x, float_t y, float_t width, float_t height) noexcept;
+  rectangle(const geometry::point &position, const geometry::size &size) noexcept;
 
-  ~rectangle() = default;
+  ~rectangle() noexcept = default;
 
   float_t x() const noexcept;
   float_t y() const noexcept;
   float_t width() const noexcept;
   float_t height() const noexcept;
 
-  void set_position(const geometry::point &position);
-  geometry::point position() const;
+  void set_position(const geometry::point &position) noexcept;
+  geometry::point position() const noexcept;
 
-  void set_size(const geometry::size &size);
-  geometry::size size() const;
+  void set_size(const geometry::size &size) noexcept;
+  geometry::size size() const noexcept;
 
-  void scale(float_t factor);
+  void scale(float_t factor) noexcept;
 
-  bool intersects(const rectangle &other) const;
+  bool intersects(const rectangle &other) const noexcept;
 
-  bool contains(const geometry::point &point) const;
-  bool contains(float_t x, float_t y) const;
+  bool contains(const geometry::point &point) const noexcept;
+  bool contains(float_t x, float_t y) const noexcept;
 
-  operator SDL_FRect() const;
+  operator SDL_FRect() const noexcept;
 
-  rectangle operator+(const geometry::point &offset) const;
+  rectangle operator+(const geometry::point &offset) const noexcept;
 
-  auto operator<=>(const rectangle &) const = default;
+  auto operator<=>(const rectangle &) const noexcept = default;
 
   friend void from_json(const nlohmann::json &j, rectangle &r);
 

@@ -5,8 +5,8 @@
 namespace framework {
 class scriptengine final : private noncopyable {
 public:
-  scriptengine() = default;
-  virtual ~scriptengine() = default;
+  scriptengine() noexcept = default;
+  virtual ~scriptengine() noexcept = default;
 
   void run();
 };

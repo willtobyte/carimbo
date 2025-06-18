@@ -13,9 +13,9 @@ class tilemap final {
     explicit tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string &name);
     ~tilemap() = default;
 
-    void update(float_t delta);
+    void update(float_t delta) noexcept;
 
-    void draw() const;
+    void draw() const noexcept;
 
     void set_target(std::shared_ptr<object> object);
 

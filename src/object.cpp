@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-object::object()
+object::object() noexcept
   : _frame(0),
     _last_frame(SDL_GetTicks()),
     _angle(.0),
@@ -12,52 +12,52 @@ object::object()
     _hover(false)
 {}
 
-object::~object() {
+object::~object() noexcept {
   fmt::println("[object] destroyed {} {}", kind(), id());
 }
 
-uint64_t object::id() const {
+uint64_t object::id() const noexcept {
   return _id;
 }
 
-std::string object::kind() const {
+std::string object::kind() const noexcept {
   return _kind;
 }
 
-std::string object::scope() const {
+std::string object::scope() const noexcept {
   return _scope;
 }
 
-geometry::point object::position() const {
+geometry::point object::position() const noexcept {
   return _position;
 }
 
-float_t object::x() const {
+float_t object::x() const noexcept {
   return _position.x();
 }
 
-void object::set_x(float_t x) {
+void object::set_x(float_t x) noexcept {
   _position.set_x(x);
 }
 
-float_t object::y() const {
+float_t object::y() const noexcept {
   return _position.y();
 }
 
-void object::set_y(float_t y) {
+void object::set_y(float_t y) noexcept {
   _position.set_y(y);
 }
 
-void object::move(float_t x_velocity, float_t y_velocity) {
+void object::move(float_t x_velocity, float_t y_velocity) noexcept {
   UNUSED(x_velocity);
   UNUSED(y_velocity);
 }
 
-void object::set_velocity(const algebra::vector2d &velocity) {
+void object::set_velocity(const algebra::vector2d &velocity) noexcept {
   _velocity = velocity;
 }
 
-algebra::vector2d object::velocity() const {
+algebra::vector2d object::velocity() const noexcept {
   return _velocity;
 }
 
@@ -173,32 +173,88 @@ void object::draw() const noexcept {
   );
 }
 
-void object::hide() {
+void object::hide() noexcept {
   unset_action();
 }
 
-void object::set_placement(float_t x, float_t y) {
+void object::set_placement(float_t x, float_t y) noexcept {
   _position.set(x, y);
 }
 
-geometry::point object::placement() const {
+geometry::point object::placement() const noexcept {
   return _position;
 }
 
-void object::set_alpha(uint8_t alpha) {
+void object::set_alpha(uint8_t alpha) noexcept {
   _alpha = alpha;
 }
 
-uint8_t object::alpha() const {
+uint8_t object::alpha() const noexcept {
   return _alpha;
 }
 
-void object::set_scale(float_t scale) {
+void object::set_scale(float_t scale) noexcept {
   _scale = scale;
 }
 
-float_t object::scale() const {
+float_t object::scale() const noexcept {
   return _scale;
+}
+
+void object::set_reflection(graphics::reflection reflection) noexcept {
+  _reflection = reflection;
+}
+
+graphics::reflection object::reflection() const noexcept {
+  return _reflection;
+}
+
+void object::set_action(const std::string& action) noexcept {
+  _action = action;
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
+
+  const auto &a = _animations.at(_action);
+  if (const auto &e = a.effect; e) {
+    e->play();
+  }
+}
+
+void object::unset_action() noexcept {
+  _action.clear();
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
+}
+
+std::string object::action() const noexcept {
+  return _action;
+}
+
+bool object::intersects(const std::shared_ptr<object> other) const noexcept {
+  if (_action.empty() || other->_action.empty()) [[likely]] {
+    return false;
+  }
+
+  const auto sit = _animations.find(_action);
+  if (sit == _animations.end() || !sit->second.hitbox) [[likely]] {
+    return false;
+  }
+
+  const auto oit = other->_animations.find(other->_action);
+  if (oit == other->_animations.end() || !oit->second.hitbox) [[likely]] {
+    return false;
+  }
+
+  return geometry::rectangle(
+    position() + sit->second.hitbox->position() * _scale,
+    sit->second.hitbox->size() * _scale
+  )
+  .intersects(
+    geometry::rectangle(
+      other->position() + oit->second.hitbox->position() * other->_scale,
+      oit->second.hitbox->size() * other->_scale
+    )
+  );
 }
 
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) {
@@ -231,62 +287,6 @@ void object::set_oncollision(const std::string &kind, std::function<void(std::sh
 
 void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) {
   _tickinmapping.emplace(n, std::move(fn));
-}
-
-void object::set_reflection(graphics::reflection reflection) {
-  _reflection = reflection;
-}
-
-graphics::reflection object::reflection() const {
-  return _reflection;
-}
-
-void object::set_action(const std::string& action) {
-  _action = action;
-  _frame = 0;
-  _last_frame = SDL_GetTicks();
-
-  const auto &a = _animations.at(_action);
-  if (const auto &e = a.effect; e) {
-    e->play();
-  }
-}
-
-void object::unset_action() {
-  _action.clear();
-  _frame = 0;
-  _last_frame = SDL_GetTicks();
-}
-
-std::string object::action() const {
-  return _action;
-}
-
-bool object::intersects(const std::shared_ptr<object> other) const {
-  if (_action.empty() || other->_action.empty()) [[likely]] {
-    return false;
-  }
-
-  const auto sit = _animations.find(_action);
-  if (sit == _animations.end() || !sit->second.hitbox) [[likely]] {
-    return false;
-  }
-
-  const auto oit = other->_animations.find(other->_action);
-  if (oit == other->_animations.end() || !oit->second.hitbox) [[likely]] {
-    return false;
-  }
-
-  return geometry::rectangle(
-    position() + sit->second.hitbox->position() * _scale,
-    sit->second.hitbox->size() * _scale
-  )
-  .intersects(
-    geometry::rectangle(
-      other->position() + oit->second.hitbox->position() * other->_scale,
-      oit->second.hitbox->size() * other->_scale
-    )
-  );
 }
 
 void object::on_email(const std::string &message) {

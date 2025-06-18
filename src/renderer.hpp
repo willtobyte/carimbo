@@ -6,12 +6,12 @@ namespace graphics {
 class renderer final {
 public:
   explicit renderer(SDL_Window *window);
-  ~renderer() = default;
+  ~renderer() noexcept = default;
 
-  operator SDL_Renderer *();
+  operator SDL_Renderer *() const noexcept;
 
-  void begin();
-  void end();
+  void begin() const noexcept;
+  void end() const noexcept;
 
 private:
   std::unique_ptr<SDL_Renderer, SDL_Deleter> _renderer;

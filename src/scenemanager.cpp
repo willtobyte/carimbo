@@ -86,7 +86,7 @@ void scenemanager::destroy(const std::string &name) {
   _scene_mapping.erase(name);
 }
 
-void scenemanager::update(float_t delta) {
+void scenemanager::update(float_t delta) noexcept {
   if (!_scene) [[unlikely]] {
     return;
   }
@@ -94,7 +94,7 @@ void scenemanager::update(float_t delta) {
   _scene->update(delta);
 }
 
-void scenemanager::draw() const {
+void scenemanager::draw() const noexcept {
   if (!_scene) [[unlikely]] {
     return;
   }

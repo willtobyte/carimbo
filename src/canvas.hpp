@@ -8,11 +8,11 @@ namespace graphics {
 class canvas final {
 public:
   explicit canvas(std::shared_ptr<renderer> renderer);
-  ~canvas() = default;
+  ~canvas() noexcept = default;
 
-  void set_pixels(const std::vector<uint32_t> &pixels);
+  void set_pixels(const std::vector<uint32_t> &pixels) noexcept;
 
-  void draw();
+  void draw() const noexcept;
 
 private:
   std::shared_ptr<renderer> _renderer;

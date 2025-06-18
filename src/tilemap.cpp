@@ -18,7 +18,7 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   _view = {.0f, .0f, width, height};
 }
 
-void tilemap::update(float_t delta) {
+void tilemap::update(float_t delta) noexcept {
   UNUSED(delta);
   if (!_target || !_tileset) {
     return;
@@ -40,7 +40,7 @@ void tilemap::update(float_t delta) {
   });
 }
 
-void tilemap::draw() const {
+void tilemap::draw() const noexcept {
   if (!_tileset) {
     return;
   }

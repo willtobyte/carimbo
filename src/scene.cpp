@@ -31,13 +31,13 @@ scene::~scene() {
   _background.reset();
 }
 
-void scene::update(float_t delta) {
+void scene::update(float_t delta) noexcept {
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
 }
 
-void scene::draw() const {
+void scene::draw() const noexcept {
   static geometry::point point{0, 0};
   _background->draw({point, _size}, {point, _size});
 }

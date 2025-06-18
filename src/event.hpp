@@ -92,7 +92,7 @@ struct mail final {
 };
 
 struct collision final {
-  collision(uint64_t a, uint64_t b)
+  collision(uint64_t a, uint64_t b) noexcept
       : a(a), b(b) {}
 
   uint64_t a;

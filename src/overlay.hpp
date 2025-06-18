@@ -10,18 +10,18 @@
 #include "widget.hpp"
 
 namespace graphics {
-class overlay : public input::eventreceiver {
+class overlay final : public input::eventreceiver {
 public:
-  explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager);
-  virtual ~overlay() = default;
+  explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager) noexcept;
+  virtual ~overlay() noexcept = default;
 
   std::variant<std::shared_ptr<label>> create(widgettype type);
 
   void destroy(const std::variant<std::shared_ptr<label>> &widget);
 
-  void update(float_t delta);
+  void update(float_t delta) noexcept;
 
-  void draw() const;
+  void draw() const noexcept;
 
   void set_cursor(const std::string &name);
 

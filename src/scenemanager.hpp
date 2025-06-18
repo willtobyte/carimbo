@@ -12,7 +12,7 @@ class objectmanager;
 class scenemanager final  : public input::eventreceiver {
 public:
   scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<framework::objectmanager> objectmanager);
-  ~scenemanager() = default;
+  ~scenemanager() noexcept = default;
 
   std::shared_ptr<scene> load(const std::string &name);
 
@@ -22,9 +22,9 @@ public:
 
   void destroy(const std::string &name);
 
-  void update(float_t delta);
+  void update(float_t delta) noexcept;
 
-  void draw() const;
+  void draw() const noexcept;
 
   void on_touch(float_t x, float_t y) const;
 

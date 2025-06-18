@@ -29,37 +29,47 @@ using animation_map = absl::flat_hash_map<std::string, animation>;
 
 class object final : public std::enable_shared_from_this<object> {
 public:
-  object();
-  virtual ~object();
+  object() noexcept;
+  virtual ~object() noexcept;
 
-  uint64_t id() const;
+  uint64_t id() const noexcept;
 
-  std::string kind() const;
+  std::string kind() const noexcept;
 
-  std::string scope() const;
+  std::string scope() const noexcept;
 
   void update(float_t delta) noexcept;
 
   void draw() const noexcept;
 
-  geometry::point position() const;
-  float_t x() const;
-  void set_x(float_t x);
-  float_t y() const;
-  void set_y(float_t y);
+  geometry::point position() const noexcept;
+  float_t x() const noexcept;
+  void set_x(float_t x) noexcept;
+  float_t y() const noexcept;
+  void set_y(float_t y) noexcept;
 
-  void move(float_t x_velocity, float_t y_velocity);
-  void set_velocity(const algebra::vector2d &velocity);
-  algebra::vector2d velocity() const;
+  void move(float_t x_velocity, float_t y_velocity) noexcept;
+  void set_velocity(const algebra::vector2d &velocity) noexcept;
+  algebra::vector2d velocity() const noexcept;
 
-  void set_placement(float_t x, float_t y);
-  geometry::point placement() const;
+  void set_placement(float_t x, float_t y) noexcept;
+  geometry::point placement() const noexcept;
 
-  void set_alpha(uint8_t alpha);
-  uint8_t alpha() const;
+  void set_alpha(uint8_t alpha) noexcept;
+  uint8_t alpha() const noexcept;
 
-  void set_scale(float_t scale);
-  float_t scale() const;
+  void set_scale(float_t scale) noexcept;
+  float_t scale() const noexcept;
+
+  void set_reflection(graphics::reflection reflection) noexcept;
+  graphics::reflection reflection() const noexcept;
+
+  void set_action(const std::string &action) noexcept;
+  void unset_action() noexcept;
+  void hide() noexcept;
+  std::string action() const noexcept;
+
+  bool intersects(std::shared_ptr<object> other) const noexcept;
 
   void set_onupdate(std::function<void(std::shared_ptr<object>)> fn);
   void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn);
@@ -69,16 +79,6 @@ public:
   void set_onunhover(std::function<void(std::shared_ptr<object>)> fn);
   void set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn);
   void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn);
-
-  void set_reflection(graphics::reflection reflection);
-  graphics::reflection reflection() const;
-
-  void set_action(const std::string &action);
-  void unset_action();
-  void hide();
-  std::string action() const;
-
-  bool intersects(std::shared_ptr<object> other) const;
 
   void on_email(const std::string &message);
 

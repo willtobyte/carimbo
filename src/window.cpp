@@ -23,7 +23,7 @@ window::window(const std::string &title, int32_t width, int32_t height, bool ful
   SDL_StartTextInput(_window.get());
 }
 
-window::operator SDL_Window *() {
+window::operator SDL_Window *() noexcept {
   return _window.get();
 }
 
@@ -36,10 +36,10 @@ std::shared_ptr<renderer> window::create_renderer(float_t scale) const {
   return ptr;
 }
 
-int32_t window::width() const {
+int32_t window::width() const noexcept {
   return _width;
 }
 
-int32_t window::height() const {
+int32_t window::height() const noexcept {
   return _height;
 }

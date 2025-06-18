@@ -6,7 +6,7 @@ namespace framework {
 template <typename T>
 class singleton {
 public:
-  virtual ~singleton() = default;
+  virtual ~singleton() noexcept = default;
 
   static std::shared_ptr<T> instance();
 };

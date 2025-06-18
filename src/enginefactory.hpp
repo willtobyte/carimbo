@@ -5,17 +5,17 @@
 namespace framework {
 class engine;
 
-class enginefactory {
+class enginefactory final {
 public:
-  enginefactory() = default;
-  virtual ~enginefactory() = default;
+  enginefactory() noexcept = default;
+  virtual ~enginefactory() noexcept = default;
 
-  enginefactory &with_title(const std::string &title);
-  enginefactory &with_width(int32_t width);
-  enginefactory &with_height(int32_t height);
-  enginefactory &with_scale(float_t scale);
-  enginefactory &with_gravity(float_t gravity);
-  enginefactory &with_fullscreen(bool fullscreen);
+  enginefactory &with_title(const std::string &title) noexcept;
+  enginefactory &with_width(int32_t width) noexcept;
+  enginefactory &with_height(int32_t height) noexcept;
+  enginefactory &with_scale(float_t scale) noexcept;
+  enginefactory &with_gravity(float_t gravity) noexcept;
+  enginefactory &with_fullscreen(bool fullscreen) noexcept;
 
   std::shared_ptr<engine> create() const;
 

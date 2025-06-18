@@ -7,7 +7,7 @@
 namespace input {
 class eventreceiver {
 public:
-  virtual ~eventreceiver() = default;
+  virtual ~eventreceiver() noexcept = default;
 
   virtual void on_quit();
   virtual void on_key_press(const event::keyboard::key &event);

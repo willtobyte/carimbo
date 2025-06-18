@@ -16,14 +16,14 @@ renderer::renderer(SDL_Window *window) {
   _renderer.reset(renderer);
 }
 
-renderer::operator SDL_Renderer *() {
+renderer::operator SDL_Renderer *() const noexcept {
   return _renderer.get();
 }
 
-void renderer::begin() {
+void renderer::begin() const noexcept {
   SDL_RenderClear(*this);
 }
 
-void renderer::end() {
+void renderer::end() const noexcept {
   SDL_RenderPresent(*this);
 }

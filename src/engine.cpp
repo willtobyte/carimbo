@@ -11,67 +11,67 @@
 
 using namespace framework;
 
-std::shared_ptr<audio::audiodevice> engine::audiodevice() const {
+std::shared_ptr<audio::audiodevice> engine::audiodevice() const noexcept {
   return _audiodevice;
 }
 
-std::shared_ptr<framework::objectmanager> engine::objectmanager() const {
+std::shared_ptr<framework::objectmanager> engine::objectmanager() const noexcept {
   return _objectmanager;
 }
 
-std::shared_ptr<input::eventmanager> engine::eventmanager() const {
+std::shared_ptr<input::eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
 }
 
-std::shared_ptr<graphics::fontfactory> engine::fontfactory() const {
+std::shared_ptr<graphics::fontfactory> engine::fontfactory() const noexcept {
   return _resourcemanager->fontfactory();
 }
 
-std::shared_ptr<graphics::overlay> engine::overlay() const {
+std::shared_ptr<graphics::overlay> engine::overlay() const noexcept {
   return _overlay;
 }
 
-std::shared_ptr<framework::resourcemanager> engine::resourcemanager() const {
+std::shared_ptr<framework::resourcemanager> engine::resourcemanager() const noexcept {
   return _resourcemanager;
 }
 
-std::shared_ptr<framework::scenemanager> engine::scenemanager() const {
+std::shared_ptr<framework::scenemanager> engine::scenemanager() const noexcept {
   return _scenemanager;
 }
 
-std::shared_ptr<framework::statemanager> engine::statemanager() const {
+std::shared_ptr<framework::statemanager> engine::statemanager() const noexcept {
   return _statemanager;
 }
 
-std::shared_ptr<audio::soundmanager> engine::soundmanager() const {
+std::shared_ptr<audio::soundmanager> engine::soundmanager() const noexcept {
   return _resourcemanager->soundmanager();
 }
 
-std::shared_ptr<graphics::window> engine::window() const {
+std::shared_ptr<graphics::window> engine::window() const noexcept {
   return _window;
 }
 
-std::shared_ptr<graphics::renderer> engine::renderer() const {
+std::shared_ptr<graphics::renderer> engine::renderer() const noexcept {
   return _renderer;
 }
 
-std::shared_ptr<graphics::canvas> engine::canvas() const {
+std::shared_ptr<graphics::canvas> engine::canvas() const noexcept {
   return _canvas;
 }
 
-std::shared_ptr<storage::cassette> engine::cassette() const {
+std::shared_ptr<storage::cassette> engine::cassette() const noexcept {
   return _cassette;
 }
 
-std::shared_ptr<framework::timermanager> engine::timermanager() const {
+std::shared_ptr<framework::timermanager> engine::timermanager() const noexcept {
   return _timermanager;
 }
 
-int32_t engine::height() const {
+int32_t engine::height() const noexcept {
   return _window->height();
 }
 
-int32_t engine::width() const {
+int32_t engine::width() const noexcept {
   return _window->width();
 }
 
@@ -133,8 +133,8 @@ void engine::prefetch(const std::vector<std::string> &filenames) {
 
 #ifdef EMSCRIPTEN
 template <class T>
-inline void run(void *arg) {
-  reinterpret_cast<T *>(arg)->_loop();
+inline void run(void *userdata) {
+  reinterpret_cast<T *>(userdata)->_loop();
 }
 #endif
 

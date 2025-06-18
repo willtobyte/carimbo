@@ -3,10 +3,10 @@
 #include "noncopyable.hpp"
 
 namespace framework {
-class application : private noncopyable {
+class application final : private noncopyable {
 public:
   application(int argc, char **argv);
-  virtual ~application() = default;
+  virtual ~application() noexcept = default;
 
   int32_t run();
 };

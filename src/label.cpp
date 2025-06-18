@@ -26,13 +26,13 @@ void label::clear() {
   _position = {0, 0};
 }
 
-void label::update(float_t delta) {
+void label::update(float_t delta) noexcept {
   if (const auto e = _effect.get()) {
     e->update(delta);
   }
 }
 
-void label::draw() const {
+void label::draw() const  noexcept {
   if (!_font || _text.empty()) [[unlikely]] {
     return;
   }

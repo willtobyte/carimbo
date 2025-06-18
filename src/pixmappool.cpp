@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-pixmappool::pixmappool(std::shared_ptr<renderer> renderer)
+pixmappool::pixmappool(std::shared_ptr<renderer> renderer) noexcept
     : _renderer(std::move(renderer)) {}
 
 std::shared_ptr<pixmap> pixmappool::get(const std::string &filename) {
@@ -20,7 +20,7 @@ std::shared_ptr<pixmap> pixmappool::get(const std::string &filename) {
   return ptr;
 }
 
-void pixmappool::flush() {
+void pixmappool::flush() noexcept {
   fmt::println("[pixmappool] actual size {}", _pool.size());
 
   const auto count = std::erase_if(_pool, [](const auto &pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });

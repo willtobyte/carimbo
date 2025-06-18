@@ -5,7 +5,7 @@
 
 namespace graphics {
 
-class label : public widget {
+class label final : public widget {
 public:
   label() = default;
   virtual ~label() = default;
@@ -18,9 +18,9 @@ public:
 
   void clear();
 
-  virtual void update(float_t delta) override;
+  virtual void update(float_t delta) noexcept override;
 
-  virtual void draw() const override;
+  virtual void draw() const noexcept override;
 
 private:
   std::shared_ptr<font> _font;

@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager)
+overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager) noexcept
     : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
@@ -30,7 +30,7 @@ void overlay::destroy(const std::variant<std::shared_ptr<label>> &widget) {
   });
 }
 
-void overlay::update(float_t delta) {
+void overlay::update(float_t delta) noexcept {
   for (const auto &widget : _widgets) {
     widget->update(delta);
   }
@@ -40,7 +40,7 @@ void overlay::update(float_t delta) {
   }
 }
 
-void overlay::draw() const {
+void overlay::draw() const noexcept {
   for (const auto &widget : _widgets) {
     widget->draw();
   }

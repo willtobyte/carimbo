@@ -27,9 +27,9 @@ public:
 
   ~scene();
 
-  void update(float_t delta);
+  void update(float_t delta) noexcept;
 
-  void draw() const;
+  void draw() const noexcept;
 
   std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> get(const std::string &name, scenetype type) const;
 
