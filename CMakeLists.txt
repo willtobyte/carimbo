@@ -203,6 +203,10 @@ else()
       $<$<CONFIG:Debug>:${DEBUG_LINK_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}>
     )
+
+    set_target_properties(${PROJECT_NAME} PRIVATE
+      PROPERTIES WIN32_EXECUTABLE TRUE
+    )
   else()
     set(GENERIC_WARNINGS
       -Wall
