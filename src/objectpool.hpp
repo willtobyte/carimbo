@@ -54,4 +54,5 @@ public:
 
 using collision_pool = singleton<objectpool<collision>>;
 using mail_pool = singleton<objectpool<mail>>;
+using object_pool = singleton<objectpool<object>>;
 }
