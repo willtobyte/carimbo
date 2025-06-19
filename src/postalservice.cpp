@@ -10,7 +10,8 @@ postalservice::postalservice() noexcept
 void postalservice::post(const mail& message) noexcept {
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::mail);
-  event.user.data1 = new mail(message);
+  const auto mail = _mail_pool->acquire(message);
+  event.user.data1 = mail.get();
 
   SDL_PushEvent(&event);
 }

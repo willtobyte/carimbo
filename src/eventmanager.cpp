@@ -159,7 +159,7 @@ void eventmanager::update(float_t delta) {
             receiver->on_mail(mail(ptr->to, ptr->body));
           }
 
-          _mail_pool->release(std::unique_ptr<framework::mail>(ptr));
+          _mail_pool->release(std::shared_ptr<framework::mail>(ptr));
         }
       } break;
 
