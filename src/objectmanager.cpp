@@ -27,8 +27,6 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
-  _dirty = true;
-
   const auto n = scope ? scope->get() : "";
   const auto& qualifier = n.empty() ? kind : fmt::format("{}/{}", n, kind);
   for (const auto& o : _objects) {
@@ -129,7 +127,6 @@ void objectmanager::manage(std::shared_ptr<object> object) {
   }
 
   _objects.emplace_back(std::move(object));
-  _dirty = true;
 }
 
 void objectmanager::unmanage(std::shared_ptr<object> object) {
@@ -141,8 +138,6 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
     std::remove(_objects.begin(), _objects.end(), object),
     _objects.end()
   );
-
-  _dirty = true;
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) {
@@ -150,7 +145,6 @@ void objectmanager::destroy(std::shared_ptr<object> object) {
     return;
   }
 
-  _dirty = true;
   _objects.erase(std::remove(_objects.begin(), _objects.end(), object), _objects.end());
   _objects.shrink_to_fit();
 
@@ -170,28 +164,17 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
 }
 
 void objectmanager::update(float_t delta) noexcept {
-  for (auto& o : _objects) {
-    const auto ox = o->x();
-    const auto oy = o->y();
-
+  for (auto it = _objects.begin(); it != _objects.end(); ++it) {
+    const auto& o = *it;
     o->update(delta);
 
-    constexpr const auto epsilon = std::numeric_limits<float_t>::epsilon();
-    if (std::abs(o->x() - ox) > epsilon || std::abs(o->y() - oy) > epsilon) {
-      _dirty = true;
-      break;
-    }
-  }
-
-  for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-    const auto& a = *it;
-    const auto aita = a->_animations.find(a->_action);
-    if (aita == a->_animations.end() || !aita->second.hitbox) [[likely]] {
+    const auto aita = o->_animations.find(o->_action);
+    if (aita == o->_animations.end() || !aita->second.hitbox) [[likely]] {
       continue;
     }
 
     const auto& ha = *aita->second.hitbox;
-    const auto has = geometry::rectangle{a->position() + ha.position() * a->_scale, ha.size() * a->_scale};
+    const auto has = geometry::rectangle{o->position() + ha.position() * o->_scale, ha.size() * o->_scale};
     for (auto jt = std::next(it); jt != _objects.end(); ++jt) {
       const auto& b = *jt;
 
@@ -207,16 +190,16 @@ void objectmanager::update(float_t delta) noexcept {
       if (hbs.y() + hbs.height() < has.y()) continue;
       if (!has.intersects(hbs)) continue;
 
-      const auto callback_a = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt);
-      const auto callback_b = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt);
+      const auto caa = get_callback_or(o->_collisionmapping, b->kind(), std::nullopt);
+      const auto cab = get_callback_or(b->_collisionmapping, o->kind(), std::nullopt);
 
-      if (callback_a) (*callback_a)(a, b);
-      if (callback_b) (*callback_b)(b, a);
+      if (caa) (*caa)(o, b);
+      if (cab) (*cab)(b, o);
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
-      auto o = _collision_pool->acquire(a->id(), b->id());
-      event.user.data1 = o.get();
+      const auto cn = _collision_pool->acquire(o->id(), b->id());
+      event.user.data1 = cn.get();
 
       SDL_PushEvent(&event);
     }

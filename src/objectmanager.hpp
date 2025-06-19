@@ -42,7 +42,6 @@ private:
   std::shared_ptr<scenemanager> _scenemanager;
   std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
-  bool _dirty{true};
 
   std::shared_ptr<objectpool<object>> _object_pool;
   std::shared_ptr<objectpool<collision>> _collision_pool;
