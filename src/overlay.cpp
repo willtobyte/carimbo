@@ -6,7 +6,7 @@ overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, st
     : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
-  auto widget = [&]() {
+  const auto widget = [&]() {
     switch (type) {
     case widgettype::label:
       return std::make_shared<label>();
