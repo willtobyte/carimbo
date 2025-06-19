@@ -20,7 +20,7 @@ public:
   int32_t right() const noexcept;
   void set_right(int32_t value) noexcept;
 
-  friend void from_json(const nlohmann::json &j, margin &m);
+  friend void from_json(const nlohmann::json& j, margin& m);
 
 private:
   int32_t _top{0};

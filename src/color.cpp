@@ -9,13 +9,13 @@ color::color(uint32_t pixel) noexcept {
   _a = static_cast<uint8_t>(pixel & 0xFF);
 }
 
-color::color(const SDL_Color &scolor) noexcept
+color::color(const SDL_Color& scolor) noexcept
     : color(scolor.r, scolor.g, scolor.b, scolor.a) {}
 
 color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
     : _r(r), _g(g), _b(b), _a(a) {}
 
-color::color(const std::string &hex)
+color::color(const std::string& hex)
     : _r(0), _g(0), _b(0), _a(255) {
   if (hex.length() != 7 && hex.length() != 9) [[unlikely]] {
     throw std::runtime_error(fmt::format("Invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
@@ -65,11 +65,11 @@ void color::set_a(uint8_t a) noexcept {
   _a = a;
 }
 
-bool color::operator==(const color &other) const noexcept {
+bool color::operator==(const color& other) const noexcept {
   return std::tie(_r, _g, _b, _a) == std::tie(other._r, other._g, other._b, other._a);
 }
 
-bool color::operator!=(const color &other) const noexcept {
+bool color::operator!=(const color& other) const noexcept {
   return !(*this == other);
 }
 

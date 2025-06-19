@@ -16,7 +16,7 @@ public:
   void flush() noexcept;
 
   void prefetch();
-  void prefetch(const std::vector<std::string> &filenames);
+  void prefetch(const std::vector<std::string>& filenames);
 
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
   std::shared_ptr<graphics::pixmappool> pixmappool() const noexcept;

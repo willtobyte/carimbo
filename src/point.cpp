@@ -30,18 +30,18 @@ point::operator SDL_FPoint() const noexcept {
   return SDL_FPoint{_x, _y};
 }
 
-point point::operator+(const point &other) const noexcept {
+point point::operator+(const point& other) const noexcept {
   return point(_x + other._x, _y + other._y);
 }
 
-point &point::operator+=(const point &other) noexcept {
+point& point::operator+=(const point& other) noexcept {
   _x += other._x;
   _y += other._y;
 
   return *this;
 }
 
-point &point::operator+=(std::pair<uint8_t, float_t> offset) noexcept{
+point& point::operator+=(const std::pair<uint8_t, float_t>& offset) noexcept{
   if (offset.first == 'x') {
     _x += offset.second;
   } else if (offset.first == 'y') {
@@ -51,10 +51,10 @@ point &point::operator+=(std::pair<uint8_t, float_t> offset) noexcept{
   return *this;
 }
 
-point point::operator-(const size &rhs) const noexcept {
+point point::operator-(const size& rhs) const noexcept {
   return point(_x - rhs.width(), _y - rhs.height());
 }
 
-point point::operator-(const point &rhs) const noexcept {
+point point::operator-(const point& rhs) const noexcept {
   return point(_x - rhs._x, _y - rhs._y);
 }

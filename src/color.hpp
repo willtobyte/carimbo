@@ -7,9 +7,9 @@ class color final {
 public:
   color() noexcept = default;
   explicit color(uint32_t pixel) noexcept;
-  explicit color(const SDL_Color &scolor) noexcept;
+  explicit color(const SDL_Color& scolor) noexcept;
   color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
-  color(const std::string &hex);
+  color(const std::string& hex);
   ~color() noexcept = default;
 
   uint8_t r() const noexcept;
@@ -22,9 +22,9 @@ public:
   void set_b(uint8_t b) noexcept;
   void set_a(uint8_t a) noexcept;
 
-  bool operator==(const color &other) const noexcept;
+  bool operator==(const color& other) const noexcept;
 
-  bool operator!=(const color &other) const noexcept;
+  bool operator!=(const color& other) const noexcept;
 
   explicit operator SDL_Color() const noexcept;
 

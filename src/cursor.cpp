@@ -4,24 +4,24 @@ using namespace graphics;
 
 using namespace input::event;
 
-cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager)
+cursor::cursor(const std::string& name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
 
-  const auto &filename = fmt::format("cursors/{}.json", name);
-  const auto &buffer = storage::io::read(filename);
-  const auto &j = nlohmann::json::parse(buffer);
+  const auto& filename = fmt::format("cursors/{}.json", name);
+  const auto& buffer = storage::io::read(filename);
+  const auto& j = nlohmann::json::parse(buffer);
 
   _point = j["point"].template get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/overlay/{}.png", name));
   _animations.reserve(j["animations"].size());
 
-  for (const auto &item : j["animations"].items()) {
-    const auto &key = item.key();
-    const auto &a = item.value();
-    const auto &f = a["frames"];
+  for (const auto& item : j["animations"].items()) {
+    const auto& key = item.key();
+    const auto& a = item.value();
+    const auto& f = a["frames"];
     std::vector<graphics::keyframe> keyframes(f.size());
-    std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
+    std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
       return graphics::keyframe{
           frame["rectangle"].template get<geometry::rectangle>(),
           frame["offset"].template get<geometry::point>(),
@@ -35,7 +35,7 @@ cursor::cursor(const std::string &name, std::shared_ptr<framework::resourcemanag
   }
 }
 
-void cursor::on_mouse_press(const mouse::button &event) {
+void cursor::on_mouse_press(const mouse::button& event) {
   // TODO FIX ME using enum input::mousebuttonevent::button;
 
   constexpr auto left = mouse::button::which::left;
@@ -55,18 +55,18 @@ void cursor::on_mouse_press(const mouse::button &event) {
   _last_frame = SDL_GetTicks();
 }
 
-void cursor::on_mouse_release(const mouse::button &event) {
+void cursor::on_mouse_release(const mouse::button& event) {
   UNUSED(event);
 }
 
-void cursor::on_mouse_motion(const mouse::motion &event) {
+void cursor::on_mouse_motion(const mouse::motion& event) {
   _position = geometry::point{event.x, event.y};
 }
 
 void cursor::update(float_t) noexcept {
   const auto now = SDL_GetTicks();
-  const auto &animation = _animations.at(_action);
-  const auto &frame = animation.keyframes[_frame];
+  const auto& animation = _animations.at(_action);
+  const auto& frame = animation.keyframes[_frame];
 
   if (frame.duration == 0 || now - _last_frame < frame.duration) {
     return;
@@ -84,7 +84,7 @@ void cursor::update(float_t) noexcept {
 }
 
 void cursor::draw() const noexcept {
-  const auto &animation = _animations.at(_action).keyframes[_frame];
+  const auto& animation = _animations.at(_action).keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
       geometry::rectangle{_position - _point + animation.offset, animation.frame.size()},
@@ -98,6 +98,6 @@ void cursor::draw() const noexcept {
   );
 }
 
-void cursor::handle(const std::string &message) noexcept {
+void cursor::handle(const std::string& message) noexcept {
   _queued_action = message;
 }

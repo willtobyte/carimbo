@@ -5,7 +5,7 @@
 namespace graphics {
 class window final {
 public:
-  window(const std::string &title, int32_t width, int32_t height, bool fullscreen);
+  window(const std::string& title, int32_t width, int32_t height, bool fullscreen);
   ~window() = default;
 
   operator SDL_Window *() noexcept;

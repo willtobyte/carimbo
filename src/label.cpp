@@ -6,7 +6,7 @@ void label::set_font(std::shared_ptr<font> font) {
   _font = std::move(font);
 }
 
-void label::set(const std::string &text, float_t x, float_t y) {
+void label::set(const std::string& text, float_t x, float_t y) {
   _text = text;
   _position = {x, y};
 }

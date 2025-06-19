@@ -5,12 +5,12 @@ using namespace framework;
 using namespace input::event;
 
 template <typename T>
-std::optional<std::function<T>> operator||(const std::optional<std::function<T>> &lhs, const std::optional<std::function<T>> &rhs) {
+std::optional<std::function<T>> operator||(const std::optional<std::function<T>>& lhs, const std::optional<std::function<T>>& rhs) {
   return lhs ? lhs : rhs;
 }
 
 template <typename Map>
-auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optional<typename Map::mapped_type> fallback) {
+auto get_callback_or(const Map& m, const typename Map::key_type& key, std::optional<typename Map::mapped_type> fallback) {
   if (const auto it = m.find(key); it != m.end()) {
     return std::optional<typename Map::mapped_type>{it->second};
   }
@@ -24,11 +24,11 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
   _collision_pool->reserve(1000);
 }
 
-std::shared_ptr<object> objectmanager::create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
+std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
   _dirty = true;
 
   const auto n = scope ? scope->get() : "";
-  const auto &qualifier = n.empty() ? kind : fmt::format("{}/{}", n, kind);
+  const auto& qualifier = n.empty() ? kind : fmt::format("{}/{}", n, kind);
   for (const auto& o : _objects) {
     if (o->_kind != kind) {
       continue;
@@ -47,26 +47,26 @@ std::shared_ptr<object> objectmanager::create(const std::string &kind, std::opti
     return clone(o);
   }
 
-  const auto &filename = fmt::format("objects/{}.json", qualifier);
-  const auto &buffer = storage::io::read(filename);
-  const auto &j = nlohmann::json::parse(buffer);
+  const auto& filename = fmt::format("objects/{}.json", qualifier);
+  const auto& buffer = storage::io::read(filename);
+  const auto& j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float_t{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/{}.png", qualifier));
 
   animation_map animations;
   animations.reserve(j["animations"].size());
-  for (const auto &item : j["animations"].items()) {
-    const auto &key = item.key();
-    const auto &a = item.value();
+  for (const auto& item : j["animations"].items()) {
+    const auto& key = item.key();
+    const auto& a = item.value();
     const auto oneshot = a.value("oneshot", false);
     const auto hitbox = a.contains("hitbox") ? std::make_optional(a.at("hitbox").template get<geometry::rectangle>()) : std::nullopt;
     const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(fmt::format("blobs/{}{}/{}.ogg", scope ? scope->get() : "", scope ? "/" : "", a.at("effect").template get_ref<const std::string&>())) : nullptr;
     const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
 
-    const auto &f = a.at("frames");
+    const auto& f = a.at("frames");
     std::vector<keyframe> keyframes(f.size());
-    std::ranges::transform(f, keyframes.begin(), [](const auto &frame) {
+    std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
       return keyframe{
           frame.at("rectangle").template get<geometry::rectangle>(),
           frame.at("offset").template get<geometry::point>(),
@@ -154,7 +154,7 @@ void objectmanager::destroy(std::shared_ptr<object> object) {
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const {
-  auto it = std::ranges::find_if(_objects, [id](const auto &object) {
+  auto it = std::ranges::find_if(_objects, [id](const auto& object) {
     return object->id() == id;
   });
 
@@ -166,7 +166,7 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
 }
 
 void objectmanager::update(float_t delta) noexcept {
-  for (auto &o : _objects) {
+  for (auto& o : _objects) {
     const auto old = o->x();
 
     o->update(delta);
@@ -178,23 +178,23 @@ void objectmanager::update(float_t delta) noexcept {
   }
 
   for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-    const auto &a = *it;
+    const auto& a = *it;
     const auto aita = a->_animations.find(a->_action);
     if (aita == a->_animations.end() || !aita->second.hitbox) [[likely]] {
       continue;
     }
 
-    const auto &ha = *aita->second.hitbox;
+    const auto& ha = *aita->second.hitbox;
     const auto has = geometry::rectangle{a->position() + ha.position() * a->_scale, ha.size() * a->_scale};
     for (auto jt = std::next(it); jt != _objects.end(); ++jt) {
-      const auto &b = *jt;
+      const auto& b = *jt;
 
       const auto aitb = b->_animations.find(b->_action);
       if (aitb == b->_animations.end() || !aitb->second.hitbox) {
         continue;
       }
 
-      const auto &hb = *aitb->second.hitbox;
+      const auto& hb = *aitb->second.hitbox;
       const auto hbs = geometry::rectangle{b->position() + hb.position() * b->_scale, hb.size() * b->_scale};
       if (hbs.x() > has.x() + has.width()) break;
       if (hbs.y() > has.y() + has.height()) continue;
@@ -218,19 +218,19 @@ void objectmanager::update(float_t delta) noexcept {
 }
 
 void objectmanager::draw() const noexcept {
-  for (const auto &o : _objects) {
+  for (const auto& o : _objects) {
     o->draw();
   }
 }
 
-void objectmanager::on_mouse_press(const mouse::button &event) {
+void objectmanager::on_mouse_press(const mouse::button& event) {
   if (event.button != mouse::button::which::left) {
     return;
   }
 
   const geometry::point point{event.x, event.y};
 
-  const auto clicked = std::ranges::any_of(_objects, [&](const auto &o) {
+  const auto clicked = std::ranges::any_of(_objects, [&](const auto& o) {
     if (o->_action.empty()) {
       return false;
     }
@@ -240,7 +240,7 @@ void objectmanager::on_mouse_press(const mouse::button &event) {
       return false;
     }
 
-    const auto &animation = it->second;
+    const auto& animation = it->second;
     if (!animation.hitbox) {
       return false;
     }
@@ -265,14 +265,14 @@ void objectmanager::on_mouse_press(const mouse::button &event) {
   }
 }
 
-void objectmanager::on_mouse_motion(const input::event::mouse::motion &event) {
-  for (const auto &o : _objects) {
+void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
+  for (const auto& o : _objects) {
     o->on_motion(event.x, event.y);
   }
 }
 
-void objectmanager::on_mail(const input::event::mail &event) {
-  if (const auto object = find(event.to); object) {
+void objectmanager::on_mail(const input::event::mail& event) {
+  if (const auto& object = find(event.to); object) {
     object->on_email(event.body);
   }
 }

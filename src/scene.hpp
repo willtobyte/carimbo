@@ -31,11 +31,11 @@ public:
 
   void draw() const noexcept;
 
-  std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> get(const std::string &name, scenetype type) const;
+  std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> get(const std::string& name, scenetype type) const;
 
   void on_enter() const;
   void on_leave() const;
-  void on_text(const std::string &text) const;
+  void on_text(const std::string& text) const;
   void on_touch(float_t x, float_t y) const;
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;
@@ -49,7 +49,7 @@ public:
   void set_ontouch(std::function<void(float_t, float_t)> fn);
   void set_onkeypress(std::function<void(int32_t)> fn);
   void set_onkeyrelease(std::function<void(int32_t)> fn);
-  void set_ontext(std::function<void(const std::string &)> fn);
+  void set_ontext(std::function<void(const std::string& )> fn);
   void set_onmotion(std::function<void(float_t, float_t)> fn);
 
 private:
@@ -65,7 +65,7 @@ private:
   std::function<void(float_t, float_t)> _ontouch;
   std::function<void(int32_t)> _onkeypress;
   std::function<void(int32_t)> _onkeyrelease;
-  std::function<void(const std::string &)> _ontext;
+  std::function<void(const std::string& )> _ontext;
   // std::function<void(float_t, float_t, int32_t button)> _onmousepress;
   // std::function<void(float_t, float_t, int32_t button)> _onmouserelease;
   std::function<void(float_t, float_t)> _onmotion;

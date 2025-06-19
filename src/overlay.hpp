@@ -17,17 +17,17 @@ public:
 
   std::variant<std::shared_ptr<label>> create(widgettype type);
 
-  void destroy(const std::variant<std::shared_ptr<label>> &widget);
+  void destroy(const std::variant<std::shared_ptr<label>>& widget);
 
   void update(float_t delta) noexcept;
 
   void draw() const noexcept;
 
-  void set_cursor(const std::string &name);
+  void set_cursor(const std::string& name);
 
   void hide();
 
-  void dispatch(widgettype type, const std::string &message);
+  void dispatch(widgettype type, const std::string& message);
 
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;

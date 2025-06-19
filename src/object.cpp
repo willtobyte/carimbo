@@ -53,7 +53,7 @@ void object::move(float_t x_velocity, float_t y_velocity) noexcept {
   UNUSED(y_velocity);
 }
 
-void object::set_velocity(const algebra::vector2d &velocity) noexcept {
+void object::set_velocity(const algebra::vector2d& velocity) noexcept {
   _velocity = velocity;
 }
 
@@ -76,13 +76,13 @@ void object::update(float_t delta) noexcept {
     return;
   }
 
-  const auto &animation = it->second;
-  const auto &keyframes = animation.keyframes;
+  const auto& animation = it->second;
+  const auto& keyframes = animation.keyframes;
   if (_frame >= keyframes.size()) {
     return;
   }
 
-  const auto &frame = keyframes[_frame];
+  const auto& frame = keyframes[_frame];
   const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
   if (!expired) {
     _position.set(
@@ -134,11 +134,11 @@ void object::draw() const noexcept {
     return;
   }
 
-  const auto &animation = _animations.at(_action).keyframes.at(_frame);
-  const auto &source = animation.frame;
-  const auto &offset = animation.offset;
+  const auto& animation = _animations.at(_action).keyframes.at(_frame);
+  const auto& source = animation.frame;
+  const auto& offset = animation.offset;
 #ifdef HITBOX
-  const auto &hitbox = _animations.at(_action).hitbox;
+  const auto& hitbox = _animations.at(_action).hitbox;
 #endif
   geometry::rectangle destination{_position + offset, source.size()};
 
@@ -214,8 +214,8 @@ void object::set_action(const std::string& action) noexcept {
   _frame = 0;
   _last_frame = SDL_GetTicks();
 
-  const auto &a = _animations.at(_action);
-  if (const auto &e = a.effect; e) {
+  const auto& a = _animations.at(_action);
+  if (const auto& e = a.effect; e) {
     e->play();
   }
 }
@@ -261,11 +261,11 @@ void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) {
   _onupdate = std::move(fn);
 }
 
-void object::set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string &)> fn) {
+void object::set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string& )> fn) {
   _onanimationfinished = std::move(fn);
 }
 
-void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string &)> fn) {
+void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )> fn) {
   _onmail = std::move(fn);
 }
 
@@ -281,7 +281,7 @@ void object::set_onunhover(std::function<void(std::shared_ptr<object>)> fn) {
   _onunhover = std::move(fn);
 }
 
-void object::set_oncollision(const std::string &kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) {
+void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) {
   _collisionmapping.emplace(kind, std::move(fn));
 }
 
@@ -289,7 +289,7 @@ void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object
   _tickinmapping.emplace(n, std::move(fn));
 }
 
-void object::on_email(const std::string &message) {
+void object::on_email(const std::string& message) {
   if (const auto fn = _onmail; fn) {
     fn(shared_from_this(), message);
   }
@@ -307,7 +307,7 @@ void object::on_motion(float_t x, float_t y) {
     return;
   }
 
-  const auto &animation = it->second;
+  const auto& animation = it->second;
   const auto hitbox = geometry::rectangle{_position + animation.hitbox->position() * _scale, animation.hitbox->size() * _scale};
   const bool inside = hitbox.contains(x, y);
   if (inside != _hover) {
@@ -328,6 +328,6 @@ void object::on_unhover() {
   }
 }
 
-memory::kv &object::kv() {
+memory::kv& object::kv() {
   return _kv;
 }

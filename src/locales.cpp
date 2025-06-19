@@ -16,8 +16,8 @@ static std::string_view language() {
 }
 
 static nlohmann::json parse(std::string_view code) {
-  const auto &filename = fmt::format("locales/{}.json", code);
-  const auto &buffer = storage::io::read(filename);
+  const auto& filename = fmt::format("locales/{}.json", code);
+  const auto& buffer = storage::io::read(filename);
   return nlohmann::json::parse(buffer);
 }
 
@@ -33,7 +33,7 @@ static const nlohmann::json& mapping() {
 }
 
 namespace framework {
-std::string text(const std::string &key) {
+std::string text(const std::string& key) {
   const auto& j = mapping();
   const auto it = j.find(key);
 

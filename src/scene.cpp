@@ -19,12 +19,12 @@ scene::scene(
 scene::~scene() {
   const auto objects = std::exchange(_objects, {});
 
-  for (const auto &[_, o] : objects) {
+  for (const auto& [_, o] : objects) {
     _objectmanager->destroy(o);
   }
 
   const auto effects = std::exchange(_effects, {});
-  for (const auto &[_, e] : effects) {
+  for (const auto& [_, e] : effects) {
     e->stop();
   }
 
@@ -77,7 +77,7 @@ void scene::on_leave() const {
     _objectmanager->unmanage(o);
   }
 
-  for (const auto &[_, e] : _effects) {
+  for (const auto& [_, e] : _effects) {
     e->stop();
   }
 }
@@ -94,7 +94,7 @@ void scene::on_key_release(int32_t code) const {
   if (const auto fn = _onkeyrelease) fn(code);
 }
 
-void scene::on_text(const std::string &text) const {
+void scene::on_text(const std::string& text) const {
   if (const auto fn = _ontext) fn(text);
 }
 
@@ -134,7 +134,7 @@ void scene::set_onkeyrelease(std::function<void(int32_t)> fn) {
   _onkeyrelease = std::move(fn);
 }
 
-void scene::set_ontext(std::function<void(const std::string &)> fn) {
+void scene::set_ontext(std::function<void(const std::string& )> fn) {
   _ontext = std::move(fn);
 }
 

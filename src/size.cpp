@@ -24,12 +24,12 @@ float_t size::height() const noexcept {
   return _height;
 }
 
-bool size::operator==(const size &rhs) const noexcept {
+bool size::operator==(const size& rhs) const noexcept {
   constexpr float_t epsilon = std::numeric_limits<float_t>::epsilon();
   return std::abs(_width - rhs._width) < epsilon && std::abs(_height - rhs._height) < epsilon;
 }
 
-bool size::operator!=(const size &rhs) const noexcept {
+bool size::operator!=(const size& rhs) const noexcept {
   return !(*this == rhs);
 }
 

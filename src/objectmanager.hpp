@@ -14,7 +14,7 @@ public:
   explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager);
   virtual ~objectmanager() = default;
 
-  std::shared_ptr<object> create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage = true);
+  std::shared_ptr<object> create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage = true);
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
 
@@ -33,9 +33,9 @@ public:
   void draw() const noexcept;
 
 protected:
-  virtual void on_mouse_press(const input::event::mouse::button &event) override;
-  virtual void on_mouse_motion(const input::event::mouse::motion &event) override;
-  virtual void on_mail(const input::event::mail &event) override;
+  virtual void on_mouse_press(const input::event::mouse::button& event) override;
+  virtual void on_mouse_motion(const input::event::mouse::motion& event) override;
+  virtual void on_mail(const input::event::mail& event) override;
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;

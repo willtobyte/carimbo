@@ -32,17 +32,17 @@ using animation_map = absl::flat_hash_map<std::string, animation>;
 
 class cursor final : public input::eventreceiver {
 public:
-  explicit cursor(const std::string &name, std::shared_ptr<framework::resourcemanager> resourcemanager);
+  explicit cursor(const std::string& name, std::shared_ptr<framework::resourcemanager> resourcemanager);
   virtual ~cursor() noexcept = default;
 
-  virtual void on_mouse_press(const input::event::mouse::button &event) override;
-  virtual void on_mouse_release(const input::event::mouse::button &event) override;
-  virtual void on_mouse_motion(const input::event::mouse::motion &event) override;
+  virtual void on_mouse_press(const input::event::mouse::button& event) override;
+  virtual void on_mouse_release(const input::event::mouse::button& event) override;
+  virtual void on_mouse_motion(const input::event::mouse::motion& event) override;
 
   void update(float_t delta) noexcept;
   void draw() const noexcept;
 
-  void handle(const std::string &message) noexcept;
+  void handle(const std::string& message) noexcept;
 
 private:
   geometry::point _position{0, 0};

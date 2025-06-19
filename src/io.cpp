@@ -39,7 +39,7 @@ std::vector<std::string> io::enumerate(std::string_view directory) {
   const auto count = std::ranges::distance(view);
   std::vector<std::string> files;
   files.reserve(std::max<size_t>(0, static_cast<size_t>(count)));
-  for (const auto &i : view) {
+  for (const auto& i : view) {
     files.emplace_back(array[i]);
   }
 

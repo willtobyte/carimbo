@@ -8,12 +8,12 @@ public:
   cassette();
 
   template <typename T>
-  void set(const std::string &key, const T &value);
+  void set(const std::string& key, const T& value);
 
   template <typename T>
-  T get(const std::string &key, const T &default_value) const;
+  T get(const std::string& key, const T& default_value) const;
 
-  void clear(const std::string &key);
+  void clear(const std::string& key);
 
 private:
   nlohmann::json _j;

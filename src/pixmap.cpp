@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
+pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& filename)
     : _renderer(std::move(renderer)) {
   const auto buffer = storage::io::read(filename);
 
@@ -57,25 +57,25 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string &filename)
 }
 
 void pixmap::draw(
-    const geometry::rectangle &source,
-    const geometry::rectangle &destination,
+    const geometry::rectangle& source,
+    const geometry::rectangle& destination,
     const double_t angle,
     reflection reflection,
     const uint8_t alpha
 #ifdef HITBOX
     ,
-    const std::optional<geometry::rectangle> &outline
+    const std::optional<geometry::rectangle>& outline
 #endif
 ) const noexcept {
-  const SDL_FRect &src = source;
-  const SDL_FRect &dst = destination;
+  const SDL_FRect& src = source;
+  const SDL_FRect& dst = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 
 #ifdef HITBOX
   if (outline) {
-    const SDL_FRect &debug = *outline;
+    const SDL_FRect& debug = *outline;
 
     SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
     SDL_RenderRect(*_renderer, &debug);

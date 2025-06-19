@@ -16,7 +16,7 @@ bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b
   return (it != _collision_mapping.end()) ? it->second : false;
 }
 
-bool statemanager::on(uint8_t player, const std::variant<gamepad::button> &type) const noexcept {
+bool statemanager::on(uint8_t player, const std::variant<gamepad::button>& type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -30,7 +30,7 @@ uint8_t statemanager::players() const noexcept {
   return static_cast<uint8_t>(_state.size());
 }
 
-constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard::key &event) {
+constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard::key& event) {
   using namespace input;
 
   switch (event) {
@@ -49,27 +49,27 @@ constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard:
   }
 }
 
-void statemanager::on_keydown(const keyboard::key &event) {
+void statemanager::on_keydown(const keyboard::key& event) {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = true;
   }
 }
 
-void statemanager::on_keyup(const keyboard::key &event) {
+void statemanager::on_keyup(const keyboard::key& event) {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = false;
   }
 }
 
-void statemanager::on_gamepadbuttondown(uint8_t who, const gamepad::button &event) {
+void statemanager::on_gamepadbuttondown(uint8_t who, const gamepad::button& event) {
   _state[who][event] = true;
 }
 
-void statemanager::on_gamepadbuttonup(uint8_t who, const gamepad::button &event) {
+void statemanager::on_gamepadbuttonup(uint8_t who, const gamepad::button& event) {
   _state[who][event] = false;
 }
 
-void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion &event) {
+void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion& event) {
   using namespace input;
 
   static constexpr auto threshold = 8000;
@@ -108,7 +108,7 @@ void statemanager::on_gamepadmotion(uint8_t who, const gamepad::motion &event) {
   }
 }
 
-void statemanager::on_collision(const input::event::collision &event) {
+void statemanager::on_collision(const input::event::collision& event) {
   _collision_mapping[make_key(event.a, event.b)] = true;
 }
 

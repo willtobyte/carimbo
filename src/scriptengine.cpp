@@ -22,7 +22,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable final : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state_view &lua, sol::function function)
+  explicit lua_loopable(const sol::state_view& lua, sol::function function)
       : _L(lua.lua_state()),
         _function(std::move(function)) {}
 
@@ -60,11 +60,11 @@ private:
   uint64_t _start{SDL_GetTicks()};
 };
 
-auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
+auto _to_lua(const nlohmann::json& value, sol::state_view lua) -> sol::object {
   switch (value.type()) {
   case nlohmann::json::value_t::object: {
     auto t = lua.create_table();
-    for (const auto &[k, v] : value.items()) {
+    for (const auto& [k, v] : value.items()) {
       t[k] = _to_lua(v, lua);
     }
 
@@ -95,17 +95,17 @@ auto _to_lua(const nlohmann::json &value, sol::state_view lua) -> sol::object {
   }
 }
 
-auto _to_json(const sol::object &value) -> nlohmann::json {
+auto _to_json(const sol::object& value) -> nlohmann::json {
   switch (value.get_type()) {
   case sol::type::table: {
     const auto lua_table = value.as<sol::table>();
-    if (std::ranges::all_of(lua_table, [](const auto &pair) {
+    if (std::ranges::all_of(lua_table, [](const auto& pair) {
           return pair.first.get_type() == sol::type::number && pair.first.template as<size_t>() >= 1;
         }
       )
     ) {
       nlohmann::json j = nlohmann::json::array();
-      for (const auto &pair : lua_table) {
+      for (const auto& pair : lua_table) {
         j.push_back(_to_json(pair.second));
       }
 
@@ -113,7 +113,7 @@ auto _to_json(const sol::object &value) -> nlohmann::json {
     }
 
     nlohmann::json j = nlohmann::json::object();
-    for (const auto &pair : lua_table) {
+    for (const auto& pair : lua_table) {
       j[pair.first.as<std::string>()] = _to_json(pair.second);
     }
 
@@ -204,17 +204,17 @@ void framework::scriptengine::run() {
   lua["achievement"] = &achievement;
 
   lua["JSON"] = lua.create_table_with(
-    "parse", [](const std::string &json, sol::this_state state) {
-      const auto &j = nlohmann::json::parse(json);
+    "parse", [](const std::string& json, sol::this_state state) {
+      const auto& j = nlohmann::json::parse(json);
 
       sol::state_view lua(state);
 
       return _to_lua(j, lua);
     },
 
-    "stringify", [](const sol::table &table) {
+    "stringify", [](const sol::table& table) {
       nlohmann::json result;
-      for (const auto &pair : table) {
+      for (const auto& pair : table) {
         result[pair.first.as<std::string>()] = _to_json(pair.second);
       }
 
@@ -280,9 +280,9 @@ void framework::scriptengine::run() {
   lua.new_usertype<memory::kv>(
     "KeyValue",
     sol::no_constructor,
-    "get", [](memory::kv &self, const std::string &key, sol::this_state state) { return self.get(key, state); },
-    "set", [](memory::kv &self, const std::string &key, const sol::object &new_value, sol::this_state state) { self.set(key, new_value, state); },
-    "subscribe", [](memory::kv &self, const std::string &key, const sol::function &callback, sol::this_state state) { self.subscribe(key, callback, state); }
+    "get", [](memory::kv& self, const std::string& key, sol::this_state state) { return self.get(key, state); },
+    "set", [](memory::kv& self, const std::string& key, const sol::object& new_value, sol::this_state state) { self.set(key, new_value, state); },
+    "subscribe", [](memory::kv& self, const std::string& key, const sol::function& callback, sol::this_state state) { self.subscribe(key, callback, state); }
   );
 
   lua.new_usertype<framework::object>(
@@ -304,18 +304,18 @@ void framework::scriptengine::run() {
     "on_collision", &framework::object::set_oncollision,
     "on_nthtick", &framework::object::set_onnthtick,
     "reflection", sol::property(
-      [](framework::object &o) {
+      [](framework::object& o) {
         return o.reflection();
       },
-      [](framework::object &o, graphics::reflection r) {
+      [](framework::object& o, graphics::reflection r) {
         o.set_reflection(r);
       }
     ),
     "action", sol::property(
-      [](framework::object &o) {
+      [](framework::object& o) {
         return o.action();
       },
-      [](framework::object &o, std::optional<std::string> v) {
+      [](framework::object& o, std::optional<std::string> v) {
         if (!v.has_value()) {
           o.unset_action();
           return;
@@ -325,10 +325,10 @@ void framework::scriptengine::run() {
       }
     ),
     "placement", sol::property(
-      [](framework::object &o) {
+      [](framework::object& o) {
         return o.placement();
       },
-      [](framework::object &o, sol::table table) {
+      [](framework::object& o, sol::table table) {
         float x = 0.0f;
         float y = 0.0f;
 
@@ -348,10 +348,10 @@ void framework::scriptengine::run() {
       }
     ),
     "velocity", sol::property(
-      [](framework::object &o) {
+      [](framework::object& o) {
         return o.velocity();
       },
-      [](framework::object &o, const sol::object &v) {
+      [](framework::object& o, const sol::object& v) {
         if (v.is<algebra::vector2d>()) {
           o.set_velocity(v.as<algebra::vector2d>());
           return;
@@ -369,14 +369,14 @@ void framework::scriptengine::run() {
         throw std::runtime_error("Invalid type for velocity. Must be Vector2D or table with x and y.");
       }
     ),
-    "kv", sol::property([](framework::object &o) -> memory::kv & { return o.kv(); })
+    "kv", sol::property([](framework::object&o) -> memory::kv& { return o.kv(); })
   );
 
   lua.new_usertype<framework::objectmanager>(
     "ObjectManager",
     sol::no_constructor,
-    "create", [](framework::objectmanager &om, const std::string &kind) {
-      return om.create(kind, std::nullopt, true);
+    "create", [](framework::objectmanager& self, const std::string& kind) {
+      return self.create(kind, std::nullopt, true);
     },
     "clone", &framework::objectmanager::clone,
     "destroy", &framework::objectmanager::destroy
@@ -385,29 +385,29 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::resourcemanager>(
     "ResourceManager",
     sol::no_constructor,
-    "flush", [&lua](framework::resourcemanager &self) {
+    "flush", [&lua](framework::resourcemanager& self) {
       lua.collect_garbage();
       self.flush();
     },
     "prefetch", sol::overload(
-        [](framework::resourcemanager &self) {
+        [](framework::resourcemanager& self) {
           self.prefetch();
         },
 
-        [](framework::resourcemanager &self, sol::table table) {
+        [](framework::resourcemanager& self, sol::table table) {
           std::vector<std::string> filenames;
           filenames.reserve(table.size());
-          for (auto &&[key, value] : table) {
+          for (const auto& [key, value] : table) {
             filenames.emplace_back(value.as<std::string>());
           }
           self.prefetch(std::move(filenames));
         },
 
-        [](framework::resourcemanager &self, sol::variadic_args arguments) {
+        [](framework::resourcemanager& self, sol::variadic_args arguments) {
           std::vector<std::string> filenames;
           filenames.reserve(arguments.size());
-          for (auto &&v : arguments) {
-            filenames.push_back(v.as<std::string>());
+          for (const auto& value : arguments) {
+            filenames.push_back(value.as<std::string>());
           }
           self.prefetch(std::move(filenames));
         }
@@ -416,9 +416,9 @@ void framework::scriptengine::run() {
 
   struct playerwrapper {
     uint8_t index;
-    const framework::statemanager &e;
+    const framework::statemanager& e;
 
-    playerwrapper(input::event::player player, const framework::statemanager &state_manager)
+    playerwrapper(input::event::player player, const framework::statemanager& state_manager)
       : index(static_cast<uint8_t>(player)), e(state_manager) {}
 
     bool on(std::variant<input::event::gamepad::button> type) {
@@ -445,7 +445,7 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
-    "player", [&player_mapping](framework::statemanager &self, input::event::player player) -> playerwrapper & {
+    "player", [&player_mapping](framework::statemanager& self, input::event::player player) -> playerwrapper& {
       const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
 
       return iterator->second;
@@ -457,8 +457,8 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "set", &framework::scenemanager::set,
     "destroy", &framework::scenemanager::destroy,
-    "register", [&lua](framework::scenemanager &manager, const std::string &name) {
-      const auto scene = manager.load(name);
+    "register", [&lua](framework::scenemanager& self, const std::string& name) {
+      const auto scene = self.load(name);
 
       const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
@@ -470,7 +470,7 @@ void framework::scriptengine::run() {
 
       auto module = result.get<sol::table>();
 
-      module["get"] = [scene](sol::table, const std::string &object, framework::scenetype type) {
+      module["get"] = [scene](sol::table, const std::string& object, framework::scenetype type) {
         return scene->get(object, type);
       };
 
@@ -511,7 +511,7 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](const std::string &text) mutable {
+        auto safe_fn = [fn](const std::string& text) mutable {
           sol::protected_function_result result = fn(text);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -579,9 +579,9 @@ void framework::scriptengine::run() {
   );
 
   struct cursorproxy {
-    graphics::overlay &o;
+    graphics::overlay& o;
 
-    void set(const std::string &name) { o.set_cursor(name); }
+    void set(const std::string& name) { o.set_cursor(name); }
 
     void hide() { o.hide(); }
   };
@@ -599,7 +599,7 @@ void framework::scriptengine::run() {
     "create", &graphics::overlay::create,
     "destroy", &graphics::overlay::destroy,
     "dispatch", &graphics::overlay::dispatch,
-    "cursor", sol::property([](graphics::overlay &o) -> cursorproxy { return cursorproxy{o}; })
+    "cursor", sol::property([](graphics::overlay& o) -> cursorproxy { return cursorproxy{o}; })
   );
 
   lua.new_usertype<framework::engine>(
@@ -647,14 +647,14 @@ void framework::scriptengine::run() {
     "set", &geometry::point::set,
     "x", sol::property(&geometry::point::x, &geometry::point::set_x),
     "y", sol::property(&geometry::point::y, &geometry::point::set_y),
-    sol::meta_function::to_string, [](const geometry::point &p) {
-      return fmt::format("point({}, {})", p.x(), p.y());
+    sol::meta_function::to_string, [](const geometry::point& self) {
+      return fmt::format("point({}, {})", self.x(), self.y());
     }
   );
 
   lua.new_usertype<geometry::size>(
     "Size",
-    sol::constructors<geometry::size(), geometry::size(float_t, float_t), geometry::size(const geometry::size &)>(),
+    sol::constructors<geometry::size(), geometry::size(float_t, float_t), geometry::size(const geometry::size&)>(),
     "width", sol::property(&geometry::size::width, &geometry::size::set_width),
     "height", sol::property(&geometry::size::height, &geometry::size::set_height)
   );
@@ -663,107 +663,107 @@ void framework::scriptengine::run() {
     "Cassette",
     sol::no_constructor,
     "clear", &storage::cassette::clear,
-    "set", [](storage::cassette &c, const std::string &key, sol::object object) {
+    "set", [](storage::cassette& self, const std::string& key, sol::object object) {
       if (object.is<int>())
-        c.set<int>(key, object.as<int>());
+        self.set<int>(key, object.as<int>());
       else if (object.is<double_t>())
-        c.set<double_t>(key, object.as<double_t>());
+        self.set<double_t>(key, object.as<double_t>());
       else if (object.is<bool>())
-        c.set<bool>(key, object.as<bool>());
+        self.set<bool>(key, object.as<bool>());
       else if (object.is<std::string>())
-        c.set<std::string>(key, object.as<std::string>());
+        self.set<std::string>(key, object.as<std::string>());
       else if (object.is<sol::table>()) {
         sol::table table = object.as<sol::table>();
-        std::function<nlohmann::json(sol::table)> table2json = [&](sol::table tbl) -> nlohmann::json {
-          nlohmann::json tmp;
+        std::function<nlohmann::json(sol::table)> table2json = [&](sol::table table) -> nlohmann::json {
+          nlohmann::json temp;
           bool is_array = true;
-          for (auto &pair : tbl) {
+          for (const auto& pair : table) {
             if (!pair.first.is<int>()) {
               is_array = false;
               break;
             }
           }
           if (is_array) {
-            tmp = nlohmann::json::array();
-            for (size_t i = 1, n = tbl.size(); i <= n; ++i) {
-              sol::optional<sol::object> opt = tbl[i];
+            temp = nlohmann::json::array();
+            for (size_t i = 1, n = table.size(); i <= n; ++i) {
+              sol::optional<sol::object> opt = table[i];
               if (opt) {
                 sol::object o = opt.value();
                 if (o.is<int>())
-                  tmp.push_back(o.as<int>());
+                  temp.push_back(o.as<int>());
                 else if (o.is<double_t>())
-                  tmp.push_back(o.as<double_t>());
+                  temp.push_back(o.as<double_t>());
                 else if (o.is<bool>())
-                  tmp.push_back(o.as<bool>());
+                  temp.push_back(o.as<bool>());
                 else if (o.is<std::string>())
-                  tmp.push_back(o.as<std::string>());
+                  temp.push_back(o.as<std::string>());
                 else if (o.is<sol::table>())
-                  tmp.push_back(table2json(o.as<sol::table>()));
+                  temp.push_back(table2json(o.as<sol::table>()));
                 else
-                  tmp.push_back(nullptr);
+                  temp.push_back(nullptr);
               } else {
-                tmp.push_back(nullptr);
+                temp.push_back(nullptr);
               }
             }
           } else {
-            tmp = nlohmann::json::object();
-            for (auto &pair : tbl) {
-              sol::object keyo = pair.first;
-              sol::object valueo = pair.second;
+            temp = nlohmann::json::object();
+            for (const auto& pair : table) {
+              const sol::object& key = pair.first;
+              const sol::object& value = pair.second;
               std::string k;
-              if (keyo.is<std::string>())
-                k = keyo.as<std::string>();
-              else if (keyo.is<int>())
-                k = std::to_string(keyo.as<int>());
+              if (key.is<std::string>())
+                k = key.as<std::string>();
+              else if (key.is<int>())
+                k = std::to_string(key.as<int>());
               else
                 continue;
-              if (valueo.is<int>())
-                tmp[k] = valueo.as<int>();
-              else if (valueo.is<double_t>())
-                tmp[k] = valueo.as<double_t>();
-              else if (valueo.is<bool>())
-                tmp[k] = valueo.as<bool>();
-              else if (valueo.is<std::string>())
-                tmp[k] = valueo.as<std::string>();
-              else if (valueo.is<sol::table>())
-                tmp[k] = table2json(valueo.as<sol::table>());
+              if (value.is<int>())
+                temp[k] = value.as<int>();
+              else if (value.is<double_t>())
+                temp[k] = value.as<double_t>();
+              else if (value.is<bool>())
+                temp[k] = value.as<bool>();
+              else if (value.is<std::string>())
+                temp[k] = value.as<std::string>();
+              else if (value.is<sol::table>())
+                temp[k] = table2json(value.as<sol::table>());
               else
-                tmp[k] = nullptr;
+                temp[k] = nullptr;
             }
           }
-          return tmp;
+          return temp;
         };
         nlohmann::json j = table2json(table);
-        c.set<nlohmann::json>(key, j);
+        self.set<nlohmann::json>(key, j);
       } else {
         throw std::runtime_error("unsupported type for set");
       }
     },
-    "get", [](const storage::cassette &c, const std::string &key, sol::object default_value, sol::this_state state) -> sol::object {
+    "get", [](const storage::cassette& self, const std::string& key, sol::object default_value, sol::this_state state) -> sol::object {
       sol::state_view lua(state);
-      const nlohmann::json j = c.get<nlohmann::json>(key, _to_json(default_value));
+      const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
 
-      std::function<sol::object(const nlohmann::json &)> json2lua =
-          [&](const nlohmann::json &js) -> sol::object {
-        if (js.is_object()) {
-          sol::table tbl = lua.create_table();
-          for (auto it = js.begin(); it != js.end(); ++it)
-            tbl[it.key()] = json2lua(it.value());
-          return sol::make_object(lua, tbl);
-        } else if (js.is_array()) {
-          sol::table tbl = lua.create_table();
+      std::function<sol::object(const nlohmann::json&)> json2lua =
+          [&](const nlohmann::json& json) -> sol::object {
+        if (json.is_object()) {
+          sol::table table = lua.create_table();
+          for (auto it = json.begin(); it != json.end(); ++it)
+            table[it.key()] = json2lua(it.value());
+          return sol::make_object(lua, table);
+        } else if (json.is_array()) {
+          sol::table table = lua.create_table();
           int index = 1;
-          for (const auto &item : js)
-            tbl[index++] = json2lua(item);
-          return sol::make_object(lua, tbl);
-        } else if (js.is_number_integer())
-          return sol::make_object(lua, js.get<int>());
-        else if (js.is_number_float())
-          return sol::make_object(lua, js.get<double_t>());
-        else if (js.is_boolean())
-          return sol::make_object(lua, js.get<bool>());
-        else if (js.is_string())
-          return sol::make_object(lua, js.get<std::string>());
+          for (const auto& item : json)
+            table[index++] = json2lua(item);
+          return sol::make_object(lua, table);
+        } else if (json.is_number_integer())
+          return sol::make_object(lua, json.get<int>());
+        else if (json.is_number_float())
+          return sol::make_object(lua, json.get<double_t>());
+        else if (json.is_boolean())
+          return sol::make_object(lua, json.get<bool>());
+        else if (json.is_string())
+          return sol::make_object(lua, json.get<std::string>());
         return sol::lua_nil;
       };
       return json2lua(j);
@@ -774,25 +774,25 @@ void framework::scriptengine::run() {
     "Socket",
     sol::constructors<network::socket()>(),
     "connect", &network::socket::connect,
-    "emit", [](network::socket &sio, const std::string &event, const sol::table &data, sol::this_state state) {
+    "emit", [](network::socket& self, const std::string& event, const sol::table& data, sol::this_state state) {
       sol::state_view lua(state);
       const auto j = _to_json(data);
-      sio.emit(event, j.dump());
+      self.emit(event, j.dump());
     },
-    "on", [](network::socket &sio, const std::string &event, const sol::function &callback, sol::this_state state) {
+    "on", [](network::socket& self, const std::string& event, const sol::function& callback, sol::this_state state) {
       sol::state_view lua(state);
 
-      sio.on(event, [callback, lua](const std::string &json) {
-        const auto &j = nlohmann::json::parse(json);
+      self.on(event, [callback, lua](const std::string& json) {
+        const auto& j = nlohmann::json::parse(json);
         callback(_to_lua(j, lua));
       });
     },
-    "rpc", [](network::socket &sio, const std::string &method, const sol::table &arguments, const sol::function &callback, sol::this_state state) {
+    "rpc", [](network::socket& self, const std::string& method, const sol::table& arguments, const sol::function& callback, sol::this_state state) {
       sol::state_view lua(state);
       const auto j = _to_json(arguments);
 
-      sio.rpc(method, j.dump(), [callback, lua](const std::string &response) {
-        const auto &j = nlohmann::json::parse(response);
+      self.rpc(method, j.dump(), [callback, lua](const std::string& response) {
+        const auto& j = nlohmann::json::parse(response);
         callback(_to_lua(j, lua));
       });
     }
@@ -800,7 +800,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<graphics::color>(
     "Color",
-    "color", sol::constructors<graphics::color(const std::string &)>(),
+    "color", sol::constructors<graphics::color(const std::string& )>(),
 
     "r", sol::property(&graphics::color::r, &graphics::color::set_r),
     "g", sol::property(&graphics::color::g, &graphics::color::set_g),
@@ -829,7 +829,7 @@ void framework::scriptengine::run() {
     sol::constructors<framework::mail(
       std::shared_ptr<framework::object>,
       std::optional<std::shared_ptr<framework::object>>,
-      const std::string &
+      const std::string&
     )>()
   );
 
@@ -901,10 +901,10 @@ void framework::scriptengine::run() {
     "Canvas",
     sol::no_constructor,
     "pixels", sol::property(
-      [](graphics::canvas &) -> sol::object {
+      [](const graphics::canvas&) -> sol::object {
         return sol::lua_nil;
       },
-      [](graphics::canvas &canvas, sol::table table) {
+      [](graphics::canvas& canvas, sol::table table) {
         const auto n = table.size();
         static std::vector<uint32_t> pixels(n);
         std::ranges::transform(

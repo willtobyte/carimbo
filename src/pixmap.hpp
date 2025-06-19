@@ -11,18 +11,18 @@ namespace graphics {
 class pixmap final {
 public:
   pixmap() = delete;
-  pixmap(std::shared_ptr<renderer> renderer, const std::string &filename);
+  pixmap(std::shared_ptr<renderer> renderer, const std::string& filename);
   ~pixmap() noexcept = default;
 
   void draw(
-      const geometry::rectangle &source,
-      const geometry::rectangle &destination,
+      const geometry::rectangle& source,
+      const geometry::rectangle& destination,
       double_t angle = 0.0L,
       reflection reflection = reflection::none,
       uint8_t alpha = 255
 #ifdef HITBOX
       ,
-      const std::optional<geometry::rectangle> &outline = std::nullopt
+      const std::optional<geometry::rectangle>& outline = std::nullopt
 #endif
   ) const noexcept;
 

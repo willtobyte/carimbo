@@ -89,7 +89,7 @@ const char *ov_strerror(int code) {
   }
 }
 
-soundfx::soundfx(const std::string &filename) {
+soundfx::soundfx(const std::string& filename) {
   std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> fp{PHYSFS_openRead(filename.c_str()), PHYSFS_close};
   if (!fp) [[unlikely]] {
     throw std::runtime_error(fmt::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));

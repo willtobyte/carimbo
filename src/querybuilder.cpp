@@ -2,7 +2,7 @@
 
 using namespace network;
 
-static std::string encode(const std::string &value) {
+static std::string encode(const std::string& value) {
   std::string encoded;
   encoded.reserve(value.size());
   for (char c : value) {
@@ -17,7 +17,7 @@ static std::string encode(const std::string &value) {
   return encoded;
 }
 
-querybuilder &querybuilder::add(const std::string &key, const std::string &value) {
+querybuilder& querybuilder::add(const std::string& key, const std::string& value) {
   _parameters.emplace(std::string(key), std::string(value));
   return *this;
 }
@@ -29,7 +29,7 @@ std::string querybuilder::build() const {
 
   std::string result;
   bool first = true;
-  for (const auto &[key, value] : _parameters) {
+  for (const auto& [key, value] : _parameters) {
     if (!first) {
       result.push_back('&');
     } else {
@@ -43,7 +43,7 @@ std::string querybuilder::build() const {
 
 std::string querybuilder::make(std::initializer_list<std::pair<std::string, std::string>> entries) {
   querybuilder builder;
-  for (const auto &[key, value] : entries) {
+  for (const auto& [key, value] : entries) {
     builder.add(key, value);
   }
   return builder.build();

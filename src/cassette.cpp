@@ -58,7 +58,7 @@ void cassette::persist() const {
 #endif
 }
 
-void cassette::clear(const std::string &key) {
+void cassette::clear(const std::string& key) {
   if (key.empty()) {
     return;
   }

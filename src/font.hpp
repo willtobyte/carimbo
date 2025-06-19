@@ -16,7 +16,7 @@ class fonteffect {
 
     virtual ~fonteffect() = default;
 
-    virtual void set(const std::string &text, geometry::point position) = 0;
+    virtual void set(const std::string& text, geometry::point position) = 0;
 
     virtual void update(float_t delta) noexcept = 0;
 
@@ -33,7 +33,7 @@ class fadeineffect final : public fonteffect {
   public:
     virtual ~fadeineffect() = default;
 
-    virtual void set(const std::string &text, geometry::point position) override;
+    virtual void set(const std::string& text, geometry::point position) override;
 
     virtual void update(float_t delta) noexcept override;
 
@@ -56,8 +56,8 @@ public:
   font() = delete;
 
   explicit font(
-    const std::string &glyphs,
-    const glyphmap &map,
+    const std::string& glyphs,
+    const glyphmap& map,
     std::shared_ptr<pixmap> pixmap,
     int16_t spacing,
     int16_t leading,
@@ -66,7 +66,7 @@ public:
 
   ~font() = default;
 
-  void draw(const std::string &text, const geometry::point &position, const std::weak_ptr<fonteffect> &effect) const noexcept;
+  void draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const noexcept;
 
   std::string glyphs() const;
 

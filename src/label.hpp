@@ -12,7 +12,7 @@ public:
 
   void set_font(std::shared_ptr<font> font);
 
-  void set(const std::string &text, float_t x, float_t y);
+  void set(const std::string& text, float_t x, float_t y);
 
   void set_effect(fonteffect::type type);
 

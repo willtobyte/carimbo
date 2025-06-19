@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string &name)
+tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string& name)
   : _resourcemanager(std::move(resourcemanager)) {
   UNUSED(name);
 

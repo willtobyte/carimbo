@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-void fadeineffect::set(const std::string &text, geometry::point position) {
+void fadeineffect::set(const std::string& text, geometry::point position) {
   const auto length = text.size();
   if (length != _last_length) {
     _last_length = length;
@@ -46,8 +46,8 @@ uint8_t fadeineffect::alpha() noexcept {
 }
 
 font::font(
-  const std::string &glyphs,
-  const glyphmap &map,
+  const std::string& glyphs,
+  const glyphmap& map,
   std::shared_ptr<pixmap> pixmap,
   int16_t spacing,
   int16_t leading,
@@ -61,7 +61,7 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect> &effect) const noexcept {
+void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const noexcept {
   if (text.empty()) {
     return;
   }
@@ -85,7 +85,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
       continue;
     }
 
-    const auto &glyph = it->second;
+    const auto& glyph = it->second;
     const auto size = glyph.size();
 
     // TODO

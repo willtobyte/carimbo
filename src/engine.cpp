@@ -127,7 +127,7 @@ void engine::prefetch() {
   _resourcemanager->prefetch();
 }
 
-void engine::prefetch(const std::vector<std::string> &filenames) {
+void engine::prefetch(const std::vector<std::string>& filenames) {
   _resourcemanager->prefetch(filenames);
 }
 
@@ -154,7 +154,7 @@ void engine::_loop() {
   const auto delta = std::min(static_cast<float_t>(ticks - prior) * 0.001f, 1.0f / 60.0f);
   prior = ticks;
 
-  for (const auto &observer : _observers) {
+  for (const auto& observer : _observers) {
     observer->on_beginupdate();
   }
 
@@ -163,15 +163,15 @@ void engine::_loop() {
   _scenemanager->update(delta);
   _objectmanager->update(delta);
 
-  for (const auto &loopable : _loopables) {
+  for (const auto& loopable : _loopables) {
     loopable->loop(delta);
   }
 
-  for (const auto &observer : _observers) {
+  for (const auto& observer : _observers) {
     observer->on_endupdate();
   }
 
-  for (const auto &observer : _observers) {
+  for (const auto& observer : _observers) {
     observer->on_begindraw();
   }
 
@@ -182,7 +182,7 @@ void engine::_loop() {
   _canvas->draw();
   _renderer->end();
 
-  for (const auto &observer : _observers) {
+  for (const auto& observer : _observers) {
     observer->on_enddraw();
   }
 

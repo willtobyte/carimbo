@@ -112,16 +112,16 @@ void socket::connect() {
 #endif
 }
 
-void socket::emit(const std::string &topic, const std::string &data) {
+void socket::emit(const std::string& topic, const std::string& data) {
   send(fmt::format(fmt::runtime(R"json({"event": {"topic": "{}", "data": {}}})json"), topic, data));
 }
 
-void socket::on(const std::string &topic, std::function<void(const std::string &)> callback) {
+void socket::on(const std::string& topic, std::function<void(const std::string& )> callback) {
   send(fmt::format(R"json({{"subscribe": "{}"}})json", topic));
   _callbacks[topic].emplace_back(callback);
 }
 
-void socket::rpc(const std::string &method, const std::string &arguments, std::function<void(const std::string &)> callback) {
+void socket::rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )> callback) {
   send(fmt::format(fmt::runtime(R"json({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})json"), ++counter, method, arguments));
   _callbacks[method].emplace_back(callback);
 }
@@ -131,7 +131,7 @@ void socket::handle_open(const EmscriptenWebSocketOpenEvent *event) {
   UNUSED(event);
   _connected = true;
 
-  for (const auto &message : _queue) {
+  for (const auto& message : _queue) {
     send(message);
   }
   _queue.clear();
@@ -179,7 +179,7 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
   );
 }
 
-void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type &endpoint) {
+void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type& endpoint) {
   UNUSED(endpoint);
 
   if (ec) {
@@ -264,8 +264,8 @@ void socket::do_read() {
 }
 #endif
 
-void socket::on_message(const std::string &buffer) {
-  const auto &j = json::parse(buffer, nullptr, false);
+void socket::on_message(const std::string& buffer) {
+  const auto& j = json::parse(buffer, nullptr, false);
 
   if (j.value("command", "") == "ping") {
     send(R"json({"command": "pong"})json");
@@ -281,7 +281,7 @@ void socket::on_message(const std::string &buffer) {
 
   if (const auto event = j.value("event", json::object()); !event.empty()) {
     invoke(
-        event.at("topic").get_ref<const std::string &>(),
+        event.at("topic").get_ref<const std::string& >(),
         event.at("data").dump()
     );
 
@@ -305,7 +305,7 @@ void socket::on_message(const std::string &buffer) {
   }
 }
 
-void socket::send(const std::string &message) {
+void socket::send(const std::string& message) {
   if (!_connected) {
     _queue.emplace_back(message);
     return;
@@ -330,11 +330,11 @@ void socket::send(const std::string &message) {
 #endif
 }
 
-void socket::invoke(const std::string &event, const std::string &data) const {
+void socket::invoke(const std::string& event, const std::string& data) const {
   if (const auto it = _callbacks.find(event); it != _callbacks.end()) {
-    const auto &callbacks = it->second;
+    const auto& callbacks = it->second;
 
-    for (const auto &callback : callbacks) {
+    for (const auto& callback : callbacks) {
       callback(data);
     }
   }
