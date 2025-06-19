@@ -171,13 +171,15 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
 
 void objectmanager::update(float_t delta) noexcept {
   for (auto& o : _objects) {
-    const auto old = o->x();
+    const auto ox = o->x();
+    const auto oy = o->y();
 
     o->update(delta);
 
-    constexpr float_t epsilon = std::numeric_limits<float_t>::epsilon();
-    if (std::abs(o->x() - old) > epsilon) {
+    constexpr const auto epsilon = std::numeric_limits<float_t>::epsilon();
+    if (std::abs(o->x() - ox) > epsilon || std::abs(o->y() - oy) > epsilon) {
       _dirty = true;
+      break;
     }
   }
 
