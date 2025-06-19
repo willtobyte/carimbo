@@ -12,8 +12,8 @@ private:
 
   template<typename... Args>
   void expand(size_t minimum, Args&&... args) {
-    size_t ncapacity = std::max(minimum, objects.size() ? objects.size() * 2 : 1);
-    for (size_t i = 0; i < ncapacity; ++i) {
+    const auto nc = std::max(minimum, objects.size() ? objects.size() * 2 : 1);
+    for (size_t i = 0; i < nc; ++i) {
       objects.emplace_back(std::make_shared<T>(std::forward<Args>(args)...));
     }
   }
