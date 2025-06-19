@@ -5,7 +5,8 @@ using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
-      _collision_pool(framework::collision_pool::instance()) {
+      _collision_pool(framework::collision_pool::instance()),
+      _mail_pool(framework::mail_pool::instance()) {
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
   if (joysticks) {
@@ -41,6 +42,7 @@ void eventmanager::update(float_t delta) {
 
       case SDL_EVENT_KEY_DOWN: {
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
+
         for (const auto& receiver : _receivers) {
           receiver->on_key_press(e);
         }
@@ -48,6 +50,7 @@ void eventmanager::update(float_t delta) {
 
       case SDL_EVENT_KEY_UP: {
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
+
         for (const auto& receiver : _receivers) {
           receiver->on_key_release(e);
         }
@@ -63,6 +66,7 @@ void eventmanager::update(float_t delta) {
 
       case SDL_EVENT_MOUSE_MOTION: {
         const mouse::motion e{event.motion.x, event.motion.y};
+
         for (const auto& receiver : _receivers) {
           receiver->on_mouse_motion(e);
         }
@@ -75,6 +79,7 @@ void eventmanager::update(float_t delta) {
           .x = event.button.x,
           .y = event.button.y
         };
+
         for (const auto& receiver : _receivers) {
           receiver->on_mouse_press(e);
         }
@@ -87,6 +92,7 @@ void eventmanager::update(float_t delta) {
           .x = event.button.x,
           .y = event.button.y
         };
+
         for (const auto& receiver : _receivers) {
           receiver->on_mouse_release(e);
         }
@@ -110,6 +116,7 @@ void eventmanager::update(float_t delta) {
 
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
         const gamepad::button e{event.gbutton.button};
+
         for (const auto& receiver : _receivers) {
           receiver->on_gamepad_press(static_cast<uint8_t>(event.gbutton.which), e);
         }
@@ -117,6 +124,7 @@ void eventmanager::update(float_t delta) {
 
       case SDL_EVENT_GAMEPAD_BUTTON_UP: {
         const gamepad::button e{event.gbutton.button};
+
         for (const auto& receiver : _receivers) {
           receiver->on_gamepad_release(static_cast<uint8_t>(event.gbutton.which), e);
         }
@@ -127,6 +135,7 @@ void eventmanager::update(float_t delta) {
         const auto axis = static_cast<gamepad::motion::axis>(event.gaxis.axis);
         const auto value = event.gaxis.value;
         const gamepad::motion e{axis, value};
+
         for (const auto& receiver : _receivers) {
           receiver->on_gamepad_motion(static_cast<uint8_t>(who), e);
         }
@@ -149,7 +158,8 @@ void eventmanager::update(float_t delta) {
           for (const auto& receiver : _receivers) {
             receiver->on_mail(mail(ptr->to, ptr->body));
           }
-          delete ptr;
+
+          _mail_pool->release(std::unique_ptr<framework::mail>(ptr));
         }
       } break;
 

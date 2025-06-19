@@ -14,6 +14,7 @@ private:
 public:
   template<typename... Args>
   std::unique_ptr<T> acquire(Args&&... args) {
+    fmt::println("acquire");
     std::lock_guard<std::mutex> lock(mutex);
 
     if (!objects.empty()) {
@@ -31,6 +32,7 @@ public:
   }
 
   void release(std::unique_ptr<T> o) {
+    fmt::println("release");
     if (o) {
       std::lock_guard<std::mutex> lock(mutex);
       objects.push_back(std::move(o));
@@ -39,6 +41,8 @@ public:
 
   template<typename... Args>
   void reserve(size_t count, Args&&... default_args) {
+    fmt::println("reserve {}", count);
+
     std::lock_guard<std::mutex> lock(mutex);
     objects.reserve(count);
     for (size_t i = 0; i < count; ++i) {
@@ -53,4 +57,5 @@ public:
 };
 
 using collision_pool = singleton<objectpool<collision>>;
+using mail_pool = singleton<objectpool<mail>>;
 }

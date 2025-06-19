@@ -15,9 +15,9 @@ struct collision final {
 
   constexpr void reset() noexcept { a = 0; b = 0; }
 
-  constexpr void reset(uint64_t na, uint64_t nb) noexcept {
-    a = na;
-    b = nb;
+  constexpr void reset(uint64_t a, uint64_t b) noexcept {
+    this->a = a;
+    this->b = b;
   }
 };
 }

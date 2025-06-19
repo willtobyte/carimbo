@@ -2,10 +2,13 @@
 
 #include "common.hpp"
 
-#include "eventreceiver.hpp"
-#include "noncopyable.hpp"
 #include "event.hpp"
+#include "collision.hpp"
+#include "mail.hpp"
+#include "eventreceiver.hpp"
 #include "objectpool.hpp"
+#include "postalservice.hpp"
+#include "noncopyable.hpp"
 
 namespace input {
 class eventmanager final : private framework::noncopyable {
@@ -25,5 +28,6 @@ private:
   std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
 
   std::shared_ptr<framework::objectpool<framework::collision>> _collision_pool;
+  std::shared_ptr<framework::objectpool<framework::mail>> _mail_pool;
 };
 }

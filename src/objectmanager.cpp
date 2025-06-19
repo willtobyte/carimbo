@@ -20,7 +20,7 @@ auto get_callback_or(const Map& m, const typename Map::key_type& key, std::optio
 
 objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager),
-      _collision_pool(framework::collision_pool::instance()) {
+      _collision_pool(collision_pool::instance()) {
   _collision_pool->reserve(1000);
 }
 
