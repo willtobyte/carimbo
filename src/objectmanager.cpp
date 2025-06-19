@@ -116,7 +116,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
 
   _objects.emplace_back(o);
 
-  fmt::println("[objectmanager] clone {} from {}", matrix->id(), o->id());
+  fmt::println("[objectmanager] clone {} from {}", o->id(), matrix->id());
 
   return o;
 }
