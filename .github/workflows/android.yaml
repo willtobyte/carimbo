@@ -35,6 +35,17 @@ jobs:
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
+      - name: Configure tools & CMake
+        run: |
+          cat <<'EOF' >> ~/.conan2/profiles/default
+          [replace_tool_requires]
+          meson/*: meson/[*]
+          pkgconf/*: pkgconf/[*]
+
+          [tool_requires]
+          !cmake/*: cmake/[>=3 <4]
+          EOF
+
       - name: Create Conan profile
         run: |
           cat > ~/.conan2/profiles/android <<EOF
