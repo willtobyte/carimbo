@@ -19,7 +19,9 @@ auto get_callback_or(const Map &m, const typename Map::key_type &key, std::optio
 }
 
 objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
-    : _resourcemanager(resourcemanager) {
+    : _resourcemanager(resourcemanager),
+      _collision_pool(framework::collision_pool::instance()) {
+  _collision_pool->reserve(1000);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string &kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
@@ -207,8 +209,9 @@ void objectmanager::update(float_t delta) noexcept {
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
-      auto ptr = std::make_unique<collision>(a->id(), b->id());
-      event.user.data1 = ptr.release();
+      auto o = _collision_pool->acquire(a->id(), b->id());
+      event.user.data1 = o.release();
+
       SDL_PushEvent(&event);
     }
   }

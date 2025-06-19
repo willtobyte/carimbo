@@ -4,10 +4,20 @@
 
 namespace framework {
 struct collision final {
+  uint64_t a;
+  uint64_t b;
+
+  constexpr collision() noexcept
+      : a(0), b(0) {}
+
   constexpr collision(uint64_t a, uint64_t b) noexcept
       : a(a), b(b) {}
 
-  uint64_t a;
-  uint64_t b;
+  constexpr void reset() noexcept { a = 0; b = 0; }
+
+  constexpr void reset(uint64_t na, uint64_t nb) noexcept {
+    a = na;
+    b = nb;
+  }
 };
 }

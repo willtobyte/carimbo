@@ -6,6 +6,7 @@
 #include "eventreceiver.hpp"
 #include "scenemanager.hpp"
 #include "resourcemanager.hpp"
+#include "objectpool.hpp"
 
 namespace framework {
 class objectmanager final : public input::eventreceiver {
@@ -42,5 +43,7 @@ private:
   std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
   bool _dirty{true};
+
+  std::shared_ptr<objectpool<framework::collision>> _collision_pool;
 };
 }

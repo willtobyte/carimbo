@@ -5,6 +5,7 @@
 #include "eventreceiver.hpp"
 #include "noncopyable.hpp"
 #include "event.hpp"
+#include "objectpool.hpp"
 
 namespace input {
 class eventmanager final : private framework::noncopyable {
@@ -22,5 +23,7 @@ private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::vector<std::shared_ptr<eventreceiver>> _receivers;
   std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
+
+  std::shared_ptr<framework::objectpool<framework::collision>> _collision_pool;
 };
 }

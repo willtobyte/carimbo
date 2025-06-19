@@ -4,7 +4,8 @@ using namespace input;
 using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
-  : _renderer(std::move(renderer)) {
+  : _renderer(std::move(renderer)),
+    _collision_pool(framework::collision_pool::instance()) {
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
   if (!joysticks) {
@@ -139,7 +140,8 @@ void eventmanager::update(float_t delta) {
           for (const auto& receiver : _receivers) {
             receiver->on_collision(collision(ptr->a, ptr->b));
           }
-          delete ptr;
+
+          _collision_pool->release(std::unique_ptr<framework::collision>(ptr));
         }
       } break;
 
@@ -160,8 +162,8 @@ void eventmanager::update(float_t delta) {
         }
 
         if (*repeat) {
-          if (auto* fn = static_cast<std::function<void()>*>(event.user.data1); fn) [[likely]] {
-            std::invoke(*fn);
+          if (auto* ptr = static_cast<std::function<void()>*>(event.user.data1); ptr) [[likely]] {
+            std::invoke(*ptr);
           }
 
           break;
