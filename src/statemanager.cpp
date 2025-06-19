@@ -8,7 +8,7 @@ static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint6
 }
 
 statemanager::statemanager() noexcept {
-  _collision_mapping.reserve(64);
+  _collision_mapping.reserve(1000);
 }
 
 bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept {

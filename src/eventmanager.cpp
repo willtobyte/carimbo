@@ -4,25 +4,23 @@ using namespace input;
 using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
-  : _renderer(std::move(renderer)),
-    _collision_pool(framework::collision_pool::instance()) {
+    : _renderer(std::move(renderer)),
+      _collision_pool(framework::collision_pool::instance()) {
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
-  if (!joysticks) {
-    return;
-  }
+  if (joysticks) {
+    for (auto index = 0; index < number; ++index) {
+      const auto gamepad_id = joysticks[static_cast<size_t>(index)];
+      if (!SDL_IsGamepad(gamepad_id)) {
+        continue;
+      }
 
-  for (auto index = 0; index < number; ++index) {
-    const auto gamepad_id = joysticks[static_cast<size_t>(index)];
-    if (!SDL_IsGamepad(gamepad_id)) {
-      continue;
-    }
-
-    if (const auto controller = SDL_OpenGamepad(gamepad_id)) {
-      _controllers.emplace(
-        SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)),
-        std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller)
-      );
+      if (const auto controller = SDL_OpenGamepad(gamepad_id)) {
+        _controllers.emplace(
+          SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)),
+          std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller)
+        );
+      }
     }
   }
 }
@@ -175,7 +173,7 @@ void eventmanager::update(float_t delta) {
       } break;
 
       default:
-        return;
+        break;
     }
   }
 }
