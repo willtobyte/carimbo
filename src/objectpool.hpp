@@ -36,7 +36,7 @@ public:
   }
 
   void release(std::shared_ptr<T> o) {
-    if (o.use_count() == 1) {
+    if (o.use_count() == MINIMAL_USE_COUNT) {
       objects.push_back(std::move(o));
     }
   }
