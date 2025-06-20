@@ -4,12 +4,11 @@ BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
 NCPUS := 10
 
 .SHELLFLAGS := -eu -o pipefail -c
+
 .DEFAULT_GOAL := help
-.DELETE_ON_ERROR:
-.SUFFIXES:
 
 ifeq ($(PROFILE),webassembly)
-	EXTRA_FLAGS := -DHITBOX=ON
+	EXTRA_FLAGS := -DHITBOX=ON -DSANDBOX=OFF
 else
 	EXTRA_FLAGS := -DHITBOX=ON -DSANDBOX=ON
 endif
