@@ -78,6 +78,7 @@ if(EMSCRIPTEN)
     -O0
     -g3
     -gsource-map
+    -fno-omit-frame-pointer
   )
 
   set(EMSDK_LINK_DEBUG_FLAGS
@@ -218,11 +219,18 @@ else()
     set(DEBUG_FLAGS
       -O0
       -g3
-      -fno-omit-frame-pointer
       -fno-inline
+      -fstandalone-debug
+      -fno-omit-frame-pointer
       -fstack-protector-strong
+      -fsanitize=address
+      -fsanitize=undefined
+      -fsanitize=leak
+      -fno-elide-constructors
       -DDEBUG
-      -Wall -Wextra -Wpedantic
+      -Wall
+      -Wextra
+      -Wpedantic
       -Wno-unused-parameter
       ${GENERIC_WARNINGS}
     )
