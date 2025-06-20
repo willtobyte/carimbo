@@ -1,8 +1,12 @@
 SHELL := /usr/bin/env bash
-SHELLFLAGS = -euo pipefail -c
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
-NCPUS := $(shell sysctl -n hw.ncpu)
+NCPUS := $(shell \
+  (command -v nproc >/dev/null 2>&1 && nproc) || \
+  (command -v sysctl >/dev/null 2>&1 && sysctl -n hw.ncpu 2>/dev/null) || \
+  (command -v getconf >/dev/null 2>&1 && getconf _NPROCESSORS_ONLN 2>/dev/null) || \
+  echo 1 \
+)
 
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
