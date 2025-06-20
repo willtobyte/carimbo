@@ -5,8 +5,8 @@ using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
-      _collision_pool(framework::collision_pool::instance()),
-      _mail_pool(framework::mail_pool::instance()) {
+      _collisionpool(framework::collisionpool::instance()),
+      _mailpool(framework::mailpool::instance()) {
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
   if (joysticks) {
@@ -148,7 +148,7 @@ void eventmanager::update(float_t delta) {
             receiver->on_collision(collision(ptr->a, ptr->b));
           }
 
-          _collision_pool->release(std::unique_ptr<framework::collision>(ptr));
+          _collisionpool->release(std::unique_ptr<framework::collision>(ptr));
         }
       } break;
 
@@ -159,7 +159,7 @@ void eventmanager::update(float_t delta) {
             receiver->on_mail(mail(ptr->to, ptr->body));
           }
 
-          _mail_pool->release(std::shared_ptr<framework::mail>(ptr));
+          _mailpool->release(std::unique_ptr<framework::mail>(ptr));
         }
       } break;
 

@@ -43,7 +43,7 @@ private:
   std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
 
-  std::shared_ptr<objectpool<object>> _object_pool;
-  std::shared_ptr<objectpool<collision>> _collision_pool;
+  std::shared_ptr<sharedpool<object>> _objectpool;
+  std::shared_ptr<uniquepool<collision>> _collisionpool;
 };
 }

@@ -30,10 +30,10 @@ namespace framework {
       body.clear();
     }
 
-    constexpr void reset(uint64_t to, const std::string& kind, const std::string& body) noexcept {
-      this->to = to;
-      this->kind = kind;
-      this->body = body;
+    constexpr void reset(const mail& message) noexcept {
+      to = message.to;
+      kind = message.kind;
+      body = message.body;
     }
   };
 }

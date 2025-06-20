@@ -20,10 +20,10 @@ auto get_callback_or(const Map& m, const typename Map::key_type& key, std::optio
 
 objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager),
-      _object_pool(object_pool::instance()),
-      _collision_pool(collision_pool::instance()) {
-  _object_pool->reserve(3000);
-  _collision_pool->reserve(1000);
+      _objectpool(objectpool::instance()),
+      _collisionpool(collisionpool::instance()) {
+  _objectpool->reserve(3000);
+  _collisionpool->reserve(1000);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
@@ -77,7 +77,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     animations.emplace(key, animation{oneshot, next, hitbox, effect, keyframes});
   }
 
-  auto o = _object_pool->acquire();
+  auto o = _objectpool->acquire();
   o->_id = _counter++;
   o->_scale = scale;
   o->_kind = kind;
@@ -98,7 +98,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
     return nullptr;
   }
 
-  const auto o = _object_pool->acquire();
+  const auto o = _objectpool->acquire();
   o->_id = _counter++;
   o->_angle = matrix->_angle;
   o->_kind = matrix->_kind;
@@ -148,7 +148,7 @@ void objectmanager::destroy(std::shared_ptr<object> object) {
   _objects.erase(std::remove(_objects.begin(), _objects.end(), object), _objects.end());
   _objects.shrink_to_fit();
 
-  _object_pool->release(object);
+  _objectpool->release(object);
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const {
@@ -198,8 +198,8 @@ void objectmanager::update(float_t delta) noexcept {
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
-      const auto cn = _collision_pool->acquire(o->id(), b->id());
-      event.user.data1 = cn.get();
+      auto cn = _collisionpool->acquire(o->id(), b->id());
+      event.user.data1 = cn.release();
 
       SDL_PushEvent(&event);
     }

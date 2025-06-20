@@ -1,44 +1,48 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "singleton.hpp"
 
 namespace framework {
 
-template<typename T>
-class objectpool {
-private:
-  std::vector<std::shared_ptr<T>> objects;
+template<typename T, typename PtrType>
+class poolbase {
+protected:
+  std::vector<PtrType> objects;
 
   template<typename... Args>
   void expand(size_t minimum, Args&&... args) {
-    const auto nc = std::max(minimum, objects.size() ? objects.size() * 2 : 1);
-    for (size_t i = 0; i < nc; ++i) {
-      objects.emplace_back(std::make_shared<T>(std::forward<Args>(args)...));
+    const auto target = std::max(minimum, objects.empty() ? size_t(1) : objects.size() * 2);
+    for (size_t i = objects.size(); i < target; ++i) {
+      objects.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
     }
   }
 
 public:
   template<typename... Args>
-  std::shared_ptr<T> acquire(Args&&... args) {
+  PtrType acquire(Args&&... args) {
     if (objects.empty()) {
       expand(size(), std::forward<Args>(args)...);
     }
 
-    auto o = std::move(objects.back());
+    PtrType obj = std::move(objects.back());
     objects.pop_back();
 
-    if constexpr (requires { o->reset(std::forward<Args>(args)...); }) {
-      o->reset(std::forward<Args>(args)...);
+    if constexpr (requires { obj->reset(std::forward<Args>(args)...); }) {
+      obj->reset(std::forward<Args>(args)...);
     }
 
-    return o;
+    return obj;
   }
 
-  void release(std::shared_ptr<T> o) {
-    if (o.use_count() == MINIMAL_USE_COUNT) {
-      objects.push_back(std::move(o));
+  void release(PtrType obj) {
+    if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) {
+      if (obj.use_count() != MINIMAL_USE_COUNT) {
+        return;
+      }
     }
+    objects.push_back(std::move(obj));
   }
 
   template<typename... Args>
@@ -51,7 +55,37 @@ public:
   }
 };
 
-using collision_pool = singleton<objectpool<collision>>;
-using mail_pool = singleton<objectpool<mail>>;
-using object_pool = singleton<objectpool<object>>;
+template<typename T>
+class sharedpool : public poolbase<T, std::shared_ptr<T>> {
+public:
+  using PtrType = std::shared_ptr<T>;
+
+  template<typename... Args>
+  PtrType acquire(Args&&... args) {
+    return poolbase<T, PtrType>::acquire(std::forward<Args>(args)...);
+  }
+
+  void release(PtrType obj) {
+    poolbase<T, PtrType>::release(std::move(obj));
+  }
+};
+
+template<typename T>
+class uniquepool : public poolbase<T, std::unique_ptr<T>> {
+public:
+  using PtrType = std::unique_ptr<T>;
+
+  template<typename... Args>
+  PtrType acquire(Args&&... args) {
+    return poolbase<T, PtrType>::acquire(std::forward<Args>(args)...);
+  }
+
+  void release(PtrType obj) {
+    poolbase<T, PtrType>::release(std::move(obj));
+  }
+};
+
+using collisionpool = singleton<uniquepool<collision>>;
+using mailpool = singleton<uniquepool<mail>>;
+using objectpool = singleton<sharedpool<object>>;
 }

@@ -27,7 +27,7 @@ private:
   std::vector<std::shared_ptr<eventreceiver>> _receivers;
   std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
 
-  std::shared_ptr<framework::objectpool<framework::collision>> _collision_pool;
-  std::shared_ptr<framework::objectpool<framework::mail>> _mail_pool;
+  std::shared_ptr<framework::uniquepool<framework::collision>> _collisionpool;
+  std::shared_ptr<framework::uniquepool<framework::mail>> _mailpool;
 };
 }

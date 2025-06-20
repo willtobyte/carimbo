@@ -10,6 +10,6 @@ public:
   void post(const mail& message) noexcept;
 
 private:
-  std::shared_ptr<framework::objectpool<framework::mail>> _mail_pool;
+  std::shared_ptr<framework::uniquepool<framework::mail>> _mailpool;
 };
 }
