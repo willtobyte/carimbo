@@ -1,7 +1,7 @@
 SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
-NCPUS := 10
+NCPUS := 8
 
 .SHELLFLAGS := -eu -o pipefail -c
 
