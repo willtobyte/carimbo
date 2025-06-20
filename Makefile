@@ -4,13 +4,16 @@ PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(filter debug,$(buildtype)),Debug,Release)
 NCPUS := $(shell sysctl -n hw.ncpu)
 
+.SHELLFLAGS := -eu -o pipefail -c
+.DEFAULT_GOAL := help
+.DELETE_ON_ERROR:
+.SUFFIXES:
+
 ifeq ($(PROFILE),webassembly)
 	EXTRA_FLAGS := -DHITBOX=ON
 else
 	EXTRA_FLAGS := -DHITBOX=ON -DSANDBOX=ON
 endif
-
-.DEFAULT_GOAL := help
 
 .PHONY: clean
 clean: ## Clean
