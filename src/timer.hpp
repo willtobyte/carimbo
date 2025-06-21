@@ -4,19 +4,15 @@
 
 namespace framework {
 struct timer final {
-  bool repeat{false};
+  bool repeat;
   std::function<void()> fn;
 
-  timer() noexcept = default;
+  timer() noexcept;
 
-  timer(bool repeat, std::function<void()> fn) noexcept
-      : repeat(repeat), fn(std::move(fn)) {}
+  timer(bool repeat, std::function<void()> fn) noexcept;
 
-  void reset() noexcept { repeat = false; fn = nullptr; }
+  void reset() noexcept;
 
-  void reset(bool repeat, std::function<void()> fn) noexcept {
-    this->repeat = repeat;
-    this->fn = fn;
-  }
+  void reset(bool repeat, std::function<void()> fn) noexcept;
 };
 }

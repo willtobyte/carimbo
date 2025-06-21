@@ -7,17 +7,12 @@ struct collision final {
   uint64_t a;
   uint64_t b;
 
-  constexpr collision() noexcept
-      : a(0), b(0) {}
+  collision() noexcept;
 
-  constexpr collision(uint64_t a, uint64_t b) noexcept
-      : a(a), b(b) {}
+  collision(uint64_t a, uint64_t b) noexcept;
 
-  constexpr void reset() noexcept { a = 0; b = 0; }
+  void reset() noexcept;
 
-  constexpr void reset(uint64_t a, uint64_t b) noexcept {
-    this->a = a;
-    this->b = b;
-  }
+  void reset(uint64_t a, uint64_t b) noexcept;
 };
 }
