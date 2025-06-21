@@ -927,7 +927,9 @@ void framework::scriptengine::run() {
 
   const auto jit = lua["jit"];
   if (jit.valid()) {
-    fmt::println("{}", jit["version"].get<std::string>());
+    fmt::println("Lua: {}", jit["version"].get<std::string>());
+  } else {
+    fmt::println("Lua: {}", lua["_VERSION"].get<std::string>());
   }
 
   const auto buffer = storage::io::read("scripts/main.lua");
