@@ -5,12 +5,11 @@ using namespace framework;
 uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
   UNUSED(id);
 
-  auto* fn = static_cast<std::function<void()>*>(userdata);
+  auto* ptr = static_cast<void *>(userdata);
 
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::timer);
-  event.user.data1 = static_cast<void*>(fn);
-  event.user.data2 = static_cast<void*>(new bool(repeat));
+  event.user.data1 = ptr;
 
   SDL_PushEvent(&event);
 
@@ -23,6 +22,11 @@ uint32_t wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
 
 uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, false);
+}
+
+timermanager::timermanager() noexcept
+    : _timerpool(timerpool::instance()){
+  _timerpool->reserve(1000);
 }
 
 uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {
@@ -38,10 +42,10 @@ void timermanager::clear(uint32_t id) {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bool repeat) {
-  auto* ptr = new std::function<void()>(std::move(fn));
+  const auto ptr = _timerpool->acquire(repeat, std::move(fn)).release();
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (!id) [[unlikely]] {
-    delete ptr;
+    _timerpool->release(std::unique_ptr<timer>(ptr));
     throw std::runtime_error(fmt::format("[SDL_AddTimer] {}", SDL_GetError()));
   }
 

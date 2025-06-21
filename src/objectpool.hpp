@@ -5,7 +5,6 @@
 #include "singleton.hpp"
 
 namespace framework {
-
 template<typename T, typename PtrType>
 class poolbase {
 protected:
@@ -88,5 +87,6 @@ public:
 
 using collisionpool = singleton<uniquepool<collision>>;
 using mailpool = singleton<uniquepool<mail>>;
+using timerpool = singleton<uniquepool<timer>>;
 using objectpool = singleton<sharedpool<object>>;
 }

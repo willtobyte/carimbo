@@ -6,7 +6,8 @@ using namespace event;
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
       _collisionpool(framework::collisionpool::instance()),
-      _mailpool(framework::mailpool::instance()) {
+      _mailpool(framework::mailpool::instance()),
+      _timerpool(framework::timerpool::instance()) {
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
   if (joysticks) {
@@ -26,7 +27,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   }
 }
 
-void eventmanager::update(float_t delta) {
+void eventmanager::update(float_t delta) noexcept {
   UNUSED(delta);
 
   SDL_Event event;
@@ -164,21 +165,12 @@ void eventmanager::update(float_t delta) {
       } break;
 
       case static_cast<uint32_t>(type::timer): {
-        std::unique_ptr<bool> repeat{static_cast<bool*>(event.user.data2)};
-        if (!repeat) [[unlikely]] {
-          break;
-        }
+        auto* ptr = static_cast<framework::timer*>(event.user.data1);
 
-        if (*repeat) {
-          if (auto* ptr = static_cast<std::function<void()>*>(event.user.data1); ptr) [[likely]] {
-            std::invoke(*ptr);
-          }
+        std::invoke(ptr->fn);
 
-          break;
-        }
-
-        if (std::unique_ptr<std::function<void()>> fn{static_cast<std::function<void()>*>(event.user.data1)}; fn) [[likely]] {
-          std::invoke(*fn);
+        if (!ptr->repeat) {
+          _timerpool->release(std::unique_ptr<framework::timer>(ptr));
         }
       } break;
 
