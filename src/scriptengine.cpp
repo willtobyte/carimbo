@@ -922,15 +922,16 @@ void framework::scriptengine::run() {
   fmt::println("Powered by Carimbo: https://carimbo.site");
   fmt::println("Version: {}", LATEST_TAG);
   fmt::println("Built on: {}, {} UTC", __DATE__, __TIME__);
-  fmt::println("License: MIT");
-  fmt::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
   const auto jit = lua["jit"];
   if (jit.valid()) {
-    fmt::println("Lua: {}", jit["version"].get<std::string>());
+    fmt::println("Interpreter: {}", jit["version"].get<std::string>());
   } else {
-    fmt::println("Lua: {}", lua["_VERSION"].get<std::string>());
+    fmt::println("Interpreter: {}", lua["_VERSION"].get<std::string>());
   }
+
+  fmt::println("License: MIT");
+  fmt::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
