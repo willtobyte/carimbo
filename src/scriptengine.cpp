@@ -923,7 +923,7 @@ void framework::scriptengine::run() {
   fmt::println("Version: {}", LATEST_TAG);
   fmt::println("Built on: {}, {} UTC", __DATE__, __TIME__);
   fmt::println("License: MIT");
-  fmt::println("Author: Rodrigo Delduca (https://rodrigodelduca.org/)");
+  fmt::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
   const auto jit = lua["jit"];
   if (jit.valid()) {
