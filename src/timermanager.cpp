@@ -39,12 +39,13 @@ void timermanager::clear(uint32_t id) {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bool repeat) {
-  const auto ptr = _timerpool->acquire(repeat, std::move(fn)).release();
+  auto ptr = _timerpool->acquire(repeat, std::move(fn)).release();
+
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
-  if (!id) [[unlikely]] {
-    _timerpool->release(std::unique_ptr<timer>(ptr));
-    throw std::runtime_error(fmt::format("[SDL_AddTimer] {}", SDL_GetError()));
+  if (id) {
+    return id;
   }
 
-  return id;
+  _timerpool->release(std::unique_ptr<timer>(ptr));
+  throw std::runtime_error(fmt::format("[SDL_AddTimer] {}", SDL_GetError()));
 }
