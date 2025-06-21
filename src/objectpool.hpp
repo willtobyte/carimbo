@@ -12,37 +12,38 @@ protected:
   std::vector<PtrType> objects;
 
   template<typename... Args>
-  void expand(size_t minimum, Args&&... args) {
+  void expand(size_t minimum, Args&&... arguments) {
     const auto target = std::max(minimum, objects.empty() ? size_t(1) : objects.size() * 2);
-    for (size_t i = objects.size(); i < target; ++i) {
-      objects.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
+    for (auto i = objects.size(); i < target; ++i) {
+      objects.emplace_back(std::make_unique<T>(std::forward<Args>(arguments)...));
     }
   }
 
 public:
   template<typename... Args>
-  PtrType acquire(Args&&... args) {
+  PtrType acquire(Args&&... arguments) {
     if (objects.empty()) {
-      expand(size(), std::forward<Args>(args)...);
+      expand(size(), std::forward<Args>(arguments)...);
     }
 
-    PtrType obj = std::move(objects.back());
+    PtrType object = std::move(objects.back());
     objects.pop_back();
 
-    if constexpr (requires { obj->reset(std::forward<Args>(args)...); }) {
-      obj->reset(std::forward<Args>(args)...);
+    if constexpr (requires { object->reset(std::forward<Args>(arguments)...); }) {
+      object->reset(std::forward<Args>(arguments)...);
     }
 
-    return obj;
+    return object;
   }
 
-  void release(PtrType obj) {
+  void release(PtrType object) {
     if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) {
-      if (obj.use_count() != MINIMAL_USE_COUNT) {
+      if (object.use_count() != MINIMAL_USE_COUNT) {
         return;
       }
     }
-    objects.push_back(std::move(obj));
+
+    objects.push_back(std::move(object));
   }
 
   template<typename... Args>
@@ -61,12 +62,12 @@ public:
   using PtrType = std::shared_ptr<T>;
 
   template<typename... Args>
-  PtrType acquire(Args&&... args) {
-    return poolbase<T, PtrType>::acquire(std::forward<Args>(args)...);
+  PtrType acquire(Args&&... arguments) {
+    return poolbase<T, PtrType>::acquire(std::forward<Args>(arguments)...);
   }
 
-  void release(PtrType obj) {
-    poolbase<T, PtrType>::release(std::move(obj));
+  void release(PtrType object) {
+    poolbase<T, PtrType>::release(std::move(object));
   }
 };
 
@@ -76,12 +77,12 @@ public:
   using PtrType = std::unique_ptr<T>;
 
   template<typename... Args>
-  PtrType acquire(Args&&... args) {
-    return poolbase<T, PtrType>::acquire(std::forward<Args>(args)...);
+  PtrType acquire(Args&&... arguments) {
+    return poolbase<T, PtrType>::acquire(std::forward<Args>(arguments)...);
   }
 
-  void release(PtrType obj) {
-    poolbase<T, PtrType>::release(std::move(obj));
+  void release(PtrType object) {
+    poolbase<T, PtrType>::release(std::move(object));
   }
 };
 
