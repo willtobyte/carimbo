@@ -925,9 +925,9 @@ void framework::scriptengine::run() {
 
   const auto jit = lua["jit"];
   if (jit.valid()) {
-    fmt::println("Interpreter: {}", jit["version"].get<std::string>());
+    fmt::println("Runtime: {}", jit["version"].get<std::string>());
   } else {
-    fmt::println("Interpreter: {}", lua["_VERSION"].get<std::string>());
+    fmt::println("Runtime: {}", lua["_VERSION"].get<std::string>());
   }
 
   fmt::println("License: MIT");
