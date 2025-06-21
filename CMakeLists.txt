@@ -25,12 +25,12 @@ else()
 endif()
 
 execute_process(
-  COMMAND git rev-parse --short HEAD
-  OUTPUT_VARIABLE commit_hash
+  COMMAND git describe --tags --match "v1.*.*" --abbrev=0
+  OUTPUT_VARIABLE latest_tag
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-add_compile_definitions(COMMIT_HASH="${commit_hash}")
+add_compile_definitions(LATEST_TAG="${latest_tag}")
 
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
