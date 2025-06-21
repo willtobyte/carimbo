@@ -4,7 +4,6 @@ using namespace framework;
 
 postalservice::postalservice() noexcept
     : _mailpool(mailpool::instance()) {
-  _mailpool->reserve(1000);
 }
 
 void postalservice::post(const mail& message) noexcept {

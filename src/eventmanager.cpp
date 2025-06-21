@@ -8,6 +8,10 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
       _collisionpool(framework::collisionpool::instance()),
       _mailpool(framework::mailpool::instance()),
       _timerpool(framework::timerpool::instance()) {
+  _collisionpool->reserve(1000);
+  _mailpool->reserve(1000);
+  _timerpool->reserve(1000);
+
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
   if (joysticks) {

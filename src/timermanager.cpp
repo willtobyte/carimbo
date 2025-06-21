@@ -23,7 +23,6 @@ uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
 
 timermanager::timermanager() noexcept
     : _timerpool(timerpool::instance()){
-  _timerpool->reserve(1000);
 }
 
 uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {

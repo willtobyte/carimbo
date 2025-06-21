@@ -22,8 +22,7 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager),
       _objectpool(objectpool::instance()),
       _collisionpool(collisionpool::instance()) {
-  _objectpool->reserve(1000);
-  _collisionpool->reserve(1000);
+  _objectpool->reserve(3000);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
