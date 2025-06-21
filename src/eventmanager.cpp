@@ -1,16 +1,13 @@
 #include "eventmanager.hpp"
+#include "envelope.hpp"
 
 using namespace input;
 using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
-      _collisionpool(framework::collisionpool::instance()),
-      _mailpool(framework::mailpool::instance()),
-      _timerpool(framework::timerpool::instance()) {
-  _collisionpool->reserve(1000);
-  _mailpool->reserve(1000);
-  _timerpool->reserve(1000);
+      _envelopepool(framework::envelopepool::instance()) {
+  _envelopepool->reserve(3000);
 
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
@@ -147,34 +144,34 @@ void eventmanager::update(float_t delta) noexcept {
       } break;
 
       case static_cast<uint32_t>(type::collision): {
-        auto* ptr = static_cast<framework::collision*>(event.user.data1);
+        auto* ptr = static_cast<framework::envelope*>(event.user.data1);
         if (ptr) {
           for (const auto& receiver : _receivers) {
-            receiver->on_collision(collision(ptr->a, ptr->b));
+            receiver->on_collision(collision(ptr->as_collision().a, ptr->as_collision().b));
           }
 
-          _collisionpool->release(std::unique_ptr<framework::collision>(ptr));
+          _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
         }
       } break;
 
       case static_cast<uint32_t>(type::mail): {
-        auto* ptr = static_cast<framework::mail*>(event.user.data1);
+        auto* ptr = static_cast<framework::envelope*>(event.user.data1);
         if (ptr) {
           for (const auto& receiver : _receivers) {
-            receiver->on_mail(mail(ptr->to, ptr->body));
+            receiver->on_mail(mail(ptr->as_mail().to, ptr->as_mail().body));
           }
 
-          _mailpool->release(std::unique_ptr<framework::mail>(ptr));
+          _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
         }
       } break;
 
       case static_cast<uint32_t>(type::timer): {
-        auto* ptr = static_cast<framework::timer*>(event.user.data1);
+        auto* ptr = static_cast<framework::envelope*>(event.user.data1);
 
-        std::invoke(ptr->fn);
+        std::invoke(ptr->as_timer().fn);
 
-        if (!ptr->repeat) {
-          _timerpool->release(std::unique_ptr<framework::timer>(ptr));
+        if (!ptr->as_timer().repeat) {
+          _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
         }
       } break;
 

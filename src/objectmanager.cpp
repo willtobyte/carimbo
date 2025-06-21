@@ -1,4 +1,5 @@
 #include "objectmanager.hpp"
+#include "objectpool.hpp"
 
 using namespace framework;
 
@@ -21,7 +22,7 @@ auto get_callback_or(const Map& m, const typename Map::key_type& key, std::optio
 objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager),
       _objectpool(objectpool::instance()),
-      _collisionpool(collisionpool::instance()) {
+      _envelopepool(envelopepool::instance()) {
   _objectpool->reserve(3000);
 }
 
@@ -197,8 +198,8 @@ void objectmanager::update(float_t delta) noexcept {
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
-      auto cn = _collisionpool->acquire(o->id(), b->id());
-      event.user.data1 = cn.release();
+      // auto cn = _envelopepool->acquire(o->id(), b->id());
+      // event.user.data1 = cn.release();
 
       SDL_PushEvent(&event);
     }

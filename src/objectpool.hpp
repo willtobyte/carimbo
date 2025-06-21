@@ -3,6 +3,8 @@
 #include "common.hpp"
 
 #include "singleton.hpp"
+#include "envelope.hpp"
+#include "object.hpp"
 
 namespace framework {
 template<typename T, typename PtrType>
@@ -11,10 +13,10 @@ protected:
   std::vector<PtrType> objects;
 
   template<typename... Args>
-  void expand(size_t minimum, Args&&... arguments) {
+  void expand(size_t minimum) {
     const auto target = std::max(minimum, objects.empty() ? size_t(1) : objects.size() * 2);
     for (auto i = objects.size(); i < target; ++i) {
-      objects.emplace_back(std::make_unique<T>(std::forward<Args>(arguments)...));
+      objects.emplace_back(std::make_unique<T>());
     }
   }
 
@@ -22,7 +24,7 @@ public:
   template<typename... Args>
   PtrType acquire(Args&&... arguments) {
     if (objects.empty()) {
-      expand(size(), std::forward<Args>(arguments)...);
+      expand(size());
     }
 
     PtrType object = std::move(objects.back());
@@ -85,8 +87,10 @@ public:
   }
 };
 
-using collisionpool = singleton<uniquepool<collision>>;
-using mailpool = singleton<uniquepool<mail>>;
-using timerpool = singleton<uniquepool<timer>>;
+//using collisionpool = singleton<uniquepool<collision>>;
+// using mailpool = singleton<uniquepool<mail>>;
+// using timerpool = singleton<uniquepool<timer>>;
+//
+using envelopepool = singleton<uniquepool<envelope>>;
 using objectpool = singleton<sharedpool<object>>;
 }

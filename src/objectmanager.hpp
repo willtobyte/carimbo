@@ -44,6 +44,6 @@ private:
   std::atomic<uint64_t> _counter{0};
 
   std::shared_ptr<sharedpool<object>> _objectpool;
-  std::shared_ptr<uniquepool<collision>> _collisionpool;
+  std::shared_ptr<uniquepool<envelope>> _envelopepool;
 };
 }

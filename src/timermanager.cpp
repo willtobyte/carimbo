@@ -22,7 +22,7 @@ uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
 }
 
 timermanager::timermanager() noexcept
-    : _timerpool(timerpool::instance()){
+    : _envelopepool(envelopepool::instance()){
 }
 
 uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {
@@ -38,13 +38,13 @@ void timermanager::clear(uint32_t id) {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bool repeat) {
-  auto ptr = _timerpool->acquire(repeat, std::move(fn)).release();
+  auto ptr = _envelopepool->acquire(repeat, std::move(fn)).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (id) [[likely]] {
     return id;
   }
 
-  _timerpool->release(std::unique_ptr<timer>(ptr));
+  _envelopepool->release(std::unique_ptr<envelope>(ptr));
   throw std::runtime_error(fmt::format("[SDL_AddTimer] {}", SDL_GetError()));
 }
