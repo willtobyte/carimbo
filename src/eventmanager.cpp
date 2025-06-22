@@ -7,7 +7,7 @@ using namespace event;
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
       _envelopepool(framework::envelopepool::instance()) {
-  _envelopepool->reserve(3000);
+  _envelopepool->reserve(1000);
 
   int32_t number;
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
