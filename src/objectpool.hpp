@@ -88,10 +88,6 @@ public:
   }
 };
 
-//using collisionpool = singleton<uniquepool<collision>>;
-// using mailpool = singleton<uniquepool<mail>>;
-// using timerpool = singleton<uniquepool<timer>>;
-//
 using envelopepool = singleton<uniquepool<envelope>>;
 using objectpool = singleton<sharedpool<object>>;
 }
