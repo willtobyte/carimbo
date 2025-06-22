@@ -20,6 +20,6 @@ void from_json(const nlohmann::json& j, point& m) {
 
 void from_json(const nlohmann::json& j, rectangle& r) {
   r._position = point{j.at("x").get<float_t>(), j.at("y").get<float_t>()};
-  r._size = geometry::size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
+  r._size = size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
 }
 }
