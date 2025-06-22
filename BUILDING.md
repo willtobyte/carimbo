@@ -2,26 +2,12 @@
 
 This guide provides a straightforward walkthrough for setting up and building the project. Follow the instructions below to get started.
 
-### Python Environment & Virtualenv
+### Install Mise & Conan
 
 Set up the Python virtual environment:
 
 ```shell
-uv venv
-```
-
-Activate it:
-
-```shell
-source .venv/bin/activate
-```
-
-### Conan
-
-Install Conan:
-
-```shell
-uv pip install conan
+mise use --global conan
 ```
 
 Create your profile:
@@ -30,21 +16,19 @@ Create your profile:
 conan profile detect --force
 ```
 
-### Add the WebAssembly Profile
-
-Create a Conan profile for WebAssembly:
-
 ```shell
-cat > ~/.conan2/profiles/webassembly <<EOF
-include(default)
+vim ~/.conan2/profiles/default
+```
 
-[settings]
-arch=wasm
-os=Emscripten
+Add this at the end:
+
+```
+[replace_tool_requires]
+meson/*: meson/[*]
+pkgconf/*: pkgconf/[*]
 
 [tool_requires]
-*: emsdk/3.1.73
-EOF
+!cmake/*: cmake/[>=3 <4]
 ```
 
 ### Configure & Build
@@ -52,39 +36,11 @@ EOF
 On the first build:
 
 ```shell
-make conan profile=webassembly
+make conan build
 ```
 
 On subsequent builds:
 
 ```shell
-make build profile=webassembly
+make build
 ```
-
-### Clone the Game Repository
-
-Clone the game repository into a local folder named `sandbox`:
-
-```shell
-gh repo clone willtobyte/slime sandbox
-```
-
-### Clone the Playground Web Application
-
-Clone the playground web application repository:
-
-```shell
-gh repo clone willtobyte/run
-```
-
-### Run the Application
-
-**Note**: Ensure Docker is running. If Docker is not installed, consider installing [OrbStack](https://orbstack.dev/).
-
-Start the application:
-
-```shell
-make run
-```
-
-Finally, open [localhost:3000/playground](http://localhost:3000/playground) in your browser.
