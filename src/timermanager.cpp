@@ -38,7 +38,7 @@ void timermanager::clear(uint32_t id) {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
-  auto ptr = _envelopepool->acquire(repeat, std::move(fn)).release();
+  auto ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (id) [[likely]] {

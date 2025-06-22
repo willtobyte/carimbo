@@ -198,8 +198,8 @@ void objectmanager::update(float_t delta) noexcept {
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
-      // auto cn = _envelopepool->acquire(o->id(), b->id());
-      // event.user.data1 = cn.release();
+      auto envelope = _envelopepool->acquire(collisionenvelope(o->id(), b->id()));
+      event.user.data1 = envelope.release();
 
       SDL_PushEvent(&event);
     }

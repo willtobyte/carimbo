@@ -2,16 +2,16 @@
 
 using namespace framework;
 
-void envelope::reset(uint64_t a, uint64_t b) noexcept {
-  payload.emplace<collision_t>(a, b);
+void envelope::reset(collisionenvelope&& envelope) noexcept {
+  payload.emplace<collisionenvelope>(std::move(envelope));
 }
 
-void envelope::reset(uint64_t to, const std::string& kind, const std::string& body) noexcept {
-  payload.emplace<mail_t>(to, kind, body);
+void envelope::reset(mailenvelope&& envelope) noexcept {
+  payload.emplace<mailenvelope>(std::move(envelope));
 }
 
-void envelope::reset(bool repeat, std::function<void()>&& fn) noexcept {
-  payload.emplace<timer_t>(repeat, std::move(fn));
+void envelope::reset(timerenvelope&& envelope) noexcept {
+  payload.emplace<timerenvelope>(std::move(envelope));
 }
 
 void envelope::reset() noexcept {
