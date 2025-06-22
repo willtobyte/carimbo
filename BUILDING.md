@@ -1,26 +1,28 @@
 ## Project Setup
 
-This guide provides a straightforward walkthrough for setting up and building the project. Follow the instructions below to get started.
+This guide provides a clear and minimal step-by-step process for setting up and building the project.
 
-### Install Mise & Conan
+### Install Tools
 
-Set up the Python virtual environment:
+Install Conan using [mise](https://mise.jdx.dev):
 
 ```shell
 mise use --global conan
 ```
 
-Create your profile:
+Detect your system profile:
 
 ```shell
 conan profile detect --force
 ```
 
+Edit your default Conan profile:
+
 ```shell
 vim ~/.conan2/profiles/default
 ```
 
-Add this at the end:
+Append the following configuration at the end of the file:
 
 ```
 [replace_tool_requires]
@@ -31,15 +33,15 @@ pkgconf/*: pkgconf/[*]
 !cmake/*: cmake/[>=3 <4]
 ```
 
-### Configure & Build
+### Build Instructions
 
-On the first build:
+First-time build (includes Conan dependency resolution):
 
 ```shell
 make conan build
 ```
 
-On subsequent builds:
+Subsequent builds (rebuild without re-resolving dependencies):
 
 ```shell
 make build
