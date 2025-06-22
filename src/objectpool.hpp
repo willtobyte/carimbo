@@ -66,13 +66,6 @@ public:
 };
 
 template<typename T>
-class sharedpool : public poolbase<T, std::shared_ptr<T>> {
-public:
-  using poolbase<T, std::shared_ptr<T>>::acquire;
-  using poolbase<T, std::shared_ptr<T>>::release;
-};
-
-template<typename T>
 class uniquepool : public poolbase<T, std::unique_ptr<T>> {
 public:
   using poolbase<T, std::unique_ptr<T>>::acquire;
@@ -80,5 +73,13 @@ public:
 };
 
 using envelopepool = singleton<uniquepool<envelope>>;
+
+template<typename T>
+class sharedpool : public poolbase<T, std::shared_ptr<T>> {
+public:
+  using poolbase<T, std::shared_ptr<T>>::acquire;
+  using poolbase<T, std::shared_ptr<T>>::release;
+};
+
 using objectpool = singleton<sharedpool<object>>;
 }
