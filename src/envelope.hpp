@@ -15,8 +15,8 @@ struct mail_t {
   std::string kind;
   std::string body;
 
-  mail_t(uint64_t to_, std::string&& kind_, std::string&& body_) noexcept
-    : to(to_), kind(std::move(kind_)), body(std::move(body_)) {}
+  mail_t(uint64_t to_, const std::string& kind, const std::string& body) noexcept
+    : to(to_), kind(kind), body(body) {}
 };
 
 struct timer_t {
@@ -47,7 +47,7 @@ public:
   [[nodiscard]] inline auto& as_timer() noexcept { return std::get<timer_t>(payload); }
 
   void reset(uint64_t a, uint64_t b) noexcept;
-  void reset(uint64_t to, std::string&& kind, std::string&& body) noexcept;
+  void reset(uint64_t to, const std::string& kind, const std::string& body) noexcept;
   void reset(bool repeat, std::function<void()>&& fn) noexcept;
   void reset() noexcept;
 };

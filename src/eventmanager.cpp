@@ -146,8 +146,10 @@ void eventmanager::update(float_t delta) noexcept {
       case static_cast<uint32_t>(type::collision): {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
         if (ptr) {
+          const auto& payload = ptr->as_collision();
+          const auto o = collision(payload.a, payload.b);
           for (const auto& receiver : _receivers) {
-            receiver->on_collision(collision(ptr->as_collision().a, ptr->as_collision().b));
+            receiver->on_collision(o);
           }
 
           _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
@@ -156,9 +158,12 @@ void eventmanager::update(float_t delta) noexcept {
 
       case static_cast<uint32_t>(type::mail): {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
+
         if (ptr) {
+          const auto& payload = ptr->as_mail();
+          const auto o = mail(payload.to, payload.body);
           for (const auto& receiver : _receivers) {
-            receiver->on_mail(mail(ptr->as_mail().to, ptr->as_mail().body));
+            receiver->on_mail(o);
           }
 
           _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
@@ -168,9 +173,11 @@ void eventmanager::update(float_t delta) noexcept {
       case static_cast<uint32_t>(type::timer): {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
 
-        std::invoke(ptr->as_timer().fn);
+        const auto& payload = ptr->as_timer();
 
-        if (!ptr->as_timer().repeat) {
+        std::invoke(payload.fn);
+
+        if (!payload.repeat) {
           _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
         }
       } break;

@@ -15,6 +15,7 @@ protected:
   template<typename... Args>
   void expand(size_t minimum) {
     const auto target = std::max(minimum, objects.empty() ? size_t(1) : objects.size() * 2);
+
     for (auto i = objects.size(); i < target; ++i) {
       objects.emplace_back(std::make_unique<T>());
     }

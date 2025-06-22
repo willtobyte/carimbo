@@ -6,8 +6,8 @@ void envelope::reset(uint64_t a, uint64_t b) noexcept {
   payload.emplace<collision_t>(a, b);
 }
 
-void envelope::reset(uint64_t to, std::string&& kind, std::string&& body) noexcept {
-  payload.emplace<mail_t>(to, std::move(kind), std::move(body));
+void envelope::reset(uint64_t to, const std::string& kind, const std::string& body) noexcept {
+  payload.emplace<mail_t>(to, kind, body);
 }
 
 void envelope::reset(bool repeat, std::function<void()>&& fn) noexcept {
