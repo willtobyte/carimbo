@@ -43,14 +43,14 @@ public:
   // void on_mouse_relese(float_t x, float_t y) const;
   void on_motion(float_t x, float_t y) const;
 
-  void set_onenter(std::function<void()> fn);
-  void set_onloop(std::function<void(float_t)> fn);
-  void set_onleave(std::function<void()> fn);
-  void set_ontouch(std::function<void(float_t, float_t)> fn);
-  void set_onkeypress(std::function<void(int32_t)> fn);
-  void set_onkeyrelease(std::function<void(int32_t)> fn);
-  void set_ontext(std::function<void(const std::string& )> fn);
-  void set_onmotion(std::function<void(float_t, float_t)> fn);
+  void set_onenter(std::function<void()>&& fn);
+  void set_onloop(std::function<void(float_t)>&& fn);
+  void set_onleave(std::function<void()>&& fn);
+  void set_ontouch(std::function<void(float_t, float_t)>&& fn);
+  void set_onkeypress(std::function<void(int32_t)>&& fn);
+  void set_onkeyrelease(std::function<void(int32_t)>&& fn);
+  void set_ontext(std::function<void(const std::string& )>&& fn);
+  void set_onmotion(std::function<void(float_t, float_t)>&& fn);
 
 private:
   std::shared_ptr<framework::objectmanager> _objectmanager;

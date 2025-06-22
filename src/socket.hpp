@@ -19,8 +19,8 @@ public:
   void connect();
 
   void emit(const std::string& topic, const std::string& data);
-  void on(const std::string& topic, std::function<void(const std::string& )> callback);
-  void rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )> callback);
+  void on(const std::string& topic, std::function<void(const std::string& )>&& callback);
+  void rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )>&& callback);
 
 #ifdef EMSCRIPTEN
   void handle_open(const EmscriptenWebSocketOpenEvent *event);

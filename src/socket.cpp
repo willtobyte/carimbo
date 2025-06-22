@@ -116,14 +116,14 @@ void socket::emit(const std::string& topic, const std::string& data) {
   send(fmt::format(fmt::runtime(R"json({"event": {"topic": "{}", "data": {}}})json"), topic, data));
 }
 
-void socket::on(const std::string& topic, std::function<void(const std::string& )> callback) {
+void socket::on(const std::string& topic, std::function<void(const std::string& )>&& callback) {
   send(fmt::format(R"json({{"subscribe": "{}"}})json", topic));
-  _callbacks[topic].emplace_back(callback);
+  _callbacks[topic].emplace_back(std::move(callback));
 }
 
-void socket::rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )> callback) {
+void socket::rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )>&& callback) {
   send(fmt::format(fmt::runtime(R"json({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})json"), ++counter, method, arguments));
-  _callbacks[method].emplace_back(callback);
+  _callbacks[method].emplace_back(std::move(callback));
 }
 
 #ifdef EMSCRIPTEN

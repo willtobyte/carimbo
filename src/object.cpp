@@ -257,35 +257,35 @@ bool object::intersects(const std::shared_ptr<object> other) const noexcept {
   );
 }
 
-void object::set_onupdate(std::function<void(std::shared_ptr<object>)> fn) {
+void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onupdate = std::move(fn);
 }
 
-void object::set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string& )> fn) {
+void object::set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
   _onanimationfinished = std::move(fn);
 }
 
-void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )> fn) {
+void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
   _onmail = std::move(fn);
 }
 
-void object::set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)> fn) {
+void object::set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)>&& fn) {
   _ontouch = std::move(fn);
 }
 
-void object::set_onhover(std::function<void(std::shared_ptr<object>)> fn) {
+void object::set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onhover = std::move(fn);
 }
 
-void object::set_onunhover(std::function<void(std::shared_ptr<object>)> fn) {
+void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onunhover = std::move(fn);
 }
 
-void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)> fn) {
+void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) {
   _collisionmapping.emplace(kind, std::move(fn));
 }
 
-void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)> fn) {
+void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)>&& fn) {
   _tickinmapping.emplace(n, std::move(fn));
 }
 
