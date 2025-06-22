@@ -16,7 +16,7 @@ protected:
 
   template<typename... Args>
   void expand(size_t minimum) {
-    const size_t target = std::max(minimum, _objects.empty() ? size_t(1) : _objects.size() * 2);
+    const auto target = std::max(minimum, _objects.empty() ? size_t(1) : _objects.size() * 2);
 
     _objects.reserve(target);
 
