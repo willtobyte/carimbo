@@ -3,14 +3,14 @@
 #include "common.hpp"
 
 namespace framework {
-struct collision_t {
+struct collision_t final {
   uint64_t a;
   uint64_t b;
 
   constexpr collision_t(uint64_t a, uint64_t b) noexcept : a(a), b(b) {}
 };
 
-struct mail_t {
+struct mail_t final {
   uint64_t to;
   std::string kind;
   std::string body;
@@ -19,7 +19,7 @@ struct mail_t {
     : to(to_), kind(kind), body(body) {}
 };
 
-struct timer_t {
+struct timer_t final {
   bool repeat;
   std::function<void()> fn;
 
