@@ -3,6 +3,7 @@
 #include "common.hpp"
 
 #include "kv.hpp"
+#include "rectangle.hpp"
 #include "reflection.hpp"
 #include "vector2d.hpp"
 
@@ -11,12 +12,22 @@ struct keyframe final {
   geometry::rectangle frame;
   geometry::point offset;
   uint64_t duration{0};
+
+  friend void from_json(const nlohmann::json& j, keyframe& o);
+};
+
+struct hitbox final {
+  std::optional<uint8_t> type;
+  std::bitset<256> reagents;
+  geometry::rectangle rectangle;
+
+  friend void from_json(const nlohmann::json& j, framework::hitbox& o);
 };
 
 struct animation final {
   bool oneshot{false};
   std::optional<std::string> next;
-  std::optional<geometry::rectangle> hitbox;
+  std::optional<hitbox> hitbox;
   std::shared_ptr<audio::soundfx> effect;
   std::vector<keyframe> keyframes;
 };

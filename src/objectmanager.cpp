@@ -1,4 +1,5 @@
 #include "objectmanager.hpp"
+
 #include "objectpool.hpp"
 
 using namespace framework;
@@ -60,21 +61,12 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     const auto& key = item.key();
     const auto& a = item.value();
     const auto oneshot = a.value("oneshot", false);
-    const auto hitbox = a.contains("hitbox") ? std::make_optional(a.at("hitbox").template get<geometry::rectangle>()) : std::nullopt;
+    const auto hitbox = a.contains("hitbox") ? std::make_optional(a.at("hitbox").template get<framework::hitbox>()) : std::nullopt;
     const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(fmt::format("blobs/{}{}/{}.ogg", scope ? scope->get() : "", scope ? "/" : "", a.at("effect").template get_ref<const std::string&>())) : nullptr;
     const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
+    const auto keyframes = a.at("frames").get<std::vector<framework::keyframe>>();
 
-    const auto& f = a.at("frames");
-    std::vector<keyframe> keyframes(f.size());
-    std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
-      return keyframe{
-          frame.at("rectangle").template get<geometry::rectangle>(),
-          frame.at("offset").template get<geometry::point>(),
-          frame.at("duration").template get<uint64_t>(),
-      };
-    });
-
-    animations.emplace(key, animation{oneshot, next, hitbox, effect, keyframes});
+    animations.emplace(key, animation{oneshot, next, hitbox, effect, std::move(keyframes)});
   }
 
   auto o = _objectpool->acquire();
@@ -163,45 +155,58 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::update(float_t delta) noexcept {
-  for (auto it = _objects.begin(); it != _objects.end(); ++it) {
-    const auto& o = *it;
-    o->update(delta);
+void objectmanager::update(float_t dt) noexcept {
+  const size_t n = _objects.size();
+  if (n < 2) [[unlikely]] return;
 
-    const auto aita = o->_animations.find(o->_action);
-    if (aita == o->_animations.end() || !aita->second.hitbox) [[likely]] {
-      continue;
-    }
+  size_t i = 0;
+  size_t j = 1;
+  const size_t pairs = n * (n - 1) / 2;
 
-    const auto& ha = *aita->second.hitbox;
-    const auto has = geometry::rectangle{o->position() + ha.position() * o->_scale, ha.size() * o->_scale};
-    for (auto jt = std::next(it); jt != _objects.end(); ++jt) {
-      const auto& b = *jt;
+  for (size_t k = 0; k < pairs; ++k) {
+    auto& a = _objects[i];
+    a->update(dt);
 
-      const auto aitb = b->_animations.find(b->_action);
-      if (aitb == b->_animations.end() || !aitb->second.hitbox) {
-        continue;
-      }
+    const auto ita = a->_animations.find(a->_action);
+    const bool has_ha = ita != a->_animations.end() && ita->second.hitbox;
+    const auto& ha = has_ha ? *ita->second.hitbox : framework::hitbox{};
+    const auto sa = a->_scale;
+    const auto pa = a->position() + ha.rectangle.position() * sa;
+    const auto sz_a = ha.rectangle.size() * sa;
+    const auto ra = geometry::rectangle{pa, sz_a};
 
-      const auto& hb = *aitb->second.hitbox;
-      const auto hbs = geometry::rectangle{b->position() + hb.position() * b->_scale, hb.size() * b->_scale};
-      if (hbs.x() > has.x() + has.width()) break;
-      if (hbs.y() > has.y() + has.height()) continue;
-      if (hbs.y() + hbs.height() < has.y()) continue;
-      if (!has.intersects(hbs)) continue;
+    auto& b = _objects[j];
+    const auto itb = b->_animations.find(b->_action);
+    const bool has_hb = itb != b->_animations.end() && itb->second.hitbox;
+    const auto& hb = has_hb ? *itb->second.hitbox : framework::hitbox{};
+    const auto sb = b->_scale;
+    const auto pb = b->position() + hb.rectangle.position() * sb;
+    const auto sz_b = hb.rectangle.size() * sb;
+    const auto rb = geometry::rectangle{pb, sz_b};
 
-      const auto caa = get_callback_or(o->_collisionmapping, b->kind(), std::nullopt);
-      const auto cab = get_callback_or(b->_collisionmapping, o->kind(), std::nullopt);
+    const bool valid = has_ha & has_hb;
+    const bool hit = valid & ra.intersects(rb);
+    const bool react =
+      (!ha.type || hb.reagents.test(ha.type.value())) ||
+      (!hb.type || ha.reagents.test(hb.type.value()));
 
-      if (caa) (*caa)(o, b);
-      if (cab) (*cab)(b, o);
+    const bool collide = hit & react;
+    if (collide) {
+      if (const auto ca = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt); ca) (*ca)(a, b);
+      if (const auto cb = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) (*cb)(b, a);
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
-      auto envelope = _envelopepool->acquire(collisionenvelope(o->id(), b->id()));
-      event.user.data1 = envelope.release();
-
+      event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
       SDL_PushEvent(&event);
+    }
+
+    ++j;
+    const bool end = j >= n;
+    if (end) {
+      ++i;
+      j = i + 1;
+      if (i >= n - 1) break;
     }
   }
 }
@@ -236,8 +241,8 @@ void objectmanager::on_mouse_press(const mouse::button& event) {
 
     const auto hitbox = geometry::rectangle
     {
-      o->_position + animation.hitbox->position() * o->_scale,
-      animation.hitbox->size() * o->_scale
+      o->_position + animation.hitbox->rectangle.position() * o->_scale,
+      animation.hitbox->rectangle.size() * o->_scale
     };
 
     if (!hitbox.contains(point)) {

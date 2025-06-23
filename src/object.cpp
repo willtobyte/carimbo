@@ -156,8 +156,11 @@ void object::draw() const noexcept {
 
 #ifdef HITBOX
   const auto debug = hitbox
-                         ? std::make_optional(geometry::rectangle{_position + hitbox->position(), hitbox->size() * _scale})
-                         : std::nullopt;
+    ? std::make_optional(geometry::rectangle{
+      _position + hitbox->rectangle.position(),
+      hitbox->rectangle.size() * _scale
+    })
+    : std::nullopt;
 #endif
 
   _spritesheet->draw(
@@ -246,13 +249,13 @@ bool object::intersects(const std::shared_ptr<object> other) const noexcept {
   }
 
   return geometry::rectangle(
-    position() + sit->second.hitbox->position() * _scale,
-    sit->second.hitbox->size() * _scale
+    position() + sit->second.hitbox->rectangle.position() * _scale,
+    sit->second.hitbox->rectangle.size() * _scale
   )
   .intersects(
     geometry::rectangle(
-      other->position() + oit->second.hitbox->position() * other->_scale,
-      oit->second.hitbox->size() * other->_scale
+      other->position() + oit->second.hitbox->rectangle.position() * other->_scale,
+      oit->second.hitbox->rectangle.size() * other->_scale
     )
   );
 }
@@ -308,7 +311,7 @@ void object::on_motion(float_t x, float_t y) {
   }
 
   const auto& animation = it->second;
-  const auto hitbox = geometry::rectangle{_position + animation.hitbox->position() * _scale, animation.hitbox->size() * _scale};
+  const auto hitbox = geometry::rectangle{_position + animation.hitbox->rectangle.position() * _scale, animation.hitbox->rectangle.size() * _scale};
   const bool inside = hitbox.contains(x, y);
   if (inside != _hover) {
     _hover = inside;
