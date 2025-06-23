@@ -156,7 +156,7 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
 }
 
 void objectmanager::update(float_t dt) noexcept {
-  for (const auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
+  for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
     auto& a = *itoa;
     a->update(dt);
 
@@ -171,7 +171,7 @@ void objectmanager::update(float_t dt) noexcept {
       ha.rectangle.size() * a->_scale
     );
 
-    for (const auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
+    for (auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
       auto& b = *itob;
 
       const auto itb = b->_animations.find(b->_action);
