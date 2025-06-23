@@ -156,57 +156,60 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
 }
 
 void objectmanager::update(float_t dt) noexcept {
-  const size_t n = _objects.size();
-  if (n < 2) [[unlikely]] return;
-
-  size_t i = 0;
-  size_t j = 1;
-  const size_t pairs = n * (n - 1) / 2;
-
-  for (size_t k = 0; k < pairs; ++k) {
-    auto& a = _objects[i];
+  for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
+    auto& a = *itoa;
     a->update(dt);
 
     const auto ita = a->_animations.find(a->_action);
-    const bool has_ha = ita != a->_animations.end() && ita->second.hitbox;
-    const auto& ha = has_ha ? *ita->second.hitbox : framework::hitbox{};
-    const auto sa = a->_scale;
-    const auto pa = a->position() + ha.rectangle.position() * sa;
-    const auto sz_a = ha.rectangle.size() * sa;
-    const auto ra = geometry::rectangle{pa, sz_a};
+    if (ita == a->_animations.end() || !ita->second.hitbox) {
+      continue;
+    }
 
-    auto& b = _objects[j];
-    const auto itb = b->_animations.find(b->_action);
-    const bool has_hb = itb != b->_animations.end() && itb->second.hitbox;
-    const auto& hb = has_hb ? *itb->second.hitbox : framework::hitbox{};
-    const auto sb = b->_scale;
-    const auto pb = b->position() + hb.rectangle.position() * sb;
-    const auto sz_b = hb.rectangle.size() * sb;
-    const auto rb = geometry::rectangle{pb, sz_b};
+    const auto& ha = *ita->second.hitbox;
+    const auto ra = geometry::rectangle(
+      a->position() + ha.rectangle.position() * a->_scale,
+      ha.rectangle.size() * a->_scale
+    );
 
-    const bool valid = has_ha & has_hb;
-    const bool hit = valid & ra.intersects(rb);
-    const bool react =
-      (!ha.type || hb.reagents.test(ha.type.value())) ||
-      (!hb.type || ha.reagents.test(hb.type.value()));
+    for (auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
+      auto& b = *itob;
 
-    const bool collide = hit & react;
-    if (collide) {
-      if (const auto ca = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt); ca) (*ca)(a, b);
-      if (const auto cb = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) (*cb)(b, a);
+      const auto itb = b->_animations.find(b->_action);
+      if (itb == b->_animations.end() || !itb->second.hitbox) {
+        continue;
+      }
+
+      const auto& hb = *itb->second.hitbox;
+
+      const bool react =
+        (!ha.type || hb.reagents.test(ha.type.value())) ||
+        (!hb.type || ha.reagents.test(hb.type.value()));
+
+      if (!react) {
+        continue;
+      }
+
+      const auto rb = geometry::rectangle(
+        b->position() + hb.rectangle.position() * b->_scale,
+        hb.rectangle.size() * b->_scale
+      );
+
+      if (!ra.intersects(rb)) {
+        continue;
+      }
+
+      if (const auto ca = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt); ca) {
+        (*ca)(a, b);
+      }
+
+      if (const auto cb = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) {
+        (*cb)(b, a);
+      }
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(type::collision);
       event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
       SDL_PushEvent(&event);
-    }
-
-    ++j;
-    const bool end = j >= n;
-    if (end) {
-      ++i;
-      j = i + 1;
-      if (i >= n - 1) break;
     }
   }
 }
