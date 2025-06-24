@@ -141,6 +141,12 @@ inline void run(void *userdata) {
 void engine::run() {
   // XXX temporary
   _tilemap = std::make_shared<tilemap>(_renderer, _resourcemanager, "foobar");
+  const std::string s = "babyroom";
+  const auto o = _objectmanager->create("bear", std::optional<std::reference_wrapper<const std::string>>(s), true);
+  o->set_placement(240, 135);
+  o->set_action("default");
+  _tilemap->set_target(o);
+  // XXX temporaruy
 
 #ifdef EMSCRIPTEN
   emscripten_set_main_loop_arg(::run<engine>, this, 0, true);
@@ -163,6 +169,7 @@ void engine::_loop() {
 
   _eventmanager->update(delta);
   _overlay->update(delta);
+  _tilemap->update(delta); // XXX temporary
   _scenemanager->update(delta);
   _objectmanager->update(delta);
 
@@ -180,10 +187,10 @@ void engine::_loop() {
 
   _renderer->begin();
   _scenemanager->draw();
+  _tilemap->draw(); // XXX temporary
   _objectmanager->draw();
   _canvas->draw();
   _overlay->draw();
-  _tilemap->draw(); // XXX temporary
   _renderer->end();
 
   for (const auto& observer : _observers) {

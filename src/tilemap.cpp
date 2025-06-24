@@ -26,16 +26,22 @@ tilemap::tilemap(
   _tileset = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
 
   _layers = {
-    {1, 0, 0, 1, 0, 1, 0, 1},
-    {1, 0, 1, 0, 1, 0, 1, 0},
-    {1, 0, 1, 0, 1, 0, 1, 0},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+
   };
 
-  if (!_tileset) {
-    return;
-  }
-
-  const auto tiles_per_row = static_cast<uint32_t>(_tileset->width() / _tilesize);
+  const auto tiles_per_row = static_cast<uint32_t>(static_cast<float_t>(_tileset->width()) / _tilesize);
 
   static constexpr const auto max_index = 255u;
 
@@ -51,21 +57,19 @@ tilemap::tilemap(
 void tilemap::update(float_t delta) noexcept {
   UNUSED(delta);
 
-  if (!_target || !_tileset) {
+  if (!_target || !_tileset) [[unlikely]] {
     return;
   }
 
-  constexpr auto smooth = 3.0f;
   const auto position = _target->position();
   const auto vw = _view.width();
   const auto vh = _view.height();
-  const auto dx = position.x() - vw * 0.5f;
-  const auto dy = position.y() - vh * 0.5f;
-  const auto damping = 1.0f - std::exp(-smooth * delta);
+
+  std::cout << "Target: (" << position.x() << ", " << position.y() << ")\n";
 
   _view.set_position({
-    _view.x() + (dx - _view.x()) * damping,
-    _view.y() + (dy - _view.y()) * damping
+    position.x() - vw * 0.5f,
+    position.y() - vh * 0.5f
   });
 }
 
@@ -74,35 +78,49 @@ void tilemap::draw() const noexcept {
     return;
   }
 
-  const auto view_x0 = _view.x();
-  const auto view_y0 = _view.y();
-  const auto view_x1 = view_x0 + _view.width();
-  const auto view_y1 = view_y0 + _view.height();
+  const float view_x0 = _view.x();
+  const float view_y0 = _view.y();
+  const float view_x1 = view_x0 + _view.width();
+  const float view_y1 = view_y0 + _view.height();
 
   const size_t map_height_tiles = _layers.size();
 
-  for (auto y = 0u; y < map_height_tiles; ++y) {
+  for (size_t y = 0; y < map_height_tiles; ++y) {
     const size_t map_width_tiles = _layers[y].size();
-    const float dest_y = static_cast<float_t>(y) * _tilesize;
 
-    if (dest_y + _tilesize < view_y0 || dest_y > view_y1) [[likely]] {
-      continue;
-    }
+    for (size_t x = 0; x < map_width_tiles; ++x) {
+      const float tile_x = static_cast<float_t>(x) * _tilesize;
+      const float tile_y = static_cast<float_t>(y) * _tilesize;
 
-    for (auto x = 0u; x < map_width_tiles; ++x) {
-      const float dest_x = static_cast<float_t>(x) * _tilesize;
-
-      if (dest_x + _tilesize < view_x0 || dest_x > view_x1) [[likely]] {
+      if (tile_x + _tilesize < view_x0) [[likely]] {
         continue;
       }
 
-      const auto index = _layers[y][x];
+      if (tile_x > view_x1) [[likely]] {
+        continue;
+      }
+
+      if (tile_y + _tilesize < view_y0) [[likely]] {
+        continue;
+      }
+
+      if (tile_y > view_y1) [[likely]] {
+        continue;
+      }
+
+      const uint32_t index = _layers[y][x];
       if (index >= _tile_sources.size()) [[unlikely]] {
         continue;
       }
 
       const auto& source = _tile_sources[index];
-      const geometry::rectangle destination{ {dest_x, dest_y}, {_tilesize, _tilesize} };
+      const auto screen_x = tile_x - view_x0;
+      const auto screen_y = tile_y - view_y0;
+
+      const geometry::rectangle destination{
+        {screen_x, screen_y},
+        {_tilesize, _tilesize}
+      };
 
       _tileset->draw(source, destination);
     }
@@ -110,5 +128,9 @@ void tilemap::draw() const noexcept {
 }
 
 void tilemap::set_target(std::shared_ptr<object> object) {
+  if (!object) [[unlikely]] {
+    return;
+  }
+
   _target = std::move(object);
 }
