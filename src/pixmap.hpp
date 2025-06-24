@@ -28,8 +28,15 @@ public:
 
   operator SDL_Texture *() const noexcept;
 
+  int32_t width() const noexcept;
+
+  int32_t height() const noexcept;
+
 private:
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;
+
+  int32_t _width;
+  int32_t _height;
 };
 }

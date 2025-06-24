@@ -139,6 +139,9 @@ inline void run(void *userdata) {
 #endif
 
 void engine::run() {
+  // XXX temporary
+  _tilemap = std::make_shared<tilemap>(_renderer, _resourcemanager, "foobar");
+
 #ifdef EMSCRIPTEN
   emscripten_set_main_loop_arg(::run<engine>, this, 0, true);
 #else
@@ -180,6 +183,7 @@ void engine::_loop() {
   _objectmanager->draw();
   _canvas->draw();
   _overlay->draw();
+  _tilemap->draw(); // XXX temporary
   _renderer->end();
 
   for (const auto& observer : _observers) {

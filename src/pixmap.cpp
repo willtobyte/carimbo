@@ -28,13 +28,15 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& filename)
     throw std::runtime_error(fmt::format("[spng_decode_image] error while decoding image: {}, error: {}", filename, spng_strerror(error)));
   }
 
+  _width = static_cast<int32_t>(ihdr.width);
+  _height = static_cast<int32_t>(ihdr.height);
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
         *_renderer,
         SDL_PIXELFORMAT_ABGR8888,
         SDL_TEXTUREACCESS_STATIC,
-        static_cast<int32_t>(ihdr.width),
-        static_cast<int32_t>(ihdr.height)
+        _width,
+        _height
       ),
       SDL_Deleter{}
   );
@@ -85,4 +87,12 @@ void pixmap::draw(
 
 pixmap::operator SDL_Texture *() const noexcept {
   return _texture.get();
+}
+
+int32_t pixmap::width() const noexcept {
+  return _width;
+}
+
+int32_t pixmap::height() const noexcept {
+  return _height;
 }

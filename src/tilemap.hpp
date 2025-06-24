@@ -20,9 +20,9 @@ class tilemap final {
     void set_target(std::shared_ptr<object> object);
 
   private:
-    std::shared_ptr<resourcemanager> _resourcemanager;
     std::shared_ptr<graphics::pixmap> _tileset;
-    uint8_t _qsize;
+    std::vector<std::vector<uint8_t>> _layers;
+    float_t _tilesize;
 
     std::shared_ptr<object> _target;
     geometry::rectangle _view;

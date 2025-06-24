@@ -18,6 +18,7 @@
 #include "soundmanager.hpp"
 #include "statemanager.hpp"
 #include "timermanager.hpp"
+#include "tilemap.hpp"
 #include "window.hpp"
 
 namespace framework {
@@ -81,5 +82,8 @@ private:
   std::vector<std::shared_ptr<lifecycleobserver>> _observers;
   std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();
   std::shared_ptr<framework::timermanager> _timermanager = std::make_shared<framework::timermanager>();
+
+  // XXX temporary
+  std::shared_ptr<tilemap> _tilemap;
 };
 }
