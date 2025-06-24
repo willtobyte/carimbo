@@ -20,23 +20,32 @@ tilemap::tilemap(
   const auto width = static_cast<float_t>(lw) / sx;
   const auto height = static_cast<float_t>(lh) / sy;
 
-  _view = {
-    .0f,
-    .0f,
-    width,
-    height
-  };
-
+  _view = { .0f, .0f, width, height };
   _tilesize = 16.f;
 
   _tileset = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
 
   _layers = {
-    {1, 0, 0, 1},
-    {1, 0, 1, 0},
-    {0, 1, 0, 1},
-    {1, 0, 1, 0}
+    {1, 0, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0},
+    {1, 0, 1, 0, 1, 0, 1, 0},
   };
+
+  if (!_tileset) {
+    return;
+  }
+
+  const auto tiles_per_row = static_cast<uint32_t>(_tileset->width() / _tilesize);
+
+  static constexpr const auto max_index = 255u;
+
+  _tile_sources.resize(max_index + 1);
+  for (auto i = 0u; i <= max_index; ++i) {
+    const float src_x = static_cast<float_t>(i % tiles_per_row) * _tilesize;
+    const float src_y = (static_cast<float_t>(i) / static_cast<float_t>(tiles_per_row)) * _tilesize;
+
+    _tile_sources[i] = geometry::rectangle{ {src_x, src_y}, {_tilesize, _tilesize} };
+  }
 }
 
 void tilemap::update(float_t delta) noexcept {
@@ -61,38 +70,41 @@ void tilemap::update(float_t delta) noexcept {
 }
 
 void tilemap::draw() const noexcept {
-  if (!_tileset) {
+  if (!_tileset) [[unlikely]] {
     return;
   }
 
-  const auto tiles_per_row = static_cast<uint32_t>(static_cast<float_t>(_tileset->width()) / _tilesize);
+  const auto view_x0 = _view.x();
+  const auto view_y0 = _view.y();
+  const auto view_x1 = view_x0 + _view.width();
+  const auto view_y1 = view_y0 + _view.height();
 
-  auto calc = [&](size_t coordinate) -> auto {
-    return static_cast<float_t>(coordinate) * _tilesize;
-  };
+  const size_t map_height_tiles = _layers.size();
 
-  for (const auto& layer : _layers) {
-    const size_t map_height_tiles = _layers.size();
-    const size_t map_width_tiles = layer.size();
+  for (auto y = 0u; y < map_height_tiles; ++y) {
+    const size_t map_width_tiles = _layers[y].size();
+    const float dest_y = static_cast<float_t>(y) * _tilesize;
 
-    for (size_t y = 0; y < map_height_tiles; ++y) {
-      for (size_t x = 0; x < map_width_tiles; ++x) {
-        const auto index = _layers[y][x];
-        const auto src_x = static_cast<float_t>(index % tiles_per_row) * _tilesize;
-        const auto src_y = (static_cast<float_t>(index) / static_cast<float_t>(tiles_per_row)) * _tilesize;
+    if (dest_y + _tilesize < view_y0 || dest_y > view_y1) [[likely]] {
+      continue;
+    }
 
-        const geometry::rectangle source{
-          {src_x, src_y},
-          {_tilesize, _tilesize}
-        };
+    for (auto x = 0u; x < map_width_tiles; ++x) {
+      const float dest_x = static_cast<float_t>(x) * _tilesize;
 
-        const geometry::rectangle destination{
-          {calc(x), calc(y)},
-          {_tilesize, _tilesize}
-        };
-
-        _tileset->draw(source, destination);
+      if (dest_x + _tilesize < view_x0 || dest_x > view_x1) [[likely]] {
+        continue;
       }
+
+      const auto index = _layers[y][x];
+      if (index >= _tile_sources.size()) [[unlikely]] {
+        continue;
+      }
+
+      const auto& source = _tile_sources[index];
+      const geometry::rectangle destination{ {dest_x, dest_y}, {_tilesize, _tilesize} };
+
+      _tileset->draw(source, destination);
     }
   }
 }
