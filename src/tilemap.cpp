@@ -65,12 +65,10 @@ void tilemap::draw() const noexcept {
     return;
   }
 
-  const auto tiles_per_row = static_cast<uint32_t>(
-    static_cast<float_t>(_tileset->width()) / _tilesize
-  );
+  const auto tiles_per_row = static_cast<uint32_t>(static_cast<float_t>(_tileset->width()) / _tilesize);
 
-  auto tile_pos = [this](size_t coord) -> float_t {
-    return static_cast<float_t>(coord) * _tilesize;
+  auto calc = [&](size_t coordinate) -> auto {
+    return static_cast<float_t>(coordinate) * _tilesize;
   };
 
   for (const auto& layer : _layers) {
@@ -89,7 +87,7 @@ void tilemap::draw() const noexcept {
         };
 
         const geometry::rectangle destination{
-          {tile_pos(x), tile_pos(y)},
+          {calc(x), calc(y)},
           {_tilesize, _tilesize}
         };
 
