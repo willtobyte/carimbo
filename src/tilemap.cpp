@@ -32,7 +32,7 @@ tilemap::tilemap(
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 2, 2, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
@@ -42,15 +42,16 @@ tilemap::tilemap(
   };
 
   const auto tiles_per_row = static_cast<uint32_t>(static_cast<float_t>(_tileset->width()) / _tilesize);
-
   static constexpr const auto max_index = 255u;
 
   _tile_sources.resize(max_index + 1);
-  for (auto i = 0u; i <= max_index; ++i) {
-    const float src_x = static_cast<float_t>(i % tiles_per_row) * _tilesize;
-    const float src_y = (static_cast<float_t>(i) / static_cast<float_t>(tiles_per_row)) * _tilesize;
+  _tile_sources[0] = geometry::rectangle{ {-1.f, -1.f}, {0.f, 0.f} };
+  for (auto i = 1u; i <= max_index; ++i) {
+    const uint32_t zbi = i - 1;
 
-    _tile_sources[i] = geometry::rectangle{ {src_x, src_y}, {_tilesize, _tilesize} };
+    const float src_x = static_cast<float_t>(zbi % tiles_per_row) * _tilesize;
+    const float src_y = static_cast<float_t>(static_cast<float_t>(zbi) / tiles_per_row) * _tilesize;
+    _tile_sources[i] = geometry::rectangle{{src_x, src_y}, {_tilesize, _tilesize}};
   }
 }
 
@@ -109,6 +110,11 @@ void tilemap::draw() const noexcept {
       }
 
       const uint32_t index = _layers[y][x];
+
+      if (!index) {
+        continue;
+      }
+
       if (index >= _tile_sources.size()) [[unlikely]] {
         continue;
       }
