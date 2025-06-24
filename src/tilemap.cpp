@@ -27,10 +27,6 @@ tilemap::tilemap(
     height
   };
 
-  // const auto& filename = fmt::format("tilemaps/{}.json", name);
-  // const auto& buffer = storage::io::read(filename);
-  // const auto& j = nlohmann::json::parse(buffer);
-
   _tilesize = 16.f;
 
   _tileset = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
@@ -41,7 +37,6 @@ tilemap::tilemap(
     {0, 1, 0, 1},
     {1, 0, 1, 0}
   };
-  // UNUSED(j);
 }
 
 void tilemap::update(float_t delta) noexcept {
@@ -51,7 +46,7 @@ void tilemap::update(float_t delta) noexcept {
     return;
   }
 
-  const constexpr auto smooth = 3.0f;
+  constexpr auto smooth = 3.0f;
   const auto position = _target->position();
   const auto vw = _view.width();
   const auto vh = _view.height();
@@ -70,7 +65,13 @@ void tilemap::draw() const noexcept {
     return;
   }
 
-  const auto tiles_per_row = static_cast<uint32_t>(_tileset->width() / _tilesize);
+  const auto tiles_per_row = static_cast<uint32_t>(
+    static_cast<float_t>(_tileset->width()) / _tilesize
+  );
+
+  auto tile_pos = [this](size_t coord) -> float_t {
+    return static_cast<float_t>(coord) * _tilesize;
+  };
 
   for (const auto& layer : _layers) {
     const size_t map_height_tiles = _layers.size();
@@ -88,7 +89,7 @@ void tilemap::draw() const noexcept {
         };
 
         const geometry::rectangle destination{
-          {x * _tilesize, y * _tilesize},
+          {tile_pos(x), tile_pos(y)},
           {_tilesize, _tilesize}
         };
 
