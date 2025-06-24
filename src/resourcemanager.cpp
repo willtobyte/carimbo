@@ -19,12 +19,6 @@ handlers = {
                 audio::soundmanager& sound,
                 graphics::fontfactory&) {
        sound.get(filename);
-    }},
-      {".json", [](const std::string& filename,
-                 graphics::pixmappool&,
-                 audio::soundmanager&,
-                 graphics::fontfactory& font) {
-       font.get(filename);
     }}
 };
 

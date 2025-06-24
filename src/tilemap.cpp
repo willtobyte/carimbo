@@ -36,10 +36,10 @@ tilemap::tilemap(
   _tileset = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
 
   _layers = {
-    {1, 1, 1, 1},
+    {1, 0, 0, 1},
     {1, 0, 1, 0},
     {0, 1, 0, 1},
-    {0, 0, 0, 0}
+    {1, 0, 1, 0}
   };
   // UNUSED(j);
 }
