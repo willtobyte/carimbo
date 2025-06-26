@@ -40,13 +40,13 @@ tilemap::tilemap(
     {1, 0, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 1},
   };
 
-  const uint32_t tiles_per_row = _tileset->width() / static_cast<uint32_t>(_tilesize);
-  static constexpr uint32_t max_index = 255;
+  const auto tiles_per_row = static_cast<uint32_t>(_tileset->width()) / static_cast<uint32_t>(_tilesize);
+  static constexpr auto max_index = std::numeric_limits<uint16_t>::max();
 
   _tile_sources.resize(max_index + 1);
   _tile_sources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
 
-  for (uint32_t i = 1; i <= max_index; ++i) {
+  for (uint16_t i = 1; i <= max_index; ++i) {
     const uint32_t zbi = i - 1;
     const float_t src_x = (zbi % tiles_per_row) * _tilesize;
     const float_t src_y = (zbi / static_cast<float_t>(tiles_per_row)) * _tilesize;
