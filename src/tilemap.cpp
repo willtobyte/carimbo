@@ -74,9 +74,9 @@ void tilemap::draw() const noexcept {
   const auto view_x1 = view_x0 + _view.width();
   const auto view_y1 = view_y0 + _view.height();
 
-  const auto map_height_tiles = _layers.size();
+  const auto mht = _layers.size();
 
-  for (size_t y = 0; y < map_height_tiles; ++y) {
+  for (size_t y = 0; y < mht; ++y) {
     const auto mwt = _layers[y].size();
 
     for (size_t x = 0; x < mwt; ++x) {
