@@ -18,7 +18,7 @@ class tilemap final {
 
   private:
     std::shared_ptr<graphics::pixmap> _tileset;
-    std::vector<geometry::rectangle> _tile_sources;
+    std::vector<geometry::rectangle> _tilesources;
     float_t _tilesize;
     std::vector<std::vector<uint16_t>> _layers;
     std::shared_ptr<object> _target;

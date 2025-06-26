@@ -41,17 +41,17 @@ tilemap::tilemap(
   };
 
   const auto tiles_per_row = static_cast<uint32_t>(_tileset->width()) / static_cast<uint32_t>(_tilesize);
+
   static constexpr auto max_index = std::numeric_limits<uint16_t>::max();
 
-  _tile_sources.resize(max_index + 1);
-  _tile_sources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
-
+  _tilesources.resize(max_index + 1);
+  _tilesources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const uint32_t zbi = i - 1;
     const float_t src_x = (zbi % tiles_per_row) * _tilesize;
     const float_t src_y = (zbi / static_cast<float_t>(tiles_per_row)) * _tilesize;
 
-    _tile_sources[i] = geometry::rectangle{{src_x, src_y}, {_tilesize, _tilesize}};
+    _tilesources[i] = geometry::rectangle{{src_x, src_y}, {_tilesize, _tilesize}};
   }
 }
 
@@ -94,9 +94,9 @@ void tilemap::draw() const noexcept {
       if (tile_y > view_y1) [[likely]] continue;
 
       const uint32_t index = _layers[y][x];
-      if (!index || index >= _tile_sources.size()) [[unlikely]] continue;
+      if (!index || index >= _tilesources.size()) [[unlikely]] continue;
 
-      const auto& source = _tile_sources[index];
+      const auto& source = _tilesources[index];
       const float screen_x = tile_x - view_x0;
       const float screen_y = tile_y - view_y0;
 
