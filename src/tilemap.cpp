@@ -1,14 +1,8 @@
 #include "tilemap.hpp"
-#include <cstdint>
 
 using namespace framework;
 
-tilemap::tilemap(
-  std::shared_ptr<graphics::renderer> renderer,
-  std::shared_ptr<resourcemanager> resourcemanager,
-  const std::string& name
-) {
-  UNUSED(resourcemanager);
+tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string& name) {
   UNUSED(name);
 
   int32_t lw, lh;
@@ -22,9 +16,9 @@ tilemap::tilemap(
   const auto height = static_cast<float_t>(lh) / sy;
 
   _view = { .0f, .0f, width, height };
-  _tilesize = 16.f;
+  _size = 16.f;
 
-  _tileset = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
+  _pixmap = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
 
   _layers = {
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
@@ -41,25 +35,25 @@ tilemap::tilemap(
     {1, 0, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 1},
   };
 
-  const auto tiles_per_row = static_cast<uint32_t>(_tileset->width()) / static_cast<uint32_t>(_tilesize);
+  const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_size);
 
   static constexpr auto max_index = std::numeric_limits<uint8_t>::max();
 
-  _tilesources.resize(max_index + 1);
-  _tilesources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
+  _sources.resize(max_index + 1);
+  _sources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const auto zbi = static_cast<uint32_t>(i - 1);
-    const auto src_x = (zbi % tiles_per_row) * _tilesize;
-    const auto src_y = (static_cast<float_t>(zbi) / static_cast<float_t>(tiles_per_row)) * _tilesize;
+    const auto src_x = (zbi % tiles_per_row) * _size;
+    const auto src_y = (static_cast<float_t>(zbi) / static_cast<float_t>(tiles_per_row)) * _size;
 
-    _tilesources[i] = geometry::rectangle{{src_x, src_y}, {_tilesize, _tilesize}};
+    _sources[i] = geometry::rectangle{{src_x, src_y}, {_size, _size}};
   }
 }
 
 void tilemap::update(float_t delta) noexcept {
   UNUSED(delta);
 
-  if (!_target || !_tileset) [[unlikely]] {
+  if (!_target) [[unlikely]] {
     return;
   }
 
@@ -71,7 +65,7 @@ void tilemap::update(float_t delta) noexcept {
 }
 
 void tilemap::draw() const noexcept {
-  if (!_tileset) [[unlikely]] {
+  if (!_pixmap) [[unlikely]] {
     return;
   }
 
@@ -86,24 +80,24 @@ void tilemap::draw() const noexcept {
     const size_t map_width_tiles = _layers[y].size();
 
     for (size_t x = 0; x < map_width_tiles; ++x) {
-      const float tile_x = x * _tilesize;
-      const float tile_y = y * _tilesize;
+      const float tile_x = x * _size;
+      const float tile_y = y * _size;
 
-      if (tile_x + _tilesize < view_x0) [[likely]] continue;
+      if (tile_x + _size < view_x0) [[likely]] continue;
       if (tile_x > view_x1) [[likely]] continue;
-      if (tile_y + _tilesize < view_y0) [[likely]] continue;
+      if (tile_y + _size < view_y0) [[likely]] continue;
       if (tile_y > view_y1) [[likely]] continue;
 
       const uint32_t index = _layers[y][x];
-      if (!index || index >= _tilesources.size()) [[unlikely]] continue;
+      if (!index || index >= _sources.size()) [[unlikely]] continue;
 
-      const auto& source = _tilesources[index];
+      const auto& source = _sources[index];
       const auto screen_x = tile_x - view_x0;
       const auto screen_y = tile_y - view_y0;
 
-      const geometry::rectangle destination{{screen_x, screen_y}, {_tilesize, _tilesize}};
+      const geometry::rectangle destination{{screen_x, screen_y}, {_size, _size}};
 
-      _tileset->draw(source, destination);
+      _pixmap->draw(source, destination);
     }
   }
 }

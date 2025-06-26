@@ -17,9 +17,9 @@ class tilemap final {
     void set_target(std::shared_ptr<object> object);
 
   private:
-    std::shared_ptr<graphics::pixmap> _tileset;
-    std::vector<geometry::rectangle> _tilesources;
-    float_t _tilesize;
+    std::shared_ptr<graphics::pixmap> _pixmap;
+    std::vector<geometry::rectangle> _sources;
+    float_t _size;
     std::vector<std::vector<uint8_t>> _layers;
     std::shared_ptr<object> _target;
     geometry::rectangle _view;
