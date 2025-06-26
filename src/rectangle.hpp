@@ -20,9 +20,11 @@ public:
   float_t width() const noexcept;
   float_t height() const noexcept;
 
+  void set_position(float_t x, float_t y) noexcept;
   void set_position(const geometry::point& position) noexcept;
   geometry::point position() const noexcept;
 
+  void set_size(float_t width, float_t height) noexcept;
   void set_size(const geometry::size& size) noexcept;
   geometry::size size() const noexcept;
 

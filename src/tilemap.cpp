@@ -37,7 +37,7 @@ tilemap::tilemap(
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
-    {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 0, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 1},
 
   };
 
@@ -66,12 +66,10 @@ void tilemap::update(float_t delta) noexcept {
   const auto vw = _view.width();
   const auto vh = _view.height();
 
-  std::cout << "Target: (" << position.x() << ", " << position.y() << ")\n";
-
-  _view.set_position({
+  _view.set_position(
     position.x() - vw * 0.5f,
     position.y() - vh * 0.5f
-  });
+  );
 }
 
 void tilemap::draw() const noexcept {

@@ -8,6 +8,10 @@ rectangle::rectangle(float_t x, float_t y, float_t w, float_t h) noexcept
 rectangle::rectangle(const point& position, const class geometry::size& size) noexcept
   : _position(position), _size(size) {}
 
+void rectangle::set_position(float_t x, float_t y) noexcept {
+  _position = {x, y};
+}
+
 void rectangle::set_position(const point& position) noexcept {
   _position = position;
 }
@@ -30,6 +34,10 @@ float_t rectangle::width() const noexcept {
 
 float_t rectangle::height() const noexcept {
   return _size.height();
+}
+
+void rectangle::set_size(float_t width, float_t height) noexcept {
+  _size = { width, height };
 }
 
 void rectangle::set_size(const geometry::size& size) noexcept {
