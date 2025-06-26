@@ -77,9 +77,9 @@ void tilemap::draw() const noexcept {
   const auto map_height_tiles = _layers.size();
 
   for (size_t y = 0; y < map_height_tiles; ++y) {
-    const size_t map_width_tiles = _layers[y].size();
+    const auto mwt = _layers[y].size();
 
-    for (size_t x = 0; x < map_width_tiles; ++x) {
+    for (size_t x = 0; x < mwt; ++x) {
       const auto tile_x = static_cast<float_t>(x) * _size;
       const auto tile_y = static_cast<float_t>(y) * _size;
 
