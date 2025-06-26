@@ -43,7 +43,7 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   _sources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const auto zbi = static_cast<uint32_t>(i - 1);
-    const auto src_x = (zbi % tiles_per_row) * _size;
+    const auto src_x = static_cast<float_t>(zbi % tiles_per_row) * _size;
     const auto src_y = (static_cast<float_t>(zbi) / static_cast<float_t>(tiles_per_row)) * _size;
 
     _sources[i] = geometry::rectangle{{src_x, src_y}, {_size, _size}};
@@ -80,8 +80,8 @@ void tilemap::draw() const noexcept {
     const size_t map_width_tiles = _layers[y].size();
 
     for (size_t x = 0; x < map_width_tiles; ++x) {
-      const float tile_x = x * _size;
-      const float tile_y = y * _size;
+      const auto tile_x = static_cast<float_t>(x) * _size;
+      const auto tile_y = static_cast<float_t>(y) * _size;
 
       if (tile_x + _size < view_x0) [[likely]] continue;
       if (tile_x > view_x1) [[likely]] continue;
