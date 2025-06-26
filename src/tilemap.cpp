@@ -88,7 +88,7 @@ void tilemap::draw() const noexcept {
       if (tile_y + _size < view_y0) [[likely]] continue;
       if (tile_y > view_y1) [[likely]] continue;
 
-      const uint32_t index = _layers[y][x];
+      const auto index = _layers[y][x];
       if (!index || index >= _sources.size()) [[unlikely]] continue;
 
       const auto& source = _sources[index];
