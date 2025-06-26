@@ -50,7 +50,7 @@ tilemap::tilemap(
     const uint32_t zbi = i - 1;
 
     const float src_x = static_cast<float_t>(zbi % tiles_per_row) * _tilesize;
-    const float src_y = static_cast<float_t>(static_cast<float_t>(zbi) / tiles_per_row) * _tilesize;
+    const float src_y = (static_cast<float>(zbi) / static_cast<float>(tiles_per_row)) * _tilesize;
     _tile_sources[i] = geometry::rectangle{{src_x, src_y}, {_tilesize, _tilesize}};
   }
 }
