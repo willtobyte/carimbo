@@ -94,7 +94,7 @@ void tilemap::draw() const noexcept {
       if (tile_y > view_y1) [[likely]] continue;
 
       const uint32_t index = _layers[y][x];
-      if (!index || index >= _tile_sources.size()) continue;
+      if (!index || index >= _tile_sources.size()) [[unlikely]] continue;
 
       const auto& source = _tile_sources[index];
       const float screen_x = tile_x - view_x0;
