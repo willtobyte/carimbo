@@ -17,8 +17,8 @@ tilemap::tilemap(
   float_t sx, sy;
   SDL_GetRenderScale(*renderer, &sx, &sy);
 
-  const auto width = static_cast<float_t>(lw) / sx;
-  const auto height = static_cast<float_t>(lh) / sy;
+  const float_t width = lw / sx;
+  const float_t height = lh / sy;
 
   _view = { .0f, .0f, width, height };
   _tilesize = 16.f;
@@ -38,19 +38,19 @@ tilemap::tilemap(
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1},
     {1, 0, 0, 1, 0, 1, 0, 1, 2, 2, 2, 2, 1},
-
   };
 
-  const auto tiles_per_row = static_cast<uint32_t>(static_cast<float_t>(_tileset->width()) / _tilesize);
-  static constexpr const auto max_index = 255u;
+  const uint32_t tiles_per_row = _tileset->width() / static_cast<uint32_t>(_tilesize);
+  static constexpr uint32_t max_index = 255;
 
   _tile_sources.resize(max_index + 1);
-  _tile_sources[0] = geometry::rectangle{ {-1.f, -1.f}, {0.f, 0.f} };
-  for (auto i = 1u; i <= max_index; ++i) {
-    const uint32_t zbi = i - 1;
+  _tile_sources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
 
-    const float src_x = static_cast<float_t>(zbi % tiles_per_row) * _tilesize;
-    const float src_y = (static_cast<float>(zbi) / static_cast<float>(tiles_per_row)) * _tilesize;
+  for (uint32_t i = 1; i <= max_index; ++i) {
+    const uint32_t zbi = i - 1;
+    const float_t src_x = (zbi % tiles_per_row) * _tilesize;
+    const float_t src_y = (zbi / static_cast<float_t>(tiles_per_row)) * _tilesize;
+
     _tile_sources[i] = geometry::rectangle{{src_x, src_y}, {_tilesize, _tilesize}};
   }
 }
@@ -63,13 +63,10 @@ void tilemap::update(float_t delta) noexcept {
   }
 
   const auto position = _target->position();
-  const auto vw = _view.width();
-  const auto vh = _view.height();
+  const float_t vw = _view.width();
+  const float_t vh = _view.height();
 
-  _view.set_position(
-    position.x() - vw * 0.5f,
-    position.y() - vh * 0.5f
-  );
+  _view.set_position(position.x() - vw * 0.5f, position.y() - vh * 0.5f);
 }
 
 void tilemap::draw() const noexcept {
@@ -88,53 +85,28 @@ void tilemap::draw() const noexcept {
     const size_t map_width_tiles = _layers[y].size();
 
     for (size_t x = 0; x < map_width_tiles; ++x) {
-      const float tile_x = static_cast<float_t>(x) * _tilesize;
-      const float tile_y = static_cast<float_t>(y) * _tilesize;
+      const float tile_x = x * _tilesize;
+      const float tile_y = y * _tilesize;
 
-      if (tile_x + _tilesize < view_x0) [[likely]] {
-        continue;
-      }
-
-      if (tile_x > view_x1) [[likely]] {
-        continue;
-      }
-
-      if (tile_y + _tilesize < view_y0) [[likely]] {
-        continue;
-      }
-
-      if (tile_y > view_y1) [[likely]] {
-        continue;
-      }
+      if (tile_x + _tilesize < view_x0) [[likely]] continue;
+      if (tile_x > view_x1) [[likely]] continue;
+      if (tile_y + _tilesize < view_y0) [[likely]] continue;
+      if (tile_y > view_y1) [[likely]] continue;
 
       const uint32_t index = _layers[y][x];
-
-      if (!index) {
-        continue;
-      }
-
-      if (index >= _tile_sources.size()) [[unlikely]] {
-        continue;
-      }
+      if (!index || index >= _tile_sources.size()) continue;
 
       const auto& source = _tile_sources[index];
-      const auto screen_x = tile_x - view_x0;
-      const auto screen_y = tile_y - view_y0;
+      const float screen_x = tile_x - view_x0;
+      const float screen_y = tile_y - view_y0;
 
-      const geometry::rectangle destination{
-        {screen_x, screen_y},
-        {_tilesize, _tilesize}
-      };
-
+      const geometry::rectangle destination{{screen_x, screen_y}, {_tilesize, _tilesize}};
       _tileset->draw(source, destination);
     }
   }
 }
 
 void tilemap::set_target(std::shared_ptr<object> object) {
-  if (!object) [[unlikely]] {
-    return;
-  }
-
+  if (!object) [[unlikely]] return;
   _target = std::move(object);
 }
