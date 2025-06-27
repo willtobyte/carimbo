@@ -26,6 +26,7 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   _layers = {
     {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1},
     {0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 2, 0},
+    {2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0},
   };
 
   const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_tile_size);
