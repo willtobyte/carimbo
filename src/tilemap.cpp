@@ -16,20 +16,37 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   const auto height = static_cast<float_t>(lh) / sy;
 
   _view = { .0f, .0f, width, height };
-  _tile_size = 16.f;
 
-  _height = 2;
-  _width = 6;
+  _pixmap = resourcemanager->pixmappool()->get(fmt::format("blobs/tilesets/{}.png", name));
 
-  _pixmap = resourcemanager->pixmappool()->get("blobs/tilesets/0.png");
+  const auto& filename = fmt::format("cursors/{}.json", name);
+  const auto& buffer = storage::io::read(filename);
+  const auto& j = nlohmann::json::parse(buffer);
 
-  _layers = {
-    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1},
-    {0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 2, 0},
-    {2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0},
-  };
+  _size = j["size"].template get<float_t>();
+  _height = j["height"].template get<float_t>();
+  _width = j["width"].template get<float_t>();
 
-  const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_tile_size);
+  _layers = j.at("layers")
+              .get<std::vector<std::vector<uint8_t>>>();
+
+  _labels = j["labels"].get<std::vector<std::string>>();
+  /*
+  {
+    "size": 16,
+    "height": 2,
+    "width", 6,
+    "layers": [
+      [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+      [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 2, 0],
+      [2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 0]
+    ],
+  }
+  */
+
+
+
+  const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_size);
 
   static constexpr auto max_index = std::numeric_limits<uint8_t>::max();
 
@@ -37,10 +54,10 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   _sources[0] = geometry::rectangle{{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const auto zbi = static_cast<uint32_t>(i - 1);
-    const auto src_x = static_cast<float_t>(zbi % tiles_per_row) * _tile_size;
-    const auto src_y = std::floor(static_cast<float_t>(zbi) / static_cast<float_t>(tiles_per_row)) * _tile_size;
+    const auto src_x = static_cast<float_t>(zbi % tiles_per_row) * _size;
+    const auto src_y = std::floor(static_cast<float_t>(zbi) / static_cast<float_t>(tiles_per_row)) * _size;
 
-    _sources[i] = geometry::rectangle{{src_x, src_y}, {_tile_size, _tile_size}};
+    _sources[i] = geometry::rectangle{{src_x, src_y}, {_size, _size}};
   }
 }
 
@@ -81,17 +98,17 @@ void tilemap::draw() const noexcept {
       const auto column = i % tiles_per_row;
       const auto row = i / tiles_per_row;
 
-      const auto tile_x = static_cast<float_t>(column) * _tile_size;
-      const auto tile_y = static_cast<float_t>(row) * _tile_size;
+      const auto tile_x = static_cast<float_t>(column) * _size;
+      const auto tile_y = static_cast<float_t>(row) * _size;
 
-      if (tile_x + _tile_size < view_x0) [[likely]] continue;
+      if (tile_x + _size < view_x0) [[likely]] continue;
       if (tile_x > view_x1) [[likely]] continue;
-      if (tile_y + _tile_size < view_y0) [[likely]] continue;
+      if (tile_y + _size < view_y0) [[likely]] continue;
       if (tile_y > view_y1) [[likely]] continue;
 
       const auto& source = _sources[index];
 
-      const geometry::rectangle destination{{ tile_x - view_x0, tile_y - view_y0 }, { _tile_size, _tile_size }};
+      const geometry::rectangle destination{{ tile_x - view_x0, tile_y - view_y0 }, { _size, _size }};
 
       _pixmap->draw(source, destination);
     }
