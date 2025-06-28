@@ -104,9 +104,11 @@ void tilemap::draw() const noexcept {
         const auto index = layer[i];
         if (!index || index >= _sources.size()) [[unlikely]] continue;
 
-        const auto& src = _sources[index];
-        const geometry::rectangle dst{{col * _size - view_x0, row * _size - view_y0}, {_size, _size}};
-        _pixmap->draw(src, dst);
+        const auto& source = _sources[index];
+
+        const geometry::rectangle destination{{col * _size - view_x0, row * _size - view_y0}, {_size, _size}};
+
+        _pixmap->draw(source, destination);
       }
     }
   }
