@@ -77,13 +77,17 @@ void tilemap::update(float_t delta) noexcept {
 }
 
 void tilemap::draw() const noexcept {
-  if (!_pixmap) [[unlikely]] return;
+  if (!_pixmap) [[unlikely]] {
+    return;
+  }
 
-  const auto view_x0 = _view.x(), view_y0 = _view.y();
-  const auto view_x1 = view_x0 + _view.width(), view_y1 = view_y0 + _view.height();
+  const auto view_x0 = _view.x();
+  const auto view_y0 = _view.y();
+  const auto view_x1 = view_x0 + _view.width();
+  const auto view_y1 = view_y0 + _view.height();
 
-  const auto min_col = static_cast<size_t>(std::max(0.f, std::floor(view_x0 / _size)));
-  const auto max_col = std::min(static_cast<size_t>(_width), static_cast<size_t>(std::ceil(view_x1 / _size)));
+  const auto min_column = static_cast<size_t>(std::max(0.f, std::floor(view_x0 / _size)));
+  const auto max_column = std::min(static_cast<size_t>(_width), static_cast<size_t>(std::ceil(view_x1 / _size)));
 
   const auto min_row = static_cast<size_t>(std::max(0.f, std::floor(view_y0 / _size)));
   const auto max_row = std::min(static_cast<size_t>(_height), static_cast<size_t>(std::ceil(view_y1 / _size)));
@@ -97,8 +101,8 @@ void tilemap::draw() const noexcept {
     const auto layer_size = layer.size();
 
     for (size_t row = min_row; row < max_row; ++row) {
-      for (size_t col = min_col; col < max_col; ++col) {
-        const auto i = row * tiles_per_row + col;
+      for (size_t column = min_column; column < max_column; ++column) {
+        const auto i = row * tiles_per_row + column;
         if (i >= layer_size) continue;
 
         const auto index = layer[i];
