@@ -35,37 +35,50 @@ tilemap::tilemap(
 
 void tilemap::update(float_t delta) noexcept {
   UNUSED(delta);
-  if (!_target) [[unlikely]] return;
 
-  const auto pos = _target->position();
-  _view.set_position(pos.x() - _view.width() * 0.5f, pos.y() - _view.height() * 0.5f);
-
-  if (_transactions.empty()) return;
-  const auto& transaction = _transactions[0];
-  if (transaction.path.empty()) return;
-
-  const auto now = SDL_GetTicks();
-  if (_last_tick == 0 || now - _last_tick < transaction.delay) {
-    if (_last_tick == 0) _last_tick = now;
+  if (_transactions.empty()) {
     return;
   }
 
-  if (_visibles.size() < _labels.size()) _visibles.resize(_labels.size(), false);
+  const auto& transaction = _transactions[0];
+  if (transaction.path.empty()) {
+    return;
+  }
+
+  const auto now = SDL_GetTicks();
+
+  if (_last_tick == 0) {
+    _last_tick = now;
+    return;
+  }
+
+  if (now - _last_tick < transaction.delay) return;
+
+  if (_visibles.size() < _labels.size()) [[unlikely]] {
+    _visibles.resize(_labels.size(), false);
+  }
 
   const auto count = transaction.path.size();
   const auto prev = _current_transaction % count;
   const auto next = (_current_transaction + 1) % count;
 
   const auto disable_it = std::find(_labels.begin(), _labels.end(), transaction.path[prev]);
-  if (disable_it != _labels.end())
+  if (disable_it != _labels.end()) [[likely]] {
     _visibles[static_cast<size_t>(std::distance(_labels.begin(), disable_it))] = false;
+  }
 
   const auto enable_it = std::find(_labels.begin(), _labels.end(), transaction.path[next]);
-  if (enable_it != _labels.end())
+  if (enable_it != _labels.end()) [[likely]] {
     _visibles[static_cast<size_t>(std::distance(_labels.begin(), enable_it))] = true;
+  }
 
   _current_transaction = next;
   _last_tick = now;
+
+  // if (!_target) [[unlikely]] return;
+
+  // const auto pos = _target->position();
+  // _view.set_position(pos.x() - _view.width() * 0.5f, pos.y() - _view.height() * 0.5f);
 }
 
 void tilemap::draw() const noexcept {

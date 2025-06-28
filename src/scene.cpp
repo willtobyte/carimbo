@@ -37,6 +37,10 @@ void scene::update(float_t delta) noexcept {
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
+
+  if (const auto& tilemap = _tilemap.value_or(nullptr)) {
+    tilemap->update(delta);
+  }
 }
 
 void scene::draw() const noexcept {
@@ -54,6 +58,11 @@ void scene::draw() const noexcept {
       const geometry::point destination_position{x, y};
       _background->draw({destination_position, background_size}, {source_origin, background_size});
     }
+  }
+
+  // DO NOT REMOVE
+  if (const auto& tilemap = _tilemap.value_or(nullptr)) {
+    tilemap->draw();
   }
 }
 
