@@ -5,6 +5,7 @@
 #include "object.hpp"
 #include "pixmap.hpp"
 #include "size.hpp"
+#include "tilemap.hpp"
 
 namespace framework {
 class objectmanager;
@@ -22,6 +23,7 @@ public:
       std::shared_ptr<graphics::pixmap> background,
       std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
       std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+      std::optional<std::shared_ptr<tilemap>> tilemap,
       geometry::size size
   );
 
@@ -57,6 +59,8 @@ private:
   std::shared_ptr<graphics::pixmap> _background;
   std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
+  std::optional<std::shared_ptr<tilemap>> _tilemap;
+
   geometry::size _size;
 
   std::function<void()> _onenter;

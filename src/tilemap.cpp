@@ -2,19 +2,11 @@
 
 using namespace framework;
 
-tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string& name) {
-  UNUSED(name);
-
-  int32_t lw, lh;
-  SDL_RendererLogicalPresentation mode;
-  SDL_GetRenderLogicalPresentation(*renderer, &lw, &lh, &mode);
-
-  float_t sx, sy;
-  SDL_GetRenderScale(*renderer, &sx, &sy);
-
-  const auto width = static_cast<float_t>(lw) / sx;
-  const auto height = static_cast<float_t>(lh) / sy;
-  _view = { 0.f, 0.f, width, height };
+tilemap::tilemap(
+    geometry::size size,
+    std::shared_ptr<resourcemanager> resourcemanager,
+    const std::string& name) {
+  _view = { 0.f, 0.f, size.width(), size.height() };
 
   _pixmap = resourcemanager->pixmappool()->get(fmt::format("blobs/tilemaps/{}.png", name));
 

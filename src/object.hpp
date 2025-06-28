@@ -102,6 +102,7 @@ public:
 
 private:
   friend class objectmanager;
+  friend class tilemap;
 
   uint64_t _id;
   uint64_t _frame;

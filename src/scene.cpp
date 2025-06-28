@@ -7,12 +7,14 @@ scene::scene(
   std::shared_ptr<graphics::pixmap> background,
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+  std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
   : _objectmanager(objectmanager),
     _background(std::move(background)),
     _objects(std::move(objects)),
     _effects(std::move(effects)),
+    _tilemap(std::move(tilemap)),
     _size(std::move(size)) {
 }
 

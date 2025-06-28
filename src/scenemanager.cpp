@@ -56,11 +56,17 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   objects.reserve(os.size());
   std::ranges::copy(oview, std::inserter(objects, objects.end()));
 
+  std::optional<std::shared_ptr<tilemap>> tmapopt;
+  if (j.contains("tilemap")) {
+    tmapopt = std::make_shared<tilemap>(size, _resourcemanager, j.at("tilemap"));
+  }
+
   const auto s = std::make_shared<scene>(
     _objectmanager,
-    background,
+    std::move(background),
     std::move(objects),
     std::move(effects),
+    std::move(tmapopt),
     size
   );
 
