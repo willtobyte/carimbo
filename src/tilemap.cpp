@@ -110,7 +110,7 @@ void tilemap::draw() const noexcept {
 
         const auto& source = _sources[index];
 
-        const geometry::rectangle destination{{col * _size - view_x0, row * _size - view_y0}, {_size, _size}};
+        const geometry::rectangle destination{{column * _size - view_x0, row * _size - view_y0}, {_size, _size}};
 
         _pixmap->draw(source, destination);
       }
