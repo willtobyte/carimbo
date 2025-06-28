@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "object.hpp"
 #include "pixmap.hpp"
 #include "resourcemanager.hpp"
@@ -25,6 +26,8 @@ class tilemap final {
     void update(float_t delta) noexcept;
     void draw() const noexcept;
     void set_target(std::shared_ptr<object> object);
+
+    std::vector<std::string> under() const noexcept;
 
   private:
     float_t _size;

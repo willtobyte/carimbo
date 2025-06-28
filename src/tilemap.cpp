@@ -125,3 +125,72 @@ void tilemap::set_target(std::shared_ptr<object> object) {
   if (!object) [[unlikely]] return;
   _target = std::move(object);
 }
+
+std::vector<std::string> tilemap::under() const noexcept {
+  if (!_target || _layers.empty()) [[unlikely]] {
+    return {};
+  }
+
+  const auto& action = _target->action();
+  if (action.empty()) [[unlikely]]
+    return {};
+
+  const auto& animations = _target->_animations;
+  const auto anim_it = animations.find(action);
+  if (anim_it == animations.end()) [[unlikely]]
+    return {};
+
+  const auto& animation = anim_it->second;
+  if (!animation.hitbox) [[unlikely]]
+    return {};
+
+  const auto hitbox = geometry::rectangle{
+    _target->position() + animation.hitbox->rectangle.position() * _target->scale(),
+    animation.hitbox->rectangle.size() * _target->scale()
+  };
+
+  const auto x0 = hitbox.x();
+  const auto y0 = hitbox.y();
+  const auto x1 = x0 + hitbox.width();
+  const auto y1 = y0 + hitbox.height();
+
+  const auto column_start = static_cast<size_t>(x0 / _size);
+  const auto column_end   = static_cast<size_t>(std::min(std::ceil(x1 / _size), _width));
+  const auto row_start = static_cast<size_t>(y0 / _size);
+  const auto row_end   = static_cast<size_t>(std::min(std::ceil(y1 / _size), _height));
+  const auto tiles_per_row = static_cast<size_t>(_width);
+
+  std::vector<std::string> result;
+  result.reserve(_labels.size());
+
+  const auto vc = std::min(_layers.size(), _visibles.size());
+
+  const auto lc = std::min(_layers.size(), _labels.size());
+
+  for (size_t l = 0; l < vc; ++l) {
+    if (!_visibles[l]) [[unlikely]] continue;
+
+    const auto& layer = _layers[l];
+    const auto layer_size = layer.size();
+
+    for (auto row = row_start; row < row_end; ++row) {
+      const auto base = row * tiles_per_row;
+      if (base >= layer_size) [[unlikely]] break;
+
+      for (auto col = column_start; col < column_end; ++col) {
+        const auto index = base + col;
+        if (index >= layer_size) [[unlikely]] break;
+
+        if (const auto tile = layer[index]; tile) [[likely]] {
+          if (l < lc) result.emplace_back(_labels[l]);
+          goto next_layer;
+        }
+      }
+    }
+
+  next_layer:
+    continue;
+  }
+
+  return result;
+}
