@@ -6,6 +6,16 @@
 #include "resourcemanager.hpp"
 
 namespace framework {
+struct transaction final {
+  std::vector<std::string> path;
+  uint16_t delay;
+
+  friend void from_json(const nlohmann::json& j, transaction& t) {
+    j.at("path").get_to(t.path);
+    j.at("delay").get_to(t.delay);
+  }
+};
+
 class tilemap final {
   public:
     tilemap() = delete;
@@ -22,9 +32,14 @@ class tilemap final {
     float_t _width;
     std::shared_ptr<graphics::pixmap> _pixmap;
     std::vector<geometry::rectangle> _sources;
-    std::vector<std::vector<uint8_t>> _layers;
     std::vector<std::string> _labels;
+    std::vector<bool> _visibles;
+    std::vector<std::vector<uint8_t>> _layers;
+    std::vector<transaction> _transactions;
     std::shared_ptr<object> _target;
     geometry::rectangle _view;
+
+    uint64_t _last_tick{0};
+    size_t _current_transaction{0};
 };
 }
