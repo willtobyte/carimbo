@@ -35,8 +35,8 @@ tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<r
   _sources[0] = {{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const auto idx = static_cast<uint32_t>(i - 1);
-    const auto src_x = (idx % tiles_per_row) * _size;
-    const auto src_y = std::floor(static_cast<float_t>(idx) / tiles_per_row) * _size;
+    const auto src_x = static_cast<float_t>(idx % tiles_per_row) * _size;
+    const auto src_y = std::floor(static_cast<float_t>(idx) / static_cast<float_t>(tiles_per_row)) * _size;
     _sources[i] = {{src_x, src_y}, {_size, _size}};
   }
 }
@@ -110,7 +110,10 @@ void tilemap::draw() const noexcept {
 
         const auto& source = _sources[index];
 
-        const geometry::rectangle destination{{column * _size - view_x0, row * _size - view_y0}, {_size, _size}};
+        const geometry::rectangle destination{
+          {static_cast<float_t>(column) * _size - view_x0, static_cast<float_t>(row) * _size - view_y0},
+          {_size, _size}
+        };
 
         _pixmap->draw(source, destination);
       }
