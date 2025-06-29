@@ -67,9 +67,12 @@ void tilemap::update(float_t delta) noexcept {
   }
 
   if (_target) [[likely]] {
-    const auto pos = _target->position();
-    _view.set_position(pos.x() - _view.width() * 0.5f,
-                       pos.y() - _view.height() * 0.5f);
+    const auto position = _target->position();
+
+    _view.set_position(
+      position.x() - _view.width() * 0.5f,
+      position.y() - _view.height() * 0.5f
+    );
   }
 }
 
