@@ -20,8 +20,6 @@ tilemap::tilemap(
   _labels = j.value("labels", std::vector<std::string>{});
   _transactions = j.value("transactions", std::vector<transaction>{});
 
-  _visibles.assign(_labels.size(), false);
-
   const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_size);
   static constexpr auto max_index = std::numeric_limits<uint8_t>::max();
 
