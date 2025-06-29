@@ -3,29 +3,22 @@
 using namespace framework;
 
 static const std::map<std::string, std::function<void(
-  const std::string& ,
+  const std::string&,
   graphics::pixmappool&,
-  audio::soundmanager&,
-  graphics::fontfactory&)>>
-handlers = {
-    {".png", [](const std::string& filename,
-                graphics::pixmappool& pixmap,
-                audio::soundmanager&,
-                graphics::fontfactory&) {
-       pixmap.get(filename);
-    }},
-    {".ogg", [](const std::string& filename,
-                graphics::pixmappool&,
-                audio::soundmanager& sound,
-                graphics::fontfactory&) {
-       sound.get(filename);
-    }},
-      {".json", [](const std::string& filename,
-                 graphics::pixmappool&,
-                 audio::soundmanager&,
-                 graphics::fontfactory& font) {
-       font.get(filename);
-    }}
+  audio::soundmanager&
+)>> handlers = {
+  {
+    ".png",
+    [](const std::string& filename, graphics::pixmappool& pixmap, audio::soundmanager&) {
+      pixmap.get(filename);
+    }
+  },
+  {
+    ".ogg",
+    [](const std::string& filename, graphics::pixmappool&, audio::soundmanager& sound) {
+      sound.get(filename);
+    }
+  }
 };
 
 resourcemanager::resourcemanager(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<audio::audiodevice> audiodevice)
@@ -59,7 +52,7 @@ void resourcemanager::prefetch(const std::vector<std::string>& filenames) {
     if (const auto& position = filename.rfind('.'); position != std::string::npos) {
       const auto& extension = filename.substr(position);
       if (const auto it = handlers.find(extension); it != handlers.end()) {
-        it->second(filename, *_pixmappool, *_soundmanager, *_fontfactory);
+        it->second(filename, *_pixmappool, *_soundmanager);
       }
     }
   }

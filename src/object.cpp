@@ -151,7 +151,7 @@ void object::draw() const noexcept {
   const auto dx = (ow - sw) * 0.5f;
   const auto dy = (oh - sh) * 0.5f;
 
-  destination.set_position({destination.x() + dx, destination.y() + dy});
+  destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
 #ifdef HITBOX

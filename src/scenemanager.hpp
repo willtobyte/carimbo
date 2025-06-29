@@ -5,6 +5,7 @@
 #include "resourcemanager.hpp"
 #include "eventreceiver.hpp"
 #include "scene.hpp"
+#include "tilemap.hpp"
 
 namespace framework {
 class objectmanager;

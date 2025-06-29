@@ -7,12 +7,14 @@ scene::scene(
   std::shared_ptr<graphics::pixmap> background,
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+  std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
   : _objectmanager(objectmanager),
     _background(std::move(background)),
     _objects(std::move(objects)),
     _effects(std::move(effects)),
+    _tilemap(std::move(tilemap)),
     _size(std::move(size)) {
 }
 
@@ -35,11 +37,33 @@ void scene::update(float_t delta) noexcept {
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
+
+  if (const auto& tilemap = _tilemap.value_or(nullptr)) {
+    tilemap->update(delta);
+  }
 }
 
 void scene::draw() const noexcept {
-  static geometry::point point{0, 0};
-  _background->draw({point, _size}, {point, _size});
+  const auto background_width  = static_cast<float_t>(_background->width());
+  const auto background_height = static_cast<float_t>(_background->height());
+
+  const auto scene_width  = _size.width();
+  const auto scene_height = _size.height();
+
+  const geometry::size background_size{background_width, background_height};
+  static geometry::point source_origin{0.0f, 0.0f};
+
+  for (auto y = 0.0f; y < scene_height; y += background_height) {
+    for (auto x = 0.0f; x < scene_width; x += background_width) {
+      const geometry::point destination_position{x, y};
+      _background->draw({destination_position, background_size}, {source_origin, background_size});
+    }
+  }
+
+  // DO NOT REMOVE
+  if (const auto& tilemap = _tilemap.value_or(nullptr)) {
+    tilemap->draw();
+  }
 }
 
 std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& name, scenetype type) const {

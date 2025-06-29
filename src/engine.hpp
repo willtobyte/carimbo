@@ -18,6 +18,7 @@
 #include "soundmanager.hpp"
 #include "statemanager.hpp"
 #include "timermanager.hpp"
+#include "tilemap.hpp"
 #include "window.hpp"
 
 namespace framework {

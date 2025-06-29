@@ -2,52 +2,193 @@
 
 using namespace framework;
 
-tilemap::tilemap(std::shared_ptr<graphics::renderer> renderer, std::shared_ptr<resourcemanager> resourcemanager, const std::string& name)
-  : _resourcemanager(std::move(resourcemanager)) {
-  UNUSED(name);
+tilemap::tilemap(
+    geometry::size size,
+    std::shared_ptr<resourcemanager> resourcemanager,
+    const std::string& name) {
+  _view = { 0.f, 0.f, size.width(), size.height() };
 
-  int32_t lw, lh;
-  SDL_RendererLogicalPresentation mode;
-  SDL_GetRenderLogicalPresentation(*renderer, &lw, &lh, &mode);
+  _pixmap = resourcemanager->pixmappool()->get(fmt::format("blobs/tilemaps/{}.png", name));
 
-  float_t sx, sy;
-  SDL_GetRenderScale(*renderer, &sx, &sy);
+  const auto& j = nlohmann::json::parse(storage::io::read(fmt::format("tilemaps/{}.json", name)));
 
-  const auto width = static_cast<float_t>(lw) / sx;
-  const auto height = static_cast<float_t>(lh) / sy;
-  _view = {.0f, .0f, width, height};
+  _size = j["size"].get<float_t>();
+  _height = j["height"].get<float_t>();
+  _width = j["width"].get<float_t>();
+  _layers = j["layers"].get<std::vector<std::vector<uint8_t>>>();
+  _visibles = j.value("visibles", std::vector<bool>{});
+  _labels = j.value("labels", std::vector<std::string>{});
+  _transactions = j.value("transactions", std::vector<transaction>{});
+
+  const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_size);
+  static constexpr auto max_index = std::numeric_limits<uint8_t>::max();
+
+  _sources.resize(max_index + 1);
+  _sources[0] = {{-1.f, -1.f}, {0.f, 0.f}};
+  for (uint16_t i = 1; i <= max_index; ++i) {
+    const auto idx = static_cast<uint32_t>(i - 1);
+    const auto src_x = static_cast<float_t>(idx % tiles_per_row) * _size;
+    const auto src_y = std::floor(static_cast<float_t>(idx) / static_cast<float_t>(tiles_per_row)) * _size;
+    _sources[i] = {{src_x, src_y}, {_size, _size}};
+  }
 }
 
 void tilemap::update(float_t delta) noexcept {
   UNUSED(delta);
-  if (!_target || !_tileset) {
-    return;
+
+  const auto now = SDL_GetTicks();
+
+  if (_last_tick == 0) {
+    _last_tick = now;
   }
 
-  const constexpr auto smooth = 3.0f;
+  if (!_transactions.empty()) {
+    const auto& transaction = _transactions[0];
+    if (!transaction.path.empty() && (now - _last_tick >= transaction.delay)) {
+      const auto count = transaction.path.size();
+      const auto prev = _current_transaction % count;
+      const auto next = (_current_transaction + 1) % count;
 
-  const auto position = _target->position();
-  const auto vw  = _view.width();
-  const auto vh  = _view.height();
+      const auto disable_it = std::find(_labels.begin(), _labels.end(), transaction.path[prev]);
+      if (disable_it != _labels.end()) [[likely]] {
+        _visibles[static_cast<size_t>(std::distance(_labels.begin(), disable_it))] = false;
+      }
 
-  const auto dx = position.x() - vw * 0.5f;
-  const auto dy = position.y() - vh * 0.5f;
-  const auto damping = 1.0f - std::exp(-smooth * delta);
+      const auto enable_it = std::find(_labels.begin(), _labels.end(), transaction.path[next]);
+      if (enable_it != _labels.end()) [[likely]] {
+        _visibles[static_cast<size_t>(std::distance(_labels.begin(), enable_it))] = true;
+      }
 
-  _view.set_position({
-    (dx - _view.x()) * damping,
-    (dy - _view.y()) * damping
-  });
+      _current_transaction = next;
+      _last_tick = now;
+    }
+  }
+
+  if (_target) [[likely]] {
+    const auto position = _target->position();
+
+    _view.set_position(
+      position.x() - _view.width() * 0.5f,
+      position.y() - _view.height() * 0.5f
+    );
+  }
 }
 
 void tilemap::draw() const noexcept {
-  if (!_tileset) {
+  if (!_pixmap) [[unlikely]] {
     return;
   }
 
-  // TODO _tileset->draw(const geometry::rectangle &source, const geometry::rectangle &destination)
+  const auto view_x0 = _view.x();
+  const auto view_y0 = _view.y();
+  const auto view_x1 = view_x0 + _view.width();
+  const auto view_y1 = view_y0 + _view.height();
+
+  const auto min_column = static_cast<size_t>(std::max(0.f, std::floor(view_x0 / _size)));
+  const auto max_column = std::min(static_cast<size_t>(_width), static_cast<size_t>(std::ceil(view_x1 / _size)));
+
+  const auto min_row = static_cast<size_t>(std::max(0.f, std::floor(view_y0 / _size)));
+  const auto max_row = std::min(static_cast<size_t>(_height), static_cast<size_t>(std::ceil(view_y1 / _size)));
+
+  const auto tiles_per_row = static_cast<size_t>(_width);
+
+  for (size_t l = 0; l < _layers.size(); ++l) {
+    if (l < _visibles.size() && !_visibles[l]) continue;
+
+    const auto& layer = _layers[l];
+    const auto layer_size = layer.size();
+
+    for (size_t row = min_row; row < max_row; ++row) {
+      for (size_t column = min_column; column < max_column; ++column) {
+        const auto i = row * tiles_per_row + column;
+        if (i >= layer_size) continue;
+
+        const auto index = layer[i];
+        if (!index || index >= _sources.size()) [[unlikely]] continue;
+
+        const auto& source = _sources[index];
+
+        const geometry::rectangle destination{
+          {static_cast<float_t>(column) * _size - view_x0, static_cast<float_t>(row) * _size - view_y0},
+          {_size, _size}
+        };
+
+        _pixmap->draw(source, destination);
+      }
+    }
+  }
 }
 
 void tilemap::set_target(std::shared_ptr<object> object) {
+  if (!object) [[unlikely]] return;
   _target = std::move(object);
+}
+
+std::vector<std::string> tilemap::under() const noexcept {
+  if (!_target || _layers.empty()) [[unlikely]] {
+    return {};
+  }
+
+  const auto& action = _target->action();
+  if (action.empty()) [[unlikely]]
+    return {};
+
+  const auto& animations = _target->_animations;
+  const auto anim_it = animations.find(action);
+  if (anim_it == animations.end()) [[unlikely]]
+    return {};
+
+  const auto& animation = anim_it->second;
+  if (!animation.hitbox) [[unlikely]]
+    return {};
+
+  const auto hitbox = geometry::rectangle{
+    _target->position() + animation.hitbox->rectangle.position() * _target->scale(),
+    animation.hitbox->rectangle.size() * _target->scale()
+  };
+
+  const auto x0 = hitbox.x();
+  const auto y0 = hitbox.y();
+  const auto x1 = x0 + hitbox.width();
+  const auto y1 = y0 + hitbox.height();
+
+  const auto column_start = static_cast<size_t>(x0 / _size);
+  const auto column_end   = static_cast<size_t>(std::min(std::ceil(x1 / _size), _width));
+  const auto row_start = static_cast<size_t>(y0 / _size);
+  const auto row_end   = static_cast<size_t>(std::min(std::ceil(y1 / _size), _height));
+  const auto tiles_per_row = static_cast<size_t>(_width);
+
+  std::vector<std::string> result;
+  result.reserve(_labels.size());
+
+  const auto vc = std::min(_layers.size(), _visibles.size());
+
+  const auto lc = std::min(_layers.size(), _labels.size());
+
+  for (size_t l = 0; l < vc; ++l) {
+    if (!_visibles[l]) [[unlikely]] continue;
+
+    const auto& layer = _layers[l];
+    const auto layer_size = layer.size();
+
+    for (auto row = row_start; row < row_end; ++row) {
+      const auto base = row * tiles_per_row;
+      if (base >= layer_size) [[unlikely]] break;
+
+      for (auto col = column_start; col < column_end; ++col) {
+        const auto index = base + col;
+        if (index >= layer_size) [[unlikely]] break;
+
+        if (const auto tile = layer[index]; tile) [[likely]] {
+          if (l < lc) result.emplace_back(_labels[l]);
+          goto next_layer;
+        }
+      }
+    }
+
+  next_layer:
+    continue;
+  }
+
+  return result;
 }
