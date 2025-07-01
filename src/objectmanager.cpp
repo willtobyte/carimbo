@@ -198,11 +198,11 @@ void objectmanager::update(float_t dt) noexcept {
         continue;
       }
 
-      if (const auto ca = callback_or(a->_collisionmapping, b->kind(), std::nullopt); ca) {
-        (*ca)(a, b);
+      if (const auto& cb = callback_or(a->_collisionmapping, b->kind(), std::nullopt); cb) {
+        (*cb)(a, b);
       }
 
-      if (const auto cb = callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) {
+      if (const auto& cb = callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) {
         (*cb)(b, a);
       }
 
