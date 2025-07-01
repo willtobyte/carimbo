@@ -31,13 +31,15 @@ std::vector<std::string> io::enumerate(std::string_view directory) {
     throw std::runtime_error(fmt::format("[PHYSFS_enumerateFiles] error while enumerating directory: {}, error: {}", directory, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
-  char *const *array = ptr.get();
+  auto *const *array = ptr.get();
 
-  auto view = std::views::iota(0) | std::views::take_while([&](size_t i) { return array[i] != nullptr; });
+  auto view = std::views::iota(0)
+    | std::views::take_while([&](size_t i) {
+      return array[i] != nullptr;
+    });
 
-  const auto count = std::ranges::distance(view);
   std::vector<std::string> files;
-  files.reserve(std::max<size_t>(0, static_cast<size_t>(count)));
+  files.reserve(std::max<size_t>(0, static_cast<size_t>(std::ranges::distance(view))));
   for (const auto& i : view) {
     files.emplace_back(array[i]);
   }
