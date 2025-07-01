@@ -475,7 +475,7 @@ void framework::scriptengine::run() {
       };
 
       if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn]() mutable {
+        auto sfn = [fn]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -483,11 +483,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_onenter(std::move(safe_fn));
+        scene->set_onenter(std::move(sfn));
       }
 
       if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](float_t delta) mutable {
+        auto sfn = [fn](float_t delta) mutable {
           sol::protected_function_result result = fn(delta);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -495,11 +495,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_onloop(std::move(safe_fn));
+        scene->set_onloop(std::move(sfn));
       }
 
       if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn]() mutable {
+        auto sfn = [fn]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -507,11 +507,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_onleave(std::move(safe_fn));
+        scene->set_onleave(std::move(sfn));
       }
 
       if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](const std::string& text) mutable {
+        auto sfn = [fn](const std::string& text) mutable {
           sol::protected_function_result result = fn(text);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -519,11 +519,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_ontext(std::move(safe_fn));
+        scene->set_ontext(std::move(sfn));
       }
 
       if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](float_t x, float_t y) mutable {
+        auto sfn = [fn](float_t x, float_t y) mutable {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -531,11 +531,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_ontouch(std::move(safe_fn));
+        scene->set_ontouch(std::move(sfn));
       }
 
       if (auto fn = module["on_keypress"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](int32_t code) mutable {
+        auto sfn = [fn](int32_t code) mutable {
           sol::protected_function_result result = fn(code);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -543,11 +543,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_onkeypress(std::move(safe_fn));
+        scene->set_onkeypress(std::move(sfn));
       }
 
       if (auto fn = module["on_keyrelease"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](int32_t code) mutable {
+        auto sfn = [fn](int32_t code) mutable {
           sol::protected_function_result result = fn(code);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -555,11 +555,11 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_onkeyrelease(std::move(safe_fn));
+        scene->set_onkeyrelease(std::move(sfn));
       }
 
       if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {
-        auto safe_fn = [fn](float_t x, float_t y) mutable {
+        auto sfn = [fn](float_t x, float_t y) mutable {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -567,7 +567,7 @@ void framework::scriptengine::run() {
           }
         };
 
-        scene->set_onmotion(std::move(safe_fn));
+        scene->set_onmotion(std::move(sfn));
       }
     }
   );
