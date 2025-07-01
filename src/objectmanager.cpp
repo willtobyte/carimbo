@@ -12,7 +12,7 @@ std::optional<std::function<T>> operator||(const std::optional<std::function<T>>
 }
 
 template <typename Map>
-auto get_callback_or(const Map& m, const typename Map::key_type& key, std::optional<typename Map::mapped_type> fallback) {
+auto callback_or(const Map& m, const typename Map::key_type& key, std::optional<typename Map::mapped_type> fallback) {
   if (const auto it = m.find(key); it != m.end()) {
     return std::optional<typename Map::mapped_type>{it->second};
   }
@@ -198,11 +198,11 @@ void objectmanager::update(float_t dt) noexcept {
         continue;
       }
 
-      if (const auto ca = get_callback_or(a->_collisionmapping, b->kind(), std::nullopt); ca) {
+      if (const auto ca = callback_or(a->_collisionmapping, b->kind(), std::nullopt); ca) {
         (*ca)(a, b);
       }
 
-      if (const auto cb = get_callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) {
+      if (const auto cb = callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) {
         (*cb)(b, a);
       }
 
