@@ -20,7 +20,7 @@ protected:
 
     _objects.reserve(target);
 
-    for (size_t i = _objects.size(); i < target; ++i) {
+    for (auto i = _objects.size(); i < target; ++i) {
       _objects.emplace_back(std::make_unique<T>());
     }
   }
