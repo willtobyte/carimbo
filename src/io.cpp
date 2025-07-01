@@ -2,7 +2,7 @@
 
 using namespace storage;
 
-std::vector<uint8_t> io::read(std::string_view filename) {
+std::vector<std::byte> io::read(std::string_view filename) {
   auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.data()), PHYSFS_close);
 
   if (!ptr) [[unlikely]] {
@@ -15,7 +15,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   }
 
   const auto amount = static_cast<std::size_t>(length);
-  std::vector<uint8_t> buffer(amount);
+  std::vector<std::byte> buffer(amount);
   const auto result = PHYSFS_readBytes(ptr.get(), buffer.data(), amount);
   if (result != length) [[unlikely]] {
     throw std::runtime_error(fmt::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes but read {}, error: {}", filename, amount, result, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
