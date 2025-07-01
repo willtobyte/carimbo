@@ -60,7 +60,6 @@ void scene::draw() const noexcept {
     }
   }
 
-  // DO NOT REMOVE
   if (const auto& tilemap = _tilemap.value_or(nullptr)) {
     tilemap->draw();
   }

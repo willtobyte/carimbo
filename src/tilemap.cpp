@@ -134,11 +134,11 @@ std::vector<std::string> tilemap::under() const noexcept {
     return {};
 
   const auto& animations = _target->_animations;
-  const auto anim_it = animations.find(action);
-  if (anim_it == animations.end()) [[unlikely]]
+  const auto ait = animations.find(action);
+  if (ait == animations.end()) [[unlikely]]
     return {};
 
-  const auto& animation = anim_it->second;
+  const auto& animation = ait->second;
   if (!animation.hitbox) [[unlikely]]
     return {};
 
