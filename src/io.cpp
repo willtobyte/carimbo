@@ -25,8 +25,7 @@ std::vector<std::uint8_t> io::read(std::string_view filename) {
 }
 
 std::vector<std::string> io::enumerate(std::string_view directory) {
-  auto deleter = [](char **list) { PHYSFS_freeList(list); };
-  std::unique_ptr<char *[], decltype(deleter)> ptr(PHYSFS_enumerateFiles(directory.data()), deleter);
+  std::unique_ptr<char*[], void(*)(char**)> ptr(PHYSFS_enumerateFiles(directory.data()), [](char** list) { PHYSFS_freeList(list); });
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(fmt::format("[PHYSFS_enumerateFiles] error while enumerating directory: {}, error: {}", directory, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
