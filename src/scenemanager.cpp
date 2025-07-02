@@ -57,8 +57,8 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   std::ranges::copy(oview, std::inserter(objects, objects.end()));
 
   std::optional<std::shared_ptr<tilemap>> map;
-  if (j.contains("tilemap")) {
-    map = std::make_shared<tilemap>(size, _resourcemanager, j.at("tilemap"));
+  if (const auto it = j.find("tilemap"); it != j.end()) {
+    map.emplace(std::make_shared<tilemap>(size, _resourcemanager, *it));
   }
 
   const auto s = std::make_shared<scene>(
@@ -155,7 +155,7 @@ void scenemanager::on_mouse_release(const input::event::mouse::button& event) {
   }
 
   UNUSED(event);
-  // _scene->on_mouse_relese(event.x, event.y);
+  // _scene->on_mouse_release(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const input::event::mouse::motion& event) {
