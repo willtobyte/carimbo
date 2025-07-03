@@ -219,8 +219,6 @@ else()
       -fstandalone-debug
       -fno-omit-frame-pointer
       -fstack-protector-strong
-      -fsanitize=address
-      -fsanitize=undefined
       -fno-elide-constructors
       -DDEBUG
       -Wall
