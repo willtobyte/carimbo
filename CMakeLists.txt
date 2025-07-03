@@ -221,7 +221,6 @@ else()
       -fstack-protector-strong
       -fsanitize=address
       -fsanitize=undefined
-      -fsanitize=leak
       -fno-elide-constructors
       -DDEBUG
       -Wall
