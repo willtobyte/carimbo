@@ -40,9 +40,9 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Debug
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build --config Debug --verbose
