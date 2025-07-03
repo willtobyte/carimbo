@@ -106,7 +106,8 @@ if(EMSCRIPTEN)
     -flto
     --strip-debug
     --strip-producers
-    -sMINIFY_IMPORTS_AND_EXPORTS=1
+    -sCLOSURE=1
+    -sMINIMAL_RUNTIME=1
     -sASSERTIONS=1
     -sDISABLE_EXCEPTION_CATCHING=0
   )
