@@ -106,7 +106,6 @@ if(EMSCRIPTEN)
     -flto
     --strip-debug
     --strip-producers
-    -sMINIMAL_RUNTIME=1
     -sASSERTIONS=1
     -sDISABLE_EXCEPTION_CATCHING=0
   )
