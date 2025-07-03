@@ -63,7 +63,7 @@ application::application(int argc, char **argv) {
 
 int32_t application::run() {
   #if defined(EMSCRIPTEN) || !defined(SANDBOX)
-  storage::filesystem::mount("bundle.7z", "/");
+  storage::filesystem::mount("bundle.zip", "/");
   #else
   storage::filesystem::mount("../sandbox", "/");
   #endif
