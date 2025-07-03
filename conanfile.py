@@ -46,8 +46,7 @@ class Carimbo(ConanFile):
         self.options["boost"].header_only = True
 
         physfs = self.options["physfs"]
-        physfs.sevenzip = True
-        physfs.zip = False
+        physfs.sevenzip = False
         physfs.grp = False
         physfs.wad = False
         physfs.hog = False
@@ -56,6 +55,7 @@ class Carimbo(ConanFile):
         physfs.slb = False
         physfs.iso9660 = False
         physfs.vdf = False
+        physfs.zip = True
 
         if not self._is_webassembly() and self._is_jit_capable():
             self.options["sol2"].with_lua = "luajit"

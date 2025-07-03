@@ -107,8 +107,8 @@ if(EMSCRIPTEN)
     --strip-debug
     --strip-producers
 
-    -sASSERTIONS=0
-    -sDISABLE_EXCEPTION_CATCHING=1
+    -sASSERTIONS=1
+    -sDISABLE_EXCEPTION_CATCHING=0
   )
 
   target_compile_options(${PROJECT_NAME} PRIVATE
