@@ -75,6 +75,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 }
 
 void scenemanager::set(const std::string& name) {
+  fmt::println(">>> scenemanager::set '{}'", name);
   if (_scene) [[likely]] {
     _scene->on_leave();
   }
