@@ -188,6 +188,7 @@ else()
       /RELEASE
       /NXCOMPAT
       /DYNAMICBASE
+      /DEBUG:NONE
     )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
@@ -255,6 +256,22 @@ else()
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_LINKER_FLAGS}>
     )
+
+  if(NOT EMSCRIPTEN AND NOT MSVC)
+    find_program(STRIP_EXECUTABLE strip)
+
+    if(APPLE)
+      set(STRIP_ARGS -u -r)
+    else()
+      set(STRIP_ARGS --strip-all)
+    endif()
+
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${STRIP_EXECUTABLE} ${STRIP_ARGS} $<TARGET_FILE:${PROJECT_NAME}>
+      COMMENT "Stripping all symbols from ${PROJECT_NAME}"
+    )
+  endif()
+
   endif()
 endif()
 
