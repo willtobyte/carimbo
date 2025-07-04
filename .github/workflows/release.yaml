@@ -73,10 +73,6 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --verbose
 
-      - name: Strip binary
-        run: |
-          ls -lah build
-
       - name: Compress artifacts
         working-directory: build
         run: |
