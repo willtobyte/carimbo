@@ -242,7 +242,8 @@ else()
       -flto
       -Wl,-x
       -Wl,-S
-      -Wl,-O2
+      -Wl,-O3
+      -Wl,-s
     )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
