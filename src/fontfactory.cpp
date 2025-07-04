@@ -27,7 +27,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   const auto pixmap = _pixmappool->get(fmt::format("blobs/overlay/{}.png", family));
 
   float_t width, height;
-  if (!SDL_GetTextureSize(*pixmap, &width, &height)) {
+  if (!SDL_GetTextureSize(*pixmap, &width, &height)) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_GetTextureSize] {}", SDL_GetError()));
   }
 
@@ -40,7 +40,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       static_cast<int32_t>(height)
     )
   };
-  if (!target) {
+  if (!target) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
 
@@ -53,13 +53,13 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   SDL_RenderPresent(*_renderer);
 
   std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
-  if (!surface) {
+  if (!surface) [[unlikely]] {
     throw std::runtime_error(fmt::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
   }
 
   SDL_SetRenderTarget(*_renderer, origin);
 
-  auto *pixels = static_cast<uint32_t *>(surface->pixels);
+  const auto *pixels = static_cast<uint32_t *>(surface->pixels);
 
   const auto separator = color(pixels[0]);
 
