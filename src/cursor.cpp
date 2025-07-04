@@ -35,11 +35,10 @@ cursor::cursor(const std::string& name, std::shared_ptr<framework::resourcemanag
   }
 }
 
-void cursor::on_mouse_press(const mouse::button& event) {
-  // TODO FIX ME using enum input::mousebuttonevent::button;
+void cursor::on_mouse_press(const input::event::mouse::button& event) {
+  constexpr const auto left = mouse::button::which::left;
+  constexpr const auto right = mouse::button::which::right;
 
-  constexpr auto left = mouse::button::which::left;
-  constexpr auto right = mouse::button::which::right;
   switch (event.button) {
   case left:
     _action = ACTION_LEFT;
