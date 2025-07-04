@@ -34,7 +34,7 @@ cassette::cassette() {
   std::ifstream file(_filename);
   std::stringstream buffer;
   buffer << file.rdbuf();
-  const auto content = buffer.str();
+  const auto& content = buffer.str();
 
   if (nlohmann::json::accept(content)) {
     _j = nlohmann::json::parse(content);
