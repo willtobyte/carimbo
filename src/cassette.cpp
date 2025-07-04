@@ -32,10 +32,10 @@ cassette::cassette() {
   }
 
   std::ifstream file(_filename);
-  const std::string content{
-    std::istreambuf_iterator<char>{file},
-    std::istreambuf_iterator<char>{}
-  };
+  const std::string content(
+    (std::istreambuf_iterator<char>(file)),
+    std::istreambuf_iterator<char>()
+  );
 
   if (nlohmann::json::accept(content)) {
     _j = nlohmann::json::parse(content);
