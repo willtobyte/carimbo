@@ -920,7 +920,7 @@ void framework::scriptengine::run() {
   );
 
   fmt::println("Powered by Carimbo: https://carimbo.site");
-  fmt::println("Version: {}", LATEST_TAG);
+  fmt::println("Version: {}", GIT_TAG);
   fmt::println("Built on: {}, {} UTC", __DATE__, __TIME__);
 
   const auto jit = lua["jit"];

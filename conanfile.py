@@ -35,7 +35,6 @@ class Carimbo(ConanFile):
         if self._is_webassembly():
             return
 
-        self.requires("abseil/20250127.0")
         self.requires("boost/1.87.0")
         self.requires("openssl/3.4.1")
 

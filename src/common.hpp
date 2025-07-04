@@ -38,10 +38,6 @@
  #endif
 #endif
 
-#ifndef EMSCRIPTEN
-  #include <absl/container/flat_hash_map.h>
-#endif
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>

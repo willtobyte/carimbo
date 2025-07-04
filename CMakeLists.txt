@@ -26,7 +26,7 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-add_compile_definitions(LATEST_TAG="${latest_tag}")
+add_compile_definitions(GIT_TAG="${latest_tag}")
 
 foreach(flag HITBOX LOCAL SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
@@ -57,7 +57,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 else()
   set(EMSCRIPTEN FALSE)
 
-  find_package(absl REQUIRED)
   find_package(Boost CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
@@ -271,7 +270,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 if(NOT EMSCRIPTEN)
   target_link_libraries(${PROJECT_NAME} PRIVATE
-    abseil::abseil
     Boost::boost
     OpenAL::OpenAL
     openssl::openssl

@@ -32,11 +32,7 @@ struct animation final {
   std::vector<keyframe> keyframes;
 };
 
-#ifdef EMSCRIPTEN
 using animation_map = std::unordered_map<std::string, animation>;
-#else
-using animation_map = absl::flat_hash_map<std::string, animation>;
-#endif
 
 class object final : public std::enable_shared_from_this<object> {
 public:
