@@ -56,6 +56,8 @@
 #include <cmath>
 #include <cstdint>
 #include <csignal>
+#include <print>
+#include <format>
 #include <filesystem>
 #include <fstream>
 #include <functional>
