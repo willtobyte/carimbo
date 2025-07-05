@@ -113,7 +113,7 @@ void socket::connect() {
 }
 
 void socket::emit(const std::string& topic, const std::string& data) {
-  send(std::format(std::runtime(R"json({"event": {"topic": "{}", "data": {}}})json"), topic, data));
+  send(std::format(R"json({{"event": {{"topic": "{}", "data": {}}}}})json", topic, data));
 }
 
 void socket::on(const std::string& topic, std::function<void(const std::string& )>&& callback) {
