@@ -19,8 +19,6 @@
  #endif
 #endif
 
-#include <fmt/format.h>
-
 #ifdef HAVE_BOOST
  #include <boost/asio.hpp>
  #include <boost/asio/connect.hpp>

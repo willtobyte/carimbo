@@ -22,7 +22,6 @@ class Carimbo(ConanFile):
         return self._os_name() in {"macos", "windows"}
 
     def requirements(self):
-        self.requires("fmt/11.2.0")
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.12.0")
         self.requires("ogg/1.3.5")

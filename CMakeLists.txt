@@ -43,7 +43,6 @@ endforeach()
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
-find_package(fmt CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
@@ -258,7 +257,6 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  fmt::fmt
   nlohmann_json::nlohmann_json
   Ogg::ogg
   physfs-static
