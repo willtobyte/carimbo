@@ -166,7 +166,6 @@ else()
       /permissive-
       /Zc:inline
       /Zc:__cplusplus
-      /Zs
     )
 
     set(DEBUG_LINK_FLAGS
