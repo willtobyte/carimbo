@@ -166,6 +166,7 @@ else()
       /permissive-
       /Zc:inline
       /Zc:__cplusplus
+      /Zs
     )
 
     set(DEBUG_LINK_FLAGS
@@ -228,6 +229,7 @@ else()
 
     set(RELEASE_FLAGS
       -O3
+      -g0
       -flto
       -fstrict-aliasing
       -funroll-loops
