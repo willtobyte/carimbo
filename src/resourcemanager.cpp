@@ -41,7 +41,7 @@ void resourcemanager::prefetch() {
   std::vector<std::string> f;
   f.reserve(filenames.size());
   for (const auto& filename : filenames) {
-    f.emplace_back(fmt::format("{}/{}", directory, filename));
+    f.emplace_back(std::format("{}/{}", directory, filename));
   }
 
   prefetch(f);

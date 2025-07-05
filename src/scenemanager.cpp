@@ -8,19 +8,19 @@ scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcem
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
-  const auto& filename = fmt::format("scenes/{}.json", name);
+  const auto& filename = std::format("scenes/{}.json", name);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
   const auto pixmappool = _resourcemanager->pixmappool();
-  const auto background = pixmappool->get(fmt::format("blobs/{}/background.png", name));
+  const auto background = pixmappool->get(std::format("blobs/{}/background.png", name));
   geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
 
   const auto& es = j.value("effects", nlohmann::json::array());
   const auto eview = es
     | std::views::transform([&](const auto& e) {
       const auto& basename = e.template get<std::string>();
-      const auto f = fmt::format("blobs/{}/{}.ogg", name, basename);
+      const auto f = std::format("blobs/{}/{}.ogg", name, basename);
       return std::pair{
         basename,
         _resourcemanager->soundmanager()->get(f)

@@ -46,5 +46,5 @@ uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, 
   }
 
   _envelopepool->release(std::unique_ptr<envelope>(ptr));
-  throw std::runtime_error(fmt::format("[SDL_AddTimer] {}", SDL_GetError()));
+  throw std::runtime_error(std::format("[SDL_AddTimer] {}", SDL_GetError()));
 }

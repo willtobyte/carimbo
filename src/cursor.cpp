@@ -8,12 +8,12 @@ cursor::cursor(const std::string& name, std::shared_ptr<framework::resourcemanag
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
 
-  const auto& filename = fmt::format("cursors/{}.json", name);
+  const auto& filename = std::format("cursors/{}.json", name);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
   _point = j["point"].template get<geometry::point>();
-  _spritesheet = _resourcemanager->pixmappool()->get(fmt::format("blobs/overlay/{}.png", name));
+  _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
   _animations.reserve(j["animations"].size());
 
   for (const auto& item : j["animations"].items()) {

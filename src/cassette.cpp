@@ -23,7 +23,7 @@ cassette::cassette() {
   }
 
   _j = nlohmann::json::object();
-  const auto script = fmt::format("document.cookie = '{}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'", _cookiekey);
+  const auto script = std::format("document.cookie = '{}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'", _cookiekey);
   emscripten_run_script(script.c_str());
 #else
   if (!std::filesystem::exists(_filename)) {
@@ -50,8 +50,8 @@ cassette::cassette() {
 void cassette::persist() const {
 #ifdef EMSCRIPTEN
   constexpr auto path = "; path=/";
-  const auto value = fmt::format("{}{}{}", _cookiekey, _j.dump(), path);
-  const auto script = fmt::format("document.cookie = '{}';", value);
+  const auto value = std::format("{}{}{}", _cookiekey, _j.dump(), path);
+  const auto script = std::format("document.cookie = '{}';", value);
   emscripten_run_script(script.c_str());
 #else
   std::ofstream file(_filename);

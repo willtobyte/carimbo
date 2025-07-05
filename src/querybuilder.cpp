@@ -36,7 +36,7 @@ std::string querybuilder::build() const {
       first = false;
     }
 
-    result.append(fmt::format("{}={}", key, encode(value)));
+    result.append(std::format("{}={}", key, encode(value)));
   }
   return result;
 }

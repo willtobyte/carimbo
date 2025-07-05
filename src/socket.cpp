@@ -68,7 +68,7 @@ socket::~socket() {
   }
 #else
   _ws.async_close(websocket::close_code::normal, [](beast::error_code ec) {
-    fmt::println(stderr, "[socket] websocket close error: {}", ec.message());
+    std::println(stderr, "[socket] websocket close error: {}", ec.message());
   });
 #endif
 }
@@ -113,16 +113,16 @@ void socket::connect() {
 }
 
 void socket::emit(const std::string& topic, const std::string& data) {
-  send(fmt::format(fmt::runtime(R"json({"event": {"topic": "{}", "data": {}}})json"), topic, data));
+  send(std::format(std::runtime(R"json({"event": {"topic": "{}", "data": {}}})json"), topic, data));
 }
 
 void socket::on(const std::string& topic, std::function<void(const std::string& )>&& callback) {
-  send(fmt::format(R"json({{"subscribe": "{}"}})json", topic));
+  send(std::format(R"json({{"subscribe": "{}"}})json", topic));
   _callbacks[topic].emplace_back(std::move(callback));
 }
 
 void socket::rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )>&& callback) {
-  send(fmt::format(fmt::runtime(R"json({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})json"), ++counter, method, arguments));
+  send(std::format(std::runtime(R"json({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})json"), ++counter, method, arguments));
   _callbacks[method].emplace_back(std::move(callback));
 }
 
@@ -165,7 +165,7 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
     if (ec == boost::asio::error::operation_aborted)
       return;
 
-    fmt::println(stderr, "[error] resolve error: {}", ec.message());
+    std::println(stderr, "[error] resolve error: {}", ec.message());
     return;
   }
 
@@ -186,7 +186,7 @@ void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type:
     if (ec == boost::asio::error::operation_aborted)
       return;
 
-    fmt::println(stderr, "[socket] connect error: {}", ec.message());
+    std::println(stderr, "[socket] connect error: {}", ec.message());
     return;
   }
 
@@ -209,7 +209,7 @@ void socket::on_ssl_handshake(beast::error_code ec) {
     if (ec == boost::asio::error::operation_aborted)
       return;
 
-    fmt::println(stderr, "[socket] ssl handshake error: {}", ec.message());
+    std::println(stderr, "[socket] ssl handshake error: {}", ec.message());
     return;
   }
 
@@ -228,7 +228,7 @@ void socket::on_handshake(beast::error_code ec) {
     if (ec == boost::asio::error::operation_aborted)
       return;
 
-    fmt::println(stderr, "[socket] handshake error: {}", ec.message());
+    std::println(stderr, "[socket] handshake error: {}", ec.message());
     return;
   }
 
@@ -242,7 +242,7 @@ void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) {
     if (ec == boost::asio::error::operation_aborted)
       return;
 
-    fmt::println(stderr, "[socket] read error: {}", ec.message());
+    std::println(stderr, "[socket] read error: {}", ec.message());
     return;
   }
 
@@ -321,7 +321,7 @@ void socket::send(const std::string& message) {
           UNUSED(bytes_transferred);
 
           if (ec) [[unlikely]] {
-            fmt::println(stderr, "[socket] write error: {}", ec.message());
+            std::println(stderr, "[socket] write error: {}", ec.message());
             return;
           }
         }

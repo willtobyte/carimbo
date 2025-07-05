@@ -14,7 +14,7 @@ window::window(const std::string& title, int32_t width, int32_t height, bool ful
           SDL_Deleter{}
       ) {
   if (_window == nullptr) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateWindow] {}", SDL_GetError()));
+    throw std::runtime_error(std::format("[SDL_CreateWindow] {}", SDL_GetError()));
   }
 
   const SDL_Rect area = { 0, 0, width, height };

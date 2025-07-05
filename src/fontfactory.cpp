@@ -9,12 +9,12 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 
 std::shared_ptr<font> fontfactory::get(const std::string& family) {
   std::filesystem::path p{family};
-  const auto filename = p.has_extension() ? family : fmt::format("fonts/{}.json", family);
+  const auto filename = p.has_extension() ? family : std::format("fonts/{}.json", family);
   if (auto it = _pool.find(filename); it != _pool.end()) {
     return it->second;
   }
 
-  fmt::println("[fontfactory] cache miss {}", filename);
+  std::println("[fontfactory] cache miss {}", filename);
 
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
@@ -24,11 +24,11 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   const auto leading = j.value("leading", int16_t{0});
   const auto scale   = j.value("scale", float_t{1.0f});
 
-  const auto pixmap = _pixmappool->get(fmt::format("blobs/overlay/{}.png", family));
+  const auto pixmap = _pixmappool->get(std::format("blobs/overlay/{}.png", family));
 
   float_t width, height;
   if (!SDL_GetTextureSize(*pixmap, &width, &height)) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_GetTextureSize] {}", SDL_GetError()));
+    throw std::runtime_error(std::format("[SDL_GetTextureSize] {}", SDL_GetError()));
   }
 
   std::unique_ptr<SDL_Texture, SDL_Deleter> target{
@@ -41,7 +41,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     )
   };
   if (!target) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateTexture] {}", SDL_GetError()));
+    throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
 
   SDL_Texture *origin = SDL_GetRenderTarget(*_renderer);
@@ -54,7 +54,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
 
   std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
   if (!surface) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
+    throw std::runtime_error(std::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
   }
 
   SDL_SetRenderTarget(*_renderer, origin);
@@ -71,7 +71,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     }
 
     if (x >= tw) [[unlikely]] {
-      throw std::runtime_error(fmt::format("missing glyph for '{}'", glyph));
+      throw std::runtime_error(std::format("missing glyph for '{}'", glyph));
     }
 
     int32_t w = 0;
@@ -109,9 +109,9 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
 }
 
 void fontfactory::flush() noexcept {
-  fmt::println("[fontfactory] actual size {}", _pool.size());
+  std::println("[fontfactory] actual size {}", _pool.size());
 
   const auto count = std::erase_if(_pool, [](auto const& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
 
-  fmt::println("[fontfactory] {} objects have been flushed", count);
+  std::println("[fontfactory] {} objects have been flushed", count);
 }

@@ -1,13 +1,13 @@
 #include "scriptengine.hpp"
 
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
-  throw std::runtime_error(fmt::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
+  throw std::runtime_error(std::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
 }
 
 sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
-  const auto filename = fmt::format("scripts/{}.lua", module);
+  const auto filename = std::format("scripts/{}.lua", module);
   const auto buffer = storage::io::read(filename);
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
 
@@ -37,7 +37,7 @@ public:
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
 
     if (_elapsed >= 1000) [[unlikely]] {
-      fmt::println("{:.1f} {}KB", static_cast<double_t>(_frames * _elapsed) * 0.001, memory);
+      std::println("{:.1f} {}KB", static_cast<double_t>(_frames * _elapsed) * 0.001, memory);
 
       _elapsed = 0;
       _frames = 0;
@@ -147,7 +147,7 @@ void framework::scriptengine::run() {
 
   lua["searcher"] = &searcher;
 
-  const auto inject = fmt::format(R"lua(
+  const auto inject = std::format(R"lua(
     local list = package.searchers or package.loaders
     table.insert(list, searcher)
   )lua");
@@ -160,7 +160,7 @@ void framework::scriptengine::run() {
 
   lua["openurl"] = [](std::string_view url) {
     #ifdef EMSCRIPTEN
-      const auto script = fmt::format(R"javascript(var a = document.createElement('a');
+      const auto script = std::format(R"javascript(var a = document.createElement('a');
         a.href = "{}";
         a.target = "_blank";
         a.rel = "noopener noreferrer";
@@ -177,7 +177,7 @@ void framework::scriptengine::run() {
 
   lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) -> sol::object {
     #ifdef EMSCRIPTEN
-      const auto script = fmt::format(R"javascript(
+      const auto script = std::format(R"javascript(
         (function(){{
           var p = new URLSearchParams(window.location.search);
           var v = p.get("{}");
@@ -460,7 +460,7 @@ void framework::scriptengine::run() {
     "register", [&lua](framework::scenemanager& self, const std::string& name) {
       const auto scene = self.load(name);
 
-      const auto buffer = storage::io::read(fmt::format("scenes/{}.lua", name));
+      const auto buffer = storage::io::read(std::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
       auto result = lua.safe_script(script, &sol::script_pass_on_error);
       if (!result.valid()) [[unlikely]] {
@@ -648,7 +648,7 @@ void framework::scriptengine::run() {
     "x", sol::property(&geometry::point::x, &geometry::point::set_x),
     "y", sol::property(&geometry::point::y, &geometry::point::set_y),
     sol::meta_function::to_string, [](const geometry::point& self) {
-      return fmt::format("point({}, {})", self.x(), self.y());
+      return std::format("point({}, {})", self.x(), self.y());
     }
   );
 
@@ -919,19 +919,19 @@ void framework::scriptengine::run() {
     )
   );
 
-  fmt::println("Powered by Carimbo: https://carimbo.site");
-  fmt::println("Version: {}", GIT_TAG);
-  fmt::println("Built on: {}, {} UTC", __DATE__, __TIME__);
+  std::println("Powered by Carimbo: https://carimbo.site");
+  std::println("Version: {}", GIT_TAG);
+  std::println("Built on: {}, {} UTC", __DATE__, __TIME__);
 
   const auto jit = lua["jit"];
   if (jit.valid()) {
-    fmt::println("Runtime: {}", jit["version"].get<std::string>());
+    std::println("Runtime: {}", jit["version"].get<std::string>());
   } else {
-    fmt::println("Runtime: {}", lua["_VERSION"].get<std::string>());
+    std::println("Runtime: {}", lua["_VERSION"].get<std::string>());
   }
 
-  fmt::println("License: MIT");
-  fmt::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
+  std::println("License: MIT");
+  std::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
@@ -954,7 +954,7 @@ void framework::scriptengine::run() {
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed = static_cast<double_t>(end - start) * 1000.0 / static_cast<double_t>(SDL_GetPerformanceFrequency());
-  fmt::println("boot time {:.3f}ms", elapsed);
+  std::println("boot time {:.3f}ms", elapsed);
 
   engine->run();
 }

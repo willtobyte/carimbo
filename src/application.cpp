@@ -26,10 +26,10 @@ using namespace framework;
 
       #ifdef HAVE_STACKSTRACE
         boost::stacktrace::stacktrace st;
-        fmt::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
+        std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
 
-      fmt::println(stderr, "{}", error);
+      std::println(stderr, "{}", error);
 
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
     }

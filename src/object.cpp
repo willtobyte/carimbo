@@ -13,7 +13,7 @@ object::object() noexcept
 {}
 
 object::~object() noexcept {
-  fmt::println("[object] destroyed {} {}", kind(), id());
+  std::println("[object] destroyed {} {}", kind(), id());
 }
 
 uint64_t object::id() const noexcept {

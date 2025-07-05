@@ -10,7 +10,7 @@ renderer::renderer(SDL_Window *window) {
 
   SDL_Renderer *renderer = SDL_CreateRendererWithProperties(props);
   if (!renderer) [[unlikely]] {
-    throw std::runtime_error(fmt::format("[SDL_CreateRendererWithProperties] {}", SDL_GetError()));
+    throw std::runtime_error(std::format("[SDL_CreateRendererWithProperties] {}", SDL_GetError()));
   }
 
   _renderer.reset(renderer);
