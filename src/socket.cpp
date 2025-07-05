@@ -122,7 +122,8 @@ void socket::on(const std::string& topic, std::function<void(const std::string& 
 }
 
 void socket::rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )>&& callback) {
-  send(std::format(std::runtime(R"json({"rpc": {"request": {"id": {}, "method": "{}", "arguments": "{}"}}}})json"), ++counter, method, arguments));
+  send(std::format(R"json({{"rpc": {{"request": {{"id": {}, "method": "{}", "arguments": "{}"}}}}}})json",
+                   ++counter, method, arguments));
   _callbacks[method].emplace_back(std::move(callback));
 }
 
