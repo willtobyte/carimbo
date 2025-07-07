@@ -8,6 +8,6 @@ namespace steam {
       achievement() noexcept = default;
       ~achievement() noexcept = default;
 
-      void unlock(std::string id) noexcept;
+      void unlock(const std::string& id) noexcept;
   };
 }
