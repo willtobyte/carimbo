@@ -913,6 +913,7 @@ void framework::scriptengine::run() {
         }
 
         const auto L = table.lua_state();
+
         sol::stack::push(L, table);
 
         for (std::size_t i = 0; i < n; ++i) {
