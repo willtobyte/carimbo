@@ -906,13 +906,15 @@ void framework::scriptengine::run() {
       },
       [](graphics::canvas& canvas, sol::table table) {
         const auto n = table.size();
-        static std::vector<uint32_t> pixels(n);
-        std::ranges::transform(
-          std::views::iota(1u, n + 1u), pixels.begin(),
-          [&table](auto index) {
-            return table[index].template get<uint32_t>();
-          }
-        );
+
+        thread_local static std::vector<uint32_t> pixels;
+        if (pixels.size() < n) {
+          pixels.resize(n);
+        }
+
+        for (uint32_t i = 0; i < n; ++i) {
+          pixels[i] = table.raw_get<uint32_t>(i + 1);
+        }
 
         canvas.set_pixels(pixels);
       }
