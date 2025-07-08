@@ -912,7 +912,7 @@ void framework::scriptengine::run() {
           buffer.resize(n);
         }
 
-        auto L = table.lua_state();
+        const auto L = table.lua_state();
         sol::stack::push(L, table);
 
         for (std::size_t i = 0; i < n; ++i) {
