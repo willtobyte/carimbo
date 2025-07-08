@@ -901,22 +901,28 @@ void framework::scriptengine::run() {
     "Canvas",
     sol::no_constructor,
     "pixels", sol::property(
-      [](const graphics::canvas&) -> sol::object {
+      [](const graphics::canvas&) {
         return sol::lua_nil;
       },
       [](graphics::canvas& canvas, sol::table table) {
         const auto n = table.size();
 
-        thread_local static std::vector<uint32_t> pixels;
-        if (pixels.size() < n) {
-          pixels.resize(n);
+        static std::vector<uint32_t> buffer;
+        if (buffer.size() != n) [[unlikely]] {
+          buffer.resize(n);
         }
 
-        for (uint32_t i = 0; i < n; ++i) {
-          pixels[i] = table.raw_get<uint32_t>(i + 1);
+        auto L = table.lua_state();
+        sol::stack::push(L, table);
+
+        for (std::size_t i = 0; i < n; ++i) {
+          lua_rawgeti(L, -1, static_cast<int>(i + 1));
+          buffer[i] = static_cast<uint32_t>(lua_tointeger(L, -1));
+          lua_pop(L, 1);
         }
 
-        canvas.set_pixels(pixels);
+        lua_pop(L, 1);
+        canvas.set_pixels(buffer);
       }
     )
   );
