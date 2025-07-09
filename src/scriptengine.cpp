@@ -904,6 +904,10 @@ void framework::scriptengine::run() {
       [](const graphics::canvas&) {
         return sol::lua_nil;
       },
+      // [](graphics::canvas& canvas, sol::as_table_t<std::vector<uint32_t>> table) {
+      //   const std::vector<uint32_t>& pixels = table.value();
+      //   canvas.set_pixels(pixels);
+      // }
       [](graphics::canvas& canvas, sol::table table) {
         const auto n = table.size();
 
