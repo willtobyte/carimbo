@@ -904,8 +904,8 @@ void framework::scriptengine::run() {
       [](const graphics::canvas&) {
         return nullptr;
       },
-      [](graphics::canvas& canvas, const std::string& data) {
-        canvas.set_pixels(reinterpret_cast<const uint32_t*>(data.c_str()));
+      [](graphics::canvas& canvas, const char* data) {
+        canvas.set_pixels(reinterpret_cast<const uint32_t*>(data));
       }
     )
   );
