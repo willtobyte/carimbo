@@ -24,11 +24,11 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   _framebuffer.reset(texture);
 }
 
-void canvas::set_pixels(const std::vector<uint32_t>& pixels) noexcept {
+void canvas::set_pixels(const uint32_t* pixels) noexcept {
   const auto ptr = _framebuffer.get();
   const auto pitch = static_cast<int>(static_cast<size_t>(ptr->w) * sizeof(uint32_t));
 
-  SDL_UpdateTexture(ptr, nullptr, pixels.data(), pitch);
+  SDL_UpdateTexture(ptr, nullptr, pixels, pitch);
 }
 
 void canvas::draw() const noexcept {

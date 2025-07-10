@@ -10,7 +10,7 @@ public:
   explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() noexcept = default;
 
-  void set_pixels(const std::vector<uint32_t>& pixels) noexcept;
+  void set_pixels(const uint32_t* pixels) noexcept;
 
   void draw() const noexcept;
 
