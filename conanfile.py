@@ -59,7 +59,7 @@ class Carimbo(ConanFile):
             self.options["sol2"].with_lua = "luajit"
 
         if self._is_ios():
-          self.options["sdl"].opengl = False
+            self.options["sdl"].opengl = False
 
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
