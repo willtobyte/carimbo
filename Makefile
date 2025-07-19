@@ -13,16 +13,16 @@ EXTRA_FLAGS := -DHITBOX=ON -DSANDBOX=ON
 endif
 
 .PHONY: clean
-clean: ## Limpa os arquivos de build
+clean: ## Cleans build artifacts
 	@rm -rf build
 	@rm -rf ~/.conan2/p
 
 .PHONY: conan
-conan: ## Instala as dependências
+conan: ## Installs dependencies
 	@conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
 
 .PHONY: build
-build: ## Compila o projeto
+build: ## Builds the project
 	@cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) $(EXTRA_FLAGS)
 	@cmake --build build --parallel $(NCPUS) --config $(BUILDTYPE) --verbose
 

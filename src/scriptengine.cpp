@@ -26,7 +26,7 @@ public:
       : _L(lua.lua_state()),
         _function(std::move(function)) {}
 
-  void loop(float_t delta) noexcept override {
+  void loop(float_t delta) override {
     _function(delta);
 
     _frames++;
