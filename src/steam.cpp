@@ -87,7 +87,7 @@ bool SetAchievement(const char* name) {
 
 bool StoreStats() {
   if (pStoreStats) {
-    pStoreStats(SteamUserStats());
+    return pStoreStats(SteamUserStats());
   }
 
   return false;
