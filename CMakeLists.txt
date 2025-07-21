@@ -186,6 +186,7 @@ else()
       /RELEASE
       /NXCOMPAT
       /DYNAMICBASE
+      /NOCOFFGRPINFO
       /DEBUG:NONE
     )
 
@@ -241,6 +242,7 @@ else()
     set(RELEASE_LINKER_FLAGS
       -flto
       -Wl,-x
+      -Wl,-s
       -Wl,-S
       -Wl,-O3
     )
