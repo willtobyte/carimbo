@@ -282,26 +282,3 @@ if(NOT EMSCRIPTEN)
     )
   endif()
 endif()
-
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-  if(EMSCRIPTEN)
-    find_program(WASM_STRIP wasm-strip)
-    if(WASM_STRIP)
-      add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${WASM_STRIP}
-                $<TARGET_FILE_DIR:${PROJECT_NAME}>/$<TARGET_FILE_BASE_NAME:${PROJECT_NAME}>.wasm
-      )
-    endif()
-  elseif(MSVC)
-    find_program(STRIP_TOOL llvm-strip strip)
-    if(STRIP_TOOL)
-      add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${STRIP_TOOL} $<TARGET_FILE:${PROJECT_NAME}>
-      )
-    endif()
-  else()
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-      COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
-    )
-  endif()
-endif()
