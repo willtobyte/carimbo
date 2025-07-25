@@ -289,8 +289,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     if(WASM_STRIP)
       add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${WASM_STRIP}
-                $<TARGET_FILE_DIR:${PROJECT_NAME}>/
-                $<TARGET_FILE_BASE_NAME:${PROJECT_NAME}>.wasm
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>/$<TARGET_FILE_BASE_NAME:${PROJECT_NAME}>.wasm
       )
     endif()
   elseif(MSVC)
