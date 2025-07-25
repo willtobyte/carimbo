@@ -77,7 +77,6 @@ if(EMSCRIPTEN)
 
   set(EMSDK_LINK_DEBUG_FLAGS
     -g3
-    -s
     -gsource-map
     -sASSERTIONS=2
     -sDISABLE_EXCEPTION_CATCHING=0
@@ -102,8 +101,7 @@ if(EMSCRIPTEN)
     -Oz
     -g0
     -flto
-    --strip-debug
-    --strip-producers
+    -s
     -sASSERTIONS=1
     -sDISABLE_EXCEPTION_CATCHING=0
   )
@@ -233,6 +231,10 @@ else()
       -flto
       -fstrict-aliasing
       -funroll-loops
+      -ffunction-sections
+      -fdata-sections
+      -fvisibility=hidden
+      -fvisibility-inlines-hidden
       -fomit-frame-pointer
       -DNDEBUG
       -Werror
@@ -241,10 +243,8 @@ else()
 
     set(RELEASE_LINKER_FLAGS
       -flto
+      -s
       -Wl,-x
-      -Wl,-s
-      -Wl,-S
-      -Wl,-O3
     )
 
     target_compile_options(${PROJECT_NAME} PRIVATE
@@ -279,6 +279,28 @@ if(NOT EMSCRIPTEN)
   if(HAVE_LUAJIT)
     target_link_libraries(${PROJECT_NAME} PRIVATE
       luajit::luajit
+    )
+  endif()
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  if(EMSCRIPTEN)
+    find_program(WASM_STRIP wasm-strip)
+    if(WASM_STRIP)
+      add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${WASM_STRIP} $<TARGET_FILE:${PROJECT_NAME}>.wasm
+      )
+    endif()
+  elseif(MSVC)
+    find_program(STRIP_TOOL llvm-strip strip)
+    if(STRIP_TOOL)
+      add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${STRIP_TOOL} $<TARGET_FILE:${PROJECT_NAME}>
+      )
+    endif()
+  else()
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_STRIP} $<TARGET_FILE:${PROJECT_NAME}>
     )
   endif()
 endif()
