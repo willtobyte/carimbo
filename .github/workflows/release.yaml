@@ -299,10 +299,8 @@ jobs:
       - name: Strip WebAssembly binary
         working-directory: build
         run: |
-          ls -lah
           wasm-opt -Oz --enable-sign-ext --enable-bulk-memory --enable-threads carimbo.wasm -o carimbo.temp
           mv carimbo.temp carimbo.wasm
-          ls -lah
 
       - name: Compress artifacts
         working-directory: build
