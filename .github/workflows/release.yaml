@@ -300,7 +300,7 @@ jobs:
         working-directory: build
         run: |
           ls -lah
-          wasm-opt -Oz --all carimbo.wasm -o carimbo.temp
+          wasm-opt -Oz --enable-sign-ext --enable-bulk-memory --enable-threads carimbo.wasm -o carimbo.temp
           mv carimbo.temp carimbo.wasm
           ls -lah
 
