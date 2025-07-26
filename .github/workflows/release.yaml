@@ -249,7 +249,7 @@ jobs:
       - name: Install WABT (wasm-strip)
         run: |
           sudo apt-get update
-          sudo apt-get install -y wabt binaryen
+          sudo apt-get install -y binaryen
 
       - name: Install terser
         run: npm install terser -g
@@ -300,7 +300,7 @@ jobs:
         working-directory: build
         run: |
           ls -lah
-          wasm-opt -Oz carimbo.wasm -o carimbo.temp
+          wasm-opt --detect-features -Oz carimbo.wasm -o carimbo.temp
           mv carimbo.temp carimbo.wasm
           ls -lah
 
