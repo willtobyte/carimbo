@@ -2,13 +2,11 @@ name: Clang-Tidy Check
 
 on:
   push:
-    paths:
-      - 'src/**.cpp'
-      - 'src/**.h'
+    branches:
+      - "*"
   pull_request:
-    paths:
-      - 'src/**.cpp'
-      - 'src/**.h'
+    branches:
+      - main
 
 jobs:
   clang-tidy:
