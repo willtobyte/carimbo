@@ -27,15 +27,15 @@ class Carimbo(ConanFile):
         self.requires("ogg/1.3.5")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
-        self.requires("sdl/3.2.14")
+        self.requires("sdl/3.2.18")
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 
         if self._is_webassembly():
             return
 
-        self.requires("boost/1.87.0")
-        self.requires("openssl/3.4.1")
+        self.requires("boost/1.88.0")
+        self.requires("openssl/3.5.1")
 
         if self._is_jit_capable():
             self.requires("luajit/2.1.0-beta3")
