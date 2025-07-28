@@ -1,0 +1,58 @@
+name: Clang-Tidy Check
+
+on:
+  push:
+    paths:
+      - 'src/**.cpp'
+      - 'src/**.h'
+  pull_request:
+    paths:
+      - 'src/**.cpp'
+      - 'src/**.h'
+
+jobs:
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Clang tools
+        run: sudo apt-get install -y clang-tidy
+
+      - name: Setup Conan
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install conan
+          conan profile detect --force
+          conan config install https://github.com/willtobyte/conan-configs.git --type git
+
+      - name: Configure tools & CMake
+        run: |
+          cat <<'EOF' >> ~/.conan2/profiles/default
+          [replace_tool_requires]
+          meson/*: meson/[*]
+          pkgconf/*: pkgconf/[*]
+
+          [tool_requires]
+          !cmake/*: cmake/[>=3 <4]
+          EOF
+
+      - name: Install dependencies
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+
+      - name: Build
+        run: |
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
+
+      - name: Run Clang-Tidy
+        run: |
+          find src \( -name '*.cpp' -o -name '*.hpp' \) -print0 |
+            xargs -0 -n1 -P$(nproc) \
+            clang-tidy -extra-arg=-Wno-unknown-warning-option -warnings-as-errors='*' \
+              -header-filter='.*' \
+              -quiet \
+              -p build \
+              || true
