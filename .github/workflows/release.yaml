@@ -188,7 +188,7 @@ jobs:
           path: artifacts/*
 
   Ubuntu:
-    runs-on: ubuntu-20.04-16core
+    runs-on: ubuntu-24.04-arm64
     if: true
     steps:
       - name: Checkout
