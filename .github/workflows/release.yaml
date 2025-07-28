@@ -188,8 +188,8 @@ jobs:
           path: artifacts/*
 
   Ubuntu:
-    runs-on: ubuntu-latest
-    if: false
+    runs-on: ubuntu-20.04-16core
+    if: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
