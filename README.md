@@ -10,7 +10,7 @@
     <img src="https://github.com/willtobyte/carimbo/actions/workflows/windows.yaml/badge.svg?branch=main" alt="Windows" />
   </span>
   <br />
-  <img src="carimbo.avif" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine" />
+  <img src="carimbo.jpg" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine" />
 </p>
 
 ### About
