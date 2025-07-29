@@ -235,62 +235,6 @@ jobs:
           name: Ubuntu
           path: artifacts/*
 
-  UbuntuARM:
-    runs-on: buildjet-4vcpu-ubuntu-2404-arm
-    if: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install GCC 14
-        run: |
-          sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-          sudo apt update
-          sudo apt install -y g++-14
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
-
-      - name: Setup Conan
-        run: |
-          python3 -m pip install --upgrade pip
-          pip install conan
-          conan profile detect --force
-          conan config install https://github.com/willtobyte/conan-configs.git --type git
-
-      - name: Configure tools & CMake
-        run: |
-          cat <<'EOF' >> ~/.conan2/profiles/default
-          [replace_tool_requires]
-          meson/*: meson/[*]
-          pkgconf/*: pkgconf/[*]
-
-          [tool_requires]
-          !cmake/*: cmake/[>=3 <4]
-          EOF
-
-      - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
-
-      - name: Build
-        run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
-
-      - name: Compress artifacts
-        working-directory: build
-        run: |
-          mkdir -p ../artifacts
-          chmod +x carimbo
-          chmod 644 LICENSES
-          tar -czvf UbuntuARM.tar.gz carimbo LICENSES
-          mv UbuntuARM.tar.gz ../artifacts
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: UbuntuARM
-          path: artifacts/*
-
   WebAssembly:
     runs-on: ubuntu-latest
     steps:
