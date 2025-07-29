@@ -196,7 +196,6 @@ jobs:
 
       - name: Setup Conan
         run: |
-          python3 -m pip install --upgrade pip
           pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
@@ -244,8 +243,7 @@ jobs:
 
       - name: Setup Conan
         run: |
-          python3 -m pip install --upgrade pip
-          pip install conan
+          pip install --user conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
