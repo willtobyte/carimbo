@@ -27,7 +27,7 @@ struct hitbox final {
 struct animation final {
   bool oneshot{false};
   std::optional<std::string> next;
-  std::optional<hitbox> hitbox;
+  std::optional<framework::hitbox> hitbox;
   std::shared_ptr<audio::soundfx> effect;
   std::vector<keyframe> keyframes;
 };

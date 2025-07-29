@@ -33,6 +33,11 @@ class envelope final {
 public:
   payload_t payload;
 
+  void reset(collisionenvelope&& envelope) noexcept;
+  void reset(mailenvelope&& envelope) noexcept;
+  void reset(timerenvelope&& envelope) noexcept;
+  void reset() noexcept;
+
   envelope() noexcept = default;
   ~envelope() noexcept = default;
 
@@ -45,10 +50,5 @@ public:
   [[nodiscard]] inline const auto& as_collision() const noexcept { return std::get<collisionenvelope>(payload); }
   [[nodiscard]] inline const auto& as_mail() const noexcept { return std::get<mailenvelope>(payload); }
   [[nodiscard]] inline const auto& as_timer() const noexcept { return std::get<timerenvelope>(payload); }
-
-  void reset(collisionenvelope&& envelope) noexcept;
-  void reset(mailenvelope&& envelope) noexcept;
-  void reset(timerenvelope&& envelope) noexcept;
-  void reset() noexcept;
 };
 }
