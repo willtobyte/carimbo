@@ -427,6 +427,7 @@ jobs:
       - iOS
       - macOS
       - Ubuntu
+      - UbuntuARM
       - WebAssembly
       - Windows
     runs-on: ubuntu-latest
