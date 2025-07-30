@@ -235,7 +235,7 @@ jobs:
           path: artifacts/*
 
   UbuntuARM:
-    runs-on: warp-ubuntu-latest-arm64-8x
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
