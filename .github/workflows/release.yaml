@@ -265,7 +265,7 @@ jobs:
             pkgconf/*: pkgconf/[*]
             EOF
 
-            conan profile new default --detect --force
+            conan profile detect --force
             conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
             cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
