@@ -244,7 +244,7 @@ jobs:
         uses: uraimo/run-on-arch-action@v3
         with:
           arch: armv8
-          distro: ubuntu24.04
+          distro: ubuntu22.04
           githubToken: ${{ github.token }}
           dockerRunArgs: |
             --volume "${{ github.workspace }}:/workspace"
