@@ -234,7 +234,7 @@ jobs:
           name: Ubuntu
           path: artifacts/*
 
-  UbuntuARMv7:
+  UbuntuAARCH64:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -265,6 +265,7 @@ jobs:
             pkgconf/*: pkgconf/[*]
             EOF
 
+            conan profile new default --detect --force
             conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
             cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
@@ -414,7 +415,7 @@ jobs:
       - iOS
       - macOS
       - Ubuntu
-      - UbuntuARMv7
+      - UbuntuAARCH64
       - WebAssembly
       - Windows
     runs-on: ubuntu-latest
