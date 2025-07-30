@@ -268,7 +268,7 @@ jobs:
             export CC=arm-linux-gnueabihf-gcc-14
             export CXX=arm-linux-gnueabihf-g++-14
 
-            pip install conan
+            pip3 install conan
             conan profile detect --force
             conan config install https://github.com/willtobyte/conan-configs.git --type git
 
