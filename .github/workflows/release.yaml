@@ -266,9 +266,7 @@ jobs:
             EOF
 
             conan profile detect --force
-            conan profile update settings.compiler=gcc default
-            conan profile update settings.compiler.version=14 default
-            conan profile update settings.compiler.libcxx=libstdc++11 default
+            conan install . -pr default -s:h compiler=gcc -s:h compiler.version=14 -s:h compiler.libcxx=libstdc++11
             conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
             cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
