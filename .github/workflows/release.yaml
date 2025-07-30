@@ -250,7 +250,7 @@ jobs:
             --volume "${{ github.workspace }}:/workspace"
           run: |
             apt-get update -y
-            apt-get install -y git gcc-14 g++-14 cmake libnuma-dev python3-pip python3-venv
+            apt-get install -y git gcc-14 g++-14 cmake build-essential libnuma-dev python3-pip python3-venv
             cd /workspace
             export CC=arm-linux-gnueabihf-gcc-14
             export CXX=arm-linux-gnueabihf-g++-14
@@ -263,9 +263,6 @@ jobs:
             [replace_tool_requires]
             meson/*: meson/[*]
             pkgconf/*: pkgconf/[*]
-
-            [tool_requires]
-            !cmake/*: cmake/[>=3 <4]
             EOF
 
             conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
