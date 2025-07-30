@@ -263,9 +263,6 @@ jobs:
             [replace_tool_requires]
             meson/*: meson/[*]
             pkgconf/*: pkgconf/[*]
-
-            [tool_requires]
-            !cmake/*: cmake/[>=3 <4]
             EOF
 
             conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
