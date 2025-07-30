@@ -234,21 +234,44 @@ jobs:
           name: Ubuntu
           path: artifacts/*
 
-  UbuntuARM:
-    runs-on: self-hosted
-    if: true
+  UbuntuARMv7:
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Conan
+      - name: Prepare ARMv7 emulation via QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx builder
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build cross‑compiled binary
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm/v7
+          push: false
+
+      - name: Cross‑compile native
+        uses: uraimo/run-on-arch-action@v3
+        with:
+          arch: armv7
+          distro: ubuntu24.04
+          githubToken: ${{ github.token }}
+          dockerRunArgs: |
+            --volume "${{ github.workspace }}:/workspace"
         run: |
-          pip install --user conan
+          apt-get update -y
+          apt-get install -y gcc-14 g++-14 libnuma-dev
+          cd /workspace
+          export CC=arm-linux-gnueabihf-gcc-14
+          export CXX=arm-linux-gnueabihf-g++-14
+
+          pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
-        run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
           meson/*: meson/[*]
@@ -258,28 +281,10 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+          conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
-      - name: Build
-        run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           cmake --build build --config Release --verbose
-
-      - name: Compress artifacts
-        working-directory: build
-        run: |
-          mkdir -p ../artifacts
-          chmod +x carimbo
-          chmod 644 LICENSES
-          tar -czvf Ubuntu.tar.gz carimbo LICENSES
-          mv Ubuntu.tar.gz ../artifacts
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: UbuntuARM
-          path: artifacts/*
 
   WebAssembly:
     runs-on: ubuntu-latest
@@ -425,7 +430,7 @@ jobs:
       - iOS
       - macOS
       - Ubuntu
-      - UbuntuARM
+      - UbuntuARMv7
       - WebAssembly
       - Windows
     runs-on: ubuntu-latest
