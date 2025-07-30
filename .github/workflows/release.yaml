@@ -251,6 +251,7 @@ jobs:
           run: |
             apt-get update -y
             apt-get install -y git gcc-14 g++-14 cmake build-essential libnuma-dev python3-pip python3-venv
+            apt-get install -y ninja-build pkg-config libudev-dev libpulse-dev libasound2-dev libx11-dev libxrandr-dev libxi-dev libxinerama-dev libxcursor-dev libgl1-mesa-dev libglu1-mesa-dev libwayland-dev libxkbcommon-dev
             cd /workspace
             export CC=arm-linux-gnueabihf-gcc-14
             export CXX=arm-linux-gnueabihf-g++-14
