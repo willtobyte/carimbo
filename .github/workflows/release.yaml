@@ -261,30 +261,30 @@ jobs:
           githubToken: ${{ github.token }}
           dockerRunArgs: |
             --volume "${{ github.workspace }}:/workspace"
-        run: |
-          apt-get update -y
-          apt-get install -y gcc-14 g++-14 libnuma-dev
-          cd /workspace
-          export CC=arm-linux-gnueabihf-gcc-14
-          export CXX=arm-linux-gnueabihf-g++-14
+          run: |
+            apt-get update -y
+            apt-get install -y gcc-14 g++-14 libnuma-dev
+            cd /workspace
+            export CC=arm-linux-gnueabihf-gcc-14
+            export CXX=arm-linux-gnueabihf-g++-14
 
-          pip install conan
-          conan profile detect --force
-          conan config install https://github.com/willtobyte/conan-configs.git --type git
+            pip install conan
+            conan profile detect --force
+            conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-          cat <<'EOF' >> ~/.conan2/profiles/default
-          [replace_tool_requires]
-          meson/*: meson/[*]
-          pkgconf/*: pkgconf/[*]
+            cat <<'EOF' >> ~/.conan2/profiles/default
+            [replace_tool_requires]
+            meson/*: meson/[*]
+            pkgconf/*: pkgconf/[*]
 
-          [tool_requires]
-          !cmake/*: cmake/[>=3 <4]
-          EOF
+            [tool_requires]
+            !cmake/*: cmake/[>=3 <4]
+            EOF
 
-          conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+            conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+            cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+            cmake --build build --config Release --verbose
 
   WebAssembly:
     runs-on: ubuntu-latest
