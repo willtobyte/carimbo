@@ -86,7 +86,7 @@ class Carimbo(ConanFile):
             toolchain.preprocessor_definitions["HAVE_BOOST"] = None
 
         if self._is_jit_capable():
-            toolchain.preprocessor_definitions["HAVE_LUAJIT"] = None
+            toolchain.preprocessor_definitions["SOL_LUAJIT"] = 1
 
         if self._have_steam():
             toolchain.preprocessor_definitions["HAVE_STEAM"] = None

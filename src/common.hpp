@@ -4,12 +4,6 @@
  #define NOMINMAX
 #endif
 
-#define SOL_ALL_SAFETIES_ON 1
-#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
-#ifdef HAVE_LUAJIT
- #define SOL_LUAJIT 1
-#endif
-
 #define WEBSOCKET 1
 
 #ifdef EMSCRIPTEN
@@ -29,11 +23,13 @@
  #include <boost/beast/websocket/ssl.hpp>
  #include <boost/config.hpp>
 
- #ifdef DEBUG
+#ifdef DEBUG
+  #define SOL_ALL_SAFETIES_ON 1
+  #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
+
   #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
   #include <boost/stacktrace.hpp>
   #define HAVE_STACKSTRACE 1
- #endif
 #endif
 
 extern "C" {
