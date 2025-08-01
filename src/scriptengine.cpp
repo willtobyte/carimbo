@@ -220,15 +220,17 @@ void framework::scriptengine::run() {
   };
 
   auto xorshift_random_int = [xorshift128plus](lua_Integer low, lua_Integer high) -> lua_Integer {
-    uint64_t r = xorshift128plus();
-    uint64_t range = static_cast<uint64_t>(high - low + 1);
-    uint64_t bounded = r % range;
-    return static_cast<lua_Integer>(low + bounded);
+    const uint64_t ulow = static_cast<uint64_t>(low);
+    const uint64_t uhigh = static_cast<uint64_t>(high);
+    const uint64_t range = uhigh - ulow + 1;
+    const uint64_t r = xorshift128plus();
+    const uint64_t bounded = r % range;
+    return static_cast<lua_Integer>(ulow + bounded);
   };
 
-  const uint64_t now = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-
-  seed(now, now ^ 0xdeadbeefcafebabeULL);
+  const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+  const auto seed_value = static_cast<uint64_t>(now);
+  seed(seed_value, seed_value ^ 0xdeadbeefcafebabeULL);
 
   lua["math"]["random"] = sol::overload(
     [xorshift_random_double]() -> double {
