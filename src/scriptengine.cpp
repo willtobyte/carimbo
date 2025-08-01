@@ -229,7 +229,8 @@ void framework::scriptengine::run() {
   };
 
   const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  const auto seed_value = static_cast<uint64_t>(now);
+  const uint64_t seed_value = static_cast<uint64_t>(static_cast<std::make_unsigned_t<decltype(now)>>(now));
+
   seed(seed_value, seed_value ^ 0xdeadbeefcafebabeULL);
 
   lua["math"]["random"] = sol::overload(
