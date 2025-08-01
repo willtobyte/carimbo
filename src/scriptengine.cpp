@@ -228,8 +228,7 @@ void framework::scriptengine::run() {
     return static_cast<lua_Integer>(ulow + bounded);
   };
 
-  const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  const uint64_t seed_value = static_cast<uint64_t>(static_cast<std::make_unsigned_t<decltype(now)>>(now));
+  const uint64_t seed_value = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
 
   seed(seed_value, seed_value ^ 0xdeadbeefcafebabeULL);
 
