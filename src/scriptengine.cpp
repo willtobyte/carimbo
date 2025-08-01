@@ -219,7 +219,7 @@ void framework::scriptengine::run() {
     return static_cast<double>(xorshift128plus()) * inv_max;
   };
 
-  auto xorshift_random_int = [xorshift128plus](int64_t low, int64_t high) -> int {
+  auto xorshift_random_int = [xorshift128plus](uint64_t low, uint64_t high) -> int {
     const auto r = xorshift128plus();
     return static_cast<int>(low + (r % (high - low + 1)));
   };
@@ -231,10 +231,10 @@ void framework::scriptengine::run() {
 		[xorshift_random_double]() -> double {
 			return xorshift_random_double();
 		},
-		[xorshift_random_int](int upper) -> int {
+		[xorshift_random_int](uint64_t upper) -> int {
 			return xorshift_random_int(1, upper);
 		},
-		[xorshift_random_int](int lower, int upper) -> int {
+		[xorshift_random_int](uint64_t lower, uint64_t upper) -> int {
 			return xorshift_random_int(lower, upper);
 		}
 	);
