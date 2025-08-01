@@ -80,6 +80,8 @@ class Carimbo(ConanFile):
 
         toolchain = CMakeToolchain(self)
 
+        toolchain.preprocessor_definitions["SOL_USING_CXX_LUA"] = None
+
         if not self._is_webassembly():
             toolchain.preprocessor_definitions["HAVE_BOOST"] = None
 

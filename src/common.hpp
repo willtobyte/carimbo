@@ -36,6 +36,12 @@
  #endif
 #endif
 
+extern "C" {
+  #include <lua.h>
+  #include <lauxlib.h>
+  #include <lualib.h>
+}
+
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <SDL3/SDL.h>
