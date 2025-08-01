@@ -245,8 +245,8 @@ void framework::scriptengine::run() {
   );
 
   lua["math"]["randomseed"] = [seed](lua_Integer seed_value) {
-    const auto seed = static_cast<uint64_t>(seed_value);
-    seed(seed, seed ^ 0xdeadbeefcafebabeULL);
+    const uint64_t s = static_cast<uint64_t>(seed_value);
+    seed(s, s ^ 0xdeadbeefcafebabeULL);
   };
 
   steam::achievement achievement;
