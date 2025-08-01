@@ -245,7 +245,8 @@ void framework::scriptengine::run() {
   );
 
   lua["math"]["randomseed"] = [seed](int64_t seed_value) {
-    seed(seed_value, seed_value ^ static_cast<int64_t>(0xdeadbeefcafebabeULL));
+    seed(static_cast<uint64_t>(seed_value),
+         static_cast<uint64_t>(seed_value) ^ 0xdeadbeefcafebabeULL);
   };
 
   steam::achievement achievement;
