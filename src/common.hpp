@@ -22,14 +22,17 @@
  #include <boost/beast/websocket.hpp>
  #include <boost/beast/websocket/ssl.hpp>
  #include <boost/config.hpp>
+#endif
 
 #ifdef DEBUG
   #define SOL_ALL_SAFETIES_ON 1
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 
-  #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
-  #include <boost/stacktrace.hpp>
-  #define HAVE_STACKSTRACE 1
+  #if HAVE_BOOST
+    #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
+    #include <boost/stacktrace.hpp>
+    #define HAVE_STACKSTRACE 1
+  #endif
 #endif
 
 extern "C" {
