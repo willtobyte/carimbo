@@ -194,18 +194,18 @@ void framework::scriptengine::run() {
     #endif
   };
 
-  static std::array<uint64_t, 2> prng_state;
+  static std::array<int64_t, 2> prng_state;
 
-  auto seed = [](uint64_t a, uint64_t b) {
+  auto seed = [](int64_t a, int64_t b) {
     if (a == 0 && b == 0) b = 1;
     prng_state[0] = a;
     prng_state[1] = b;
   };
 
-  auto xorshift128plus = []() -> uint64_t {
-    uint64_t s1 = prng_state[0];
-    uint64_t s0 = prng_state[1];
-    uint64_t result = s0 + s1;
+  auto xorshift128plus = []() -> int64_t {
+    int64_t s1 = prng_state[0];
+    int64_t s0 = prng_state[1];
+    int64_t result = s0 + s1;
 
     prng_state[0] = s0;
     s1 ^= s1 << 23;
@@ -216,33 +216,34 @@ void framework::scriptengine::run() {
 
   auto xorshift_random_double = [xorshift128plus]() -> double {
     constexpr double inv_max = 1.0 / static_cast<double>(std::numeric_limits<uint64_t>::max());
-    return static_cast<double>(xorshift128plus()) * inv_max;
+    return static_cast<double>(static_cast<uint64_t>(xorshift128plus())) * inv_max;
   };
 
-  auto xorshift_random_int = [xorshift128plus](uint64_t low, uint64_t high) -> int {
-    uint64_t r = xorshift128plus();
-    uint64_t range = high - low + 1;
-    return static_cast<int>(low + (r % range));
+  auto xorshift_random_int = [xorshift128plus](int64_t low, int64_t high) -> int {
+    int64_t r = xorshift128plus();
+    int64_t range = high - low + 1;
+    int64_t bounded = static_cast<int64_t>(static_cast<uint64_t>(r) % static_cast<uint64_t>(range));
+    return static_cast<int>(low + bounded);
   };
 
-  const auto now = static_cast<uint64_t>(std::chrono::high_resolution_clock::now().time_since_epoch().count());
+  const int64_t now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
-  seed(now, now ^ 0xdeadbeefcafebabeULL);
+  seed(now, now ^ static_cast<int64_t>(0xdeadbeefcafebabeULL));
 
   lua["math"]["random"] = sol::overload(
     [xorshift_random_double]() -> double {
       return xorshift_random_double();
     },
-    [xorshift_random_int](uint64_t upper) -> int {
+    [xorshift_random_int](int64_t upper) -> int {
       return xorshift_random_int(1, upper);
     },
-    [xorshift_random_int](uint64_t lower, uint64_t upper) -> int {
+    [xorshift_random_int](int64_t lower, int64_t upper) -> int {
       return xorshift_random_int(lower, upper);
     }
   );
 
-  lua["math"]["randomseed"] = [seed](uint64_t seed_value) {
-    seed(seed_value, seed_value ^ 0xdeadbeefcafebabeULL);
+  lua["math"]["randomseed"] = [seed](int64_t seed_value) {
+    seed(seed_value, seed_value ^ static_cast<int64_t>(0xdeadbeefcafebabeULL));
   };
 
   steam::achievement achievement;
