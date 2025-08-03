@@ -23,6 +23,10 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 "Carimbo" comes from the 🇧🇷 word for "stamp," and that is exactly what a 2D game engine does—it continuously stamps sprites onto the screen.
 
+### Documentation
+
+See [DOCUMENTATION.md](DOCUMENTATION.md).
+
 ### Games
 
 Games and demos created with the Carimbo engine are hosted at [carimbo.games](https://carimbo.games). They can be tested or played online without installation, thanks to WebAssembly technology supported by all modern browsers.
