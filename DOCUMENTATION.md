@@ -105,24 +105,19 @@ end
 
 Both functions are empty placeholders here and should be filled with game-specific logic.
 
-### Managers &
-
-
-    "canvas", &framework::engine::canvas,
-    "cassette", &framework::engine::cassette,
-    "objectmanager", &framework::engine::objectmanager,
-    "fontfactory", &framework::engine::fontfactory,
-    "overlay", &framework::engine::overlay,
-    "resourcemanager", &framework::engine::resourcemanager,
-    "soundmanager", &framework::engine::soundmanager,
-    "statemanager", &framework::engine::statemanager,
-    "scenemanager", &framework::engine::scenemanager,
-    "timermanager", &framework::engine::timermanager,
-
+### Managers & Miscellaneous
 
 The engine instance, now made global for convenience, holds the following components:
 * `canvas` an object that has a pixels property, where you can write arbitrary pixels to the screen — think of it like a poor man’s shader.
 * `cassette` remember when old computers and some consoles used cassette tapes to store programs? Same logic — you can use it as a key-value store to save game data.
+* `objectmanager` manager responsible for creating and destroying objects
+* `fontfactory` manager responsible for loading bitmap fonts.
+* `overlay` manager responsible for handling the Heads-Up Display (HUD)
+* `resourcemanager` manager responsible for batch loading assets and flushing unused ones.
+* `soundmanager` manager responsible for playing and stopping sounds, as well as flushing them.
+* `statemanager` manager responsible for allowing instant querying of input state.
+* `scenemanager` manager responsible for registering and setting the current scenario.
+* `timermanager` manager responsible for creating periodic and single-shot timers.
 
 
 ### Scenes
