@@ -154,8 +154,8 @@ local rep, char = string.rep, string.char
 function Effect:new()
   local width, height = 480, 270
 
-  -- Define a single red pixel (RGBA = 255, 0, 0, 255)
-  local pixel = char(255, 0, 0, 255)
+  -- Define a single red pixel (BGRA = 0, 0, 255, 255)
+  local pixel = char(0, 0, 255, 255)
 
   -- One horizontal line of red pixels
   local line = rep(pixel, width)
