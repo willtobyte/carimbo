@@ -1,0 +1,38 @@
+
+
+### Engine Initialization
+
+```lua
+_G.engine = EngineFactory.new()
+	:with_title("Untitled")
+	:with_width(1920)
+	:with_height(1080)
+	:with_scale(4.0)
+	:with_fullscreen(true)
+	:create()
+```
+
+This block creates a new engine instance using a fluent interface provided by _EngineFactory_. Here’s what each method does:
+* `with_title("Untitled")`: Sets the window title to "Untitled".
+* `with_width(1920)`: Sets the window width to 1920 pixels.
+* `with_height(1080)`: Sets the window height to 1080 pixels.
+* `with_scale(4.0)`: Applies a render scaling factor of 4.0 (useful for retro pixel art aesthetics).
+* `with_fullscreen(true)`: Launches the engine in fullscreen mode.
+* `create()`: Finalizes the setup and returns the initialized engine object.
+
+The engine is stored globally as `_G.engine`.
+
+#### Lifecycle Hooks
+
+```lua
+function setup()
+end
+
+function loop()
+end
+```
+
+* `setup()`: Called once when the engine starts. Use this function to initialize game objects, load resources, or prepare state.
+* `loop()`: Called every frame. This is the main game loop where game logic, input handling, and rendering should be performed.
+
+Both functions are empty placeholders here and should be filled with game-specific logic.
