@@ -1,3 +1,4 @@
+# Carimbo Lua API Documentation
 
 ## Lua
 
@@ -16,6 +17,8 @@ achievement:unlock("achievement_id")
 ```
 
 It works on macOS (Apple Silicon) and Windows (amd64), and it was also tested and confirmed to work on Proton for Linux without any necessary changes.
+
+## The Basics
 
 ### File structure
 
