@@ -177,6 +177,20 @@ end
 return Effect:new()
 ```
 
+How to use:
+
+```lua
+local effect = require("effects/effect")
+
+local scene = {}
+
+function scene.on_loop()
+	effect:loop()
+end
+
+return scene
+```
+
 ### Cassette
 
 ### Scenes
