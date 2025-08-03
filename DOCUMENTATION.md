@@ -141,27 +141,39 @@ end
 ### Canvas
 
 ```lua
+-- Effect module that fills the entire canvas with a solid red color.
+
 local Effect = {}
 Effect.__index = Effect
 
+-- Local aliases for performance
 local rep, char = string.rep, string.char
 
 function Effect:new()
   local width, height = 480, 270
+
+  -- Define a single red pixel (RGBA = 255, 0, 0, 255)
   local pixel = char(255, 0, 0, 255)
+
+  -- One horizontal line of red pixels
   local line = rep(pixel, width)
+
+  -- Full frame precomputed: vertical repetition of red lines
   local frame = rep(line, height)
 
   return setmetatable({
-    canvas = engine:canvas(),
-    frame = frame,
-  }, self)
+      canvas = engine:canvas(),
+      frame = frame,
+    }, self)
 end
 
+-- Loop function: called every frame to render the effect
 function Effect:loop()
+  -- Set the entire canvas to the precomputed red frame
   self.canvas.pixels = self.frame
 end
 
+-- Return an initialized instance of Effect
 return Effect:new()
 ```
 
