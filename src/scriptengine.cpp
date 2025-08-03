@@ -27,6 +27,8 @@ double xorshift_random_double() {
 }
 
 lua_Integer xorshift_random_int(const lua_Integer low, const lua_Integer high) {
+  if (low > high) std::swap(low, high);
+
   const auto ulow = static_cast<uint64_t>(low);
   const auto range = static_cast<uint64_t>(high - low + 1);
   return static_cast<lua_Integer>(ulow + (xorshift128plus() % range));
