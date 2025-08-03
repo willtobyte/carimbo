@@ -1,7 +1,6 @@
 #include "scriptengine.hpp"
 
 static std::array<uint64_t, 2> prng_state;
-constexpr double inv_max = 1.0 / static_cast<double>(std::numeric_limits<uint64_t>::max());
 
 void seed(const uint64_t a, uint64_t b) {
   if (a == 0 && b == 0) b = 1;
@@ -21,6 +20,8 @@ uint64_t xorshift128plus() {
 }
 
 double xorshift_random_double() {
+  static constexpr const auto inv_max = 1.0 / static_cast<double>(std::numeric_limits<uint64_t>::max());
+
   return static_cast<double>(xorshift128plus()) * inv_max;
 }
 
