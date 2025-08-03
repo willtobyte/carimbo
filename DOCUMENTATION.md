@@ -6,7 +6,7 @@ Carimbo runs on multiple platforms—Windows, Linux, macOS, Android, iOS, WebAss
 
 ## Lua
 
-Carimbo supports both PUC-Rio Lua and LuaJIT.
+Carimbo supports both [PUC-Rio Lua](https://lua.org) and [LuaJIT](https://luajit.org).
 PUC-Rio Lua is only used when compiling to WebAssembly or targeting iOS, since LuaJIT is not compatible with WebAssembly and JIT compilation is not permitted on iOS. For all other platforms, LuaJIT is used to take advantage of its Just-In-Time compilation performance benefits.
 
 **It’s important to always write code that is compatible with both runtimes** to ensure maximum portability across all supported platforms.
@@ -221,7 +221,7 @@ return scene
 
 ### Cassette
 
-Remember when the world was simple, things were hard, and we were poor? I had the chance to use a ZX81 clone, and the only way to store data long-term was on a cassette tape.
+Remember when the world was simple, things were hard, and we were poor? I had the chance to use a [ZX81 clone](https://en.wikipedia.org/wiki/TK85), and the only way to store data long-term was on a cassette tape.
 
 Well, in Carimbo, there’s an interface for reading and writing the game’s state in a key-value format to a `cassette.json` file, or to a cookie when running on the web.
 
