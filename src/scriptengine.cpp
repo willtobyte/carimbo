@@ -2,10 +2,11 @@
 
 static std::array<uint64_t, 2> prng_state;
 
-void seed(const uint64_t a, uint64_t b) {
-  if (a == 0 && b == 0) b = 1;
-  prng_state[0] = a;
-  prng_state[1] = b;
+void seed(uint64_t value) {
+  constexpr uint64_t mix = 0xdeadbeefcafebabeULL;
+  if (value == 0) value = 1;
+  prng_state[0] = value;
+  prng_state[1] = value ^ mix;
 }
 
 uint64_t xorshift128plus() {
@@ -226,8 +227,7 @@ void framework::scriptengine::run() {
   };
 
   const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  const auto seed_val = static_cast<uint64_t>(now);
-  seed(seed_val, seed_val ^ 0xdeadbeefcafebabeULL);
+  seed(static_cast<uint64_t>(now));
 
   lua["math"]["random"] = sol::overload(
     []() -> double {
@@ -242,8 +242,7 @@ void framework::scriptengine::run() {
   );
 
   lua["math"]["randomseed"] = [](lua_Integer seed_value) {
-    const uint64_t s = static_cast<uint64_t>(seed_value);
-    seed(s, s ^ 0xdeadbeefcafebabeULL);
+    seed(static_cast<uint64_t>(seed_value));
   };
 
   steam::achievement achievement;
