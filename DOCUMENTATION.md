@@ -21,8 +21,8 @@ Any game made with the Carimbo must follow the following structure.
 │   └── myscene
 │       └── myitem.json
 ├── scenes
-│   ├── babyroom.json
-│   └── babyroom.lua
+│   ├── myscene.json
+│   └── myscene.lua
 └── scripts
     ├── helpers
     │   └── functional.lua
