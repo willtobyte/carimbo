@@ -72,12 +72,12 @@ It must be located inside `scripts/main.lua`.
 
 ```lua
 _G.engine = EngineFactory.new()
-	:with_title("Untitled")
-	:with_width(1920)
-	:with_height(1080)
-	:with_scale(4.0)
-	:with_fullscreen(true)
-	:create()
+  :with_title("Untitled")
+  :with_width(1920)
+  :with_height(1080)
+  :with_scale(4.0)
+  :with_fullscreen(true)
+  :create()
 ```
 
 This block creates a new engine instance using a fluent interface provided by _EngineFactory_. Here’s what each method does:
@@ -127,8 +127,8 @@ local timermanager = engine:timermanager()
 function scene.on_enter()
   local delay = 600
   local id = timermanager:set(delay, function()
-		print("On timer.")
-	end)
+    print("On timer.")
+  end)
 end
 ```
 
@@ -185,9 +185,9 @@ function scene.on_leave()
   -- SceneManager will handle stopping all sounds before the transition.
 
   -- Clean up the object pool.
-	for o in pairs(pool) do
-		pool[o] = nil
-	end
+  for o in pairs(pool) do
+    pool[o] = nil
+  end
 end
 
 return scene
@@ -201,9 +201,9 @@ After registering one or more scenes, call `set` to make the SceneManager use th
 local scenemanager = engine:scenemanager()
 
 function setup()
-	scenemanager:register("myscene")
-	-- ...Other scenes.
+  scenemanager:register("myscene")
+  -- ...Other scenes.
 
-	scenemanager:set("myscene")
+  scenemanager:set("myscene")
 end
 ```
