@@ -107,7 +107,7 @@ Both functions are empty placeholders here and should be filled with game-specif
 
 ### Managers & Miscellaneous
 
-The engine instance, now made global for convenience, holds the following components:
+The __**engine**__ instance, now made global for convenience, holds the following components:
 * `canvas` an object that has a pixels property, where you can write arbitrary pixels to the screen — think of it like a poor man’s shader.
 * `cassette` remember when old computers and some consoles used cassette tapes to store programs? Same logic — you can use it as a key-value store to save game data.
 * `objectmanager` manager responsible for creating and destroying objects
