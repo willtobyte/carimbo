@@ -1,5 +1,9 @@
 # Carimbo Lua API Documentation
 
+## Platforms
+
+Carimbo runs on multiple platforms—Windows, Linux, macOS, Android, iOS, WebAssembly, etc.—but currently, releases are only compiled for Windows (amd64), macOS (Apple Silicon), and WebAssembly.
+
 ## Lua
 
 Carimbo supports both PUC-Rio Lua and LuaJIT.
@@ -18,7 +22,7 @@ achievement:unlock("achievement_id")
 
 It works on macOS (Apple Silicon) and Windows (amd64), and it was also tested and confirmed to work on Proton for Linux without any necessary changes.
 
-## The Basics
+## The essential
 
 ### File structure
 
