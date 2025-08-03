@@ -24,7 +24,7 @@ It works on macOS (Apple Silicon) and Windows (amd64), and it was also tested an
 
 ## The essential
 
-### File structure
+### Game Filesystem Structure
 
 Any game made with the Carimbo must follow the following structure.
 
