@@ -161,7 +161,7 @@ local scenemanager = engine:scenemanager()
 
 function setup()
 	scenemanager:register("myscene")
-	-- ...
+	-- ...Other scenes.
 
 	scenemanager:set("myscene")
 end
