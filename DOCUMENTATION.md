@@ -104,3 +104,36 @@ end
 * `loop()`: Called every frame. This is the main game loop where game logic, input handling, and rendering should be performed.
 
 Both functions are empty placeholders here and should be filled with game-specific logic.
+
+
+### Scenes
+
+
+```lua
+local scene = {}
+
+local pool = {}
+
+function scene.on_enter()
+end
+
+function scene.on_loop()
+end
+
+function scene.on_text(text)
+end
+
+function scene.on_keypress(code)
+end
+
+function scene.on_motion(x, y)
+end
+
+function scene.on_leave()
+	for o in pairs(pool) do
+		pool[o] = nil
+	end
+end
+
+return scene
+```
