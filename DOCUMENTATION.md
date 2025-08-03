@@ -160,6 +160,7 @@ function scene.on_text(text)
 end
 
 function scene.on_keypress(code)
+  -- Set an action for the play of the object.
   pool.object.action = "play"
 end
 
