@@ -105,6 +105,8 @@ end
 
 Both functions are empty placeholders here and should be filled with game-specific logic.
 
+They must **mandatorily** be declared in `scripts/main.lua`, even if left empty.
+
 ### Managers & Miscellaneous
 
 The **engine** instance, now made global for convenience, holds the following components:
