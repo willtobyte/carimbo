@@ -119,6 +119,18 @@ The engine instance, now made global for convenience, holds the following compon
 * `scenemanager` manager responsible for registering and setting the current scenario.
 * `timermanager` manager responsible for creating periodic and single-shot timers.
 
+Example:
+
+```lua
+local timermanager = engine:timermanager()
+
+function scene.on_enter()
+  local delay = 600
+  local id = timermanager:set(delay, function()
+		print("On timer.")
+	end)
+end
+```
 
 ### Scenes
 
@@ -155,7 +167,8 @@ function scene.on_motion(x, y)
 end
 
 function scene.on_leave()
-  -- No need to stop any sound effects manually. SceneManager will handle stopping all sounds before the transition.
+  -- No need to stop any sound effects manually.
+  -- SceneManager will handle stopping all sounds before the transition.
 
   -- Clean up the object pool.
 	for o in pairs(pool) do
