@@ -132,6 +132,10 @@ function scene.on_enter()
 end
 ```
 
+### Canvas
+
+### Cassette
+
 ### Scenes
 
 Every game needs at least one scene. It is used to load objects, sound effects, and handle input logic through callbacks.
