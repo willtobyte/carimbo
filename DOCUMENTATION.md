@@ -145,6 +145,8 @@ local scene = {}
 local pool = {}
 
 function scene.on_enter()
+  -- On scene enter.
+
   -- Retrieve a sound effect from the scenario.
  	pool.theme = scene:get("theme", SceneType.effect)
 	pool.theme:play(true)
@@ -154,20 +156,27 @@ function scene.on_enter()
 end
 
 function scene.on_loop()
+  -- Every loop.
 end
 
 function scene.on_text(text)
+  -- On text input.
 end
 
 function scene.on_keypress(code)
+  -- On key press.
+
   -- Set an action for the play of the object.
   pool.object.action = "play"
 end
 
 function scene.on_motion(x, y)
+  -- On mouse motion.
 end
 
 function scene.on_leave()
+  -- On scene leave.
+
   -- No need to stop any sound effects manually.
   -- SceneManager will handle stopping all sounds before the transition.
 
