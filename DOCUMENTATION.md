@@ -124,11 +124,17 @@ Example:
 ```lua
 local timermanager = engine:timermanager()
 
+local id
+
 function scene.on_enter()
   local delay = 600
-  local id = timermanager:set(delay, function()
+  id = timermanager:set(delay, function()
     print("On timer.")
   end)
+end
+
+function scene.on_leave()
+  timermanager:clear(id)
 end
 ```
 
