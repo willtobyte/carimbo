@@ -1,5 +1,71 @@
 
 
+### File structure
+
+Any game made with the Carimbo must follow the following structure.
+
+```
+.
+├── blobs
+│   ├── myscene
+│   │   ├── background.png
+│   │   └── myitem.png
+│   └── overlay
+│       ├── myfont.png
+│       └── mycursor.png
+├── cursors
+│   └── mycursor.json
+├── fonts
+│   └── myfont.json
+├── objects
+│   └── myscene
+│       └── myitem.json
+├── scenes
+│   ├── babyroom.json
+│   └── babyroom.lua
+└── scripts
+    ├── helpers
+    │   └── functional.lua
+    └── main.lua
+```
+
+`blobs/`
+
+Binary asset storage for all media used by the game.
+
+*Subdirectories:*
+* myscene/: Assets specific to a given scene.
+* overlay/: UI-related assets, both visual and audio.
+
+*Includes:*
+* Images (`.png`): Scene backgrounds or objects.
+* Audio (`.ogg`): Sound effects or music.
+
+`cursors/`
+
+Cursor definitions in `.json` format.
+
+`fonts/`
+
+Font metadata files in `.json` format used by the UI renderer.
+
+`objects/`
+
+Scene-specific object definitions in `.json` format, grouped by scene slug.
+
+`scenes/`
+
+Scene logic and configuration. Must contains:
+* A `.json` metadata file.
+* A `.lua` script for behavior.
+
+`scripts/`
+
+All general Lua code.
+* `helpers/`: Shared helper modules.
+* `main.lua`: Game entry point.
+
+
 ### Engine Initialization
 
 ```lua
