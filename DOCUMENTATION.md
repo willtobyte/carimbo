@@ -147,18 +147,19 @@ Effect.__index = Effect
 local rep, char = string.rep, string.char
 
 function Effect:new()
-  width, height = 480, 270
+  local width, height = 480, 270
   local pixel = char(255, 0, 0, 255)
+  local line = rep(pixel, width)
+  local frame = rep(line, height)
+
   return setmetatable({
     canvas = engine:canvas(),
-    width = width,
-    height = height,
-    line = rep(pixel, width),
+    frame = frame,
   }, self)
 end
 
 function Effect:loop()
-  self.canvas.pixels = rep(self.line, self.height)
+  self.canvas.pixels = self.frame
 end
 
 return Effect:new()
