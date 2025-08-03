@@ -112,9 +112,16 @@ Both functions are empty placeholders here and should be filled with game-specif
 ```lua
 local scene = {}
 
+-- Object pool.
 local pool = {}
 
 function scene.on_enter()
+  -- Retrieve a sound effect from the scenario.
+ 	pool.theme = scene:get("theme", SceneType.effect)
+	pool.theme:play(true)
+
+  -- Retrieve an object from the scenario, useful when you need to manipulate it.
+	pool.object = scene:get("object", SceneType.object)
 end
 
 function scene.on_loop()
@@ -124,12 +131,16 @@ function scene.on_text(text)
 end
 
 function scene.on_keypress(code)
+  pool.object.action = "play"
 end
 
 function scene.on_motion(x, y)
 end
 
 function scene.on_leave()
+  -- No need to stop any sound effects manually. SceneManager will handle stopping all sounds before the transition.
+
+  -- Clean up the object pool.
 	for o in pairs(pool) do
 		pool[o] = nil
 	end
