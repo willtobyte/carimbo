@@ -1,4 +1,21 @@
 
+## Lua
+
+Carimbo supports both PUC-Rio Lua and LuaJIT.
+PUC-Rio Lua is only used when compiling to WebAssembly or targeting iOS, since LuaJIT is not compatible with WebAssembly and JIT compilation is not permitted on iOS. For all other platforms, LuaJIT is used to take advantage of its Just-In-Time compilation performance benefits.
+
+**It’s important to always write code that is compatible with both runtimes** to ensure maximum portability across all supported platforms.
+
+## Steam
+
+Carimbo allows unlocking achievements through a simple API, without requiring dynamic linking to Valve’s DLL.
+Here’s an example:
+
+```lua
+achievement:unlock("achievement_id")
+```
+
+It works on macOS (Apple Silicon) and Windows (amd64), and it was also tested and confirmed to work on Proton for Linux without any necessary changes.
 
 ### File structure
 
