@@ -25,7 +25,7 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 ### Documentation
 
-See [DOCUMENTATION.md](DOCUMENTATION.md).
+See [DOCUMENTATION](DOCUMENTATION.md).
 
 ### Games
 
