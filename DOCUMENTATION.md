@@ -108,8 +108,11 @@ Both functions are empty placeholders here and should be filled with game-specif
 
 ### Scenes
 
+Every game needs at least one scene. It is used to load objects, sound effects, and handle input logic through callbacks.
 
 ```lua
+-- Scene script with basic setup, interaction, and cleanup logic.
+
 local scene = {}
 
 -- Object pool.
@@ -147,4 +150,19 @@ function scene.on_leave()
 end
 
 return scene
+```
+
+Before using it, you must always `register` the scene. This can be done all at once during the engine’s boot process, or lazily as the player progresses, like this:
+
+After registering one or more scenes, call `set` to make the SceneManager use the selected scene.
+
+```lua
+local scenemanager = engine:scenemanager()
+
+function setup()
+	scenemanager:register("myscene")
+	-- ...
+
+	scenemanager:set("myscene")
+end
 ```
