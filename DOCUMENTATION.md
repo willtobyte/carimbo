@@ -140,6 +140,30 @@ end
 
 ### Canvas
 
+```lua
+local Effect = {}
+Effect.__index = Effect
+
+local rep, char = string.rep, string.char
+
+function Effect:new()
+  width, height = 480, 270
+  local pixel = char(255, 0, 0, 255)
+  return setmetatable({
+    canvas = engine:canvas(),
+    width = width,
+    height = height,
+    line = rep(pixel, width),
+  }, self)
+end
+
+function Effect:loop()
+  self.canvas.pixels = rep(self.line, self.height)
+end
+
+return Effect:new()
+```
+
 ### Cassette
 
 ### Scenes
