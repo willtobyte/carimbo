@@ -68,6 +68,8 @@ All general Lua code.
 
 ### Engine Initialization
 
+It must be located inside `scripts/main.lua`.
+
 ```lua
 _G.engine = EngineFactory.new()
 	:with_title("Untitled")
