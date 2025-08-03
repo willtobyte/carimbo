@@ -206,12 +206,14 @@ return Effect:new()
 How to use:
 
 ```lua
+-- Import the effect.
 local effect = require("effects/effect")
 
 local scene = {}
 
 function scene.on_loop()
-	effect:loop()
+  -- On each loop iteration, call the effect’s loop as well, if necessary.
+  effect:loop()
 end
 
 return scene
