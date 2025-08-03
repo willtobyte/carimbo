@@ -221,6 +221,27 @@ return scene
 
 ### Cassette
 
+Remember when the world was simple, things were hard, and we were poor? I had the chance to have a ZX81 clone, and the only way to store data long-term was on a cassette tape.
+
+Well, in Carimbo, there’s an interface for reading and writing the game’s key-value format to a `cassette.json` file, or to a cookie when running on the web.
+
+There’s a set method that takes a string as the key and a value that can be any basic Lua type—like `string`, `number`, `boolean`, `nil`, and other primitives.
+
+The get method allows you to retrieve any value previously stored.
+
+Example:
+
+```lua
+local cassette = engine:cassette()
+
+-- Set the system/stage to playground. It is recommended to namespace the keys with a prefix.
+cassette:set("system/stage", "playground")
+
+-- Get the value
+local scene = cassette:set("system/stage")
+-- scene is now `playground`.
+```
+
 ### Scenes
 
 Every game needs at least one scene. It is used to load objects, sound effects, and handle input logic through callbacks.
