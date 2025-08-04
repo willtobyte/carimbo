@@ -14,6 +14,8 @@ public:
 
   void set(const std::string& text, float_t x, float_t y);
 
+  void set(float_t x, float_t y);
+
   void set_effect(fonteffect::type type);
 
   void clear();

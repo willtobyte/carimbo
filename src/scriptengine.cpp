@@ -930,11 +930,17 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<graphics::label>(
     "Label",
-    sol::constructors<graphics::label()>(),
-    sol::base_classes,
-    sol::bases<graphics::widget>(),
+    sol::no_constructor,
+    sol::base_classes, sol::bases<graphics::widget>(),
     "font", sol::property(&graphics::label::set_font),
-    "set", &graphics::label::set,
+    "set", sol::overload(
+      [](std::shared_ptr<graphics::label> self, float_t x, float_t y) {
+        self->set(x, y);
+      },
+      [](std::shared_ptr<graphics::label> self, const std::string& text, float_t x, float_t y) {
+        self->set(text, x, y);
+      }
+    ),
     "effect", sol::property(&graphics::label::set_effect),
     "clear", &graphics::label::clear
   );

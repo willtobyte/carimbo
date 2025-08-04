@@ -11,6 +11,10 @@ void label::set(const std::string& text, float_t x, float_t y) {
   _position = {x, y};
 }
 
+void label::set(float_t x, float_t y) {
+  _position = {x, y};
+}
+
 void label::set_effect(fonteffect::type type) {
   switch (type) {
     case fonteffect::type::fadein:
