@@ -242,6 +242,23 @@ local scene = cassette:set("system/stage")
 -- scene is now `playground`.
 ```
 
+### ObjectManager
+
+Initially, this was the only way to create or destroy objects. However, today this task is, to some extent, automated by the SceneManager. Still, if you need to create, clone or destroy objects ad hoc, you can use the API below.
+
+```lua
+local objectmanager = engine:objectmanager()
+
+-- Create an object.
+local object = objectmanager:create("object")
+
+-- Clone an object.
+local other = objectmanager:clone(object)
+
+-- Destroy an object.
+objectmanager:destroy(object)
+```
+
 ### Scenes
 
 Every game needs at least one scene. It is used to load objects, sound effects, and handle input logic through callbacks.
