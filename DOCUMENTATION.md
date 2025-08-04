@@ -145,25 +145,6 @@ The **engine** instance, now made global for convenience, holds the following co
 * `scenemanager` manager responsible for registering and setting the current scenario.
 * `timermanager` manager responsible for creating periodic and single-shot timers.
 
-Example:
-
-```lua
-local timermanager = engine:timermanager()
-
-local id
-
-function scene.on_enter()
-  local delay = 600
-  id = timermanager:set(delay, function()
-    print("On timer.")
-  end)
-end
-
-function scene.on_leave()
-  timermanager:clear(id)
-end
-```
-
 ### Canvas
 
 ```lua
@@ -315,6 +296,16 @@ resourcemanager:flush()
 resourcemanager:prefetch({ "a.png", "b.ogg" })
 ```
 
+### SoundManager
+
+TODO
+
+### StateManager
+
+TODO
+
+
+
 ### SceneManager
 
 Manager is responsible for registering, setting, and destroying scenes. A scene can include a background, objects, and sound effects, all declared in a metadata JSON. Additionally, every scene must include a Lua script to handle specific situations.
@@ -404,4 +395,24 @@ function setup()
 
   scenemanager:set("myscene")
 end
+```
+
+### TimerManager
+
+```lua
+local timermanager = engine:timermanager()
+
+local id
+
+local delay = 600
+-- Creates a periodic timer that calls the callback at the given interval. Returns the timer ID.
+id = timermanager:set(delay, function()
+  print("On timer.")
+end)
+
+-- Stops the timer given a timer ID.
+timermanager:clear(id)
+
+-- Calls the callback only once after the specified time.
+timermanager:singleshot(delay, function() print("Only one time.") end)
 ```
