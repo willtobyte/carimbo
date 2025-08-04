@@ -261,6 +261,45 @@ objectmanager:destroy(object)
 
 ### FontFactory
 
+### Overlay
+
+For now, the overlay manager is only used to set cursors and create labels on the screen.
+
+```lua
+local overlay = engine:overlay()
+
+-- Load and set the cursor artwork.
+overlay.cursor:set("horn")
+```
+
+It is possible to dispatch messages to the cursor; upon receiving a message, it plays the corresponding animation defined in its JSON
+
+```lua
+-- Plays `damage` animation
+overlay:dispatch(WidgetType.cursor, "damage")
+```
+
+To display labels (text) at arbitrary positions on the screen, you need to instantiate a Label, assign it a font and position, with or without text.
+
+```lua
+local fontfactory = engine:fontfactory()
+local overlay = engine:overlay()
+
+-- Load and parse the font if it’s already cached; if so, return the shared instance.
+local myfont = fontfactory:get("myfont")
+
+-- Create a label.
+local label = overlay:create(WidgetType.label)
+-- Set the font on the label.
+label.font = myfont
+
+local text = "hakuna matata"
+-- Set the label some text at position X = 10 and Y = 10 on the screen.
+label:set(text, 10, 10)
+
+-- It is also possible to change only the position without changing the text.
+label:set(10, 10)
+```
 
 ### SceneManager
 
