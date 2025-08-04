@@ -399,14 +399,14 @@ end
 
 ### TimerManager
 
+Manager responsible for handling periodic and single-shot timers.
+
 ```lua
 local timermanager = engine:timermanager()
 
-local id
-
 local delay = 600
 -- Creates a periodic timer that calls the callback at the given interval. Returns the timer ID.
-id = timermanager:set(delay, function()
+local id = timermanager:set(delay, function()
   print("On timer.")
 end)
 
