@@ -301,6 +301,20 @@ label:set(text, 10, 10)
 label:set(10, 10)
 ```
 
+### ResourceManager
+
+Manager in charge of loading asset batches and releasing those no longer needed.
+
+```lua
+local resourcemanager = engine:resourcemanager()
+
+-- Flush unused resources
+resourcemanager:flush()
+
+-- Prefetch resources in batches (blocks the game until finished)
+resourcemanager:prefetch({ "a.png", "b.ogg" })
+```
+
 ### SceneManager
 
 Manager is responsible for registering, setting, and destroying scenes. A scene can include a background, objects, and sound effects, all declared in a metadata JSON. Additionally, every scene must include a Lua script to handle specific situations.
