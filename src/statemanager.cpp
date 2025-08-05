@@ -17,10 +17,8 @@ bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b
 }
 
 bool statemanager::on(uint8_t player, const std::variant<gamepad::button>& type) const noexcept {
-  std::println("on");
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
-      std::println("{}", tit->second);
       return tit->second;
     }
   }
