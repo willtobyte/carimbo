@@ -79,7 +79,7 @@ void socket::connect() {
 #ifdef SANDBOX
       "http://localhost:3000/socket";
 #else
-      "https://" + std::string(emscripten_run_script_string("window.location.hostname")) + "/socket";
+      "https://socket." + std::string(emscripten_run_script_string("window.location.hostname"));
 #endif
   EmscriptenWebSocketCreateAttributes attrs = {
       url.c_str(),

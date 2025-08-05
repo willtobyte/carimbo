@@ -4,7 +4,7 @@
  #define NOMINMAX
 #endif
 
-#define WEBSOCKET 1
+#define WEBSOCKET
 
 #ifdef EMSCRIPTEN
  #include <emscripten.h>
@@ -29,9 +29,9 @@
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 
   #if HAVE_BOOST
-    #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED 1
+    #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
     #include <boost/stacktrace.hpp>
-    #define HAVE_STACKSTRACE 1
+    #define HAVE_STACKSTRACE
   #endif
 #endif
 
