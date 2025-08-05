@@ -27,19 +27,19 @@ public:
   uint8_t players() const noexcept;
 
 protected:
-  virtual void on_keydown(const input::event::keyboard::key& event);
+  virtual void on_key_press(const input::event::keyboard::key& event) override;
 
-  virtual void on_keyup(const input::event::keyboard::key& event);
+  virtual void on_key_release(const input::event::keyboard::key& event) override;
 
-  virtual void on_gamepadbuttondown(uint8_t who, const input::event::gamepad::button& event);
+  virtual void on_gamepad_press(uint8_t who, const input::event::gamepad::button& event) override;
 
-  virtual void on_gamepadbuttonup(uint8_t who, const input::event::gamepad::button& event);
+  virtual void on_gamepad_release(uint8_t who, const input::event::gamepad::button& event) override;
 
-  virtual void on_gamepadmotion(uint8_t who, const input::event::gamepad::motion& event);
+  virtual void on_gamepad_motion(uint8_t who, const input::event::gamepad::motion& event) override;
 
-  virtual void on_collision(const input::event::collision& event);
+  virtual void on_collision(const input::event::collision& event) override;
 
-  virtual void on_endupdate();
+  virtual void on_endupdate() override;
 
 private:
   std::unordered_map<uint8_t, std::unordered_map<std::variant<input::event::gamepad::button>, bool>> _state;
