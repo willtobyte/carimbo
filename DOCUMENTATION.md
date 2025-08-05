@@ -311,9 +311,63 @@ resourcemanager:prefetch({ "a.png", "b.ogg" })
 
 ### SoundManager
 
-TODO
+Manager responsible for playing and stopping sounds or music, where both are referred to as soundfx.
+
+This is a primitive but useful approach in some cases. The file should be located inside the blobs.
+
+`blobs/{filename}/.ogg`
+
+```lua
+local soundmanager = engine:soundmanager()
+
+-- Play a SoundFX.
+soundmanager:play("scream")
+
+-- Stop a SoundFX.
+soundmanager:stop("scream")
+```
 
 ### StateManager
+
+Manager responsible for allowing state queries in an active and immediate way.
+
+```lua
+local statemanager = engine:statemanager()
+
+-- Returns true if one entity is colliding with another.
+local collides = statemanager:collides()
+
+-- Returns the number of players. The keyboard and mouse are always considered as the first input device, as well
+-- as the first joystick. The remaining devices follow in sequence.
+local n = statemanager:players()
+
+-- `player` & `on`: An easy method to retrieve the input state of each player.
+if statemanager:player(Player.one):on(Controller.up) then
+  print("Up is being pressed.")
+end
+
+if statemanager:player(Player.two):on(Controller.left) then
+  print("Left is being pressed.")
+end
+```
+
+  lua.new_usertype<framework::statemanager>(
+    "StateManager",
+    sol::no_constructor,
+    "collides", &statemanager::collides,
+    "players", sol::property(&statemanager::players),
+    "player", [&player_mapping](framework::statemanager& self, input::event::player player) -> playerwrapper& {
+      const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
+
+      return iterator->second;
+    }
+  );
+lua.new_usertype<playerwrapper>(
+    "PlayerWrapper",
+    sol::no_constructor,
+    "on", &playerwrapper::on
+  );
+
 
 TODO
 
