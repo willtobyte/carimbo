@@ -27,7 +27,11 @@ void from_json(const nlohmann::json& j, rectangle& o) {
 namespace framework {
 void from_json(const nlohmann::json& j, keyframe& o) {
   o.frame = j.at("rectangle").get<geometry::rectangle>();
-  o.offset = j.at("offset").get<geometry::point>();
+
+  if (j.contains("offset")) {
+    o.offset = j.at("offset").get<geometry::point>();
+  }
+
   o.duration = j.at("duration").get<uint64_t>();
 }
 
