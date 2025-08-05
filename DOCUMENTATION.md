@@ -242,6 +242,18 @@ objectmanager:destroy(object)
 
 ### FontFactory
 
+### Font
+
+```lua
+local fontfactory = engine:fontfactory()
+
+-- Get the font.
+local myfont.font = fontfactory:get("myfont")
+
+-- Returns the sequence of glyphs.
+myfont.glyphs
+```
+
 ### Overlay
 
 For now, the overlay manager is only used to set cursors and create labels on the screen.
