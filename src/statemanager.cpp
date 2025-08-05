@@ -16,7 +16,7 @@ bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b
   return (it != _collision_mapping.end()) ? it->second : false;
 }
 
-bool statemanager::on(uint8_t player, const std::variant<gamepad::button>& type) const noexcept {
+bool statemanager::on(uint8_t player, gamepad::button type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;

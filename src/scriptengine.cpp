@@ -338,6 +338,42 @@ void framework::scriptengine::run() {
     "subscribe", [](memory::kv& self, const std::string& key, const sol::function& callback, sol::this_state state) { self.subscribe(key, callback, state); }
   );
 
+  struct velocityproxy {
+    framework::object& o;
+
+    float_t x() const { return o.velocity().x(); }
+    float_t y() const { return o.velocity().y(); }
+
+    void set_x(float_t x) {
+      auto v = o.velocity();
+      v.set_x(x);
+      o.set_velocity(v);
+    }
+
+    void set_y(float_t y) {
+      auto v = o.velocity();
+      v.set_y(y);
+      o.set_velocity(v);
+    }
+
+    void set(const sol::table& table) {
+      const auto x = table.get_or<float_t>("x", table.get_or(1, 0.0));
+      const auto y = table.get_or<float_t>("y", table.get_or(2, 0.0));
+      o.set_velocity(algebra::vector2d{x, y});
+    }
+
+    algebra::vector2d get() const {
+      return o.velocity();
+    }
+  };
+
+  lua.new_usertype<velocityproxy>("VelocityProxy",
+    "x", sol::property(&velocityproxy::x, &velocityproxy::set_x),
+    "y", sol::property(&velocityproxy::y, &velocityproxy::set_y),
+    "set", &velocityproxy::set,
+    "get", &velocityproxy::get
+  );
+
   lua.new_usertype<framework::object>(
     "Object",
     sol::no_constructor,
@@ -401,24 +437,23 @@ void framework::scriptengine::run() {
     ),
     "velocity", sol::property(
       [](framework::object& o) {
-        return o.velocity();
+        return velocityproxy{o};
       },
       [](framework::object& o, const sol::object& v) {
+        if (v.is<sol::table>()) {
+          const auto table = v.as<sol::table>();
+          const auto x = table.get_or<float_t>("x", table.get_or(1, 0.0));
+          const auto y = table.get_or<float_t>("y", table.get_or(2, 0.0));
+          o.set_velocity(algebra::vector2d{x, y});
+          return;
+        }
+
         if (v.is<algebra::vector2d>()) {
           o.set_velocity(v.as<algebra::vector2d>());
           return;
         }
 
-        if (v.is<sol::table>()) {
-          sol::table table = v.as<sol::table>();
-
-          auto x = table.get_or<float_t>("x", table.get_or(1, 0.0));
-          auto y = table.get_or<float_t>("y", table.get_or(2, 0.0));
-          o.set_velocity(algebra::vector2d{x, y});
-          return;
-        }
-
-        throw std::runtime_error("Invalid type for velocity. Must be Vector2D or table with x and y.");
+        throw std::runtime_error("invalid value for velocity");
       }
     ),
     "kv", sol::property([](framework::object&o) -> memory::kv& { return o.kv(); })
@@ -473,7 +508,7 @@ void framework::scriptengine::run() {
     playerwrapper(input::event::player player, const framework::statemanager& state_manager)
       : index(static_cast<uint8_t>(player)), e(state_manager) {}
 
-    bool on(std::variant<input::event::gamepad::button> type) {
+    bool on(input::event::gamepad::button type) {
       return e.on(static_cast<uint8_t>(index), type);
     }
   };

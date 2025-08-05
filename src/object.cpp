@@ -49,7 +49,6 @@ void object::set_y(float_t y) noexcept {
 }
 
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
-  std::println("set velocity {} {}", velocity.x(), velocity.y());
   _velocity = velocity;
 }
 
