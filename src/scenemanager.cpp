@@ -77,6 +77,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 void scenemanager::set(const std::string& name) {
   if (_scene) [[likely]] {
     _scene->on_leave();
+    _resourcemanager->flush();
   }
 
   _scene = _scene_mapping.at(name);
@@ -90,6 +91,7 @@ std::shared_ptr<scene> scenemanager::get(const std::string& name) const {
 
 void scenemanager::destroy(const std::string& name) {
   _scene_mapping.erase(name);
+  _resourcemanager->flush();
 }
 
 void scenemanager::update(float_t delta) noexcept {

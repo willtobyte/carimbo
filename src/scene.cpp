@@ -30,6 +30,7 @@ scene::~scene() {
     e->stop();
   }
 
+  std::println("[scene destroyed] >>>>>>>>>>>");
   _background.reset();
 }
 
