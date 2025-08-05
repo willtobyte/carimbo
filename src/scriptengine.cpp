@@ -552,6 +552,7 @@ void framework::scriptengine::run() {
       auto result = lua.safe_script(script, &sol::script_pass_on_error);
       if (!result.valid()) [[unlikely]] {
         sol::error err = result;
+        std::println(std::cerr, "Lua error: {}", err.what());
         throw std::runtime_error(err.what());
       }
 
@@ -566,6 +567,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_enter] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -578,6 +580,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn(delta);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_loop] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -590,6 +593,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_leave] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -602,6 +606,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn(text);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_text] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -614,6 +619,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_touch] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -626,6 +632,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn(code);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_keypress] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -638,6 +645,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn(code);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_keyrelease] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };
@@ -650,6 +658,7 @@ void framework::scriptengine::run() {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
+            std::println(std::cerr, "[on_motion] Lua error: {}", err.what());
             throw std::runtime_error(err.what());
           }
         };

@@ -208,9 +208,13 @@ graphics::reflection object::reflection() const noexcept {
 }
 
 void object::set_action(const std::string& action) noexcept {
+  if (_action == action) {
+    return;
+  }
+
   _action = action;
-  // _frame = 0;
-  // _last_frame = SDL_GetTicks();
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
 
   const auto& a = _animations.at(_action);
   if (const auto& e = a.effect; e) {
