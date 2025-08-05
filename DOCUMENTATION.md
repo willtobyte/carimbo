@@ -304,7 +304,8 @@ local resourcemanager = engine:resourcemanager()
 -- Flush unused resources
 resourcemanager:flush()
 
--- Prefetch resources in batches (blocks the game until finished)
+-- Prefetch resources in batches (blocks the game until finished).
+-- If no parameter is passed, load the entire blobs directory recursively.
 resourcemanager:prefetch({ "a.png", "b.ogg" })
 ```
 
