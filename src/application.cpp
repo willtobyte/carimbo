@@ -1,4 +1,5 @@
 #include "application.hpp"
+#include <stdexcept>
 
 using namespace framework;
 
@@ -16,14 +17,6 @@ using namespace framework;
     }
 
     if (error) {
-      #ifdef DEBUG
-        #if defined(_MSC_VER)
-          __debugbreak();
-        #else
-          raise(SIGTRAP);
-        #endif
-      #endif
-
       #ifdef HAVE_STACKSTRACE
         boost::stacktrace::stacktrace st;
         std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
@@ -32,6 +25,14 @@ using namespace framework;
       std::println(stderr, "{}", error);
 
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
+
+      #ifdef DEBUG
+        #if defined(_MSC_VER)
+          __debugbreak();
+        #else
+          raise(SIGTRAP);
+        #endif
+      #endif
     }
   }
 

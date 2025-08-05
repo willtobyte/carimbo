@@ -21,7 +21,7 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) noexcept
 }
 
 void soundmanager::play(const std::string& filename, bool loop) noexcept {
-  if (const auto& sound = get(std::format("blobs/{}/.ogg", filename)); sound) {
+  if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->play(loop);
   }
 }
