@@ -301,7 +301,7 @@ Manager in charge of loading asset batches and releasing those no longer needed.
 ```lua
 local resourcemanager = engine:resourcemanager()
 
--- Flush unused resources
+-- Flush unused resources.
 resourcemanager:flush()
 
 -- Prefetch resources in batches (blocks the game until finished).
