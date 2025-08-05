@@ -48,17 +48,12 @@ void object::set_y(float_t y) noexcept {
   _position.set_y(y);
 }
 
-void object::move(float_t x_velocity, float_t y_velocity) noexcept {
-  UNUSED(x_velocity);
-  UNUSED(y_velocity);
-}
-
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
   std::println("set velocity {} {}", velocity.x(), velocity.y());
   _velocity = velocity;
 }
 
-algebra::vector2d object::velocity() const noexcept {
+algebra::vector2d& object::velocity() noexcept {
   return _velocity;
 }
 

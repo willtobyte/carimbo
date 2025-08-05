@@ -55,9 +55,8 @@ public:
   float_t y() const noexcept;
   void set_y(float_t y) noexcept;
 
-  void move(float_t x_velocity, float_t y_velocity) noexcept;
   void set_velocity(const algebra::vector2d& velocity) noexcept;
-  algebra::vector2d velocity() const noexcept;
+  algebra::vector2d& velocity() noexcept;
 
   void set_placement(float_t x, float_t y) noexcept;
   geometry::point placement() const noexcept;
