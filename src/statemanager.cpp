@@ -62,6 +62,7 @@ void statemanager::on_key_release(const keyboard::key& event) {
 }
 
 void statemanager::on_gamepad_press(uint8_t who, const gamepad::button& event) {
+  std::println("on_gamepad_press {}", who);
   _state[who - 1][event] = true;
 }
 
