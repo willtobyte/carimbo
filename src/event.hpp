@@ -5,7 +5,7 @@
 namespace input {
 namespace event {
 enum class player : uint8_t {
-  one = 0,
+  one = 1,
   two
 };
 

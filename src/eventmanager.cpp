@@ -1,5 +1,6 @@
 #include "eventmanager.hpp"
 #include "envelope.hpp"
+#include <SDL3/SDL_gamepad.h>
 
 using namespace input;
 using namespace event;
@@ -8,7 +9,9 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
       _envelopepool(framework::envelopepool::instance()) {
   int32_t number;
+
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
+
   if (joysticks) {
     for (auto index = 0; index < number; ++index) {
       const auto gamepad_id = joysticks[static_cast<size_t>(index)];

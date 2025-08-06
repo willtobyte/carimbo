@@ -51,22 +51,23 @@ constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard:
 
 void statemanager::on_key_press(const keyboard::key& event) {
   if (auto ctrl = keytoctrl(event)) {
-    _state[0][*ctrl] = true;
+    _state[1][*ctrl] = true;
   }
 }
 
 void statemanager::on_key_release(const keyboard::key& event) {
   if (auto ctrl = keytoctrl(event)) {
-    _state[0][*ctrl] = false;
+    _state[1][*ctrl] = false;
   }
 }
 
 void statemanager::on_gamepad_press(uint8_t who, const gamepad::button& event) {
-  _state[who][event] = true;
+  std::println("on_gamepad_press {}", who);
+  _state[who - 1][event] = true;
 }
 
 void statemanager::on_gamepad_release(uint8_t who, const gamepad::button& event) {
-  _state[who][event] = false;
+  _state[who - 1][event] = false;
 }
 
 void statemanager::on_gamepad_motion(uint8_t who, const gamepad::motion& event) {
@@ -74,22 +75,21 @@ void statemanager::on_gamepad_motion(uint8_t who, const gamepad::motion& event) 
 
   static constexpr auto threshold = 8000;
   static constexpr auto deadzone = 4000;
-
   const auto process = [&](keyboard::key negative, keyboard::key positive) {
     if (event.value < -threshold) {
       if (auto ctrl = keytoctrl(negative)) {
-        _state[who][*ctrl] = true;
+        _state[who - 1][*ctrl] = true;
       }
     } else if (event.value > threshold) {
       if (auto ctrl = keytoctrl(positive)) {
-        _state[who][*ctrl] = true;
+        _state[who - 1][*ctrl] = true;
       }
     } else if (std::abs(event.value) < deadzone) {
       if (auto ctrl = keytoctrl(negative)) {
-        _state[who][*ctrl] = false;
+        _state[who - 1][*ctrl] = false;
       }
       if (auto ctrl = keytoctrl(positive)) {
-        _state[who][*ctrl] = false;
+        _state[who - 1][*ctrl] = false;
       }
     }
   };
