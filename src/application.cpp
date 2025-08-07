@@ -66,7 +66,7 @@ int32_t application::run() {
   #if defined(EMSCRIPTEN) || !defined(SANDBOX)
   storage::filesystem::mount("cartridge.zip", "/");
   #else
-  storage::filesystem::mount("../sandbox", "/");
+  storage::filesystem::mount(std::getenv("ROOT"), "/");
   #endif
 
   auto se = scriptengine();
