@@ -51,13 +51,13 @@ constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard:
 
 void statemanager::on_key_press(const keyboard::key& event) {
   if (auto ctrl = keytoctrl(event)) {
-    _state[1][*ctrl] = true;
+    _state[0][*ctrl] = true;
   }
 }
 
 void statemanager::on_key_release(const keyboard::key& event) {
   if (auto ctrl = keytoctrl(event)) {
-    _state[1][*ctrl] = false;
+    _state[0][*ctrl] = false;
   }
 }
 
