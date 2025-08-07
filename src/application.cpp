@@ -1,5 +1,4 @@
 #include "application.hpp"
-#include <stdexcept>
 
 using namespace framework;
 
