@@ -169,7 +169,7 @@ jobs:
       - name: Strip binary
         working-directory: build
         run: |
-            strip -S -x carimbo
+          strip -S -x carimbo
 
       - name: Compress artifacts
         working-directory: build

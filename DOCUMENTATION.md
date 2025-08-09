@@ -57,13 +57,15 @@ Any game made with the Carimbo must follow the following structure.
 
 Binary asset storage for all media used by the game.
 
-*Subdirectories:*
-* myscene/: Assets specific to a given scene.
-* overlay/: UI-related assets, both visual and audio.
+_Subdirectories:_
 
-*Includes:*
-* Images (`.png`): Scene backgrounds or objects.
-* Audio (`.ogg`): Sound effects or music.
+- myscene/: Assets specific to a given scene.
+- overlay/: UI-related assets, both visual and audio.
+
+_Includes:_
+
+- Images (`.png`): Scene backgrounds or objects.
+- Audio (`.ogg`): Sound effects or music.
 
 `cursors/`
 
@@ -80,15 +82,16 @@ Scene-specific object definitions in `.json` format, grouped by scene slug.
 `scenes/`
 
 Scene logic and configuration. Must contains:
-* A `.json` metadata file.
-* A `.lua` script for behavior.
+
+- A `.json` metadata file.
+- A `.lua` script for behavior.
 
 `scripts/`
 
 All general Lua code.
-* `helpers/`: Shared helper modules.
-* `main.lua`: Game entry point.
 
+- `helpers/`: Shared helper modules.
+- `main.lua`: Game entry point.
 
 ### Engine Initialization
 
@@ -105,12 +108,13 @@ _G.engine = EngineFactory.new()
 ```
 
 This block creates a new engine instance using a fluent interface provided by _EngineFactory_. Here’s what each method does:
-* `with_title("Untitled")`: Sets the window title to "Untitled".
-* `with_width(1920)`: Sets the window width to 1920 pixels.
-* `with_height(1080)`: Sets the window height to 1080 pixels.
-* `with_scale(4.0)`: Applies a render scaling factor of 4.0 (useful for retro pixel art aesthetics).
-* `with_fullscreen(true)`: Launches the engine in fullscreen mode.
-* `create()`: Finalizes the setup and returns the initialized engine object.
+
+- `with_title("Untitled")`: Sets the window title to "Untitled".
+- `with_width(1920)`: Sets the window width to 1920 pixels.
+- `with_height(1080)`: Sets the window height to 1080 pixels.
+- `with_scale(4.0)`: Applies a render scaling factor of 4.0 (useful for retro pixel art aesthetics).
+- `with_fullscreen(true)`: Launches the engine in fullscreen mode.
+- `create()`: Finalizes the setup and returns the initialized engine object.
 
 The engine is stored globally as `_G.engine`.
 
@@ -124,8 +128,8 @@ function loop()
 end
 ```
 
-* `setup()`: Called once when the engine starts. Use this function to initialize game objects, load resources, or prepare state.
-* `loop()`: Called every frame. This is the main game loop where game logic, input handling, and rendering should be performed.
+- `setup()`: Called once when the engine starts. Use this function to initialize game objects, load resources, or prepare state.
+- `loop()`: Called every frame. This is the main game loop where game logic, input handling, and rendering should be performed.
 
 Both functions are empty placeholders here and should be filled with game-specific logic.
 
@@ -134,16 +138,17 @@ They must **mandatorily** be declared in `scripts/main.lua`, even if left empty.
 ### Managers & Miscellaneous
 
 The **engine** instance, now made global for convenience, holds the following components:
-* `canvas` an object that has a pixels property, where you can write arbitrary pixels to the screen — think of it like a poor man’s shader.
-* `cassette` remember when old computers and some consoles used cassette tapes to store programs? Same logic — you can use it as a key-value store to save game data.
-* `objectmanager` manager responsible for creating and destroying objects
-* `fontfactory` manager responsible for loading bitmap fonts.
-* `overlay` manager responsible for handling the Heads-Up Display (HUD)
-* `resourcemanager` manager responsible for batch loading assets and flushing unused ones.
-* `soundmanager` manager responsible for playing and stopping sounds, as well as flushing them.
-* `statemanager` manager responsible for allowing instant querying of input state.
-* `scenemanager` manager responsible for registering and setting the current scenario.
-* `timermanager` manager responsible for creating periodic and single-shot timers.
+
+- `canvas` an object that has a pixels property, where you can write arbitrary pixels to the screen — think of it like a poor man’s shader.
+- `cassette` remember when old computers and some consoles used cassette tapes to store programs? Same logic — you can use it as a key-value store to save game data.
+- `objectmanager` manager responsible for creating and destroying objects
+- `fontfactory` manager responsible for loading bitmap fonts.
+- `overlay` manager responsible for handling the Heads-Up Display (HUD)
+- `resourcemanager` manager responsible for batch loading assets and flushing unused ones.
+- `soundmanager` manager responsible for playing and stopping sounds, as well as flushing them.
+- `statemanager` manager responsible for allowing instant querying of input state.
+- `scenemanager` manager responsible for registering and setting the current scenario.
+- `timermanager` manager responsible for creating periodic and single-shot timers.
 
 ### Canvas
 
@@ -351,27 +356,25 @@ if statemanager:player(Player.two):on(Controller.left) then
 end
 ```
 
-  lua.new_usertype<framework::statemanager>(
-    "StateManager",
-    sol::no_constructor,
-    "collides", &statemanager::collides,
-    "players", sol::property(&statemanager::players),
-    "player", [&player_mapping](framework::statemanager& self, input::event::player player) -> playerwrapper& {
-      const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
+lua.new_usertype<framework::statemanager>(
+"StateManager",
+sol::no_constructor,
+"collides", &statemanager::collides,
+"players", sol::property(&statemanager::players),
+"player", [&player_mapping](framework::statemanager& self, input::event::player player) -> playerwrapper& {
+const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
 
       return iterator->second;
     }
-  );
-lua.new_usertype<playerwrapper>(
-    "PlayerWrapper",
-    sol::no_constructor,
-    "on", &playerwrapper::on
-  );
 
+);
+lua.new_usertype<playerwrapper>(
+"PlayerWrapper",
+sol::no_constructor,
+"on", &playerwrapper::on
+);
 
 TODO
-
-
 
 ### SceneManager
 
