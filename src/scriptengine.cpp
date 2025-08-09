@@ -993,6 +993,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
     "Canvas",
     sol::no_constructor,
+    // TODO "mode": sol::property(...)
     "pixels", sol::property(
       [](const graphics::canvas&) {
         return nullptr;
