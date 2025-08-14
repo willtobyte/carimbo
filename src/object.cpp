@@ -132,7 +132,7 @@ void object::draw() const noexcept {
   const auto& animation = _animations.at(_action).keyframes.at(_frame);
   const auto& source = animation.frame;
   const auto& offset = animation.offset;
-#ifdef HITBOX
+#ifdef DEBUG
   const auto& hitbox = _animations.at(_action).hitbox;
 #endif
   geometry::rectangle destination{_position + offset, source.size()};
@@ -149,7 +149,7 @@ void object::draw() const noexcept {
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
-#ifdef HITBOX
+#ifdef DEBUG
   const auto debug = hitbox
     ? std::make_optional(geometry::rectangle{
       _position + hitbox->rectangle.position(),
@@ -164,7 +164,7 @@ void object::draw() const noexcept {
       _angle,
       _reflection,
       _alpha
-#ifdef HITBOX
+#ifdef DEBUG
       ,
       debug
 #endif

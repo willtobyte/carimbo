@@ -90,7 +90,7 @@ void cursor::draw() const noexcept {
       0,
       reflection::none,
       255
-#ifdef HITBOX
+#ifdef DEBUG
       ,
       std::nullopt
 #endif

@@ -64,7 +64,7 @@ void pixmap::draw(
     const double_t angle,
     reflection reflection,
     const uint8_t alpha
-#ifdef HITBOX
+#ifdef DEBUG
     ,
     const std::optional<geometry::rectangle>& outline
 #endif
@@ -75,7 +75,7 @@ void pixmap::draw(
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &src, &dst, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 
-#ifdef HITBOX
+#ifdef DEBUG
   if (outline) {
     const SDL_FRect& debug = *outline;
 

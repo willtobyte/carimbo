@@ -28,7 +28,7 @@ execute_process(
 
 add_compile_definitions(GIT_TAG="${latest_tag}")
 
-foreach(flag HITBOX LOCAL SANDBOX)
+foreach(flag SANDBOX)
   option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})
     target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})

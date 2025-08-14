@@ -20,7 +20,7 @@ public:
       double_t angle = 0.0L,
       reflection reflection = reflection::none,
       uint8_t alpha = 255
-#ifdef HITBOX
+#ifdef DEBUG
       ,
       const std::optional<geometry::rectangle>& outline = std::nullopt
 #endif
