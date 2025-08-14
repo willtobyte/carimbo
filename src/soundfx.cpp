@@ -2,6 +2,8 @@
 
 using namespace audio;
 
+constexpr std::size_t buffer_4mb = 4 * 1024 * 1024;
+
 static size_t ovPHYSFS_read(void *ptr, size_t size, size_t nmemb, void *source) {
   auto file = reinterpret_cast<PHYSFS_file *>(source);
   PHYSFS_sint64 result = PHYSFS_readBytes(file, ptr, static_cast<PHYSFS_uint32>(size) * static_cast<PHYSFS_uint32>(nmemb));
@@ -95,6 +97,8 @@ soundfx::soundfx(const std::string& filename) {
     throw std::runtime_error(std::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
+  PHYSFS_setBuffer(fp.get(), buffer_4mb);
+
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
   if (ov_open_callbacks(fp.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
     throw std::runtime_error(std::format("[ov_open_callbacks] error while opening file: {}", filename));
@@ -111,11 +115,24 @@ soundfx::soundfx(const std::string& filename) {
   const auto frequency = static_cast<ALsizei>(info->rate);
 
   auto offset = 0L;
-  constexpr auto length = 2014 * 8;
-  std::array<uint8_t, length> array{};
 
   std::vector<uint8_t> data;
-  data.reserve(static_cast<size_t>(ov_pcm_total(vf.get(), -1) * info->channels * 2));
+  {
+    const auto total_pcm = ov_pcm_total(vf.get(), -1);
+    if (total_pcm < 0) [[unlikely]] {
+      throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", filename));
+    }
+
+    const auto bytes_per_sample = 2;
+    const auto channels = static_cast<uint64_t>(info->channels);
+    const auto total_bytes_64 = static_cast<uint64_t>(total_pcm) * channels * bytes_per_sample;
+    if (total_bytes_64 > std::numeric_limits<size_t>::max()) [[unlikely]] {
+      throw std::runtime_error(std::format("[decode] file too large: {}", filename));
+    }
+
+    const auto total_bytes = static_cast<size_t>(total_bytes_64);
+    data.resize(total_bytes);
+  }
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
   constexpr const auto bigendian = 0;
@@ -123,13 +140,39 @@ soundfx::soundfx(const std::string& filename) {
   constexpr const auto bigendian = 1;
 #endif
 
+  size_t written = 0;
   do {
-    offset = ov_read(vf.get(), reinterpret_cast<char *>(array.data()), length, bigendian, 2, 1, nullptr);
+    const size_t available = data.size() - written;
+    if (available == 0) {
+      break;
+    }
+
+    const int to_read = (available > static_cast<size_t>(std::numeric_limits<int>::max()))
+                        ? std::numeric_limits<int>::max()
+                        : static_cast<int>(available);
+
+    offset = ov_read(
+      vf.get(),
+      reinterpret_cast<char *>(data.data() + written),
+      to_read,
+      bigendian,
+      2,
+      1,
+      nullptr
+    );
+
     if (offset < 0) [[unlikely]] {
       throw std::runtime_error(std::format("[ov_read] error while reading file: {}, error: {}", filename, ov_strerror(static_cast<int32_t>(offset))));
     }
-    data.insert(data.end(), array.begin(), std::ranges::next(array.begin(), offset));
-  } while (offset > 0);
+
+    if (offset == 0) {
+      break;
+    }
+
+    written += static_cast<size_t>(offset);
+  } while (true);
+
+  data.resize(written);
 
   ALuint buffer;
   alGenBuffers(1, &buffer);
