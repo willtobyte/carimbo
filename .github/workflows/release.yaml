@@ -236,6 +236,7 @@ jobs:
 
   UbuntuARM:
     runs-on: ubuntu-24.04-arm
+    if: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
