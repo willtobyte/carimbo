@@ -9,7 +9,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
       _envelopepool(framework::envelopepool::instance()) {
   int32_t number;
-
+  _mappingorder.reserve(8);
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
 
   if (joysticks) {
@@ -20,10 +20,11 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
       }
 
       if (const auto controller = SDL_OpenGamepad(gamepad_id)) {
-        _controllers.emplace(
-          SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)),
-          std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller)
-        );
+        const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
+        _controllers.emplace(jid, std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
+
+        _mappingorder.push_back(jid);
+        _joystickmapping[jid] = static_cast<uint8_t>(_mappingorder.size() - 1);
       }
     }
   }
@@ -107,40 +108,78 @@ void eventmanager::update(float_t delta) noexcept {
         }
 
         if (auto controller = SDL_OpenGamepad(event.cdevice.which)) {
-          const auto joystick = SDL_GetGamepadJoystick(controller);
-          const auto id = SDL_GetJoystickID(joystick);
-          _controllers[id] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
+          const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
+
+          _controllers[jid] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
+
+          _mappingorder.push_back(jid);
+          _joystickmapping[jid] = static_cast<uint8_t>(_mappingorder.size() - 1);
         }
       } break;
 
-      case SDL_EVENT_GAMEPAD_REMOVED:
-        _controllers.erase(event.cdevice.which);
-        break;
+      case SDL_EVENT_GAMEPAD_REMOVED: {
+        const auto it = _joystickmapping.find(event.cdevice.which);
+          if (it == _joystickmapping.end()) {
+            _controllers.erase(event.cdevice.which);
+            break;
+          }
+
+          const auto index = it->second;
+          const SDL_JoystickID rid = event.cdevice.which;
+          const SDL_JoystickID lid = _mappingorder.back();
+
+          _mappingorder[index] = lid;
+          _joystickmapping[lid] = index;
+
+          _mappingorder.pop_back();
+          _joystickmapping.erase(rid);
+          _controllers.erase(rid);
+      } break;
 
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
+        const auto it = _joystickmapping.find(event.gbutton.which);
+        if (it == _joystickmapping.end()) {
+          break;
+        }
+
+        const uint8_t slot = it->second;
+
         const gamepad::button e{event.gbutton.button};
 
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepad_press(static_cast<uint8_t>(event.gbutton.which), e);
+          receiver->on_gamepad_press(slot, e);
         }
       } break;
 
       case SDL_EVENT_GAMEPAD_BUTTON_UP: {
+        const auto it = _joystickmapping.find(event.gbutton.which);
+        if (it == _joystickmapping.end()) {
+          break;
+        }
+
+        const uint8_t slot = it->second;
+
         const gamepad::button e{event.gbutton.button};
 
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepad_release(static_cast<uint8_t>(event.gbutton.which), e);
+          receiver->on_gamepad_release(slot, e);
         }
       } break;
 
       case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
-        const auto who = event.gaxis.which;
+        const auto it = _joystickmapping.find(event.gbutton.which);
+        if (it == _joystickmapping.end()) {
+          break;
+        }
+
+        const uint8_t slot = it->second;
+
         const auto axis = static_cast<gamepad::motion::axis>(event.gaxis.axis);
         const auto value = event.gaxis.value;
         const gamepad::motion e{axis, value};
 
         for (const auto& receiver : _receivers) {
-          receiver->on_gamepad_motion(static_cast<uint8_t>(who), e);
+          receiver->on_gamepad_motion(slot, e);
         }
       } break;
 

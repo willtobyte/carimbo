@@ -23,6 +23,8 @@ private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::vector<std::shared_ptr<eventreceiver>> _receivers;
   std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
+  std::unordered_map<SDL_JoystickID, uint8_t> _joystickmapping;
+  std::vector<SDL_JoystickID> _mappingorder;
   std::shared_ptr<framework::uniquepool<framework::envelope>> _envelopepool;
 };
 }
