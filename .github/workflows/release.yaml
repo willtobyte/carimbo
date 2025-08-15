@@ -255,10 +255,6 @@ jobs:
       - name: Configure tools & CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
-          [replace_tool_requires]
-          meson/*: meson/[*]
-          pkgconf/*: pkgconf/[*]
-
           [tool_requires]
           !cmake/*: cmake/[>=3 <4]
           EOF
