@@ -32,10 +32,15 @@ resourcemanager::resourcemanager(
     _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
     _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
     _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
+
+  const auto fun = [&]{ eventmanager->update(.0f); };
+
+  UNUSED(fun);
+
   // TODO
-  // _pixmappool->setloophook();
-  // _soundmanager->setloophook();
-  // _fontfactory->setloophook();
+  // _pixmappool->setonupdate(f); // std::function<void()> callback
+  // _soundmanager->setprogresstick();
+  // _fontfactory->setloadloop();
 }
 
 void resourcemanager::flush() noexcept {
