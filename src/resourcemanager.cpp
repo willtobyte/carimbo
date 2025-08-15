@@ -26,12 +26,12 @@ resourcemanager::resourcemanager(
   std::shared_ptr<audio::audiodevice> audiodevice,
   std::shared_ptr<input::eventmanager> eventmanager
 )
-  : _renderer(std::move(renderer)),
-    _audiodevice(std::move(audiodevice)),
-    _eventmanager(std::move(eventmanager)),
-    _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
-    _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
-    _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
+    : _renderer(std::move(renderer)),
+      _audiodevice(std::move(audiodevice)),
+      _eventmanager(std::move(eventmanager)),
+      _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
+      _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
+      _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
 
   const auto fun = [&]{ eventmanager->update(.0f); };
 
