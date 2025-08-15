@@ -9,6 +9,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)),
       _envelopepool(framework::envelopepool::instance()) {
   int32_t number;
+  _joystickmapping.reserve(8);
   _mappingorder.reserve(8);
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
 
