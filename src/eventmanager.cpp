@@ -11,7 +11,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   int32_t number;
 
   _joystickmapping.reserve(8);
-  _mappingorder.reserve(8);
+  _joystickgorder.reserve(8);
 
   std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
 
@@ -26,8 +26,8 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
         const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
         _controllers.emplace(jid, std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
 
-        _mappingorder.push_back(jid);
-        _joystickmapping[jid] = static_cast<uint8_t>(_mappingorder.size() - 1);
+        _joystickgorder.push_back(jid);
+        _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
       }
     }
   }
@@ -115,8 +115,8 @@ void eventmanager::update(float_t delta) noexcept {
 
           _controllers[jid] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
 
-          _mappingorder.push_back(jid);
-          _joystickmapping[jid] = static_cast<uint8_t>(_mappingorder.size() - 1);
+          _joystickgorder.push_back(jid);
+          _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
         }
       } break;
 
@@ -129,12 +129,12 @@ void eventmanager::update(float_t delta) noexcept {
 
           const auto index = it->second;
           const SDL_JoystickID rid = event.cdevice.which;
-          const SDL_JoystickID lid = _mappingorder.back();
+          const SDL_JoystickID lid = _joystickgorder.back();
 
-          _mappingorder[index] = lid;
+          _joystickgorder[index] = lid;
           _joystickmapping[lid] = index;
 
-          _mappingorder.pop_back();
+          _joystickgorder.pop_back();
           _joystickmapping.erase(rid);
           _controllers.erase(rid);
       } break;
