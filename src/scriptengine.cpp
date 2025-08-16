@@ -560,8 +560,8 @@ void framework::scriptengine::run() {
       std::weak_ptr<framework::scene> ws = scene;
 
       module["get"] = [ws](sol::table, const std::string& name, framework::scenetype type) {
-        if (auto s = ws.lock()) [[likely]] {
-          return s->get(name, type);
+        if (auto scene = ws.lock()) [[likely]] {
+          return scene->get(name, type);
         }
 
         throw std::runtime_error("scene expired");
