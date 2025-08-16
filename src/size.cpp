@@ -41,7 +41,6 @@ size size::operator*(float_t factor) const noexcept {
 }
 
 size size::operator/(float_t factor) const noexcept {
-  assert(factor != 0);
   return {
       _width / factor,
       _height / factor

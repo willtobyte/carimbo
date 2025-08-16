@@ -92,19 +92,17 @@ const char *ov_strerror(int code) {
 }
 
 soundfx::soundfx(const std::string& filename) {
-  std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> fp{PHYSFS_openRead(filename.c_str()), PHYSFS_close};
-  if (!fp) [[unlikely]] {
+  std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> ptr{PHYSFS_openRead(filename.c_str()), PHYSFS_close};
+  if (!ptr) [[unlikely]] {
     throw std::runtime_error(std::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
-  PHYSFS_setBuffer(fp.get(), buffer_4mb);
-
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
-  if (ov_open_callbacks(fp.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
+  if (ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
     throw std::runtime_error(std::format("[ov_open_callbacks] error while opening file: {}", filename));
   }
 
-  [[maybe_unused]] auto *pointer = fp.release();
+  [[maybe_unused]] auto *pointer = ptr.release();
 
   const auto info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
