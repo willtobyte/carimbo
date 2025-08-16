@@ -1,6 +1,7 @@
 #include "eventmanager.hpp"
 #include "envelope.hpp"
 #include <SDL3/SDL_gamepad.h>
+#include <SDL3/SDL_keycode.h>
 
 using namespace input;
 using namespace event;
@@ -62,6 +63,14 @@ void eventmanager::update(float_t delta) noexcept {
       } break;
 
       case SDL_EVENT_KEY_UP: {
+        switch (event.key.key) {
+          case SDLK_F11:
+            auto* const window = static_cast<SDL_Window*>(*_renderer);
+            const auto fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
+            SDL_SetWindowFullscreen(window, !fullscreen);
+            break;
+        }
+
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
 
         for (const auto& receiver : _receivers) {
