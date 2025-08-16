@@ -545,6 +545,8 @@ void framework::scriptengine::run() {
     "set", &framework::scenemanager::set,
     "destroy", &framework::scenemanager::destroy,
     "register", [&lua](framework::scenemanager& self, const std::string& name) {
+      const auto start = SDL_GetPerformanceCounter();
+
       const auto scene = self.load(name);
 
       const auto buffer = storage::io::read(std::format("scenes/{}.lua", name));
@@ -662,6 +664,10 @@ void framework::scriptengine::run() {
 
         scene->set_onmotion(std::move(sfn));
       }
+
+      const auto end = SDL_GetPerformanceCounter();
+      const auto elapsed = static_cast<double_t>(end - start) * 1000.0 / static_cast<double_t>(SDL_GetPerformanceFrequency());
+      std::println("[scriptengine] {} took {:.3f}ms", name, elapsed);
     }
   );
 

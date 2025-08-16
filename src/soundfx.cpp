@@ -2,8 +2,6 @@
 
 using namespace audio;
 
-constexpr std::size_t buffer_4mb = 4 * 1024 * 1024;
-
 static size_t ovPHYSFS_read(void *ptr, size_t size, size_t nmemb, void *source) {
   auto file = reinterpret_cast<PHYSFS_file *>(source);
   PHYSFS_sint64 result = PHYSFS_readBytes(file, ptr, static_cast<PHYSFS_uint32>(size) * static_cast<PHYSFS_uint32>(nmemb));
