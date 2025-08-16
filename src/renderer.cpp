@@ -1,10 +1,13 @@
 #include "renderer.hpp"
 
+#include "window.hpp"
+
 using namespace graphics;
 
-renderer::renderer(SDL_Window *window) {
+renderer::renderer(std::shared_ptr<window> window)
+    : _window(std::move(window)) {
   SDL_PropertiesID props = SDL_CreateProperties();
-  SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, window);
+  SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, *_window);
   SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, 1);
   SDL_SetStringProperty(props, SDL_PROP_RENDERER_CREATE_NAME_STRING, nullptr);
 
@@ -18,6 +21,10 @@ renderer::renderer(SDL_Window *window) {
 
 renderer::operator SDL_Renderer *() const noexcept {
   return _renderer.get();
+}
+
+renderer::operator SDL_Window *() const noexcept {
+  return *_window;
 }
 
 void renderer::begin() const noexcept {

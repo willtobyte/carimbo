@@ -3,14 +3,14 @@
 #include "common.hpp"
 
 namespace graphics {
-class window final {
+class window final : public std::enable_shared_from_this<window> {
 public:
   window(const std::string& title, int32_t width, int32_t height, bool fullscreen);
   ~window() = default;
 
-  operator SDL_Window *() noexcept;
+  operator SDL_Window *() const noexcept;
 
-  std::shared_ptr<renderer> create_renderer(float_t scale) const;
+  std::shared_ptr<renderer> create_renderer(float_t scale);
 
   int32_t width() const noexcept;
 
