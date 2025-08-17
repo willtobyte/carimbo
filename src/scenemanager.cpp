@@ -8,6 +8,10 @@ scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcem
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
+  if (_scene_mapping.contains(name)) {
+    return nullptr;
+  }
+
   const auto& filename = std::format("scenes/{}.json", name);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
