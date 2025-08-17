@@ -573,12 +573,14 @@ void framework::scriptengine::run() {
       };
 
       if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn]() mutable {
+        auto sfn = [fn, &lua]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
+
+          lua.collect_garbage();
         };
 
         scene->set_onenter(std::move(sfn));
@@ -597,12 +599,14 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn]() mutable {
+        auto sfn = [fn, &lua]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
+
+          lua.collect_garbage();
         };
 
         scene->set_onleave(std::move(sfn));
