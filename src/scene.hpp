@@ -18,7 +18,8 @@ enum class scenetype : uint8_t {
 class scene final {
 public:
   scene() = delete;
-  explicit scene(
+  scene(
+      const std::string& name,
       std::shared_ptr<framework::objectmanager> objectmanager,
       std::shared_ptr<graphics::pixmap> background,
       std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
@@ -34,6 +35,8 @@ public:
   void draw() const noexcept;
 
   std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> get(const std::string& name, scenetype type) const;
+
+  std::string name() const noexcept;
 
   void on_enter() const;
   void on_leave() const;
@@ -55,6 +58,7 @@ public:
   void set_onmotion(std::function<void(float_t, float_t)>&& fn);
 
 private:
+  std::string _name;
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::pixmap> _background;
   std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;

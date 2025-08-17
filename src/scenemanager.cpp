@@ -62,6 +62,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   }
 
   const auto s = std::make_shared<scene>(
+    name,
     _objectmanager,
     std::move(background),
     std::move(objects),
@@ -76,10 +77,13 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 
 void scenemanager::set(const std::string& name) {
   if (_scene) [[likely]] {
+    std::println("[scenemanager] left scene {}", _scene->name());
     _scene->on_leave();
   }
 
   _scene = _scene_mapping.at(name);
+
+  std::println("[scenemanager] entered scene {}", name);
 
   _scene->on_enter();
 }

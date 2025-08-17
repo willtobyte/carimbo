@@ -3,6 +3,7 @@
 using namespace framework;
 
 scene::scene(
+  const std::string& name,
   std::shared_ptr<objectmanager> objectmanager,
   std::shared_ptr<graphics::pixmap> background,
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
@@ -10,7 +11,8 @@ scene::scene(
   std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
-    : _objectmanager(objectmanager),
+    : _name(name),
+      _objectmanager(objectmanager),
       _background(std::move(background)),
       _objects(std::move(objects)),
       _effects(std::move(effects)),
@@ -85,6 +87,10 @@ std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::ge
   }
 
   throw std::out_of_range("scene::get(): '" + name + "' not found");
+}
+
+std::string scene::name() const noexcept {
+  return _name;
 }
 
 void scene::on_enter() const {
