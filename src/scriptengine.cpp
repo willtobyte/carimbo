@@ -1042,9 +1042,9 @@ void framework::scriptengine::run() {
   }
 
   const auto setup = lua["setup"].get<sol::protected_function>();
-  const auto sr = setup();
-  if (!sr.valid()) [[unlikely]] {
-    sol::error err = sr;
+  const auto sp = setup();
+  if (!sp.valid()) [[unlikely]] {
+    sol::error err = sp;
     throw std::runtime_error(err.what());
   }
 
