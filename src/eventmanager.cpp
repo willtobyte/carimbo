@@ -35,6 +35,8 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
 
         _joystickgorder.push_back(jid);
         _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
+
+        std::println("[eventmanager] gamepad connected {}", jid);
       }
     }
   }
@@ -137,6 +139,8 @@ void eventmanager::update(float_t delta) noexcept {
 
           _joystickgorder.push_back(jid);
           _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
+
+          std::println("[eventmanager] gamepad connected {}", jid);
         }
       } break;
 
@@ -157,6 +161,8 @@ void eventmanager::update(float_t delta) noexcept {
           _joystickgorder.pop_back();
           _joystickmapping.erase(rid);
           _controllers.erase(rid);
+
+          std::println("[eventmanager] gamepad disconnected {}", rid);
       } break;
 
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
