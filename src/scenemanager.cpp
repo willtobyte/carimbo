@@ -89,7 +89,33 @@ std::shared_ptr<scene> scenemanager::get(const std::string& name) const {
 }
 
 void scenemanager::destroy(const std::string& name) {
-  _scene_mapping.erase(name);
+  if (name.size() == 1 && name.front() == '*') {
+    if (_scene_mapping.empty()) {
+      _resourcemanager->flush();
+      return;
+    }
+
+    const auto keep = _scene ? _scene.get() : nullptr;
+
+    for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
+      if (it->second.get() == keep) {
+        ++it;
+        continue;
+      }
+
+      it = _scene_mapping.erase(it);
+    }
+
+    _resourcemanager->flush();
+    return;
+  }
+
+  const auto it = _scene_mapping.find(name);
+  if (it == _scene_mapping.end()) {
+    return;
+  }
+
+  _scene_mapping.erase(it);
   _resourcemanager->flush();
 }
 
