@@ -62,7 +62,12 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     const auto& key = item.key();
     const auto& a = item.value();
     const auto hitbox = a.contains("hitbox") ? std::make_optional(a.at("hitbox").template get<framework::hitbox>()) : std::nullopt;
-    const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(std::format("blobs/{}{}/{}.ogg", scope ? scope->get() : "", scope ? "/" : "", a.at("effect").template get_ref<const std::string&>())) : nullptr;
+    const auto effect = a.contains("effect")
+        ? _resourcemanager->soundmanager()->get(
+            scope
+                ? std::format("blobs/{}/{}.ogg", scope->get(), a.at("effect").template get_ref<const std::string&>())
+                : std::format("blobs/{}.ogg", a.at("effect").template get_ref<const std::string&>())
+          ) : nullptr;
     const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
     const bool oneshot = next.has_value() || a.value("oneshot", false);
     const auto keyframes = a.at("frames").get<std::vector<framework::keyframe>>();

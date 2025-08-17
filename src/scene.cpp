@@ -10,26 +10,32 @@ scene::scene(
   std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
-  : _objectmanager(objectmanager),
-    _background(std::move(background)),
-    _objects(std::move(objects)),
-    _effects(std::move(effects)),
-    _tilemap(std::move(tilemap)),
-    _size(std::move(size)) {
+    : _objectmanager(objectmanager),
+      _background(std::move(background)),
+      _objects(std::move(objects)),
+      _effects(std::move(effects)),
+      _tilemap(std::move(tilemap)),
+      _size(std::move(size)) {
 }
 
-scene::~scene() {
-  const auto objects = std::exchange(_objects, {});
-
+scene::~scene() noexcept {
+  auto objects = std::exchange(_objects, {});
   for (const auto& [_, o] : objects) {
     _objectmanager->destroy(o);
   }
 
-  const auto effects = std::exchange(_effects, {});
+  objects.clear();
+  objects.shrink_to_fit();
+
+  auto effects = std::exchange(_effects, {});
   for (const auto& [_, e] : effects) {
     e->stop();
   }
 
+  effects.clear();
+  effects.shrink_to_fit();
+
+  _tilemap.reset();
   _background.reset();
 }
 

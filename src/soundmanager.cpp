@@ -27,7 +27,7 @@ void soundmanager::play(const std::string& filename, bool loop) noexcept {
 }
 
 void soundmanager::stop(const std::string& filename) noexcept {
-  if (const auto& sound = get(filename); sound) {
+  if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->stop();
   }
 }

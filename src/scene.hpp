@@ -27,7 +27,7 @@ public:
       geometry::size size
   );
 
-  ~scene();
+  ~scene() noexcept;
 
   void update(float_t delta) noexcept;
 
