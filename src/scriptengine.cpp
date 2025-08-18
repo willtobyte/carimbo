@@ -548,9 +548,6 @@ void framework::scriptengine::run() {
       const auto start = SDL_GetPerformanceCounter();
 
       const auto scene = self.load(name);
-      if (!scene) {
-        return;
-      }
 
       const auto buffer = storage::io::read(std::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
@@ -562,14 +559,8 @@ void framework::scriptengine::run() {
 
       auto module = result.get<sol::table>();
 
-      std::weak_ptr<framework::scene> ws = scene;
-
-      module["get"] = [ws](sol::table, const std::string& name, framework::scenetype type) {
-        if (auto scene = ws.lock()) [[likely]] {
-          return scene->get(name, type);
-        }
-
-        throw std::runtime_error("scene expired");
+      module["get"] = [scene](sol::table, const std::string& name, framework::scenetype type) {
+        return scene->get(name, type);
       };
 
       if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
