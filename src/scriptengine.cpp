@@ -548,6 +548,9 @@ void framework::scriptengine::run() {
       const auto start = SDL_GetPerformanceCounter();
 
       const auto scene = self.load(name);
+      if (!scene) [[unlikely]] {
+        return;
+      }
 
       const auto buffer = storage::io::read(std::format("scenes/{}.lua", name));
       std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
