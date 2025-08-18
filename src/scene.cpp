@@ -77,7 +77,7 @@ std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::ge
     }
   }
 
-  throw std::out_of_range("scene::get(): '" + name + "' not found");
+  throw std::out_of_range(std::format("[scene] {} not found", name));
 }
 
 std::string scene::name() const noexcept {
