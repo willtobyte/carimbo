@@ -75,14 +75,14 @@ void scene::draw() const noexcept {
 
 std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& name, scenetype type) const {
   if (type == scenetype::object) {
-    for (const auto& [key, obj] : _objects) {
-      if (key == name) return obj;
+    for (const auto& [key, object] : _objects) {
+      if (key == name) return object;
     }
   }
 
   if (type == scenetype::effect) {
-    for (const auto& [key, fx] : _effects) {
-      if (key == name) return fx;
+    for (const auto& [key, effect] : _effects) {
+      if (key == name) return effect;
     }
   }
 
