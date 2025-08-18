@@ -26,19 +26,10 @@ scene::~scene() noexcept {
     _objectmanager->destroy(o);
   }
 
-  objects.clear();
-  objects.shrink_to_fit();
-
   auto effects = std::exchange(_effects, {});
   for (const auto& [_, e] : effects) {
     e->stop();
   }
-
-  effects.clear();
-  effects.shrink_to_fit();
-
-  _tilemap.reset();
-  _background.reset();
 }
 
 void scene::update(float_t delta) noexcept {
