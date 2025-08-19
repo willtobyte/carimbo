@@ -562,7 +562,14 @@ void framework::scriptengine::run() {
 
       auto module = result.get<sol::table>();
 
-      module["get"] = [scene](sol::table, const std::string& name, framework::scenetype type) {
+      auto ws = std::weak_ptr<framework::scene>(scene);
+
+      module["get"] = [ws](sol::table, const std::string& name, framework::scenetype type) {
+        auto scene = ws.lock();
+        if (!scene) {
+          throw std::runtime_error("scene expired");
+        }
+
         return scene->get(name, type);
       };
 
