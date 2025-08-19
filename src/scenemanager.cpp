@@ -80,16 +80,17 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 }
 
 void scenemanager::set(const std::string& name) {
-  if (_scene) [[likely]] {
-    std::println("[scenemanager] left scene {}", _scene->name());
-    _scene->on_leave();
+  if (auto active = _scene.lock()) {
+    std::println("[scenemanager] left scene {}", active->name());
+    active->on_leave();
   }
 
-  _scene = _scene_mapping.at(name);
+  auto& ptr = _scene_mapping.at(name);
+  _scene = ptr;
+  _current = name;
 
   std::println("[scenemanager] entered scene {}", name);
-
-  _scene->on_enter();
+  ptr->on_enter();
 }
 
 std::shared_ptr<scene> scenemanager::get(const std::string& name) const {
@@ -98,19 +99,8 @@ std::shared_ptr<scene> scenemanager::get(const std::string& name) const {
 
 void scenemanager::destroy(const std::string& name) {
   if (name.size() == 1 && name.front() == '*') {
-    if (_scene_mapping.empty()) {
-      _resourcemanager->flush();
-      return;
-    }
-
-    const auto keep = _scene ? _scene.get() : nullptr;
-
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
-      if (it->second.get() == keep) {
-        ++it;
-        continue;
-      }
-
+      if (it->first == _current) { ++it; continue; }
       it = _scene_mapping.erase(it);
     }
 
@@ -118,85 +108,58 @@ void scenemanager::destroy(const std::string& name) {
     return;
   }
 
-  const auto it = _scene_mapping.find(name);
-  if (it == _scene_mapping.end()) {
-    return;
+  _scene_mapping.erase(name);
+  if (name == _current) {
+    _scene.reset();
+    _current.clear();
   }
 
-  _scene_mapping.erase(it);
   _resourcemanager->flush();
 }
 
 void scenemanager::update(float_t delta) noexcept {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->update(delta);
+  auto s = _scene.lock();
+  s->update(delta);
 }
 
 void scenemanager::draw() const noexcept {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->draw();
+  auto s = _scene.lock();
+  s->draw();
 }
 
 void scenemanager::on_touch(float_t x, float_t y) const {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->on_touch(x, y);
+  auto s = _scene.lock();
+  s->on_touch(x, y);
 }
 
 void scenemanager::on_key_press(const input::event::keyboard::key& event) {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->on_key_press(static_cast<int32_t>(event));
+  auto s = _scene.lock();
+  s->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const input::event::keyboard::key& event) {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->on_key_release(static_cast<int32_t>(event));
+  auto s = _scene.lock();
+  s->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(const std::string& text) {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->on_text(text);
+  auto s = _scene.lock();
+  s->on_text(text);
 }
 
 void scenemanager::on_mouse_press(const input::event::mouse::button& event) {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
+  auto s = _scene.lock();
   UNUSED(event);
-  // _scene->on_mouse_press(event.x, event.y);
+  // s->on_mouse_press(event.x, event.y);
 }
 
 void scenemanager::on_mouse_release(const input::event::mouse::button& event) {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
+  auto s = _scene.lock();
   UNUSED(event);
-  // _scene->on_mouse_release(event.x, event.y);
+  // s->on_mouse_release(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const input::event::mouse::motion& event) {
-  if (!_scene) [[unlikely]] {
-    return;
-  }
-
-  _scene->on_motion(event.x, event.y);
+  auto s = _scene.lock();
+  s->on_motion(event.x, event.y);
 }
