@@ -20,15 +20,15 @@ tilemap::tilemap(
   _labels = j.value("labels", std::vector<std::string>{});
   _transactions = j.value("transactions", std::vector<transaction>{});
 
-  const auto tiles_per_row = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_size);
+  const auto tpr = static_cast<uint32_t>(_pixmap->width()) / static_cast<uint32_t>(_size);
   static constexpr auto max_index = std::numeric_limits<uint8_t>::max();
 
   _sources.resize(max_index + 1);
   _sources[0] = {{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const auto idx = static_cast<uint32_t>(i - 1);
-    const auto src_x = static_cast<float_t>(idx % tiles_per_row) * _size;
-    const auto src_y = std::floor(static_cast<float_t>(idx) / static_cast<float_t>(tiles_per_row)) * _size;
+    const auto src_x = static_cast<float_t>(idx % tpr) * _size;
+    const auto src_y = std::floor(static_cast<float_t>(idx) / static_cast<float_t>(tpr)) * _size;
     _sources[i] = {{src_x, src_y}, {_size, _size}};
   }
 }
@@ -90,7 +90,7 @@ void tilemap::draw() const noexcept {
   const auto min_row = static_cast<size_t>(std::max(0.f, std::floor(view_y0 / _size)));
   const auto max_row = std::min(static_cast<size_t>(_height), static_cast<size_t>(std::ceil(view_y1 / _size)));
 
-  const auto tiles_per_row = static_cast<size_t>(_width);
+  const auto tpr = static_cast<size_t>(_width);
 
   for (size_t l = 0; l < _layers.size(); ++l) {
     if (l < _visibles.size() && !_visibles[l]) continue;
@@ -100,7 +100,7 @@ void tilemap::draw() const noexcept {
 
     for (size_t row = min_row; row < max_row; ++row) {
       for (size_t column = min_column; column < max_column; ++column) {
-        const auto i = row * tiles_per_row + column;
+        const auto i = row * tpr + column;
         if (i >= layer_size) continue;
 
         const auto index = layer[i];
@@ -152,11 +152,11 @@ std::vector<std::string> tilemap::under() const noexcept {
   const auto x1 = x0 + hitbox.width();
   const auto y1 = y0 + hitbox.height();
 
-  const auto column_start = static_cast<size_t>(x0 / _size);
-  const auto column_end   = static_cast<size_t>(std::min(std::ceil(x1 / _size), _width));
-  const auto row_start = static_cast<size_t>(y0 / _size);
-  const auto row_end   = static_cast<size_t>(std::min(std::ceil(y1 / _size), _height));
-  const auto tiles_per_row = static_cast<size_t>(_width);
+  const auto cstart = static_cast<size_t>(x0 / _size);
+  const auto cend   = static_cast<size_t>(std::min(std::ceil(x1 / _size), _width));
+  const auto rstart = static_cast<size_t>(y0 / _size);
+  const auto rend   = static_cast<size_t>(std::min(std::ceil(y1 / _size), _height));
+  const auto tpr = static_cast<size_t>(_width);
 
   std::vector<std::string> result;
   result.reserve(_labels.size());
@@ -169,15 +169,15 @@ std::vector<std::string> tilemap::under() const noexcept {
     if (!_visibles[l]) [[unlikely]] continue;
 
     const auto& layer = _layers[l];
-    const auto layer_size = layer.size();
+    const auto ls = layer.size();
 
-    for (auto row = row_start; row < row_end; ++row) {
-      const auto base = row * tiles_per_row;
-      if (base >= layer_size) [[unlikely]] break;
+    for (auto row = rstart; row < rend; ++row) {
+      const auto base = row * tpr;
+      if (base >= ls) [[unlikely]] break;
 
-      for (auto col = column_start; col < column_end; ++col) {
+      for (auto col = cstart; col < cend; ++col) {
         const auto index = base + col;
-        if (index >= layer_size) [[unlikely]] break;
+        if (index >= ls) [[unlikely]] break;
 
         if (const auto tile = layer[index]; tile) [[likely]] {
           if (l < lc) result.emplace_back(_labels[l]);
