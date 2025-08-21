@@ -566,15 +566,18 @@ void framework::scriptengine::run() {
 
       auto module = result.get<sol::table>();
 
-      auto ws = std::weak_ptr<framework::scene>(scene);
+      auto wptr = std::weak_ptr<framework::scene>(scene);
 
-      module["get"] = [ws](sol::table, const std::string& name, framework::scenetype type) {
-        auto scene = ws.lock();
+      module["get"] = [wptr, &name](sol::table, const std::string& id, framework::scenetype type) {
+        auto scene = wptr.lock();
         if (!scene) {
-          throw std::runtime_error("scene expired");
+          std::println("[scriptengine] scene {} expired while accessing object {}", name, id);
+
+          return std::variant<std::shared_ptr<framework::object>,
+                              std::shared_ptr<audio::soundfx>>{};
         }
 
-        return scene->get(name, type);
+        return scene->get(id, type);
       };
 
       if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {

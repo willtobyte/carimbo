@@ -64,20 +64,20 @@ void scene::draw() const noexcept {
   }
 }
 
-std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& name, scenetype type) const {
+std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& id, scenetype type) const {
   if (type == scenetype::object) {
     for (const auto& [key, object] : _objects) {
-      if (key == name) return object;
+      if (key == id) return object;
     }
   }
 
   if (type == scenetype::effect) {
     for (const auto& [key, effect] : _effects) {
-      if (key == name) return effect;
+      if (key == id) return effect;
     }
   }
 
-  throw std::out_of_range(std::format("[scene] {} not found", name));
+  throw std::out_of_range(std::format("[scene] resource {} not found", id));
 }
 
 std::string scene::name() const noexcept {
