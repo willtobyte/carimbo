@@ -84,11 +84,11 @@ void tilemap::draw() const noexcept {
   const auto view_x1 = view_x0 + _view.width();
   const auto view_y1 = view_y0 + _view.height();
 
-  const auto min_column = static_cast<size_t>(std::max(0.f, std::floor(view_x0 / _size)));
-  const auto max_column = std::min(static_cast<size_t>(_width), static_cast<size_t>(std::ceil(view_x1 / _size)));
+  const auto minc = static_cast<size_t>(std::max(0.f, std::floor(view_x0 / _size)));
+  const auto maxc = std::min(static_cast<size_t>(_width), static_cast<size_t>(std::ceil(view_x1 / _size)));
 
-  const auto min_row = static_cast<size_t>(std::max(0.f, std::floor(view_y0 / _size)));
-  const auto max_row = std::min(static_cast<size_t>(_height), static_cast<size_t>(std::ceil(view_y1 / _size)));
+  const auto minr = static_cast<size_t>(std::max(0.f, std::floor(view_y0 / _size)));
+  const auto maxr = std::min(static_cast<size_t>(_height), static_cast<size_t>(std::ceil(view_y1 / _size)));
 
   const auto tpr = static_cast<size_t>(_width);
 
@@ -98,8 +98,8 @@ void tilemap::draw() const noexcept {
     const auto& layer = _layers[l];
     const auto layer_size = layer.size();
 
-    for (size_t row = min_row; row < max_row; ++row) {
-      for (size_t column = min_column; column < max_column; ++column) {
+    for (size_t row = minr; row < maxr; ++row) {
+      for (size_t column = minc; column < maxc; ++column) {
         const auto i = row * tpr + column;
         if (i >= layer_size) continue;
 
