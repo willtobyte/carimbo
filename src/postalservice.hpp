@@ -25,6 +25,6 @@ public:
   void post(const mail& message) noexcept;
 
 private:
-  std::shared_ptr<uniquepool<envelope>> _envelopepool;
+  std::shared_ptr<uniquepool<envelope, envelope_pool_name>> _envelopepool;
 };
 }

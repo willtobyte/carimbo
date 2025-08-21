@@ -9,7 +9,7 @@
 
 namespace framework {
 
-template<typename T, typename PtrType>
+template<typename T, typename PtrType, auto& Name>
 class poolbase {
 protected:
   std::vector<PtrType> _objects;
@@ -23,6 +23,8 @@ protected:
     for (auto i = _objects.size(); i < target; ++i) {
       _objects.emplace_back(std::make_unique<T>());
     }
+
+    std::println("[pool<{}>] expanded to {} objects", Name, target);
   }
 
 public:
@@ -65,21 +67,23 @@ public:
   }
 };
 
-template<typename T>
-class uniquepool : public poolbase<T, std::unique_ptr<T>> {
+template<typename T, auto& Name>
+class uniquepool : public poolbase<T, std::unique_ptr<T>, Name> {
 public:
-  using poolbase<T, std::unique_ptr<T>>::acquire;
-  using poolbase<T, std::unique_ptr<T>>::release;
+  using poolbase<T, std::unique_ptr<T>, Name>::acquire;
+  using poolbase<T, std::unique_ptr<T>, Name>::release;
 };
 
-using envelopepool = singleton<uniquepool<envelope>>;
+inline constexpr char envelope_pool_name[] = "envelope";
+using envelopepool = singleton<uniquepool<envelope, envelope_pool_name>>;
 
-template<typename T>
-class sharedpool : public poolbase<T, std::shared_ptr<T>> {
+template<typename T, auto& Name>
+class sharedpool : public poolbase<T, std::shared_ptr<T>, Name> {
 public:
-  using poolbase<T, std::shared_ptr<T>>::acquire;
-  using poolbase<T, std::shared_ptr<T>>::release;
+  using poolbase<T, std::shared_ptr<T>, Name>::acquire;
+  using poolbase<T, std::shared_ptr<T>, Name>::release;
 };
 
-using objectpool = singleton<sharedpool<object>>;
+inline constexpr char object_pool_name[] = "object";
+using objectpool = singleton<sharedpool<object, object_pool_name>>;
 }

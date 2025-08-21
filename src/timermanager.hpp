@@ -16,6 +16,6 @@ protected:
   uint32_t add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat);
 
 private:
-  std::shared_ptr<uniquepool<envelope>> _envelopepool;
+  std::shared_ptr<uniquepool<envelope, envelope_pool_name>> _envelopepool;
 };
 }
