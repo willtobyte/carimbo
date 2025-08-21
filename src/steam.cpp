@@ -95,7 +95,7 @@ bool StoreStats() {
 
 #else
 
-bool SteamAPI_InitSafe()            { return false; }
+bool SteamAPI_InitSafe()           { return false; }
 void SteamAPI_Shutdown()           {}
 void SteamAPI_RunCallbacks()       {}
 void* SteamUserStats()             { return nullptr; }
