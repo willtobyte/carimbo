@@ -543,7 +543,11 @@ void framework::scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "set", &framework::scenemanager::set,
-    "destroy", &framework::scenemanager::destroy,
+    "destroy", [&lua](framework::scenemanager& self, const std::string& name) {
+      self.destroy(name);
+      lua.collect_garbage();
+      lua.collect_garbage();
+    },
     "register", [&lua](framework::scenemanager& self, const std::string& name) {
       const auto start = SDL_GetPerformanceCounter();
 
@@ -582,6 +586,7 @@ void framework::scriptengine::run() {
           }
 
           lua.collect_garbage();
+          lua.collect_garbage();
         };
 
         scene->set_onenter(std::move(sfn));
@@ -607,6 +612,7 @@ void framework::scriptengine::run() {
             throw std::runtime_error(err.what());
           }
 
+          lua.collect_garbage();
           lua.collect_garbage();
         };
 
