@@ -7,8 +7,7 @@ using namespace input;
 using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
-    : _renderer(std::move(renderer)),
-      _envelopepool(framework::envelopepool::instance()) {
+    : _renderer(std::move(renderer)) {
   int32_t number;
 
   _joystickmapping.reserve(8);

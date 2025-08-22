@@ -14,22 +14,17 @@ class poolbase {
 protected:
   std::vector<PtrType> _objects;
 
-  template<typename... Args>
   void expand(size_t minimum) {
     size_t target = _objects.capacity();
     if (target == 0) target = 1;
 
     while (target < minimum) target <<= 1;
 
-    target <<= 1;
-
     _objects.reserve(target);
 
     for (size_t i = _objects.size(); i < target; ++i) {
-      if constexpr (std::is_same_v<PtrType, std::unique_ptr<T>>)
-        _objects.emplace_back(std::make_unique<T>());
-      if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>)
-        _objects.emplace_back(std::make_shared<T>());
+      if constexpr (std::is_same_v<PtrType, std::unique_ptr<T>>) _objects.emplace_back(std::make_unique<T>());
+      if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) _objects.emplace_back(std::make_shared<T>());
     }
 
     std::println("[pool<{}>] expanded to {} objects", Name, target);
@@ -39,7 +34,9 @@ public:
   template<typename... Args>
   PtrType acquire(Args&&... args) {
     if (_objects.empty()) {
-      expand(size());
+      const auto capacity = _objects.capacity();
+      const auto need = capacity ? (capacity << 1) : 1;
+      expand(need);
     }
 
     PtrType object = std::move(_objects.back());

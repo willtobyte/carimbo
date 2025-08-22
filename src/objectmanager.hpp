@@ -43,7 +43,7 @@ private:
   std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
 
-  std::shared_ptr<sharedpool<object, framework::object_pool_name>> _objectpool;
-  std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool;
+  std::shared_ptr<sharedpool<object, framework::object_pool_name>> _objectpool = objectpool::instance();
+  std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };
 }

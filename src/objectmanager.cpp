@@ -21,9 +21,7 @@ auto callback_or(const Map& m, const typename Map::key_type& key, std::optional<
 }
 
 objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
-    : _resourcemanager(resourcemanager),
-      _objectpool(objectpool::instance()),
-      _envelopepool(envelopepool::instance()) {
+    : _resourcemanager(resourcemanager) {
   _objectpool->reserve(64);
   _envelopepool->reserve(64);
 }
