@@ -19,13 +19,13 @@ class scene final {
 public:
   scene() = delete;
   scene(
-      const std::string& name,
-      std::shared_ptr<framework::objectmanager> objectmanager,
-      std::shared_ptr<graphics::pixmap> background,
-      std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
-      std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
-      std::optional<std::shared_ptr<tilemap>> tilemap,
-      geometry::size size
+    const std::string& name,
+    std::shared_ptr<framework::objectmanager> objectmanager,
+    std::shared_ptr<graphics::pixmap> background,
+    std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
+    std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+    std::optional<std::shared_ptr<tilemap>> tilemap,
+    geometry::size size
   );
 
   ~scene() noexcept;
