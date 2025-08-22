@@ -2,12 +2,11 @@
 
 using namespace graphics;
 
-color::color(uint32_t pixel) noexcept {
-  _r = static_cast<uint8_t>((pixel >> 24) & 0xFF);
-  _g = static_cast<uint8_t>((pixel >> 16) & 0xFF);
-  _b = static_cast<uint8_t>((pixel >> 8)  & 0xFF);
-  _a = static_cast<uint8_t>(pixel & 0xFF);
-}
+color::color(uint32_t pixel) noexcept
+    : _r(static_cast<uint8_t>(pixel >> 24)),
+      _g(static_cast<uint8_t>(pixel >> 16)),
+      _b(static_cast<uint8_t>(pixel >> 8)),
+      _a(static_cast<uint8_t>(pixel)) {}
 
 color::color(const SDL_Color& scolor) noexcept
     : color(scolor.r, scolor.g, scolor.b, scolor.a) {}
@@ -66,7 +65,7 @@ void color::set_a(uint8_t a) noexcept {
 }
 
 bool color::operator==(const color& other) const noexcept {
-  return std::tie(_r, _g, _b, _a) == std::tie(other._r, other._g, other._b, other._a);
+  return *reinterpret_cast<const uint32_t*>(this) == *reinterpret_cast<const uint32_t*>(&other);
 }
 
 bool color::operator!=(const color& other) const noexcept {

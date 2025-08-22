@@ -314,15 +314,6 @@ void framework::scriptengine::run() {
   );
 
   lua.new_enum(
-    "Anchor",
-    "top", framework::anchor::top,
-    "bottom", framework::anchor::bottom,
-    "left", framework::anchor::left,
-    "right", framework::anchor::right,
-    "none", framework::anchor::none
-  );
-
-  lua.new_enum(
     "Reflection",
     "none", graphics::reflection::none,
     "horizontal", graphics::reflection::horizontal,
