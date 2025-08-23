@@ -535,7 +535,11 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "set", &framework::scenemanager::set,
     "destroy", [&lua](framework::scenemanager& self, const std::string& name) {
+      lua.collect_garbage();
+      lua.collect_garbage();
+
       self.destroy(name);
+
       lua.collect_garbage();
       lua.collect_garbage();
     },
