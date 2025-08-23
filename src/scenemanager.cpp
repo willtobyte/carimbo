@@ -110,13 +110,11 @@ void scenemanager::destroy(const std::string& name) {
     return;
   }
 
-  std::println("[scenemanager] destroyed scene {}", name);
-
-  _scene_mapping.erase(name);
-  if (name == _current) {
-    _scene.reset();
-    _current.clear();
+  if (_scene_mapping.erase(name) == 0) {
+    return;
   }
+
+  std::println("[scenemanager] destroyed scene {}", name);
 
   _resourcemanager->flush();
 }
