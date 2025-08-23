@@ -559,7 +559,7 @@ void framework::scriptengine::run() {
 
       auto ptr = std::weak_ptr<framework::scene>(scene);
 
-      module["get"] = [ptr, &name](sol::table, const std::string& id, framework::scenetype type) {
+      module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
         auto scene = ptr.lock();
         if (!scene) {
           std::println("[scriptengine] scene {} expired while accessing object {}", name, id);
