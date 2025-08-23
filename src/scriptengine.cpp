@@ -557,10 +557,10 @@ void framework::scriptengine::run() {
 
       auto module = result.get<sol::table>();
 
-      auto wptr = std::weak_ptr<framework::scene>(scene);
+      auto ptr = std::weak_ptr<framework::scene>(scene);
 
-      module["get"] = [wptr, &name](sol::table, const std::string& id, framework::scenetype type) {
-        auto scene = wptr.lock();
+      module["get"] = [ptr, &name](sol::table, const std::string& id, framework::scenetype type) {
+        auto scene = ptr.lock();
         if (!scene) {
           std::println("[scriptengine] scene {} expired while accessing object {}", name, id);
 
