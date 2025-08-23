@@ -37,6 +37,8 @@ public:
 
   int32_t height() const noexcept;
 
+  void set_blendmode(blendmode mode);
+
 private:
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;

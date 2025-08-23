@@ -96,3 +96,9 @@ int32_t pixmap::width() const noexcept {
 int32_t pixmap::height() const noexcept {
   return _height;
 }
+
+void pixmap::set_blendmode(blendmode mode) {
+  if (!SDL_SetTextureBlendMode(_texture.get(), static_cast<SDL_BlendMode>(mode))) {
+    throw std::runtime_error(std::format("[SDL_SetTextureBlendMode] {}", SDL_GetError()));
+  }
+}

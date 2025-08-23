@@ -1,7 +1,5 @@
 #include "objectmanager.hpp"
 
-#include "objectpool.hpp"
-
 using namespace framework;
 
 using namespace input::event;
