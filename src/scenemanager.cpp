@@ -72,7 +72,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     std::move(objects),
     std::move(effects),
     std::move(map),
-    size
+    std::move(size)
   );
 
   _scene_mapping[name] = s;
@@ -107,6 +107,7 @@ void scenemanager::destroy(const std::string& name) {
   }
 
   if (_scene_mapping.erase(name) == 0) {
+    std::println("[scenemanager] scene {} not found, nothing destroyed", name);
     return;
   }
 
