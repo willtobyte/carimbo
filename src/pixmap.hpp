@@ -5,9 +5,13 @@
 #include "rectangle.hpp"
 #include "reflection.hpp"
 #include "renderer.hpp"
-#include "size.hpp"
 
 namespace graphics {
+enum class blendmode : SDL_BlendMode {
+  None = SDL_BLENDMODE_NONE,
+  Add  = SDL_BLENDMODE_ADD
+};
+
 class pixmap final {
 public:
   pixmap() = delete;
