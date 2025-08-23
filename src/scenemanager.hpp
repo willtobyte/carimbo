@@ -19,8 +19,6 @@ public:
 
   void set(const std::string& name);
 
-  std::shared_ptr<scene> get(const std::string& name) const;
-
   void destroy(const std::string& name);
 
   void update(float_t delta) noexcept;

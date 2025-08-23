@@ -93,10 +93,6 @@ void scenemanager::set(const std::string& name) {
   ptr->on_enter();
 }
 
-std::shared_ptr<scene> scenemanager::get(const std::string& name) const {
-  return _scene_mapping.at(name);
-}
-
 void scenemanager::destroy(const std::string& name) {
   if (name.size() == 1 && name.front() == '*') {
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
