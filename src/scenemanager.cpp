@@ -98,17 +98,19 @@ std::shared_ptr<scene> scenemanager::get(const std::string& name) const {
 }
 
 void scenemanager::destroy(const std::string& name) {
-  std::println("[scenemanager] destroyed scene {}", name);
-
   if (name.size() == 1 && name.front() == '*') {
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
       if (it->first == _current) { ++it; continue; }
+      std::println("[scenemanager] destroyed scene {}", it->first);
+
       it = _scene_mapping.erase(it);
     }
 
     _resourcemanager->flush();
     return;
   }
+
+  std::println("[scenemanager] destroyed scene {}", name);
 
   _scene_mapping.erase(name);
   if (name == _current) {
