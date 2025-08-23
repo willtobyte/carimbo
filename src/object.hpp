@@ -119,8 +119,6 @@ private:
   animation_map _animations;
 
   memory::kv _kv;
-  uint64_t _tick_count{0};
-  uint64_t _last_tick{0};
   std::function<void(std::shared_ptr<object>, float_t, float_t)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
@@ -128,6 +126,5 @@ private:
   std::function<void(std::shared_ptr<object>, const std::string& )> _onanimationfinished;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>> _collisionmapping;
-  std::unordered_map<uint64_t, std::function<void(std::shared_ptr<object>)>> _tickinmapping;
 };
 }

@@ -381,7 +381,6 @@ void framework::scriptengine::run() {
     "on_hover", &framework::object::set_onhover,
     "on_unhover", &framework::object::set_onunhover,
     "on_collision", &framework::object::set_oncollision,
-    "on_nthtick", &framework::object::set_onnthtick,
     "reflection", sol::property(
       [](framework::object& o) {
         return o.reflection();

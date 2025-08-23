@@ -287,10 +287,6 @@ void object::set_oncollision(const std::string& kind, std::function<void(std::sh
   _collisionmapping.emplace(kind, std::move(fn));
 }
 
-void object::set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)>&& fn) {
-  _tickinmapping.emplace(n, std::move(fn));
-}
-
 void object::on_email(const std::string& message) {
   if (const auto fn = _onmail; fn) {
     fn(shared_from_this(), message);

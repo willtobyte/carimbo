@@ -3,8 +3,8 @@
 using namespace framework;
 
 scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager)
-  : _resourcemanager(std::move(resourcemanager)),
-    _objectmanager(std::move(objectmanager)) {
+    : _resourcemanager(std::move(resourcemanager)),
+      _objectmanager(std::move(objectmanager)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
