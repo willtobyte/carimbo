@@ -199,6 +199,14 @@ float_t object::scale() const noexcept {
   return _scale;
 }
 
+void object::set_angle(double_t angle) noexcept {
+  _angle = angle;
+}
+
+double_t object::angle() const noexcept {
+  return _angle;
+}
+
 void object::set_reflection(graphics::reflection reflection) noexcept {
   _reflection = reflection;
 }

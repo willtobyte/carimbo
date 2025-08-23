@@ -69,6 +69,9 @@ public:
   void set_scale(float_t scale) noexcept;
   float_t scale() const noexcept;
 
+  void set_angle(double_t angle) noexcept;
+  double_t angle() const noexcept;
+
   void set_reflection(graphics::reflection reflection) noexcept;
   graphics::reflection reflection() const noexcept;
 

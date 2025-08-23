@@ -373,6 +373,7 @@ void framework::scriptengine::run() {
     "y", sol::property(&framework::object::y, &framework::object::set_y),
     "alpha", sol::property(&framework::object::alpha, &framework::object::set_alpha),
     "scale", sol::property(&framework::object::scale, &framework::object::set_scale),
+    "angle", sol::property(&framework::object::angle, &framework::object::set_angle),
     "hide", &framework::object::hide,
     "on_update", &framework::object::set_onupdate,
     "on_animationfinished", &framework::object::set_onanimationfinished,
