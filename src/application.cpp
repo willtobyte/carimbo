@@ -23,7 +23,7 @@ using namespace framework;
 
       std::println(stderr, "{}", error);
 
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Catastrophe", error, nullptr);
+      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
 
       #ifdef DEBUG
         #if defined(_MSC_VER)

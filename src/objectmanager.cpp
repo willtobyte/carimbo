@@ -222,7 +222,7 @@ void objectmanager::draw() const noexcept {
   }
 }
 
-void objectmanager::on_mouse_press(const mouse::button& event) {
+void objectmanager::on_mouse_release(const mouse::button& event) {
   if (event.button != mouse::button::which::left) {
     return;
   }
