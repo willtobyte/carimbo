@@ -84,7 +84,7 @@ std::string scene::name() const noexcept {
   return _name;
 }
 
-void scene::on_enter() const {
+void scene::on_enter() {
   for (const auto& [_, o] : _objects) {
     _objectmanager->manage(o);
   }
@@ -94,7 +94,7 @@ void scene::on_enter() const {
   }
 }
 
-void scene::on_leave() const {
+void scene::on_leave() {
   if (const auto fn = _onleave) {
     fn();
   }
@@ -106,6 +106,15 @@ void scene::on_leave() const {
   for (const auto& [_, e] : _effects) {
     e->stop();
   }
+
+  _onenter = {};
+  _onloop = {};
+  _onleave = {};
+  _ontouch = {};
+  _onkeypress = {};
+  _onkeyrelease = {};
+  _ontext = {};
+  _onmotion = {};
 }
 
 void scene::on_touch(float_t x, float_t y) const {
