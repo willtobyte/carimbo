@@ -16,6 +16,8 @@ renderer::renderer(std::shared_ptr<window> window)
     throw std::runtime_error(std::format("[SDL_CreateRendererWithProperties] {}", SDL_GetError()));
   }
 
+  // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
   _renderer.reset(renderer);
 }
 

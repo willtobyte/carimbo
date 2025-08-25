@@ -5,19 +5,17 @@ using namespace audio;
 soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept
     : _audiodevice(std::move(audiodevice)) {}
 
-std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) noexcept {
-  if (auto it = _pool.find(filename); it != _pool.end()) [[likely]] {
+std::shared_ptr<soundfx> soundmanager::get(const std::string& name) noexcept {
+  auto [it, inserted] = _pool.try_emplace(name);
+  if (!inserted) [[unlikely]] {
     return it->second;
   }
 
-  std::println("[soundmanager] cache miss {}", filename);
-
+  std::println("[soundmanager] cache miss {}", name);
   assert(_audiodevice);
 
-  auto ptr = std::make_shared<soundfx>(filename);
-  _pool.emplace(filename, ptr);
-
-  return ptr;
+  it->second = std::make_shared<soundfx>(name);
+  return it->second;
 }
 
 void soundmanager::play(const std::string& filename, bool loop) noexcept {
