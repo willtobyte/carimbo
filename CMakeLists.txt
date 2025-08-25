@@ -200,6 +200,7 @@ else()
   else()
     set(GENERIC_WARNINGS
       -Wall
+      -Werror
       -Wextra
       -Wpedantic
       -Wconversion
@@ -237,7 +238,6 @@ else()
       -fvisibility-inlines-hidden
       -fomit-frame-pointer
       -DNDEBUG
-      -Werror
       ${GENERIC_WARNINGS}
     )
 
