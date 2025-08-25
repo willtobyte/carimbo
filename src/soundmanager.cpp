@@ -36,3 +36,13 @@ void soundmanager::flush() noexcept {
   const auto count = std::erase_if(_pool, [](const auto& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
   std::println("[soundmanager] {} objects have been flushed", count);
 }
+
+#ifdef DEBUG
+void soundmanager::debug() const noexcept {
+  std::println("soundmanager::debug total objects: {}", _pool.size());
+
+  for (const auto& [key, ptr] : _pool) {
+    std::println("  [{}] use_count={}", key, ptr.use_count());
+  }
+}
+#endif
