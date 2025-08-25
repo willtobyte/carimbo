@@ -18,6 +18,8 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     return it->second;
   }
 
+  SDL_Texture* const origin = SDL_GetRenderTarget(*_renderer);
+
   try {
     std::println("[fontfactory] cache miss {}", filename);
 
@@ -50,8 +52,6 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
     }
 
-    SDL_Texture* const origin = SDL_GetRenderTarget(*_renderer);
-
     SDL_SetRenderTarget(*_renderer, target.get());
     SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
     SDL_RenderClear(*_renderer);
@@ -60,7 +60,6 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
 
     std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
     if (!surface) [[unlikely]] {
-      SDL_SetRenderTarget(*_renderer, origin);
       throw std::runtime_error(std::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
     }
 
@@ -104,6 +103,8 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
 
     return it->second;
   } catch (...) {
+    SDL_SetRenderTarget(*_renderer, origin);
+
     _pool.erase(it);
     throw;
   }
