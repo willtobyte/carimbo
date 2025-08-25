@@ -17,6 +17,10 @@ public:
 
   void flush() noexcept;
 
+  #ifdef DEBUG
+  void debug() const noexcept;
+  #endif
+
 private:
   std::shared_ptr<renderer> _renderer;
   std::unordered_map<std::string, pixmap_ptr> _pool;

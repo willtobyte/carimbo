@@ -89,22 +89,22 @@ const char *ov_strerror(int code) {
   }
 }
 
-soundfx::soundfx(const std::string& filename) {
-  std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> ptr{PHYSFS_openRead(filename.c_str()), PHYSFS_close};
+soundfx::soundfx(const std::string& name) {
+  std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> ptr{PHYSFS_openRead(name.c_str()), PHYSFS_close};
   if (!ptr) [[unlikely]] {
-    throw std::runtime_error(std::format("[PHYSFS_openRead] error while opening file: {}, error: {}", filename, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    throw std::runtime_error(std::format("[PHYSFS_openRead] error while opening file: {}, error: {}", name, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
   if (ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_open_callbacks] error while opening file: {}", filename));
+    throw std::runtime_error(std::format("[ov_open_callbacks] error while opening file: {}", name));
   }
 
   [[maybe_unused]] auto *pointer = ptr.release();
 
   const auto info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_info] failed to retrieve OggVorbis info file: {}", filename));
+    throw std::runtime_error(std::format("[ov_info] failed to retrieve OggVorbis info file: {}", name));
   }
 
   const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
@@ -116,14 +116,14 @@ soundfx::soundfx(const std::string& filename) {
   {
     const auto total_pcm = ov_pcm_total(vf.get(), -1);
     if (total_pcm < 0) [[unlikely]] {
-      throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", filename));
+      throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", name));
     }
 
     const auto bytes_per_sample = 2;
     const auto channels = static_cast<uint64_t>(info->channels);
     const auto total_bytes_64 = static_cast<uint64_t>(total_pcm) * channels * bytes_per_sample;
     if (total_bytes_64 > std::numeric_limits<size_t>::max()) [[unlikely]] {
-      throw std::runtime_error(std::format("[decode] file too large: {}", filename));
+      throw std::runtime_error(std::format("[decode] file too large: {}", name));
     }
 
     const auto total_bytes = static_cast<size_t>(total_bytes_64);
@@ -158,7 +158,7 @@ soundfx::soundfx(const std::string& filename) {
     );
 
     if (offset < 0) [[unlikely]] {
-      throw std::runtime_error(std::format("[ov_read] error while reading file: {}, error: {}", filename, ov_strerror(static_cast<int32_t>(offset))));
+      throw std::runtime_error(std::format("[ov_read] error while reading file: {}, error: {}", name, ov_strerror(static_cast<int32_t>(offset))));
     }
 
     if (offset == 0) {

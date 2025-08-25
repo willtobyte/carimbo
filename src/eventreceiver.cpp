@@ -51,3 +51,8 @@ void eventreceiver::on_mail(const mail& event) {
 void eventreceiver::on_collision(const collision& event) {
   UNUSED(event);
 }
+
+#ifdef DEBUG
+void eventreceiver::on_debug() {
+}
+#endif

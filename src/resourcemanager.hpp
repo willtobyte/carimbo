@@ -24,6 +24,10 @@ public:
   void prefetch();
   void prefetch(const std::vector<std::string>& filenames);
 
+  #ifdef DEBUG
+  void debug() const noexcept;
+  #endif
+
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
   std::shared_ptr<graphics::pixmappool> pixmappool() const noexcept;
   std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;

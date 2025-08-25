@@ -56,15 +56,22 @@ public:
   void set_renderer(std::shared_ptr<graphics::renderer> renderer);
 
   void add_loopable(std::shared_ptr<loopable> loopable);
+
   void flush() const;
+
   void prefetch();
   void prefetch(const std::vector<std::string>& filenames);
+
   void run();
 
   void _loop();
 
 protected:
   virtual void on_quit() override;
+
+  #ifdef DEBUG
+  virtual void on_debug() override;
+  #endif
 
 private:
   std::atomic<bool> _running{true};

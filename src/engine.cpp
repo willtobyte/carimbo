@@ -195,3 +195,9 @@ void engine::_loop() {
 void engine::on_quit() {
   _running = false;
 }
+
+#ifdef DEBUG
+void engine::on_debug() {
+  _resourcemanager->debug();
+}
+#endif

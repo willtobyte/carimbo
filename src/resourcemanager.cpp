@@ -72,6 +72,13 @@ void resourcemanager::prefetch(const std::vector<std::string>& filenames) {
   }
 }
 
+#ifdef DEBUG
+void resourcemanager::debug() const noexcept {
+  _pixmappool->debug();
+  // TODO ... add others.
+}
+#endif
+
 std::shared_ptr<graphics::renderer> resourcemanager::renderer() const noexcept {
   return _renderer;
 }

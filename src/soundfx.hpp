@@ -5,7 +5,7 @@
 namespace audio {
 class soundfx final {
 public:
-  soundfx(const std::string& filename);
+  soundfx(const std::string& name);
   ~soundfx() noexcept;
 
   void play(bool loop = false) const noexcept;
