@@ -34,12 +34,14 @@ resourcemanager::resourcemanager(
       _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
       _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
   const auto loop = [ptr = std::weak_ptr<framework::engine>(_engine)] {
+#ifndef EMSCRIPTEN
     auto e = ptr.lock();
     if (!e) [[unlikely]] {
       return;
     }
 
     e->_loop();
+#endif
   };
 
   _pixmappool->set_loop(loop);
