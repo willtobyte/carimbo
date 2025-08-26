@@ -103,5 +103,9 @@ private:
   std::vector<std::shared_ptr<lifecycleobserver>> _observers;
   std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();
   std::shared_ptr<framework::timermanager> _timermanager = std::make_shared<framework::timermanager>();
+
+#ifdef EMSCRIPTEN
+  std::atomic_bool _scheduled_once{false};
+#endif
 };
 }
