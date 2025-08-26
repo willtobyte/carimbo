@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "eventreceiver.hpp"
+
 namespace audio {
   class audiodevice;
   class soundmanager;
@@ -34,8 +36,6 @@ namespace storage {
 }
 
 namespace framework {
-class resourcemanager;
-
 class engine final : public input::eventreceiver {
 public:
   engine() = default;

@@ -2,11 +2,17 @@
 
 #include "common.hpp"
 
-#include "event.hpp"
 #include "eventreceiver.hpp"
 #include "point.hpp"
 #include "rectangle.hpp"
-#include "resourcemanager.hpp"
+
+namespace framework {
+  class resourcemanager;
+}
+
+namespace graphics {
+  class pixmap;
+}
 
 namespace graphics {
 constexpr auto ACTION_DEFAULT = "default";
@@ -47,7 +53,7 @@ private:
   uint64_t _last_frame{0};
   geometry::point _point;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
-  std::shared_ptr<pixmap> _spritesheet;
+  std::shared_ptr<graphics::pixmap> _spritesheet;
   animation_map _animations;
   std::optional<std::string> _queued_action;
 };

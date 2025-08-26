@@ -2,10 +2,11 @@
 
 #include "common.hpp"
 
-#include "pixmap.hpp"
 #include "point.hpp"
 
 namespace graphics {
+class pixmap;
+
 using glyphmap = std::map<uint8_t, geometry::rectangle>;
 
 class fonteffect {

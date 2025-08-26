@@ -2,9 +2,11 @@
 
 #include "common.hpp"
 
-#include "font.hpp"
-#include "renderer.hpp"
-#include "pixmappool.hpp"
+namespace graphics {
+  class font;
+  class pixmappool;
+  class renderer;
+}
 
 namespace graphics {
 class fontfactory final {

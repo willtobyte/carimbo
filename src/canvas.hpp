@@ -2,9 +2,8 @@
 
 #include "common.hpp"
 
-#include "renderer.hpp"
-
 namespace graphics {
+class renderer;
 class canvas final {
 public:
   explicit canvas(std::shared_ptr<renderer> renderer);

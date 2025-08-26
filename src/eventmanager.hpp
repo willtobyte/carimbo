@@ -2,10 +2,18 @@
 
 #include "common.hpp"
 
-#include "envelope.hpp"
-#include "eventreceiver.hpp"
-#include "objectpool.hpp"
 #include "noncopyable.hpp"
+
+#include "envelope.hpp"
+#include "objectpool.hpp"
+
+namespace graphics {
+  class renderer;
+}
+
+namespace input {
+  class eventreceiver;
+}
 
 namespace input {
 class eventmanager final : private framework::noncopyable {
