@@ -603,12 +603,14 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn, &lua]() mutable {
+        auto sfn = [fn, &lua, module]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
             throw std::runtime_error(err.what());
           }
+
+          module.clear();
 
           lua.collect_garbage();
           lua.collect_garbage();
