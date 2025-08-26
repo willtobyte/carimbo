@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-#include "eventmanager.hpp"
+#include "engine.hpp"
 #include "fontfactory.hpp"
 #include "pixmappool.hpp"
 #include "soundmanager.hpp"
@@ -14,7 +14,7 @@ public:
   resourcemanager(
     std::shared_ptr<graphics::renderer> renderer,
     std::shared_ptr<audio::audiodevice> audiodevice,
-    std::shared_ptr<input::eventmanager> eventmanager
+    std::shared_ptr<engine> engine
   );
 
   ~resourcemanager() noexcept = default;
@@ -36,7 +36,7 @@ public:
 private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::shared_ptr<audio::audiodevice> _audiodevice;
-  std::shared_ptr<input::eventmanager> _eventmanager;
+  std::shared_ptr<framework::engine> _engine;
   std::shared_ptr<graphics::pixmappool> _pixmappool;
   std::shared_ptr<audio::soundmanager> _soundmanager;
   std::shared_ptr<graphics::fontfactory> _fontfactory;

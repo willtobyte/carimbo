@@ -47,7 +47,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto window = std::make_shared<graphics::window>(_title, _width, _height, _fullscreen);
   const auto renderer = window->create_renderer(_scale);
   const auto eventmanager = std::make_shared<input::eventmanager>(renderer);
-  const auto resourcemanager = std::make_shared<framework::resourcemanager>(renderer, audiodevice, eventmanager);
+  const auto resourcemanager = std::make_shared<framework::resourcemanager>(renderer, audiodevice, engine);
   const auto overlay = std::make_shared<graphics::overlay>(resourcemanager, eventmanager);
   const auto statemanager = std::make_shared<framework::statemanager>();
   const auto objectmanager = std::make_shared<framework::objectmanager>(resourcemanager);

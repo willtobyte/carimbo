@@ -118,47 +118,56 @@ void scenemanager::destroy(const std::string& name) {
 
 void scenemanager::update(float_t delta) noexcept {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->update(delta);
 }
 
 void scenemanager::draw() const noexcept {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->draw();
 }
 
 void scenemanager::on_touch(float_t x, float_t y) const {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->on_touch(x, y);
 }
 
 void scenemanager::on_key_press(const input::event::keyboard::key& event) {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const input::event::keyboard::key& event) {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(const std::string& text) {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->on_text(text);
 }
 
 void scenemanager::on_mouse_press(const input::event::mouse::button& event) {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   UNUSED(event);
   // s->on_mouse_press(event.x, event.y);
 }
 
 void scenemanager::on_mouse_release(const input::event::mouse::button& event) {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   UNUSED(event);
   // s->on_mouse_release(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const input::event::mouse::motion& event) {
   auto s = _scene.lock();
+  if (!s) [[unlikely]] return;
   s->on_motion(event.x, event.y);
 }

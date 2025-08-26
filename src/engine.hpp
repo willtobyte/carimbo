@@ -2,26 +2,40 @@
 
 #include "common.hpp"
 
-#include "audiodevice.hpp"
-#include "canvas.hpp"
-#include "cassette.hpp"
-#include "eventmanager.hpp"
-#include "eventreceiver.hpp"
-#include "fontfactory.hpp"
-#include "lifecycleobserver.hpp"
-#include "loopable.hpp"
-#include "objectmanager.hpp"
-#include "overlay.hpp"
-#include "renderer.hpp"
-#include "resourcemanager.hpp"
-#include "scenemanager.hpp"
-#include "soundmanager.hpp"
-#include "statemanager.hpp"
-#include "timermanager.hpp"
-#include "tilemap.hpp"
-#include "window.hpp"
+namespace audio {
+  class audiodevice;
+  class soundmanager;
+}
 
 namespace framework {
+  class lifecycleobserver;
+  class loopable;
+  class objectmanager;
+  class resourcemanager;
+  class scenemanager;
+  class statemanager;
+  class timermanager;
+}
+
+namespace graphics {
+  class canvas;
+  class fontfactory;
+  class overlay;
+  class renderer;
+  class window;
+}
+
+namespace input {
+  class eventmanager;
+}
+
+namespace storage {
+  class cassette;
+}
+
+namespace framework {
+class resourcemanager;
+
 class engine final : public input::eventreceiver {
 public:
   engine() = default;

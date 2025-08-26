@@ -17,9 +17,12 @@ public:
 
   void flush() noexcept;
 
+  void set_loop(std::function<void()> fn) noexcept;
+
 private:
   std::unordered_map<std::string, std::shared_ptr<font>> _pool;
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<pixmappool> _pixmappool;
+  std::function<void()> _loop;
 };
 }

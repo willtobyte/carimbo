@@ -101,6 +101,8 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       spacing, leading, scale
     );
 
+    _loop();
+
     return it->second;
   } catch (...) {
     SDL_SetRenderTarget(*_renderer, origin);
@@ -116,4 +118,8 @@ void fontfactory::flush() noexcept {
   const auto count = std::erase_if(_pool, [](auto const& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
 
   std::println("[fontfactory] {} objects have been flushed", count);
+}
+
+void fontfactory::set_loop(std::function<void()> fn) noexcept {
+  _loop = std::move(fn);;
 }

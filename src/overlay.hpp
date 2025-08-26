@@ -32,7 +32,7 @@ public:
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<input::eventmanager> _eventmanager;
-  std::vector<std::shared_ptr<widget>> _widgets;
-  std::shared_ptr<cursor> _cursor;
+  std::vector<std::shared_ptr<graphics::widget>> _widgets;
+  std::shared_ptr<graphics::cursor> _cursor;
 };
 }

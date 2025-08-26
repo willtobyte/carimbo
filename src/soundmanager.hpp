@@ -16,6 +16,8 @@ public:
 
   void flush() noexcept;
 
+  void set_loop(std::function<void()> fn) noexcept;
+
   #ifdef DEBUG
   void debug() const noexcept;
   #endif
@@ -26,8 +28,10 @@ private:
   std::unordered_map<
     std::string,
     std::shared_ptr<soundfx>,
-    std::hash<std::string_view>,
-    std::equal_to<>
+    std::hash<std::string>,
+    std::equal_to<std::string>
   > _pool;
+
+  std::function<void()> _loop;
 };
 }
