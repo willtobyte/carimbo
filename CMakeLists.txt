@@ -218,6 +218,7 @@ else()
       -fno-omit-frame-pointer
       -fstack-protector-strong
       -fno-elide-constructors
+      -fsanitize=address,undefined
       -DDEBUG
       -Wall
       -Wextra
