@@ -113,22 +113,14 @@ soundfx::soundfx(const std::string& name) {
   auto offset = 0L;
 
   std::vector<uint8_t> data;
-  {
-    const auto total_pcm = ov_pcm_total(vf.get(), -1);
-    if (total_pcm < 0) [[unlikely]] {
-      throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", name));
-    }
-
-    const auto bytes_per_sample = 2;
-    const auto channels = static_cast<uint64_t>(info->channels);
-    const auto total_bytes_64 = static_cast<uint64_t>(total_pcm) * channels * bytes_per_sample;
-    if (total_bytes_64 > std::numeric_limits<size_t>::max()) [[unlikely]] {
-      throw std::runtime_error(std::format("[decode] file too large: {}", name));
-    }
-
-    const auto total_bytes = static_cast<size_t>(total_bytes_64);
-    data.resize(total_bytes);
+  const auto pcm_total = ov_pcm_total(vf.get(), -1);
+  if (pcm_total < 0) [[unlikely]] {
+    throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", name));
   }
+
+  const auto total = static_cast<size_t>(static_cast<uint64_t>(pcm_total) * info->channels * 2);
+
+  data.resize(total);
 
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
   constexpr const auto bigendian = 0;
@@ -143,9 +135,7 @@ soundfx::soundfx(const std::string& name) {
       break;
     }
 
-    const int to_read = (available > static_cast<size_t>(std::numeric_limits<int>::max()))
-                        ? std::numeric_limits<int>::max()
-                        : static_cast<int>(available);
+    const int to_read = (available > static_cast<size_t>(std::numeric_limits<int>::max())) ? std::numeric_limits<int>::max() : static_cast<int>(available);
 
     offset = ov_read(
       vf.get(),
