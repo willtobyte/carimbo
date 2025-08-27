@@ -610,8 +610,6 @@ void framework::scriptengine::run() {
             throw std::runtime_error(err.what());
           }
 
-          module.clear();
-
           lua.collect_garbage();
           lua.collect_garbage();
         };

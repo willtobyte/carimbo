@@ -38,8 +38,8 @@ public:
 
   std::string name() const noexcept;
 
-  void on_enter();
-  void on_leave();
+  void on_enter() const;
+  void on_leave() const;
   void on_text(const std::string& text) const;
   void on_touch(float_t x, float_t y) const;
   void on_key_press(int32_t code) const;
