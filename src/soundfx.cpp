@@ -118,7 +118,11 @@ soundfx::soundfx(const std::string& name) {
     throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", name));
   }
 
-  const auto total = static_cast<size_t>(static_cast<uint64_t>(pcm_total) * info->channels * 2);
+  const auto total = static_cast<size_t>(
+    static_cast<uint64_t>(pcm_total) *
+    static_cast<uint64_t>(info->channels) *
+    static_cast<uint64_t>(2)
+  );
 
   data.resize(total);
 
