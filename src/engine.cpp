@@ -131,23 +131,24 @@ void engine::prefetch(const std::vector<std::string>& filenames) {
   _resourcemanager->prefetch(filenames);
 }
 
+#ifdef EMSCRIPTEN
+template <class T>
+inline void run(void *userdata) {
+  reinterpret_cast<T *>(userdata)->_loop();
+}
+#endif
+
 void engine::run() {
+#ifdef EMSCRIPTEN
+  emscripten_set_main_loop_arg(::run<engine>, this, 0, true);
+#else
   while (_running) [[likely]] {
     _loop();
   }
+#endif
 }
 
 void engine::_loop() {
-#ifdef EMSCRIPTEN
-  if (!_scheduled_once.exchange(true)) {
-    emscripten_async_call(
-      +[](void* p){ run<engine>(p); },
-      this,
-      0
-    );
-  }
-#endif
-
   const auto ticks = SDL_GetTicks();
   static auto prior = ticks;
   // const auto delta = std::min(static_cast<float_t>(ticks - prior) * 0.001f, 1.0f / 60.0f);
