@@ -101,7 +101,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       spacing, leading, scale
     );
 
-    _loop();
+    // _loop();
 
     return it->second;
   } catch (...) {

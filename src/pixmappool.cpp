@@ -15,7 +15,7 @@ std::shared_ptr<pixmap> pixmappool::get(const std::string& name) {
   std::println("[pixmappool] cache miss {}", name);
   assert(_renderer);
 
-  _loop();
+  // _loop();
 
   it->second = std::make_shared<pixmap>(_renderer, name);
   return it->second;
