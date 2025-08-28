@@ -60,7 +60,8 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
 
     std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
     if (!surface) [[unlikely]] {
-      throw std::runtime_error(std::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
+      throw std::runtime_error(
+        std::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
     }
 
     SDL_SetRenderTarget(*_renderer, origin);
