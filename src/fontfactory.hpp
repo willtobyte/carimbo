@@ -19,6 +19,10 @@ public:
 
   void flush() noexcept;
 
+#ifdef DEBUG
+  void debug() const noexcept;
+#endif
+
   void set_loop(std::function<void()> fn) noexcept;
 
 private:

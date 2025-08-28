@@ -83,9 +83,9 @@ public:
 protected:
   virtual void on_quit() override;
 
-  #ifdef DEBUG
+#ifdef DEBUG
   virtual void on_debug() override;
-  #endif
+#endif
 
 private:
   std::atomic<bool> _running{true};

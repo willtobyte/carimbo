@@ -81,7 +81,7 @@ void resourcemanager::prefetch(const std::vector<std::string>& filenames) {
 void resourcemanager::debug() const noexcept {
   _pixmappool->debug();
   _soundmanager->debug();
-  // TODO ... add others.
+  _fontfactory->debug();
 }
 #endif
 

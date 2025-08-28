@@ -72,7 +72,7 @@ void eventmanager::update(float_t delta) noexcept {
             break;
         }
 
-        #ifdef DEBUG
+#ifdef DEBUG
           case SDLK_D: {
             if (event.key.mod & SDL_KMOD_CTRL) {
               for (const auto& receiver : _receivers) {
@@ -82,7 +82,7 @@ void eventmanager::update(float_t delta) noexcept {
               break;
             }
           }
-        #endif
+#endif
 
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
 

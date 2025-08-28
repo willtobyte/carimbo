@@ -19,9 +19,9 @@ public:
 
   void set_loop(std::function<void()> fn) noexcept;
 
-  #ifdef DEBUG
+#ifdef DEBUG
   void debug() const noexcept;
-  #endif
+#endif
 
 private:
   std::shared_ptr<renderer> _renderer;
