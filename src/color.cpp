@@ -17,11 +17,13 @@ color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
 color::color(const std::string& hex)
     : _r(0), _g(0), _b(0), _a(255) {
   if (hex.length() != 7 && hex.length() != 9) [[unlikely]] {
-    throw std::runtime_error(std::format("Invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
+    throw std::runtime_error(
+      std::format("Invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
   }
 
   if (hex[0] != '#') [[unlikely]] {
-    throw std::runtime_error(std::format("Hex code '{}' must start with '#'.", hex));
+    throw std::runtime_error(
+      std::format("Hex code '{}' must start with '#'.", hex));
   }
 
   _r = static_cast<uint8_t>(std::stoi(hex.substr(1, 2), nullptr, 16));

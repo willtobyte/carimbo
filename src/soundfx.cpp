@@ -92,19 +92,24 @@ const char *ov_strerror(int code) {
 soundfx::soundfx(const std::string& name) {
   std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)> ptr{PHYSFS_openRead(name.c_str()), PHYSFS_close};
   if (!ptr) [[unlikely]] {
-    throw std::runtime_error(std::format("[PHYSFS_openRead] error while opening file: {}, error: {}", name, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    throw std::runtime_error(
+      std::format("[PHYSFS_openRead] error while opening file: {}, error: {}",
+        name,
+        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
   if (ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, PHYSFS_callbacks) < 0) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_open_callbacks] error while opening file: {}", name));
+    throw std::runtime_error(
+      std::format("[ov_open_callbacks] error while opening file: {}", name));
   }
 
   [[maybe_unused]] auto *pointer = ptr.release();
 
   const auto info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_info] failed to retrieve OggVorbis info file: {}", name));
+    throw std::runtime_error(
+      std::format("[ov_info] failed to retrieve OggVorbis info file: {}", name));
   }
 
   const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
@@ -115,7 +120,8 @@ soundfx::soundfx(const std::string& name) {
   std::vector<uint8_t> data;
   const auto pcm_total = ov_pcm_total(vf.get(), -1);
   if (pcm_total < 0) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_pcm_total] failed for file: {}", name));
+    throw std::runtime_error(
+      std::format("[ov_pcm_total] failed for file: {}", name));
   }
 
   const auto total = static_cast<size_t>(
@@ -152,7 +158,10 @@ soundfx::soundfx(const std::string& name) {
     );
 
     if (offset < 0) [[unlikely]] {
-      throw std::runtime_error(std::format("[ov_read] error while reading file: {}, error: {}", name, ov_strerror(static_cast<int32_t>(offset))));
+      throw std::runtime_error(
+        std::format("[ov_read] error while reading file: {}, error: {}",
+          name,
+          ov_strerror(static_cast<int32_t>(offset))));
     }
 
     if (offset == 0) {

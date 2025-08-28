@@ -35,7 +35,9 @@ lua_Integer xorshift_random_int(lua_Integer low, lua_Integer high) {
 }
 
 [[noreturn]] void panic(sol::optional<std::string> maybe_message) {
-  throw std::runtime_error(std::format("Lua panic: {}", maybe_message.value_or("unknown Lua error")));
+  throw std::runtime_error(
+    std::format("Lua panic: {}",
+      maybe_message.value_or("unknown Lua error")));
 }
 
 sol::object searcher(sol::this_state state, const std::string& module) {
