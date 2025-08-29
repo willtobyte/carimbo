@@ -44,7 +44,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     std::unique_ptr<SDL_Texture, SDL_Deleter> target{
       SDL_CreateTexture(
         *_renderer,
-        SDL_PIXELFORMAT_ARGB8888,
+        SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_TARGET,
         tw, th)
     };

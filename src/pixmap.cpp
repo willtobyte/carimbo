@@ -46,7 +46,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& name)
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
         *_renderer,
-        SDL_PIXELFORMAT_ABGR8888,
+        SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STATIC,
         _width,
         _height

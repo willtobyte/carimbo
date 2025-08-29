@@ -14,7 +14,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   const auto width = static_cast<int32_t>(std::lround(static_cast<float>(lw) / sx));
   const auto height = static_cast<int32_t>(std::lround(static_cast<float>(lh) / sy));
 
-  SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+  SDL_Texture *texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
   if (!texture) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
