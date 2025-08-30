@@ -13,5 +13,6 @@ public:
 
 private:
   ALuint _source;
+  ALuint _buffer{0};
 };
 }
