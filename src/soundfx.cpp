@@ -110,9 +110,10 @@ soundfx::soundfx(const std::string& name) {
       break;
     }
 
-    auto to_read = (available > static_cast<size_t>(static_cast<unsigned int>(std::numeric_limits<int>::max())))
-                  ? std::numeric_limits<int>::max()
-                  : static_cast<int>(available);
+    auto to_read =
+        (available > static_cast<size_t>(std::numeric_limits<int>::max()))
+            ? std::numeric_limits<int>::max()
+            : static_cast<int>(available);
 
     auto got = ov_read(
       vf.get(),
