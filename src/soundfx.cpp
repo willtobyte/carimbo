@@ -1,16 +1,4 @@
 #include "soundfx.hpp"
-#include "io.hpp"
-
-#include <cassert>
-#include <cstdint>
-#include <cstring>
-#include <format>
-#include <limits>
-#include <memory>
-#include <string>
-#include <vector>
-
-#include <vorbis/vorbisfile.h>
 
 using namespace audio;
 
@@ -98,9 +86,9 @@ soundfx::soundfx(const std::string& name) {
   std::vector<std::uint8_t> linear16(total);
 
   #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-    constexpr int bigendian = 0;
+    constexpr int endian = 0;
   #else
-    constexpr int bigendian = 1;
+    constexpr int endian = 1;
   #endif
 
   auto offset = 0ULL;
@@ -119,7 +107,7 @@ soundfx::soundfx(const std::string& name) {
       vf.get(),
       reinterpret_cast<char*>(linear16.data() + offset),
       to_read,
-      bigendian,
+      endian,
       2,
       1,
       nullptr
