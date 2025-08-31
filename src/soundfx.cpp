@@ -63,6 +63,7 @@ soundfx::soundfx(const std::string& name) {
   stream mem{buffer.data(), buffer.size(), 0};
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
   ov_open_callbacks(&mem, vf.get(), nullptr, 0, MemoryCallbacks);
+  // ov_halfrate(vf.get(), 1);
 
   const auto* info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
