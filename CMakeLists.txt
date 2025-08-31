@@ -191,12 +191,17 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_FLAGS}>
-      NOMINMAX
     )
 
     target_link_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_LINK_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_LINK_FLAGS}>
+    )
+
+    target_compile_definitions(${PROJECT_NAME} PRIVATE
+      NOMINMAX
+      WIN32_LEAN_AND_MEAN
+      _WIN32_WINNT=0x0601
     )
   else()
     set(GENERIC_WARNINGS
