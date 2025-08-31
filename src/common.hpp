@@ -52,6 +52,10 @@ extern "C" {
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
+#if defined(HAVE_STEAM) && !defined(SANDBOX)
+  #include <steam/steam_api.h>
+#endif
+
 #include <algorithm>
 #include <array>
 #include <atomic>

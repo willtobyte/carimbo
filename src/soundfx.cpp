@@ -12,28 +12,9 @@
 
 #include <vorbis/vorbisfile.h>
 
-#if defined(__APPLE__)
-  #include <OpenAL/al.h>
-  #include <OpenAL/alc.h>
-#else
-  #include <AL/al.h>
-  #include <AL/alc.h>
-#endif
-
-// Detecta endian sem depender de SDL
-#if !defined(AUDIO_LIL_ENDIAN) && !defined(AUDIO_BIG_ENDIAN)
-  #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-    #define AUDIO_LIL_ENDIAN 1
-  #else
-    #define AUDIO_BIG_ENDIAN 1
-  #endif
-#endif
-
-namespace audio {
+using namespace audio;
 
 namespace {
-
-// Stream de memória para libvorbisfile
 struct stream {
   const unsigned char* base{nullptr};
   size_t size{0};
@@ -42,29 +23,29 @@ struct stream {
 
 size_t cb_read(void* ptr, size_t size, size_t nmemb, void* src) {
   auto* ms = static_cast<stream*>(src);
-  size_t want = size * nmemb;
-  size_t left = (ms->pos < ms->size) ? (ms->size - ms->pos) : 0;
+  const auto want = size * nmemb;
+  const auto left = (ms->pos < ms->size) ? (ms->size - ms->pos) : 0;
   if (!left) return 0;
-  size_t take = want < left ? want : left;
+  const auto take = want < left ? want : left;
   std::memcpy(ptr, ms->base + ms->pos, take);
   ms->pos += take;
-  return take / size; // fread semantics
+  return take / size;
 }
 
 int cb_seek(void* src, ogg_int64_t offset, int whence) {
   auto* ms = static_cast<stream*>(src);
-  size_t target = 0;
+  auto target = 0ULL;
 
   switch (whence) {
     case SEEK_SET: target = offset < 0 ? 0 : static_cast<size_t>(offset); break;
     case SEEK_CUR: {
-      long long cur = static_cast<long long>(ms->pos) + offset;
+      const auto cur = static_cast<long long>(ms->pos) + offset;
       if (cur < 0) return -1;
       target = static_cast<size_t>(cur);
       break;
     }
     case SEEK_END: {
-      long long end = static_cast<long long>(ms->size) + offset;
+      const auto end = static_cast<long long>(ms->size) + offset;
       if (end < 0) return -1;
       target = static_cast<size_t>(end);
       break;
@@ -85,37 +66,15 @@ long cb_tell(void* src) {
 
 int cb_close(void* /*src*/) { return 0; }
 
-const char* ov_error(int code) {
-  switch (code) {
-    case OV_FALSE:      return "ov_read() returned 0";
-    case OV_EOF:        return "End of file";
-    case OV_HOLE:       return "Hole in bitstream";
-    case OV_EREAD:      return "Read error";
-    case OV_EFAULT:     return "Internal inconsistency";
-    case OV_EIMPL:      return "Not implemented";
-    case OV_EINVAL:     return "Invalid argument";
-    case OV_ENOTVORBIS: return "Not Vorbis";
-    case OV_EBADHEADER: return "Bad header";
-    case OV_EVERSION:   return "Unsupported version";
-    case OV_EBADLINK:   return "Bad link";
-    case OV_ENOSEEK:    return "Not seekable";
-  }
-  return "Unknown";
+ov_callbacks MemoryCallbacks = { cb_read, cb_seek, cb_close, cb_tell };
 }
-
-ov_callbacks MEM = { cb_read, cb_seek, cb_close, cb_tell };
-
-} // anon
 
 soundfx::soundfx(const std::string& name) {
   const std::vector<std::uint8_t> buffer = storage::io::read(name);
 
   stream mem{buffer.data(), buffer.size(), 0};
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
-  int rc = ov_open_callbacks(&mem, vf.get(), nullptr, 0, MEM);
-  if (rc < 0) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_open_callbacks(mem)] {} ({}: {})", name, rc, ov_error(rc)));
-  }
+  ov_open_callbacks(&mem, vf.get(), nullptr, 0, MemoryCallbacks);
 
   const auto* info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
@@ -138,22 +97,22 @@ soundfx::soundfx(const std::string& name) {
 
   std::vector<std::uint8_t> pcm16(total);
 
-#if defined(AUDIO_LIL_ENDIAN)
-  constexpr int bigendian = 0;
-#else
-  constexpr int bigendian = 1;
-#endif
+  #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+    constexpr int bigendian = 0;
+  #else
+    constexpr int bigendian = 1;
+  #endif
 
-  size_t offset = 0;
+  auto offset = 0ULL;
   for (;;) {
-    size_t available = pcm16.size() - offset;
+    auto available = pcm16.size() - offset;
     if (!available) break;
 
-    int to_read = (available > static_cast<size_t>(static_cast<unsigned int>(std::numeric_limits<int>::max())))
+    auto to_read = (available > static_cast<size_t>(static_cast<unsigned int>(std::numeric_limits<int>::max())))
                   ? std::numeric_limits<int>::max()
                   : static_cast<int>(available);
 
-    long got = ov_read(
+    auto got = ov_read(
       vf.get(),
       reinterpret_cast<char*>(pcm16.data() + offset),
       to_read,
@@ -164,7 +123,7 @@ soundfx::soundfx(const std::string& name) {
     );
 
     if (got < 0) [[unlikely]] {
-      throw std::runtime_error(std::format("[ov_read] {} | {}", name, ov_error(static_cast<int>(got))));
+      throw std::runtime_error(std::format("[ov_read] {}", name));
     } else if (!got) {
       break;
     }
@@ -182,8 +141,20 @@ soundfx::soundfx(const std::string& name) {
 }
 
 soundfx::~soundfx() noexcept {
-  if (_source) alDeleteSources(1, &_source);
-  if (_buffer) alDeleteBuffers(1, &_buffer);
+  if (_source == 0) goto free_buffer;
+
+  if (_source) {
+    alSourceStop(_source);
+    alSourcei(_source, AL_BUFFER, 0);
+    alDeleteSources(1, &_source);
+    _source = 0;
+  }
+
+  free_buffer:
+    if (_buffer) {
+      alDeleteBuffers(1, &_buffer);
+      _buffer = 0;
+    }
 }
 
 void soundfx::play(bool loop) const noexcept {
@@ -193,6 +164,4 @@ void soundfx::play(bool loop) const noexcept {
 
 void soundfx::stop() const noexcept {
   alSourceStop(_source);
-}
-
 }

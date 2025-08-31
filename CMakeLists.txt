@@ -191,6 +191,7 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE
       $<$<CONFIG:Debug>:${DEBUG_FLAGS}>
       $<$<CONFIG:Release>:${RELEASE_FLAGS}>
+      NOMINMAX
     )
 
     target_link_options(${PROJECT_NAME} PRIVATE
