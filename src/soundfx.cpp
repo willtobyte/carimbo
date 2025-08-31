@@ -115,7 +115,15 @@ soundfx::soundfx(const std::string& name) {
     );
 
     if (got < 0) [[unlikely]] {
-      throw std::runtime_error(std::format("[ov_read] {}", name));
+      std::string reason;
+      switch (got) {
+        case OV_HOLE:     reason = "OV_HOLE: Interruption or corruption in the stream"; break;
+        case OV_EBADLINK: reason = "OV_EBADLINK: Invalid or corrupt bitstream section"; break;
+        case OV_EINVAL:   reason = "OV_EINVAL: Invalid argument or corrupted stream"; break;
+        default:          reason = "Unknown error"; break;
+      }
+
+      throw std::runtime_error(std::format("[ov_read] {} ({})", name, reason));
     } else if (!got) {
       break;
     }
