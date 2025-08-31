@@ -95,7 +95,7 @@ soundfx::soundfx(const std::string& name) {
     2ULL
   );
 
-  std::vector<std::uint8_t> pcm16(total);
+  std::vector<std::uint8_t> linear16(total);
 
   #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
     constexpr int bigendian = 0;
@@ -105,8 +105,10 @@ soundfx::soundfx(const std::string& name) {
 
   auto offset = 0ULL;
   for (;;) {
-    auto available = pcm16.size() - offset;
-    if (!available) break;
+    auto available = linear16.size() - offset;
+    if (!available) {
+      break;
+    }
 
     auto to_read = (available > static_cast<size_t>(static_cast<unsigned int>(std::numeric_limits<int>::max())))
                   ? std::numeric_limits<int>::max()
@@ -114,7 +116,7 @@ soundfx::soundfx(const std::string& name) {
 
     auto got = ov_read(
       vf.get(),
-      reinterpret_cast<char*>(pcm16.data() + offset),
+      reinterpret_cast<char*>(linear16.data() + offset),
       to_read,
       bigendian,
       2,
@@ -131,17 +133,19 @@ soundfx::soundfx(const std::string& name) {
     offset += static_cast<size_t>(got);
   }
 
-  pcm16.resize(offset);
+  linear16.resize(offset);
 
   alGenBuffers(1, &_buffer);
-  alBufferData(_buffer, format, pcm16.data(), static_cast<ALsizei>(pcm16.size()), frequency);
+  alBufferData(_buffer, format, linear16.data(), static_cast<ALsizei>(linear16.size()), frequency);
 
   alGenSources(1, &_source);
   alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));
 }
 
 soundfx::~soundfx() noexcept {
-  if (_source == 0) goto free_buffer;
+  if (_source == 0) {
+    goto free_buffer;
+  }
 
   if (_source) {
     alSourceStop(_source);
