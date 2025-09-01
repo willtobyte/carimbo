@@ -57,13 +57,16 @@ int cb_close(void* /*src*/) { return 0; }
 ov_callbacks MemoryCallbacks = { cb_read, cb_seek, cb_close, cb_tell };
 }
 
-soundfx::soundfx(const std::string& name) {
+soundfx::soundfx(const std::string& name, bool retro) {
   const std::vector<std::uint8_t> buffer = storage::io::read(name);
 
   stream mem{buffer.data(), buffer.size(), 0};
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
   ov_open_callbacks(&mem, vf.get(), nullptr, 0, MemoryCallbacks);
-  // ov_halfrate(vf.get(), 1);
+
+  if (retro) {
+    ov_halfrate(vf.get(), 1);
+  }
 
   const auto* info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
