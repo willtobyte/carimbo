@@ -89,12 +89,6 @@ soundfx::soundfx(const std::string& name, bool retro) {
 
   std::vector<std::uint8_t> linear16(total);
 
-  #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-    constexpr int endian = 0;
-  #else
-    constexpr int endian = 1;
-  #endif
-
   auto offset = 0ULL;
   for (;;) {
     auto available = linear16.size() - offset;
@@ -108,13 +102,13 @@ soundfx::soundfx(const std::string& name, bool retro) {
             : static_cast<int>(available);
 
     auto got = ov_read(
-      vf.get(),
-      reinterpret_cast<char*>(linear16.data() + offset),
-      to_read,
-      endian,
-      2,
-      1,
-      nullptr
+      vf.get(),                                          // OggVorbis_File*
+      reinterpret_cast<char*>(linear16.data() + offset), // buffer
+      to_read,                                           // buffer size
+      0,                                                 // big endian flag
+      2,                                                 // bytes per sample
+      1,                                                 // signed (1) / unsigned (0)
+      nullptr                                            // bitstream index
     );
 
     if (got < 0) [[unlikely]] {
