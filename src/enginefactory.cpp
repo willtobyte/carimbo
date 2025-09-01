@@ -70,5 +70,7 @@ std::shared_ptr<engine> enginefactory::create() const {
 
   objectmanager->set_scenemanager(scenemanager);
 
+  // const auto soundmanager = resourcemanager->soundmanager();
+
   return engine;
 }
