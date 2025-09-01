@@ -4,6 +4,10 @@
 #include "soundfx.hpp"
 
 namespace audio {
+enum soundeffect : std::uint8_t {
+  half = 0,
+};
+
 class soundmanager final {
 public:
   soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept;
@@ -17,6 +21,8 @@ public:
   void flush() noexcept;
 
   void set_loop(std::function<void()> fn) noexcept;
+
+  void set_effect(soundeffect effect) noexcept;
 
 #ifdef DEBUG
   void debug() const noexcept;
