@@ -16,7 +16,7 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& name) noexcept {
 
   // _loop();
 
-  it->second = std::make_shared<soundfx>(name);
+  it->second = std::make_shared<soundfx>(name, true);
   return it->second;
 }
 
