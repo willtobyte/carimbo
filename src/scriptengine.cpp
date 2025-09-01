@@ -258,6 +258,15 @@ void framework::scriptengine::run() {
 
   lua["achievement"] = &achievement;
 
+  platform::desktop desktop;
+
+  lua.new_usertype<platform::desktop>(
+    "Desktop",
+    "path", &platform::desktop::path
+  );
+
+  lua["desktop"] = &desktop;
+
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string& json, sol::this_state state) {
       const auto& j = nlohmann::json::parse(json);
