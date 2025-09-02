@@ -151,7 +151,6 @@ void engine::run() {
 void engine::_loop() {
   const auto ticks = SDL_GetTicks();
   static auto prior = ticks;
-  // const auto delta = std::min(static_cast<float_t>(ticks - prior) * 0.001f, 1.0f / 60.0f);
   const auto delta = static_cast<float_t>(ticks - prior) * 0.001f;
   prior = ticks;
 
