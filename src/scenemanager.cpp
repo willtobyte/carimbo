@@ -8,8 +8,9 @@ scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcem
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
-  if (_scene_mapping.contains(name)) {
-    return nullptr;
+  const auto [it, inserted] = _scene_mapping.try_emplace(name, nullptr);
+  if (!inserted) {
+    return it->second;
   }
 
   const auto& filename = std::format("scenes/{}.json", name);
@@ -65,7 +66,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     map.emplace(std::make_shared<tilemap>(size, _resourcemanager, *it));
   }
 
-  const auto s = std::make_shared<scene>(
+  it->second = std::make_shared<scene>(
     name,
     _objectmanager,
     std::move(background),
@@ -75,8 +76,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     std::move(size)
   );
 
-  _scene_mapping[name] = s;
-  return s;
+  return it->second;
 }
 
 void scenemanager::set(const std::string& name) {
