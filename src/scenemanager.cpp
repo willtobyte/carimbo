@@ -17,8 +17,8 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
-  const auto pixmappool = _resourcemanager->pixmappool();
-  const auto background = pixmappool->get(std::format("blobs/{}/background.png", name));
+  const auto background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
+
   geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
 
   const auto& es = j.value("effects", nlohmann::json::array());
