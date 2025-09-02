@@ -39,23 +39,24 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto& os = j.value("objects", nlohmann::json::array());
   const auto oview = os
     | std::views::transform([&](const auto& data) {
-      const auto& key = data["name"].template get_ref<const std::string&>();
-      const auto& kind = data["kind"].template get_ref<const std::string&>();
-      std::optional<std::string> action =
-        data.contains("action") && data["action"].is_string()
-          ? std::optional<std::string>{data["action"].template get_ref<const std::string&>()}
-          : std::nullopt;
-      const auto x = data.value("x", .0f);
-      const auto y = data.value("y", .0f);
+        std::optional<std::string> action;
+        if (auto it = data.find("action"); it != data.end() && it->is_string()) {
+          action = it->template get<std::string>();
+        }
 
-      auto e = _objectmanager->create(kind, name, false);
-      e->set_placement(x, y);
-      if (action) {
-        e->set_action(*action);
-      }
+        const auto& key = data["name"].template get_ref<const std::string&>();
+        const auto& kind = data["kind"].template get_ref<const std::string&>();
+        const auto x = data.value("x", .0f);
+        const auto y = data.value("y", .0f);
 
-      return std::pair<std::string, std::shared_ptr<object>>{key, e};
-    });
+        auto e = _objectmanager->create(kind, name, false);
+        e->set_placement(x, y);
+        if (action) {
+          e->set_action(*action);
+        }
+
+        return std::pair<std::string, std::shared_ptr<object>>{key, e};
+      });
 
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
   objects.reserve(os.size());
