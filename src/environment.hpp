@@ -8,6 +8,6 @@ class desktop {
     desktop() noexcept = default;
     ~desktop() noexcept = default;
 
-    std::optional<std::string> path() const noexcept;
+    std::optional<std::string> folder() const noexcept;
 };
 }

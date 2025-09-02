@@ -262,7 +262,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<platform::desktop>(
     "Desktop",
-    "path", &platform::desktop::path
+    "folder", &platform::desktop::folder
   );
 
   lua["desktop"] = &desktop;
