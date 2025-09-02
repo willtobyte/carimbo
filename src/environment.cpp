@@ -11,6 +11,10 @@ std::optional<std::string> desktop::folder() const noexcept {
   return std::string{folder};
 }
 
+int32_t operatingsystem::memory() const noexcept {
+  return SDL_GetSystemRAM();
+}
+
 std::string operatingsystem::name() const noexcept {
   return std::string{SDL_GetPlatform()};
 }

@@ -271,6 +271,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<platform::operatingsystem>(
     "OperatingSystem",
+    "memory", &platform::operatingsystem::memory,
     "name", &platform::operatingsystem::name
   );
 
