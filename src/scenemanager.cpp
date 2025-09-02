@@ -10,7 +10,7 @@ scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcem
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name, nullptr);
   if (!inserted) {
-    return it->second;
+    return nullptr;
   }
 
   const auto& filename = std::format("scenes/{}.json", name);
