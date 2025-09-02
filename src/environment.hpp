@@ -10,4 +10,12 @@ class desktop {
 
     std::optional<std::string> folder() const noexcept;
 };
+
+class operatingsystem {
+  public:
+    operatingsystem() noexcept = default;
+    ~operatingsystem() noexcept = default;
+
+    std::string name() const noexcept;
+};
 }

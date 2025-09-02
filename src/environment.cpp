@@ -10,3 +10,7 @@ std::optional<std::string> desktop::folder() const noexcept {
 
   return std::string{folder};
 }
+
+std::string operatingsystem::name() const noexcept {
+  return std::string{SDL_GetPlatform()};
+}

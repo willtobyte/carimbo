@@ -267,6 +267,15 @@ void framework::scriptengine::run() {
 
   lua["desktop"] = &desktop;
 
+  platform::operatingsystem operatingsystem;
+
+  lua.new_usertype<platform::operatingsystem>(
+    "OperatingSystem",
+    "name", &platform::operatingsystem::name
+  );
+
+  lua["operatingsystem"] = &operatingsystem;
+
   lua["JSON"] = lua.create_table_with(
     "parse", [](const std::string& json, sol::this_state state) {
       const auto& j = nlohmann::json::parse(json);
