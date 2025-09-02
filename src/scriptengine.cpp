@@ -1,5 +1,7 @@
 #include "scriptengine.hpp"
 #include "environment.hpp"
+#include "soundmanager.hpp"
+#include <sol/property.hpp>
 
 static std::array<uint64_t, 2> prng_state;
 
@@ -308,6 +310,12 @@ void framework::scriptengine::run() {
      "stop", &audio::soundfx::stop
   );
 
+  lua.new_enum(
+    "SoundEffect",
+    "none", audio::soundeffect::none,
+    "half", audio::soundeffect::half
+  );
+
   lua.new_usertype<audio::soundmanager>(
     "SoundManager",
     sol::no_constructor,
@@ -315,7 +323,8 @@ void framework::scriptengine::run() {
       auto loop = loop_opt.value_or(false);
       manager.play(name, loop);
     },
-    "stop", &audio::soundmanager::stop
+    "stop", &audio::soundmanager::stop,
+    "effect", sol::property(&audio::soundmanager::set_effect)
   );
 
   lua.new_enum(

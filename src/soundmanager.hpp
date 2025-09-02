@@ -5,7 +5,8 @@
 
 namespace audio {
 enum soundeffect : std::uint8_t {
-  half = 0,
+  none = 0,
+  half,
 };
 
 class soundmanager final {
@@ -39,5 +40,7 @@ private:
   > _pool;
 
   std::function<void()> _loop;
+
+  soundeffect _effect{none};
 };
 }

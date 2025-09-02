@@ -16,7 +16,7 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& name) noexcept {
 
   // _loop();
 
-  it->second = std::make_shared<soundfx>(name, false);
+  it->second = std::make_shared<soundfx>(name, _effect == half);
   return it->second;
 }
 
@@ -41,6 +41,10 @@ void soundmanager::flush() noexcept {
 
 void soundmanager::set_loop(std::function<void()> fn) noexcept {
   _loop = std::move(fn);;
+}
+
+void soundmanager::set_effect(soundeffect effect) noexcept {
+  _effect = effect;
 }
 
 #ifdef DEBUG
