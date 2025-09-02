@@ -11,6 +11,10 @@ std::optional<std::string> desktop::folder() const noexcept {
   return std::string{folder};
 }
 
+int32_t operatingsystem::compute() const noexcept {
+  return SDL_GetNumLogicalCPUCores();
+}
+
 int32_t operatingsystem::memory() const noexcept {
   return SDL_GetSystemRAM();
 }

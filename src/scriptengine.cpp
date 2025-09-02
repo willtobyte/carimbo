@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include "environment.hpp"
 
 static std::array<uint64_t, 2> prng_state;
 
@@ -271,6 +272,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<platform::operatingsystem>(
     "OperatingSystem",
+    "compute", &platform::operatingsystem::compute,
     "memory", &platform::operatingsystem::memory,
     "name", &platform::operatingsystem::name
   );
