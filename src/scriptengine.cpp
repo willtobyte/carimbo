@@ -48,7 +48,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
   const auto filename = std::format("scripts/{}.lua", module);
   const auto buffer = storage::io::read(filename);
-  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+  std::string_view script{reinterpret_cast<const char *>(buffer.data()), buffer.size()};
 
   const auto loader = lua.load(script, filename);
   if (!loader.valid()) [[unlikely]] {
@@ -617,7 +617,7 @@ void framework::scriptengine::run() {
       }
 
       const auto buffer = storage::io::read(std::format("scenes/{}.lua", name));
-      std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+      std::string_view script{reinterpret_cast<const char *>(buffer.data()), buffer.size()};
       auto result = lua.safe_script(script, &sol::script_pass_on_error);
       if (!result.valid()) [[unlikely]] {
         sol::error err = result;
@@ -1143,7 +1143,7 @@ void framework::scriptengine::run() {
   std::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
   const auto buffer = storage::io::read("scripts/main.lua");
-  std::string_view script(reinterpret_cast<const char *>(buffer.data()), buffer.size());
+  std::string_view script{reinterpret_cast<const char *>(buffer.data()), buffer.size()};
   const auto scr = lua.safe_script(script, &sol::script_pass_on_error);
   if (!scr.valid()) [[unlikely]] {
     sol::error err = scr;
