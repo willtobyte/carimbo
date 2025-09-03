@@ -356,9 +356,29 @@ void framework::scriptengine::run() {
   lua.new_usertype<memory::kv>(
     "KeyValue",
     sol::no_constructor,
-    "get", [](memory::kv& self, const std::string& key, sol::this_state state) { return self.get(key, state); },
-    "set", [](memory::kv& self, const std::string& key, const sol::object& new_value, sol::this_state state) { self.set(key, new_value, state); },
-    "subscribe", [](memory::kv& self, const std::string& key, const sol::function& callback, sol::this_state state) { self.subscribe(key, callback, state); }
+    "get", [](
+      memory::kv& self,
+      const std::string& key,
+      sol::this_state state
+    ) {
+      return self.get(key, state);
+    },
+    "set", [](
+      memory::kv& self,
+      const std::string& key,
+      const sol::object& new_value,
+      sol::this_state state
+    ) {
+      self.set(key, new_value, state);
+    },
+    "subscribe", [](
+      memory::kv& self,
+      const std::string& key,
+      const sol::function& callback,
+      sol::this_state state)
+    {
+      self.subscribe(key, callback, state);
+    }
   );
 
   struct velocityproxy {
