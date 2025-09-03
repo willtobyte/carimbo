@@ -579,7 +579,10 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
-    "player", [&player_mapping](framework::statemanager& self, input::event::player player) -> playerwrapper& {
+    "player", [&player_mapping](
+      framework::statemanager& self,
+      input::event::player player
+    ) -> playerwrapper& {
       const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
 
       return iterator->second;
@@ -590,7 +593,10 @@ void framework::scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "set", &framework::scenemanager::set,
-    "destroy", [&lua](framework::scenemanager& self, const std::string& name) {
+    "destroy", [&lua](
+      framework::scenemanager& self,
+      const std::string& name
+    ) {
       lua.collect_garbage();
       lua.collect_garbage();
 
@@ -599,7 +605,10 @@ void framework::scriptengine::run() {
       lua.collect_garbage();
       lua.collect_garbage();
     },
-    "register", [&lua](framework::scenemanager& self, const std::string& name) {
+    "register", [&lua](
+      framework::scenemanager& self,
+      const std::string& name
+    ) {
       const auto start = SDL_GetPerformanceCounter();
 
       const auto scene = self.load(name);
@@ -766,7 +775,8 @@ void framework::scriptengine::run() {
     "create", &graphics::overlay::create,
     "destroy", &graphics::overlay::destroy,
     "dispatch", &graphics::overlay::dispatch,
-    "cursor", sol::property([](graphics::overlay& o) -> cursorproxy { return cursorproxy{o}; })
+    "cursor", sol::property([](graphics::overlay& o) ->
+      cursorproxy { return cursorproxy{o}; })
   );
 
   lua.new_usertype<framework::engine>(
@@ -830,7 +840,11 @@ void framework::scriptengine::run() {
     "Cassette",
     sol::no_constructor,
     "clear", &storage::cassette::clear,
-    "set", [](storage::cassette& self, const std::string& key, sol::object object) {
+    "set", [](
+      storage::cassette& self,
+      const std::string& key,
+      sol::object object
+    ) {
       if (object.is<int>())
         self.set<int>(key, object.as<int>());
       else if (object.is<double_t>())
@@ -906,7 +920,12 @@ void framework::scriptengine::run() {
         throw std::runtime_error("unsupported type for set");
       }
     },
-    "get", [](const storage::cassette& self, const std::string& key, sol::object default_value, sol::this_state state) -> sol::object {
+    "get", [](
+      const storage::cassette& self,
+      const std::string& key,
+      sol::object default_value,
+      sol::this_state state
+    ) -> sol::object {
       sol::state_view lua(state);
       const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
 
@@ -941,12 +960,22 @@ void framework::scriptengine::run() {
     "Socket",
     sol::constructors<network::socket()>(),
     "connect", &network::socket::connect,
-    "emit", [](network::socket& self, const std::string& event, const sol::table& data, sol::this_state state) {
+    "emit", [](
+      network::socket& self,
+      const std::string& event,
+      const sol::table& data,
+      sol::this_state state
+    ) {
       sol::state_view lua(state);
       const auto j = _to_json(data);
       self.emit(event, j.dump());
     },
-    "on", [](network::socket& self, const std::string& event, const sol::function& callback, sol::this_state state) {
+    "on", [](
+      network::socket& self,
+      const std::string& event,
+      const sol::function& callback,
+      sol::this_state state
+    ) {
       sol::state_view lua(state);
 
       self.on(event, [callback, lua](const std::string& json) {
@@ -954,7 +983,13 @@ void framework::scriptengine::run() {
         callback(_to_lua(j, lua));
       });
     },
-    "rpc", [](network::socket& self, const std::string& method, const sol::table& arguments, const sol::function& callback, sol::this_state state) {
+    "rpc", [](
+      network::socket& self,
+      const std::string& method,
+      const sol::table& arguments,
+      const sol::function& callback,
+      sol::this_state state
+    ) {
       sol::state_view lua(state);
       const auto j = _to_json(arguments);
 
