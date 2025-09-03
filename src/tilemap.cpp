@@ -10,7 +10,9 @@ tilemap::tilemap(
 
   _pixmap = resourcemanager->pixmappool()->get(std::format("blobs/tilemaps/{}.png", name));
 
-  const auto& j = nlohmann::json::parse(storage::io::read(std::format("tilemaps/{}.json", name)));
+  const auto& filename = std::format("tilemaps/{}.json", name);
+  const auto& buffer = storage::io::read(filename);
+  const auto& j = nlohmann::json::parse(buffer);
 
   _size = j["size"].get<float_t>();
   _height = j["height"].get<float_t>();
