@@ -1163,7 +1163,7 @@ void framework::scriptengine::run() {
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =
-      (static_cast<double_t>(end - start) * 1000.0) / SDL_GetPerformanceFrequency();
+      (static_cast<double_t>(end - start) * 1000.0) / static_cast<double_t>(SDL_GetPerformanceFrequency());
   std::println("boot time {:.3f}ms", elapsed);
 
   engine->run();
