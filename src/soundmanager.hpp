@@ -6,7 +6,7 @@
 namespace audio {
 enum soundeffect : std::uint8_t {
   none = 0,
-  half,
+  retro,
 };
 
 class soundmanager final {

@@ -313,7 +313,7 @@ void framework::scriptengine::run() {
   lua.new_enum(
     "SoundEffect",
     "none", audio::soundeffect::none,
-    "half", audio::soundeffect::half
+    "retro", audio::soundeffect::retro
   );
 
   lua.new_usertype<audio::soundmanager>(
