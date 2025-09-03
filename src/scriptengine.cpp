@@ -1083,10 +1083,19 @@ void framework::scriptengine::run() {
     sol::base_classes, sol::bases<graphics::widget>(),
     "font", sol::property(&graphics::label::set_font),
     "set", sol::overload(
-      [](std::shared_ptr<graphics::label> self, float_t x, float_t y) {
+      [](
+        std::shared_ptr<graphics::label> self,
+        float_t x,
+        float_t y
+      ) {
         self->set(x, y);
       },
-      [](std::shared_ptr<graphics::label> self, const std::string& text, float_t x, float_t y) {
+      [](
+        std::shared_ptr<graphics::label> self,
+        const std::string& text,
+        float_t x,
+        float_t y
+      ) {
         self->set(text, x, y);
       }
     ),
