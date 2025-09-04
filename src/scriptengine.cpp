@@ -61,7 +61,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable final : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state& lua, sol::function function)
+  explicit lua_loopable(const sol::state_view lua, sol::function function)
       : _L(lua),
         _function(std::move(function)) {}
 
@@ -76,7 +76,7 @@ public:
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
 
     if (_elapsed >= 1000) [[unlikely]] {
-      std::println("{:.1f} {}KB", static_cast<double_t>(_frames * _elapsed) * 0.001, memory);
+      std::println("{:.1f} {}KB", (1000.0 * _frames) / static_cast<double>(_elapsed), memory);
 
       _elapsed = 0;
       _frames = 0;
