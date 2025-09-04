@@ -17,5 +17,7 @@ protected:
 
 private:
   std::shared_ptr<uniquepool<envelope, envelope_pool_name>> _envelopepool;
+
+  std::unordered_map<uint32_t, envelope*> _repeatmapping;
 };
 }

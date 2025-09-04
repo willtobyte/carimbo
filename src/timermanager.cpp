@@ -35,6 +35,14 @@ uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn)
 
 void timermanager::clear(uint32_t id) {
   SDL_RemoveTimer(id);
+
+  const auto it = _repeatmapping.find(id);
+  if (it == _repeatmapping.end()) {
+    return;
+  }
+
+  _envelopepool->release(std::unique_ptr<envelope>(it->second));
+  _repeatmapping.erase(it);
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
@@ -42,6 +50,10 @@ uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, 
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (id) [[likely]] {
+    if (repeat) {
+      _repeatmapping.emplace(id, ptr);
+    }
+
     return id;
   }
 
