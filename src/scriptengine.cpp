@@ -61,8 +61,8 @@ sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable final : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state_view& lua, sol::function function)
-      : _L(lua.lua_state()),
+  explicit lua_loopable(const sol::state& lua, sol::function function)
+      : _L(lua),
         _function(std::move(function)) {}
 
   void loop(float_t delta) override {
