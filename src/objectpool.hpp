@@ -60,7 +60,7 @@ public:
       }
     }
 
-    _objects.push_back(std::move(object));
+    _objects.emplace_back(std::move(object));
   }
 
   void reserve(size_t count) {
