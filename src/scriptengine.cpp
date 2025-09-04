@@ -76,7 +76,7 @@ public:
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
 
     if (_elapsed >= 1000) [[unlikely]] {
-      std::println("{:.1f} {}KB", (1000.0 * _frames) / static_cast<double>(_elapsed), memory);
+      std::println("{:.1f} {}KB", (1000.0 * static_cast<double_t>(_frames)) / static_cast<double_t>(_elapsed), memory);
 
       _elapsed = 0;
       _frames = 0;
