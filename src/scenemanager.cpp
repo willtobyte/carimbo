@@ -25,7 +25,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto eview = es
     | std::views::transform([&](const auto& e) {
       const auto& basename = e.template get<std::string>();
-      const auto f = std::format("blobs/{}/{}.ogg", name, basename);
+      const auto& f = std::format("blobs/{}/{}.ogg", name, basename);
       return std::pair{
         std::move(basename),
         std::move(_resourcemanager->soundmanager()->get(f))
