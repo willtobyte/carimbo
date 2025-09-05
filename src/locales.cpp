@@ -1,6 +1,6 @@
 #include "locales.hpp"
 
-static std::string_view language() {
+static constexpr std::string language() {
   auto count = 0;
   const auto locales = SDL_GetPreferredLocales(&count);
   if (!locales || count == 0) {
@@ -15,7 +15,7 @@ static std::string_view language() {
   return locale->language;
 }
 
-static nlohmann::json parse(std::string_view code) {
+static nlohmann::json parse(const std::string& code) {
   const auto& filename = std::format("locales/{}.json", code);
   const auto& buffer = storage::io::read(filename);
   return nlohmann::json::parse(buffer);
