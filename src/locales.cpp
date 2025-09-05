@@ -1,6 +1,6 @@
 #include "locales.hpp"
 
-static constexpr std::string language() {
+static std::string language() {
   auto count = 0;
   const auto locales = SDL_GetPreferredLocales(&count);
   if (!locales || count == 0) {
