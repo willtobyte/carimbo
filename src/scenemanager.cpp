@@ -55,7 +55,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
           e->set_action(*action);
         }
 
-        return std::pair<std::string, std::shared_ptr<object>>{key, e};
+        return std::pair<std::string, std::shared_ptr<object>>{std::move(key), std::move(e)};
       });
 
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
