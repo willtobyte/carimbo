@@ -21,46 +21,39 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 
   geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
 
-  const auto& es = j.value("effects", nlohmann::json::array());
-  const auto eview = es
-    | std::views::transform([&](const auto& e) {
-      const auto& basename = e.template get<std::string>();
-      const auto& f = std::format("blobs/{}/{}.ogg", name, basename);
-      return std::pair{
-        std::move(basename),
-        std::move(_resourcemanager->soundmanager()->get(f))
-      };
-    });
-
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects;
+  const auto& es = j.value("effects", nlohmann::json::array());
   effects.reserve(es.size());
-  std::ranges::copy(eview, std::inserter(effects, effects.end()));
 
-  const auto& os = j.value("objects", nlohmann::json::array());
-  const auto oview = os
-    | std::views::transform([&](const auto& data) {
-        std::optional<std::string> action;
-        if (auto it = data.find("action"); it != data.end() && it->is_string()) {
-          action = it->template get<std::string>();
-        }
-
-        const auto& key = data["name"].template get_ref<const std::string&>();
-        const auto& kind = data["kind"].template get_ref<const std::string&>();
-        const auto x = data.value("x", .0f);
-        const auto y = data.value("y", .0f);
-
-        auto e = _objectmanager->create(kind, name, false);
-        e->set_placement(x, y);
-        if (action) {
-          e->set_action(*action);
-        }
-
-        return std::pair<std::string, std::shared_ptr<object>>{std::move(key), std::move(e)};
-      });
+  for (const auto& i : es) {
+      const std::string basename = i.get<std::string>();
+      const std::string f = std::format("blobs/{}/{}.ogg", name, basename);
+      effects.emplace_back(std::move(basename), _resourcemanager->soundmanager()->get(f));
+  }
 
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
+  const auto os = j.value("objects", nlohmann::json::array());
   objects.reserve(os.size());
-  std::ranges::copy(oview, std::inserter(objects, objects.end()));
+
+  for (const auto& i : os) {
+    if (!i.is_object()) continue;
+
+    std::string key = i["name"].get<std::string>();
+    std::string kind = i["kind"].get<std::string>();
+
+    const float x = i.value("x", 0.0f);
+    const float y = i.value("y", 0.0f);
+
+    std::string action = i.value("action", std::string{});
+
+    auto o = _objectmanager->create(kind, name, false);
+    o->set_placement(x, y);
+    if (!action.empty()) {
+      o->set_action(action);
+    }
+
+    objects.emplace_back(std::move(key), std::move(o));
+  }
 
   std::optional<std::shared_ptr<tilemap>> map;
   if (const auto it = j.find("tilemap"); it != j.end()) {

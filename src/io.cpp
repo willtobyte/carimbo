@@ -5,14 +5,14 @@ using namespace storage;
 std::vector<std::uint8_t> io::read(std::string_view filename) {
   auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.data()), PHYSFS_close);
 
-  PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
-
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(
       std::format("[PHYSFS_openRead] error while opening file: {}, error: {}",
         filename,
         PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
+
+  PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
 
   const auto length = PHYSFS_fileLength(ptr.get());
   if (length <= 0) [[unlikely]] {
