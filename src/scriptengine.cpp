@@ -193,7 +193,7 @@ void framework::scriptengine::run() {
 
   lua.script(inject);
 
-  lua["_"] = &text;
+  lua["_"] = &localization::text;
 
   lua["moment"] = &moment;
 

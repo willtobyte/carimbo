@@ -2,6 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
+namespace localization {
 std::string text(const std::string& key);
 }

@@ -32,7 +32,7 @@ static const nlohmann::json& mapping() {
   return j;
 }
 
-namespace framework {
+namespace localization {
 std::string text(const std::string& key) {
   const auto& j = mapping();
   const auto it = j.find(key);
