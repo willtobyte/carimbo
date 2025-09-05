@@ -26,9 +26,9 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   effects.reserve(es.size());
 
   for (const auto& i : es) {
-      const std::string basename = i.get<std::string>();
-      const std::string f = std::format("blobs/{}/{}.ogg", name, basename);
-      effects.emplace_back(std::move(basename), _resourcemanager->soundmanager()->get(f));
+    const std::string basename = i.get<std::string>();
+    const std::string f = std::format("blobs/{}/{}.ogg", name, basename);
+    effects.emplace_back(std::move(basename), _resourcemanager->soundmanager()->get(f));
   }
 
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
