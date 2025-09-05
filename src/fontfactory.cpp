@@ -13,7 +13,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     ? family
     : std::format("fonts/{}.json", family);
 
-  auto [it, inserted] = _pool.try_emplace(filename);
+  const auto [it, inserted] = _pool.try_emplace(filename);
   if (!inserted) [[unlikely]] {
     return it->second;
   }

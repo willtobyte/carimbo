@@ -7,7 +7,7 @@ pixmappool::pixmappool(std::shared_ptr<renderer> renderer) noexcept
     : _renderer(std::move(renderer)) {}
 
 std::shared_ptr<pixmap> pixmappool::get(const std::string& name) {
-  auto [it, inserted] = _pool.try_emplace(name);
+  const auto [it, inserted] = _pool.try_emplace(name);
   if (!inserted) [[unlikely]] {
     return it->second;
   }

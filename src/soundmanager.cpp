@@ -6,7 +6,7 @@ soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept
     : _audiodevice(std::move(audiodevice)) {}
 
 std::shared_ptr<soundfx> soundmanager::get(const std::string& name) noexcept {
-  auto [it, inserted] = _pool.try_emplace(name);
+  const auto [it, inserted] = _pool.try_emplace(name);
   if (!inserted) [[unlikely]] {
     return it->second;
   }
