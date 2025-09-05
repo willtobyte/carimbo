@@ -27,7 +27,7 @@ std::vector<std::uint8_t> io::read(std::string_view filename) {
   const auto result = PHYSFS_readBytes(ptr.get(), buffer.data(), amount);
   if (result != length) [[unlikely]] {
     throw std::runtime_error(
-      std::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes but read {}, error: {}",
+      std::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes however read {}, error: {}",
         filename,
         amount,
         result,
