@@ -27,8 +27,8 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
       const auto& basename = e.template get<std::string>();
       const auto f = std::format("blobs/{}/{}.ogg", name, basename);
       return std::pair{
-        basename,
-        _resourcemanager->soundmanager()->get(f)
+        std::move(basename),
+        std::move(_resourcemanager->soundmanager()->get(f))
       };
     });
 
