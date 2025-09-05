@@ -356,26 +356,6 @@ if statemanager:player(Player.two):on(Controller.left) then
 end
 ```
 
-lua.new_usertype<framework::statemanager>(
-"StateManager",
-sol::no_constructor,
-"collides", &statemanager::collides,
-"players", sol::property(&statemanager::players),
-"player", [&player_mapping](framework::statemanager& self, input::event::player player) -> playerwrapper& {
-const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
-
-      return iterator->second;
-    }
-
-);
-lua.new_usertype<playerwrapper>(
-"PlayerWrapper",
-sol::no_constructor,
-"on", &playerwrapper::on
-);
-
-TODO
-
 ### SceneManager
 
 Manager is responsible for registering, setting, and destroying scenes. A scene can include a background, objects, and sound effects, all declared in a metadata JSON. Additionally, every scene must include a Lua script to handle specific situations.
