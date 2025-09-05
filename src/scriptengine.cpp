@@ -583,9 +583,9 @@ void framework::scriptengine::run() {
       framework::statemanager& self,
       input::event::player player
     ) -> playerwrapper& {
-      const auto [iterator, inserted] = player_mapping.try_emplace(player, player, self);
+      const auto [it, _] = player_mapping.try_emplace(player, player, self);
 
-      return iterator->second;
+      return it->second;
     }
   );
 
