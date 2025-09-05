@@ -8,8 +8,8 @@ public:
   io() = delete;
   ~io() = delete;
 
-  static std::vector<uint8_t> read(std::string_view filename);
+  static std::vector<uint8_t> read(const std::string& filename);
 
-  static std::vector<std::string> enumerate(std::string_view directory);
+  static std::vector<std::string> enumerate(const std::string& directory);
 };
 }
