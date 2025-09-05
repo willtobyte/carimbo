@@ -22,6 +22,7 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager) {
   _objectpool->reserve(64);
   _envelopepool->reserve(64);
+  _objects.reserve(128);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
