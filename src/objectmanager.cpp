@@ -25,7 +25,8 @@ objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
-  const auto n = scope ? scope->get() : "";
+  static const std::string empty;
+  const auto& n = scope.value_or(std::cref(empty)).get();
   const auto& qualifier = n.empty() ? kind : std::format("{}/{}", n, kind);
   for (const auto& o : _objects) {
     if (o->_kind != kind) {
