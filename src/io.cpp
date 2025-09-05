@@ -52,12 +52,12 @@ std::vector<std::string> io::enumerate(std::string_view directory) {
   auto n = 0uz;
   while (array[n] != nullptr) ++n;
 
-  std::vector<std::string> files;
-  files.reserve(n);
+  std::vector<std::string> names;
+  names.reserve(n);
 
   for (auto i = 0uz; i < n; ++i) {
-    files.emplace_back(array[i]);
+    names.emplace_back(array[i]);
   }
 
-  return files;
+  return names;
 }
