@@ -281,7 +281,4 @@ if(NOT EMSCRIPTEN)
   )
 endif()
 
-get_target_property(SENTRY_INCS sentry::sentry INTERFACE_INCLUDE_DIRECTORIES)
-message(STATUS "Sentry include dirs: ${SENTRY_INCS}")
-
 target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
