@@ -51,7 +51,7 @@ else()
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
 
-  if (HAVE_LUAJIT)
+  if(HAVE_LUAJIT)
     find_package(luajit CONFIG REQUIRED)
   endif()
 
