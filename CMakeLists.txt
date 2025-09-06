@@ -29,19 +29,10 @@ execute_process(
 add_compile_definitions(GIT_TAG="${latest_tag}")
 
 foreach(flag SANDBOX)
-  option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})
     target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
   endif()
 endforeach()
-
-foreach(flag HAVE_BOOST HAVE_LUAJIT HAVE_STEAM)
-  if(${flag})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
-  endif()
-endforeach()
-
-target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
@@ -60,10 +51,16 @@ else()
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
 
-  if(HAVE_LUAJIT)
+  if (HAVE_LUAJIT)
     find_package(luajit CONFIG REQUIRED)
   endif()
+
+  if(HAVE_SENTRY)
+    find_package(sentry-native CONFIG REQUIRED)
+  endif()
 endif()
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
@@ -284,8 +281,10 @@ if(NOT EMSCRIPTEN)
   )
 
   if(HAVE_LUAJIT)
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-      luajit::luajit
-    )
+    target_link_libraries(${PROJECT_NAME} PRIVATE luajit::luajit)
+  endif()
+
+  if(HAVE_SENTRY)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sentry-native::sentry-native)
   endif()
 endif()

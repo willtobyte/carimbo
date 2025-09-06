@@ -20,6 +20,14 @@
  #include <boost/config.hpp>
 #endif
 
+#ifdef HAVE_SENTRY
+ #define SENTRY_BUILD_STATIC 1
+
+ #include <sentry.h>
+
+ auto* _ = sentry_options_new();
+#endif
+
 #ifdef DEBUG
   #define SOL_ALL_SAFETIES_ON 1
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
