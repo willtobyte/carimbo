@@ -21,9 +21,6 @@ class Carimbo(ConanFile):
     def _have_steam(self):
         return self._os_name() in {"macos", "windows"}
 
-    def _have_sentry(self):
-        return self._os_name() in {"android", "ios", "linux", "macos", "windows"}
-
     def requirements(self):
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.12.0")
@@ -95,7 +92,7 @@ class Carimbo(ConanFile):
         if self._is_jit_capable():
             toolchain.preprocessor_definitions["SOL_LUAJIT"] = 1
 
-        if self._have_sentry():
+        if not self._is_webassembly():
             toolchain.preprocessor_definitions["HAVE_SENTRY"] = "ON"
             toolchain.cache_variables["HAVE_SENTRY"] = "ON"
 
