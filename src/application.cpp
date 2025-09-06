@@ -16,6 +16,10 @@ using namespace framework;
     }
 
     if (error) {
+      #ifdef HAVE_SENTRY
+      sentry_capture_message(error, SENTRY_LEVEL_FATAL);
+      #endif
+
       #ifdef HAVE_STACKSTRACE
         boost::stacktrace::stacktrace st;
         std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
@@ -33,10 +37,6 @@ using namespace framework;
         #endif
       #endif
     }
-
-    #ifdef HAVE_SENTRY
-    sentry_capture_message(error, SENTRY_LEVEL_FATAL);
-    #endif
   }
 
   std::exit(EXIT_FAILURE);
