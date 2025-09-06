@@ -40,10 +40,15 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
   return *this;
 }
 
+#ifdef HAVE_SENTRY
 enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
-  _sentry_dsn = dsn;
+  auto *options = sentry_options_new();
+  sentry_options_set_dsn(options, dsn.c_str());
+  sentry_init(options);
+
   return *this;
 }
+#endif
 
 std::shared_ptr<engine> enginefactory::create() const {
   const auto audiodevice = std::make_shared<audio::audiodevice>();

@@ -29,8 +29,5 @@ private:
   float_t _scale{1.0};
   float_t _gravity{9.8f};
   bool _fullscreen{false};
-  #ifdef HAVE_SENTRY
-  std::string _sentry_dsn;
-  #endif
 };
 }
