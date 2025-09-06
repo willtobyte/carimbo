@@ -41,6 +41,8 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
 }
 
 enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
+  UNUSED(dsn);
+
   #ifdef HAVE_SENTRY
   auto *options = sentry_options_new();
   sentry_options_set_dsn(options, dsn.c_str());
