@@ -56,11 +56,9 @@ else()
   endif()
 
   if(HAVE_SENTRY)
-    find_package(sentry-native CONFIG REQUIRED)
+    find_package(sentry CONFIG REQUIRED)
   endif()
 endif()
-
-target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
@@ -278,13 +276,12 @@ if(NOT EMSCRIPTEN)
     Boost::boost
     OpenAL::OpenAL
     openssl::openssl
+    $<$<BOOL:${HAVE_LUAJIT}>:luajit::luajit>
+    $<$<BOOL:${HAVE_SENTRY}>:sentry::sentry>
   )
-
-  if(HAVE_LUAJIT)
-    target_link_libraries(${PROJECT_NAME} PRIVATE luajit::luajit)
-  endif()
-
-  if(HAVE_SENTRY)
-    target_link_libraries(${PROJECT_NAME} PRIVATE sentry-native::sentry-native)
-  endif()
 endif()
+
+get_target_property(SENTRY_INCS sentry::sentry INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "Sentry include dirs: ${SENTRY_INCS}")
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
