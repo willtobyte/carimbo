@@ -35,7 +35,7 @@ using namespace framework;
     }
 
     #ifdef HAVE_SENTRY
-    sentry_capture_message(error ? error : "Unhandled unknown exception", SENTRY_LEVEL_FATAL);
+    sentry_capture_message(error, SENTRY_LEVEL_FATAL);
     #endif
   }
 
