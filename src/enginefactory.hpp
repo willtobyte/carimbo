@@ -16,6 +16,7 @@ public:
   enginefactory& with_scale(float_t scale) noexcept;
   enginefactory& with_gravity(float_t gravity) noexcept;
   enginefactory& with_fullscreen(bool fullscreen) noexcept;
+  enginefactory& with_sentry(const std::string& dsn) noexcept;
 
   std::shared_ptr<engine> create() const;
 
@@ -24,7 +25,7 @@ private:
   int32_t _width{800};
   int32_t _height{600};
   float_t _scale{1.0};
-  float_t _gravity{9.8};
+  float_t _gravity{9.8f};
   bool _fullscreen{false};
 };
 }
