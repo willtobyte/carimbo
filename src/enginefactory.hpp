@@ -16,9 +16,7 @@ public:
   enginefactory& with_scale(float_t scale) noexcept;
   enginefactory& with_gravity(float_t gravity) noexcept;
   enginefactory& with_fullscreen(bool fullscreen) noexcept;
-  #ifdef HAVE_SENTRY
   enginefactory& with_sentry(const std::string& dsn) noexcept;
-  #endif
 
   std::shared_ptr<engine> create() const;
 
