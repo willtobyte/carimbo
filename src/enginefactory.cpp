@@ -40,6 +40,11 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
   return *this;
 }
 
+enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
+  _sentry_dsn = dsn;
+  return *this;
+}
+
 std::shared_ptr<engine> enginefactory::create() const {
   const auto audiodevice = std::make_shared<audio::audiodevice>();
   const auto engine = std::make_shared<framework::engine>();
