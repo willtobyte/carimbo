@@ -51,6 +51,10 @@ application::application(int argc, char **argv) {
   std::signal(SIGINT, fn);
   std::signal(SIGTERM, fn);
 
+  #ifdef HAVE_SENTRY
+  std::atexit([] { sentry_close(); });
+  #endif
+
   std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });
 
