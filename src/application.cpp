@@ -33,6 +33,10 @@ using namespace framework;
         #endif
       #endif
     }
+
+    #ifdef HAVE_SENTRY
+    sentry_capture_message(error ? error : "Unhandled unknown exception", SENTRY_LEVEL_FATAL);
+    #endif
   }
 
   std::exit(EXIT_FAILURE);
