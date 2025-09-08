@@ -41,6 +41,7 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
+find_package(sentry CONFIG REQUIRED)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   set(EMSCRIPTEN TRUE)
@@ -56,7 +57,7 @@ else()
   endif()
 
   if(HAVE_SENTRY)
-    find_package(sentry CONFIG REQUIRED)
+    # find_package(sentry CONFIG REQUIRED)
 
     target_include_directories(${PROJECT_NAME} PRIVATE
       $<TARGET_PROPERTY:sentry-native::sentry-native,INTERFACE_INCLUDE_DIRECTORIES>
