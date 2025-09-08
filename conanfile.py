@@ -21,6 +21,9 @@ class Carimbo(ConanFile):
     def _have_steam(self):
         return self._os_name() in {"macos", "windows"}
 
+    def _have_sentry(self):
+      return not self._is_webassembly()
+
     def requirements(self):
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.12.0")
@@ -41,7 +44,7 @@ class Carimbo(ConanFile):
             self.requires("luajit/2.1.0-beta3")
 
         if self._have_sentry():
-            self.requires("sentry-native/0.10.0")
+          self.requires("sentry-native/0.10.0")
 
     def configure(self):
         self.options["boost"].header_only = True

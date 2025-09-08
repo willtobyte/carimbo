@@ -57,6 +57,10 @@ else()
 
   if(HAVE_SENTRY)
     find_package(sentry CONFIG REQUIRED)
+
+    target_include_directories(${PROJECT_NAME} PRIVATE
+      $<TARGET_PROPERTY:sentry-native::sentry-native,INTERFACE_INCLUDE_DIRECTORIES>
+    )
   endif()
 endif()
 
@@ -277,7 +281,7 @@ if(NOT EMSCRIPTEN)
     OpenAL::OpenAL
     openssl::openssl
     $<$<BOOL:${HAVE_LUAJIT}>:luajit::luajit>
-    $<$<BOOL:${HAVE_SENTRY}>:sentry::sentry>
+    $<$<BOOL:${HAVE_SENTRY}>:sentry-native::sentry-native>
   )
 endif()
 
