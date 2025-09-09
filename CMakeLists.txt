@@ -43,39 +43,6 @@ find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  set(EMSCRIPTEN TRUE)
-else()
-  set(EMSCRIPTEN FALSE)
-
-  find_package(Boost CONFIG REQUIRED)
-  find_package(OpenAL CONFIG REQUIRED)
-  find_package(OpenSSL CONFIG REQUIRED)
-
-  find_package(sentry CONFIG QUIET)
-
-  if(HAVE_LUAJIT)
-    find_package(luajit CONFIG REQUIRED)
-  endif()
-
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    Boost::boost
-    OpenAL::OpenAL
-    openssl::openssl
-  )
-
-  if(SOL_LUAJIT)
-    target_link_libraries(${PROJECT_NAME} PRIVATE luajit::luajit)
-  endif()
-
-  if(sentry_FOUND)
-    target_link_libraries(${PROJECT_NAME} PRIVATE sentry-native::sentry-native)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_SENTRY=1)
-  endif()
-endif()
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
-
-if(EMSCRIPTEN)
   set(EMSDK_COMPILE_DEBUG_FLAGS
     -O0
     -g3
@@ -143,6 +110,31 @@ if(EMSCRIPTEN)
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
 else()
+  find_package(Boost CONFIG REQUIRED)
+  find_package(OpenAL CONFIG REQUIRED)
+  find_package(OpenSSL CONFIG REQUIRED)
+
+  find_package(sentry CONFIG QUIET)
+
+  if(HAVE_LUAJIT)
+    find_package(luajit CONFIG REQUIRED)
+  endif()
+
+  target_link_libraries(${PROJECT_NAME} PRIVATE
+    Boost::boost
+    OpenAL::OpenAL
+    openssl::openssl
+  )
+
+  if(SOL_LUAJIT)
+    target_link_libraries(${PROJECT_NAME} PRIVATE luajit::luajit)
+  endif()
+
+  if(sentry_FOUND)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sentry-native::sentry-native)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_SENTRY=1)
+  endif()
+
   if(MSVC)
     set(DEBUG_FLAGS
       /Od
@@ -273,6 +265,8 @@ else()
     )
   endif()
 endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   nlohmann_json::nlohmann_json
