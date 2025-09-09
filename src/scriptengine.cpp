@@ -620,8 +620,8 @@ void framework::scriptengine::run() {
       const auto buffer = storage::io::read(filename);
       std::string_view script{reinterpret_cast<const char *>(buffer.data()), buffer.size()};
       const auto result = lua.load(script, std::format("@{}", filename));
-      sol::protected_function pf = result.get<sol::protected_function>();
-      sol::protected_function_result exec = pf();
+      const auto pf = result.get<sol::protected_function>();
+      const auto exec = pf();
       if (!exec.valid()) [[unlikely]] {
         sol::error err = exec;
         throw std::runtime_error(err.what());

@@ -43,7 +43,7 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
 enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
   UNUSED(dsn);
 
-  #ifdef HAVE_SENTRY
+  #if defined(HAVE_SENTRY) && !defined(SANDBOX)
     if (dsn.empty()) {
       return *this;
     }
