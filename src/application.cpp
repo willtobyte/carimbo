@@ -16,17 +16,26 @@ using namespace framework;
     }
 
     if (error) {
+      #ifdef HAVE_STACKTRACE
+        boost::stacktrace::stacktrace st;
+        std::vector<void*> frames;
+        frames.reserve(st.size());
+        for (const auto& f : st) frames.push_back(const_cast<void*>(f.address()));
+      #endif
+
       #ifdef HAVE_SENTRY
         sentry_value_t exc = sentry_value_new_exception("std::exception", error);
-        sentry_value_set_stacktrace(exc, nullptr, 0);
+
+        #ifdef HAVE_STACKTRACE
+          sentry_value_set_stacktrace(exc, frames.data(), frames.size());
+        #endif
 
         sentry_value_t ev = sentry_value_new_event();
         sentry_event_add_exception(ev, exc);
         sentry_capture_event(ev);
       #endif
 
-      #ifdef HAVE_STACKSTRACE
-        boost::stacktrace::stacktrace st;
+      #ifdef HAVE_STACKTRACE
         std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
 

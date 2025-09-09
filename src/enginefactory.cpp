@@ -51,8 +51,10 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     auto *options = sentry_options_new();
     sentry_options_set_dsn(options, dsn.c_str());
 
-    sentry_options_set_debug(options, 1);
-    sentry_options_set_logger_level(options, SENTRY_LEVEL_DEBUG);
+    #ifdef DEBUG
+      sentry_options_set_debug(options, 1);
+      sentry_options_set_logger_level(options, SENTRY_LEVEL_DEBUG);
+    #endif
 
     sentry_init(options);
   #endif

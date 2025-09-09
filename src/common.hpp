@@ -29,12 +29,13 @@
 #ifdef DEBUG
   #define SOL_ALL_SAFETIES_ON 1
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
+#endif
 
-  #if HAVE_BOOST
-    #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
-    #include <boost/stacktrace.hpp>
-    #define HAVE_STACKSTRACE
-  #endif
+#ifdef HAVE_BOOST
+  #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
+  #include <boost/stacktrace.hpp>
+
+  #define HAVE_STACKTRACE
 #endif
 
 extern "C" {
