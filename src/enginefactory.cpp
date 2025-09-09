@@ -43,6 +43,8 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
 enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
   UNUSED(dsn);
 
+  std::println(">>> {}", dsn);
+
   #ifdef HAVE_SENTRY
     if (dsn.empty()) {
       return *this;
@@ -57,6 +59,8 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     #endif
 
     sentry_init(options);
+
+    std::println(">>> HAVE SENTRY");
   #endif
 
   return *this;
