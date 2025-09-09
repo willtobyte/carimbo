@@ -54,11 +54,11 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
           s.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
           s.crossOrigin = 'anonymous';
           s.defer = true;
-          s.onload = function(){
+          s.onload = function(){{
             if (!window.Sentry) return;
-            window.Sentry.init({ dsn: dsn });
+            window.Sentry.init({{ dsn }});
             window.__sentry_inited__ = true;
-          };
+          }};
           document.head.appendChild(s);
         })("{}");
       )javascript",
