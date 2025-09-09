@@ -48,20 +48,20 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
   #ifdef EMSCRIPTEN
     const auto script = std::format(
       R"javascript(
-        (function(){
+        (function(){{
           var __dsn="{}";
           if (window.Sentry && window.__sentry_inited__) return;
           var s = document.createElement('script');
           s.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
           s.crossOrigin = 'anonymous';
           s.defer = true;
-          s.onload = function(){
+          s.onload = function(){{
             if (!window.Sentry) return;
-            window.Sentry.init({ dsn: __dsn });
+            window.Sentry.init({{ dsn: __dsn }});
             window.__sentry_inited__ = true;
-          };
+          }};
           document.head.appendChild(s);
-        })();
+        }})();
       )javascript",
       dsn
     );
