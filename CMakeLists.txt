@@ -61,9 +61,12 @@ else()
     Boost::boost
     OpenAL::OpenAL
     openssl::openssl
-    luajit::luajit
     sentry-native::sentry-native
   )
+
+  if(SOL_LUAJIT)
+    target_link_libraries(${PROJECT_NAME} PRIVATE luajit::luajit)
+  endif()
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:DEBUG>)
