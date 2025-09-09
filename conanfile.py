@@ -21,6 +21,9 @@ class Carimbo(ConanFile):
     def _have_steam(self):
         return self._os_name() in {"macos", "windows"}
 
+    def _have_sentry(self):
+      return self._os_name() in {"macos", "windows"}
+
     def requirements(self):
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.12.0")
@@ -39,6 +42,9 @@ class Carimbo(ConanFile):
 
         if self._is_jit_capable():
             self.requires("luajit/2.1.0-beta3")
+
+        if self._have_sentry():
+            self.requires("sentry-native/0.10.0")
 
     def configure(self):
         self.options["boost"].header_only = True
@@ -61,6 +67,9 @@ class Carimbo(ConanFile):
         if self._is_ios():
             self.options["sdl"].opengl = False
 
+        if self._have_sentry():
+            self.options["sentry-native"].backend = "inproc"
+
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
         with license_output.open("w", encoding="utf-8") as out:
@@ -80,16 +89,18 @@ class Carimbo(ConanFile):
 
         toolchain = CMakeToolchain(self)
 
-        toolchain.preprocessor_definitions["SOL_USING_CXX_LUA"] = None
+        toolchain.preprocessor_definitions["SOL_USING_CXX_LUA"] = "ON"
 
         if not self._is_webassembly():
-            toolchain.preprocessor_definitions["HAVE_BOOST"] = None
+            toolchain.preprocessor_definitions["HAVE_BOOST"] = "ON"
+            toolchain.cache_variables["HAVE_BOOST"] = "ON"
 
         if self._is_jit_capable():
             toolchain.preprocessor_definitions["SOL_LUAJIT"] = 1
 
         if self._have_steam():
-            toolchain.preprocessor_definitions["HAVE_STEAM"] = None
+            toolchain.preprocessor_definitions["HAVE_STEAM"] = "ON"
+            toolchain.cache_variables["HAVE_STEAM"] = "ON"
 
         toolchain.generate()
         CMakeDeps(self).generate()

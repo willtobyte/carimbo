@@ -40,6 +40,28 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
   return *this;
 }
 
+enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
+  UNUSED(dsn);
+
+  #ifdef HAVE_SENTRY
+    if (dsn.empty()) {
+      return *this;
+    }
+
+    auto *options = sentry_options_new();
+    sentry_options_set_dsn(options, dsn.c_str());
+
+    #ifdef DEBUG
+      sentry_options_set_debug(options, 1);
+      sentry_options_set_logger_level(options, SENTRY_LEVEL_DEBUG);
+    #endif
+
+    sentry_init(options);
+  #endif
+
+  return *this;
+}
+
 std::shared_ptr<engine> enginefactory::create() const {
   const auto audiodevice = std::make_shared<audio::audiodevice>();
   const auto engine = std::make_shared<framework::engine>();

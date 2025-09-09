@@ -16,7 +16,16 @@ using namespace framework;
     }
 
     if (error) {
-      #ifdef HAVE_STACKSTRACE
+      #ifdef HAVE_SENTRY
+        const auto exc = sentry_value_new_exception("exception", error);
+        const auto ev = sentry_value_new_event();
+
+        sentry_event_add_exception(ev, exc);
+
+        sentry_capture_event(ev);
+      #endif
+
+      #ifdef HAVE_STACKTRACE
         boost::stacktrace::stacktrace st;
         std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
@@ -50,6 +59,10 @@ application::application(int argc, char **argv) {
 
   std::signal(SIGINT, fn);
   std::signal(SIGTERM, fn);
+
+  #ifdef HAVE_SENTRY
+  std::atexit([] { sentry_close(); });
+  #endif
 
   std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });

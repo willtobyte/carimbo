@@ -29,19 +29,10 @@ execute_process(
 add_compile_definitions(GIT_TAG="${latest_tag}")
 
 foreach(flag SANDBOX)
-  option(${flag} "Enable ${flag} flag" OFF)
   if(${flag})
     target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
   endif()
 endforeach()
-
-foreach(flag HAVE_BOOST HAVE_LUAJIT HAVE_STEAM)
-  if(${flag})
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ${flag})
-  endif()
-endforeach()
-
-target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})
 
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
@@ -60,8 +51,25 @@ else()
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
 
+  find_package(sentry CONFIG QUIET)
+
   if(HAVE_LUAJIT)
     find_package(luajit CONFIG REQUIRED)
+  endif()
+
+  target_link_libraries(${PROJECT_NAME} PRIVATE
+    Boost::boost
+    OpenAL::OpenAL
+    openssl::openssl
+  )
+
+  if(SOL_LUAJIT)
+    target_link_libraries(${PROJECT_NAME} PRIVATE luajit::luajit)
+  endif()
+
+  if(sentry_FOUND)
+    target_link_libraries(${PROJECT_NAME} PRIVATE sentry-native::sentry-native)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAS_SENTRY=1)
   endif()
 endif()
 
@@ -276,16 +284,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   vorbis::vorbis
 )
 
-if(NOT EMSCRIPTEN)
-  target_link_libraries(${PROJECT_NAME} PRIVATE
-    Boost::boost
-    OpenAL::OpenAL
-    openssl::openssl
-  )
-
-  if(HAVE_LUAJIT)
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-      luajit::luajit
-    )
-  endif()
-endif()
+target_precompile_headers(${PROJECT_NAME} PRIVATE ${HEADER_FILES})

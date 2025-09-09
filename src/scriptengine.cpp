@@ -815,6 +815,7 @@ void framework::scriptengine::run() {
     "with_scale", &framework::enginefactory::with_scale,
     "with_gravity", &framework::enginefactory::with_gravity,
     "with_fullscreen", &framework::enginefactory::with_fullscreen,
+    "with_sentry", &framework::enginefactory::with_sentry,
     "create", &framework::enginefactory::create
   );
 
