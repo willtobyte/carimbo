@@ -21,8 +21,6 @@
 #endif
 
 #ifdef HAVE_SENTRY
- #define SENTRY_BUILD_STATIC 1
-
  #include <sentry.h>
 #endif
 

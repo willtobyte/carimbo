@@ -69,7 +69,7 @@ else()
 
   if(sentry_FOUND)
     target_link_libraries(${PROJECT_NAME} PRIVATE sentry-native::sentry-native)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE HAS_SENTRY=1)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE HAVE_SENTRY=1)
   endif()
 endif()
 
