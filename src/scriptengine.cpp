@@ -199,7 +199,7 @@ void framework::scriptengine::run() {
 
   lua["openurl"] = [](std::string_view url) {
     #ifdef EMSCRIPTEN
-      const auto script = std::format(R"javascript(var a = document.createElement('a');
+      const auto script = std::format(R"javascript(const a = document.createElement('a');
         a.href = "{}";
         a.target = "_blank";
         a.rel = "noopener noreferrer";
@@ -218,8 +218,8 @@ void framework::scriptengine::run() {
     #ifdef EMSCRIPTEN
       const auto script = std::format(R"javascript(
         (function(){{
-          var p = new URLSearchParams(window.location.search);
-          var v = p.get("{}");
+          const p = new URLSearchParams(window.location.search);
+          const v = p.get("{}");
           return v !== null ? v : "{}";
         }})()
       )javascript", key, defval);

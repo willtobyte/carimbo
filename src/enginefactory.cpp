@@ -49,18 +49,18 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     const auto script = std::format(
       R"javascript(
         (function(){{
-          var __dsn="{}";
+          const __dsn="{}";
           if (window.Sentry && window.__sentry_inited__) return;
-          var s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
-          s.crossOrigin = 'anonymous';
-          s.defer = true;
-          s.onload = function(){{
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
+          script.crossOrigin = 'anonymous';
+          script.defer = true;
+          script.onload = function(){{
             if (!window.Sentry) return;
             window.Sentry.init({{ dsn: __dsn }});
             window.__sentry_inited__ = true;
           }};
-          document.head.appendChild(s);
+          document.head.appendChild(script);
         }})();
       )javascript",
       dsn
