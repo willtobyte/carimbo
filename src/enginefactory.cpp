@@ -41,14 +41,35 @@ enginefactory& enginefactory::with_fullscreen(bool fullscreen) noexcept {
 }
 
 enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
-  UNUSED(dsn);
+  if (dsn.empty()) {
+    return *this;
+  }
+
+  #ifdef EMSCRIPTEN
+    const auto script = std::format(
+      R"javascript(
+        (function(dsn){
+          if (window.Sentry && window.__sentry_inited__) return;
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
+          s.crossOrigin = 'anonymous';
+          s.defer = true;
+          s.onload = function(){
+            if (!window.Sentry) return;
+            window.Sentry.init({ dsn: dsn });
+            window.__sentry_inited__ = true;
+          };
+          document.head.appendChild(s);
+        })("{}");
+      )javascript",
+      dsn
+    );
+
+    emscripten_run_script(script.c_str());
+  #endif
 
   #if defined(HAVE_SENTRY) && !defined(SANDBOX)
-    if (dsn.empty()) {
-      return *this;
-    }
-
-    auto *options = sentry_options_new();
+    const auto *options = sentry_options_new();
     sentry_options_set_dsn(options, dsn.c_str());
 
     #ifdef DEBUG
