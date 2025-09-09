@@ -66,7 +66,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
       dsn
     );
 
-    emscripten_run_script(std::format(std::string{script}, dsn).c_str());
+    emscripten_run_script(script.c_str());
   #endif
 
   #if defined(HAVE_SENTRY) && !defined(SANDBOX)
