@@ -24,8 +24,6 @@
  #define SENTRY_BUILD_STATIC 1
 
  #include <sentry.h>
-
- auto* _ = sentry_options_new();
 #endif
 
 #ifdef DEBUG

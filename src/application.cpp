@@ -17,7 +17,12 @@ using namespace framework;
 
     if (error) {
       #ifdef HAVE_SENTRY
-      sentry_capture_message(error, SENTRY_LEVEL_FATAL);
+        sentry_value_t exc = sentry_value_new_exception("std::exception", error);
+        sentry_value_set_stacktrace(exc, nullptr, 0);
+
+        sentry_value_t ev = sentry_value_new_event();
+        sentry_event_add_exception(ev, exc);
+        sentry_capture_event(ev);
       #endif
 
       #ifdef HAVE_STACKSTRACE

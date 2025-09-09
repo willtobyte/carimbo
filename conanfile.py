@@ -63,6 +63,7 @@ class Carimbo(ConanFile):
 
         if not self._is_webassembly() and self._is_jit_capable():
             self.options["sol2"].with_lua = "luajit"
+            self.options["sentry-native"].with_crashpad = True
 
         if self._is_ios():
             self.options["sdl"].opengl = False
