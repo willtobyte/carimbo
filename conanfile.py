@@ -98,10 +98,6 @@ class Carimbo(ConanFile):
         if self._is_jit_capable():
             toolchain.preprocessor_definitions["SOL_LUAJIT"] = 1
 
-        if not self._is_webassembly():
-            toolchain.preprocessor_definitions["HAVE_SENTRY"] = "ON"
-            toolchain.cache_variables["HAVE_SENTRY"] = "ON"
-
         if self._have_steam():
             toolchain.preprocessor_definitions["HAVE_STEAM"] = "ON"
             toolchain.cache_variables["HAVE_STEAM"] = "ON"
