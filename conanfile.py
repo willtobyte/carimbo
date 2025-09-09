@@ -22,7 +22,7 @@ class Carimbo(ConanFile):
         return self._os_name() in {"macos", "windows"}
 
     def _have_sentry(self):
-      return not self._is_webassembly()
+      return self._os_name() in {"macos", "windows"}
 
     def requirements(self):
         self.requires("libspng/0.7.4")
