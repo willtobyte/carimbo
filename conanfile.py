@@ -44,7 +44,7 @@ class Carimbo(ConanFile):
             self.requires("luajit/2.1.0-beta3")
 
         if self._have_sentry():
-          self.requires("sentry-native/0.10.0")
+            self.requires("sentry-native/0.10.0")
 
     def configure(self):
         self.options["boost"].header_only = True
@@ -66,6 +66,9 @@ class Carimbo(ConanFile):
 
         if self._is_ios():
             self.options["sdl"].opengl = False
+
+        if self._have_sentry():
+            self.options["sentry-native"].backend = "inproc"
 
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
