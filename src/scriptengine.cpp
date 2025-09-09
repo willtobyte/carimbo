@@ -50,7 +50,7 @@ sol::object searcher(sol::this_state state, const std::string& module) {
   const auto buffer = storage::io::read(filename);
   std::string_view script{reinterpret_cast<const char *>(buffer.data()), buffer.size()};
 
-  const auto loader = lua.load(script, filename);
+  const auto loader = lua.load(script, std::format("@{}", filename));
   if (!loader.valid()) [[unlikely]] {
     sol::error err = loader;
     throw std::runtime_error(err.what());
@@ -616,15 +616,18 @@ void framework::scriptengine::run() {
         return;
       }
 
-      const auto buffer = storage::io::read(std::format("scenes/{}.lua", name));
+      const auto filename = std::format("scenes/{}.lua", name);
+      const auto buffer = storage::io::read(filename);
       std::string_view script{reinterpret_cast<const char *>(buffer.data()), buffer.size()};
-      auto result = lua.safe_script(script, &sol::script_pass_on_error);
-      if (!result.valid()) [[unlikely]] {
-        sol::error err = result;
+      const auto result = lua.load(script, std::format("@{}", filename));
+      sol::protected_function pf = result.get<sol::protected_function>();
+      sol::protected_function_result exec = pf();
+      if (!exec.valid()) [[unlikely]] {
+        sol::error err = exec;
         throw std::runtime_error(err.what());
       }
 
-      auto module = result.get<sol::table>();
+      auto module = exec.get<sol::table>();
 
       auto ptr = std::weak_ptr<framework::scene>(scene);
 
