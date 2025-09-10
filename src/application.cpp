@@ -77,9 +77,9 @@ application::application(int argc, char **argv) {
 int32_t application::run() {
   static_assert(std::endian::native == std::endian::little);
 
-  const auto* e = std::getenv("ENTRYPOINT");
+  const auto* p = std::getenv("CARTRIDGE");
 
-  storage::filesystem::mount(e ? e : "cartridge.zip", "/");
+  storage::filesystem::mount(p ? p : "cartridge.zip", "/");
 
   auto se = scriptengine();
   se.run();
