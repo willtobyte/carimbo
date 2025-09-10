@@ -77,15 +77,9 @@ application::application(int argc, char **argv) {
 int32_t application::run() {
   static_assert(std::endian::native == std::endian::little);
 
-  static const auto* entry =
-  #if defined(EMSCRIPTEN) || !defined(SANDBOX)
-    "cartridge.zip"
-  #else
-    std::getenv("ENTRYPOINT")
-  #endif
-  ;
+  const auto* e = std::getenv("ENTRYPOINT");
 
-  storage::filesystem::mount(entry, "/");
+  storage::filesystem::mount(e ? e : "cartridge.zip", "/");
 
   auto se = scriptengine();
   se.run();
