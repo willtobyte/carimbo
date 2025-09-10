@@ -208,14 +208,7 @@ void framework::scriptengine::run() {
 
   lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) -> sol::object {
     #ifdef EMSCRIPTEN
-      const auto script = std::format(R"javascript(
-        (function(){{
-          const p = new URLSearchParams(window.location.search);
-          const v = p.get("{}");
-          return v !== null ? v : "{}";
-        }})()
-      )javascript", key, defval);
-
+      const auto script = std::format(R"javascript(new URLSearchParams(location.search).get("{}") ?? "{}")javascript", key, defval);
       const char* result = emscripten_run_script_string(script.c_str());
       if (!result || !*result) return sol::make_object(lua, defval);
       return sol::make_object(lua, std::string(result));
