@@ -199,7 +199,7 @@ void framework::scriptengine::run() {
 
   lua["openurl"] = [](std::string_view url) {
     #ifdef EMSCRIPTEN
-      const auto script = std::format(R"javascript(window.open({}, '_blank', 'noopener,noreferrer');)javascript", url);
+      const auto script = std::format(R"javascript(window.open('{}', '_blank', 'noopener,noreferrer');)javascript", url);
       emscripten_run_script(script.c_str());
     #else
       SDL_OpenURL(url.data());
