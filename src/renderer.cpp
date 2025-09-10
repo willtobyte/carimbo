@@ -9,7 +9,7 @@ renderer::renderer(std::shared_ptr<window> window)
   const auto* nv = std::getenv("NOVSYNC");
   UNUSED(nv);
 
-  constexpr const auto vsync =
+  const auto vsync =
     #ifdef SANDBOX
       0
     #else
