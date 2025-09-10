@@ -13,7 +13,7 @@ window::window(const std::string& title, int32_t width, int32_t height, bool ful
         ),
         SDL_Deleter{}
       ) {
-  if (_window == nullptr) [[unlikely]] {
+  if (!_window) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_CreateWindow] {}", SDL_GetError()));
   }
 
