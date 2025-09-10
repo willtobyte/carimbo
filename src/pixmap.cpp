@@ -78,8 +78,8 @@ void pixmap::draw(
     const std::optional<geometry::rectangle>& outline
 #endif
 ) const noexcept {
-  const auto& _source = source;
-  const auto& _destination = destination;
+  const SDL_FRect& _source = source;
+  const SDL_FRect& _destination = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &_source, &_destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
