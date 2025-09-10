@@ -61,7 +61,7 @@ application::application(int argc, char **argv) {
   std::signal(SIGTERM, fn);
 
   #ifdef HAVE_SENTRY
-  std::atexit([] { sentry_close(); });
+    std::atexit([] { sentry_close(); });
   #endif
 
   std::atexit([] { PHYSFS_deinit(); });
@@ -70,7 +70,7 @@ application::application(int argc, char **argv) {
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
   #ifdef HAVE_STEAM
-  SteamAPI_InitSafe();
+    SteamAPI_InitSafe();
   #endif
 }
 
@@ -78,12 +78,12 @@ int32_t application::run() {
   static_assert(std::endian::native == std::endian::little);
 
   static const auto* entry =
-    #if defined(EMSCRIPTEN) || !defined(SANDBOX)
-      "cartridge.zip"
-    #else
-      std::getenv("ENTRYPOINT")
-    #endif
-    ;
+  #if defined(EMSCRIPTEN) || !defined(SANDBOX)
+    "cartridge.zip"
+  #else
+    std::getenv("ENTRYPOINT")
+  #endif
+  ;
 
   storage::filesystem::mount(entry, "/");
 
