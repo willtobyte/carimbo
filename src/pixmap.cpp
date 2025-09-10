@@ -53,16 +53,16 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& name)
       ),
       SDL_Deleter{}
   );
-  if (!_texture) {
+  if (!_texture) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
 
   const auto pitch = static_cast<int32_t>(ihdr.width * 4);
-  if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) {
+  if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_UpdateTexture] {}", SDL_GetError()));
   }
 
-  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) {
+  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_SetTextureScaleMode] {}", SDL_GetError()));
   }
 }
@@ -107,7 +107,7 @@ int32_t pixmap::height() const noexcept {
 }
 
 void pixmap::set_blendmode(blendmode mode) {
-  if (!SDL_SetTextureBlendMode(_texture.get(), static_cast<SDL_BlendMode>(mode))) {
+  if (!SDL_SetTextureBlendMode(_texture.get(), static_cast<SDL_BlendMode>(mode))) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_SetTextureBlendMode] {}", SDL_GetError()));
   }
 }
