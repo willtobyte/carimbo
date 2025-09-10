@@ -6,11 +6,14 @@ using namespace graphics;
 
 renderer::renderer(std::shared_ptr<window> window)
     : _window(std::move(window)) {
+  const auto* nv = std::getenv("NOVSYNC");
+  UNUSED(nv);
+
   constexpr const auto vsync =
     #ifdef SANDBOX
       0
     #else
-      1
+      nv ? 0 : 1
     #endif
     ;
 
