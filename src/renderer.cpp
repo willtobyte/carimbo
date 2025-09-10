@@ -6,9 +6,17 @@ using namespace graphics;
 
 renderer::renderer(std::shared_ptr<window> window)
     : _window(std::move(window)) {
+  constexpr const auto VSYNC =
+  #ifdef SANDBOX
+    0
+  #else
+    1
+  #endif
+  ;
+
   SDL_PropertiesID props = SDL_CreateProperties();
   SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, *_window);
-  SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, 1);
+  SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, VSYNC);
   SDL_SetStringProperty(props, SDL_PROP_RENDERER_CREATE_NAME_STRING, nullptr);
 
   SDL_Renderer *renderer = SDL_CreateRendererWithProperties(props);
