@@ -7,12 +7,12 @@ using namespace graphics;
 renderer::renderer(std::shared_ptr<window> window)
     : _window(std::move(window)) {
   constexpr const auto VSYNC =
-  #ifdef SANDBOX
-    0
-  #else
-    1
-  #endif
-  ;
+    #ifdef SANDBOX
+      0
+    #else
+      1
+    #endif
+    ;
 
   SDL_PropertiesID props = SDL_CreateProperties();
   SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, *_window);
