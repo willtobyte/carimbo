@@ -7,6 +7,7 @@ using namespace graphics;
 renderer::renderer(std::shared_ptr<window> window)
     : _window(std::move(window)) {
   const auto* n = std::getenv("NOVSYNC");
+
   UNUSED(n);
 
   const auto vsync =
