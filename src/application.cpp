@@ -79,9 +79,9 @@ int32_t application::run() {
 
   static const auto* entry =
     #if defined(EMSCRIPTEN) || !defined(SANDBOX)
-        "cartridge.zip"
+      "cartridge.zip"
     #else
-        std::getenv("ENTRYPOINT")
+      std::getenv("ENTRYPOINT")
     #endif
     ;
 
