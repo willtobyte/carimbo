@@ -612,6 +612,8 @@ void framework::scriptengine::run() {
         throw std::runtime_error(err.what());
       }
 
+      // const auto modn = std::format("scenes.{}", name);
+
       auto module = exec.get<sol::table>();
 
       auto ptr = std::weak_ptr<framework::scene>(scene);
@@ -653,21 +655,6 @@ void framework::scriptengine::run() {
         };
 
         scene->set_onloop(std::move(sfn));
-      }
-
-      if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn, &lua, module]() mutable {
-          sol::protected_function_result result = fn();
-          if (!result.valid()) [[unlikely]] {
-            sol::error err = result;
-            throw std::runtime_error(err.what());
-          }
-
-          lua.collect_garbage();
-          lua.collect_garbage();
-        };
-
-        scene->set_onleave(std::move(sfn));
       }
 
       if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
@@ -728,6 +715,21 @@ void framework::scriptengine::run() {
         };
 
         scene->set_onmotion(std::move(sfn));
+      }
+
+      if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
+        auto sfn = [fn, &lua, module]() mutable {
+          sol::protected_function_result result = fn();
+          if (!result.valid()) [[unlikely]] {
+            sol::error err = result;
+            throw std::runtime_error(err.what());
+          }
+
+          lua.collect_garbage();
+          lua.collect_garbage();
+        };
+
+        scene->set_onleave(std::move(sfn));
       }
 
       const auto end = SDL_GetPerformanceCounter();
