@@ -1,6 +1,6 @@
-## Carimbo: A Modern, Cross-Platform 2D Game Engine
-
 <p align="center">
+  <img src="carimbo.jpg" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine" />
+  <br />
   <span>
     <img src="https://github.com/willtobyte/carimbo/actions/workflows/android.yaml/badge.svg?branch=main" alt="Android" />
     <img src="https://github.com/willtobyte/carimbo/actions/workflows/ios.yaml/badge.svg?branch=main" alt="iOS" />
@@ -9,9 +9,9 @@
     <img src="https://github.com/willtobyte/carimbo/actions/workflows/webassembly.yaml/badge.svg?branch=main" alt="WebAssembly" />
     <img src="https://github.com/willtobyte/carimbo/actions/workflows/windows.yaml/badge.svg?branch=main" alt="Windows" />
   </span>
-  <br />
-  <img src="carimbo.jpg" alt="Carimbo: A Modern, Cross-Platform 2D Game Engine" />
 </p>
+
+### Carimbo: A Modern, Cross-Platform 2D Game Engine
 
 ### About
 
