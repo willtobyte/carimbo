@@ -33,7 +33,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
       continue;
     }
 
-    const auto it = _map.find(static_cast<uint8_t>(ch));
+    const auto it = _map.find(ch);
     if (it == _map.end()) {
       continue;
     }

@@ -89,7 +89,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
         ++h;
       }
 
-      map[static_cast<uint8_t>(glyph)] = {
+      map[glyph] = {
         { static_cast<float_t>(x), static_cast<float_t>(y) },
         { static_cast<float_t>(w), static_cast<float_t>(h) }
       };
