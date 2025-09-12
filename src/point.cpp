@@ -42,8 +42,8 @@ point& point::operator+=(const point& other) noexcept {
 }
 
 point& point::operator+=(const std::pair<uint8_t, float_t>& o) noexcept {
-  static constexpr const auto X = static_cast<uint8_t>('x');
-  static constexpr const auto Y = static_cast<uint8_t>('y');
+  constexpr const auto X = static_cast<uint8_t>('x');
+  constexpr const auto Y = static_cast<uint8_t>('y');
 
   switch (o.first) {
     case X: _x += o.second; return *this;
