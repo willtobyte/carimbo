@@ -718,7 +718,7 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn, &lua, module]() mutable {
+        auto sfn = [fn, &lua]() mutable {
           sol::protected_function_result result = fn();
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
