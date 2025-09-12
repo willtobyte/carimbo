@@ -25,7 +25,7 @@ public:
 
   point operator+(const point& other) const noexcept;
   point& operator+=(const point& other) noexcept;
-  point& operator+=(const std::pair<uint8_t, float_t>& offset) noexcept;
+  point& operator+=(const std::pair<char, float_t>& offset) noexcept;
 
   point operator-(const size& rhs) const noexcept;
   point operator-(const point& rhs) const noexcept;

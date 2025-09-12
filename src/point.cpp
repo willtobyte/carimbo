@@ -41,8 +41,8 @@ point& point::operator+=(const point& other) noexcept {
   return *this;
 }
 
-point& point::operator+=(const std::pair<uint8_t, float_t>& o) noexcept {
-  switch (static_cast<char>(o.first)) {
+point& point::operator+=(const std::pair<char, float_t>& o) noexcept {
+  switch (o.first) {
     case 'x': _x += o.second; return *this;
     case 'y': _y += o.second; return *this;
   }
