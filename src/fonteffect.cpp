@@ -8,7 +8,7 @@ void fadeineffect::set(const std::string& text, geometry::point position) {
     _last_length = length;
     _text = text;
     _position = position;
-    _fade_time = 0.0f;
+    _fade_time = .0f;
     _animating = true;
     _alpha = 0;
   }
