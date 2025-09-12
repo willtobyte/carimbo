@@ -26,7 +26,13 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-add_compile_definitions(GIT_TAG="${latest_tag}")
+execute_process(
+  COMMAND git rev-parse --short=6 HEAD
+  OUTPUT_VARIABLE commit_short
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_compile_definitions(GIT_TAG="${latest_tag}+${commit_short}")
 
 foreach(flag SANDBOX)
   if(${flag})
