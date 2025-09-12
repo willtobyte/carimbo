@@ -38,11 +38,11 @@ class fadeineffect final : public fonteffect {
     std::string _text;
     geometry::point _position;
     uint8_t _alpha;
-    const float_t _fade_duration = .3f;
-    float_t _fade_time = 0.0f;
-    bool _animating = false;
-    char _last_char = '\0';
-    size_t _last_length = 0;
-    size_t _draw_calls = 0;
+    float_t _fade_time{.0f};
+    bool _animating{false};
+    size_t _last_length{0};
+    size_t _draw_calls{0};
+
+    const float_t _fade_duration{.3f};
 };
 }
