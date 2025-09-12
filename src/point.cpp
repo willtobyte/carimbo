@@ -46,6 +46,7 @@ point& point::operator+=(const std::pair<uint8_t, float_t>& o) noexcept {
     case 'x': _x += o.second; return *this;
     case 'y': _y += o.second; return *this;
   }
+
   return *this;
 }
 
