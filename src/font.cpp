@@ -95,17 +95,12 @@ void font::draw(const std::string& text, const geometry::point& position, const 
     // }
 
     double_t angle = .0L;
+    reflection reflection = reflection::none;
+    uint8_t alpha = 255;
+
     if (const auto e = effect.lock()) {
       angle = e->angle();
-    }
-
-    reflection reflection = reflection::none;
-    if (const auto e = effect.lock()) {
       reflection = e->reflection();
-    }
-
-    uint8_t alpha = 255;
-    if (const auto e = effect.lock()) {
       alpha = e->alpha();
     }
 
