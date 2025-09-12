@@ -66,10 +66,6 @@ void font::draw(const std::string& text, const geometry::point& position, const 
     return;
   }
 
-  if (const auto e = effect.lock()) {
-    e->set(text, position);
-  }
-
   geometry::point cursor = position;
 
   const auto height = _map.begin()->second.height() * _scale;

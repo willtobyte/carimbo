@@ -41,5 +41,9 @@ void label::draw() const  noexcept {
     return;
   }
 
+  if (const auto e = _effect.get()) {
+    e->set(_text, _position);
+  }
+
   _font->draw(_text, _position, _effect);
 }
