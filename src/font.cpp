@@ -88,20 +88,16 @@ void font::draw(const std::string& text, const geometry::point& position, const 
     const auto& glyph = it->second;
     const auto size = glyph.size();
 
-    // TODO
-    // float_t scale = .0f;
-    // if (auto* e = _effect.get()) {
-    //   scale = e->scale();
-    // }
-
     double_t angle = .0L;
     reflection reflection = reflection::none;
     uint8_t alpha = 255;
+    // float_t scale = .0f;
 
     if (const auto e = effect.lock()) {
       angle = e->angle();
       reflection = e->reflection();
       alpha = e->alpha();
+      // scale = e->scale();
     }
 
     _pixmap->draw(
