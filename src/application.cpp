@@ -17,7 +17,7 @@ using namespace framework;
 
     if (error) {
       #ifdef HAVE_SENTRY
-        const auto exc = sentry_value_new_exception("exception", error);
+        const auto exc = sentry_value_new_exception("Exception", error);
         const auto ev = sentry_value_new_event();
 
         sentry_event_add_exception(ev, exc);
