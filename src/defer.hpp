@@ -2,18 +2,18 @@
 
 template <typename F>
 struct Defer {
-    [[no_unique_address]] F f;
+  [[no_unique_address]] F f;
 
-    explicit Defer(F&& fn) noexcept(std::is_nothrow_move_constructible_v<F>)
-        : f(std::move(fn)) {}
+  explicit Defer(F&& fn) noexcept(std::is_nothrow_move_constructible_v<F>)
+      : f(std::move(fn)) {}
 
-    Defer(const Defer&) = delete;
-    Defer& operator=(const Defer&) = delete;
-    Defer(Defer&&) = delete;
+  Defer(const Defer&) = delete;
+  Defer& operator=(const Defer&) = delete;
+  Defer(Defer&&) = delete;
 
-    ~Defer() noexcept(noexcept(std::declval<F&>()())) {
-      f();
-    }
+  ~Defer() noexcept(noexcept(std::declval<F&>()())) {
+    f();
+  }
 };
 
 template <typename F>
