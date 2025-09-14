@@ -197,12 +197,12 @@ void framework::scriptengine::run() {
 
   lua["moment"] = &moment;
 
-  lua["openurl"] = [](std::string_view url) {
+  lua["openurl"] = [](std::string url) {
     #ifdef EMSCRIPTEN
       const auto script = std::format(R"javascript(window.open('{}', '_blank', 'noopener,noreferrer');)javascript", url);
       emscripten_run_script(script.c_str());
     #else
-      SDL_OpenURL(url.data());
+      SDL_OpenURL(url.c_str());
     #endif
   };
 
