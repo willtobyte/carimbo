@@ -36,6 +36,10 @@ cursor::cursor(const std::string& name, std::shared_ptr<framework::resourcemanag
 }
 
 void cursor::on_mouse_press(const input::event::mouse::button& event) {
+  UNUSED(event);
+}
+
+void cursor::on_mouse_release(const mouse::button& event) {
   constexpr const auto left = mouse::button::which::left;
   constexpr const auto right = mouse::button::which::right;
 
@@ -52,10 +56,6 @@ void cursor::on_mouse_press(const input::event::mouse::button& event) {
 
   _frame = 0;
   _last_frame = SDL_GetTicks();
-}
-
-void cursor::on_mouse_release(const mouse::button& event) {
-  UNUSED(event);
 }
 
 void cursor::on_mouse_motion(const mouse::motion& event) {
