@@ -207,22 +207,31 @@ void framework::scriptengine::run() {
   };
 
   lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) -> sol::object {
+    auto out = defval;
+
     #ifdef EMSCRIPTEN
-      const auto script = std::format(R"javascript(new URLSearchParams(location.search).get("{}") ?? "{}")javascript", key, defval);
-      const char* result = emscripten_run_script_string(script.c_str());
-      if (!result || !*result) return sol::make_object(lua, defval);
-      return sol::make_object(lua, std::string(result));
+      const auto script = std::format(
+          R"javascript(
+            new URLSearchParams(location.search).get("{}") ?? "{}"
+          )javascript",
+          key,
+          defval
+      );
+
+      if (const auto* result = emscripten_run_script_string(script.c_str()); result && *result) {
+        out.assign(result);
+      }
     #else
       auto uppercase_key = key;
       std::ranges::transform(uppercase_key, uppercase_key.begin(),
-                            [](unsigned char c) { return std::toupper(c); });
+                            [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 
       if (const auto* value = std::getenv(uppercase_key.c_str()); value && *value) {
-        return sol::make_object(lua, std::string(value));
+        out.assign(value);
       }
-
-      return sol::make_object(lua, defval);
     #endif
+
+    return sol::make_object(lua, out);
   };
 
   const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
