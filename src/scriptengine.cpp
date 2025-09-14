@@ -213,7 +213,14 @@ void framework::scriptengine::run() {
       if (!result || !*result) return sol::make_object(lua, defval);
       return sol::make_object(lua, std::string(result));
     #else
-      UNUSED(key);
+      auto uppercase_key = key;
+      std::ranges::transform(uppercase_key, uppercase_key.begin(),
+                            [](unsigned char c) { return std::toupper(c); });
+
+      if (const auto* value = std::getenv(uppercase_key.c_str()); value && *value) {
+        return sol::make_object(lua, std::string(value));
+      }
+
       return sol::make_object(lua, defval);
     #endif
   };
