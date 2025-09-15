@@ -1130,7 +1130,7 @@ void framework::scriptengine::run() {
         return nullptr;
       },
       [](graphics::canvas& canvas, const char* data) {
-        canvas.set_pixels(reinterpret_cast<const uint32_t*>(data));
+        canvas.set_pixels(data);
       }
     )
   );
