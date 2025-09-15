@@ -25,10 +25,17 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
 }
 
 void canvas::set_pixels(const char* pixels) noexcept {
-  const auto ptr = _framebuffer.get();
-  const auto pitch = ptr->w * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGBA32);
+  if (!pixels) [[unlikely]] {
+    return;
+  }
 
-  SDL_UpdateTexture(ptr, nullptr, pixels, pitch);
+  const auto ptr = _framebuffer.get();
+  void* buffer = nullptr;
+  auto pitch = 0;
+
+  SDL_LockTexture(ptr, nullptr, &buffer, &pitch);
+  std::memcpy(buffer, pixels, static_cast<size_t>(pitch) * static_cast<size_t>(ptr->h));
+  SDL_UnlockTexture(ptr);
 }
 
 void canvas::draw() const noexcept {
