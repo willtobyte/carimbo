@@ -50,9 +50,5 @@ void canvas::clear() noexcept {
 }
 
 void canvas::draw() const noexcept {
-  if (!_framebuffer) [[unlikely]] {
-    return;
-  }
-
   SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }
