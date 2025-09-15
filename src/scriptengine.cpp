@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include "canvas.hpp"
 #include "environment.hpp"
 #include "soundmanager.hpp"
 #include <sol/property.hpp>
@@ -1124,6 +1125,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::canvas>(
     "Canvas",
     sol::no_constructor,
+    "clear", &graphics::canvas::clear,
     // TODO "mode": sol::property(...)
     "pixels", sol::property(
       [](const graphics::canvas&) {

@@ -22,6 +22,13 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
   _framebuffer.reset(texture);
+
+  const auto packed = SDL_MapRGBA(SDL_GetPixelFormatDetails(SDL_PIXELFORMAT_RGBA32), nullptr, 0, 0, 0, 0);
+  const auto count = static_cast<size_t>(width) * static_cast<size_t>(height);
+
+  _transparent = std::make_unique<uint32_t[]>(count);
+
+  std::fill(_transparent.get(), _transparent.get() + count, packed);
 }
 
 void canvas::set_pixels(const char* pixels) noexcept {
@@ -36,6 +43,10 @@ void canvas::set_pixels(const char* pixels) noexcept {
   SDL_LockTexture(ptr, nullptr, &buffer, &pitch);
   std::memcpy(buffer, pixels, static_cast<size_t>(pitch) * static_cast<size_t>(ptr->h));
   SDL_UnlockTexture(ptr);
+}
+
+void canvas::clear() noexcept {
+  set_pixels(reinterpret_cast<const char*>(_transparent.get()));
 }
 
 void canvas::draw() const noexcept {

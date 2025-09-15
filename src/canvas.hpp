@@ -11,10 +11,13 @@ public:
 
   void set_pixels(const char* pixels) noexcept;
 
+  void clear() noexcept;
+
   void draw() const noexcept;
 
 private:
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _framebuffer;
+  std::unique_ptr<uint32_t[]> _transparent;
 };
 }
