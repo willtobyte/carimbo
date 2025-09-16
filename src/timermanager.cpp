@@ -25,11 +25,11 @@ timermanager::timermanager() noexcept
     : _envelopepool(envelopepool::instance()) {
 }
 
-uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {
+uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) {
   return add_timer(interval, std::move(fn), true);
 }
 
-uint32_t timermanager::singleshot(uint32_t interval, std::function<void()> fn) {
+uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) {
   return add_timer(interval, std::move(fn), false);
 }
 
@@ -45,7 +45,7 @@ void timermanager::clear(uint32_t id) {
   _envelopemapping.erase(it);
 }
 
-uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bool repeat) {
+uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
   const auto ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
