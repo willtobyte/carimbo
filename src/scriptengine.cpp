@@ -606,8 +606,8 @@ void framework::scriptengine::run() {
       lua.collect_garbage();
 
       auto loaded = lua["package"]["loaded"];
-      for (const auto& n : freed) {
-        loaded[std::format("scenes/{}", n)] = sol::lua_nil;
+      for (const auto& f : freed) {
+        loaded[std::format("scenes/{}", f)] = sol::lua_nil;
       }
 
       lua.collect_garbage();
