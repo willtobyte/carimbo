@@ -87,27 +87,31 @@ void scenemanager::set(const std::string& name) {
   ptr->on_enter();
 }
 
-void scenemanager::destroy(const std::string& name) {
+std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept {
+  std::vector<std::string> result;
+
   if (name.size() == 1 && name.front() == '*') {
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
       if (it->first == _current) { ++it; continue; }
       std::println("[scenemanager] destroyed scene {}", it->first);
-
+      result.push_back(it->first);
       it = _scene_mapping.erase(it);
     }
 
     _resourcemanager->flush();
-    return;
+    return result;
   }
 
   if (_scene_mapping.erase(name) == 0) {
     std::println("[scenemanager] scene {} not found, nothing destroyed", name);
-    return;
+    return result;
   }
 
   std::println("[scenemanager] destroyed scene {}", name);
+  result.push_back(name);
 
   _resourcemanager->flush();
+  return result;
 }
 
 void scenemanager::update(float_t delta) noexcept {

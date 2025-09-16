@@ -19,7 +19,7 @@ public:
 
   void set(const std::string& name);
 
-  void destroy(const std::string& name);
+  std::vector<std::string> destroy(const std::string& name) noexcept;
 
   void update(float_t delta) noexcept;
 
