@@ -50,10 +50,7 @@ uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, 
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (id) [[likely]] {
-    if (repeat) {
-      _repeatmapping.emplace(id, ptr);
-    }
-
+    _repeatmapping.emplace(id, ptr);
     return id;
   }
 
