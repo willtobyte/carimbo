@@ -3,6 +3,7 @@
 #include "environment.hpp"
 #include "soundmanager.hpp"
 #include <sol/property.hpp>
+#include <sol/types.hpp>
 
 static std::array<uint64_t, 2> prng_state;
 
@@ -599,10 +600,14 @@ void framework::scriptengine::run() {
       framework::scenemanager& self,
       const std::string& name
     ) {
+      self.destroy(name);
+
       lua.collect_garbage();
       lua.collect_garbage();
 
-      self.destroy(name);
+      auto loaded = lua["package"]["loaded"];
+      const auto modn = std::format("scenes/{}", name);
+      loaded[modn] = sol::lua_nil;
 
       lua.collect_garbage();
       lua.collect_garbage();
@@ -629,9 +634,11 @@ void framework::scriptengine::run() {
         throw std::runtime_error(err.what());
       }
 
-      // const auto modn = std::format("scenes.{}", name);
-
       auto module = exec.get<sol::table>();
+
+      auto loaded = lua["package"]["loaded"];
+      const auto modn = std::format("scenes/{}", name);
+      loaded[modn] = module;
 
       auto ptr = std::weak_ptr<framework::scene>(scene);
 
