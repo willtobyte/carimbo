@@ -638,8 +638,7 @@ void framework::scriptengine::run() {
       auto module = exec.get<sol::table>();
 
       auto loaded = lua["package"]["loaded"];
-      const auto modn = std::format("scenes/{}", name);
-      loaded[modn] = module;
+      loaded[std::format("scenes/{}", name)] = module;
 
       auto ptr = std::weak_ptr<framework::scene>(scene);
 
