@@ -185,7 +185,7 @@ struct sentinel final {
   explicit sentinel(std::string name) : name(std::move(name)) {}
 
   ~sentinel() noexcept {
-    std::println("[garbagecollector] object collected {}", name);
+    std::println("[garbagecollector] collected {}", name);
   }
 };
 
