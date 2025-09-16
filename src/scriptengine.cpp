@@ -206,10 +206,8 @@ void framework::scriptengine::run() {
   lua.script(inject);
 
   lua["sentinel"] = [&lua](sol::object object, sol::object name) -> sol::object {
-    sentinel s(std::string(name.as<std::string>()));
-
-    auto u = sol::make_object(lua, std::move(s));
-
+    sentinel s(name.as<std::string>());
+    const auto u = sol::make_object(lua, std::move(s));
     object.as<sol::table>().raw_set("__sentinel", u);
 
     return u;
