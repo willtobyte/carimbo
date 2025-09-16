@@ -179,6 +179,16 @@ auto _to_json(const sol::object& value) -> nlohmann::json {
   }
 }
 
+struct sentinel final {
+  std::string name;
+
+  explicit sentinel(std::string name) : name(std::move(name)) {}
+
+  ~sentinel() noexcept {
+    std::println("[garbagecollector] object collected {}", name);
+  }
+};
+
 void framework::scriptengine::run() {
   const auto start = SDL_GetPerformanceCounter();
 
@@ -194,6 +204,16 @@ void framework::scriptengine::run() {
   )lua");
 
   lua.script(inject);
+
+  lua["sentinel"] = [&lua](sol::object object, sol::object name) -> sol::object {
+    sentinel s(std::string(name.as<std::string>()));
+
+    auto u = sol::make_object(lua, std::move(s));
+
+    object.as<sol::table>().raw_set("__sentinel", u);
+
+    return u;
+  };
 
   lua["_"] = &localization::text;
 
