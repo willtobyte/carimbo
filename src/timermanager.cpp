@@ -22,35 +22,35 @@ uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
 }
 
 timermanager::timermanager() noexcept
-    : _envelopepool(envelopepool::instance()){
+    : _envelopepool(envelopepool::instance()) {
 }
 
-uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) {
+uint32_t timermanager::set(uint32_t interval, std::function<void()> fn) {
   return add_timer(interval, std::move(fn), true);
 }
 
-uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) {
+uint32_t timermanager::singleshot(uint32_t interval, std::function<void()> fn) {
   return add_timer(interval, std::move(fn), false);
 }
 
 void timermanager::clear(uint32_t id) {
   SDL_RemoveTimer(id);
 
-  const auto it = _repeatmapping.find(id);
-  if (it == _repeatmapping.end()) {
+  const auto it = _envelopemapping.find(id);
+  if (it == _envelopemapping.end()) {
     return;
   }
 
   _envelopepool->release(std::unique_ptr<envelope>(it->second));
-  _repeatmapping.erase(it);
+  _envelopemapping.erase(it);
 }
 
-uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
+uint32_t timermanager::add_timer(uint32_t interval, std::function<void()> fn, bool repeat) {
   const auto ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   if (id) [[likely]] {
-    _repeatmapping.emplace(id, ptr);
+    _envelopemapping.emplace(id, ptr);
     return id;
   }
 
