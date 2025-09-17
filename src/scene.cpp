@@ -32,7 +32,7 @@ scene::~scene() noexcept {
 }
 
 void scene::update(float_t delta) noexcept {
-  if (const auto fn = _onloop; fn) {
+  if (const auto& fn = _onloop; fn) {
     fn(delta);
   }
 
@@ -49,10 +49,10 @@ void scene::draw() const noexcept {
   const auto scene_height = _size.height();
 
   const geometry::size background_size{background_width, background_height};
-  static geometry::point source_origin{0.0f, 0.0f};
+  static geometry::point source_origin{.0f, .0f};
 
-  for (auto y = 0.0f; y < scene_height; y += background_height) {
-    for (auto x = 0.0f; x < scene_width; x += background_width) {
+  for (auto y = .0f; y < scene_height; y += background_height) {
+    for (auto x = .0f; x < scene_width; x += background_width) {
       const geometry::point destination_position{x, y};
       _background->draw({destination_position, background_size}, {source_origin, background_size});
     }
@@ -88,13 +88,13 @@ void scene::on_enter() const {
     _objectmanager->manage(o);
   }
 
-  if (const auto fn = _onenter) {
+  if (const auto& fn = _onenter) {
     fn();
   }
 }
 
 void scene::on_leave() const {
-  if (const auto fn = _onleave) {
+  if (const auto& fn = _onleave) {
     fn();
   }
 
@@ -108,19 +108,25 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float_t x, float_t y) const {
-  if (const auto fn = _ontouch) fn(x, y);
+  if (const auto& fn = _ontouch) fn(x, y);
 }
 
 void scene::on_key_press(int32_t code) const {
-  if (const auto fn = _onkeypress) fn(code);
+  if (const auto& fn = _onkeypress) {
+    fn(code);
+  }
 }
 
 void scene::on_key_release(int32_t code) const {
-  if (const auto fn = _onkeyrelease) fn(code);
+  if (const auto& fn = _onkeyrelease) {
+    fn(code);
+  }
 }
 
 void scene::on_text(const std::string& text) const {
-  if (const auto fn = _ontext) fn(text);
+  if (const auto& fn = _ontext) {
+    fn(text);
+  }
 }
 
 // void scene::on_mouse_press(float_t x, float_t y) {
@@ -132,7 +138,9 @@ void scene::on_text(const std::string& text) const {
 // }
 
 void scene::on_motion(float_t x, float_t y) const {
-  if (const auto fn = _onmotion) fn(x, y);
+  if (const auto& fn = _onmotion) {
+    fn(x, y);
+  }
 }
 
 void scene::set_onenter(std::function<void()>&& fn) {

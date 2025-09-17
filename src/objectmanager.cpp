@@ -118,7 +118,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
 }
 
 void objectmanager::manage(std::shared_ptr<object> object) {
-  if (!object) {
+  if (!object) [[unlikely]] {
     return;
   }
 
@@ -126,7 +126,7 @@ void objectmanager::manage(std::shared_ptr<object> object) {
 }
 
 void objectmanager::unmanage(std::shared_ptr<object> object) {
-  if (!object) {
+  if (!object) [[unlikely]] {
     return;
   }
 
@@ -134,7 +134,7 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) {
-  if (!object) {
+  if (!object) [[unlikely]] {
     return;
   }
 
