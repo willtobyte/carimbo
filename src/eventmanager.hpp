@@ -23,7 +23,7 @@ public:
 
   void update(float_t delta) noexcept;
 
-  void add_receiver(std::shared_ptr<eventreceiver>&& receiver);
+  void add_receiver(std::shared_ptr<eventreceiver> receiver);
 
   void remove_receiver(std::shared_ptr<eventreceiver> receiver);
 
