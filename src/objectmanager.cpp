@@ -138,7 +138,7 @@ void objectmanager::destroy(std::shared_ptr<object> object) {
     return;
   }
 
-  _objects.erase(std::remove(_objects.begin(), _objects.end(), object), _objects.end());
+  std::erase(_objects, object);
   _objects.shrink_to_fit();
 
   _objectpool->release(object);

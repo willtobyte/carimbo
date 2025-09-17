@@ -274,8 +274,5 @@ void eventmanager::add_receiver(std::shared_ptr<eventreceiver> receiver) {
 }
 
 void eventmanager::remove_receiver(std::shared_ptr<eventreceiver> receiver) {
-  _receivers.erase(
-    std::remove(_receivers.begin(), _receivers.end(), receiver),
-    _receivers.end()
-  );
+  std::erase(_receivers, receiver);
 }
