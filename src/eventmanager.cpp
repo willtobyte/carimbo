@@ -183,7 +183,7 @@ void eventmanager::update(float_t delta) noexcept {
           break;
         }
 
-        const uint8_t slot = it->second;
+        const auto slot = it->second;
 
         const gamepad::button e{event.gbutton.button};
 
@@ -198,7 +198,7 @@ void eventmanager::update(float_t delta) noexcept {
           break;
         }
 
-        const uint8_t slot = it->second;
+        const auto slot = it->second;
 
         const gamepad::button e{event.gbutton.button};
 
@@ -213,7 +213,7 @@ void eventmanager::update(float_t delta) noexcept {
           break;
         }
 
-        const uint8_t slot = it->second;
+        const auto slot = it->second;
 
         const auto axis = static_cast<gamepad::motion::axis>(event.gaxis.axis);
         const auto value = event.gaxis.value;
