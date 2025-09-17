@@ -3,66 +3,107 @@
 using namespace audio;
 
 namespace {
-struct stream {
-  const unsigned char* base{nullptr};
-  size_t size{0};
-  size_t pos{0};
-};
+  static size_t cb_read(void* ptr, size_t size, size_t nmemb, void* source)
+  {
+    const auto file = reinterpret_cast<PHYSFS_file*> (source);
 
-size_t cb_read(void* ptr, size_t size, size_t nmemb, void* src) {
-  auto* ms = static_cast<stream*>(src);
-  const auto want = size * nmemb;
-  const auto left = (ms->pos < ms->size) ? (ms->size - ms->pos) : 0;
-  if (!left) return 0;
-  const auto take = want < left ? want : left;
-  std::memcpy(ptr, ms->base + ms->pos, take);
-  ms->pos += take;
-  return take / size;
-}
-
-int cb_seek(void* src, ogg_int64_t offset, int whence) {
-  auto* ms = static_cast<stream*>(src);
-  auto target = 0ULL;
-
-  switch (whence) {
-    case SEEK_SET: target = offset < 0 ? 0 : static_cast<size_t>(offset); break;
-    case SEEK_CUR: {
-      const auto cur = static_cast<long long>(ms->pos) + offset;
-      if (cur < 0) return -1;
-      target = static_cast<size_t>(cur);
-      break;
+    PHYSFS_sint64 result
+      = PHYSFS_readBytes(file, ptr, static_cast<PHYSFS_uint32>(size) * static_cast<PHYSFS_uint32>(nmemb));
+    if (result <= 0) [[unlikely]] {
+      return 0;
     }
-    case SEEK_END: {
-      const auto end = static_cast<long long>(ms->size) + offset;
-      if (end < 0) return -1;
-      target = static_cast<size_t>(end);
-      break;
-    }
-    default: assert(false); return -1;
+
+    return static_cast<size_t> (result) / size;
   }
 
-  if (target > ms->size) target = ms->size;
-  ms->pos = target;
-  return 0;
-}
+  static int cb_seek(void* source, ogg_int64_t offset, int whence)
+  {
+    auto* file = reinterpret_cast<PHYSFS_File*>(source);
 
-long cb_tell(void* src) {
-  auto* ms = static_cast<stream*>(src);
-  if (ms->pos > static_cast<size_t>(std::numeric_limits<long>::max())) return -1;
-  return static_cast<long>(ms->pos);
-}
+    switch (whence) {
+      case SEEK_SET: {
+        if (offset < 0) [[unlikely]] {
+          return -1;
+        }
 
-int cb_close(void* /*src*/) { return 0; }
+        const auto ok = PHYSFS_seek(file, static_cast<PHYSFS_uint64>(offset));
+        return ok ? 0 : -1;
+      }
 
-ov_callbacks MemoryCallbacks = { cb_read, cb_seek, cb_close, cb_tell };
+      case SEEK_CUR: {
+        const PHYSFS_sint64 position = PHYSFS_tell(file);
+        if (position < 0) [[unlikely]] {
+          return -1;
+        }
+
+        if ((offset > 0 && position > (std::numeric_limits<PHYSFS_sint64>::max)() - offset) ||
+            (offset < 0 && position < (std::numeric_limits<PHYSFS_sint64>::min)() - offset)) [[unlikely]] {
+          return -1;
+        }
+
+        const PHYSFS_sint64 target = position + offset;
+        if (target < 0) [[unlikely]] {
+          return -1;
+        }
+
+        const auto ok = PHYSFS_seek(file, static_cast<PHYSFS_uint64>(target));
+        return ok ? 0 : -1;
+      }
+
+      case SEEK_END: {
+        const PHYSFS_sint64 end = PHYSFS_fileLength(file);
+        if (end < 0) [[unlikely]] {
+          return -1;
+        }
+
+        if ((offset > 0 && end > (std::numeric_limits<PHYSFS_sint64>::max)() - offset) ||
+            (offset < 0 && end < (std::numeric_limits<PHYSFS_sint64>::min)() - offset)) [[unlikely]] {
+          return -1;
+        }
+
+        const PHYSFS_sint64 target = end + offset;
+        if (target < 0) [[unlikely]] {
+          return -1;
+        }
+
+        const auto ok = PHYSFS_seek(file, static_cast<PHYSFS_uint64>(target));
+        return ok ? 0 : -1;
+      }
+    }
+
+    assert(false); [[unlikely]];
+    return -1;
+  }
+
+  static int cb_close(void* source)
+  {
+    const auto file = reinterpret_cast<PHYSFS_file*> (source);
+    PHYSFS_close(file);
+    return 0;
+  }
+
+  static long cb_tell(void* source)
+  {
+    const auto file = reinterpret_cast<PHYSFS_file*> (source);
+    return static_cast<long>(PHYSFS_tell(file));
+  }
 }
 
 soundfx::soundfx(const std::string& name, bool retro) {
-  const std::vector<std::uint8_t> buffer = storage::io::read(name);
+  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(name.c_str()), PHYSFS_close);
 
-  stream mem{buffer.data(), buffer.size(), 0};
+  if (!ptr) [[unlikely]] {
+    throw std::runtime_error(
+      std::format("[PHYSFS_openRead] error while opening file: {}, error: {}",
+        name,
+        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+  }
+
+  PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
+
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
-  ov_open_callbacks(&mem, vf.get(), nullptr, 0, MemoryCallbacks);
+  ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
+  ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 
   if (retro) {
     ov_halfrate(vf.get(), 1);
