@@ -269,8 +269,8 @@ void eventmanager::update(float_t delta) noexcept {
   }
 }
 
-void eventmanager::add_receiver(std::shared_ptr<eventreceiver> receiver) {
-  _receivers.emplace_back(receiver);
+void eventmanager::add_receiver(std::shared_ptr<eventreceiver>&& receiver) {
+  _receivers.emplace_back(std::move(receiver));
 }
 
 void eventmanager::remove_receiver(std::shared_ptr<eventreceiver> receiver) {
