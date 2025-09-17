@@ -180,12 +180,13 @@ auto _to_json(const sol::object& value) -> nlohmann::json {
 }
 
 struct sentinel final {
-  std::string name;
+  std::string _name;
 
-  explicit sentinel(std::string name) : name(std::move(name)) {}
+  explicit sentinel(std::string name)
+      : _name(std::move(name)) {}
 
   ~sentinel() noexcept {
-    std::println("[garbagecollector] collected {}", name);
+    std::println("[garbagecollector] collected {}", _name);
   }
 };
 
