@@ -130,10 +130,7 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
     return;
   }
 
-  _objects.erase(
-    std::remove(_objects.begin(), _objects.end(), object),
-    _objects.end()
-  );
+  std::erase(_objects, object);
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) {
