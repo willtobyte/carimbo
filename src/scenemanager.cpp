@@ -103,7 +103,7 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
   }
 
   if (_scene_mapping.erase(name) == 0) {
-    std::println("[scenemanager] scene {} not found, nothing destroyed", name);
+    std::println("[scenemanager] scene {} not found, nothing to destroy", name);
     return result;
   }
 
