@@ -296,13 +296,13 @@ void object::set_oncollision(const std::string& kind, std::function<void(std::sh
 }
 
 void object::on_email(const std::string& message) {
-  if (const auto fn = _onmail; fn) {
+  if (const auto& fn = _onmail; fn) {
     fn(shared_from_this(), message);
   }
 }
 
 void object::on_touch(float_t x, float_t y) {
-  if (const auto fn = _ontouch; fn) {
+  if (const auto& fn = _ontouch; fn) {
     fn(shared_from_this(), x, y);
   }
 }
@@ -323,13 +323,13 @@ void object::on_motion(float_t x, float_t y) {
 }
 
 void object::on_hover() {
-  if (const auto fn = _onhover; fn) {
+  if (const auto& fn = _onhover; fn) {
     fn(shared_from_this());
   }
 }
 
 void object::on_unhover() {
-  if (const auto fn = _onunhover; fn) {
+  if (const auto& fn = _onunhover; fn) {
     fn(shared_from_this());
   }
 }

@@ -130,11 +130,11 @@ void scene::on_text(const std::string& text) const {
 }
 
 // void scene::on_mouse_press(float_t x, float_t y) {
-//   if (const auto fn = _onmousepress) fn(x, y);
+//   if (const auto& fn = _onmousepress) fn(x, y);
 // }
 
 // void scene::on_mouse_relese(float_t x, float_t y) {
-//   if (const auto fn = _onmouserelease) fn(x, y);
+//   if (const auto& fn = _onmouserelease) fn(x, y);
 // }
 
 void scene::on_motion(float_t x, float_t y) const {
