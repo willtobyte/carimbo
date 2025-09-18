@@ -18,12 +18,12 @@ color::color(const std::string& hex)
     : _r(0), _g(0), _b(0), _a(255) {
   if (hex.length() != 7 && hex.length() != 9) [[unlikely]] {
     throw std::runtime_error(
-      std::format("Invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
+      std::format("invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
   }
 
   if (hex[0] != '#') [[unlikely]] {
     throw std::runtime_error(
-      std::format("Hex code '{}' must start with '#'.", hex));
+      std::format("hex code '{}' must start with '#'.", hex));
   }
 
   _r = static_cast<uint8_t>(std::stoi(hex.substr(1, 2), nullptr, 16));
@@ -67,7 +67,7 @@ void color::set_a(uint8_t a) noexcept {
 }
 
 bool color::operator==(const color& other) const noexcept {
-  return *reinterpret_cast<const uint32_t*>(this) == *reinterpret_cast<const uint32_t*>(&other);
+  return _r == other._r && _g == other._g && _b == other._b && _a == other._a;
 }
 
 bool color::operator!=(const color& other) const noexcept {
