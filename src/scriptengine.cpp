@@ -329,6 +329,7 @@ void framework::scriptengine::run() {
        sfx.play(loop);
      },
      "stop", &audio::soundfx::stop,
+     "on_begin", &audio::soundfx::set_onbegin,
      "on_end", &audio::soundfx::set_onend
   );
 

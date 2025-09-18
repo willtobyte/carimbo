@@ -201,6 +201,10 @@ void soundfx::play(bool loop) const noexcept {
   _notified.store(false, std::memory_order_relaxed);
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
+
+  if (const auto& fn = _onbegin; fn) {
+    fn();
+  }
 }
 
 void soundfx::stop() const noexcept {
@@ -225,6 +229,10 @@ void soundfx::update(float_t delta) noexcept {
   if (const auto& fn = _onend; fn) {
     fn();
   }
+}
+
+void soundfx::set_onbegin(std::function<void()>&& callback) noexcept {
+  _onbegin = std::move(callback);
 }
 
 void soundfx::set_onend(std::function<void()>&& callback) noexcept {

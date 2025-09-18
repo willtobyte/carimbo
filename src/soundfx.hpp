@@ -13,12 +13,14 @@ public:
 
   void update(float_t delta) noexcept;
 
+  void set_onbegin(std::function<void()>&& callback) noexcept;
   void set_onend(std::function<void()>&& callback) noexcept;
 
 private:
   ALuint _source{0};
   ALuint _buffer{0};
 
+  std::function<void()> _onbegin{};
   std::function<void()> _onend{};
   mutable std::atomic<bool> _notified{false};
 };
