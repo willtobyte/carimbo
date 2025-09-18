@@ -89,13 +89,13 @@ namespace {
   }
 }
 
-soundfx::soundfx(const std::string& name, bool retro) {
-  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(name.c_str()), PHYSFS_close);
+soundfx::soundfx(const std::string& filename) {
+  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.c_str()), PHYSFS_close);
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(
       std::format("[PHYSFS_openRead] error while opening file: {}, error: {}",
-        name,
+        filename,
         PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
@@ -105,13 +105,9 @@ soundfx::soundfx(const std::string& name, bool retro) {
   ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
   ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 
-  if (retro) {
-    ov_halfrate(vf.get(), 1);
-  }
-
   const auto* info = ov_info(vf.get(), -1);
   if (!info) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_info] {}", name));
+    throw std::runtime_error(std::format("[ov_info] {}", filename));
   }
 
   const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
@@ -119,7 +115,7 @@ soundfx::soundfx(const std::string& name, bool retro) {
 
   const auto pcm_total = ov_pcm_total(vf.get(), -1);
   if (pcm_total < 0) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_pcm_total] {}", name));
+    throw std::runtime_error(std::format("[ov_pcm_total] {}", filename));
   }
 
   const auto total = static_cast<size_t>(
@@ -161,7 +157,7 @@ soundfx::soundfx(const std::string& name, bool retro) {
         default:          reason = "Unknown error"; break;
       }
 
-      throw std::runtime_error(std::format("[ov_read] {} ({})", name, reason));
+      throw std::runtime_error(std::format("[ov_read] {} ({})", filename, reason));
     } else if (!got) {
       break;
     }
