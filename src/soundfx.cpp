@@ -113,59 +113,39 @@ soundfx::soundfx(const std::string& filename) {
   const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(info->rate);
 
-  const auto pcm_total = ov_pcm_total(vf.get(), -1);
-  if (pcm_total < 0) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_pcm_total] {}", filename));
-  }
+  std::vector<std::uint8_t> linear16;
+  linear16.reserve(4 * 1024 * 1024);
 
-  const auto total = static_cast<size_t>(
-    static_cast<size_t>(pcm_total) *
-    static_cast<size_t>(info->channels) *
-    2ULL
-  );
+  std::array<char, 256 * 1024> buffer{};
 
-  std::vector<std::uint8_t> linear16(total);
-
-  auto offset = 0ULL;
   for (;;) {
-    auto available = linear16.size() - offset;
-    if (!available) {
-      break;
-    }
-
-    auto to_read =
-        (available > static_cast<size_t>(std::numeric_limits<int>::max()))
-            ? std::numeric_limits<int>::max()
-            : static_cast<int>(available);
-
     auto got = ov_read(
-      vf.get(),                                          // OggVorbis_File*
-      reinterpret_cast<char*>(linear16.data() + offset), // buffer
-      to_read,                                           // buffer size
-      0,                                                 // big endian flag
-      2,                                                 // bytes per sample
-      1,                                                 // signed (1) / unsigned (0)
-      nullptr                                            // bitstream index
+      vf.get(),
+      buffer.data(),
+      static_cast<int>(buffer.size()),
+      0,  // little-endian
+      2,  // 16-bit
+      1,  // signed
+      nullptr
     );
 
     if (got < 0) [[unlikely]] {
       std::string reason;
-      switch (got) {
-        case OV_HOLE:     reason = "OV_HOLE: Interruption or corruption in the stream"; break;
-        case OV_EBADLINK: reason = "OV_EBADLINK: Invalid or corrupt bitstream section"; break;
-        case OV_EINVAL:   reason = "OV_EINVAL: Invalid argument or corrupted stream"; break;
-        default:          reason = "Unknown error"; break;
-      }
-
+      if (got == OV_HOLE)      reason = "OV_HOLE: Interruption or corruption in the stream";
+      if (got == OV_EBADLINK)  reason = "OV_EBADLINK: Invalid or corrupt bitstream section";
+      if (got == OV_EINVAL)    reason = "OV_EINVAL: Invalid argument or corrupted stream";
+      if (reason.empty())      reason = "Unknown error";
       throw std::runtime_error(std::format("[ov_read] {} ({})", filename, reason));
-    } else if (!got) {
+    }
+
+    if (!got) {
       break;
     }
 
-    offset += static_cast<size_t>(got);
+    size_t old = linear16.size();
+    linear16.resize(old + static_cast<size_t>(got));
+    std::memcpy(linear16.data() + old, buffer.data(), static_cast<size_t>(got));
   }
-
-  linear16.resize(offset);
 
   alGenBuffers(1, &_buffer);
   alBufferData(_buffer, format, linear16.data(), static_cast<ALsizei>(linear16.size()), frequency);
