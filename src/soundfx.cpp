@@ -102,7 +102,7 @@ soundfx::soundfx(const std::string& filename) {
   PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
 
   std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
-  ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
+  ov_callbacks callbacks = {cb_read, cb_seek, cb_close, cb_tell};
   ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 
   const auto* props = ov_info(vf.get(), -1);
@@ -114,7 +114,7 @@ soundfx::soundfx(const std::string& filename) {
   const auto frequency = static_cast<ALsizei>(props->rate);
 
   std::vector<std::uint8_t> linear16;
-  linear16.reserve(4 * 1024 * 1024);
+  linear16.reserve(8 * 1024 * 1024);
 
   std::array<char, 512 * 1024> buffer{};
 
@@ -130,11 +130,14 @@ soundfx::soundfx(const std::string& filename) {
     );
 
     if (got < 0) [[unlikely]] {
-      std::string reason;
-      if (got == OV_HOLE)      reason = "OV_HOLE: Interruption or corruption in the stream";
-      if (got == OV_EBADLINK)  reason = "OV_EBADLINK: Invalid or corrupt bitstream section";
-      if (got == OV_EINVAL)    reason = "OV_EINVAL: Invalid argument or corrupted stream";
-      if (reason.empty())      reason = "Unknown error";
+      std::string_view reason;
+      switch (got) {
+        case OV_HOLE:     reason = "OV_HOLE: Interruption or corruption in the stream"; break;
+        case OV_EBADLINK: reason = "OV_EBADLINK: Invalid or corrupt bitstream section"; break;
+        case OV_EINVAL:   reason = "OV_EINVAL: Invalid argument or corrupted stream"; break;
+        default:          reason = "Unknown error"; break;
+      }
+  
       throw std::runtime_error(std::format("[ov_read] {} ({})", filename, reason));
     }
 
