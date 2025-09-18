@@ -119,7 +119,7 @@ soundfx::soundfx(const std::string& filename) {
   std::array<char, 256 * 1024> buffer{};
 
   for (;;) {
-    auto got = ov_read(
+    auto got = static_cast<size_t>(ov_read(
       vf.get(),
       buffer.data(),
       static_cast<int>(buffer.size()),
@@ -127,7 +127,7 @@ soundfx::soundfx(const std::string& filename) {
       2,  // 16-bit
       1,  // signed
       nullptr
-    );
+    ));
 
     if (got < 0) [[unlikely]] {
       std::string reason;
@@ -142,9 +142,9 @@ soundfx::soundfx(const std::string& filename) {
       break;
     }
 
-    size_t old = linear16.size();
-    linear16.resize(old + static_cast<size_t>(got));
-    std::memcpy(linear16.data() + old, buffer.data(), static_cast<size_t>(got));
+    auto old = linear16.size();
+    linear16.resize(old + got);
+    std::memcpy(linear16.data() + old, buffer.data(), got);
   }
 
   alGenBuffers(1, &_buffer);
