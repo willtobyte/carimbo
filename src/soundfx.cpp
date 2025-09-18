@@ -114,9 +114,10 @@ soundfx::soundfx(const std::string& filename) {
   const auto frequency = static_cast<ALsizei>(props->rate);
 
   std::vector<std::uint8_t> linear16;
-  linear16.reserve(4 * 1024 * 1024);
+  linear16.reserve(4u * 1024u * 1024u);
 
-  std::array<char, 256 * 1024> buffer{};
+  // std::array<char, 256 * 1024> buffer{};
+  std::vector<char> buffer(256u * 1024u);
 
   for (;;) {
     auto got = ov_read(
