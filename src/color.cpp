@@ -14,23 +14,26 @@ color::color(const SDL_Color& scolor) noexcept
 color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
     : _r(r), _g(g), _b(b), _a(a) {}
 
-color::color(const std::string& hex)
-    : _r(0), _g(0), _b(0), _a(255) {
-  if (hex.length() != 7 && hex.length() != 9) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("invalid hex code format: '{}'. Use #RRGGBB or #RRGGBBAA.", hex));
+color::color(const std::string& hex) {
+  const size_t n = hex.size();
+  if (n != 7 && n != 9) [[unlikely]] {
+    throw std::runtime_error(std::format("invalid hex code: '{}'. Use #RRGGBB or #RRGGBBAA", hex));
   }
 
   if (hex[0] != '#') [[unlikely]] {
-    throw std::runtime_error(
-      std::format("hex code '{}' must start with '#'.", hex));
+    throw std::runtime_error(std::format("hex code '{}' must start with '#'", hex));
   }
 
-  _r = static_cast<uint8_t>(std::stoi(hex.substr(1, 2), nullptr, 16));
-  _g = static_cast<uint8_t>(std::stoi(hex.substr(3, 2), nullptr, 16));
-  _b = static_cast<uint8_t>(std::stoi(hex.substr(5, 2), nullptr, 16));
-  if (hex.length() == 9) {
-    _a = static_cast<uint8_t>(std::stoi(hex.substr(7, 2), nullptr, 16));
+  try {
+    _r = static_cast<uint8_t>(std::stoi(hex.substr(1, 2), nullptr, 16));
+    _g = static_cast<uint8_t>(std::stoi(hex.substr(3, 2), nullptr, 16));
+    _b = static_cast<uint8_t>(std::stoi(hex.substr(5, 2), nullptr, 16));
+
+    if (n == 9) {
+      _a = static_cast<uint8_t>(std::stoi(hex.substr(7, 2), nullptr, 16));
+    }
+  } catch (...) {
+    throw std::runtime_error(std::format("invalid hex digits in '{}'", hex));
   }
 }
 
