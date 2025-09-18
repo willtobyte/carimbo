@@ -137,7 +137,7 @@ soundfx::soundfx(const std::string& filename) {
         case OV_EINVAL:   reason = "OV_EINVAL: Invalid argument or corrupted stream"; break;
         default:          reason = "Unknown error"; break;
       }
-  
+
       throw std::runtime_error(std::format("[ov_read] {} ({})", filename, reason));
     }
 
@@ -159,7 +159,7 @@ soundfx::soundfx(const std::string& filename) {
 
 soundfx::~soundfx() noexcept {
   if (_source == 0) {
-    goto free_buffer;
+    goto freebuffer;
   }
 
   if (_source) {
@@ -169,7 +169,7 @@ soundfx::~soundfx() noexcept {
     _source = 0;
   }
 
-  free_buffer:
+  freebuffer:
     if (_buffer) {
       alDeleteBuffers(1, &_buffer);
       _buffer = 0;
