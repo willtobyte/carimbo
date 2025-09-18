@@ -39,7 +39,7 @@ void soundmanager::flush() noexcept {
 
 void soundmanager::update(float_t delta) noexcept {
   for (auto& entry : _pool) {
-    const auto &e = entry.second;
+    const auto& e = entry.second;
 
     if (!e) [[unlikely]] {
       continue;
