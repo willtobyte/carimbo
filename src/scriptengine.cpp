@@ -7,14 +7,14 @@
 
 static std::array<uint64_t, 2> prng_state;
 
-void seed(uint64_t value) {
+static void seed(uint64_t value) {
   constexpr uint64_t mix = 0xdeadbeefcafebabeULL;
   if (value == 0) value = 1;
   prng_state[0] = value;
   prng_state[1] = value ^ mix;
 }
 
-uint64_t xorshift128plus() {
+static uint64_t xorshift128plus() {
   const auto s1 = prng_state[0];
   const auto s0 = prng_state[1];
   const auto result = s0 + s1;
@@ -25,13 +25,13 @@ uint64_t xorshift128plus() {
   return result;
 }
 
-double xorshift_random_double() {
+static double xorshift_random_double() {
   static constexpr const auto inv_max = 1.0 / static_cast<double>(std::numeric_limits<uint64_t>::max());
 
   return static_cast<double>(xorshift128plus()) * inv_max;
 }
 
-lua_Integer xorshift_random_int(lua_Integer low, lua_Integer high) {
+static lua_Integer xorshift_random_int(lua_Integer low, lua_Integer high) {
   if (low > high) std::swap(low, high);
 
   const auto ulow = static_cast<uint64_t>(low);
@@ -39,13 +39,13 @@ lua_Integer xorshift_random_int(lua_Integer low, lua_Integer high) {
   return static_cast<lua_Integer>(ulow + (xorshift128plus() % range));
 }
 
-[[noreturn]] void panic(sol::optional<std::string> maybe_message) {
+[[noreturn]] static void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(
     std::format("Lua panic: {}",
       maybe_message.value_or("unknown Lua error")));
 }
 
-sol::object searcher(sol::this_state state, const std::string& module) {
+static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
   const auto filename = std::format("scripts/{}.lua", module);
