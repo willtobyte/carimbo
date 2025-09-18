@@ -17,17 +17,17 @@ using namespace framework;
 
     if (error) {
       #ifdef HAVE_SENTRY
-        const auto exc = sentry_value_new_exception("exception", error);
-        const auto ev = sentry_value_new_event();
+      const auto exc = sentry_value_new_exception("exception", error);
+      const auto ev = sentry_value_new_event();
 
-        sentry_event_add_exception(ev, exc);
+      sentry_event_add_exception(ev, exc);
 
-        sentry_capture_event(ev);
+      sentry_capture_event(ev);
       #endif
 
       #ifdef HAVE_STACKTRACE
-        boost::stacktrace::stacktrace st;
-        std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
+      boost::stacktrace::stacktrace st;
+      std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
       #endif
 
       std::println(stderr, "{}", error);
