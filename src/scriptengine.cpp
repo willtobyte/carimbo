@@ -328,13 +328,8 @@ void framework::scriptengine::run() {
        auto loop = loop_opt.value_or(false);
        sfx.play(loop);
      },
-     "stop", &audio::soundfx::stop
-  );
-
-  lua.new_enum(
-    "SoundEffect",
-    "none", audio::soundeffect::none,
-    "retro", audio::soundeffect::retro
+     "stop", &audio::soundfx::stop,
+     "on_end", &audio::soundfx::set_onend
   );
 
   lua.new_usertype<audio::soundmanager>(
@@ -348,8 +343,7 @@ void framework::scriptengine::run() {
       auto loop = loop_opt.value_or(false);
       manager.play(name, loop);
     },
-    "stop", &audio::soundmanager::stop,
-    "effect", sol::property(&audio::soundmanager::set_effect)
+    "stop", &audio::soundmanager::stop
   );
 
   lua.new_enum(

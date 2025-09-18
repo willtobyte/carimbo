@@ -4,11 +4,6 @@
 #include "soundfx.hpp"
 
 namespace audio {
-enum soundeffect : std::uint8_t {
-  none = 0,
-  retro,
-};
-
 class soundmanager final {
 public:
   soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept;
@@ -21,9 +16,7 @@ public:
 
   void flush() noexcept;
 
-  void set_loop(std::function<void()> fn) noexcept;
-
-  void set_effect(soundeffect effect) noexcept;
+  void update(float_t delta) noexcept;
 
 #ifdef DEBUG
   void debug() const noexcept;
@@ -38,9 +31,5 @@ private:
     std::hash<std::string>,
     std::equal_to<std::string>
   > _pool;
-
-  std::function<void()> _loop;
-
-  soundeffect _effect{none};
 };
 }

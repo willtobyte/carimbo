@@ -3,16 +3,16 @@
 
 using namespace graphics;
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& name)
+pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& filename)
     : _renderer(std::move(renderer)) {
-  const auto buffer = storage::io::read(name);
+  const auto buffer = storage::io::read(filename);
 
   const auto ctx = std::unique_ptr<spng_ctx, decltype(&spng_ctx_free)>(spng_ctx_new(0), spng_ctx_free);
 
   if (const auto error = spng_set_png_buffer(ctx.get(), buffer.data(), buffer.size()); error != SPNG_OK) [[unlikely]] {
     throw std::runtime_error(
       std::format("[spng_set_png_buffer] error while parsing image: {}, error: {}",
-        name,
+        filename,
         spng_strerror(error)));
   }
 
@@ -20,7 +20,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& name)
   if (const auto error = spng_get_ihdr(ctx.get(), &ihdr); error != SPNG_OK) [[unlikely]] {
     throw std::runtime_error(
       std::format("[spng_get_ihdr] error while getting image information: {}, error: {}",
-        name,
+        filename,
         spng_strerror(error)));
   }
 
@@ -29,7 +29,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& name)
   if (const auto error = spng_decoded_image_size(ctx.get(), format, &length); error != SPNG_OK) [[unlikely]] {
     throw std::runtime_error(
       std::format("[spng_decoded_image_size] error while getting image size: {}, error: {}",
-        name,
+        filename,
         spng_strerror(error)));
   }
 
@@ -37,7 +37,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& name)
   if (const auto error = spng_decode_image(ctx.get(), output.data(), length, format, SPNG_DECODE_TRNS); error != SPNG_OK) [[unlikely]] {
     throw std::runtime_error(
       std::format("[spng_decode_image] error while decoding image: {}, error: {}",
-        name,
+        filename,
         spng_strerror(error)));
   }
 

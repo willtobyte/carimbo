@@ -5,18 +5,16 @@ using namespace audio;
 soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept
     : _audiodevice(std::move(audiodevice)) {}
 
-std::shared_ptr<soundfx> soundmanager::get(const std::string& name) noexcept {
-  const auto [it, inserted] = _pool.try_emplace(name);
+std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) noexcept {
+  const auto [it, inserted] = _pool.try_emplace(filename);
   if (!inserted) [[unlikely]] {
     return it->second;
   }
 
-  std::println("[soundmanager] cache miss {}", name);
+  std::println("[soundmanager] cache miss {}", filename);
   assert(_audiodevice);
 
-  // _loop();
-
-  it->second = std::make_shared<soundfx>(name, _effect == retro);
+  it->second = std::make_shared<soundfx>(filename);
   return it->second;
 }
 
@@ -39,12 +37,20 @@ void soundmanager::flush() noexcept {
   std::println("[soundmanager] {} objects have been flushed", count);
 }
 
-void soundmanager::set_loop(std::function<void()> fn) noexcept {
-  _loop = std::move(fn);;
-}
+void soundmanager::update(float_t delta) noexcept {
+  for (auto &entry : _pool) {
+    const auto &e = entry.second;
 
-void soundmanager::set_effect(soundeffect effect) noexcept {
-  _effect = effect;
+    if (!e) {
+      continue;
+    }
+
+    if (e.use_count() <= MINIMAL_USE_COUNT) {
+      continue;
+    }
+
+    e->update(delta);
+  }
 }
 
 #ifdef DEBUG

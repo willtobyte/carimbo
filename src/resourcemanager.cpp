@@ -54,6 +54,10 @@ void resourcemanager::flush() noexcept {
   _fontfactory->flush();
 }
 
+void resourcemanager::update(float_t delta) noexcept {
+  _soundmanager->update(delta);
+}
+
 void resourcemanager::prefetch() {
   const auto directory = "blobs";
   const auto filenames = storage::io::enumerate(directory);

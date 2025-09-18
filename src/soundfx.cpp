@@ -198,10 +198,35 @@ soundfx::~soundfx() noexcept {
 }
 
 void soundfx::play(bool loop) const noexcept {
+  _notified.store(false, std::memory_order_relaxed);
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
 }
 
 void soundfx::stop() const noexcept {
   alSourceStop(_source);
+}
+
+void soundfx::update(float_t delta) noexcept {
+  UNUSED(delta);
+
+  if (_notified.load(std::memory_order_relaxed)) [[likely]] {
+    return;
+  }
+
+  auto state = AL_INITIAL;
+  alGetSourcei(_source, AL_SOURCE_STATE, &state);
+
+  if (state != AL_STOPPED) {
+    return;
+  }
+
+  _notified.store(true, std::memory_order_relaxed);
+  if (const auto& fn = _onend; fn) {
+    fn();
+  }
+}
+
+void soundfx::set_onend(std::function<void()>&& callback) noexcept {
+  _onend = std::move(callback);
 }

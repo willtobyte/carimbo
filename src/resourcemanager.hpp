@@ -21,6 +21,8 @@ public:
 
   void flush() noexcept;
 
+  void update(float_t delta) noexcept;
+
   void prefetch();
   void prefetch(const std::vector<std::string>& filenames);
 

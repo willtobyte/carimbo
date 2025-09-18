@@ -159,6 +159,7 @@ void engine::_loop() {
   }
 
   _eventmanager->update(delta);
+  _resourcemanager->update(delta);
   _overlay->update(delta);
   _scenemanager->update(delta);
   _objectmanager->update(delta);

@@ -19,11 +19,9 @@ public:
 
   void flush() noexcept;
 
-#ifdef DEBUG
+  #ifdef DEBUG
   void debug() const noexcept;
-#endif
-
-  void set_loop(std::function<void()> fn) noexcept;
+  #endif
 
 private:
   std::unordered_map<std::string, std::shared_ptr<font>> _pool;

@@ -102,8 +102,6 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       spacing, leading, scale
     );
 
-    // _loop();
-
     return it->second;
   } catch (...) {
     SDL_SetRenderTarget(*_renderer, origin);
@@ -130,7 +128,3 @@ void fontfactory::debug() const noexcept {
   }
 }
 #endif
-
-void fontfactory::set_loop(std::function<void()> fn) noexcept {
-  _loop = std::move(fn);;
-}
