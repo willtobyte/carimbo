@@ -105,13 +105,13 @@ soundfx::soundfx(const std::string& filename) {
   ov_callbacks callbacks = { cb_read, cb_seek, cb_close, cb_tell };
   ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 
-  const auto* info = ov_info(vf.get(), -1);
-  if (!info) [[unlikely]] {
+  const auto* props = ov_info(vf.get(), -1);
+  if (!props) [[unlikely]] {
     throw std::runtime_error(std::format("[ov_info] {}", filename));
   }
 
-  const auto format = (info->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
-  const auto frequency = static_cast<ALsizei>(info->rate);
+  const auto format = (props->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+  const auto frequency = static_cast<ALsizei>(props->rate);
 
   std::vector<std::uint8_t> linear16;
   linear16.reserve(4 * 1024 * 1024);
