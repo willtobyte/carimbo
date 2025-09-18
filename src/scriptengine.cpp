@@ -142,23 +142,23 @@ static nlohmann::json _to_json(const sol::object& value) {
 
   switch (value.get_type()) {
     case sol::type::table: {
-      const auto lua_table = value.as<sol::table>();
+      const auto table = value.as<sol::table>();
 
       const bool is_array =
-        std::ranges::all_of(lua_table, [](const auto& pair) {
+        std::ranges::all_of(table, [](const auto& pair) {
           return pair.first.get_type() == sol::type::number
                  && pair.first.template as<size_t>() >= 1;
         });
 
       if (is_array) {
-        json j = json::array();
-        j.get_ref<json::array_t&>().reserve(lua_table.size());
-        for (const auto& pair : lua_table) j.push_back(_to_json(pair.second));
+        auto j = json::array();
+        j.get_ref<json::array_t&>().reserve(table.size());
+        for (const auto& pair : table) j.push_back(_to_json(pair.second));
         return j;
       }
 
-      json j = json::object();
-      for (const auto& pair : lua_table)
+      auto j = json::object();
+      for (const auto& pair : table)
         j[pair.first.as<std::string>()] = _to_json(pair.second);
       return j;
     }
@@ -172,7 +172,7 @@ static nlohmann::json _to_json(const sol::object& value) {
     case sol::type::number: {
       const auto number = value.as<double_t>();
       double_t intpart{};
-      const double_t frac = std::modf(number, &intpart);
+      const auto frac = std::modf(number, &intpart);
 
       if (std::abs(frac) < std::numeric_limits<double_t>::epsilon())
         return json(static_cast<int64_t>(intpart));
