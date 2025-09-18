@@ -22,6 +22,6 @@ private:
 
   std::function<void()> _onbegin{};
   std::function<void()> _onend{};
-  std::atomic<bool> _notified{false};
+  mutable std::atomic<bool> _notified{false};
 };
 }
