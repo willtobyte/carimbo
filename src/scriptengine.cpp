@@ -5,40 +5,6 @@
 #include <sol/property.hpp>
 #include <sol/types.hpp>
 
-static std::array<uint64_t, 2> prng_state;
-
-static void seed(uint64_t value) {
-  constexpr uint64_t mix = 0xdeadbeefcafebabeULL;
-  if (value == 0) value = 1;
-  prng_state[0] = value;
-  prng_state[1] = value ^ mix;
-}
-
-static uint64_t xorshift128plus() {
-  const auto s1 = prng_state[0];
-  const auto s0 = prng_state[1];
-  const auto result = s0 + s1;
-
-  prng_state[0] = s0;
-  prng_state[1] = (s1 ^ (s1 << 23)) ^ s0 ^ ((s1 ^ (s1 << 23)) >> 18) ^ (s0 >> 5);
-
-  return result;
-}
-
-static double xorshift_random_double() {
-  static constexpr const auto inv_max = 1.0 / static_cast<double>(std::numeric_limits<uint64_t>::max());
-
-  return static_cast<double>(xorshift128plus()) * inv_max;
-}
-
-static lua_Integer xorshift_random_int(lua_Integer low, lua_Integer high) {
-  if (low > high) std::swap(low, high);
-
-  const auto ulow = static_cast<uint64_t>(low);
-  const auto range = static_cast<uint64_t>(high - low + 1);
-  return static_cast<lua_Integer>(ulow + (xorshift128plus() % range));
-}
-
 [[noreturn]] static void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(
     std::format("Lua panic: {}",
@@ -258,25 +224,6 @@ void framework::scriptengine::run() {
     #endif
 
     return sol::make_object(lua, out);
-  };
-
-  const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  seed(static_cast<uint64_t>(now));
-
-  lua["math"]["random"] = sol::overload(
-    []() {
-      return xorshift_random_double();
-    },
-    [](lua_Integer upper) {
-      return xorshift_random_int(1, upper);
-    },
-    [](lua_Integer lower, lua_Integer upper) {
-      return xorshift_random_int(lower, upper);
-    }
-  );
-
-  lua["math"]["randomseed"] = [](lua_Integer seed_value) {
-    seed(static_cast<uint64_t>(seed_value));
   };
 
   steam::achievement achievement;
