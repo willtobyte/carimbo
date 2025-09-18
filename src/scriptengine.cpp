@@ -101,81 +101,87 @@ private:
   uint64_t _start{SDL_GetTicks()};
 };
 
-auto _to_lua(const nlohmann::json& value, sol::state_view lua) -> sol::object {
+static sol::object _to_lua(const nlohmann::json& value, sol::state_view lua) {
+  using nlohmann::json;
+
   switch (value.type()) {
-  case nlohmann::json::value_t::object: {
-    auto t = lua.create_table();
-    for (const auto& [k, v] : value.items()) {
-      t[k] = _to_lua(v, lua);
+    case json::value_t::object: {
+      auto t = lua.create_table(0, static_cast<int>(value.size()));
+      for (const auto& [k, v] : value.items()) t[k] = _to_lua(v, lua);
+      return sol::make_object(lua, t);
     }
 
-    return t;
-  }
-
-  case nlohmann::json::value_t::array: {
-    auto t = lua.create_table();
-    for (size_t i = 0; i < value.size(); ++i) {
-      t[i + 1] = _to_lua(value[i], lua);
+    case json::value_t::array: {
+      auto t = lua.create_table(static_cast<int>(value.size()), 0);
+      for (size_t i = 0, n = value.size(); i < n; ++i) t[i + 1] = _to_lua(value[i], lua);
+      return sol::make_object(lua, t);
     }
 
-    return t;
-  }
+    case json::value_t::string:
+      return sol::make_object(lua, value.get<std::string>());
 
-  case nlohmann::json::value_t::string:
-    return sol::make_object(lua, value.get<std::string>());
-  case nlohmann::json::value_t::boolean:
-    return sol::make_object(lua, value.get<bool>());
-  case nlohmann::json::value_t::number_integer:
-    return sol::make_object(lua, value.get<int64_t>());
-  case nlohmann::json::value_t::number_unsigned:
-    return sol::make_object(lua, value.get<uint64_t>());
-  case nlohmann::json::value_t::number_float:
-    return sol::make_object(lua, value.get<double_t>());
-  default:
-    return sol::lua_nil;
+    case json::value_t::boolean:
+      return sol::make_object(lua, value.get<bool>());
+
+    case json::value_t::number_integer:
+      return sol::make_object(lua, value.get<int64_t>());
+
+    case json::value_t::number_unsigned:
+      return sol::make_object(lua, value.get<uint64_t>());
+
+    case json::value_t::number_float:
+      return sol::make_object(lua, value.get<double_t>());
+
+    default:
+      return sol::make_object(lua, sol::lua_nil);
   }
 }
 
-auto _to_json(const sol::object& value) -> nlohmann::json {
+static nlohmann::json _to_json(const sol::object& value) {
+  using nlohmann::json;
+
   switch (value.get_type()) {
-  case sol::type::table: {
-    const auto lua_table = value.as<sol::table>();
-    if (std::ranges::all_of(lua_table, [](const auto& pair) {
-          return pair.first.get_type() == sol::type::number && pair.first.template as<size_t>() >= 1;
-        }
-      )
-    ) {
-      nlohmann::json j = nlohmann::json::array();
-      for (const auto& pair : lua_table) {
-        j.push_back(_to_json(pair.second));
+    case sol::type::table: {
+      const auto lua_table = value.as<sol::table>();
+
+      const bool is_array =
+        std::ranges::all_of(lua_table, [](const auto& pair) {
+          return pair.first.get_type() == sol::type::number
+                 && pair.first.template as<size_t>() >= 1;
+        });
+
+      if (is_array) {
+        json j = json::array();
+        j.get_ref<json::array_t&>().reserve(lua_table.size());
+        for (const auto& pair : lua_table) j.push_back(_to_json(pair.second));
+        return j;
       }
 
+      json j = json::object();
+      for (const auto& pair : lua_table)
+        j[pair.first.as<std::string>()] = _to_json(pair.second);
       return j;
     }
 
-    nlohmann::json j = nlohmann::json::object();
-    for (const auto& pair : lua_table) {
-      j[pair.first.as<std::string>()] = _to_json(pair.second);
+    case sol::type::string:
+      return json(value.as<std::string>());
+
+    case sol::type::boolean:
+      return json(value.as<bool>());
+
+    case sol::type::number: {
+      const auto number = value.as<double_t>();
+      double_t intpart{};
+      const double_t frac = std::modf(number, &intpart);
+
+      if (std::abs(frac) < std::numeric_limits<double_t>::epsilon())
+        return json(static_cast<int64_t>(intpart));
+
+      return json(number);
     }
 
-    return j;
-  }
-
-  case sol::type::string:
-    return value.as<std::string>();
-  case sol::type::boolean:
-    return value.as<bool>();
-  case sol::type::number: {
-    const auto number = value.as<double_t>();
-    double_t intpart;
-    const double_t frac = std::modf(number, &intpart);
-    return std::abs(frac) < std::numeric_limits<double_t>::epsilon()
-        ? static_cast<double_t>(static_cast<int64_t>(intpart))
-        : number;
-  }
-
-  default:
-    return nullptr;
+    default:
+      return json();
   }
 }
 
@@ -206,7 +212,7 @@ void framework::scriptengine::run() {
 
   lua.script(inject);
 
-  lua["sentinel"] = [&lua](sol::object object, sol::object name) -> sol::object {
+  lua["sentinel"] = [&lua](sol::object object, sol::object name) {
     auto u = sol::make_object<sentinel>(lua, name.as<std::string>());
     object.as<sol::table>().raw_set("__sentinel", u);
 
@@ -226,7 +232,7 @@ void framework::scriptengine::run() {
     #endif
   };
 
-  lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) -> sol::object {
+  lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) {
     auto out = defval;
 
     #ifdef EMSCRIPTEN
@@ -258,13 +264,13 @@ void framework::scriptengine::run() {
   seed(static_cast<uint64_t>(now));
 
   lua["math"]["random"] = sol::overload(
-    []() -> double {
+    []() {
       return xorshift_random_double();
     },
-    [](lua_Integer upper) -> lua_Integer {
+    [](lua_Integer upper) {
       return xorshift_random_int(1, upper);
     },
-    [](lua_Integer lower, lua_Integer upper) -> lua_Integer {
+    [](lua_Integer lower, lua_Integer upper) {
       return xorshift_random_int(lower, upper);
     }
   );
@@ -519,7 +525,7 @@ void framework::scriptengine::run() {
         throw std::runtime_error("invalid value for velocity");
       }
     ),
-    "kv", sol::property([](framework::object&o) -> memory::kv& { return o.kv(); })
+    "kv", sol::property([](framework::object&o) { return o.kv(); })
   );
 
   lua.new_usertype<framework::objectmanager>(
@@ -598,7 +604,7 @@ void framework::scriptengine::run() {
     "player", [&player_mapping](
       framework::statemanager& self,
       input::event::player player
-    ) -> playerwrapper& {
+    ) {
       const auto it = player_mapping.try_emplace(player, player, self).first;
 
       return it->second;
@@ -802,8 +808,7 @@ void framework::scriptengine::run() {
     "create", &graphics::overlay::create,
     "destroy", &graphics::overlay::destroy,
     "dispatch", &graphics::overlay::dispatch,
-    "cursor", sol::property([](graphics::overlay& o) ->
-      cursorproxy { return cursorproxy{o}; })
+    "cursor", sol::property([](graphics::overlay& o) { return cursorproxy{o}; })
   );
 
   lua.new_usertype<framework::engine>(
@@ -883,7 +888,7 @@ void framework::scriptengine::run() {
         self.set<std::string>(key, object.as<std::string>());
       else if (object.is<sol::table>()) {
         sol::table table = object.as<sol::table>();
-        std::function<nlohmann::json(sol::table)> table2json = [&](sol::table table) -> nlohmann::json {
+        std::function<nlohmann::json(sol::table)> table2json = [&](sol::table table) {
           nlohmann::json temp;
           bool is_array = true;
           for (const auto& pair : table) {
@@ -953,7 +958,7 @@ void framework::scriptengine::run() {
       const std::string& key,
       sol::object default_value,
       sol::this_state state
-    ) -> sol::object {
+    ) {
       sol::state_view lua(state);
       const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
 
