@@ -388,6 +388,21 @@ void framework::scriptengine::run() {
       sol::this_state state
     ) {
       self.decrby(key, value, state);
+    },
+    "getset", [](
+      memory::kv& self,
+      const std::string& key,
+      const sol::object& value,
+      sol::this_state state
+    ) {
+      return self.getset(key, value, state);
+    },
+    "setnx", [](
+      memory::kv& self,
+      const std::string& key,
+      const sol::object& value
+    ) {
+      return self.setnx(key, value);
     }
   );
 

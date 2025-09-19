@@ -6,7 +6,7 @@ static std::shared_ptr<observable> ensure(
   const std::string& key,
   std::unordered_map<std::string, std::shared_ptr<observable>>& values,
   lua_State *L
-) { 
+) {
   const auto [it, inserted] = values.try_emplace(key, std::make_shared<observable>());
   if (inserted) {
     it->second->set(sol::make_object(L, sol::lua_nil));
@@ -102,4 +102,35 @@ void kv::decr(const std::string& key, sol::this_state state) {
 
 void kv::decrby(const std::string& key, int64_t value, sol::this_state state) {
   add(key, -value, _values, state);
+}
+
+sol::object kv::getset(const std::string& key, const sol::object& value, sol::this_state state) {
+  auto* L = state.L;
+  const auto o = ensure(key, _values, L);
+  const auto old = o->get();
+  o->set(value);
+  return old;
+}
+
+bool kv::setnx(const std::string& key, const sol::object& value) {
+  const auto it = _values.find(key);
+  if (it == _values.end()) {
+    auto o = std::make_shared<observable>();
+    o->set(value);
+    _values.emplace(key, std::move(o));
+    return true;
+  }
+
+  const auto current = it->second->get();
+  if (!current.valid()) {
+    it->second->set(value);
+    return true;
+  }
+
+  if (current.get_type() == sol::type::lua_nil) {
+    it->second->set(value);
+    return true;
+  }
+
+  return false;
 }

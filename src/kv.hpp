@@ -24,6 +24,8 @@ public:
   void incrby(const std::string& key, int64_t value, sol::this_state state);
   void decr(const std::string& key, sol::this_state state);
   void decrby(const std::string& key, int64_t value, sol::this_state state);
+  sol::object getset(const std::string& key, const sol::object& value, sol::this_state state);
+  bool setnx(const std::string& key, const sol::object& value);
 
 private:
   std::unordered_map<std::string, std::shared_ptr<observable>> _values;
