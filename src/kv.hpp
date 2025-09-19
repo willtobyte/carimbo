@@ -16,8 +16,8 @@ private:
 
 class kv final {
 public:
-  sol::object get(const std::string& key, sol::this_state state);
-  void set(const std::string& key, const sol::object& value, sol::this_state state);
+  sol::object get(const std::string& key, sol::this_state state, const sol::object& default_value = sol::lua_nil);
+  void set(const std::string& key, const sol::object& value);
   void subscribe(const std::string& key, const sol::function& callback, sol::this_state state);
   void unset(const std::string& key, sol::this_state state);
   void incr(const std::string& key, sol::this_state state);

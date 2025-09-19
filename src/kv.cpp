@@ -2,19 +2,7 @@
 
 using namespace memory;
 
-static std::shared_ptr<observable> ensure(
-  const std::string& key,
-  std::unordered_map<std::string, std::shared_ptr<observable>>& values,
-  lua_State *L
-) {
-  const auto [it, inserted] = values.try_emplace(key, std::make_shared<observable>());
-  if (inserted) {
-    it->second->set(sol::make_object(L, sol::lua_nil));
-  }
-
-  return it->second;
-}
-
+namespace {
 static void add(
   const std::string& key,
   int64_t delta,
@@ -22,36 +10,43 @@ static void add(
   sol::this_state state
 ) {
   auto* L = state.L;
-  const auto o = ensure(key, values, L);
-  const auto value = o->get();
+
+  auto [it, inserted] = values.try_emplace(key, std::make_shared<observable>());
+  if (inserted) {
+    it->second->set(sol::make_object(L, delta));
+    return;
+  }
+
+  const sol::object value = it->second->get();
 
   if (!value.valid()) {
-    o->set(sol::make_object(L, delta));
+    it->second->set(sol::make_object(L, delta));
     return;
   }
 
   if (value.get_type() == sol::type::lua_nil) {
-    o->set(sol::make_object(L, delta));
+    it->second->set(sol::make_object(L, delta));
     return;
   }
 
   if (value.is<double>()) {
     const auto v = value.as<double>() + static_cast<double>(delta);
-    o->set(sol::make_object(L, v));
+    it->second->set(sol::make_object(L, v));
     return;
   }
 
   if (value.is<int64_t>()) {
     const auto v = value.as<int64_t>() + delta;
-    o->set(sol::make_object(L, v));
+    it->second->set(sol::make_object(L, v));
     return;
   }
 
   if (value.is<int>()) {
     const auto v = static_cast<int64_t>(value.as<int>()) + delta;
-    o->set(sol::make_object(L, v));
+    it->second->set(sol::make_object(L, v));
     return;
   }
+}
 }
 
 sol::object observable::get() const {
@@ -69,16 +64,31 @@ void observable::subscribe(const sol::function& callback) {
   _subscribers.emplace_back(callback);
 }
 
-sol::object kv::get(const std::string& key, sol::this_state state) {
-  return ensure(key, _values, state.L)->get();
+sol::object kv::get(const std::string& key, sol::this_state state, const sol::object& default_value) {
+  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+
+  if (inserted) {
+    sol::object dv = default_value.valid()
+      ? default_value
+      : sol::make_object(state.L, sol::lua_nil);
+
+    it->second->set(dv);
+
+    return dv;
+  }
+
+  return it->second->get();
 }
 
-void kv::set(const std::string& key, const sol::object& value, sol::this_state state) {
-  ensure(key, _values, state.L)->set(value);
+void kv::set(const std::string& key, const sol::object& value) {
+  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  it->second->set(value);
 }
 
 void kv::subscribe(const std::string& key, const sol::function& callback, sol::this_state state) {
-  ensure(key, _values, state.L)->subscribe(callback);
+  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  if (inserted) it->second->set(sol::make_object(state.L, sol::lua_nil));
+  it->second->subscribe(callback);
 }
 
 void kv::unset(const std::string& key, sol::this_state state) {
@@ -105,23 +115,26 @@ void kv::decrby(const std::string& key, int64_t value, sol::this_state state) {
 }
 
 sol::object kv::getset(const std::string& key, const sol::object& value, sol::this_state state) {
-  auto* L = state.L;
-  const auto o = ensure(key, _values, L);
-  const auto old = o->get();
-  o->set(value);
+  const auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  if (inserted) {
+    sol::object old = sol::make_object(state.L, sol::lua_nil);
+    it->second->set(value);
+    return old;
+  }
+
+  const sol::object old = it->second->get();
+  it->second->set(value);
   return old;
 }
 
 bool kv::setnx(const std::string& key, const sol::object& value) {
-  const auto it = _values.find(key);
-  if (it == _values.end()) {
-    auto o = std::make_shared<observable>();
-    o->set(value);
-    _values.emplace(key, std::move(o));
+  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  if (inserted) {
+    it->second->set(value);
     return true;
   }
 
-  const auto current = it->second->get();
+  const sol::object current = it->second->get();
   if (!current.valid()) {
     it->second->set(value);
     return true;

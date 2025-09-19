@@ -329,82 +329,21 @@ void framework::scriptengine::run() {
   lua.new_usertype<memory::kv>(
     "KeyValue",
     sol::no_constructor,
-    "get", [](
-      memory::kv& self,
-      const std::string& key,
-      sol::this_state state
-    ) {
-      return self.get(key, state);
-    },
-    "set", [](
-      memory::kv& self,
-      const std::string& key,
-      const sol::object& value,
-      sol::this_state state
-    ) {
-      self.set(key, value, state);
-    },
-    "subscribe", [](
-      memory::kv& self,
-      const std::string& key,
-      const sol::function& callback,
-      sol::this_state state
-    ) {
-      self.subscribe(key, callback, state);
-    },
-    "unset", [](
-      memory::kv& self,
-      const std::string& key,
-      sol::this_state state
-    ) {
-      self.unset(key, state);
-    },
-    "incr", [](
-      memory::kv& self,
-      const std::string& key,
-      sol::this_state state
-    ) {
-      self.incr(key, state);
-    },
-    "incrby", [](
-      memory::kv& self,
-      const std::string& key,
-      int64_t value,
-      sol::this_state state
-    ) {
-      self.incrby(key, value, state);
-    },
-    "decr", [](
-      memory::kv& self,
-      const std::string& key,
-      sol::this_state state
-    ) {
-      self.decr(key, state);
-    },
-    "decrby", [](
-      memory::kv& self,
-      const std::string& key,
-      int64_t value,
-      sol::this_state state
-    ) {
-      self.decrby(key, value, state);
-    },
-    "getset", [](
-      memory::kv& self,
-      const std::string& key,
-      const sol::object& value,
-      sol::this_state state
-    ) {
-      return self.getset(key, value, state);
-    },
-    "setnx", [](
-      memory::kv& self,
-      const std::string& key,
-      const sol::object& value
-    ) {
-      return self.setnx(key, value);
-    }
+    "get", &memory::kv::get,
+    "set", &memory::kv::set,
+    "subscribe", &memory::kv::subscribe,
+    "unset", &memory::kv::unset,
+    "incr", &memory::kv::incr,
+    "incrby", &memory::kv::incrby,
+    "decr", &memory::kv::decr,
+    "decrby", &memory::kv::decrby,
+    "getset", &memory::kv::getset,
+    "setnx", &memory::kv::setnx
   );
+
+  memory::kv kv;
+
+  lua["kv"] = &kv;
 
   struct velocityproxy {
     framework::object& o;
