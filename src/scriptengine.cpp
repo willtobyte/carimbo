@@ -339,10 +339,10 @@ void framework::scriptengine::run() {
     "set", [](
       memory::kv& self,
       const std::string& key,
-      const sol::object& new_value,
+      const sol::object& value,
       sol::this_state state
     ) {
-      self.set(key, new_value, state);
+      self.set(key, value, state);
     },
     "subscribe", [](
       memory::kv& self,
@@ -351,6 +351,43 @@ void framework::scriptengine::run() {
       sol::this_state state
     ) {
       self.subscribe(key, callback, state);
+    },
+    "unset", [](
+      memory::kv& self,
+      const std::string& key,
+      sol::this_state state
+    ) {
+      self.unset(key, state);
+    },
+    "incr", [](
+      memory::kv& self,
+      const std::string& key,
+      sol::this_state state
+    ) {
+      self.incr(key, state);
+    },
+    "incrby", [](
+      memory::kv& self,
+      const std::string& key,
+      int64_t value,
+      sol::this_state state
+    ) {
+      self.incrby(key, value, state);
+    },
+    "decr", [](
+      memory::kv& self,
+      const std::string& key,
+      sol::this_state state
+    ) {
+      self.decr(key, state);
+    },
+    "decrby", [](
+      memory::kv& self,
+      const std::string& key,
+      int64_t value,
+      sol::this_state state
+    ) {
+      self.decrby(key, value, state);
     }
   );
 

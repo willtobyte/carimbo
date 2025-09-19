@@ -17,10 +17,17 @@ private:
 class kv final {
 public:
   sol::object get(const std::string& key, sol::this_state state);
-  void set(const std::string& key, const sol::object& new_value, sol::this_state state);
+  void set(const std::string& key, const sol::object& value, sol::this_state state);
   void subscribe(const std::string& key, const sol::function& callback, sol::this_state state);
+  void unset(const std::string& key, sol::this_state state);
+  void incr(const std::string& key, sol::this_state state);
+  void incrby(const std::string& key, int64_t value, sol::this_state state);
+  void decr(const std::string& key, sol::this_state state);
+  void decrby(const std::string& key, int64_t value, sol::this_state state);
 
 protected:
+  void add(const std::string& key, int64_t delta, sol::this_state stage);
+
   std::shared_ptr<observable> ensure(const std::string& key, lua_State *L);
 
 private:
