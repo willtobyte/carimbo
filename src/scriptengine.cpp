@@ -348,8 +348,8 @@ void framework::scriptengine::run() {
       memory::kv& self,
       const std::string& key,
       const sol::function& callback,
-      sol::this_state state)
-    {
+      sol::this_state state
+    ) {
       self.subscribe(key, callback, state);
     }
   );
