@@ -6,7 +6,7 @@ namespace memory {
 class observable final {
 public:
   sol::object get() const;
-  void set(const sol::object& new_value);
+  void set(const sol::object& value);
   void subscribe(const sol::function& callback);
 
 private:
@@ -24,11 +24,6 @@ public:
   void incrby(const std::string& key, int64_t value, sol::this_state state);
   void decr(const std::string& key, sol::this_state state);
   void decrby(const std::string& key, int64_t value, sol::this_state state);
-
-protected:
-  void add(const std::string& key, int64_t delta, sol::this_state stage);
-
-  std::shared_ptr<observable> ensure(const std::string& key, lua_State *L);
 
 private:
   std::unordered_map<std::string, std::shared_ptr<observable>> _values;
