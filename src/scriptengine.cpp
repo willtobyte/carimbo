@@ -472,7 +472,7 @@ void framework::scriptengine::run() {
         throw std::runtime_error("invalid value for velocity");
       }
     ),
-    "kv", sol::property([](framework::object&o) { return o.kv(); })
+    "kv", sol::property([](framework::object&o) -> memory::kv& { return o.kv(); })
   );
 
   lua.new_usertype<framework::objectmanager>(
