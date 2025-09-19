@@ -38,7 +38,7 @@ class Carimbo(ConanFile):
             return
 
         self.requires("boost/1.88.0")
-        self.requires("openssl/3.5.1")
+        self.requires("openssl/3.5.2")
 
         if self._is_jit_capable():
             self.requires("luajit/2.1.0-beta3")

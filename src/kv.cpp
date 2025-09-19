@@ -6,7 +6,7 @@ static std::shared_ptr<observable> ensure(
   const std::string& key,
   std::unordered_map<std::string, std::shared_ptr<observable>>& values,
   lua_State *L
-) {
+) { 
   const auto [it, inserted] = values.try_emplace(key, std::make_shared<observable>());
   if (inserted) {
     it->second->set(sol::make_object(L, sol::lua_nil));
