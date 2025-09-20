@@ -101,10 +101,10 @@ void object::update(float_t delta) noexcept {
   }
 
   if (animation.oneshot) {
-    const auto name = std::exchange(_action, "");
+    const auto action = std::exchange(_action, "");
 
     if (const auto& fn = _onend; fn) {
-      fn(shared_from_this(), name);
+      fn(shared_from_this(), action);
     }
 
     if (!animation.next) {
@@ -151,10 +151,11 @@ void object::draw() const noexcept {
 
 #ifdef DEBUG
   const auto debug = hitbox
-    ? std::make_optional(geometry::rectangle{
-      _position + hitbox->rectangle.position(),
-      hitbox->rectangle.size() * _scale
-    })
+    ? std::make_optional(
+        geometry::rectangle{
+          _position + hitbox->rectangle.position(),
+          hitbox->rectangle.size() * _scale
+        })
     : std::nullopt;
 #endif
 
