@@ -557,14 +557,14 @@ void framework::scriptengine::run() {
       framework::scenemanager& self,
       const std::string& name
     ) {
-      const auto destroyed = self.destroy(name);
+      const auto scenes = self.destroy(name);
 
       lua.collect_garbage();
       lua.collect_garbage();
 
       auto loaded = lua["package"]["loaded"];
-      for (const auto& n : destroyed) {
-        loaded[std::format("scenes/{}", n)] = sol::lua_nil;
+      for (const auto& scene : scenes) {
+        loaded[std::format("scenes/{}", scene)] = sol::lua_nil;
       }
 
       lua.collect_garbage();
