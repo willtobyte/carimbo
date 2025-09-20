@@ -82,7 +82,8 @@ public:
   bool intersects(std::shared_ptr<object> other) const noexcept;
 
   void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn);
-  void set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
+  void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
+  void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
   void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)>&& fn);
   void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn);
@@ -125,7 +126,8 @@ private:
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
   std::function<void(std::shared_ptr<object>)> _onupdate;
-  std::function<void(std::shared_ptr<object>, const std::string& )> _onanimationfinished;
+  std::function<void(std::shared_ptr<object>, const std::string& )> _onbegin;
+  std::function<void(std::shared_ptr<object>, const std::string& )> _onend;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>> _collisionmapping;
 };

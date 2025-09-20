@@ -101,10 +101,10 @@ void object::update(float_t delta) noexcept {
   }
 
   if (animation.oneshot) {
-    const std::string finished = std::exchange(_action, "");
+    const auto name = std::exchange(_action, "");
 
-    if (_onanimationfinished) {
-      _onanimationfinished(shared_from_this(), finished);
+    if (const auto& fn = _onend; fn) {
+      fn(shared_from_this(), name);
     }
 
     if (!animation.next) {
@@ -228,6 +228,10 @@ void object::set_action(const std::string& action) noexcept {
   if (const auto& e = a.effect; e) {
     e->play();
   }
+
+  if (const auto& fn = _onbegin; fn) {
+    fn(shared_from_this(), _action);
+  }
 }
 
 void object::unset_action() noexcept {
@@ -271,8 +275,12 @@ void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onupdate = std::move(fn);
 }
 
-void object::set_onanimationfinished(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
-  _onanimationfinished = std::move(fn);
+void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
+  _onbegin = std::move(fn);
+}
+
+void object::set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
+  _onend = std::move(fn);
 }
 
 void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
