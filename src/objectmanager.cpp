@@ -270,7 +270,7 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
 }
 
 void objectmanager::on_mail(const input::event::mail& event) {
-  if (const auto& object = find(event.to); object) {
-    object->on_email(event.body);
+  if (const auto& o = find(event.to); o) {
+    o->on_email(event.body);
   }
 }
