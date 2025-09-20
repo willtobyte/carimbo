@@ -216,12 +216,17 @@ graphics::reflection object::reflection() const noexcept {
   return _reflection;
 }
 
-void object::set_action(const std::string& action) noexcept {
-  if (_action == action) {
+void object::set_action(const std::optional<std::string>& action) noexcept {
+  if (!action.has_value()) {
+    unset_action();
     return;
   }
 
-  _action = action;
+  if (_action == *action) {
+    return;
+  }
+
+  _action = *action;
   _frame = 0;
   _last_frame = SDL_GetTicks();
 

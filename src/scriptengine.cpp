@@ -390,6 +390,7 @@ void framework::scriptengine::run() {
     "alpha", sol::property(&framework::object::alpha, &framework::object::set_alpha),
     "scale", sol::property(&framework::object::scale, &framework::object::set_scale),
     "angle", sol::property(&framework::object::angle, &framework::object::set_angle),
+    "reflection", sol::property(&framework::object::reflection, &framework::object::set_reflection),
     "hide", &framework::object::hide,
     "on_update", &framework::object::set_onupdate,
     "on_begin", &framework::object::set_onbegin,
@@ -399,27 +400,7 @@ void framework::scriptengine::run() {
     "on_hover", &framework::object::set_onhover,
     "on_unhover", &framework::object::set_onunhover,
     "on_collision", &framework::object::set_oncollision,
-    "reflection", sol::property(
-      [](framework::object& o) {
-        return o.reflection();
-      },
-      [](framework::object& o, graphics::reflection r) {
-        o.set_reflection(r);
-      }
-    ),
-    "action", sol::property(
-      [](framework::object& o) {
-        return o.action();
-      },
-      [](framework::object& o, std::optional<std::string> v) {
-        if (!v.has_value()) {
-          o.unset_action();
-          return;
-        }
-
-        o.set_action(*v);
-      }
-    ),
+    "action", sol::property(&framework::object::action, &framework::object::set_action),
     "placement", sol::property(
       [](framework::object& o) {
         return o.placement();
