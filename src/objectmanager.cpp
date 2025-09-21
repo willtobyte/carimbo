@@ -1,4 +1,5 @@
 #include "objectmanager.hpp"
+#include "object.hpp"
 
 using namespace framework;
 
@@ -156,10 +157,10 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::update(float_t dt) noexcept {
+void objectmanager::update(float_t delta) noexcept {
   for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
-    auto& a = *itoa;
-    a->update(dt);
+    const auto& a = *itoa;
+    a->update(delta);
 
     const auto ita = a->_animations.find(a->_action);
     if (ita == a->_animations.end() || !ita->second.hitbox) {
