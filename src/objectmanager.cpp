@@ -200,12 +200,12 @@ void objectmanager::update(float_t delta) noexcept {
         continue;
       }
 
-      if (const auto& cb = callback_or(a->_collisionmapping, b->kind(), std::nullopt); cb) {
-        (*cb)(a, b);
+      if (const auto& callback = callback_or(a->_collisionmapping, b->kind(), std::nullopt); callback) {
+        (*callback)(a, b);
       }
 
-      if (const auto& cb = callback_or(b->_collisionmapping, a->kind(), std::nullopt); cb) {
-        (*cb)(b, a);
+      if (const auto& callback = callback_or(b->_collisionmapping, a->kind(), std::nullopt); callback) {
+        (*callback)(b, a);
       }
 
       SDL_Event event{};
