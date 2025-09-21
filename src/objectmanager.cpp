@@ -68,7 +68,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
           ) : nullptr;
     const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
     const bool oneshot = next.has_value() || a.value("oneshot", false);
-    const auto keyframes = a.at("frames").get<std::vector<framework::keyframe>>();
+    const auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
 
     animations.emplace(key, animation{oneshot, next, hitbox, effect, std::move(keyframes)});
   }

@@ -105,7 +105,7 @@ private:
   friend class tilemap;
 
   uint64_t _id;
-  uint64_t _frame;
+  std::size_t _frame;
   uint64_t _last_frame;
   double_t _angle;
   uint8_t _alpha;

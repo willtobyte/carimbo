@@ -125,50 +125,58 @@ void object::update(float_t delta) noexcept {
 }
 
 void object::draw() const noexcept {
-  if (_action.empty()) [[unlikely]] {
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) [[unlikely]] {
     return;
   }
 
-  const auto& animation = _animations.at(_action).keyframes.at(_frame);
-  const auto& source = animation.frame;
-  const auto& offset = animation.offset;
-#ifdef DEBUG
-  const auto& hitbox = _animations.at(_action).hitbox;
-#endif
+  const auto& keyframes = it->second.keyframes;
+  if (keyframes.empty()) [[unlikely]] {
+    return;
+  }
+
+  if (_frame >= keyframes.size()) [[unlikely]] {
+    return;
+  }
+
+  const auto& keyframe = keyframes[_frame];
+  const auto& source = keyframe.frame;
+  const auto& offset = keyframe.offset;
+
   geometry::rectangle destination{_position + offset, source.size()};
 
   const auto ow = destination.width();
   const auto oh = destination.height();
-
   const auto sw = ow * _scale;
   const auto sh = oh * _scale;
-
-  const auto dx = (ow - sw) * 0.5f;
-  const auto dy = (oh - sh) * 0.5f;
+  const auto dx = (ow - sw) * .5f;
+  const auto dy = (oh - sh) * .5f;
 
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
-#ifdef DEBUG
-  const auto debug = hitbox
-    ? std::make_optional(
+  #ifdef DEBUG
+    const auto& hitbox = it->second.hitbox;
+    std::optional<geometry::rectangle> debug;
+    if (hitbox) {
+      debug.emplace(
         geometry::rectangle{
           _position + hitbox->rectangle.position(),
           hitbox->rectangle.size() * _scale
-        })
-    : std::nullopt;
-#endif
+        }
+      );
+    }
+  #endif
 
   _spritesheet->draw(
-      source,
-      destination,
-      _angle,
-      _reflection,
-      _alpha
-#ifdef DEBUG
-      ,
-      debug
-#endif
+    source,
+    destination,
+    _angle,
+    _reflection,
+    _alpha
+    #ifdef DEBUG
+      , debug
+    #endif
   );
 }
 
