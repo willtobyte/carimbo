@@ -31,6 +31,11 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     effects.emplace_back(std::move(basename), _resourcemanager->soundmanager()->get(f));
   }
 
+  const auto& fs = j.value("fonts", nlohmann::json::array());
+  for (const auto& i : fs) {
+    _resourcemanager->fontfactory()->get(i);
+  }
+
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
   const auto os = j.value("objects", nlohmann::json::array());
   objects.reserve(os.size());
