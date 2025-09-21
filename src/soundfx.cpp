@@ -3,8 +3,7 @@
 using namespace audio;
 
 namespace {
-  static size_t cb_read(void* ptr, size_t size, size_t nmemb, void* source)
-  {
+  static size_t cb_read(void* ptr, size_t size, size_t nmemb, void* source) {
     const auto file = reinterpret_cast<PHYSFS_file*> (source);
 
     PHYSFS_sint64 result
@@ -16,8 +15,7 @@ namespace {
     return static_cast<size_t> (result) / size;
   }
 
-  static int cb_seek(void* source, ogg_int64_t offset, int whence)
-  {
+  static int cb_seek(void* source, ogg_int64_t offset, int whence) {
     auto* file = reinterpret_cast<PHYSFS_File*>(source);
 
     switch (whence) {
@@ -75,15 +73,13 @@ namespace {
     return -1;
   }
 
-  static int cb_close(void* source)
-  {
+  static int cb_close(void* source) {
     const auto file = reinterpret_cast<PHYSFS_file*> (source);
     PHYSFS_close(file);
     return 0;
   }
 
-  static long cb_tell(void* source)
-  {
+  static long cb_tell(void* source) {
     const auto file = reinterpret_cast<PHYSFS_file*> (source);
     return static_cast<long>(PHYSFS_tell(file));
   }
