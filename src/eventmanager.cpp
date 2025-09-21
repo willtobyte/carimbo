@@ -274,5 +274,18 @@ void eventmanager::add_receiver(std::shared_ptr<eventreceiver> receiver) {
 }
 
 void eventmanager::remove_receiver(std::shared_ptr<eventreceiver> receiver) {
-  std::erase(_receivers, receiver);
+  if (!receiver) [[unlikely]] {
+    return;
+  }
+
+  const auto it = std::find(_receivers.begin(), _receivers.end(), receiver);
+  if (it == _receivers.end()) {
+    return;
+  }
+
+  if (std::next(it) != _receivers.end()) {
+    *it = std::move(_receivers.back());
+  }
+
+  _receivers.pop_back();
 }

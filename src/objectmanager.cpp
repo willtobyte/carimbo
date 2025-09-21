@@ -131,7 +131,16 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
     return;
   }
 
-  std::erase(_objects, object);
+  const auto it = std::find(_objects.begin(), _objects.end(), object);
+  if (it == _objects.end()) {
+    return;
+  }
+
+  if (std::next(it) != _objects.end()) {
+    *it = std::move(_objects.back());
+  }
+
+  _objects.pop_back();
 }
 
 void objectmanager::destroy(std::shared_ptr<object> object) {
@@ -139,18 +148,28 @@ void objectmanager::destroy(std::shared_ptr<object> object) {
     return;
   }
 
-  std::erase(_objects, object);
-  _objects.shrink_to_fit();
+  const auto it = std::find(_objects.begin(), _objects.end(), object);
+  if (it == _objects.end()) {
+    return;
+  }
+
+  if (std::next(it) != _objects.end()) {
+    *it = std::move(_objects.back());
+  }
+
+  _objects.pop_back();
 
   _objectpool->release(object);
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const {
-  auto it = std::ranges::find_if(_objects, [id](const auto& object) {
-    return object->id() == id;
-  });
+  for (const auto& o : _objects) {
+    if (o->id() == id) {
+      return o;
+    }
+  }
 
-  return (it != _objects.end()) ? *it : nullptr;
+  return nullptr;
 }
 
 void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) {
