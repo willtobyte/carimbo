@@ -131,11 +131,7 @@ void object::draw() const noexcept {
   }
 
   const auto& keyframes = it->second.keyframes;
-  if (keyframes.empty()) [[unlikely]] {
-    return;
-  }
-
-  if (_frame >= keyframes.size()) [[unlikely]] {
+  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] {
     return;
   }
 
