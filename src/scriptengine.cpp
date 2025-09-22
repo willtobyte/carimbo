@@ -385,6 +385,7 @@ void framework::scriptengine::run() {
     "Object",
     sol::no_constructor,
     "id", sol::property(&framework::object::id),
+    "kind", sol::property(&framework::object::kind),
     "x", sol::property(&framework::object::x, &framework::object::set_x),
     "y", sol::property(&framework::object::y, &framework::object::set_y),
     "alpha", sol::property(&framework::object::alpha, &framework::object::set_alpha),
