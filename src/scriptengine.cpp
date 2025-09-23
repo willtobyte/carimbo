@@ -4,6 +4,7 @@
 #include "soundmanager.hpp"
 #include <sol/property.hpp>
 #include <sol/types.hpp>
+#include <string>
 
 [[noreturn]] static void panic(sol::optional<std::string> maybe_message) {
   throw std::runtime_error(
@@ -381,6 +382,18 @@ void framework::scriptengine::run() {
     "get", &velocityproxy::get
   );
 
+  struct metaobject {
+    static sol::object index(framework::object& o, sol::stack_object key) {
+      auto& store = o.kv();
+      return store.get(key.as<const std::string&>());
+    }
+
+    static void new_index(framework::object& o, sol::stack_object key, sol::stack_object value) {
+      auto& store = o.kv();
+      store.set(key.as<const std::string&>(), value);
+    }
+  };
+
   lua.new_usertype<framework::object>(
     "Object",
     sol::no_constructor,
@@ -446,7 +459,8 @@ void framework::scriptengine::run() {
         throw std::runtime_error("invalid value for velocity");
       }
     ),
-    "kv", sol::property([](framework::object&o) -> memory::kv& { return o.kv(); })
+    sol::meta_function::index, metaobject::index,
+    sol::meta_function::new_index, metaobject::new_index
   );
 
   lua.new_usertype<framework::objectmanager>(

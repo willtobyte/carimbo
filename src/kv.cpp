@@ -64,30 +64,30 @@ void observable::subscribe(const sol::function& callback) {
   _subscribers.emplace_back(callback);
 }
 
-sol::object kv::get(const std::string& key, sol::this_state state, const sol::object& default_value) {
+sol::object kv::get(const std::string& key, const sol::object& default_value) {
   auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
 
   if (inserted) {
-    sol::object dv = default_value.valid()
-      ? default_value
-      : sol::make_object(state.L, sol::lua_nil);
+    it->second->set(default_value);
 
-    it->second->set(dv);
-
-    return dv;
+    return default_value;
   }
 
   return it->second->get();
 }
 
 void kv::set(const std::string& key, const sol::object& value) {
-  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  const auto it = _values.try_emplace(key, std::make_shared<observable>()).first;
+
   it->second->set(value);
 }
 
 void kv::subscribe(const std::string& key, const sol::function& callback, sol::this_state state) {
-  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
-  if (inserted) it->second->set(sol::make_object(state.L, sol::lua_nil));
+  const auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+  if (inserted) {
+    it->second->set(sol::make_object(state.L, sol::lua_nil));
+  }
+
   it->second->subscribe(callback);
 }
 
