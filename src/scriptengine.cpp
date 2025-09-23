@@ -2,6 +2,7 @@
 #include "canvas.hpp"
 #include "environment.hpp"
 #include "soundmanager.hpp"
+#include <sol/object.hpp>
 #include <sol/property.hpp>
 #include <sol/types.hpp>
 #include <string>
@@ -327,19 +328,25 @@ void framework::scriptengine::run() {
     "both", graphics::reflection::both
   );
 
+
+  struct metakv {
+    static sol::object index(memory::kv& store, sol::stack_object key, sol::this_state state) {
+      const auto& ptr = store.get(key.as<std::string>());
+      return sol::make_object(state, std::ref(*ptr));
+    }
+
+    static void new_index(memory::kv& store, sol::stack_object key, sol::stack_object value) {
+      store.set(key.as<std::string>(), value);
+    }
+  };
+
   lua.new_usertype<memory::kv>(
     "KeyValue",
     sol::no_constructor,
-    "get", &memory::kv::get,
-    "set", &memory::kv::set,
-    "subscribe", &memory::kv::subscribe,
-    "unset", &memory::kv::unset,
-    "incr", &memory::kv::incr,
-    "incrby", &memory::kv::incrby,
-    "decr", &memory::kv::decr,
-    "decrby", &memory::kv::decrby,
-    "getset", &memory::kv::getset,
-    "setnx", &memory::kv::setnx
+    // "get", &memory::kv::get,
+    // "set", &memory::kv::set,
+    sol::meta_function::index, metakv::index,
+    sol::meta_function::new_index, metakv::new_index
   );
 
   memory::kv kv;
@@ -385,8 +392,8 @@ void framework::scriptengine::run() {
   struct metaobject {
     static sol::object index(framework::object& o, sol::stack_object key, sol::this_state state) {
       auto& store = o.kv();
-      const auto& value = store.get(key.as<std::string>());
-      return sol::make_object(state, std::ref(value));
+      const auto& ptr = store.get(key.as<std::string>());
+      return sol::make_object(state, std::ref(*ptr));
     }
 
     static void new_index(framework::object& o, sol::stack_object key, sol::stack_object value) {

@@ -8,7 +8,6 @@ public:
   sol::object value() const;
   void set(const sol::object& value);
   void subscribe(const sol::function& callback);
-  std::string to_string(sol::this_state state) const;
 
 private:
   sol::object _value;
@@ -19,14 +18,7 @@ class kv final {
 public:
   std::shared_ptr<memory::observable> get(const std::string& key, const sol::object& default_value = sol::lua_nil);
   void set(const std::string& key, const sol::object& value);
-  void subscribe(const std::string& key, const sol::function& callback, sol::this_state state);
-  void unset(const std::string& key, sol::this_state state);
-  void incr(const std::string& key, sol::this_state state);
-  void incrby(const std::string& key, int64_t value, sol::this_state state);
-  void decr(const std::string& key, sol::this_state state);
-  void decrby(const std::string& key, int64_t value, sol::this_state state);
-  sol::object getset(const std::string& key, const sol::object& value, sol::this_state state);
-  bool setnx(const std::string& key, const sol::object& value);
+  // void subscribe(const std::string& key, const sol::function& callback, sol::this_state state);
 
 private:
   std::unordered_map<std::string, std::shared_ptr<observable>> _values;
