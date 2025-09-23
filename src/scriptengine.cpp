@@ -383,9 +383,10 @@ void framework::scriptengine::run() {
   );
 
   struct metaobject {
-    static sol::object index(framework::object& o, sol::stack_object key) {
+    static sol::object index(framework::object& o, sol::stack_object key, sol::this_state state) {
       auto& store = o.kv();
-      return store.get(key.as<const std::string&>());
+      const auto& value = store.get(key.as<const std::string&>());
+      return sol::make_object(state, std::ref(value));
     }
 
     static void new_index(framework::object& o, sol::stack_object key, sol::stack_object value) {
@@ -393,6 +394,14 @@ void framework::scriptengine::run() {
       store.set(key.as<const std::string&>(), value);
     }
   };
+
+  lua.new_usertype<memory::observable>(
+    "Observable",
+    sol::no_constructor,
+    "value", sol::property(&memory::observable::value),
+    "set", &memory::observable::set,
+    "subscribe", &memory::observable::subscribe
+  );
 
   lua.new_usertype<framework::object>(
     "Object",

@@ -5,9 +5,10 @@
 namespace memory {
 class observable final {
 public:
-  sol::object get() const;
+  sol::object value() const;
   void set(const sol::object& value);
   void subscribe(const sol::function& callback);
+  std::string to_string(sol::this_state state) const;
 
 private:
   sol::object _value;
@@ -16,7 +17,7 @@ private:
 
 class kv final {
 public:
-  sol::object get(const std::string& key, const sol::object& default_value = sol::lua_nil);
+  std::shared_ptr<memory::observable> get(const std::string& key, const sol::object& default_value = sol::lua_nil);
   void set(const std::string& key, const sol::object& value);
   void subscribe(const std::string& key, const sol::function& callback, sol::this_state state);
   void unset(const std::string& key, sol::this_state state);

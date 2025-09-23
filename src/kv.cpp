@@ -17,7 +17,7 @@ static void add(
     return;
   }
 
-  const sol::object value = it->second->get();
+  const auto value = it->second->value();
 
   if (!value.valid()) {
     it->second->set(sol::make_object(L, delta));
@@ -49,7 +49,7 @@ static void add(
 }
 }
 
-sol::object observable::get() const {
+sol::object observable::value() const {
   return _value;
 }
 
@@ -64,16 +64,14 @@ void observable::subscribe(const sol::function& callback) {
   _subscribers.emplace_back(callback);
 }
 
-sol::object kv::get(const std::string& key, const sol::object& default_value) {
+std::shared_ptr<memory::observable> kv::get(const std::string& key, const sol::object& default_value) {
   auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
 
   if (inserted) {
     it->second->set(default_value);
-
-    return default_value;
   }
 
-  return it->second->get();
+  return it->second;
 }
 
 void kv::set(const std::string& key, const sol::object& value) {
@@ -92,7 +90,7 @@ void kv::subscribe(const std::string& key, const sol::function& callback, sol::t
 }
 
 void kv::unset(const std::string& key, sol::this_state state) {
-  if (auto it = _values.find(key); it != _values.end()) {
+  if (const auto it = _values.find(key); it != _values.end()) {
     it->second->set(sol::make_object(state.L, sol::lua_nil));
     _values.erase(it);
   }
@@ -117,12 +115,12 @@ void kv::decrby(const std::string& key, int64_t value, sol::this_state state) {
 sol::object kv::getset(const std::string& key, const sol::object& value, sol::this_state state) {
   const auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
   if (inserted) {
-    sol::object old = sol::make_object(state.L, sol::lua_nil);
+    auto old = sol::make_object(state.L, sol::lua_nil);
     it->second->set(value);
     return old;
   }
 
-  const sol::object old = it->second->get();
+  const auto old = it->second->value();
   it->second->set(value);
   return old;
 }
@@ -134,7 +132,7 @@ bool kv::setnx(const std::string& key, const sol::object& value) {
     return true;
   }
 
-  const sol::object current = it->second->get();
+  const auto current = it->second->value();
   if (!current.valid()) {
     it->second->set(value);
     return true;
