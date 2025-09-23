@@ -343,8 +343,6 @@ void framework::scriptengine::run() {
   lua.new_usertype<memory::kv>(
     "KeyValue",
     sol::no_constructor,
-    // "get", &memory::kv::get,
-    // "set", &memory::kv::set,
     sol::meta_function::index, metakv::index,
     sol::meta_function::new_index, metakv::new_index
   );
