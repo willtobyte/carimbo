@@ -385,13 +385,13 @@ void framework::scriptengine::run() {
   struct metaobject {
     static sol::object index(framework::object& o, sol::stack_object key, sol::this_state state) {
       auto& store = o.kv();
-      const auto& value = store.get(key.as<const std::string&>());
+      const auto& value = store.get(key.as<std::string>());
       return sol::make_object(state, std::ref(value));
     }
 
     static void new_index(framework::object& o, sol::stack_object key, sol::stack_object value) {
       auto& store = o.kv();
-      store.set(key.as<const std::string&>(), value);
+      store.set(key.as<std::string>(), value);
     }
   };
 
