@@ -8,13 +8,14 @@ sol::object observable::value() const {
 
 void observable::set(const sol::object& value) {
   _value = value;
-  for (const auto& callback : _subscribers) {
-    callback(value);
+
+  if (const auto& fn = _subscriber; fn) {
+    fn(value);
   }
 }
 
-void observable::subscribe(const sol::function& callback) {
-  _subscribers.emplace_back(callback);
+void observable::subscribe(const std::function<void(const sol::object&)>&& callback) {
+  _subscriber = std::move(callback);
 }
 
 std::shared_ptr<memory::observable> kv::get(const std::string& key, const sol::object& default_value) {
