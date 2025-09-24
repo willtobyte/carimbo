@@ -132,17 +132,20 @@ std::vector<std::string> tilemap::under() const noexcept {
   }
 
   const auto& action = _target->action();
-  if (action.empty()) [[unlikely]]
+  if (action.empty()) [[unlikely]] {
     return {};
+  }
 
   const auto& animations = _target->_animations;
   const auto ait = animations.find(action);
-  if (ait == animations.end()) [[unlikely]]
+  if (ait == animations.end()) [[unlikely]] {
     return {};
+  }
 
   const auto& animation = ait->second;
-  if (!animation.hitbox) [[unlikely]]
+  if (!animation.hitbox) [[unlikely]] {
     return {};
+  }
 
   const auto hitbox =
     geometry::rectangle{
@@ -184,12 +187,12 @@ std::vector<std::string> tilemap::under() const noexcept {
 
         if (const auto tile = layer[index]; tile) [[likely]] {
           if (l < lc) result.emplace_back(_labels[l]);
-          goto next_layer;
+          goto next;
         }
       }
     }
 
-  next_layer:
+  next:
     continue;
   }
 
