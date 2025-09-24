@@ -144,10 +144,11 @@ std::vector<std::string> tilemap::under() const noexcept {
   if (!animation.hitbox) [[unlikely]]
     return {};
 
-  const auto hitbox = geometry::rectangle{
-    _target->position() + animation.hitbox->rectangle.position() * _target->scale(),
-    animation.hitbox->rectangle.size() * _target->scale()
-  };
+  const auto hitbox =
+    geometry::rectangle{
+      _target->position() + animation.hitbox->rectangle.position() * _target->scale(),
+      animation.hitbox->rectangle.size() * _target->scale()
+    };
 
   const auto x0 = hitbox.x();
   const auto y0 = hitbox.y();

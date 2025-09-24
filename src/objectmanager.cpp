@@ -187,10 +187,11 @@ void objectmanager::update(float_t delta) noexcept {
     }
 
     const auto& ha = *ita->second.hitbox;
-    const auto ra = geometry::rectangle(
-      a->position() + ha.rectangle.position() * a->_scale,
-      ha.rectangle.size() * a->_scale
-    );
+    const auto ra =
+      geometry::rectangle(
+        a->position() + ha.rectangle.position() * a->_scale,
+        ha.rectangle.size() * a->_scale
+      );
 
     for (auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
       auto& b = *itob;
