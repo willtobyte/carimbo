@@ -332,7 +332,13 @@ void object::on_motion(float_t x, float_t y) {
   }
 
   const auto& animation = it->second;
-  const auto hitbox = geometry::rectangle{_position + animation.hitbox->rectangle.position() * _scale, animation.hitbox->rectangle.size() * _scale};
+
+  const auto hitbox =
+    geometry::rectangle{
+      _position + animation.hitbox->rectangle.position() * _scale,
+      animation.hitbox->rectangle.size() * _scale
+    };
+
   const bool inside = hitbox.contains(x, y);
   if (inside != _hover) {
     _hover = inside;
