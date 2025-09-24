@@ -339,7 +339,7 @@ void object::on_motion(float_t x, float_t y) {
       animation.hitbox->rectangle.size() * _scale
     };
 
-  const bool inside = hitbox.contains(x, y);
+  const auto inside = hitbox.contains(x, y);
   if (inside != _hover) {
     _hover = inside;
     inside ? on_hover() : on_unhover();
