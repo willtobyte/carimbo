@@ -264,11 +264,11 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
       return false;
     }
 
-    const auto hitbox = geometry::rectangle
-    {
-      o->_position + animation.hitbox->rectangle.position() * o->_scale,
-      animation.hitbox->rectangle.size() * o->_scale
-    };
+    const auto hitbox =
+      geometry::rectangle {
+        o->_position + animation.hitbox->rectangle.position() * o->_scale,
+        animation.hitbox->rectangle.size() * o->_scale
+      };
 
     if (!hitbox.contains(point)) {
       return false;
