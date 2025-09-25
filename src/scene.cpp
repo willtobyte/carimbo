@@ -42,25 +42,15 @@ void scene::update(float_t delta) noexcept {
 }
 
 void scene::draw() const noexcept {
-  const auto background_width  = static_cast<float_t>(_background->width());
-  const auto background_height = static_cast<float_t>(_background->height());
+  const auto size =
+    geometry::size{
+      static_cast<float_t>(_background->width()),
+      static_cast<float_t>(_background->height())
+    };
 
-  const auto scene_width  = _size.width();
-  const auto scene_height = _size.height();
+  static auto origin = geometry::point{.0f, .0f};
 
-  const geometry::size background_size{background_width, background_height};
-  static geometry::point source_origin{.0f, .0f};
-
-  for (auto y = .0f; y < scene_height; y += background_height) {
-    for (auto x = .0f; x < scene_width; x += background_width) {
-      const geometry::point destination_position{x, y};
-      _background->draw({destination_position, background_size}, {source_origin, background_size});
-    }
-  }
-
-  if (const auto& tilemap = _tilemap.value_or(nullptr)) {
-    tilemap->draw();
-  }
+  _background->draw({origin, size}, {origin, size});
 }
 
 std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& id, scenetype type) const {
