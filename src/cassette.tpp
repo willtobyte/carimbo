@@ -2,7 +2,7 @@
 
 template<typename T>
 void cassette::set(const std::string& key, const T& value) {
-  if (key.empty()) {
+  if (key.empty()) [[unlikely]] {
     return;
   }
 
