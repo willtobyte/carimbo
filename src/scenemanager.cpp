@@ -80,7 +80,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 
 void scenemanager::set(const std::string& name) {
   if (const auto active = _scene.lock()) {
-    std::println("[scenemanager] left scene {}", active->name());
+    std::println("[scenemanager] left {}", active->name());
     active->on_leave();
   }
 
@@ -88,7 +88,7 @@ void scenemanager::set(const std::string& name) {
   _scene = ptr;
   _current = name;
 
-  std::println("[scenemanager] entered scene {}", name);
+  std::println("[scenemanager] entered {}", name);
   ptr->on_enter();
 }
 
@@ -98,7 +98,7 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
   if (name.size() == 1 && name.front() == '*') {
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
       if (it->first == _current) { ++it; continue; }
-      std::println("[scenemanager] destroyed scene {}", it->first);
+      std::println("[scenemanager] destroyed {}", it->first);
       result.push_back(it->first);
       it = _scene_mapping.erase(it);
     }
@@ -112,7 +112,7 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
     return result;
   }
 
-  std::println("[scenemanager] destroyed scene {}", name);
+  std::println("[scenemanager] destroyed {}", name);
   result.push_back(name);
 
   _resourcemanager->flush();
