@@ -1,4 +1,5 @@
 #include "scene.hpp"
+#include "rectangle.hpp"
 
 using namespace framework;
 
@@ -42,15 +43,14 @@ void scene::update(float_t delta) noexcept {
 }
 
 void scene::draw() const noexcept {
-  const auto size =
-    geometry::size{
+  const auto r =
+    geometry::rectangle{
+      .0f, .0f,
       static_cast<float_t>(_background->width()),
       static_cast<float_t>(_background->height())
     };
 
-  static auto origin = geometry::point{.0f, .0f};
-
-  _background->draw({origin, size}, {origin, size});
+  _background->draw(r, r);
 }
 
 std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& id, scenetype type) const {
