@@ -97,7 +97,7 @@ void pixmap::draw(
 #endif
 }
 
-pixmap::operator SDL_Texture *() const noexcept {
+pixmap::operator SDL_Texture* () const noexcept {
   return _texture.get();
 }
 

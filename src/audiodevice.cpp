@@ -3,12 +3,12 @@
 using namespace audio;
 
 audiodevice::audiodevice()
-    : _device(nullptr, [](ALCdevice *device) {
+    : _device(nullptr, [](ALCdevice* device) {
         if (device) {
           alcCloseDevice(device);
         }
       }),
-      _context(nullptr, [](ALCcontext *context) {
+      _context(nullptr, [](ALCcontext* context) {
         if (context) {
           alcMakeContextCurrent(nullptr);
           alcDestroyContext(context);

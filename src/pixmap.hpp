@@ -31,7 +31,7 @@ public:
 #endif
   ) const noexcept;
 
-  operator SDL_Texture *() const noexcept;
+  operator SDL_Texture* () const noexcept;
 
   int32_t width() const noexcept;
 

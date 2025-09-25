@@ -5,8 +5,8 @@ using namespace network;
 using json = nlohmann::json;
 
 #ifdef EMSCRIPTEN
-EM_BOOL websocket_on_open(int, const EmscriptenWebSocketOpenEvent *event, void *data) {
-  auto *self = static_cast<socket *>(data);
+EM_BOOL websocket_on_open(int, const EmscriptenWebSocketOpenEvent* event, void* data) {
+  auto* self = static_cast<socket*>(data);
   if (!self) {
     return EM_FALSE;
   }
@@ -15,8 +15,8 @@ EM_BOOL websocket_on_open(int, const EmscriptenWebSocketOpenEvent *event, void *
   return EM_FALSE;
 }
 
-EM_BOOL websocket_on_message(int, const EmscriptenWebSocketMessageEvent *event, void *data) {
-  auto *self = static_cast<socket *>(data);
+EM_BOOL websocket_on_message(int, const EmscriptenWebSocketMessageEvent* event, void* data) {
+  auto* self = static_cast<socket*>(data);
   if (!self) {
     return EM_FALSE;
   }
@@ -25,8 +25,8 @@ EM_BOOL websocket_on_message(int, const EmscriptenWebSocketMessageEvent *event, 
   return EM_FALSE;
 }
 
-EM_BOOL websocket_on_error(int, const EmscriptenWebSocketErrorEvent *event, void *data) {
-  auto *self = static_cast<socket *>(data);
+EM_BOOL websocket_on_error(int, const EmscriptenWebSocketErrorEvent* event, void* data) {
+  auto* self = static_cast<socket*>(data);
   if (!self) {
     return EM_FALSE;
   }
@@ -35,8 +35,8 @@ EM_BOOL websocket_on_error(int, const EmscriptenWebSocketErrorEvent *event, void
   return EM_FALSE;
 }
 
-EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent *event, void *data) {
-  auto *self = static_cast<socket *>(data);
+EM_BOOL websocket_on_close(int, const EmscriptenWebSocketCloseEvent* event, void* data) {
+  auto* self = static_cast<socket*>(data);
   if (!self) {
     return EM_FALSE;
   }
@@ -59,7 +59,7 @@ socket::socket() {
 socket::~socket() {
 #ifdef EMSCRIPTEN
   constexpr int code = 1000;
-  constexpr const char *reason = "Client disconnecting";
+  constexpr const char* reason = "Client disconnecting";
 
   if (_socket) {
     emscripten_websocket_close(_socket, code, reason);
@@ -128,7 +128,7 @@ void socket::rpc(const std::string& method, const std::string& arguments, std::f
 }
 
 #ifdef EMSCRIPTEN
-void socket::handle_open(const EmscriptenWebSocketOpenEvent *event) {
+void socket::handle_open(const EmscriptenWebSocketOpenEvent* event) {
   UNUSED(event);
   _connected = true;
 
@@ -138,22 +138,22 @@ void socket::handle_open(const EmscriptenWebSocketOpenEvent *event) {
   _queue.clear();
 }
 
-void socket::handle_message(const EmscriptenWebSocketMessageEvent *event) {
+void socket::handle_message(const EmscriptenWebSocketMessageEvent* event) {
   if (!event->isText) {
     return;
   }
 
-  std::string buffer(reinterpret_cast<const char *>(event->data), event->numBytes);
+  std::string buffer(reinterpret_cast<const char*>(event->data), event->numBytes);
 
   on_message(buffer);
 }
 
-void socket::handle_error(const EmscriptenWebSocketErrorEvent *event) {
+void socket::handle_error(const EmscriptenWebSocketErrorEvent* event) {
   UNUSED(event);
   invoke("error", "WebSocket error occurred");
 }
 
-void socket::handle_close(const EmscriptenWebSocketCloseEvent *event) {
+void socket::handle_close(const EmscriptenWebSocketCloseEvent* event) {
   UNUSED(event);
 }
 #endif

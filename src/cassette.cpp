@@ -4,7 +4,7 @@ using namespace storage;
 
 cassette::cassette() {
 #ifdef EMSCRIPTEN
-  const auto *raw = emscripten_run_script_string("document.cookie");
+  const auto* raw = emscripten_run_script_string("document.cookie");
   const auto cookie = std::string(raw ? raw : "");
   const auto position = cookie.find(_cookiekey);
   if (position == std::string::npos) {

@@ -13,11 +13,11 @@ uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool
   return repeat ? interval : 0;
 }
 
-uint32_t wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
+uint32_t wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, true);
 }
 
-uint32_t singleshot_wrapper(void *userdata, SDL_TimerID id, uint32_t interval) {
+uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, false);
 }
 

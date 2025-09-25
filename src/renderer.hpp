@@ -10,9 +10,9 @@ public:
   explicit renderer(std::shared_ptr<window> window);
   ~renderer() noexcept = default;
 
-  operator SDL_Renderer *() const noexcept;
+  operator SDL_Renderer* () const noexcept;
 
-  operator SDL_Window *() const noexcept;
+  operator SDL_Window* () const noexcept;
 
   void begin() const noexcept;
   void end() const noexcept;

@@ -20,13 +20,13 @@
 
 #if defined(DYNLIB_LOAD)
 
-using SteamAPI_InitSafe_t     = bool(S_CALLTYPE *)();
-using SteamAPI_Shutdown_t     = void(S_CALLTYPE *)();
-using SteamAPI_RunCallbacks_t = void(S_CALLTYPE *)();
-using SteamUserStats_t        = void*(S_CALLTYPE *)();
-using GetAchievement_t        = bool(S_CALLTYPE *)(void*, const char*, bool*);
-using SetAchievement_t        = bool(S_CALLTYPE *)(void*, const char*);
-using StoreStats_t            = bool(S_CALLTYPE *)(void*);
+using SteamAPI_InitSafe_t     = bool(S_CALLTYPE*)();
+using SteamAPI_Shutdown_t     = void(S_CALLTYPE*)();
+using SteamAPI_RunCallbacks_t = void(S_CALLTYPE*)();
+using SteamUserStats_t        = void*(S_CALLTYPE*)();
+using GetAchievement_t        = bool(S_CALLTYPE*)(void*, const char*, bool*);
+using SetAchievement_t        = bool(S_CALLTYPE*)(void*, const char*);
+using StoreStats_t            = bool(S_CALLTYPE*)(void*);
 
 static DYNLIB_HANDLE hSteamApi = DYNLIB_LOAD(STEAM_LIB_NAME);
 

@@ -47,7 +47,7 @@ using namespace framework;
   std::exit(EXIT_FAILURE);
 }
 
-application::application(int argc, char **argv) {
+application::application(int argc, char** argv) {
   UNUSED(argc);
   UNUSED(argv);
 

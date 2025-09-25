@@ -23,7 +23,7 @@ window::window(const std::string& title, int32_t width, int32_t height, bool ful
   SDL_StartTextInput(_window.get());
 }
 
-window::operator SDL_Window *() const noexcept {
+window::operator SDL_Window* () const noexcept {
   return _window.get();
 }
 

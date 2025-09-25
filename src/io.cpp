@@ -47,7 +47,7 @@ std::vector<std::string> io::enumerate(const std::string& directory) {
         PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
-  auto *const *array = ptr.get();
+  auto* const *array = ptr.get();
 
   auto n = 0uz;
   while (array[n] != nullptr) ++n;

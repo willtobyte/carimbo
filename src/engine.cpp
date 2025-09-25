@@ -133,8 +133,8 @@ void engine::prefetch(const std::vector<std::string>& filenames) {
 
 #ifdef EMSCRIPTEN
 template <class T>
-inline void run(void *userdata) {
-  reinterpret_cast<T *>(userdata)->_loop();
+inline void run(void* userdata) {
+  reinterpret_cast<T*>(userdata)->_loop();
 }
 #endif
 

@@ -8,7 +8,7 @@ public:
   window(const std::string& title, int32_t width, int32_t height, bool fullscreen);
   ~window() = default;
 
-  operator SDL_Window *() const noexcept;
+  operator SDL_Window*() const noexcept;
 
   std::shared_ptr<renderer> create_renderer(float_t scale);
 

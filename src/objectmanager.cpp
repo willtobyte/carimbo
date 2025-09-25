@@ -212,10 +212,10 @@ void objectmanager::update(float_t delta) noexcept {
       }
 
       const auto rb =
-        geometry::rectangle(
+        geometry::rectangle{
           b->position() + hb.rectangle.position() * b->_scale,
           hb.rectangle.size() * b->_scale
-        );
+        };
 
       if (!ra.intersects(rb)) {
         continue;

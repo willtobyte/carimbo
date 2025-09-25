@@ -23,10 +23,10 @@ public:
   void rpc(const std::string& method, const std::string& arguments, std::function<void(const std::string& )>&& callback);
 
 #ifdef EMSCRIPTEN
-  void handle_open(const EmscriptenWebSocketOpenEvent *event);
-  void handle_message(const EmscriptenWebSocketMessageEvent *event);
-  void handle_error(const EmscriptenWebSocketErrorEvent *event);
-  void handle_close(const EmscriptenWebSocketCloseEvent *event);
+  void handle_open(const EmscriptenWebSocketOpenEvent* event);
+  void handle_message(const EmscriptenWebSocketMessageEvent* event);
+  void handle_error(const EmscriptenWebSocketErrorEvent* event);
+  void handle_close(const EmscriptenWebSocketCloseEvent* event);
 #endif
 private:
 #ifndef EMSCRIPTEN

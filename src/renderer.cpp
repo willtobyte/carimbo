@@ -31,11 +31,11 @@ renderer::renderer(std::shared_ptr<window> window)
   _renderer.reset(renderer);
 }
 
-renderer::operator SDL_Renderer *() const noexcept {
+renderer::operator SDL_Renderer* () const noexcept {
   return _renderer.get();
 }
 
-renderer::operator SDL_Window *() const noexcept {
+renderer::operator SDL_Window* () const noexcept {
   return *_window;
 }
 
