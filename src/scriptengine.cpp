@@ -200,7 +200,7 @@ void framework::scriptengine::run() {
     #endif
   };
 
-  lua["queryparam"] = [&lua](const std::string& key, const std::string& defval) {
+  lua["queryparam"] = [](const std::string& key, const std::string& defval) {
     auto out = defval;
 
     #ifdef EMSCRIPTEN
@@ -225,7 +225,7 @@ void framework::scriptengine::run() {
       }
     #endif
 
-    return sol::make_object(lua, out);
+    return out;
   };
 
   steam::achievement achievement;
