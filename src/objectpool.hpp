@@ -49,12 +49,13 @@ public:
     return object;
   }
 
-  void release(PtrType object) {
+  void release(PtrType&& object) {
     if (!object) {
       return;
     }
 
     if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) {
+      std::println(">>> object.use_count() {}", object.use_count());
       if (object.use_count() != MINIMAL_USE_COUNT) {
         return;
       }

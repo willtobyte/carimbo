@@ -1,5 +1,6 @@
 #include "objectmanager.hpp"
 #include "object.hpp"
+#include <memory>
 
 using namespace framework;
 
@@ -21,9 +22,8 @@ auto callback_or(const Map& m, const typename Map::key_type& key, std::optional<
 
 objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(resourcemanager) {
-  _objectpool->reserve(64);
   _envelopepool->reserve(64);
-  _objects.reserve(64);
+  _objects.reserve(256);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
@@ -74,7 +74,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     animations.emplace(key, animation{oneshot, next, hitbox, effect, std::move(keyframes)});
   }
 
-  auto o = _objectpool->acquire();
+  auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_scale = scale;
   o->_kind = kind;
@@ -95,7 +95,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
     return nullptr;
   }
 
-  const auto o = _objectpool->acquire();
+  const auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_angle = matrix->_angle;
   o->_kind = matrix->_kind;
@@ -132,7 +132,7 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
   }
 
   const auto it = std::find(_objects.begin(), _objects.end(), object);
-  if (it == _objects.end()) {
+  if (it == _objects.end()) [[unlikely]] {
     return;
   }
 
@@ -143,23 +143,19 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
   _objects.pop_back();
 }
 
-void objectmanager::destroy(std::shared_ptr<object> object) {
+void objectmanager::destroy(const std::shared_ptr<object>& object) {
   if (!object) [[unlikely]] {
     return;
   }
 
-  const auto it = std::find(_objects.begin(), _objects.end(), object);
+  auto it = std::find(_objects.begin(), _objects.end(), object);
   if (it == _objects.end()) {
     return;
   }
 
-  if (std::next(it) != _objects.end()) {
-    *it = std::move(_objects.back());
-  }
-
+  auto ptr = std::move(*it);
+  if (std::next(it) != _objects.end()) *it = std::move(_objects.back());
   _objects.pop_back();
-
-  _objectpool->release(object);
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const {
