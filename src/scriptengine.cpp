@@ -457,9 +457,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::objectmanager>(
     "ObjectManager",
     sol::no_constructor,
-    "create", [](framework::objectmanager& self, const std::string& kind) {
-      return self.create(kind, std::nullopt, true);
-    },
+    "create", &framework::objectmanager::create,
     "clone", &framework::objectmanager::clone,
     "remove", &framework::objectmanager::remove
   );
