@@ -1,5 +1,4 @@
 #include "scene.hpp"
-#include "rectangle.hpp"
 
 using namespace framework;
 
