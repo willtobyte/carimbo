@@ -328,29 +328,6 @@ void framework::scriptengine::run() {
     "both", graphics::reflection::both
   );
 
-
-  struct metakv {
-    static sol::object index(memory::kv& store, sol::stack_object key, sol::this_state state) {
-      const auto& ptr = store.get(key.as<std::string>());
-      return sol::make_object(state, std::ref(*ptr));
-    }
-
-    static void new_index(memory::kv& store, sol::stack_object key, sol::stack_object value) {
-      store.set(key.as<std::string>(), value);
-    }
-  };
-
-  lua.new_usertype<memory::kv>(
-    "KeyValue",
-    sol::no_constructor,
-    sol::meta_function::index, metakv::index,
-    sol::meta_function::new_index, metakv::new_index
-  );
-
-  memory::kv kv;
-
-  lua["kv"] = &kv;
-
   struct velocityproxy {
     framework::object& o;
 
