@@ -20,7 +20,7 @@ public:
 
   void manage(std::shared_ptr<object> object) noexcept;
 
-  void destroy(std::shared_ptr<object> object) noexcept;
+  void remove(std::shared_ptr<object> object) noexcept;
 
   std::shared_ptr<object> find(uint64_t id) const noexcept;
 

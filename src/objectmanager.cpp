@@ -126,7 +126,7 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   _objects.emplace_back(std::move(object));
 }
 
-void objectmanager::destroy(std::shared_ptr<object> object) noexcept {
+void objectmanager::remove(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return;
   }

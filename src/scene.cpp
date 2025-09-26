@@ -22,7 +22,7 @@ scene::scene(
 scene::~scene() noexcept {
   auto objects = std::exchange(_objects, {});
   for (const auto& [_, o] : objects) {
-    _objectmanager->destroy(o);
+    _objectmanager->remove(o);
   }
 
   auto effects = std::exchange(_effects, {});
@@ -88,7 +88,7 @@ void scene::on_leave() const {
   }
 
   for (const auto& [_, o] : _objects) {
-    _objectmanager->destroy(o);
+    _objectmanager->remove(o);
   }
 
   for (const auto& [_, e] : _effects) {
