@@ -461,7 +461,7 @@ void framework::scriptengine::run() {
       return self.create(kind, std::nullopt, true);
     },
     "clone", &framework::objectmanager::clone,
-    "destroy", &framework::objectmanager::destroy
+    "remove", &framework::objectmanager::remove
   );
 
   lua.new_usertype<framework::resourcemanager>(
