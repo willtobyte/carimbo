@@ -88,7 +88,7 @@ void scene::on_leave() const {
   }
 
   for (const auto& [_, o] : _objects) {
-    _objectmanager->unmanage(o);
+    _objectmanager->destroy(o);
   }
 
   for (const auto& [_, e] : _effects) {

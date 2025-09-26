@@ -118,7 +118,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   return o;
 }
 
-void objectmanager::manage(std::shared_ptr<object> object) {
+void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return;
   }
@@ -126,7 +126,7 @@ void objectmanager::manage(std::shared_ptr<object> object) {
   _objects.emplace_back(std::move(object));
 }
 
-void objectmanager::unmanage(std::shared_ptr<object> object) {
+void objectmanager::destroy(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return;
   }
@@ -136,29 +136,14 @@ void objectmanager::unmanage(std::shared_ptr<object> object) {
     return;
   }
 
-  if (std::next(it) != _objects.end()) {
-    *it = std::move(_objects.back());
+  if (it != _objects.end() - 1) [[likely]] {
+    std::iter_swap(it, _objects.end() - 1);
   }
 
   _objects.pop_back();
 }
 
-void objectmanager::destroy(const std::shared_ptr<object>& object) {
-  if (!object) [[unlikely]] {
-    return;
-  }
-
-  auto it = std::find(_objects.begin(), _objects.end(), object);
-  if (it == _objects.end()) {
-    return;
-  }
-
-  auto ptr = std::move(*it);
-  if (std::next(it) != _objects.end()) *it = std::move(_objects.back());
-  _objects.pop_back();
-}
-
-std::shared_ptr<object> objectmanager::find(uint64_t id) const {
+std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
   for (const auto& o : _objects) {
     if (o->id() == id) {
       return o;
@@ -168,7 +153,7 @@ std::shared_ptr<object> objectmanager::find(uint64_t id) const {
   return nullptr;
 }
 
-void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) {
+void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept {
   _scenemanager = std::move(scenemanager);
 }
 

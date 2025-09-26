@@ -18,15 +18,13 @@ public:
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
 
-  void manage(std::shared_ptr<object> object);
+  void manage(std::shared_ptr<object> object) noexcept;
 
-  void unmanage(std::shared_ptr<object> object);
+  void destroy(std::shared_ptr<object> object) noexcept;
 
-  void destroy(const std::shared_ptr<object>& object);
+  std::shared_ptr<object> find(uint64_t id) const noexcept;
 
-  std::shared_ptr<object> find(uint64_t id) const;
-
-  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
+  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept;
 
   void update(float_t delta) noexcept;
 
