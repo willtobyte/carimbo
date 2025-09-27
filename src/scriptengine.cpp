@@ -561,13 +561,11 @@ void framework::scriptengine::run() {
       const std::string& name
     ) {
       const auto start = SDL_GetPerformanceCounter();
-      std::println(">>> 0");
       const auto scene = self.load(name);
       if (!scene) [[unlikely]] {
-        std::println(">>> ERROR");
         return;
       }
-std::println(">>> 1");
+
       const auto filename = std::format("scenes/{}.lua", name);
       const auto buffer = storage::io::read(filename);
       std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
@@ -579,12 +577,10 @@ std::println(">>> 1");
         throw std::runtime_error(err.what());
       }
 
-      std::println(">>> 2");
       auto module = exec.get<sol::table>();
 
       auto loaded = lua["package"]["loaded"];
       loaded[std::format("scenes/{}", name)] = module;
-std::println(">>> 3");
       auto ptr = std::weak_ptr<framework::scene>(scene);
 
       module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
