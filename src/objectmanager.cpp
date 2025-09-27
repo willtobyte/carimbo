@@ -54,7 +54,6 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   const auto scale = j.value("scale", float_t{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
-
   animation_map animations;
   animations.reserve(j["animations"].size());
   for (const auto& item : j["animations"].items()) {
@@ -82,7 +81,6 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
 
-  std::println("[objectmanager] created {} {}", qualifier, o->id());
   if (manage) {
     _objects.emplace_back(o);
   }
