@@ -586,10 +586,10 @@ void framework::scriptengine::run() {
       module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
         auto scene = ptr.lock();
         if (!scene) {
-          std::println("[scriptengine] scene {} expired while accessing object {}", name, id);
-
-          return std::variant<std::shared_ptr<framework::object>,
-                              std::shared_ptr<audio::soundfx>>{};
+          throw std::runtime_error(std::format(
+            "[scriptengine] scene {} expired while accessing object {}",
+              name, id
+          ));
         }
 
         return scene->get(id, type);
