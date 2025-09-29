@@ -411,19 +411,19 @@ void framework::scriptengine::run() {
         return o.placement();
       },
       [](framework::object& o, sol::table table) {
-        float x = 0.0f;
-        float y = 0.0f;
+        auto x = .0f;
+        auto y = .0f;
 
         if (table["x"].valid()) {
-          x = table["x"].get<float>();
+          x = table["x"].get<float_t>();
         } else if (table[1].valid()) {
-          x = table[1].get<float>();
+          x = table[1].get<float_t>();
         }
 
         if (table["y"].valid()) {
-          y = table["y"].get<float>();
+          y = table["y"].get<float_t>();
         } else if (table[2].valid()) {
-          y = table[2].get<float>();
+          y = table[2].get<float_t>();
         }
 
         o.set_placement(x, y);
