@@ -38,8 +38,8 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       throw std::runtime_error(std::format("[SDL_GetTextureSize] {}", SDL_GetError()));
     }
 
-    const int32_t tw = static_cast<int32_t>(fw);
-    const int32_t th = static_cast<int32_t>(fh);
+    const auto tw = static_cast<int32_t>(fw);
+    const auto th = static_cast<int32_t>(fh);
 
     std::unique_ptr<SDL_Texture, SDL_Deleter> target{
       SDL_CreateTexture(
@@ -70,7 +70,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     const auto separator = color(pixels[0]);
 
     glyphmap map;
-    int32_t x = 0, y = 0;
+    auto x = 0, y = 0;
     for (char glyph : glyphs) {
       while (x < tw && color(pixels[y * tw + x]) == separator) {
         ++x;
@@ -79,12 +79,12 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
         throw std::runtime_error(std::format("missing glyph for '{}'", glyph));
       }
 
-      int32_t w = 0;
+      auto w = 0;
       while (x + w < tw && color(pixels[y * tw + x + w]) != separator) {
         ++w;
       }
 
-      int32_t h = 0;
+      auto h = 0;
       while (y + h < th && color(pixels[(y + h) * tw + x]) != separator) {
         ++h;
       }
