@@ -588,7 +588,8 @@ void framework::scriptengine::run() {
         if (!scene) {
           throw std::runtime_error(std::format(
             "[scriptengine] scene {} expired while accessing object {}",
-              name, id
+              name,
+              id
           ));
         }
 
