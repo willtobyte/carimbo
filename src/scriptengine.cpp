@@ -436,8 +436,8 @@ void framework::scriptengine::run() {
       [](framework::object& o, const sol::object& v) {
         if (v.is<sol::table>()) {
           const auto table = v.as<sol::table>();
-          const auto x = table.get_or<float_t>("x", table.get_or(1, 0.0));
-          const auto y = table.get_or<float_t>("y", table.get_or(2, 0.0));
+          const auto x = table.get_or<float_t>("x", table.get_or(1, 0));
+          const auto y = table.get_or<float_t>("y", table.get_or(2, 0));
           o.set_velocity(algebra::vector2d{x, y});
           return;
         }
