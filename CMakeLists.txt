@@ -116,7 +116,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     $<$<CONFIG:Debug>:${EMSDK_LINK_DEBUG_FLAGS}>
     $<$<CONFIG:Release>:${EMSDK_LINK_RELEASE_FLAGS}>
   )
-else()
+endif()
+
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   find_package(Boost CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
