@@ -125,7 +125,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 
   find_package(sentry CONFIG QUIET)
 
-  if(HAVE_LUAJIT)
+  if(SOL_LUAJIT)
     find_package(luajit CONFIG REQUIRED)
   endif()
 
