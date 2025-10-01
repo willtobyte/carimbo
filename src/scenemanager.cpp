@@ -99,7 +99,7 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
       if (it->first == _current) { ++it; continue; }
       std::println("[scenemanager] destroyed {}", it->first);
-      result.push_back(it->first);
+      result.emplace_back(it->first);
       it = _scene_mapping.erase(it);
     }
 
@@ -113,7 +113,7 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
   }
 
   std::println("[scenemanager] destroyed {}", name);
-  result.push_back(name);
+  result.emplace_back(name);
 
   _resourcemanager->flush();
   return result;

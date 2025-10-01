@@ -121,7 +121,7 @@ static nlohmann::json _to_json(const sol::object& value) {
       if (is_array) {
         auto j = json::array();
         j.get_ref<json::array_t&>().reserve(table.size());
-        for (const auto& pair : table) j.push_back(_to_json(pair.second));
+        for (const auto& pair : table) j.emplace_back(_to_json(pair.second));
         return j;
       }
 
@@ -487,7 +487,7 @@ void framework::scriptengine::run() {
           std::vector<std::string> filenames;
           filenames.reserve(arguments.size());
           for (const auto& value : arguments) {
-            filenames.push_back(value.as<std::string>());
+            filenames.emplace_back(value.as<std::string>());
           }
           self.prefetch(std::move(filenames));
         }
@@ -827,19 +827,19 @@ void framework::scriptengine::run() {
               if (opt) {
                 sol::object o = opt.value();
                 if (o.is<int>())
-                  json.push_back(o.as<int>());
+                  json.emplace_back(o.as<int>());
                 else if (o.is<double_t>())
-                  json.push_back(o.as<double_t>());
+                  json.emplace_back(o.as<double_t>());
                 else if (o.is<bool>())
-                  json.push_back(o.as<bool>());
+                  json.emplace_back(o.as<bool>());
                 else if (o.is<std::string>())
-                  json.push_back(o.as<std::string>());
+                  json.emplace_back(o.as<std::string>());
                 else if (o.is<sol::table>())
-                  json.push_back(table2json(o.as<sol::table>()));
+                  json.emplace_back(table2json(o.as<sol::table>()));
                 else
-                  json.push_back(nullptr);
+                  json.emplace_back(nullptr);
               } else {
-                json.push_back(nullptr);
+                json.emplace_back(nullptr);
               }
             }
           } else {

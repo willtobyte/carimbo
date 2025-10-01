@@ -33,7 +33,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
 
         _controllers.emplace(jid, std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
 
-        _joystickgorder.push_back(jid);
+        _joystickgorder.emplace_back(jid);
         _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
 
         std::println("[eventmanager] gamepad connected {}", jid);
@@ -149,7 +149,7 @@ void eventmanager::update(float_t delta) noexcept {
 
           _controllers[jid] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
 
-          _joystickgorder.push_back(jid);
+          _joystickgorder.emplace_back(jid);
           _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
 
           std::println("[eventmanager] gamepad connected {}", jid);
