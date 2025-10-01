@@ -812,38 +812,38 @@ void framework::scriptengine::run() {
       else if (object.is<sol::table>()) {
         sol::table table = object.as<sol::table>();
         std::function<nlohmann::json(sol::table)> table2json = [&](sol::table table) {
-          nlohmann::json temp;
-          bool is_array = true;
+          nlohmann::json json;
+          auto isarray = true;
           for (const auto& pair : table) {
             if (!pair.first.is<int>()) {
-              is_array = false;
+              isarray = false;
               break;
             }
           }
-          if (is_array) {
-            temp = nlohmann::json::array();
+          if (isarray) {
+            json = nlohmann::json::array();
             for (size_t i = 1, n = table.size(); i <= n; ++i) {
               sol::optional<sol::object> opt = table[i];
               if (opt) {
                 sol::object o = opt.value();
                 if (o.is<int>())
-                  temp.push_back(o.as<int>());
+                  json.push_back(o.as<int>());
                 else if (o.is<double_t>())
-                  temp.push_back(o.as<double_t>());
+                  json.push_back(o.as<double_t>());
                 else if (o.is<bool>())
-                  temp.push_back(o.as<bool>());
+                  json.push_back(o.as<bool>());
                 else if (o.is<std::string>())
-                  temp.push_back(o.as<std::string>());
+                  json.push_back(o.as<std::string>());
                 else if (o.is<sol::table>())
-                  temp.push_back(table2json(o.as<sol::table>()));
+                  json.push_back(table2json(o.as<sol::table>()));
                 else
-                  temp.push_back(nullptr);
+                  json.push_back(nullptr);
               } else {
-                temp.push_back(nullptr);
+                json.push_back(nullptr);
               }
             }
           } else {
-            temp = nlohmann::json::object();
+            json = nlohmann::json::object();
             for (const auto& pair : table) {
               const sol::object& key = pair.first;
               const sol::object& value = pair.second;
@@ -855,23 +855,23 @@ void framework::scriptengine::run() {
               else
                 continue;
               if (value.is<int>())
-                temp[k] = value.as<int>();
+                json[k] = value.as<int>();
               else if (value.is<double_t>())
-                temp[k] = value.as<double_t>();
+                json[k] = value.as<double_t>();
               else if (value.is<bool>())
-                temp[k] = value.as<bool>();
+                json[k] = value.as<bool>();
               else if (value.is<std::string>())
-                temp[k] = value.as<std::string>();
+                json[k] = value.as<std::string>();
               else if (value.is<sol::table>())
-                temp[k] = table2json(value.as<sol::table>());
+                json[k] = table2json(value.as<sol::table>());
               else
-                temp[k] = nullptr;
+                json[k] = nullptr;
             }
           }
-          return temp;
+          return json;
         };
-        nlohmann::json j = table2json(table);
-        self.set<nlohmann::json>(key, j);
+
+        self.set<nlohmann::json>(key, table2json(table));
       } else {
         throw std::runtime_error("unsupported type for set");
       }
