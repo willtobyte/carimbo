@@ -22,7 +22,7 @@ protected:
 
     _objects.reserve(target);
 
-    for (size_t i = _objects.size(); i < target; ++i) {
+    for (auto i = _objects.size(); i < target; ++i) {
       if constexpr (std::is_same_v<PtrType, std::unique_ptr<T>>) _objects.emplace_back(std::make_unique<T>());
       if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) _objects.emplace_back(std::make_shared<T>());
     }

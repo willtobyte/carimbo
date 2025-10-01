@@ -81,7 +81,7 @@ static sol::object _to_lua(const nlohmann::json& value, sol::state_view lua) {
 
     case json::value_t::array: {
       auto t = lua.create_table(static_cast<int>(value.size()), 0);
-      for (size_t i = 0, n = value.size(); i < n; ++i) t[i + 1] = _to_lua(value[i], lua);
+      for (auto i = 0uz, n = value.size(); i < n; ++i) t[i + 1] = _to_lua(value[i], lua);
       return sol::make_object(lua, t);
     }
 
@@ -822,7 +822,7 @@ void framework::scriptengine::run() {
           }
           if (isarray) {
             json = nlohmann::json::array();
-            for (size_t i = 1, n = table.size(); i <= n; ++i) {
+            for (auto i = 1uz, n = table.size(); i <= n; ++i) {
               sol::optional<sol::object> opt = table[i];
               if (opt) {
                 sol::object o = opt.value();
