@@ -21,7 +21,7 @@ else()
 endif()
 
 execute_process(
-  COMMAND git describe --tags --match "v1.*.*" --abbrev=0
+  COMMAND git describe --tags --match "v*.*.*" --abbrev=0
   OUTPUT_VARIABLE latest_tag
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
