@@ -845,8 +845,8 @@ void framework::scriptengine::run() {
           } else {
             json = nlohmann::json::object();
             for (const auto& pair : table) {
-              const sol::object& key = pair.first;
-              const sol::object& value = pair.second;
+              const auto& key = pair.first;
+              const auto& value = pair.second;
               std::string k;
               if (key.is<std::string>())
                 k = key.as<std::string>();
