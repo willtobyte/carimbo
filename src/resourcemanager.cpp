@@ -10,14 +10,14 @@ static const std::map<std::string, std::function<void(
 )>> handlers = {
   {
     ".png",
-    [](const std::string& filename, graphics::pixmappool& pixmap, audio::soundmanager&) {
-      pixmap.get(filename);
+    [](const std::string& filename, graphics::pixmappool& pixmappool, audio::soundmanager&) {
+      pixmappool.get(filename);
     }
   },
   {
     ".ogg",
-    [](const std::string& filename, graphics::pixmappool&, audio::soundmanager& sound) {
-      sound.get(filename);
+    [](const std::string& filename, graphics::pixmappool&, audio::soundmanager& soundmanager) {
+      soundmanager.get(filename);
     }
   }
 };
