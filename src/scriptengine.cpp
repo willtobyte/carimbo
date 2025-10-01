@@ -779,10 +779,7 @@ void framework::scriptengine::run() {
     sol::constructors<geometry::point(), geometry::point(float_t, float_t)>(),
     "set", &geometry::point::set,
     "x", sol::property(&geometry::point::x, &geometry::point::set_x),
-    "y", sol::property(&geometry::point::y, &geometry::point::set_y),
-    sol::meta_function::to_string, [](const geometry::point& self) {
-      return std::format("point({}, {})", self.x(), self.y());
-    }
+    "y", sol::property(&geometry::point::y, &geometry::point::set_y)
   );
 
   lua.new_usertype<geometry::size>(
