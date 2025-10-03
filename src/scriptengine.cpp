@@ -259,7 +259,6 @@ void framework::scriptengine::run() {
 
       return _to_lua(j, lua);
     },
-
     "stringify", [](const sol::table& table) {
       nlohmann::json result;
       for (const auto& pair : table) {
