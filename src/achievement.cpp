@@ -14,6 +14,8 @@ void achievement::unlock(const std::string& id) noexcept {
     return;
   }
 
+  std::println("[achievement] unlocked {}", id);
+
   SetAchievement(ptr);
   StoreStats();
 }
