@@ -7,12 +7,6 @@
 #include <sol/types.hpp>
 #include <string>
 
-[[noreturn]] static void panic(sol::optional<std::string> maybe_message) {
-  throw std::runtime_error(
-    std::format("Lua panic: {}",
-      maybe_message.value_or("unknown Lua error")));
-}
-
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
@@ -167,7 +161,7 @@ struct sentinel final {
 void framework::scriptengine::run() {
   const auto start = SDL_GetPerformanceCounter();
 
-  sol::state lua(sol::c_call<decltype(&panic), &panic>);
+  sol::state lua;
 
   lua.open_libraries();
 
