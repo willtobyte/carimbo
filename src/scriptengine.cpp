@@ -456,7 +456,7 @@ void framework::scriptengine::run() {
       sol::optional<std::string> scope_opt,
       sol::optional<bool> manage_opt
     ) {
-      const bool manage = manage_opt.value_or(true);
+      const auto manage = manage_opt.value_or(true);
       if (!scope_opt) {
         return manager.create(kind, std::nullopt, manage);
       }
