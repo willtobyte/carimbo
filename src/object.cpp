@@ -57,8 +57,8 @@ algebra::vector2d& object::velocity() noexcept {
 }
 
 void object::update(float_t delta) noexcept {
-  if (_onupdate) {
-    _onupdate(shared_from_this());
+  if (const auto& fn = _onupdate; fn) {
+    fn(shared_from_this());
   }
 
   if (_action.empty()) {
