@@ -14,6 +14,20 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
   const auto id = _counter++;
 
+  /*
+   [{
+    "count": 100,
+    "xvel": {"start": 1.0, "end": 1.0},
+    "yvel": {"start": 1.0, "end": 1.0},
+    "gx": {"start": 1.0, "end": 1.0},
+    "gy": {"start": 1.0, "end": 1.0},
+    "life": {"start": 1.0, "end": 1.0},
+    "pixmaps": 3, // random between
+    "distribuition": [10, 10, 80] // 3 pixmaps
+    "width": 20,
+    "height": 20,
+   }]
+   */
   const auto count = j.value("count", 0ull);
 
   const auto xvel = j["xvel"];
