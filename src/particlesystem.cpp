@@ -13,46 +13,48 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
   const auto id = _counter++;
-  _pixmaps.try_emplace(id, std::move(pixmap));
 
-  UNUSED(name);
+  const auto count = j.value("count", 0ull);
 
-  const auto count = 1000ull;
+  const auto xvel = j["xvel"];
+  const auto yvel = j["yvel"];
+  const auto gx = j["gx"];
+  const auto gy = j["gy"];
+  const auto life = j["gy"];
+
+  emitter e{};
+  e.x = x;
+  e.y = y;
+  e.pixmap = id;
+  e.xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
+  e.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
+  e.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
+  e.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
+  e.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
 
   auto particles = std::vector<particle>();
   particles.reserve(count);
 
-  std::mt19937 rng{std::random_device{}()};
-  std::uniform_real_distribution<float> xveldist(j["xvel"].value("start", .0f), j["xveldist"].value("end", .0f));
-  std::uniform_real_distribution<float> yveldist(j["yvel"].value("start", .0f), j["yveldist"].value("end", .0f));
-  std::uniform_real_distribution<float> gxdist(j["gx"].value("start", .0f), j["gx"].value("end", .0f));
-  std::uniform_real_distribution<float> gydist(j["gy"].value("start", .0f), j["gy"].value("end", .0f));
-  std::uniform_real_distribution<float> lifedist(j["life"].value("start", .0f), j["life"].value("end", .0f));
-
   for (auto i = 0uz; i < count; ++i) {
     particle p{};
     p.angle = 0.0;
-    p.x = x,
-    p.y = y,
-    p.vx = xveldist(rng);
-    p.vy = yveldist(rng);
-    p.gx = gxdist(rng);
-    p.gy = gydist(rng);
-    p.life = lifedist(rng);
+    p.x = e.x,
+    p.y = e.y,
+    p.vx = e.randxvel();
+    p.vy = e.randyvel();
+    p.gx = e.randgx();
+    p.gy = e.randgy();
+    p.life = e.randlife();
     p.frame = 0;
-    p.pixmap = 0;
+    p.pixmap = e.pixmap;
     p.alpha = 255;
 
     particles.emplace_back(p);
   }
 
-  /*
-  {
-    "x"
-    "y"
-    "pix"
-  }
-  */
+  _pixmaps.try_emplace(id, std::move(pixmap));
+  _emitters.try_emplace(name, std::move(e));
+  _particles.try_emplace(name, std::move(particles));
 }
 
 void particlesystem::destroy(const std::string& name) noexcept {
@@ -70,10 +72,32 @@ void particlesystem::destroy(const std::string& name) noexcept {
 
 void particlesystem::update(float_t delta) noexcept {
   for (auto& bucket : _particles) {
+    auto& e = _emitters.find(bucket.first)->second;
+
     auto& particles = bucket.second;
 
-    for (auto& particle : particles) {
-      particle.life -= delta;
+    for (auto& p : particles) {
+      p.life -= delta;
+
+      if (p.life > .0f) {
+        p.x += p.vx * delta;
+        p.y += p.vy * delta;
+
+        continue;
+      }
+
+      // respawn
+      p.angle = 0.0;
+      p.x = e.x,
+      p.y = e.y,
+      p.vx = e.randxvel();
+      p.vy = e.randyvel();
+      p.gx = e.randgx();
+      p.gy = e.randgy();
+      p.life = e.randlife();
+      p.frame = 0;
+      p.pixmap = 0;
+      p.alpha = 255;
     }
   }
 }

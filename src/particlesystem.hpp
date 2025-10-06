@@ -15,6 +15,23 @@ struct particle final {
   uint8_t pad[3];
 };
 
+struct emitter final {
+  float x, y;
+  uint32_t pixmap;
+  std::mt19937 rng{std::random_device{}()};
+  std::uniform_real_distribution<float> xveldist;
+  std::uniform_real_distribution<float> yveldist;
+  std::uniform_real_distribution<float> gxdist;
+  std::uniform_real_distribution<float> gydist;
+  std::uniform_real_distribution<float> lifedist;
+
+  auto randxvel() noexcept { return xveldist(rng); }
+  auto randyvel() noexcept { return yveldist(rng); }
+  auto randgx() noexcept { return gxdist(rng); }
+  auto randgy() noexcept { return gydist(rng); }
+  auto randlife() noexcept { return lifedist(rng); }
+};
+
 class particlesystem final {
   public:
     explicit particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
@@ -33,5 +50,6 @@ class particlesystem final {
     std::shared_ptr<framework::resourcemanager> _resourcemanager;
     std::unordered_map<std::string, std::vector<particle>> _particles;
     std::unordered_map<uint32_t, std::shared_ptr<pixmap>> _pixmaps;
+    std::unordered_map<std::string, emitter> _emitters;
 };
 }
