@@ -6,7 +6,7 @@ particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resou
     : _resourcemanager(std::move(resourcemanager)) {
 }
 
-void particlesystem::create(const std::string& name, const std::string& kind) {
+void particlesystem::create(const std::string& name, const std::string& kind, float_t x, float_t y) {
   const auto& filename = std::format("particles/{}.json", kind);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
@@ -14,6 +14,37 @@ void particlesystem::create(const std::string& name, const std::string& kind) {
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
   const auto id = _counter++;
   _pixmaps.try_emplace(id, std::move(pixmap));
+
+  UNUSED(name);
+
+  const auto count = 1000ull;
+
+  auto particles = std::vector<particle>();
+  particles.reserve(count);
+
+  std::mt19937 rng{std::random_device{}()};
+  std::uniform_real_distribution<float> xveldist(j["xvel"].value("start", .0f), j["xveldist"].value("end", .0f));
+  std::uniform_real_distribution<float> yveldist(j["yvel"].value("start", .0f), j["yveldist"].value("end", .0f));
+  std::uniform_real_distribution<float> gxdist(j["gx"].value("start", .0f), j["gx"].value("end", .0f));
+  std::uniform_real_distribution<float> gydist(j["gy"].value("start", .0f), j["gy"].value("end", .0f));
+  std::uniform_real_distribution<float> lifedist(j["life"].value("start", .0f), j["life"].value("end", .0f));
+
+  for (auto i = 0uz; i < count; ++i) {
+    particle p{};
+    p.angle = 0.0;
+    p.x = x,
+    p.y = y,
+    p.vx = xveldist(rng);
+    p.vy = yveldist(rng);
+    p.gx = gxdist(rng);
+    p.gy = gydist(rng);
+    p.life = lifedist(rng);
+    p.frame = 0;
+    p.pixmap = 0;
+    p.alpha = 255;
+
+    particles.emplace_back(p);
+  }
 
   /*
   {
@@ -44,7 +75,7 @@ void particlesystem::update(float_t delta) noexcept {
     for (auto& particle : particles) {
       particle.life -= delta;
     }
-  } 
+  }
 }
 
 void particlesystem::draw() const noexcept {
