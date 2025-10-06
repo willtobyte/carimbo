@@ -91,8 +91,8 @@ void cursor::draw() const noexcept {
         animation.frame.size()
       },
       0,
-      reflection::none,
-      255
+      255,
+      reflection::none
 #ifdef DEBUG
       ,
       std::nullopt

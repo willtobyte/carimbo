@@ -168,8 +168,8 @@ void object::draw() const noexcept {
     source,
     destination,
     _angle,
-    _reflection,
-    _alpha
+    _alpha,
+    _reflection
     #ifdef DEBUG
       , debug
     #endif

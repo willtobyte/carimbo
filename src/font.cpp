@@ -57,8 +57,8 @@ void font::draw(const std::string& text, const geometry::point& position, const 
       glyph,
       {cursor, size * _scale},
       angle,
-      reflection,
-      alpha
+      alpha,
+      reflection
     );
 
     cursor += std::make_pair('x', size.width() + _spacing);

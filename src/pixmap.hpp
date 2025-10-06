@@ -23,8 +23,8 @@ public:
       const geometry::rectangle& source,
       const geometry::rectangle& destination,
       double_t angle = 0.0L,
-      reflection reflection = reflection::none,
-      uint8_t alpha = 255
+      uint8_t alpha = 255,
+      reflection reflection = reflection::none
 #ifdef DEBUG
       ,
       const std::optional<geometry::rectangle>& outline = std::nullopt

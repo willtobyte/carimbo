@@ -74,8 +74,8 @@ void pixmap::draw(
     const geometry::rectangle& source,
     const geometry::rectangle& destination,
     const double_t angle,
-    reflection reflection,
-    const uint8_t alpha
+    const uint8_t alpha,
+    reflection reflection
 #ifdef DEBUG
     ,
     const std::optional<geometry::rectangle>& outline
