@@ -1,11 +1,4 @@
 #include "scriptengine.hpp"
-#include "canvas.hpp"
-#include "environment.hpp"
-#include "soundmanager.hpp"
-#include <sol/object.hpp>
-#include <sol/property.hpp>
-#include <sol/types.hpp>
-#include <string>
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
@@ -752,6 +745,7 @@ void framework::scriptengine::run() {
     "statemanager", &framework::engine::statemanager,
     "scenemanager", &framework::engine::scenemanager,
     "timermanager", &framework::engine::timermanager,
+    "particlesystem", &framework::engine::particlesystem,
     "run", &framework::engine::run
   );
 

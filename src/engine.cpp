@@ -4,6 +4,7 @@
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "objectmanager.hpp"
+#include "particlesystem.hpp"
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
 #include "statemanager.hpp"
@@ -55,6 +56,10 @@ std::shared_ptr<graphics::renderer> engine::renderer() const noexcept {
   return _renderer;
 }
 
+std::shared_ptr<graphics::particlesystem> engine::particlesystem() const noexcept {
+  return _particlesystem;
+}
+
 std::shared_ptr<graphics::canvas> engine::canvas() const noexcept {
   return _canvas;
 }
@@ -75,60 +80,52 @@ int32_t engine::width() const noexcept {
   return _window->width();
 }
 
-void engine::set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) {
+void engine::set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept {
   _audiodevice = std::move(audiodevice);
 }
 
-void engine::set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) {
+void engine::set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) noexcept {
   _objectmanager = std::move(objectmanager);
 }
 
-void engine::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) {
+void engine::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept {
   _eventmanager = std::move(eventmanager);
 }
 
-void engine::set_overlay(std::shared_ptr<graphics::overlay> overlay) {
+void engine::set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept {
   _overlay = std::move(overlay);
 }
 
-void engine::set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) {
+void engine::set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept {
   _resourcemanager = std::move(resourcemanager);
 }
 
-void engine::set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) {
+void engine::set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept {
   _scenemanager = std::move(scenemanager);
 }
 
-void engine::set_statemanager(std::shared_ptr<framework::statemanager> statemanager) {
+void engine::set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem) noexcept {
+  _particlesystem = std::move(particlesystem);
+}
+
+void engine::set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept {
   _statemanager = std::move(statemanager);
 
   _observers.emplace_back(_statemanager);
 }
 
-void engine::set_window(std::shared_ptr<graphics::window> window) {
+void engine::set_window(std::shared_ptr<graphics::window> window) noexcept {
   _window = std::move(window);
 }
 
-void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) {
+void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept {
   _renderer = std::move(renderer);
 
   _canvas = std::make_shared<graphics::canvas>(_renderer);
 }
 
-void engine::add_loopable(std::shared_ptr<loopable> loopable) {
+void engine::add_loopable(std::shared_ptr<loopable> loopable) noexcept {
   _loopables.emplace_back(std::move(loopable));
-}
-
-void engine::flush() const {
-  _resourcemanager->flush();
-}
-
-void engine::prefetch() {
-  _resourcemanager->prefetch();
-}
-
-void engine::prefetch(const std::vector<std::string>& filenames) {
-  _resourcemanager->prefetch(filenames);
 }
 
 #ifdef EMSCRIPTEN

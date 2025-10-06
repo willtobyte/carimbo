@@ -24,6 +24,7 @@ namespace graphics {
   class fontfactory;
   class overlay;
   class renderer;
+  class particlesystem;
   class window;
 }
 
@@ -53,28 +54,25 @@ public:
   std::shared_ptr<graphics::window> window() const noexcept;
   std::shared_ptr<graphics::renderer> renderer() const noexcept;
   std::shared_ptr<graphics::canvas> canvas() const noexcept;
+  std::shared_ptr<graphics::particlesystem> particlesystem() const noexcept;
   std::shared_ptr<storage::cassette> cassette() const noexcept;
   std::shared_ptr<framework::timermanager> timermanager() const noexcept;
 
   int32_t height() const noexcept;
   int32_t width() const noexcept;
 
-  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
-  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);
-  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager);
-  void set_overlay(std::shared_ptr<graphics::overlay> overlay);
-  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager);
-  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager);
-  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager);
-  void set_window(std::shared_ptr<graphics::window> window);
-  void set_renderer(std::shared_ptr<graphics::renderer> renderer);
+  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept;
+  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) noexcept;
+  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept;
+  void set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept;
+  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
+  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept;
+  void set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem) noexcept;
+  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept;
+  void set_window(std::shared_ptr<graphics::window> window) noexcept;
+  void set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept;
 
-  void add_loopable(std::shared_ptr<loopable> loopable);
-
-  void flush() const;
-
-  void prefetch();
-  void prefetch(const std::vector<std::string>& filenames);
+  void add_loopable(std::shared_ptr<loopable> loopable) noexcept;
 
   void run();
 
@@ -99,6 +97,7 @@ private:
   std::shared_ptr<framework::statemanager> _statemanager;
   std::shared_ptr<graphics::renderer> _renderer;
   std::shared_ptr<graphics::canvas> _canvas;
+  std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::shared_ptr<graphics::window> _window;
   std::vector<std::shared_ptr<lifecycleobserver>> _observers;
   std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();
