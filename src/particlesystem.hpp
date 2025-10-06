@@ -16,6 +16,10 @@ class particlesystem final {
     explicit particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
     ~particlesystem() noexcept = default;
 
+    void create(const std::string& name, const std::string& kind);
+
+    void destroy(const std::string& name) noexcept;
+
     void update() noexcept;
 
     void draw() const noexcept;
