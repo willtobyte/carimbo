@@ -9,10 +9,8 @@ struct particle final {
   float vx, vy;
   float gx, gy;
   float life;
-  uint32_t frame;
   uint32_t pixmap;
   uint8_t alpha;
-  uint8_t pad[3];
 };
 
 struct emitter final {

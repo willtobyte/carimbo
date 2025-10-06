@@ -44,7 +44,6 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
     p.gx = e.randgx();
     p.gy = e.randgy();
     p.life = e.randlife();
-    p.frame = 0;
     p.pixmap = e.pixmap;
     p.alpha = 255;
 
@@ -96,7 +95,6 @@ void particlesystem::update(float_t delta) noexcept {
       p.gx = e.randgx();
       p.gy = e.randgy();
       p.life = e.randlife();
-      p.frame = 0;
       p.pixmap = e.pixmap;
       p.alpha = 255;
     }
