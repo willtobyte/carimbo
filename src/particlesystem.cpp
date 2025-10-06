@@ -22,10 +22,15 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
     "gx": {"start": 1.0, "end": 1.0},
     "gy": {"start": 1.0, "end": 1.0},
     "life": {"start": 1.0, "end": 1.0},
-    "pixmaps": 3, // random between
     "distribuition": [10, 10, 80] // 3 pixmaps
-    "width": 20,
-    "height": 20,
+    "sources": [{
+      "x": 0,
+      "y": 0,
+      "width": 100,
+      "height": 100
+    },
+    ...
+    ]
    }]
    */
   const auto count = j.value("count", 0ull);
@@ -58,6 +63,7 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
     p.gx = e.randgx();
     p.gy = e.randgy();
     p.life = e.randlife();
+    p.scale = 1.f;
     p.pixmap = e.pixmap;
     p.alpha = 255;
 
@@ -109,6 +115,7 @@ void particlesystem::update(float_t delta) noexcept {
       p.gx = e.randgx();
       p.gy = e.randgy();
       p.life = e.randlife();
+      p.scale = 1.f;
       p.pixmap = e.pixmap;
       p.alpha = 255;
     }

@@ -9,6 +9,7 @@ struct particle final {
   float vx, vy;
   float gx, gy;
   float life;
+  float scale;
   uint32_t pixmap;
   uint8_t alpha;
 };
@@ -21,6 +22,7 @@ struct emitter final {
   std::uniform_real_distribution<float> yveldist;
   std::uniform_real_distribution<float> gxdist;
   std::uniform_real_distribution<float> gydist;
+  std::uniform_real_distribution<float> scaledist;
   std::uniform_real_distribution<float> lifedist;
 
   auto randxvel() noexcept { return xveldist(rng); }
