@@ -37,6 +37,16 @@ void particlesystem::destroy(const std::string& name) noexcept {
   _particles.erase(it);
 }
 
+void particlesystem::update(float_t delta) noexcept {
+  for (auto& bucket : _particles) {
+    auto& particles = bucket.second;
+
+    for (auto& particle : particles) {
+      particle.life -= delta;
+    }
+  } 
+}
+
 void particlesystem::draw() const noexcept {
   for (const auto& bucket : _particles) {
     const auto& particles = bucket.second;

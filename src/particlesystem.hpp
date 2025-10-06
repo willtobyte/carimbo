@@ -4,11 +4,15 @@
 
 namespace graphics {
 struct particle final {
-  double_t angle;
-  float x, y, life;
+  double angle;
+  float x, y;
+  float vx, vy;
+  float gx, gy;
+  float life;
   uint32_t frame;
   uint32_t pixmap;
   uint8_t alpha;
+  uint8_t pad[3];
 };
 
 class particlesystem final {
@@ -20,7 +24,7 @@ class particlesystem final {
 
     void destroy(const std::string& name) noexcept;
 
-    void update() noexcept;
+    void update(float_t delta) noexcept;
 
     void draw() const noexcept;
 
