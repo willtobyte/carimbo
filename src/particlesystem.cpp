@@ -11,9 +11,9 @@ void particlesystem::create(const std::string& name, const std::string& kind) {
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
-  const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
+  const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
   const auto id = _counter++;
-  _spritesheets.try_emplace(id, std::move(spritesheet));
+  _pixmaps.try_emplace(id, std::move(pixmap));
 
   /*
   {
@@ -31,7 +31,7 @@ void particlesystem::destroy(const std::string& name) noexcept {
   }
 
   for (const auto& particle : it->second) {
-    _spritesheets.erase(particle.pixmap);
+    _pixmaps.erase(particle.pixmap);
   }
 
   _particles.erase(it);
