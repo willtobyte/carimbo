@@ -25,8 +25,9 @@ class particlesystem final {
     void draw() const noexcept;
 
   private:
+    std::atomic<uint32_t> _counter{0};
     std::shared_ptr<framework::resourcemanager> _resourcemanager;
     std::unordered_map<std::string, std::vector<particle>> _particles;
-    std::unordered_map<uint32_t, std::shared_ptr<pixmap>> _pixmaps;
+    std::unordered_map<uint32_t, std::shared_ptr<pixmap>> _spritesheets;
 };
 }

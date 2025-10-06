@@ -6,6 +6,24 @@ particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resou
     : _resourcemanager(std::move(resourcemanager)) {
 }
 
+void particlesystem::create(const std::string& name, const std::string& kind) {
+  const auto& filename = std::format("particles/{}.json", kind);
+  const auto& buffer = storage::io::read(filename);
+  const auto& j = nlohmann::json::parse(buffer);
+
+  const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
+  const auto id = _counter++;
+  _spritesheets.try_emplace(id, std::move(spritesheet));
+
+  /*
+  {
+    "x"
+    "y"
+    "pix"
+  }
+  */
+}
+
 void particlesystem::draw() const noexcept {
   for (const auto& bucket : _particles) {
     const auto& particles = bucket.second;
