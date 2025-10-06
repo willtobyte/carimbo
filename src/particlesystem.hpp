@@ -21,7 +21,7 @@ class particlesystem final {
     void draw() const noexcept;
 
   private:
-    std::unordered_map<uint32_t, std::vector<particle>> _particles;
+    std::unordered_map<std::string, std::vector<particle>> _particles;
     std::unordered_map<uint32_t, std::shared_ptr<pixmap>> _pixmaps;
 };
 }
