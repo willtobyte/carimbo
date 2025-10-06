@@ -2,6 +2,10 @@
 
 using namespace graphics;
 
+particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
+    : _resourcemanager(std::move(resourcemanager)) {
+}
+
 void particlesystem::draw() const noexcept {
   for (const auto& bucket : _particles) {
     const auto& particles = bucket.second;
