@@ -20,7 +20,7 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
   const auto yvel = j["yvel"];
   const auto gx = j["gx"];
   const auto gy = j["gy"];
-  const auto life = j["gy"];
+  const auto life = j["life"];
 
   emitter e{};
   e.x = x;
@@ -79,16 +79,18 @@ void particlesystem::update(float_t delta) noexcept {
       p.life -= delta;
 
       if (p.life > .0f) {
+        p.vx += p.gx * delta;
+        p.vy += p.gy * delta;
+
         p.x += p.vx * delta;
         p.y += p.vy * delta;
 
         continue;
       }
 
-      // respawn
       p.angle = 0.0;
-      p.x = e.x,
-      p.y = e.y,
+      p.x = e.x;
+      p.y = e.y;
       p.vx = e.randxvel();
       p.vy = e.randyvel();
       p.gx = e.randgx();
