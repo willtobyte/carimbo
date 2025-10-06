@@ -4,11 +4,11 @@
 
 namespace graphics {
 struct particle final {
-  float x, y, life, angle;
+  double_t angle;
+  float x, y, life;
   uint32_t frame;
   uint32_t pixmap;
   uint8_t alpha;
-  uint8_t pad[3];
 };
 
 class particlesystem final {
