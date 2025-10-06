@@ -86,7 +86,10 @@ void cursor::draw() const noexcept {
   const auto& animation = _animations.at(_action).keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
-      geometry::rectangle{_position - _point + animation.offset, animation.frame.size()},
+      geometry::rectangle{
+        _position - _point + animation.offset,
+        animation.frame.size()
+      },
       0,
       reflection::none,
       255
