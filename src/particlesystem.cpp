@@ -24,6 +24,19 @@ void particlesystem::create(const std::string& name, const std::string& kind) {
   */
 }
 
+void particlesystem::destroy(const std::string& name) noexcept {
+  const auto it = _particles.find(name);
+  if (it == _particles.end()) [[unlikely]] {
+    return;
+  }
+
+  for (const auto& particle : it->second) {
+    _spritesheets.erase(particle.pixmap);
+  }
+
+  _particles.erase(it);
+}
+
 void particlesystem::draw() const noexcept {
   for (const auto& bucket : _particles) {
     const auto& particles = bucket.second;
