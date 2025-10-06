@@ -34,7 +34,6 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
 
   auto particles = std::vector<particle>();
   particles.reserve(count);
-
   for (auto i = 0uz; i < count; ++i) {
     particle p{};
     p.angle = 0.0;
