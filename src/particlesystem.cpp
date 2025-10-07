@@ -94,7 +94,7 @@ void particlesystem::update(float_t delta) noexcept {
 
     auto& e = eit->second;
 
-    std::for_each(particles.begin(), particles.end(), [&](particle& p){
+    std::for_each(particles.begin(), particles.end(), [&](particle& p) {
       p.life -= delta;
 
       if (p.life > .0f) {
