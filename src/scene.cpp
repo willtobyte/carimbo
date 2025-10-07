@@ -78,7 +78,7 @@ void scene::on_enter() const {
     _objectmanager->manage(o);
   }
 
-  if (const auto& fn = _onenter) {
+  if (const auto& fn = _onenter; fn) {
     fn();
   }
 }
@@ -98,37 +98,43 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float_t x, float_t y) const {
-  if (const auto& fn = _ontouch) fn(x, y);
+  if (const auto& fn = _ontouch; fn) {
+    fn(x, y);
+  }
 }
 
 void scene::on_key_press(int32_t code) const {
-  if (const auto& fn = _onkeypress) {
+  if (const auto& fn = _onkeypress; fn) {
     fn(code);
   }
 }
 
 void scene::on_key_release(int32_t code) const {
-  if (const auto& fn = _onkeyrelease) {
+  if (const auto& fn = _onkeyrelease; fn) {
     fn(code);
   }
 }
 
 void scene::on_text(const std::string& text) const {
-  if (const auto& fn = _ontext) {
+  if (const auto& fn = _ontext; fn) {
     fn(text);
   }
 }
 
 // void scene::on_mouse_press(float_t x, float_t y) {
-//   if (const auto& fn = _onmousepress) fn(x, y);
+//   if (const auto& fn = _onmousepress; fn) {
+//     fn(x, y);
+//   }
 // }
 
 // void scene::on_mouse_relese(float_t x, float_t y) {
-//   if (const auto& fn = _onmouserelease) fn(x, y);
+//   if (const auto& fn = _onmouserelease; fn) {
+//     fn(x, y);
+//   }
 // }
 
 void scene::on_motion(float_t x, float_t y) const {
-  if (const auto& fn = _onmotion) {
+  if (const auto& fn = _onmotion; fn) {
     fn(x, y);
   }
 }
