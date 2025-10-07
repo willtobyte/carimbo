@@ -15,11 +15,12 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto count = j.value("count", 0ull);
 
-  const auto xvel = j["xvel"];
-  const auto yvel = j["yvel"];
-  const auto gx = j["gx"];
-  const auto gy = j["gy"];
+  const auto xvel = j["velocity"]["x"];
+  const auto yvel = j["velocity"]["y"];
+  const auto gx = j["gravity"]["x"];
+  const auto gy = j["gravity"]["y"];
   const auto life = j["life"];
+  const auto scale = j["scale"];
   const auto alpha = j["alpha"];
 
   conf c{};
@@ -31,6 +32,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   c.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
   c.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
   c.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
+  c.scaledist = std::uniform_real_distribution<float>(scale.value("start", .0f), scale.value("end", .0f));
   c.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 0u));
 
   auto ps = std::vector<particle>();
