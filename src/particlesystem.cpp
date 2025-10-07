@@ -81,8 +81,8 @@ void graphics::particlesystem::clear() noexcept {
 void particlesystem::update(float_t delta) noexcept {
   for (const auto& batch : _batches) {
     auto& e = batch->emitter;
-    auto& particles = batch->particles;
-    for (auto& p : particles) {
+    auto& ps = batch->particles;
+    for (auto& p : ps) {
       p.life -= delta;
 
       if (p.life > 0.f) {
@@ -112,14 +112,14 @@ void particlesystem::update(float_t delta) noexcept {
 void particlesystem::draw() const noexcept {
   for (const auto& batch : _batches) {
     auto& e = batch->emitter;
-    auto& particles = batch->particles;
+    auto& ps = batch->particles;
 
     const auto& pixmap = *e.pixmap;
     const auto width = static_cast<float>(pixmap.width());
     const auto height = static_cast<float>(pixmap.height());
     const geometry::rectangle source{0, 0, width, height};
 
-    for (const auto& p : particles) {
+    for (const auto& p : ps) {
       const geometry::rectangle destination{p.x, p.y, width, height};
 
       pixmap.draw(
