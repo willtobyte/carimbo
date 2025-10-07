@@ -6,17 +6,8 @@ using namespace graphics;
 
 renderer::renderer(std::shared_ptr<window> window)
     : _window(std::move(window)) {
-  const auto* n = std::getenv("NOVSYNC");
-
-  UNUSED(n);
-
   const auto vsync =
-    #ifdef SANDBOX
-      0
-    #else
-      n ? 0 : 1
-    #endif
-    ;
+    std::getenv("NOVSYNC") ? 0 : 1;
 
   auto props = SDL_CreateProperties();
   SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, *_window);
