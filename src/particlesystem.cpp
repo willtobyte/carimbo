@@ -56,9 +56,9 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
     p.gx = e.randgx();
     p.gy = e.randgy();
     p.life = e.randlife();
+    p.alpha = e.randalpha();
     p.scale = 1.f;
     p.pixmap = e.pixmap;
-    p.alpha = 255;
 
     particles.emplace_back(p);
   }
@@ -97,6 +97,8 @@ void particlesystem::update(float_t delta) noexcept {
         p.x += p.vx * delta;
         p.y += p.vy * delta;
 
+        p.alpha = static_cast<uint8_t>(255.f * (p.life));
+
         continue;
       }
 
@@ -108,9 +110,9 @@ void particlesystem::update(float_t delta) noexcept {
       p.gx = e.randgx();
       p.gy = e.randgy();
       p.life = e.randlife();
+      p.alpha = e.randalpha();
       p.scale = 1.f;
       p.pixmap = e.pixmap;
-      p.alpha = 255;
     }
   }
 }

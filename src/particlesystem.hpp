@@ -24,12 +24,14 @@ struct emitter final {
   std::uniform_real_distribution<float> gydist;
   std::uniform_real_distribution<float> scaledist;
   std::uniform_real_distribution<float> lifedist;
+  std::uniform_int_distribution<uint8_t> alphadist;
 
   auto randxvel() noexcept { return xveldist(rng); }
   auto randyvel() noexcept { return yveldist(rng); }
   auto randgx() noexcept { return gxdist(rng); }
   auto randgy() noexcept { return gydist(rng); }
   auto randlife() noexcept { return lifedist(rng); }
+  auto randalpha() noexcept { return alphadist(rng); }
 };
 
 class particlesystem final {
