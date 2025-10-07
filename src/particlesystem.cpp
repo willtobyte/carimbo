@@ -3,7 +3,7 @@
 using namespace graphics;
 
 particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
-: _resourcemanager(std::move(resourcemanager)) {
+  : _resourcemanager(std::move(resourcemanager)) {
 }
 
 std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, float_t x, float_t y) const {
@@ -22,35 +22,35 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   const auto life = j["life"];
   const auto alpha = j["alpha"];
 
-  emitter emitter{};
-  emitter.x = x;
-  emitter.y = y;
-  emitter.pixmap = pixmap;
-  emitter.xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
-  emitter.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
-  emitter.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
-  emitter.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
-  emitter.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
-  emitter.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 0u));
+  conf c{};
+  c.x = x;
+  c.y = y;
+  c.pixmap = pixmap;
+  c.xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
+  c.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
+  c.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
+  c.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
+  c.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
+  c.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 0u));
 
-  auto particles = std::vector<particle>();
-  particles.reserve(count);
+  auto ps = std::vector<particle>();
+  ps.reserve(count);
   for (auto i = 0uz; i < count; ++i) {
-    auto& p = particles.emplace_back();
+    auto& p = ps.emplace_back();
 
     p.angle = 0.0;
     p.x = x,
     p.y = y,
-    p.vx = emitter.randxvel();
-    p.vy = emitter.randyvel();
-    p.gx = emitter.randgx();
-    p.gy = emitter.randgy();
-    p.life = emitter.randlife();
-    p.alpha = emitter.randalpha();
+    p.vx = c.randxvel();
+    p.vy = c.randyvel();
+    p.gx = c.randgx();
+    p.gy = c.randgy();
+    p.life = c.randlife();
+    p.alpha = c.randalpha();
     p.scale = 1.f;
   }
 
-  return std::make_shared<particlebatch>(emitter, particles);
+  return std::make_shared<particlebatch>(c, ps);
 }
 
 particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
@@ -80,7 +80,7 @@ void graphics::particlesystem::clear() noexcept {
 
 void particlesystem::update(float_t delta) noexcept {
   for (const auto& batch : _batches) {
-    auto& e = batch->emitter;
+    auto& c = batch->conf;
     auto& ps = batch->particles;
     for (auto& p : ps) {
       p.life -= delta;
@@ -96,14 +96,14 @@ void particlesystem::update(float_t delta) noexcept {
       }
 
       p.angle = .0;
-      p.x = e.x;
-      p.y = e.y;
-      p.vx = e.randxvel();
-      p.vy = e.randyvel();
-      p.gx = e.randgx();
-      p.gy = e.randgy();
-      p.life = e.randlife();
-      p.alpha = e.randalpha();
+      p.x = c.x;
+      p.y = c.y;
+      p.vx = c.randxvel();
+      p.vy = c.randyvel();
+      p.gx = c.randgx();
+      p.gy = c.randgy();
+      p.life = c.randlife();
+      p.alpha = c.randalpha();
       p.scale = 1.f;
     }
   }
@@ -111,10 +111,10 @@ void particlesystem::update(float_t delta) noexcept {
 
 void particlesystem::draw() const noexcept {
   for (const auto& batch : _batches) {
-    auto& e = batch->emitter;
+    auto& c = batch->conf;
     auto& ps = batch->particles;
 
-    const auto& pixmap = *e.pixmap;
+    const auto& pixmap = *c.pixmap;
     const auto width = static_cast<float>(pixmap.width());
     const auto height = static_cast<float>(pixmap.height());
     const geometry::rectangle source{0, 0, width, height};

@@ -14,7 +14,7 @@ struct particle final {
   uint8_t alpha;
 };
 
-struct emitter final {
+struct conf final {
   float x, y;
   std::shared_ptr<pixmap> pixmap;
   std::mt19937 rng{std::random_device{}()};
@@ -35,7 +35,7 @@ struct emitter final {
 };
 
 struct particlebatch final {
-  emitter emitter;
+  conf conf;
   std::vector<particle> particles;
 };
 
