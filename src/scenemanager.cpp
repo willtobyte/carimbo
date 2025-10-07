@@ -7,9 +7,9 @@ scenemanager::scenemanager(
   std::shared_ptr<objectmanager> objectmanager,
   std::shared_ptr<graphics::particlesystem> particlesystem
 )
-    : _resourcemanager(std::move(resourcemanager)),
-      _objectmanager(std::move(objectmanager)),
-      _particlesystem(std::move(particlesystem)) {
+  : _resourcemanager(std::move(resourcemanager)),
+    _objectmanager(std::move(objectmanager)),
+    _particlesystem(std::move(particlesystem)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
@@ -37,7 +37,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   }
 
   const auto& ps = j.value("particles", nlohmann::json::array());
-  std::vector<std::string> particles;
+  std::vector<std::shared_ptr<graphics::particlebatch>> particles;
   particles.reserve(ps.size());
   for (const auto& i : ps) {
     const auto name = i["name"];
@@ -45,10 +45,12 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     const auto x = i["x"];
     const auto y = i["y"];
 
-    _particlesystem->create(name, kind, x, y);
-    particles.emplace_back(name);
+    UNUSED(name);
+
+    const auto factory = _particlesystem->factory();
+    const auto batch = factory->create(kind, x, y);
+    particles.emplace_back(batch);
   }
-  //_particlesystem
 
   const auto& fs = j.value("fonts", nlohmann::json::array());
   for (const auto& i : fs) {
@@ -87,11 +89,11 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   it->second = std::make_shared<scene>(
     name,
     _objectmanager,
-    //_particlesystem,
+    _particlesystem,
     std::move(background),
-    //std::move(particles),
     std::move(objects),
     std::move(effects),
+    std::move(particles),
     std::move(map),
     std::move(size)
   );

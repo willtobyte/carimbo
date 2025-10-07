@@ -17,13 +17,14 @@ enum class scenetype : uint8_t {
 
 class scene final {
 public:
-  scene() = delete;
   scene(
     const std::string& name,
     std::shared_ptr<framework::objectmanager> objectmanager,
+    std::shared_ptr<graphics::particlesystem> particlesystem,
     std::shared_ptr<graphics::pixmap> background,
     std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
     std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+    std::vector<std::shared_ptr<graphics::particlebatch>> particles,
     std::optional<std::shared_ptr<tilemap>> tilemap,
     geometry::size size
   );
@@ -60,9 +61,11 @@ public:
 private:
   std::string _name;
   std::shared_ptr<framework::objectmanager> _objectmanager;
+  std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::shared_ptr<graphics::pixmap> _background;
   std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
+  std::vector<std::shared_ptr<graphics::particlebatch>> _particles;
   std::optional<std::shared_ptr<tilemap>> _tilemap;
 
   geometry::size _size;

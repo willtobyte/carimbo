@@ -5,19 +5,23 @@ using namespace framework;
 scene::scene(
   const std::string& name,
   std::shared_ptr<objectmanager> objectmanager,
+  std::shared_ptr<graphics::particlesystem> particlesystem,
   std::shared_ptr<graphics::pixmap> background,
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
+  std::vector<std::shared_ptr<graphics::particlebatch>> particles,
   std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
-    : _name(name),
-      _objectmanager(std::move(objectmanager)),
-      _background(std::move(background)),
-      _objects(std::move(objects)),
-      _effects(std::move(effects)),
-      _tilemap(std::move(tilemap)),
-      _size(std::move(size)) {
+  : _name(name),
+    _objectmanager(std::move(objectmanager)),
+    _particlesystem(std::move(particlesystem)),
+    _background(std::move(background)),
+    _objects(std::move(objects)),
+    _effects(std::move(effects)),
+    _particles(std::move(particles)),
+    _tilemap(std::move(tilemap)),
+    _size(std::move(size)) {
 }
 
 scene::~scene() noexcept {
@@ -78,6 +82,8 @@ void scene::on_enter() const {
     _objectmanager->manage(o);
   }
 
+  _particlesystem->set(_particles);
+
   if (const auto& fn = _onenter; fn) {
     fn();
   }
@@ -87,6 +93,8 @@ void scene::on_leave() const {
   if (const auto& fn = _onleave; fn) {
     fn();
   }
+
+  _particlesystem->clear();
 
   for (const auto& [_, o] : _objects) {
     _objectmanager->remove(o);

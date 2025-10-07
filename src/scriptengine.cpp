@@ -1,4 +1,6 @@
 #include "scriptengine.hpp"
+#include "particlesystem.hpp"
+#include <sol/property.hpp>
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
@@ -732,11 +734,15 @@ void framework::scriptengine::run() {
     "cursor", sol::property([](graphics::overlay& o) { return cursorproxy{o}; })
   );
 
+  lua.new_usertype<graphics::particlefactory>(
+    "ParticleFactory",
+    sol::no_constructor
+  );
+
   lua.new_usertype<graphics::particlesystem>(
     "ParticleSystem",
     sol::no_constructor,
-    "create", &graphics::particlesystem::create,
-    "destroy", &graphics::particlesystem::destroy
+    "factory", sol::property(&graphics::particlesystem::factory)
   );
 
   lua.new_usertype<framework::engine>(

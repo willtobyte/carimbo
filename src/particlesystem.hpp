@@ -16,7 +16,7 @@ struct particle final {
 
 struct emitter final {
   float x, y;
-  uint32_t pixmap;
+  std::shared_ptr<pixmap> pixmap;
   std::mt19937 rng{std::random_device{}()};
   std::uniform_real_distribution<float> xveldist;
   std::uniform_real_distribution<float> yveldist;
@@ -34,24 +34,40 @@ struct emitter final {
   auto randalpha() noexcept { return static_cast<uint8_t>(alphadist(rng)); }
 };
 
+struct particlebatch final {
+  emitter emitter;
+  std::vector<particle> particles;
+};
+
+class particlefactory final {
+  public:
+    explicit particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
+
+    std::shared_ptr<particlebatch> create(const std::string& kind, float x, float y) const;
+
+  private:
+    std::shared_ptr<framework::resourcemanager> _resourcemanager;
+};
+
 class particlesystem final {
   public:
     explicit particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
     ~particlesystem() noexcept = default;
 
-    void create(const std::string& name, const std::string& kind, float_t x, float_t y);
+    void add(std::shared_ptr<particlebatch> batch) noexcept;
 
-    void destroy(const std::string& name) noexcept;
+    void set(std::vector<std::shared_ptr<particlebatch>> batches) noexcept;
+
+    void clear() noexcept;
 
     void update(float_t delta) noexcept;
 
     void draw() const noexcept;
 
+    std::shared_ptr<particlefactory> factory() const noexcept;
+
   private:
-    std::atomic<uint32_t> _counter{0};
-    std::shared_ptr<framework::resourcemanager> _resourcemanager;
-    std::unordered_map<std::string, std::vector<particle>> _particles;
-    std::unordered_map<uint32_t, std::shared_ptr<pixmap>> _pixmaps;
-    std::unordered_map<std::string, emitter> _emitters;
+    std::shared_ptr<particlefactory> _factory;
+    std::vector<std::shared_ptr<particlebatch>> _batches;
 };
 }
