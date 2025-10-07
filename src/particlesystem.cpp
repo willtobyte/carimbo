@@ -88,8 +88,8 @@ void particlesystem::update(float_t delta) noexcept {
       if (p.life > 0.f) {
         p.vx += p.gx * delta;
         p.vy += p.gy * delta;
-        p.x  += p.vx * delta;
-        p.y  += p.vy * delta;
+        p.x += p.vx * delta;
+        p.y += p.vy * delta;
         p.alpha = static_cast<uint8_t>(std::clamp(255.f * p.life, 0.f, 255.f));
 
         continue;
