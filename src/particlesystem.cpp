@@ -39,8 +39,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
     auto& p = particles.emplace_back();
 
     p.angle = 0.0;
-    p.x = emitter.x,
-    p.y = emitter.y,
+    p.x = x,
+    p.y = y,
     p.vx = emitter.randxvel();
     p.vy = emitter.randyvel();
     p.gx = emitter.randgx();
