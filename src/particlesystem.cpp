@@ -36,7 +36,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   auto particles = std::vector<particle>();
   particles.reserve(count);
   for (auto i = 0uz; i < count; ++i) {
-    particle p{};
+    auto& p = particles.emplace_back();
+
     p.angle = 0.0;
     p.x = emitter.x,
     p.y = emitter.y,
@@ -47,8 +48,6 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
     p.life = emitter.randlife();
     p.alpha = emitter.randalpha();
     p.scale = 1.f;
-
-    particles.emplace_back(p);
   }
 
   return std::make_shared<particlebatch>(emitter, particles);
