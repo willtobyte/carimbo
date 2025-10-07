@@ -19,8 +19,8 @@ static sol::object searcher(sol::this_state state, const std::string& module) {
 class lua_loopable final : public framework::loopable {
 public:
   explicit lua_loopable(const sol::state_view lua, sol::function function)
-      : _L(lua),
-        _function(std::move(function)) {}
+    : _L(lua),
+      _function(std::move(function)) {}
 
   void loop(float_t delta) override {
     _function(delta);
@@ -741,7 +741,10 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::particlesystem>(
     "ParticleSystem",
     sol::no_constructor,
-    "factory", sol::property(&graphics::particlesystem::factory)
+    "factory", sol::property(&graphics::particlesystem::factory),
+    "add", &graphics::particlesystem::add,
+    "clear", &graphics::particlesystem::clear,
+    "set", &graphics::particlesystem::set
   );
 
   lua.new_usertype<framework::engine>(
