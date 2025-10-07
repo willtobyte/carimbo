@@ -59,7 +59,10 @@ particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resou
 }
 
 void graphics::particlesystem::add(std::shared_ptr<particlebatch> batch) noexcept {
-  if (!batch) return;
+  if (!batch) {
+    return;
+  }
+
   _batches.emplace_back(std::move(batch));
 }
 
