@@ -34,6 +34,8 @@ scene::~scene() noexcept {
   for (const auto& [_, e] : effects) {
     e->stop();
   }
+  
+  _particlesystem->clear();
 }
 
 void scene::update(float_t delta) noexcept {
