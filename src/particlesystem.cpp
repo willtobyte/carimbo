@@ -94,17 +94,17 @@ void particlesystem::update(float_t delta) noexcept {
 
     auto& e = eit->second;
 
-    std::for_each(particles.begin(), particles.end(), [&](particle& p) {
+    for (auto& p : particles) {
       p.life -= delta;
 
-      if (p.life > .0f) {
+      if (p.life > 0.f) {
         p.vx += p.gx * delta;
         p.vy += p.gy * delta;
         p.x  += p.vx * delta;
         p.y  += p.vy * delta;
         p.alpha = static_cast<uint8_t>(std::clamp(255.f * p.life, 0.f, 255.f));
 
-        return;
+        continue;
       }
 
       p.angle = .0;
@@ -118,7 +118,7 @@ void particlesystem::update(float_t delta) noexcept {
       p.alpha = e.randalpha();
       p.scale = 1.f;
       p.pixmap = e.pixmap;
-    });
+    }
   }
 }
 
