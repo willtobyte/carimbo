@@ -15,23 +15,16 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
   const auto id = _counter++;
 
   /*
-   [{
+   {
     "count": 100,
     "xvel": {"start": 1.0, "end": 1.0},
     "yvel": {"start": 1.0, "end": 1.0},
     "gx": {"start": 1.0, "end": 1.0},
     "gy": {"start": 1.0, "end": 1.0},
     "life": {"start": 1.0, "end": 1.0},
-    "distribuition": [10, 10, 80] // 3 pixmaps
-    "sources": [{
-      "x": 0,
-      "y": 0,
-      "width": 100,
-      "height": 100
-    },
     ...
     ]
-   }]
+   }
    */
   const auto count = j.value("count", 0ull);
 
