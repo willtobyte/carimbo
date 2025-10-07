@@ -33,6 +33,7 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
   const auto gx = j["gx"];
   const auto gy = j["gy"];
   const auto life = j["life"];
+  const auto alpha = j["alpha"];
 
   emitter e{};
   e.x = x;
@@ -43,6 +44,7 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
   e.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
   e.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
   e.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
+  e.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 0u), life.value("end", 0u));
 
   auto particles = std::vector<particle>();
   particles.reserve(count);
