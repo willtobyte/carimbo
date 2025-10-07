@@ -44,7 +44,7 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
   e.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
   e.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
   e.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
-  e.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 0u), life.value("end", 0u));
+  e.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 0u));
 
   auto particles = std::vector<particle>();
   particles.reserve(count);
@@ -71,40 +71,43 @@ void particlesystem::create(const std::string& name, const std::string& kind, fl
 }
 
 void particlesystem::destroy(const std::string& name) noexcept {
-  const auto it = _particles.find(name);
-  if (it == _particles.end()) [[unlikely]] {
+  const auto pit = _particles.find(name);
+  if (pit == _particles.end()) [[unlikely]] {
     return;
   }
 
-  for (const auto& particle : it->second) {
-    _pixmaps.erase(particle.pixmap);
+  const auto eit = _emitters.find(name);
+  if (eit != _emitters.end()) {
+    _pixmaps.erase(eit->second.pixmap);
   }
 
-  _particles.erase(it);
+  _emitters.erase(name);
+  _particles.erase(pit);
 }
 
 void particlesystem::update(float_t delta) noexcept {
-  for (auto& bucket : _particles) {
-    auto& e = _emitters.find(bucket.first)->second;
+  for (auto& [name, particles] : _particles) {
+    const auto eit = _emitters.find(name);
+    if (eit == _emitters.end()) [[unlikely]] {
+      return;
+    }
 
-    auto& particles = bucket.second;
+    auto& e = eit->second;
 
-    for (auto& p : particles) {
+    std::for_each(particles.begin(), particles.end(), [&](particle& p){
       p.life -= delta;
 
       if (p.life > .0f) {
         p.vx += p.gx * delta;
         p.vy += p.gy * delta;
+        p.x  += p.vx * delta;
+        p.y  += p.vy * delta;
+        p.alpha = static_cast<uint8_t>(std::clamp(255.f * p.life, 0.f, 255.f));
 
-        p.x += p.vx * delta;
-        p.y += p.vy * delta;
-
-        p.alpha = static_cast<uint8_t>(255.f * (p.life));
-
-        continue;
+        return;
       }
 
-      p.angle = 0.0;
+      p.angle = .0;
       p.x = e.x;
       p.y = e.y;
       p.vx = e.randxvel();
@@ -115,38 +118,35 @@ void particlesystem::update(float_t delta) noexcept {
       p.alpha = e.randalpha();
       p.scale = 1.f;
       p.pixmap = e.pixmap;
-    }
+    });
   }
 }
 
 void particlesystem::draw() const noexcept {
-  for (const auto& bucket : _particles) {
-    const auto& particles = bucket.second;
+  for (const auto& [name, particles] : _particles) {
+    const auto eit = _emitters.find(name);
+    if (eit == _emitters.end()) [[unlikely]] {
+      continue;
+    }
 
-    for (const auto& particle : particles) {
-      const auto it = _pixmaps.find(particle.pixmap);
-      if (it == _pixmaps.end()) [[unlikely]] {
-        continue;
-      }
+    const auto pit = _pixmaps.find(eit->second.pixmap);
+    if (pit == _pixmaps.end()) [[unlikely]] {
+      continue;
+    }
 
-      const auto& pixmap = *it->second;
+    const auto& pixmap = *pit->second;
+    const auto width = static_cast<float>(pixmap.width());
+    const auto height = static_cast<float>(pixmap.height());
+    const geometry::rectangle source{0, 0, width, height};
 
-      const auto width  = static_cast<float_t>(pixmap.width());
-      const auto height = static_cast<float_t>(pixmap.height());
-      const geometry::rectangle source{0, 0, width, height};
-
-      const geometry::rectangle destination{
-        particle.x,
-        particle.y,
-        width,
-        height
-      };
+    for (const auto& p : particles) {
+      const geometry::rectangle destination{p.x, p.y, width, height};
 
       pixmap.draw(
         source,
         destination,
-        particle.angle,
-        particle.alpha
+        p.angle,
+        p.alpha
       );
     }
   }

@@ -60,6 +60,7 @@ extern "C" {
 #include <cmath>
 #include <cstdint>
 #include <csignal>
+#include <execution>
 #include <filesystem>
 #include <format>
 #include <fstream>
