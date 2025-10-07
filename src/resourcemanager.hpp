@@ -6,6 +6,7 @@
 #include "fontfactory.hpp"
 #include "pixmappool.hpp"
 #include "soundmanager.hpp"
+#include "particlesystem.hpp"
 
 namespace framework {
 class resourcemanager final {

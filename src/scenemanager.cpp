@@ -2,9 +2,14 @@
 
 using namespace framework;
 
-scenemanager::scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<objectmanager> objectmanager)
+scenemanager::scenemanager(
+  std::shared_ptr<framework::resourcemanager> resourcemanager,
+  std::shared_ptr<objectmanager> objectmanager,
+  std::shared_ptr<graphics::particlesystem> particlesystem
+)
     : _resourcemanager(std::move(resourcemanager)),
-      _objectmanager(std::move(objectmanager)) {
+      _objectmanager(std::move(objectmanager)),
+      _particlesystem(std::move(particlesystem)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
@@ -30,6 +35,20 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     const std::string f = std::format("blobs/{}/{}.ogg", name, basename);
     effects.emplace_back(std::move(basename), _resourcemanager->soundmanager()->get(f));
   }
+
+  const auto& ps = j.value("particles", nlohmann::json::array());
+  std::vector<std::string> particles;
+  particles.reserve(ps.size());
+  for (const auto& i : ps) {
+    const auto name = i["name"];
+    const auto kind = i["kind"];
+    const auto x = i["x"];
+    const auto y = i["y"];
+
+    _particlesystem->create(name, kind, x, y);
+    particles.emplace_back(name);
+  }
+  //_particlesystem
 
   const auto& fs = j.value("fonts", nlohmann::json::array());
   for (const auto& i : fs) {
@@ -68,7 +87,9 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   it->second = std::make_shared<scene>(
     name,
     _objectmanager,
+    //_particlesystem,
     std::move(background),
+    //std::move(particles),
     std::move(objects),
     std::move(effects),
     std::move(map),

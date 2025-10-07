@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 
+#include "particlesystem.hpp"
 #include "resourcemanager.hpp"
 #include "eventreceiver.hpp"
 #include "scene.hpp"
@@ -12,7 +13,12 @@ class objectmanager;
 
 class scenemanager final  : public input::eventreceiver {
 public:
-  scenemanager(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<framework::objectmanager> objectmanager);
+  scenemanager(
+    std::shared_ptr<framework::resourcemanager> resourcemanager,
+    std::shared_ptr<framework::objectmanager> objectmanager,
+    std::shared_ptr<graphics::particlesystem> particlesystem
+  );
+
   ~scenemanager() noexcept = default;
 
   std::shared_ptr<scene> load(const std::string& name);
@@ -38,6 +44,7 @@ protected:
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<framework::objectmanager> _objectmanager;
+  std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::unordered_map<std::string, std::shared_ptr<scene>> _scene_mapping;
   std::weak_ptr<scene> _scene;
   std::string _current;

@@ -17,7 +17,8 @@ scene::scene(
       _objects(std::move(objects)),
       _effects(std::move(effects)),
       _tilemap(std::move(tilemap)),
-      _size(std::move(size)) {}
+      _size(std::move(size)) {
+}
 
 scene::~scene() noexcept {
   auto objects = std::exchange(_objects, {});
@@ -83,7 +84,7 @@ void scene::on_enter() const {
 }
 
 void scene::on_leave() const {
-  if (const auto& fn = _onleave) {
+  if (const auto& fn = _onleave; fn) {
     fn();
   }
 
