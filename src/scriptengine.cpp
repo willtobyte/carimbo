@@ -732,6 +732,13 @@ void framework::scriptengine::run() {
     "cursor", sol::property([](graphics::overlay& o) { return cursorproxy{o}; })
   );
 
+  lua.new_usertype<graphics::particlesystem>(
+    "ParticleSystem",
+    sol::no_constructor,
+    "create", &graphics::particlesystem::create,
+    "destroy", &graphics::particlesystem::destroy
+  );
+
   lua.new_usertype<framework::engine>(
     "Engine",
     sol::no_constructor,
