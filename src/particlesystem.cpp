@@ -15,6 +15,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto count = j.value("count", 0ull);
 
+  const auto& xstart = j.value("start", nlohmann::json::object()).value("x", nlohmann::json::object());
+  const auto& ystart = j.value("start", nlohmann::json::object()).value("y", nlohmann::json::object());
   const auto& xvel = j.value("velocity", nlohmann::json::object()).value("x", nlohmann::json::object());
   const auto& yvel = j.value("velocity", nlohmann::json::object()).value("y", nlohmann::json::object());
   const auto& gx = j.value("gravity", nlohmann::json::object()).value("x", nlohmann::json::object());
@@ -27,6 +29,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   c.x = x;
   c.y = y;
   c.pixmap = pixmap;
+  c.xstartdist = std::uniform_real_distribution<float>(xstart.value("start", .0f), xstart.value("end", .0f));
+  c.ystartdist = std::uniform_real_distribution<float>(ystart.value("start", .0f), ystart.value("end", .0f));
   c.xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
   c.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
   c.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
@@ -41,8 +45,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
     auto& p = ps.emplace_back();
 
     p.angle = 0.0;
-    p.x = x,
-    p.y = y,
+    p.x = x + c.randxstart(),
+    p.y = y + c.randystart(),
     p.vx = c.randxvel();
     p.vy = c.randyvel();
     p.gx = c.randgx();
@@ -98,8 +102,8 @@ void particlesystem::update(float_t delta) noexcept {
       }
 
       p.angle = .0;
-      p.x = c.x;
-      p.y = c.y;
+      p.x = c.x + c.randxstart(),
+      p.y = c.y + c.randystart(),
       p.vx = c.randxvel();
       p.vy = c.randyvel();
       p.gx = c.randgx();

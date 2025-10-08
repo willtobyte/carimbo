@@ -18,6 +18,8 @@ struct conf final {
   float x, y;
   std::shared_ptr<pixmap> pixmap;
   std::mt19937 rng{std::random_device{}()};
+  std::uniform_real_distribution<float> xstartdist;
+  std::uniform_real_distribution<float> ystartdist;
   std::uniform_real_distribution<float> xveldist;
   std::uniform_real_distribution<float> yveldist;
   std::uniform_real_distribution<float> gxdist;
@@ -26,6 +28,8 @@ struct conf final {
   std::uniform_real_distribution<float> lifedist;
   std::uniform_int_distribution<unsigned int> alphadist;
 
+  auto randxstart() noexcept { return xstartdist(rng); }
+  auto randystart() noexcept { return ystartdist(rng); }
   auto randxvel() noexcept { return xveldist(rng); }
   auto randyvel() noexcept { return yveldist(rng); }
   auto randgx() noexcept { return gxdist(rng); }
