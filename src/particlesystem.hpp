@@ -17,10 +17,10 @@ struct particleconf final {
   bool active;
   std::shared_ptr<pixmap> pixmap;
   std::minstd_rand rng{std::random_device{}()};
+  std::uniform_real_distribution<float> xspawnd;
+  std::uniform_real_distribution<float> yspawnd;
   std::uniform_real_distribution<float> radiusd;
   std::uniform_real_distribution<double> angled;
-  std::uniform_real_distribution<float> xstartd;
-  std::uniform_real_distribution<float> ystartd;
   std::uniform_real_distribution<float> xveld;
   std::uniform_real_distribution<float> yveld;
   std::uniform_real_distribution<float> gxd;
@@ -33,8 +33,8 @@ struct particleconf final {
 
   auto randradius() noexcept { return radiusd(rng); }
   auto randangle() noexcept { return angled(rng); }
-  auto randxstart() noexcept { return xstartd(rng); }
-  auto randystart() noexcept { return ystartd(rng); }
+  auto randxspawn() noexcept { return xspawnd(rng); }
+  auto randyspawn() noexcept { return yspawnd(rng); }
   auto randxvel() noexcept { return xveld(rng); }
   auto randyvel() noexcept { return yveld(rng); }
   auto randgx() noexcept { return gxd(rng); }

@@ -39,8 +39,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   c->x = x;
   c->y = y;
   c->pixmap = pixmap;
-  c->xstartd = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
-  c->ystartd = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
+  c->xspawnd = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
+  c->yspawnd = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
   c->radiusd = std::uniform_real_distribution<float>(radius.value("start", .0f), radius.value("end", .0f));
   c->angled = std::uniform_real_distribution<double>(angle.value("start", .0), angle.value("end", .0));
   c->xveld = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
@@ -58,8 +58,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   for (auto i = 0uz; i < count; ++i) {
     auto& p = ps.emplace_back();
 
-    p.x = x + c->randxstart(),
-    p.y = y + c->randystart(),
+    p.x = x + c->randxspawn(),
+    p.y = y + c->randyspawn(),
     // p.angle = c.randangle();
     // p.radius = c.randradius();
     p.vx = c->randxvel();
@@ -126,8 +126,8 @@ void particlesystem::update(float_t delta) noexcept {
         continue;
       }
 
-      p.x = c->x + c->randxstart();
-      p.y = c->y + c->randystart();
+      p.x = c->x + c->randxspawn();
+      p.y = c->y + c->randyspawn();
       p.vx = c->randxvel();
       p.vy = c->randyvel();
       p.gx = c->randgx();
