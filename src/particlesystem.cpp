@@ -79,7 +79,7 @@ particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resou
   : _factory(std::make_shared<particlefactory>(resourcemanager)) {
 }
 
-void graphics::particlesystem::add(std::shared_ptr<particlebatch> batch) noexcept {
+void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) noexcept {
   if (!batch) {
     return;
   }
@@ -87,7 +87,7 @@ void graphics::particlesystem::add(std::shared_ptr<particlebatch> batch) noexcep
   _batches.emplace_back(std::move(batch));
 }
 
-void graphics::particlesystem::set(std::vector<std::shared_ptr<particlebatch>> batches) noexcept {
+void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) noexcept {
   if (batches.empty()) {
     _batches.clear();
     return;

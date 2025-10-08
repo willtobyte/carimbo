@@ -37,19 +37,19 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   }
 
   const auto& ps = j.value("particles", nlohmann::json::array());
-  std::vector<std::shared_ptr<graphics::particlebatch>> particles;
+  std::unordered_map<std::string, std::vector<std::shared_ptr<graphics::particlebatch>>> particles;
   particles.reserve(ps.size());
+
+  const auto factory = _particlesystem->factory();
+
   for (const auto& i : ps) {
-    const auto name = i["name"];
-    const auto kind = i["kind"];
-    const auto x = i["x"];
-    const auto y = i["y"];
+    const auto& name = i["name"].get_ref<const std::string&>();
+    const auto& kind = i["kind"].get_ref<const std::string&>();
+    const auto x = i["x"].get<float>();
+    const auto y = i["y"].get<float>();
 
-    UNUSED(name);
-
-    const auto factory = _particlesystem->factory();
-    const auto batch = factory->create(kind, x, y);
-    particles.emplace_back(batch);
+    auto& v = particles[name];
+    v.emplace_back(factory->create(kind, x, y));
   }
 
   const auto& fs = j.value("fonts", nlohmann::json::array());

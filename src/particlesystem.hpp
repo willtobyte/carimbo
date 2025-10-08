@@ -68,9 +68,9 @@ class particlesystem final {
     explicit particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
     ~particlesystem() noexcept = default;
 
-    void add(std::shared_ptr<particlebatch> batch) noexcept;
+    void add(const std::shared_ptr<particlebatch>& batch) noexcept;
 
-    void set(std::vector<std::shared_ptr<particlebatch>> batches) noexcept;
+    void set(const std::vector<std::shared_ptr<particlebatch>>& batches) noexcept;
 
     void clear() noexcept;
 

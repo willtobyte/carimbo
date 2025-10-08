@@ -9,7 +9,7 @@ scene::scene(
   std::shared_ptr<graphics::pixmap> background,
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
-  std::vector<std::shared_ptr<graphics::particlebatch>> particles,
+  std::unordered_map<std::string, std::vector<std::shared_ptr<graphics::particlebatch>>> particles,
   std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
@@ -34,7 +34,7 @@ scene::~scene() noexcept {
   for (const auto& [_, e] : effects) {
     e->stop();
   }
-  
+
   _particlesystem->clear();
 }
 
@@ -84,7 +84,9 @@ void scene::on_enter() const {
     _objectmanager->manage(o);
   }
 
-  _particlesystem->set(_particles);
+  for (auto&& batches : std::views::values(_particles)) {
+    _particlesystem->set(batches);
+  }
 
   if (const auto& fn = _onenter; fn) {
     fn();
