@@ -3,16 +3,13 @@
 #include "common.hpp"
 
 namespace graphics {
-struct particle final {
+struct alignas(16) particle final {
   float x, y;
   float vx, vy;
   float gx, gy;
   float av, af;
-  float life;
-  float scale;
-  float angle;
-  uint32_t pixmap;
-  uint8_t alpha;
+  float life, scale, angle;
+  float alpha;
 };
 
 struct particleconf final {

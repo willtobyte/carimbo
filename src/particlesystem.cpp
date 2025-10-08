@@ -163,7 +163,7 @@ void particlesystem::draw() const noexcept {
         source,
         destination,
         static_cast<double>(p.angle),
-        p.alpha
+        static_cast<uint8_t>(p.alpha)
       );
     }
   }
