@@ -4,14 +4,13 @@
 
 namespace graphics {
 struct particle final {
-  double angle;
-  //float radius;
   float x, y;
   float vx, vy;
   float gx, gy;
   float av, af;
   float life;
   float scale;
+  float angle;
   uint32_t pixmap;
   uint8_t alpha;
 };

@@ -109,7 +109,7 @@ void particlesystem::update(float_t delta) noexcept {
 
       if (p.life > 0.f) {
         p.av += p.af * delta;
-        p.angle += static_cast<double>(p.av * delta);
+        p.angle += p.av * delta;
 
         p.vx += p.gx * delta;
         p.vy += p.gy * delta;
@@ -153,7 +153,7 @@ void particlesystem::draw() const noexcept {
       pixmap.draw(
         source,
         destination,
-        p.angle,
+        static_cast<double>(p.angle),
         p.alpha
       );
     }
