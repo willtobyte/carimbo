@@ -17,7 +17,7 @@ struct particle final {
 
 struct particleconf final {
   float x, y;
-  bool running;
+  bool active;
   std::shared_ptr<pixmap> pixmap;
   std::mt19937 rng{std::random_device{}()};
   std::uniform_real_distribution<float> radiusdist;
@@ -48,8 +48,7 @@ struct particleconf final {
   auto randrotforce() noexcept { return rotforcedist(rng); }
   auto randrotvel() noexcept { return rotveldist(rng); }
 
-  void show() noexcept { running = true; }
-  void hide() noexcept { running = false; }
+  void set_active(bool value) noexcept { active = value; }
 };
 
 struct particlebatch final {

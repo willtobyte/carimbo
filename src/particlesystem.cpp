@@ -35,7 +35,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   const auto& rvel = rotation.value("velocity", nlohmann::json::object());
 
   const auto c = std::make_shared<particleconf>();
-  c->running = true;
+  c->active = true;
   c->x = x;
   c->y = y;
   c->pixmap = pixmap;
@@ -104,7 +104,7 @@ void graphics::particlesystem::clear() noexcept {
 void particlesystem::update(float_t delta) noexcept {
   for (const auto& batch : _batches) {
     auto& c = batch->conf;
-    if (!c->running) [[unlikely]] {
+    if (!c->active) [[unlikely]] {
       continue;
     }
 
@@ -145,7 +145,7 @@ void particlesystem::update(float_t delta) noexcept {
 void particlesystem::draw() const noexcept {
   for (const auto& batch : _batches) {
     auto& c = batch->conf;
-    if (!c->running) [[unlikely]] {
+    if (!c->active) [[unlikely]] {
       continue;
     }
 
