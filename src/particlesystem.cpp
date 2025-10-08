@@ -15,13 +15,13 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto count = j.value("count", 0ull);
 
-  const auto xvel = j["velocity"]["x"];
-  const auto yvel = j["velocity"]["y"];
-  const auto gx = j["gravity"]["x"];
-  const auto gy = j["gravity"]["y"];
-  const auto life = j["life"];
-  const auto scale = j["scale"];
-  const auto alpha = j["alpha"];
+  const auto& xvel = j.value("velocity", nlohmann::json::object()).value("x", nlohmann::json::object());
+  const auto& yvel = j.value("velocity", nlohmann::json::object()).value("y", nlohmann::json::object());
+  const auto& gx = j.value("gravity", nlohmann::json::object()).value("x", nlohmann::json::object());
+  const auto& gy = j.value("gravity", nlohmann::json::object()).value("y", nlohmann::json::object());
+  const auto& scale = j.value("scale", nlohmann::json::object());
+  const auto& life = j.value("life", nlohmann::json::object());
+  const auto& alpha = j.value("alpha", nlohmann::json::object());
 
   conf c{};
   c.x = x;
@@ -31,9 +31,9 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   c.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
   c.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
   c.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
-  c.lifedist = std::uniform_real_distribution<float>(life.value("start", .0f), life.value("end", .0f));
-  c.scaledist = std::uniform_real_distribution<float>(scale.value("start", .0f), scale.value("end", .0f));
-  c.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 0u));
+  c.lifedist = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
+  c.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
+  c.scaledist = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
 
   auto ps = std::vector<particle>();
   ps.reserve(count);
@@ -49,7 +49,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
     p.gy = c.randgy();
     p.life = c.randlife();
     p.alpha = c.randalpha();
-    p.scale = 1.f;
+    p.scale = c.randscale();
   }
 
   return std::make_shared<particlebatch>(c, ps);
@@ -104,9 +104,10 @@ void particlesystem::update(float_t delta) noexcept {
       p.vy = c.randyvel();
       p.gx = c.randgx();
       p.gy = c.randgy();
+      p.scale = c.randscale();
       p.life = c.randlife();
       p.alpha = c.randalpha();
-      p.scale = 1.f;
+      p.scale = c.randscale();
     }
   }
 }
@@ -122,7 +123,7 @@ void particlesystem::draw() const noexcept {
     const geometry::rectangle source{0, 0, width, height};
 
     for (const auto& p : ps) {
-      const geometry::rectangle destination{p.x, p.y, width, height};
+      const geometry::rectangle destination{p.x, p.y, width * p.scale, height * p.scale};
 
       pixmap.draw(
         source,

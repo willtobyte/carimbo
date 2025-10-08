@@ -30,6 +30,7 @@ struct conf final {
   auto randyvel() noexcept { return yveldist(rng); }
   auto randgx() noexcept { return gxdist(rng); }
   auto randgy() noexcept { return gydist(rng); }
+  auto randscale() noexcept { return scaledist(rng); }
   auto randlife() noexcept { return lifedist(rng); }
   auto randalpha() noexcept { return static_cast<uint8_t>(alphadist(rng)); }
 };
