@@ -17,33 +17,33 @@ struct particleconf final {
   bool active;
   std::shared_ptr<pixmap> pixmap;
   std::minstd_rand rng{std::random_device{}()};
-  std::uniform_real_distribution<float> radiusdist;
-  std::uniform_real_distribution<double> angledist;
-  std::uniform_real_distribution<float> xstartdist;
-  std::uniform_real_distribution<float> ystartdist;
-  std::uniform_real_distribution<float> xveldist;
-  std::uniform_real_distribution<float> yveldist;
-  std::uniform_real_distribution<float> gxdist;
-  std::uniform_real_distribution<float> gydist;
-  std::uniform_real_distribution<float> scaledist;
-  std::uniform_real_distribution<float> lifedist;
-  std::uniform_int_distribution<unsigned int> alphadist;
-  std::uniform_real_distribution<float> rotforcedist;
-  std::uniform_real_distribution<float> rotveldist;
+  std::uniform_real_distribution<float> radiusd;
+  std::uniform_real_distribution<double> angled;
+  std::uniform_real_distribution<float> xstartd;
+  std::uniform_real_distribution<float> ystartd;
+  std::uniform_real_distribution<float> xveld;
+  std::uniform_real_distribution<float> yveld;
+  std::uniform_real_distribution<float> gxd;
+  std::uniform_real_distribution<float> gyd;
+  std::uniform_real_distribution<float> scaled;
+  std::uniform_real_distribution<float> lifed;
+  std::uniform_int_distribution<unsigned int> alphad;
+  std::uniform_real_distribution<float> rotforced;
+  std::uniform_real_distribution<float> rotveld;
 
-  auto randradius() noexcept { return radiusdist(rng); }
-  auto randangle() noexcept { return angledist(rng); }
-  auto randxstart() noexcept { return xstartdist(rng); }
-  auto randystart() noexcept { return ystartdist(rng); }
-  auto randxvel() noexcept { return xveldist(rng); }
-  auto randyvel() noexcept { return yveldist(rng); }
-  auto randgx() noexcept { return gxdist(rng); }
-  auto randgy() noexcept { return gydist(rng); }
-  auto randscale() noexcept { return scaledist(rng); }
-  auto randlife() noexcept { return lifedist(rng); }
-  auto randalpha() noexcept { return static_cast<uint8_t>(alphadist(rng)); }
-  auto randrotforce() noexcept { return rotforcedist(rng); }
-  auto randrotvel() noexcept { return rotveldist(rng); }
+  auto randradius() noexcept { return radiusd(rng); }
+  auto randangle() noexcept { return angled(rng); }
+  auto randxstart() noexcept { return xstartd(rng); }
+  auto randystart() noexcept { return ystartd(rng); }
+  auto randxvel() noexcept { return xveld(rng); }
+  auto randyvel() noexcept { return yveld(rng); }
+  auto randgx() noexcept { return gxd(rng); }
+  auto randgy() noexcept { return gyd(rng); }
+  auto randscale() noexcept { return scaled(rng); }
+  auto randlife() noexcept { return lifed(rng); }
+  auto randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
+  auto randrotforce() noexcept { return rotforced(rng); }
+  auto randrotvel() noexcept { return rotveld(rng); }
 
   void set_active(bool value) noexcept { active = value; }
 };
