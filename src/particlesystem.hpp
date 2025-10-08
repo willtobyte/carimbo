@@ -16,7 +16,7 @@ struct particleconf final {
   float x, y;
   bool active;
   std::shared_ptr<pixmap> pixmap;
-  std::mt19937 rng{std::random_device{}()};
+  std::minstd_rand rng{std::random_device{}()};
   std::uniform_real_distribution<float> radiusdist;
   std::uniform_real_distribution<double> angledist;
   std::uniform_real_distribution<float> xstartdist;
