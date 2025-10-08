@@ -5,9 +5,11 @@
 namespace graphics {
 struct particle final {
   double angle;
+  //float radius;
   float x, y;
   float vx, vy;
   float gx, gy;
+  float av, af;
   float life;
   float scale;
   uint32_t pixmap;
@@ -18,6 +20,8 @@ struct conf final {
   float x, y;
   std::shared_ptr<pixmap> pixmap;
   std::mt19937 rng{std::random_device{}()};
+  std::uniform_real_distribution<float> radiusdist;
+  std::uniform_real_distribution<double> angledist;
   std::uniform_real_distribution<float> xstartdist;
   std::uniform_real_distribution<float> ystartdist;
   std::uniform_real_distribution<float> xveldist;
@@ -27,7 +31,11 @@ struct conf final {
   std::uniform_real_distribution<float> scaledist;
   std::uniform_real_distribution<float> lifedist;
   std::uniform_int_distribution<unsigned int> alphadist;
+  std::uniform_real_distribution<float> rotforcedist;
+  std::uniform_real_distribution<float> rotveldist;
 
+  auto randradius() noexcept { return radiusdist(rng); }
+  auto randangle() noexcept { return angledist(rng); }
   auto randxstart() noexcept { return xstartdist(rng); }
   auto randystart() noexcept { return ystartdist(rng); }
   auto randxvel() noexcept { return xveldist(rng); }
@@ -37,6 +45,8 @@ struct conf final {
   auto randscale() noexcept { return scaledist(rng); }
   auto randlife() noexcept { return lifedist(rng); }
   auto randalpha() noexcept { return static_cast<uint8_t>(alphadist(rng)); }
+  auto randrotforce() noexcept { return rotforcedist(rng); }
+  auto randrotvel() noexcept { return rotveldist(rng); }
 };
 
 struct particlebatch final {

@@ -15,22 +15,33 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto count = j.value("count", 0ull);
 
-  const auto& xstart = j.value("start", nlohmann::json::object()).value("x", nlohmann::json::object());
-  const auto& ystart = j.value("start", nlohmann::json::object()).value("y", nlohmann::json::object());
-  const auto& xvel = j.value("velocity", nlohmann::json::object()).value("x", nlohmann::json::object());
-  const auto& yvel = j.value("velocity", nlohmann::json::object()).value("y", nlohmann::json::object());
-  const auto& gx = j.value("gravity", nlohmann::json::object()).value("x", nlohmann::json::object());
-  const auto& gy = j.value("gravity", nlohmann::json::object()).value("y", nlohmann::json::object());
+  const auto& spawn = j.value("spawn", nlohmann::json::object());
+  const auto& velocity = j.value("velocity", nlohmann::json::object());
+  const auto& gravity = j.value("gravity", nlohmann::json::object());
+  const auto& rotation = j.value("rotation", nlohmann::json::object());
+
+  const auto& radius = spawn.value("radius", nlohmann::json::object());
+  const auto& angle = spawn.value("angle", nlohmann::json::object());
+  const auto& xspawn = spawn.value("x", nlohmann::json::object());
+  const auto& yspawn = spawn.value("y", nlohmann::json::object());
+  const auto& xvel = velocity.value("x", nlohmann::json::object());
+  const auto& yvel = velocity.value("y", nlohmann::json::object());
+  const auto& gx = gravity.value("x", nlohmann::json::object());
+  const auto& gy = gravity.value("y", nlohmann::json::object());
   const auto& scale = j.value("scale", nlohmann::json::object());
   const auto& life = j.value("life", nlohmann::json::object());
   const auto& alpha = j.value("alpha", nlohmann::json::object());
+  const auto& rforce = rotation.value("force", nlohmann::json::object());
+  const auto& rvel = rotation.value("velocity", nlohmann::json::object());
 
   conf c{};
   c.x = x;
   c.y = y;
   c.pixmap = pixmap;
-  c.xstartdist = std::uniform_real_distribution<float>(xstart.value("start", .0f), xstart.value("end", .0f));
-  c.ystartdist = std::uniform_real_distribution<float>(ystart.value("start", .0f), ystart.value("end", .0f));
+  c.xstartdist = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
+  c.ystartdist = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
+  c.radiusdist = std::uniform_real_distribution<float>(radius.value("start", .0f), radius.value("end", .0f));
+  c.angledist = std::uniform_real_distribution<double>(angle.value("start", .0), angle.value("end", .0));
   c.xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
   c.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
   c.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
@@ -38,19 +49,24 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   c.lifedist = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
   c.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
   c.scaledist = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
+  c.rotforcedist = std::uniform_real_distribution<float>(rforce.value("start", .0f), rforce.value("end", .0f));
+  c.rotveldist = std::uniform_real_distribution<float>(rvel.value("start", .0f),   rvel.value("end", .0f));
 
   auto ps = std::vector<particle>();
   ps.reserve(count);
   for (auto i = 0uz; i < count; ++i) {
     auto& p = ps.emplace_back();
 
-    p.angle = 0.0;
     p.x = x + c.randxstart(),
     p.y = y + c.randystart(),
+    // p.angle = c.randangle();
+    // p.radius = c.randradius();
     p.vx = c.randxvel();
     p.vy = c.randyvel();
     p.gx = c.randgx();
     p.gy = c.randgy();
+    p.av = c.randrotvel();
+    p.af = c.randrotforce();
     p.life = c.randlife();
     p.alpha = c.randalpha();
     p.scale = c.randscale();
@@ -92,22 +108,27 @@ void particlesystem::update(float_t delta) noexcept {
       p.life -= delta;
 
       if (p.life > 0.f) {
+        p.av += p.af * delta;
+        p.angle += static_cast<double>(p.av * delta);
+
         p.vx += p.gx * delta;
         p.vy += p.gy * delta;
         p.x += p.vx * delta;
         p.y += p.vy * delta;
+
         p.alpha = static_cast<uint8_t>(std::clamp(255.f * p.life, 0.f, 255.f));
 
         continue;
       }
 
-      p.angle = .0;
-      p.x = c.x + c.randxstart(),
-      p.y = c.y + c.randystart(),
+      p.x = c.x + c.randxstart();
+      p.y = c.y + c.randystart();
       p.vx = c.randxvel();
       p.vy = c.randyvel();
       p.gx = c.randgx();
       p.gy = c.randgy();
+      p.av = c.randrotvel();
+      p.af = c.randrotforce();
       p.scale = c.randscale();
       p.life = c.randlife();
       p.alpha = c.randalpha();
