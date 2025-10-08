@@ -13,7 +13,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
 
-  const auto count = j.value("count", 0ull);
+  const auto count = j.value("count", 0uz);
 
   const auto& spawn = j.value("spawn", nlohmann::json::object());
   const auto& velocity = j.value("velocity", nlohmann::json::object());
