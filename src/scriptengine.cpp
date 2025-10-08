@@ -291,7 +291,8 @@ void framework::scriptengine::run() {
   lua.new_enum(
     "SceneType",
     "object", framework::scenetype::object,
-    "effect", framework::scenetype::effect
+    "effect", framework::scenetype::effect,
+    "particle", framework::scenetype::particle
   );
 
   lua.new_enum(
@@ -730,6 +731,13 @@ void framework::scriptengine::run() {
     "destroy", &graphics::overlay::destroy,
     "dispatch", &graphics::overlay::dispatch,
     "cursor", sol::property([](graphics::overlay& o) { return cursorproxy{o}; })
+  );
+
+  lua.new_usertype<graphics::particleconf>(
+    "ParticleConf",
+    sol::no_constructor,
+    "show", &graphics::particleconf::show,
+    "hide", &graphics::particleconf::hide
   );
 
   lua.new_usertype<graphics::particlefactory>(

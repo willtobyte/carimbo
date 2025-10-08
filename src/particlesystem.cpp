@@ -34,42 +34,43 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   const auto& rforce = rotation.value("force", nlohmann::json::object());
   const auto& rvel = rotation.value("velocity", nlohmann::json::object());
 
-  conf c{};
-  c.x = x;
-  c.y = y;
-  c.pixmap = pixmap;
-  c.xstartdist = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
-  c.ystartdist = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
-  c.radiusdist = std::uniform_real_distribution<float>(radius.value("start", .0f), radius.value("end", .0f));
-  c.angledist = std::uniform_real_distribution<double>(angle.value("start", .0), angle.value("end", .0));
-  c.xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
-  c.yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
-  c.gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
-  c.gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
-  c.lifedist = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
-  c.alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
-  c.scaledist = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
-  c.rotforcedist = std::uniform_real_distribution<float>(rforce.value("start", .0f), rforce.value("end", .0f));
-  c.rotveldist = std::uniform_real_distribution<float>(rvel.value("start", .0f),   rvel.value("end", .0f));
+  const auto c = std::make_shared<particleconf>();
+  c->running = true;
+  c->x = x;
+  c->y = y;
+  c->pixmap = pixmap;
+  c->xstartdist = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
+  c->ystartdist = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
+  c->radiusdist = std::uniform_real_distribution<float>(radius.value("start", .0f), radius.value("end", .0f));
+  c->angledist = std::uniform_real_distribution<double>(angle.value("start", .0), angle.value("end", .0));
+  c->xveldist = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
+  c->yveldist = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
+  c->gxdist = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
+  c->gydist = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
+  c->lifedist = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
+  c->alphadist = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
+  c->scaledist = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
+  c->rotforcedist = std::uniform_real_distribution<float>(rforce.value("start", .0f), rforce.value("end", .0f));
+  c->rotveldist = std::uniform_real_distribution<float>(rvel.value("start", .0f),   rvel.value("end", .0f));
 
   auto ps = std::vector<particle>();
   ps.reserve(count);
   for (auto i = 0uz; i < count; ++i) {
     auto& p = ps.emplace_back();
 
-    p.x = x + c.randxstart(),
-    p.y = y + c.randystart(),
+    p.x = x + c->randxstart(),
+    p.y = y + c->randystart(),
     // p.angle = c.randangle();
     // p.radius = c.randradius();
-    p.vx = c.randxvel();
-    p.vy = c.randyvel();
-    p.gx = c.randgx();
-    p.gy = c.randgy();
-    p.av = c.randrotvel();
-    p.af = c.randrotforce();
-    p.life = c.randlife();
-    p.alpha = c.randalpha();
-    p.scale = c.randscale();
+    p.vx = c->randxvel();
+    p.vy = c->randyvel();
+    p.gx = c->randgx();
+    p.gy = c->randgy();
+    p.av = c->randrotvel();
+    p.af = c->randrotforce();
+    p.life = c->randlife();
+    p.alpha = c->randalpha();
+    p.scale = c->randscale();
   }
 
   return std::make_shared<particlebatch>(c, ps);
@@ -103,6 +104,10 @@ void graphics::particlesystem::clear() noexcept {
 void particlesystem::update(float_t delta) noexcept {
   for (const auto& batch : _batches) {
     auto& c = batch->conf;
+    if (!c->running) [[unlikely]] {
+      continue;
+    }
+
     auto& ps = batch->particles;
     for (auto& p : ps) {
       p.life -= delta;
@@ -121,18 +126,18 @@ void particlesystem::update(float_t delta) noexcept {
         continue;
       }
 
-      p.x = c.x + c.randxstart();
-      p.y = c.y + c.randystart();
-      p.vx = c.randxvel();
-      p.vy = c.randyvel();
-      p.gx = c.randgx();
-      p.gy = c.randgy();
-      p.av = c.randrotvel();
-      p.af = c.randrotforce();
-      p.scale = c.randscale();
-      p.life = c.randlife();
-      p.alpha = c.randalpha();
-      p.scale = c.randscale();
+      p.x = c->x + c->randxstart();
+      p.y = c->y + c->randystart();
+      p.vx = c->randxvel();
+      p.vy = c->randyvel();
+      p.gx = c->randgx();
+      p.gy = c->randgy();
+      p.av = c->randrotvel();
+      p.af = c->randrotforce();
+      p.scale = c->randscale();
+      p.life = c->randlife();
+      p.alpha = c->randalpha();
+      p.scale = c->randscale();
     }
   }
 }
@@ -140,9 +145,13 @@ void particlesystem::update(float_t delta) noexcept {
 void particlesystem::draw() const noexcept {
   for (const auto& batch : _batches) {
     auto& c = batch->conf;
+    if (!c->running) [[unlikely]] {
+      continue;
+    }
+
     auto& ps = batch->particles;
 
-    const auto& pixmap = *c.pixmap;
+    const auto& pixmap = *c->pixmap;
     const auto width = static_cast<float>(pixmap.width());
     const auto height = static_cast<float>(pixmap.height());
     const geometry::rectangle source{0, 0, width, height};

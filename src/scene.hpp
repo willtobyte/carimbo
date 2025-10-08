@@ -12,7 +12,8 @@ class objectmanager;
 
 enum class scenetype : uint8_t {
   object = 0,
-  effect
+  effect,
+  particle
 };
 
 class scene final {
@@ -24,7 +25,7 @@ public:
     std::shared_ptr<graphics::pixmap> background,
     std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
     std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
-    std::unordered_map<std::string, std::vector<std::shared_ptr<graphics::particlebatch>>> particles,
+    std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
     std::optional<std::shared_ptr<tilemap>> tilemap,
     geometry::size size
   );
@@ -35,7 +36,11 @@ public:
 
   void draw() const noexcept;
 
-  std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> get(const std::string& name, scenetype type) const;
+  std::variant<
+    std::shared_ptr<object>,
+    std::shared_ptr<audio::soundfx>,
+    std::shared_ptr<graphics::particleconf>
+  > get(const std::string& name, scenetype type) const;
 
   std::string name() const noexcept;
 
@@ -65,7 +70,7 @@ private:
   std::shared_ptr<graphics::pixmap> _background;
   std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
-  std::unordered_map<std::string, std::vector<std::shared_ptr<graphics::particlebatch>>> _particles;
+  std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> _particles;
   std::optional<std::shared_ptr<tilemap>> _tilemap;
 
   geometry::size _size;

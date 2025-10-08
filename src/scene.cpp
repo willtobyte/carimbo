@@ -9,7 +9,7 @@ scene::scene(
   std::shared_ptr<graphics::pixmap> background,
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
-  std::unordered_map<std::string, std::vector<std::shared_ptr<graphics::particlebatch>>> particles,
+  std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
   std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
@@ -59,7 +59,11 @@ void scene::draw() const noexcept {
   _background->draw(r, r);
 }
 
-std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::get(const std::string& id, scenetype type) const {
+std::variant<
+  std::shared_ptr<object>,
+  std::shared_ptr<audio::soundfx>,
+  std::shared_ptr<graphics::particleconf>
+> scene::get(const std::string& id, scenetype type) const {
   if (type == scenetype::object) {
     for (const auto& [key, object] : _objects) {
       if (key == id) return object;
@@ -69,6 +73,12 @@ std::variant<std::shared_ptr<object>, std::shared_ptr<audio::soundfx>> scene::ge
   if (type == scenetype::effect) {
     for (const auto& [key, effect] : _effects) {
       if (key == id) return effect;
+    }
+  }
+
+  if (type == scenetype::particle) {
+    for (const auto& [key, batch] : _particles) {
+      if (key == id) return batch->conf;
     }
   }
 
@@ -84,8 +94,8 @@ void scene::on_enter() const {
     _objectmanager->manage(o);
   }
 
-  for (auto&& batches : std::views::values(_particles)) {
-    _particlesystem->set(batches);
+  for (const auto& [key, batch] : _particles) {
+    _particlesystem->add(batch);
   }
 
   if (const auto& fn = _onenter; fn) {

@@ -15,8 +15,9 @@ struct particle final {
   uint8_t alpha;
 };
 
-struct conf final {
+struct particleconf final {
   float x, y;
+  bool running;
   std::shared_ptr<pixmap> pixmap;
   std::mt19937 rng{std::random_device{}()};
   std::uniform_real_distribution<float> radiusdist;
@@ -46,10 +47,13 @@ struct conf final {
   auto randalpha() noexcept { return static_cast<uint8_t>(alphadist(rng)); }
   auto randrotforce() noexcept { return rotforcedist(rng); }
   auto randrotvel() noexcept { return rotveldist(rng); }
+
+  void show() noexcept { running = true; }
+  void hide() noexcept { running = false; }
 };
 
 struct particlebatch final {
-  conf conf;
+  std::shared_ptr<particleconf> conf;
   std::vector<particle> particles;
 };
 
