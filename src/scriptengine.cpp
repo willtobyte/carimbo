@@ -869,8 +869,9 @@ void framework::scriptengine::run() {
         case nlohmann::json::value_t::null:
           return sol::make_object(lua, nullptr);
         case nlohmann::json::value_t::number_integer:
+          return sol::make_object(lua, j.get<int64_t>());
         case nlohmann::json::value_t::number_unsigned:
-          return sol::make_object(lua, j.get<int>());
+          return sol::make_object(lua, j.get<uint64_t>());
         case nlohmann::json::value_t::number_float:
           return sol::make_object(lua, j.get<double>());
         case nlohmann::json::value_t::boolean:
