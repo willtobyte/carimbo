@@ -856,7 +856,7 @@ void framework::scriptengine::run() {
 
       const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
 
-      if (default_value.is<sol::lua_nil_t>() && j.is_null()) {
+      if (j.is_null()) {
         return sol::make_object(lua, nullptr);
       } else if (j.is_number_integer()) {
         return sol::make_object(lua, j.get<int>());
