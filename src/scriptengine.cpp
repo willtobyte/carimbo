@@ -280,9 +280,9 @@ void framework::scriptengine::run() {
   lua.new_usertype<audio::soundfx>(
     "SoundFX",
     sol::no_constructor,
-     "play", [](audio::soundfx& sfx, std::optional<bool> loop_opt) {
+     "play", [](audio::soundfx& self, std::optional<bool> loop_opt) {
        auto loop = loop_opt.value_or(false);
-       sfx.play(loop);
+       self.play(loop);
      },
      "stop", &audio::soundfx::stop,
      "on_begin", &audio::soundfx::set_onbegin,
@@ -293,12 +293,12 @@ void framework::scriptengine::run() {
     "SoundManager",
     sol::no_constructor,
     "play", [](
-      audio::soundmanager& manager,
+      audio::soundmanager& self,
       const std::string& name,
       std::optional<bool> loop_opt
     ) {
       auto loop = loop_opt.value_or(false);
-      manager.play(name, loop);
+      self.play(name, loop);
     },
     "stop", &audio::soundmanager::stop
   );
@@ -331,31 +331,31 @@ void framework::scriptengine::run() {
   );
 
   struct velocityproxy {
-    framework::object& o;
+    framework::object& self;
 
-    float x() const { return o.velocity().x(); }
-    float y() const { return o.velocity().y(); }
+    float x() const { return self.velocity().x(); }
+    float y() const { return self.velocity().y(); }
 
     void set_x(float x) {
-      auto v = o.velocity();
+      auto v = self.velocity();
       v.set_x(x);
-      o.set_velocity(v);
+      self.set_velocity(v);
     }
 
     void set_y(float y) {
-      auto v = o.velocity();
+      auto v = self.velocity();
       v.set_y(y);
-      o.set_velocity(v);
+      self.set_velocity(v);
     }
 
     void set(const sol::table& table) {
       const auto x = table.get_or<float>("x", table.get_or(1, 0.0));
       const auto y = table.get_or<float>("y", table.get_or(2, 0.0));
-      o.set_velocity(algebra::vector2d{x, y});
+      self.set_velocity(algebra::vector2d{x, y});
     }
 
     algebra::vector2d get() const {
-      return o.velocity();
+      return self.velocity();
     }
   };
 
@@ -367,14 +367,14 @@ void framework::scriptengine::run() {
   );
 
   struct metaobject {
-    static sol::object index(framework::object& o, sol::stack_object key, sol::this_state state) {
-      auto& store = o.kv();
+    static sol::object index(framework::object& self, sol::stack_object key, sol::this_state state) {
+      auto& store = self.kv();
       const auto& ptr = store.get(key.as<std::string>());
       return sol::make_object(state, std::ref(*ptr));
     }
 
-    static void new_index(framework::object& o, sol::stack_object key, sol::stack_object value) {
-      auto& store = o.kv();
+    static void new_index(framework::object& self, sol::stack_object key, sol::stack_object value) {
+      auto& store = self.kv();
       store.set(key.as<std::string>(), value);
     }
   };
@@ -412,28 +412,28 @@ void framework::scriptengine::run() {
       [](framework::object& o) {
         return o.placement();
       },
-      [](framework::object& o, sol::table table) {
+      [](framework::object& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
 
-        o.set_placement(x, y);
+        self.set_placement(x, y);
       }
     ),
     "velocity", sol::property(
       [](framework::object& o) {
         return velocityproxy{o};
       },
-      [](framework::object& o, const sol::object& v) {
-        if (v.is<sol::table>()) {
-          const auto table = v.as<sol::table>();
+      [](framework::object& self, const sol::object& value) {
+        if (value.is<sol::table>()) {
+          const auto table = value.as<sol::table>();
           const auto x = table.get_or<float>("x", table.get_or(1, 0));
           const auto y = table.get_or<float>("y", table.get_or(2, 0));
-          o.set_velocity(algebra::vector2d{x, y});
+          self.set_velocity(algebra::vector2d{x, y});
           return;
         }
 
-        if (v.is<algebra::vector2d>()) {
-          o.set_velocity(v.as<algebra::vector2d>());
+        if (value.is<algebra::vector2d>()) {
+          self.set_velocity(value.as<algebra::vector2d>());
           return;
         }
 
@@ -448,17 +448,17 @@ void framework::scriptengine::run() {
     "ObjectManager",
     sol::no_constructor,
     "create", [](
-      framework::objectmanager& manager,
+      framework::objectmanager& self,
       const std::string& kind,
       sol::optional<std::string> scope_opt,
       sol::optional<bool> manage_opt
     ) {
       const auto manage = manage_opt.value_or(true);
       if (!scope_opt) {
-        return manager.create(kind, std::nullopt, manage);
+        return self.create(kind, std::nullopt, manage);
       }
 
-      return manager.create(kind, std::cref(*scope_opt), manage);
+      return self.create(kind, std::cref(*scope_opt), manage);
     },
     "clone", &framework::objectmanager::clone,
     "remove", &framework::objectmanager::remove
@@ -1035,8 +1035,8 @@ void framework::scriptengine::run() {
       [](const graphics::canvas&) {
         return nullptr;
       },
-      [](graphics::canvas& canvas, const char* data) {
-        canvas.set_pixels(data);
+      [](graphics::canvas& self, const char* data) {
+        self.set_pixels(data);
       }
     )
   );
