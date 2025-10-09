@@ -44,18 +44,18 @@ void font::draw(const std::string& text, const geometry::point& position, const 
     double angle = .0L;
     reflection reflection = reflection::none;
     uint8_t alpha = 255;
-    // float scale = 1.f;
+    float scale = 1.f;
 
-    if (const auto e = effect.lock()) {
+    if (const auto e = effect.lock(); e) {
       angle = e->angle();
       reflection = e->reflection();
       alpha = e->alpha();
-      // scale = e->scale();
+      scale = e->scale();
     }
 
     _pixmap->draw(
       glyph,
-      {cursor, size * _scale},
+      {cursor, size * _scale * scale},
       angle,
       alpha,
       reflection
