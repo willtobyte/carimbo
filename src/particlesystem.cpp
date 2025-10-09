@@ -6,7 +6,7 @@ particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> res
   : _resourcemanager(std::move(resourcemanager)) {
 }
 
-std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, float_t x, float_t y) const {
+std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, float x, float y) const {
   const auto& filename = std::format("particles/{}.json", kind);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
@@ -101,7 +101,7 @@ void graphics::particlesystem::clear() noexcept {
   _batches.clear();
 }
 
-void particlesystem::update(float_t delta) noexcept {
+void particlesystem::update(float delta) noexcept {
   for (const auto& batch : _batches) {
     auto& c = batch->conf;
     if (!c->active) [[unlikely]] {

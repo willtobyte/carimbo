@@ -27,11 +27,11 @@ public:
 
   std::vector<std::string> destroy(const std::string& name) noexcept;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
   void draw() const noexcept;
 
-  void on_touch(float_t x, float_t y) const;
+  void on_touch(float x, float y) const;
 
 protected:
   virtual void on_key_press(const input::event::keyboard::key& event) override;

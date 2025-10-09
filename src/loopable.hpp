@@ -6,6 +6,6 @@ public:
   loopable() noexcept = default;
   virtual ~loopable() noexcept = default;
 
-  virtual void loop(float_t delta) = 0;
+  virtual void loop(float delta) = 0;
 };
 }

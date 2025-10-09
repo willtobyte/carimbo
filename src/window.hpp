@@ -10,7 +10,7 @@ public:
 
   operator SDL_Window*() const noexcept;
 
-  std::shared_ptr<renderer> create_renderer(float_t scale);
+  std::shared_ptr<renderer> create_renderer(float scale);
 
   int32_t width() const noexcept;
 

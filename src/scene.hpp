@@ -32,7 +32,7 @@ public:
 
   ~scene() noexcept;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
   void draw() const noexcept;
 
@@ -47,21 +47,21 @@ public:
   void on_enter() const;
   void on_leave() const;
   void on_text(const std::string& text) const;
-  void on_touch(float_t x, float_t y) const;
+  void on_touch(float x, float y) const;
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;
-  void on_motion(float_t x, float_t y) const;
-  // void on_mouse_press(float_t x, float_t y) const;
-  // void on_mouse_relese(float_t x, float_t y) const;
+  void on_motion(float x, float y) const;
+  // void on_mouse_press(float x, float y) const;
+  // void on_mouse_relese(float x, float y) const;
 
   void set_onenter(std::function<void()>&& fn);
-  void set_onloop(std::function<void(float_t)>&& fn);
+  void set_onloop(std::function<void(float)>&& fn);
   void set_onleave(std::function<void()>&& fn);
-  void set_ontouch(std::function<void(float_t, float_t)>&& fn);
+  void set_ontouch(std::function<void(float, float)>&& fn);
   void set_onkeypress(std::function<void(int32_t)>&& fn);
   void set_onkeyrelease(std::function<void(int32_t)>&& fn);
   void set_ontext(std::function<void(const std::string& )>&& fn);
-  void set_onmotion(std::function<void(float_t, float_t)>&& fn);
+  void set_onmotion(std::function<void(float, float)>&& fn);
 
 private:
   std::string _name;
@@ -76,14 +76,14 @@ private:
   geometry::size _size;
 
   std::function<void()> _onenter;
-  std::function<void(float_t)> _onloop;
+  std::function<void(float)> _onloop;
   std::function<void()> _onleave;
-  std::function<void(float_t, float_t)> _ontouch;
+  std::function<void(float, float)> _ontouch;
   std::function<void(int32_t)> _onkeypress;
   std::function<void(int32_t)> _onkeyrelease;
   std::function<void(const std::string& )> _ontext;
-  // std::function<void(float_t, float_t, int32_t button)> _onmousepress;
-  // std::function<void(float_t, float_t, int32_t button)> _onmouserelease;
-  std::function<void(float_t, float_t)> _onmotion;
+  // std::function<void(float, float, int32_t button)> _onmousepress;
+  // std::function<void(float, float, int32_t button)> _onmouserelease;
+  std::function<void(float, float)> _onmotion;
 };
 }

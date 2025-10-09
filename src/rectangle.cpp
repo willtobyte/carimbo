@@ -2,13 +2,13 @@
 
 using namespace geometry;
 
-rectangle::rectangle(float_t x, float_t y, float_t w, float_t h) noexcept
+rectangle::rectangle(float x, float y, float w, float h) noexcept
   : _position{ x, y }, _size{ w, h } {}
 
 rectangle::rectangle(const point& position, const class geometry::size& size) noexcept
   : _position(position), _size(size) {}
 
-void rectangle::set_position(float_t x, float_t y) noexcept {
+void rectangle::set_position(float x, float y) noexcept {
   _position = {x, y};
 }
 
@@ -20,23 +20,23 @@ point rectangle::position() const noexcept {
   return _position;
 }
 
-float_t rectangle::x() const noexcept {
+float rectangle::x() const noexcept {
   return _position.x();
 }
 
-float_t rectangle::y() const noexcept {
+float rectangle::y() const noexcept {
   return _position.y();
 }
 
-float_t rectangle::width() const noexcept {
+float rectangle::width() const noexcept {
   return _size.width();
 }
 
-float_t rectangle::height() const noexcept {
+float rectangle::height() const noexcept {
   return _size.height();
 }
 
-void rectangle::set_size(float_t width, float_t height) noexcept {
+void rectangle::set_size(float width, float height) noexcept {
   _size = { width, height };
 }
 
@@ -48,7 +48,7 @@ size rectangle::size() const noexcept {
   return _size;
 }
 
-void rectangle::scale(float_t factor) noexcept {
+void rectangle::scale(float factor) noexcept {
   _size.set_width(_size.width() * factor);
   _size.set_height(_size.height() * factor);
 }
@@ -70,7 +70,7 @@ bool rectangle::contains(const point& point) const noexcept {
   return x >= left && x < right && y >= top && y < bottom;
 }
 
-bool rectangle::contains(float_t x, float_t y) const noexcept {
+bool rectangle::contains(float x, float y) const noexcept {
   const auto [left, top] = std::pair{ _position.x(), _position.y() };
   const auto [right, bottom] = std::pair{ left + _size.width(), top + _size.height() };
 

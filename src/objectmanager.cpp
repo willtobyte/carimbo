@@ -52,7 +52,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
-  const auto scale = j.value("scale", float_t{1.f});
+  const auto scale = j.value("scale", float{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
   animation_map animations;
   animations.reserve(j["animations"].size());
@@ -156,7 +156,7 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::update(float_t delta) noexcept {
+void objectmanager::update(float delta) noexcept {
   for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
     const auto& a = *itoa;
     a->update(delta);

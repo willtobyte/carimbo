@@ -37,7 +37,7 @@ void soundmanager::flush() noexcept {
   std::println("[soundmanager] {} objects have been flushed", count);
 }
 
-void soundmanager::update(float_t delta) noexcept {
+void soundmanager::update(float delta) noexcept {
   for (auto& entry : _pool) {
     const auto& e = entry.second;
 

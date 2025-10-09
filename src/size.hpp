@@ -7,28 +7,28 @@ class size final {
 public:
   size() noexcept;
   size(const size&) noexcept = default;
-  size(float_t width, float_t height) noexcept;
+  size(float width, float height) noexcept;
 
   ~size() noexcept = default;
 
-  void set_width(float_t width) noexcept;
-  [[nodiscard]] float_t width() const noexcept;
+  void set_width(float width) noexcept;
+  [[nodiscard]] float width() const noexcept;
 
-  void set_height(float_t height) noexcept;
-  [[nodiscard]] float_t height() const noexcept;
+  void set_height(float height) noexcept;
+  [[nodiscard]] float height() const noexcept;
 
   bool operator==(const size& rhs) const noexcept;
   bool operator!=(const size& rhs) const noexcept;
 
-  size operator*(float_t factor) const noexcept;
-  size operator/(float_t factor) const noexcept;
+  size operator*(float factor) const noexcept;
+  size operator/(float factor) const noexcept;
 
   auto operator<=>(const size&) const noexcept = default;
 
   friend void from_json(const nlohmann::json& j, size& s);
 
 private:
-  float_t _width{0};
-  float_t _height{0};
+  float _width{0};
+  float _height{0};
 };
 }

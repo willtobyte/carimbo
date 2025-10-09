@@ -31,8 +31,8 @@ enum class key : int32_t {
 
 namespace mouse {
 struct motion {
-  float_t x;
-  float_t y;
+  float x;
+  float y;
 };
 
 struct button {
@@ -49,8 +49,8 @@ struct button {
 
   type type;
   which button;
-  float_t x;
-  float_t y;
+  float x;
+  float y;
 };
 }
 

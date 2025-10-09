@@ -9,23 +9,23 @@ class point final {
 public:
   point() noexcept = default;
   point(const point&) noexcept = default;
-  point(float_t x, float_t y) noexcept;
+  point(float x, float y) noexcept;
 
   ~point() noexcept = default;
 
-  void set(float_t x, float_t y) noexcept;
+  void set(float x, float y) noexcept;
 
-  float_t x() const noexcept;
-  void set_x(float_t x) noexcept;
+  float x() const noexcept;
+  void set_x(float x) noexcept;
 
-  float_t y() const noexcept;
-  void set_y(float_t y) noexcept;
+  float y() const noexcept;
+  void set_y(float y) noexcept;
 
   operator SDL_FPoint() const noexcept;
 
   point operator+(const point& other) const noexcept;
   point& operator+=(const point& other) noexcept;
-  point& operator+=(const std::pair<char, float_t>& offset) noexcept;
+  point& operator+=(const std::pair<char, float>& offset) noexcept;
 
   point operator-(const size& rhs) const noexcept;
   point operator-(const point& rhs) const noexcept;
@@ -35,14 +35,14 @@ public:
   friend void from_json(const nlohmann::json& j, point& m);
 
 private:
-  float_t _x{0};
-  float_t _y{0};
+  float _x{0};
+  float _y{0};
 };
 
-inline point operator*(const point& p, float_t factor) noexcept {
+inline point operator*(const point& p, float factor) noexcept {
   return point(
-      static_cast<float_t>(std::round(p.x() * factor)),
-      static_cast<float_t>(std::round(p.y() * factor))
+      static_cast<float>(std::round(p.x() * factor)),
+      static_cast<float>(std::round(p.y() * factor))
   );
 }
 }

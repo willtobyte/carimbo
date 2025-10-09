@@ -27,16 +27,16 @@ class tilemap final {
     );
     ~tilemap() = default;
 
-    void update(float_t delta) noexcept;
+    void update(float delta) noexcept;
     void draw() const noexcept;
     void set_target(std::shared_ptr<object> object);
 
     std::vector<std::string> under() const noexcept;
 
   private:
-    float_t _size;
-    float_t _height;
-    float_t _width;
+    float _size;
+    float _height;
+    float _width;
     std::shared_ptr<graphics::pixmap> _pixmap;
     std::vector<geometry::rectangle> _sources;
     std::vector<std::string> _labels;

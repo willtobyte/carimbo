@@ -54,7 +54,7 @@ void resourcemanager::flush() noexcept {
   _fontfactory->flush();
 }
 
-void resourcemanager::update(float_t delta) noexcept {
+void resourcemanager::update(float delta) noexcept {
   _soundmanager->update(delta);
 }
 

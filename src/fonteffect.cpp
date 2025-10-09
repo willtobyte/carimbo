@@ -16,7 +16,7 @@ void fadeineffect::set(const std::string& text, geometry::point position) {
    _draw_calls = 0;
 }
 
-void fadeineffect::update(float_t delta) noexcept {
+void fadeineffect::update(float delta) noexcept {
   if (_text.empty()) {
     return;
   }

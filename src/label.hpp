@@ -13,15 +13,15 @@ public:
 
   void set_font(std::shared_ptr<font> font);
 
-  void set(const std::string& text, float_t x, float_t y);
+  void set(const std::string& text, float x, float y);
 
-  void set(float_t x, float_t y);
+  void set(float x, float y);
 
   void set_effect(fonteffect::type type);
 
   void clear();
 
-  virtual void update(float_t delta) noexcept override;
+  virtual void update(float delta) noexcept override;
 
   virtual void draw() const noexcept override;
 

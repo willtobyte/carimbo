@@ -16,7 +16,7 @@ public:
 
   void flush() noexcept;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
 #ifdef DEBUG
   void debug() const noexcept;

@@ -24,7 +24,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 
   const auto background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
 
-  geometry::size size{j.at("width").get<float_t>(), j.at("height").get<float_t>()};
+  geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
 
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects;
   const auto& es = j.value("effects", nlohmann::json::array());
@@ -141,7 +141,7 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
   return result;
 }
 
-void scenemanager::update(float_t delta) noexcept {
+void scenemanager::update(float delta) noexcept {
   const auto s = _scene.lock();
   if (!s) [[unlikely]] return;
   s->update(delta);
@@ -153,7 +153,7 @@ void scenemanager::draw() const noexcept {
   s->draw();
 }
 
-void scenemanager::on_touch(float_t x, float_t y) const {
+void scenemanager::on_touch(float x, float y) const {
   const auto s = _scene.lock();
   if (!s) [[unlikely]] return;
   s->on_touch(x, y);

@@ -38,7 +38,7 @@ scene::~scene() noexcept {
   _particlesystem->clear();
 }
 
-void scene::update(float_t delta) noexcept {
+void scene::update(float delta) noexcept {
   if (const auto& fn = _onloop; fn) [[likely]] {
     fn(delta);
   }
@@ -52,8 +52,8 @@ void scene::draw() const noexcept {
   const auto r =
     geometry::rectangle{
       .0f, .0f,
-      static_cast<float_t>(_background->width()),
-      static_cast<float_t>(_background->height())
+      static_cast<float>(_background->width()),
+      static_cast<float>(_background->height())
     };
 
   _background->draw(r, r);
@@ -119,7 +119,7 @@ void scene::on_leave() const {
   }
 }
 
-void scene::on_touch(float_t x, float_t y) const {
+void scene::on_touch(float x, float y) const {
   if (const auto& fn = _ontouch; fn) {
     fn(x, y);
   }
@@ -143,19 +143,19 @@ void scene::on_text(const std::string& text) const {
   }
 }
 
-// void scene::on_mouse_press(float_t x, float_t y) {
+// void scene::on_mouse_press(float x, float y) {
 //   if (const auto& fn = _onmousepress; fn) {
 //     fn(x, y);
 //   }
 // }
 
-// void scene::on_mouse_relese(float_t x, float_t y) {
+// void scene::on_mouse_relese(float x, float y) {
 //   if (const auto& fn = _onmouserelease; fn) {
 //     fn(x, y);
 //   }
 // }
 
-void scene::on_motion(float_t x, float_t y) const {
+void scene::on_motion(float x, float y) const {
   if (const auto& fn = _onmotion; fn) {
     fn(x, y);
   }
@@ -165,7 +165,7 @@ void scene::set_onenter(std::function<void()>&& fn) {
   _onenter = std::move(fn);
 }
 
-void scene::set_onloop(std::function<void(float_t)>&& fn) {
+void scene::set_onloop(std::function<void(float)>&& fn) {
   _onloop = std::move(fn);
 }
 
@@ -173,7 +173,7 @@ void scene::set_onleave(std::function<void()>&& fn) {
   _onleave = std::move(fn);
 }
 
-void scene::set_ontouch(std::function<void(float_t, float_t)>&& fn) {
+void scene::set_ontouch(std::function<void(float, float)>&& fn) {
   _ontouch = std::move(fn);
 }
 
@@ -189,14 +189,14 @@ void scene::set_ontext(std::function<void(const std::string& )>&& fn) {
   _ontext = std::move(fn);
 }
 
-// void scene::set_onmousepress(std::function<void(float_t, float_t)> fn) {
+// void scene::set_onmousepress(std::function<void(float, float)> fn) {
 // _onmousepress = std::move(fn);
 // }
 
-// void scene::set_onmouserelease(std::function<void(float_t, float_t)> fn) {
+// void scene::set_onmouserelease(std::function<void(float, float)> fn) {
 // _onmouserelease = std::move(fn);
 // }
 
-void scene::set_onmotion(std::function<void(float_t, float_t)>&& fn) {
+void scene::set_onmotion(std::function<void(float, float)>&& fn) {
   _onmotion = std::move(fn);
 }

@@ -11,7 +11,7 @@ public:
   void play(bool loop = false) const noexcept;
   void stop() const noexcept;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
   void set_onbegin(std::function<void()>&& callback) noexcept;
   void set_onend(std::function<void()>&& callback) noexcept;

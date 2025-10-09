@@ -41,7 +41,7 @@ public:
   virtual void on_mouse_release(const input::event::mouse::button& event) override;
   virtual void on_mouse_motion(const input::event::mouse::motion& event) override;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
   void draw() const noexcept;
 
   void handle(const std::string& message) noexcept;

@@ -2,7 +2,7 @@
 
 using namespace storage;
 
-std::vector<std::uint8_t> io::read(const std::string& filename) {
+std::vector<uint8_t> io::read(const std::string& filename) {
   const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.c_str()), PHYSFS_close);
 
   if (!ptr) [[unlikely]] {

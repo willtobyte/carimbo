@@ -109,7 +109,7 @@ soundfx::soundfx(const std::string& filename) {
   const auto format = (props->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(props->rate);
 
-  std::vector<std::uint8_t> linear16;
+  std::vector<uint8_t> linear16;
   linear16.reserve(8 * 1024 * 1024);
 
   std::array<char, 512 * 1024> buffer{};
@@ -186,7 +186,7 @@ void soundfx::stop() const noexcept {
   alSourceStop(_source);
 }
 
-void soundfx::update(float_t delta) noexcept {
+void soundfx::update(float delta) noexcept {
   UNUSED(delta);
 
   if (_notified.load(std::memory_order_relaxed)) {

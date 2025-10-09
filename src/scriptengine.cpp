@@ -22,7 +22,7 @@ public:
     : _L(lua),
       _function(std::move(function)) {}
 
-  void loop(float_t delta) override {
+  void loop(float delta) override {
     _function(delta);
 
     _frames++;
@@ -318,24 +318,24 @@ void framework::scriptengine::run() {
   struct velocityproxy {
     framework::object& o;
 
-    float_t x() const { return o.velocity().x(); }
-    float_t y() const { return o.velocity().y(); }
+    float x() const { return o.velocity().x(); }
+    float y() const { return o.velocity().y(); }
 
-    void set_x(float_t x) {
+    void set_x(float x) {
       auto v = o.velocity();
       v.set_x(x);
       o.set_velocity(v);
     }
 
-    void set_y(float_t y) {
+    void set_y(float y) {
       auto v = o.velocity();
       v.set_y(y);
       o.set_velocity(v);
     }
 
     void set(const sol::table& table) {
-      const auto x = table.get_or<float_t>("x", table.get_or(1, 0.0));
-      const auto y = table.get_or<float_t>("y", table.get_or(2, 0.0));
+      const auto x = table.get_or<float>("x", table.get_or(1, 0.0));
+      const auto y = table.get_or<float>("y", table.get_or(2, 0.0));
       o.set_velocity(algebra::vector2d{x, y});
     }
 
@@ -402,15 +402,15 @@ void framework::scriptengine::run() {
         auto y = .0f;
 
         if (table["x"].valid()) {
-          x = table["x"].get<float_t>();
+          x = table["x"].get<float>();
         } else if (table[1].valid()) {
-          x = table[1].get<float_t>();
+          x = table[1].get<float>();
         }
 
         if (table["y"].valid()) {
-          y = table["y"].get<float_t>();
+          y = table["y"].get<float>();
         } else if (table[2].valid()) {
-          y = table[2].get<float_t>();
+          y = table[2].get<float>();
         }
 
         o.set_placement(x, y);
@@ -423,8 +423,8 @@ void framework::scriptengine::run() {
       [](framework::object& o, const sol::object& v) {
         if (v.is<sol::table>()) {
           const auto table = v.as<sol::table>();
-          const auto x = table.get_or<float_t>("x", table.get_or(1, 0));
-          const auto y = table.get_or<float_t>("y", table.get_or(2, 0));
+          const auto x = table.get_or<float>("x", table.get_or(1, 0));
+          const auto y = table.get_or<float>("y", table.get_or(2, 0));
           o.set_velocity(algebra::vector2d{x, y});
           return;
         }
@@ -611,7 +611,7 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn](float_t delta) mutable {
+        auto sfn = [fn](float delta) mutable {
           sol::protected_function_result result = fn(delta);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -635,7 +635,7 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn](float_t x, float_t y) mutable {
+        auto sfn = [fn](float x, float y) mutable {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -671,7 +671,7 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn](float_t x, float_t y) mutable {
+        auto sfn = [fn](float x, float y) mutable {
           sol::protected_function_result result = fn(x, y);
           if (!result.valid()) [[unlikely]] {
             sol::error err = result;
@@ -798,7 +798,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<geometry::point>(
     "Point",
-    sol::constructors<geometry::point(), geometry::point(float_t, float_t)>(),
+    sol::constructors<geometry::point(), geometry::point(float, float)>(),
     "set", &geometry::point::set,
     "x", sol::property(&geometry::point::x, &geometry::point::set_x),
     "y", sol::property(&geometry::point::y, &geometry::point::set_y)
@@ -806,7 +806,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<geometry::size>(
     "Size",
-    sol::constructors<geometry::size(), geometry::size(float_t, float_t), geometry::size(const geometry::size&)>(),
+    sol::constructors<geometry::size(), geometry::size(float, float), geometry::size(const geometry::size&)>(),
     "width", sol::property(&geometry::size::width, &geometry::size::set_width),
     "height", sol::property(&geometry::size::height, &geometry::size::set_height)
   );
@@ -1026,7 +1026,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<algebra::vector2d>(
     "Vector2D",
-    sol::constructors<algebra::vector2d(), algebra::vector2d(float_t, float_t)>(),
+    sol::constructors<algebra::vector2d(), algebra::vector2d(float, float)>(),
 
     "x", sol::property(&algebra::vector2d::x, &algebra::vector2d::set_x),
     "y", sol::property(&algebra::vector2d::y, &algebra::vector2d::set_y),
@@ -1060,16 +1060,16 @@ void framework::scriptengine::run() {
     "set", sol::overload(
       [](
         std::shared_ptr<graphics::label> self,
-        float_t x,
-        float_t y
+        float x,
+        float y
       ) {
         self->set(x, y);
       },
       [](
         std::shared_ptr<graphics::label> self,
         const std::string& text,
-        float_t x,
-        float_t y
+        float x,
+        float y
       ) {
         self->set(text, x, y);
       }

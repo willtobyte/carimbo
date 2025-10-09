@@ -8,7 +8,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   SDL_RendererLogicalPresentation mode;
   SDL_GetRenderLogicalPresentation(*_renderer, &lw, &lh, &mode);
 
-  float_t sx, sy;
+  float sx, sy;
   SDL_GetRenderScale(*_renderer, &sx, &sy);
 
   const auto width = static_cast<int32_t>(std::lround(static_cast<float>(lw) / sx));

@@ -10,30 +10,30 @@ class rectangle final {
 public:
   rectangle() noexcept = default;
   rectangle(const rectangle& other) noexcept = default;
-  rectangle(float_t x, float_t y, float_t width, float_t height) noexcept;
+  rectangle(float x, float y, float width, float height) noexcept;
   rectangle(const geometry::point& position, const geometry::size& size) noexcept;
 
   ~rectangle() noexcept = default;
 
-  float_t x() const noexcept;
-  float_t y() const noexcept;
-  float_t width() const noexcept;
-  float_t height() const noexcept;
+  float x() const noexcept;
+  float y() const noexcept;
+  float width() const noexcept;
+  float height() const noexcept;
 
-  void set_position(float_t x, float_t y) noexcept;
+  void set_position(float x, float y) noexcept;
   void set_position(const geometry::point& position) noexcept;
   geometry::point position() const noexcept;
 
-  void set_size(float_t width, float_t height) noexcept;
+  void set_size(float width, float height) noexcept;
   void set_size(const geometry::size& size) noexcept;
   geometry::size size() const noexcept;
 
-  void scale(float_t factor) noexcept;
+  void scale(float factor) noexcept;
 
   bool intersects(const rectangle& other) const noexcept;
 
   bool contains(const geometry::point& point) const noexcept;
-  bool contains(float_t x, float_t y) const noexcept;
+  bool contains(float x, float y) const noexcept;
 
   operator SDL_FRect() const noexcept;
 

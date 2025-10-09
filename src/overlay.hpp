@@ -19,7 +19,7 @@ public:
 
   void destroy(const std::variant<std::shared_ptr<label>>& widget);
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
   void draw() const noexcept;
 

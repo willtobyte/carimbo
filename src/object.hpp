@@ -4,6 +4,7 @@
 
 #include "kv.hpp"
 #include "rectangle.hpp"
+#include "reflection.hpp"
 #include "vector2d.hpp"
 #include "pixmap.hpp"
 #include "soundfx.hpp"
@@ -46,27 +47,27 @@ public:
 
   std::string scope() const noexcept;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
   void draw() const noexcept;
 
   geometry::point position() const noexcept;
-  float_t x() const noexcept;
-  void set_x(float_t x) noexcept;
-  float_t y() const noexcept;
-  void set_y(float_t y) noexcept;
+  float x() const noexcept;
+  void set_x(float x) noexcept;
+  float y() const noexcept;
+  void set_y(float y) noexcept;
 
   void set_velocity(const algebra::vector2d& velocity) noexcept;
   algebra::vector2d& velocity() noexcept;
 
-  void set_placement(float_t x, float_t y) noexcept;
+  void set_placement(float x, float y) noexcept;
   geometry::point placement() const noexcept;
 
   void set_alpha(uint8_t alpha) noexcept;
   uint8_t alpha() const noexcept;
 
-  void set_scale(float_t scale) noexcept;
-  float_t scale() const noexcept;
+  void set_scale(float scale) noexcept;
+  float scale() const noexcept;
 
   void set_angle(double_t angle) noexcept;
   double_t angle() const noexcept;
@@ -85,7 +86,7 @@ public:
   void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
   void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)>&& fn);
+  void set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn);
   void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn);
   void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn);
   void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn);
@@ -93,8 +94,8 @@ public:
 
   void on_email(const std::string& message);
 
-  void on_touch(float_t x, float_t y);
-  void on_motion(float_t x, float_t y);
+  void on_touch(float x, float y);
+  void on_motion(float x, float y);
   void on_hover();
   void on_unhover();
 
@@ -109,7 +110,7 @@ private:
   uint64_t _last_frame;
   double_t _angle;
   uint8_t _alpha;
-  float_t _scale;
+  float _scale;
   graphics::reflection _reflection;
   bool _hover;
 
@@ -122,7 +123,7 @@ private:
   animation_map _animations;
 
   memory::kv _kv;
-  std::function<void(std::shared_ptr<object>, float_t, float_t)> _ontouch;
+  std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
   std::function<void(std::shared_ptr<object>)> _onupdate;

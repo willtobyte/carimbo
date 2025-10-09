@@ -29,11 +29,11 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
     const auto& glyphs = j["glyphs"].get_ref<const std::string&>();
     const auto spacing = j.value("spacing", int16_t{0});
     const auto leading = j.value("leading", int16_t{0});
-    const auto scale   = j.value("scale",   float_t{1.0f});
+    const auto scale   = j.value("scale",   float{1.0f});
 
     const auto pixmap = _pixmappool->get(std::format("blobs/overlay/{}.png", family));
 
-    float_t fw, fh;
+    float fw, fh;
     if (!SDL_GetTextureSize(*pixmap, &fw, &fh)) [[unlikely]] {
       throw std::runtime_error(std::format("[SDL_GetTextureSize] {}", SDL_GetError()));
     }
@@ -90,8 +90,8 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
       }
 
       map[glyph] = {
-        { static_cast<float_t>(x), static_cast<float_t>(y) },
-        { static_cast<float_t>(w), static_cast<float_t>(h) }
+        { static_cast<float>(x), static_cast<float>(y) },
+        { static_cast<float>(w), static_cast<float>(h) }
       };
 
       x += w;

@@ -2,27 +2,27 @@
 
 using namespace geometry;
 
-point::point(float_t x, float_t y) noexcept
+point::point(float x, float y) noexcept
   : _x(x), _y(y) {}
 
-void point::set(float_t x, float_t y) noexcept {
+void point::set(float x, float y) noexcept {
   _x = x;
   _y = y;
 }
 
-float_t point::x() const noexcept {
+float point::x() const noexcept {
   return _x;
 }
 
-void point::set_x(float_t x) noexcept {
+void point::set_x(float x) noexcept {
   _x = x;
 }
 
-float_t point::y() const noexcept {
+float point::y() const noexcept {
   return _y;
 }
 
-void point::set_y(float_t y) noexcept {
+void point::set_y(float y) noexcept {
   _y = y;
 }
 
@@ -41,7 +41,7 @@ point& point::operator+=(const point& other) noexcept {
   return *this;
 }
 
-point& point::operator+=(const std::pair<char, float_t>& o) noexcept {
+point& point::operator+=(const std::pair<char, float>& o) noexcept {
   switch (o.first) {
     case 'x': _x += o.second; return *this;
     case 'y': _y += o.second; return *this;

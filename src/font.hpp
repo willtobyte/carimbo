@@ -20,7 +20,7 @@ public:
     std::shared_ptr<pixmap> pixmap,
     int16_t spacing,
     int16_t leading,
-    float_t scale
+    float scale
   );
 
   ~font() = default;
@@ -35,6 +35,6 @@ private:
   std::shared_ptr<pixmap> _pixmap;
   int16_t _spacing{0};
   int16_t _leading{0};
-  float_t _scale{1.0f};
+  float _scale{1.0f};
 };
 }

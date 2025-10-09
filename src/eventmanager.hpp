@@ -21,7 +21,7 @@ public:
   explicit eventmanager(std::shared_ptr<graphics::renderer> renderer);
   virtual ~eventmanager() noexcept = default;
 
-  void update(float_t delta) noexcept;
+  void update(float delta) noexcept;
 
   void add_receiver(std::shared_ptr<eventreceiver> receiver);
 

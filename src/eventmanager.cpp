@@ -42,7 +42,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   }
 }
 
-void eventmanager::update(float_t delta) noexcept {
+void eventmanager::update(float delta) noexcept {
   UNUSED(delta);
 
   SDL_Event event;

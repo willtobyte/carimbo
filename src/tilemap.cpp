@@ -14,9 +14,9 @@ tilemap::tilemap(
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
-  _size = j["size"].get<float_t>();
-  _height = j["height"].get<float_t>();
-  _width = j["width"].get<float_t>();
+  _size = j["size"].get<float>();
+  _height = j["height"].get<float>();
+  _width = j["width"].get<float>();
   _layers = j["layers"].get<std::vector<std::vector<uint8_t>>>();
   _visibles = j.value("visibles", std::vector<bool>{});
   _labels = j.value("labels", std::vector<std::string>{});
@@ -29,13 +29,13 @@ tilemap::tilemap(
   _sources[0] = {{-1.f, -1.f}, {0.f, 0.f}};
   for (uint16_t i = 1; i <= max_index; ++i) {
     const auto idx = static_cast<uint32_t>(i - 1);
-    const auto src_x = static_cast<float_t>(idx % tpr) * _size;
-    const auto src_y = std::floor(static_cast<float_t>(idx) / static_cast<float_t>(tpr)) * _size;
+    const auto src_x = static_cast<float>(idx % tpr) * _size;
+    const auto src_y = std::floor(static_cast<float>(idx) / static_cast<float>(tpr)) * _size;
     _sources[i] = {{src_x, src_y}, {_size, _size}};
   }
 }
 
-void tilemap::update(float_t delta) noexcept {
+void tilemap::update(float delta) noexcept {
   UNUSED(delta);
 
   const auto now = SDL_GetTicks();
@@ -111,7 +111,7 @@ void tilemap::draw() const noexcept {
         const auto& source = _sources[index];
 
         const geometry::rectangle destination{
-          {static_cast<float_t>(column) * _size - view_x0, static_cast<float_t>(row) * _size - view_y0},
+          {static_cast<float>(column) * _size - view_x0, static_cast<float>(row) * _size - view_y0},
           {_size, _size}
         };
 

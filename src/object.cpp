@@ -32,19 +32,19 @@ geometry::point object::position() const noexcept {
   return _position;
 }
 
-float_t object::x() const noexcept {
+float object::x() const noexcept {
   return _position.x();
 }
 
-void object::set_x(float_t x) noexcept {
+void object::set_x(float x) noexcept {
   _position.set_x(x);
 }
 
-float_t object::y() const noexcept {
+float object::y() const noexcept {
   return _position.y();
 }
 
-void object::set_y(float_t y) noexcept {
+void object::set_y(float y) noexcept {
   _position.set_y(y);
 }
 
@@ -56,7 +56,7 @@ algebra::vector2d& object::velocity() noexcept {
   return _velocity;
 }
 
-void object::update(float_t delta) noexcept {
+void object::update(float delta) noexcept {
   if (const auto& fn = _onupdate; fn) {
     fn(shared_from_this());
   }
@@ -180,7 +180,7 @@ void object::hide() noexcept {
   unset_action();
 }
 
-void object::set_placement(float_t x, float_t y) noexcept {
+void object::set_placement(float x, float y) noexcept {
   _position.set(x, y);
 }
 
@@ -196,11 +196,11 @@ uint8_t object::alpha() const noexcept {
   return _alpha;
 }
 
-void object::set_scale(float_t scale) noexcept {
+void object::set_scale(float scale) noexcept {
   _scale = scale;
 }
 
-float_t object::scale() const noexcept {
+float object::scale() const noexcept {
   return _scale;
 }
 
@@ -297,7 +297,7 @@ void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::s
   _onmail = std::move(fn);
 }
 
-void object::set_ontouch(std::function<void(std::shared_ptr<object>, float_t, float_t)>&& fn) {
+void object::set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) {
   _ontouch = std::move(fn);
 }
 
@@ -319,13 +319,13 @@ void object::on_email(const std::string& message) {
   }
 }
 
-void object::on_touch(float_t x, float_t y) {
+void object::on_touch(float x, float y) {
   if (const auto& fn = _ontouch; fn) {
     fn(shared_from_this(), x, y);
   }
 }
 
-void object::on_motion(float_t x, float_t y) {
+void object::on_motion(float x, float y) {
   const auto it = _animations.find(_action);
   if (it == _animations.end() || !it->second.hitbox) {
     return;

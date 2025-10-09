@@ -26,12 +26,12 @@ enginefactory& enginefactory::with_height(int32_t height) noexcept {
   return *this;
 }
 
-enginefactory& enginefactory::with_scale(float_t scale) noexcept {
+enginefactory& enginefactory::with_scale(float scale) noexcept {
   _scale = scale;
   return *this;
 }
 
-enginefactory& enginefactory::with_gravity(float_t gravity) noexcept {
+enginefactory& enginefactory::with_gravity(float gravity) noexcept {
   _gravity = gravity;
   return *this;
 }

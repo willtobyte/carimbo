@@ -30,7 +30,7 @@ void overlay::destroy(const std::variant<std::shared_ptr<label>>& widget) {
   });
 }
 
-void overlay::update(float_t delta) noexcept {
+void overlay::update(float delta) noexcept {
   for (const auto& widget : _widgets) {
     widget->update(delta);
   }

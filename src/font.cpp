@@ -8,7 +8,7 @@ font::font(
   std::shared_ptr<pixmap> pixmap,
   int16_t spacing,
   int16_t leading,
-  float_t scale
+  float scale
 )
   : _glyphs(glyphs),
     _map(map),
@@ -44,7 +44,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
     double_t angle = .0L;
     reflection reflection = reflection::none;
     uint8_t alpha = 255;
-    // float_t scale = 1.f;
+    // float scale = 1.f;
 
     if (const auto e = effect.lock()) {
       angle = e->angle();

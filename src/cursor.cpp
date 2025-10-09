@@ -62,7 +62,8 @@ void cursor::on_mouse_motion(const mouse::motion& event) {
   _position = geometry::point{event.x, event.y};
 }
 
-void cursor::update(float_t) noexcept {
+void cursor::update(float delta) noexcept {
+  UNUSED(delta);
   const auto now = SDL_GetTicks();
   const auto& animation = _animations.at(_action);
   const auto& frame = animation.keyframes[_frame];

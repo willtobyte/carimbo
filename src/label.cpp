@@ -6,12 +6,12 @@ void label::set_font(std::shared_ptr<font> font) {
   _font = std::move(font);
 }
 
-void label::set(const std::string& text, float_t x, float_t y) {
+void label::set(const std::string& text, float x, float y) {
   _text = text;
   _position = {x, y};
 }
 
-void label::set(float_t x, float_t y) {
+void label::set(float x, float y) {
   _position = {x, y};
 }
 
@@ -30,7 +30,7 @@ void label::clear() {
   _position = {0, 0};
 }
 
-void label::update(float_t delta) noexcept {
+void label::update(float delta) noexcept {
   if (const auto e = _effect.get()) {
     e->update(delta);
   }
