@@ -834,16 +834,25 @@ void framework::scriptengine::run() {
       const std::string& key,
       sol::object value
     ) {
-      if (value.is<int>()) {
-        self.set<int>(key, value.as<int>());
-      } else if (value.is<double>()) {
-        self.set<double>(key, value.as<double>());
-      } else if (value.is<bool>()) {
-        self.set<bool>(key, value.as<bool>());
-      } else if (value.is<std::string>()) {
-        self.set<std::string>(key, value.as<std::string>());
-      } else {
-        throw std::runtime_error(std::format("set('{}'): unsupported Lua type '{}'", key, sol::type_name(value.lua_state(), value.get_type())));
+      switch (value.get_type()) {
+        case sol::type::number: {
+          if (value.is<int>()) {
+            self.set(key, value.as<int>());
+            break;
+          }
+
+          self.set(key, value.as<double>());
+          break;
+        }
+        case sol::type::boolean:
+          self.set(key, value.as<bool>());
+          break;
+        case sol::type::string:
+          self.set(key, value.as<std::string>());
+          break;
+        default:
+          self.set(key, nullptr);
+          break;
       }
     },
     "get", [](
@@ -856,18 +865,20 @@ void framework::scriptengine::run() {
 
       const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
 
-      if (j.is_null()) {
-        return sol::make_object(lua, nullptr);
-      } else if (j.is_number_integer()) {
-        return sol::make_object(lua, j.get<int>());
-      } else if (j.is_number_float()) {
-        return sol::make_object(lua, j.get<double>());
-      } else if (j.is_boolean()) {
-        return sol::make_object(lua, j.get<bool>());
-      } else if (j.is_string()) {
-        return sol::make_object(lua, j.get<std::string>());
-      }  else {
-        throw std::runtime_error(std::format("'{}': unsupported JSON type '{}'", key, j.type_name()));
+      switch (j.type()) {
+        case nlohmann::json::value_t::null:
+          return sol::make_object(lua, nullptr);
+        case nlohmann::json::value_t::number_integer:
+        case nlohmann::json::value_t::number_unsigned:
+          return sol::make_object(lua, j.get<int>());
+        case nlohmann::json::value_t::number_float:
+          return sol::make_object(lua, j.get<double>());
+        case nlohmann::json::value_t::boolean:
+          return sol::make_object(lua, j.get<bool>());
+        case nlohmann::json::value_t::string:
+          return sol::make_object(lua, j.get<std::string>());
+        default:
+          return sol::make_object(lua, nullptr);
       }
     }
   );
