@@ -61,15 +61,21 @@ static sol::object _to_lua(const nlohmann::json& value, sol::state_view lua) {
 
   switch (value.type()) {
     case json::value_t::object: {
-      auto t = lua.create_table(0, static_cast<int>(value.size()));
-      for (const auto& [k, v] : value.items()) t[k] = _to_lua(v, lua);
-      return sol::make_object(lua, t);
+      auto table = lua.create_table(0, static_cast<int>(value.size()));
+      for (const auto& [k, v] : value.items()) {
+        table[k] = _to_lua(v, lua);
+      }
+
+      return sol::make_object(lua, table);
     }
 
     case json::value_t::array: {
-      auto t = lua.create_table(static_cast<int>(value.size()), 0);
-      for (auto i = 0uz, n = value.size(); i < n; ++i) t[i + 1] = _to_lua(value[i], lua);
-      return sol::make_object(lua, t);
+      auto table = lua.create_table(static_cast<int>(value.size()), 0);
+      for (auto i = 0uz, n = value.size(); i < n; ++i) {
+        table[i + 1] = _to_lua(value[i], lua);
+      }
+
+      return sol::make_object(lua, lua);
     }
 
     case json::value_t::string:
@@ -96,28 +102,6 @@ static nlohmann::json _to_json(const sol::object& value) {
   using nlohmann::json;
 
   switch (value.get_type()) {
-    case sol::type::table: {
-      const auto table = value.as<sol::table>();
-
-      const bool is_array =
-        std::ranges::all_of(table, [](const auto& pair) {
-          return pair.first.get_type() == sol::type::number
-                 && pair.first.template as<size_t>() >= 1;
-        });
-
-      if (is_array) {
-        auto j = json::array();
-        j.get_ref<json::array_t&>().reserve(table.size());
-        for (const auto& pair : table) j.emplace_back(_to_json(pair.second));
-        return j;
-      }
-
-      auto j = json::object();
-      for (const auto& pair : table)
-        j[pair.first.as<std::string>()] = _to_json(pair.second);
-      return j;
-    }
-
     case sol::type::string:
       return json(value.as<std::string>());
 
@@ -125,14 +109,45 @@ static nlohmann::json _to_json(const sol::object& value) {
       return json(value.as<bool>());
 
     case sol::type::number: {
-      const auto number = value.as<double>();
-      double intpart{};
-      const auto frac = std::modf(number, &intpart);
+      const double x = value.as<double>();
+      double i{};
+      const double frac = std::modf(x, &i);
 
-      if (std::abs(frac) < std::numeric_limits<double>::epsilon())
-        return json(static_cast<int64_t>(intpart));
+      if (std::fabs(frac) < std::numeric_limits<double>::epsilon()) {
+        return json(static_cast<int64_t>(i));
+      }
 
-      return json(number);
+      return json(x);
+    }
+
+    case sol::type::table: {
+      const auto table = value.as<sol::table>();
+      const auto n = table.size();
+
+      bool is_array = true;
+      for (auto i = 1uz; i <= n; ++i) {
+        if (!table[i].valid()) {
+          is_array = false;
+          break;
+        }
+      }
+
+      if (is_array) {
+        auto j = json::array();
+        j.get_ref<json::array_t&>().reserve(n);
+        for (auto i = 1uz; i <= n; ++i) {
+          j.emplace_back(_to_json(table[i]));
+        }
+
+        return j;
+      }
+
+      auto j = json::object();
+      for (const auto& kv : table) {
+        j.emplace(kv.first.as<std::string>(), _to_json(kv.second));
+      }
+
+      return j;
     }
 
     default:
@@ -729,11 +744,11 @@ void framework::scriptengine::run() {
       []() {
         return nullptr;
       },
-      [](graphics::particleconf& o, sol::table table) {
+      [](graphics::particleconf& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
 
-        o.set_placement(x, y);
+        self.set_placement(x, y);
       }
     )
   );
@@ -816,79 +831,16 @@ void framework::scriptengine::run() {
     "set", [](
       storage::cassette& self,
       const std::string& key,
-      sol::object object
+      sol::object value
     ) {
-      if (object.is<int>())
-        self.set<int>(key, object.as<int>());
-      else if (object.is<double>())
-        self.set<double>(key, object.as<double>());
-      else if (object.is<bool>())
-        self.set<bool>(key, object.as<bool>());
-      else if (object.is<std::string>())
-        self.set<std::string>(key, object.as<std::string>());
-      else if (object.is<sol::table>()) {
-        sol::table table = object.as<sol::table>();
-        std::function<nlohmann::json(sol::table)> table2json = [&](sol::table table) {
-          nlohmann::json json;
-          auto isarray = true;
-          for (const auto& pair : table) {
-            if (!pair.first.is<int>()) {
-              isarray = false;
-              break;
-            }
-          }
-          if (isarray) {
-            json = nlohmann::json::array();
-            for (auto i = 1uz, n = table.size(); i <= n; ++i) {
-              sol::optional<sol::object> opt = table[i];
-              if (opt) {
-                sol::object o = opt.value();
-                if (o.is<int>())
-                  json.emplace_back(o.as<int>());
-                else if (o.is<double>())
-                  json.emplace_back(o.as<double>());
-                else if (o.is<bool>())
-                  json.emplace_back(o.as<bool>());
-                else if (o.is<std::string>())
-                  json.emplace_back(o.as<std::string>());
-                else if (o.is<sol::table>())
-                  json.emplace_back(table2json(o.as<sol::table>()));
-                else
-                  json.emplace_back(nullptr);
-              } else {
-                json.emplace_back(nullptr);
-              }
-            }
-          } else {
-            json = nlohmann::json::object();
-            for (const auto& pair : table) {
-              const auto& key = pair.first;
-              const auto& value = pair.second;
-              std::string k;
-              if (key.is<std::string>())
-                k = key.as<std::string>();
-              else if (key.is<int>())
-                k = std::to_string(key.as<int>());
-              else
-                continue;
-              if (value.is<int>())
-                json[k] = value.as<int>();
-              else if (value.is<double>())
-                json[k] = value.as<double>();
-              else if (value.is<bool>())
-                json[k] = value.as<bool>();
-              else if (value.is<std::string>())
-                json[k] = value.as<std::string>();
-              else if (value.is<sol::table>())
-                json[k] = table2json(value.as<sol::table>());
-              else
-                json[k] = nullptr;
-            }
-          }
-          return json;
-        };
-
-        self.set<nlohmann::json>(key, table2json(table));
+      if (value.is<int>()) {
+        self.set<int>(key, value.as<int>());
+      } else if (value.is<double>()) {
+        self.set<double>(key, value.as<double>());
+      } else if (value.is<bool>()) {
+        self.set<bool>(key, value.as<bool>());
+      } else if (value.is<std::string>()) {
+        self.set<std::string>(key, value.as<std::string>());
       } else {
         throw std::runtime_error("unsupported type for set");
       }
@@ -900,32 +852,19 @@ void framework::scriptengine::run() {
       sol::this_state state
     ) {
       sol::state_view lua(state);
-      const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
 
-      std::function<sol::object(const nlohmann::json&)> json2lua =
-          [&](const nlohmann::json& json) -> sol::object {
-        if (json.is_object()) {
-          sol::table table = lua.create_table();
-          for (auto it = json.begin(); it != json.end(); ++it)
-            table[it.key()] = json2lua(it.value());
-          return sol::make_object(lua, table);
-        } else if (json.is_array()) {
-          sol::table table = lua.create_table();
-          int index = 1;
-          for (const auto& item : json)
-            table[index++] = json2lua(item);
-          return sol::make_object(lua, table);
-        } else if (json.is_number_integer())
-          return sol::make_object(lua, json.get<int>());
-        else if (json.is_number_float())
-          return sol::make_object(lua, json.get<double>());
-        else if (json.is_boolean())
-          return sol::make_object(lua, json.get<bool>());
-        else if (json.is_string())
-          return sol::make_object(lua, json.get<std::string>());
-        return sol::lua_nil;
-      };
-      return json2lua(j);
+      const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
+      if (j.is_number_integer()) {
+        return sol::make_object(lua, j.get<int>());
+      } else if (j.is_number_float()) {
+        return sol::make_object(lua, j.get<double>());
+      } else if (j.is_boolean()) {
+        return sol::make_object(lua, j.get<bool>());
+      } else if (j.is_string()) {
+        return sol::make_object(lua, j.get<std::string>());
+      }  else {
+        throw std::runtime_error("unsupported type for get");
+      }
     }
   );
 
