@@ -842,7 +842,7 @@ void framework::scriptengine::run() {
       } else if (value.is<std::string>()) {
         self.set<std::string>(key, value.as<std::string>());
       } else {
-        throw std::runtime_error("unsupported type for set");
+        throw std::runtime_error(std::format("unsupported type for set '{}'", sol::type_name(value.lua_state(), value.get_type())));
       }
     },
     "get", [](
@@ -863,7 +863,7 @@ void framework::scriptengine::run() {
       } else if (j.is_string()) {
         return sol::make_object(lua, j.get<std::string>());
       }  else {
-        throw std::runtime_error("unsupported type for get");
+        throw std::runtime_error(std::format("unsupported type for get '{}'", j.type_name()));
       }
     }
   );
