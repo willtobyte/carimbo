@@ -890,10 +890,8 @@ void framework::scriptengine::run() {
     "emit", [](
       network::socket& self,
       const std::string& event,
-      const sol::table& data,
-      sol::this_state state
+      const sol::table& data
     ) {
-      sol::state_view lua(state);
       const auto j = _to_json(data);
       self.emit(event, j.dump());
     },
