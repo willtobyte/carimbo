@@ -398,20 +398,8 @@ void framework::scriptengine::run() {
         return o.placement();
       },
       [](framework::object& o, sol::table table) {
-        auto x = .0f;
-        auto y = .0f;
-
-        if (table["x"].valid()) {
-          x = table["x"].get<float>();
-        } else if (table[1].valid()) {
-          x = table[1].get<float>();
-        }
-
-        if (table["y"].valid()) {
-          y = table["y"].get<float>();
-        } else if (table[2].valid()) {
-          y = table[2].get<float>();
-        }
+        const auto x = table.get_or("x", table.get_or(1, .0f));
+        const auto y = table.get_or("y", table.get_or(2, .0f));
 
         o.set_placement(x, y);
       }
@@ -738,24 +726,12 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "active", sol::property(&graphics::particleconf::active),
     "placement", sol::property(
-      [](graphics::particleconf& o) {
-        return std::make_tuple(o.x, o.y);
+      []() {
+        return nullptr;
       },
       [](graphics::particleconf& o, sol::table table) {
-        auto x = .0f;
-        auto y = .0f;
-
-        if (table["x"].valid()) {
-          x = table["x"].get<float>();
-        } else if (table[1].valid()) {
-          x = table[1].get<float>();
-        }
-
-        if (table["y"].valid()) {
-          y = table["y"].get<float>();
-        } else if (table[2].valid()) {
-          y = table[2].get<float>();
-        }
+        const auto x = table.get_or("x", table.get_or(1, .0f));
+        const auto y = table.get_or("y", table.get_or(2, .0f));
 
         o.set_placement(x, y);
       }
