@@ -134,7 +134,6 @@ void particlesystem::update(float delta) noexcept {
       p.gy = c->randgy();
       p.av = c->randrotvel();
       p.af = c->randrotforce();
-      p.scale = c->randscale();
       p.life = c->randlife();
       p.alpha = c->randalpha();
       p.scale = c->randscale();
