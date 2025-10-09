@@ -46,7 +46,6 @@ struct particleconf final {
   auto randrotvel() noexcept { return rotveld(rng); }
 
   void set_active(bool value) noexcept { active = value; }
-  void set_placement(float x, float y) noexcept { x = x; y = y; };
 };
 
 struct particlebatch final {

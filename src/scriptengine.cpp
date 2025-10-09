@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include <sol/types.hpp>
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
