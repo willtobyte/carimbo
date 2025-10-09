@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include <cstdint>
 #include <sol/types.hpp>
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
@@ -836,8 +837,13 @@ void framework::scriptengine::run() {
     ) {
       switch (value.get_type()) {
         case sol::type::number: {
-          if (value.is<int>()) {
-            self.set(key, value.as<int>());
+          if (value.is<int64_t>()) {
+            self.set(key, value.as<int64_t>());
+            break;
+          }
+
+          if (value.is<uint64_t>()) {
+            self.set(key, value.as<uint64_t>());
             break;
           }
 
