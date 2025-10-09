@@ -125,7 +125,7 @@ static nlohmann::json _to_json(const sol::object& value) {
       const auto table = value.as<sol::table>();
       const auto n = table.size();
 
-      bool is_array = true;
+      auto is_array = true;
       for (auto i = 1uz; i <= n; ++i) {
         if (!table[i].valid()) {
           is_array = false;
@@ -137,7 +137,7 @@ static nlohmann::json _to_json(const sol::object& value) {
         auto j = json::array();
         j.get_ref<json::array_t&>().reserve(n);
         for (auto i = 1uz; i <= n; ++i) {
-          j.emplace_back(_to_json(table[i]));
+          j.emplace_back(_to_json(table.get<sol::object>(i)));
         }
 
         return j;
