@@ -842,7 +842,7 @@ void framework::scriptengine::run() {
       } else if (value.is<std::string>()) {
         self.set<std::string>(key, value.as<std::string>());
       } else {
-        throw std::runtime_error(std::format("unsupported type for set '{}'", sol::type_name(value.lua_state(), value.get_type())));
+        throw std::runtime_error(std::format("set('{}'): unsupported Lua type '{}'", key, sol::type_name(value.lua_state(), value.get_type())));
       }
     },
     "get", [](
@@ -863,7 +863,7 @@ void framework::scriptengine::run() {
       } else if (j.is_string()) {
         return sol::make_object(lua, j.get<std::string>());
       }  else {
-        throw std::runtime_error(std::format("unsupported type for get '{}'", j.type_name()));
+        throw std::runtime_error(std::format("get('{}'): unsupported JSON type '{}'", key, j.type_name()));
       }
     }
   );
