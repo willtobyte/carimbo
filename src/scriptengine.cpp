@@ -867,7 +867,7 @@ void framework::scriptengine::run() {
       } else if (j.is_string()) {
         return sol::make_object(lua, j.get<std::string>());
       }  else {
-        throw std::runtime_error(std::format("get('{}'): unsupported JSON type '{}'", key, j.type_name()));
+        throw std::runtime_error(std::format("'{}': unsupported JSON type '{}'", key, j.type_name()));
       }
     }
   );
