@@ -73,7 +73,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
     p.scale = c->randscale();
   }
 
-  return std::make_shared<particlebatch>(c, ps);
+  return std::make_shared<particlebatch>(c, std::move(ps));
 }
 
 particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
