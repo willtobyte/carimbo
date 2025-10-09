@@ -1,5 +1,4 @@
 #include "scriptengine.hpp"
-#include <sol/types.hpp>
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
@@ -737,7 +736,30 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::particleconf>(
     "ParticleConf",
     sol::no_constructor,
-    "active", sol::property(&graphics::particleconf::active)
+    "active", sol::property(&graphics::particleconf::active),
+    "placement", sol::property(
+      [](graphics::particleconf& o) {
+        return std::make_tuple(o.x, o.y);
+      },
+      [](graphics::particleconf& o, sol::table table) {
+        auto x = .0f;
+        auto y = .0f;
+
+        if (table["x"].valid()) {
+          x = table["x"].get<float>();
+        } else if (table[1].valid()) {
+          x = table[1].get<float>();
+        }
+
+        if (table["y"].valid()) {
+          y = table["y"].get<float>();
+        } else if (table[2].valid()) {
+          y = table[2].get<float>();
+        }
+
+        o.set_placement(x, y);
+      }
+    )
   );
 
   lua.new_usertype<graphics::particlefactory>(
