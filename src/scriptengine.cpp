@@ -739,8 +739,8 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "active", &graphics::particleconf::active,
     "placement", sol::property(
-      []() {
-        return nullptr;
+      [](graphics::particleconf& o) {
+        return std::make_tuple(o.x, o.y);
       },
       [](graphics::particleconf& o, sol::table table) {
         auto x = .0f;
