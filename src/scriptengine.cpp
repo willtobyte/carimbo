@@ -737,8 +737,9 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::particleconf>(
     "ParticleConf",
     sol::no_constructor,
-    "active", sol::property(
-      &graphics::particleconf::active, &graphics::particleconf::set_active)
+    "active", &graphics::particleconf::active,
+    "x", &graphics::particleconf::x,
+    "y", &graphics::particleconf::y
   );
 
   lua.new_usertype<graphics::particlefactory>(

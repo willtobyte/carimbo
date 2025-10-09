@@ -44,8 +44,6 @@ struct particleconf final {
   auto randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
   auto randrotforce() noexcept { return rotforced(rng); }
   auto randrotvel() noexcept { return rotveld(rng); }
-
-  void set_active(bool v) noexcept { active = v; }
 };
 
 struct particlebatch final {
