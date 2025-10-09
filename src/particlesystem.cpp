@@ -81,7 +81,7 @@ particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resou
 }
 
 void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) noexcept {
-  if (!batch) {
+  if (!batch) [[unlikely]] {
     return;
   }
 
