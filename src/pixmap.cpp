@@ -73,7 +73,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& filename)
 void pixmap::draw(
     const geometry::rectangle& source,
     const geometry::rectangle& destination,
-    const double_t angle,
+    const double angle,
     const uint8_t alpha,
     reflection reflection
 #ifdef DEBUG

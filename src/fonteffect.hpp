@@ -17,7 +17,7 @@ class fonteffect {
 
     virtual float scale() noexcept { return 1.f; };
 
-    virtual double_t angle() noexcept { return .0L; };
+    virtual double angle() noexcept { return .0L; };
 
     virtual reflection reflection() noexcept { return reflection::none; };
 

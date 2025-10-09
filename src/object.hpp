@@ -69,8 +69,8 @@ public:
   void set_scale(float scale) noexcept;
   float scale() const noexcept;
 
-  void set_angle(double_t angle) noexcept;
-  double_t angle() const noexcept;
+  void set_angle(double angle) noexcept;
+  double angle() const noexcept;
 
   void set_reflection(graphics::reflection reflection) noexcept;
   graphics::reflection reflection() const noexcept;
@@ -108,7 +108,7 @@ private:
   uint64_t _id;
   std::size_t _frame;
   uint64_t _last_frame;
-  double_t _angle;
+  double _angle;
   uint8_t _alpha;
   float _scale;
   graphics::reflection _reflection;

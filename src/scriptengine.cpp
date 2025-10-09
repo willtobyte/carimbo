@@ -34,7 +34,7 @@ public:
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
 
     if (_elapsed >= 1000) [[unlikely]] {
-      std::println("{:.1f} {}KB", (1000.0 * static_cast<double_t>(_frames)) / static_cast<double_t>(_elapsed), memory);
+      std::println("{:.1f} {}KB", (1000.0 * static_cast<double>(_frames)) / static_cast<double>(_elapsed), memory);
 
       _elapsed = 0;
       _frames = 0;
@@ -86,7 +86,7 @@ static sol::object _to_lua(const nlohmann::json& value, sol::state_view lua) {
       return sol::make_object(lua, value.get<uint64_t>());
 
     case json::value_t::number_float:
-      return sol::make_object(lua, value.get<double_t>());
+      return sol::make_object(lua, value.get<double>());
 
     default:
       return sol::make_object(lua, sol::lua_nil);
@@ -126,11 +126,11 @@ static nlohmann::json _to_json(const sol::object& value) {
       return json(value.as<bool>());
 
     case sol::type::number: {
-      const auto number = value.as<double_t>();
-      double_t intpart{};
+      const auto number = value.as<double>();
+      double intpart{};
       const auto frac = std::modf(number, &intpart);
 
-      if (std::abs(frac) < std::numeric_limits<double_t>::epsilon())
+      if (std::abs(frac) < std::numeric_limits<double>::epsilon())
         return json(static_cast<int64_t>(intpart));
 
       return json(number);
@@ -699,7 +699,7 @@ void framework::scriptengine::run() {
       }
 
       const auto end = SDL_GetPerformanceCounter();
-      const auto elapsed = static_cast<double_t>(end - start) * 1000.0 / static_cast<double_t>(SDL_GetPerformanceFrequency());
+      const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
       std::println("[scriptengine] {} took {:.3f}ms", name, elapsed);
     }
   );
@@ -823,8 +823,8 @@ void framework::scriptengine::run() {
     ) {
       if (object.is<int>())
         self.set<int>(key, object.as<int>());
-      else if (object.is<double_t>())
-        self.set<double_t>(key, object.as<double_t>());
+      else if (object.is<double>())
+        self.set<double>(key, object.as<double>());
       else if (object.is<bool>())
         self.set<bool>(key, object.as<bool>());
       else if (object.is<std::string>())
@@ -848,8 +848,8 @@ void framework::scriptengine::run() {
                 sol::object o = opt.value();
                 if (o.is<int>())
                   json.emplace_back(o.as<int>());
-                else if (o.is<double_t>())
-                  json.emplace_back(o.as<double_t>());
+                else if (o.is<double>())
+                  json.emplace_back(o.as<double>());
                 else if (o.is<bool>())
                   json.emplace_back(o.as<bool>());
                 else if (o.is<std::string>())
@@ -876,8 +876,8 @@ void framework::scriptengine::run() {
                 continue;
               if (value.is<int>())
                 json[k] = value.as<int>();
-              else if (value.is<double_t>())
-                json[k] = value.as<double_t>();
+              else if (value.is<double>())
+                json[k] = value.as<double>();
               else if (value.is<bool>())
                 json[k] = value.as<bool>();
               else if (value.is<std::string>())
@@ -921,7 +921,7 @@ void framework::scriptengine::run() {
         } else if (json.is_number_integer())
           return sol::make_object(lua, json.get<int>());
         else if (json.is_number_float())
-          return sol::make_object(lua, json.get<double_t>());
+          return sol::make_object(lua, json.get<double>());
         else if (json.is_boolean())
           return sol::make_object(lua, json.get<bool>());
         else if (json.is_string())
@@ -1140,7 +1140,7 @@ void framework::scriptengine::run() {
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =
-      (static_cast<double_t>(end - start) * 1000.0) / static_cast<double_t>(SDL_GetPerformanceFrequency());
+      (static_cast<double>(end - start) * 1000.0) / static_cast<double>(SDL_GetPerformanceFrequency());
   std::println("boot time {:.3f}ms", elapsed);
 
   engine->run();

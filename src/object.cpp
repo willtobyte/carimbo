@@ -204,11 +204,11 @@ float object::scale() const noexcept {
   return _scale;
 }
 
-void object::set_angle(double_t angle) noexcept {
+void object::set_angle(double angle) noexcept {
   _angle = angle;
 }
 
-double_t object::angle() const noexcept {
+double object::angle() const noexcept {
   return _angle;
 }
 

@@ -41,7 +41,7 @@ void font::draw(const std::string& text, const geometry::point& position, const 
     const auto& glyph = it->second;
     const auto size = glyph.size();
 
-    double_t angle = .0L;
+    double angle = .0L;
     reflection reflection = reflection::none;
     uint8_t alpha = 255;
     // float scale = 1.f;

@@ -22,7 +22,7 @@ public:
   void draw(
       const geometry::rectangle& source,
       const geometry::rectangle& destination,
-      double_t angle = 0.0L,
+      double angle = 0.0L,
       uint8_t alpha = 255,
       reflection reflection = reflection::none
 #ifdef DEBUG
