@@ -78,6 +78,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
 particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
   : _factory(std::make_shared<particlefactory>(resourcemanager)) {
+  _batches.reserve(16);
 }
 
 void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) noexcept {
@@ -85,7 +86,7 @@ void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) 
     return;
   }
 
-  _batches.emplace_back(std::move(batch));
+  _batches.emplace_back(batch);
 }
 
 void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) noexcept {
@@ -94,7 +95,7 @@ void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebat
     return;
   }
 
-  _batches = std::move(batches);
+  _batches = batches;
 }
 
 void graphics::particlesystem::clear() noexcept {
