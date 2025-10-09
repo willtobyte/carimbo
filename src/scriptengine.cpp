@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include <sol/types.hpp>
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
@@ -854,7 +855,10 @@ void framework::scriptengine::run() {
       sol::state_view lua(state);
 
       const nlohmann::json j = self.get<nlohmann::json>(key, _to_json(default_value));
-      if (j.is_number_integer()) {
+
+      if (default_value.is<sol::lua_nil_t>() && j.is_null()) {
+        return sol::make_object(lua, nullptr);
+      } else if (j.is_number_integer()) {
         return sol::make_object(lua, j.get<int>());
       } else if (j.is_number_float()) {
         return sol::make_object(lua, j.get<double>());
