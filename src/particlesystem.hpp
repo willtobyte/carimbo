@@ -3,15 +3,6 @@
 #include "common.hpp"
 
 namespace graphics {
-struct alignas(16) particle final {
-  float x, y;
-  float vx, vy;
-  float gx, gy;
-  float av, af;
-  float life, scale, angle;
-  float alpha;
-};
-
 struct particleconf final {
   float x, y;
   bool active;
@@ -50,7 +41,19 @@ struct particleconf final {
 
 struct particlebatch final {
   std::shared_ptr<particleconf> conf;
-  std::vector<particle> particles;
+
+  std::vector<float> x, y;
+  std::vector<float> vx, vy;
+  std::vector<float> gx, gy;
+  std::vector<float> av, af;
+  std::vector<float> life;
+  std::vector<float> scale;
+  std::vector<float> angle;
+  std::vector<std::uint8_t> alpha;
+
+  std::size_t size() const noexcept {
+    return x.size();
+  }
 };
 
 class particlefactory final {
