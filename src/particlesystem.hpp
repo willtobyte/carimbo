@@ -19,8 +19,8 @@ struct particleconf final {
   std::uniform_real_distribution<float> scaled;
   std::uniform_real_distribution<float> lifed;
   std::uniform_int_distribution<unsigned int> alphad;
-  std::uniform_real_distribution<float> rotforced;
-  std::uniform_real_distribution<float> rotveld;
+  std::uniform_real_distribution<double> rotforced;
+  std::uniform_real_distribution<double> rotveld;
 
   auto randradius() noexcept { return radiusd(rng); }
   auto randangle() noexcept { return angled(rng); }
@@ -45,10 +45,10 @@ struct particlebatch final {
   std::vector<float> x, y;
   std::vector<float> vx, vy;
   std::vector<float> gx, gy;
-  std::vector<float> av, af;
+  std::vector<double> av, af;
   std::vector<float> life;
   std::vector<float> scale;
-  std::vector<float> angle;
+  std::vector<double> angle;
   std::vector<std::uint8_t> alpha;
 
   std::size_t size() const noexcept {

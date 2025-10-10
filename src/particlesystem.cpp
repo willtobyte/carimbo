@@ -50,8 +50,8 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   conf->lifed = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
   conf->alphad = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
   conf->scaled = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
-  conf->rotforced = std::uniform_real_distribution<float>(rforce.value("start", .0f), rforce.value("end", .0f));
-  conf->rotveld = std::uniform_real_distribution<float>(rvel.value("start", .0f),   rvel.value("end", .0f));
+  conf->rotforced = std::uniform_real_distribution<double>(rforce.value("start", .0), rforce.value("end", .0));
+  conf->rotveld = std::uniform_real_distribution<double>(rvel.value("start", .0),   rvel.value("end", .0));
 
   auto pb = std::make_shared<particlebatch>();
   pb->conf = conf;
@@ -80,7 +80,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
     pb->life[i] = conf->randlife();
     pb->alpha[i] = conf->randalpha();
     pb->scale[i] = conf->randscale();
-    pb->angle[i] = 0.f;
+    pb->angle[i] = conf->randangle();
   }
 
   return pb;
@@ -114,8 +114,8 @@ void graphics::particlesystem::clear() noexcept {
 
 void particlesystem::update(float delta) noexcept {
   for (const auto& batch : _batches) {
-    auto& c = batch->conf;
-    if (!c->active) [[unlikely]] {
+    auto& conf = batch->conf;
+    if (!conf->active) [[unlikely]] {
       continue;
     }
 
@@ -123,30 +123,32 @@ void particlesystem::update(float delta) noexcept {
     for (auto i = 0uz; i < n; ++i) {
       batch->life[i] -= delta;
       if (batch->life[i] > 0.f) {
-        batch->av[i] += batch->af[i] * delta;
-        batch->angle[i] += batch->av[i] * delta;
+        const auto d = static_cast<double>(delta);
+        batch->av[i] += batch->af[i] * d;
+        batch->angle[i] += batch->av[i] * d;
 
         batch->vx[i] += batch->gx[i] * delta;
         batch->vy[i] += batch->gy[i] * delta;
         batch->x[i] += batch->vx[i] * delta;
         batch->y[i] += batch->vy[i] * delta;
 
-        batch->alpha[i] = static_cast<std::uint8_t>(std::clamp(255.f * batch->life[i], 0.f, 255.f));
+        const auto a = 255.f * batch->life[i];
+        batch->alpha[i] = static_cast<std::uint8_t>(std::clamp(a, .0f, 255.f));
         continue;
       }
 
-      batch->x[i] = c->x + c->randxspawn();
-      batch->y[i] = c->y + c->randyspawn();
-      batch->vx[i] = c->randxvel();
-      batch->vy[i] = c->randyvel();
-      batch->gx[i] = c->randgx();
-      batch->gy[i] = c->randgy();
-      batch->av[i] = c->randrotvel();
-      batch->af[i] = c->randrotforce();
-      batch->life[i] = c->randlife();
-      batch->alpha[i] = c->randalpha();
-      batch->scale[i] = c->randscale();
-      batch->angle[i] = 0.f;
+      batch->x[i] = conf->x + conf->randxspawn();
+      batch->y[i] = conf->y + conf->randyspawn();
+      batch->vx[i] = conf->randxvel();
+      batch->vy[i] = conf->randyvel();
+      batch->gx[i] = conf->randgx();
+      batch->gy[i] = conf->randgy();
+      batch->av[i] = conf->randrotvel();
+      batch->af[i] = conf->randrotforce();
+      batch->life[i] = conf->randlife();
+      batch->alpha[i] = conf->randalpha();
+      batch->scale[i] = conf->randscale();
+      batch->angle[i] = conf->randangle();
     }
   }
 }
@@ -180,7 +182,7 @@ void particlesystem::draw() const noexcept {
       pixmap.draw(
         source,
         destination,
-        static_cast<double>(angle[i]),
+        angle[i],
         alpha[i]
       );
     }
