@@ -1,5 +1,4 @@
 #include "pixmap.hpp"
-#include <SDL3/SDL_surface.h>
 
 using namespace graphics;
 
