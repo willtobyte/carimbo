@@ -24,13 +24,13 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   const auto& angle = spawn.value("angle", nlohmann::json::object());
   const auto& xspawn = spawn.value("x", nlohmann::json::object());
   const auto& yspawn = spawn.value("y", nlohmann::json::object());
+  const auto& scale = spawn.value("scale", nlohmann::json::object());
+  const auto& life = spawn.value("life", nlohmann::json::object());
+  const auto& alpha = spawn.value("alpha", nlohmann::json::object());
   const auto& xvel = velocity.value("x", nlohmann::json::object());
   const auto& yvel = velocity.value("y", nlohmann::json::object());
   const auto& gx = gravity.value("x", nlohmann::json::object());
   const auto& gy = gravity.value("y", nlohmann::json::object());
-  const auto& scale = j.value("scale", nlohmann::json::object());
-  const auto& life = j.value("life", nlohmann::json::object());
-  const auto& alpha = j.value("alpha", nlohmann::json::object());
   const auto& rforce = rotation.value("force", nlohmann::json::object());
   const auto& rvel = rotation.value("velocity", nlohmann::json::object());
 
