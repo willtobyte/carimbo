@@ -305,21 +305,21 @@ void eventmanager::update(float delta) noexcept {
   }
 }
 
-void eventmanager::add_receiver(std::shared_ptr<eventreceiver> receiver) {
+void eventmanager::add_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept {
   _receivers.emplace_back(receiver);
 }
 
-void eventmanager::remove_receiver(std::shared_ptr<eventreceiver> receiver) {
+void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept {
   if (!receiver) [[unlikely]] {
     return;
   }
 
   std::owner_less<void> less;
-  std::erase_if(_receivers, [&](const std::weak_ptr<eventreceiver>& weak) {
-    if (weak.expired()) {
-      return true;
+  for (auto i = _receivers.size(); i-- > 0; ) {
+    auto& weak = _receivers[i];
+    if (weak.expired() || (!less(weak, receiver) && !less(receiver, weak))) {
+      _receivers[i] = std::move(_receivers.back());
+      _receivers.pop_back();
     }
-
-    return !less(weak, receiver) && !less(receiver, weak);
-  });
+  }
 }
