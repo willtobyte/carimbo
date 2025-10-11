@@ -338,6 +338,12 @@ jobs:
         working-directory: build
         run: terser carimbo.js --compress --mangle --output carimbo.js
 
+      - name: Strip webassembly
+        working-directory: build
+        run: |
+          cargo binstall wasm-tools
+          wasm-tools strip carimbo.wasm -o carimbo.wasm
+
       - name: Compress artifacts
         working-directory: build
         run: |

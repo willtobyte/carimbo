@@ -1061,7 +1061,7 @@ void framework::scriptengine::run() {
   );
 
   std::println("Powered by Carimbo: https://carimbo.site");
-  std::println("Version: {}", GIT_TAG);
+  std::println("Version: {}", GIT_VERSION);
   std::println("Built on: {}, {} UTC", __DATE__, __TIME__);
 
   const auto jit = lua["jit"];
