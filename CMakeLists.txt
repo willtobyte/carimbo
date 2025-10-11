@@ -71,6 +71,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sUSE_VORBIS=1
 
     -sWASM_BIGINT=1
+
     -sWEBSOCKET_SUBPROTOCOL=text
     -lwebsocket.js
 
