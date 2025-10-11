@@ -15,24 +15,24 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto count = j.value("count", 0uz);
 
-  const auto spawn = j.value("spawn", nlohmann::json::object());
-  const auto velocity = j.value("velocity", nlohmann::json::object());
-  const auto gravity = j.value("gravity", nlohmann::json::object());
-  const auto rotation = j.value("rotation", nlohmann::json::object());
+  const auto& spawn = j.value("spawn", nlohmann::json::object());
+  const auto& velocity = j.value("velocity", nlohmann::json::object());
+  const auto& gravity = j.value("gravity", nlohmann::json::object());
+  const auto& rotation = j.value("rotation", nlohmann::json::object());
 
-  const auto radius = spawn.value("radius", nlohmann::json::object());
-  const auto angle = spawn.value("angle", nlohmann::json::object());
-  const auto xspawn = spawn.value("x", nlohmann::json::object());
-  const auto yspawn = spawn.value("y", nlohmann::json::object());
-  const auto scale = spawn.value("scale", nlohmann::json::object());
-  const auto life = spawn.value("life", nlohmann::json::object());
-  const auto alpha = spawn.value("alpha", nlohmann::json::object());
-  const auto xvel = velocity.value("x", nlohmann::json::object());
-  const auto yvel = velocity.value("y", nlohmann::json::object());
-  const auto gx = gravity.value("x", nlohmann::json::object());
-  const auto gy = gravity.value("y", nlohmann::json::object());
-  const auto rforce = rotation.value("force", nlohmann::json::object());
-  const auto rvel = rotation.value("velocity", nlohmann::json::object());
+  const auto& radius = spawn.value("radius", nlohmann::json::object());
+  const auto& angle = spawn.value("angle", nlohmann::json::object());
+  const auto& xspawn = spawn.value("x", nlohmann::json::object());
+  const auto& yspawn = spawn.value("y", nlohmann::json::object());
+  const auto& scale = spawn.value("scale", nlohmann::json::object());
+  const auto& life = spawn.value("life", nlohmann::json::object());
+  const auto& alpha = spawn.value("alpha", nlohmann::json::object());
+  const auto& xvel = velocity.value("x", nlohmann::json::object());
+  const auto& yvel = velocity.value("y", nlohmann::json::object());
+  const auto& gx = gravity.value("x", nlohmann::json::object());
+  const auto& gy = gravity.value("y", nlohmann::json::object());
+  const auto& rforce = rotation.value("force", nlohmann::json::object());
+  const auto& rvel = rotation.value("velocity", nlohmann::json::object());
 
   const auto conf = std::make_shared<particleconf>();
   conf->active = true;
@@ -54,7 +54,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   conf->rotveld = std::uniform_real_distribution<double>(rvel.value("start", .0),   rvel.value("end", .0));
 
   auto pb = std::make_shared<particlebatch>();
-  pb->conf = conf;
+  pb->conf = std::move(conf);
   pb->x.resize(count);
   pb->y.resize(count);
   pb->vx.resize(count);
