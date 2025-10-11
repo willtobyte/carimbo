@@ -14,8 +14,7 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) noexcept
   std::println("[soundmanager] cache miss {}", filename);
   assert(_audiodevice);
 
-  it->second = std::make_shared<soundfx>(filename);
-  return it->second;
+  return it->second = std::make_shared<soundfx>(filename);
 }
 
 void soundmanager::play(const std::string& filename, bool loop) noexcept {

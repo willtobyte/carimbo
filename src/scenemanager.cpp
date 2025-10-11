@@ -85,7 +85,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     map.emplace(std::make_shared<tilemap>(size, _resourcemanager, *it));
   }
 
-  it->second = std::make_shared<scene>(
+  return it->second = std::make_shared<scene>(
     name,
     _objectmanager,
     _particlesystem,
@@ -96,8 +96,6 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     std::move(map),
     std::move(size)
   );
-
-  return it->second;
 }
 
 void scenemanager::set(const std::string& name) {
