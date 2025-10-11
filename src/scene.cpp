@@ -62,7 +62,7 @@ void scene::draw() const noexcept {
 std::variant<
   std::shared_ptr<object>,
   std::shared_ptr<audio::soundfx>,
-  std::shared_ptr<graphics::particleconf>
+  std::shared_ptr<graphics::particleprops>
 > scene::get(const std::string& id, scenetype type) const {
   if (type == scenetype::object) {
     for (const auto& [key, object] : _objects) {
@@ -78,7 +78,7 @@ std::variant<
 
   if (type == scenetype::particle) {
     for (const auto& [key, batch] : _particles) {
-      if (key == id) return batch->conf;
+      if (key == id) return batch->props;
     }
   }
 

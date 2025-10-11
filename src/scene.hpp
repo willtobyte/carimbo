@@ -39,7 +39,7 @@ public:
   std::variant<
     std::shared_ptr<object>,
     std::shared_ptr<audio::soundfx>,
-    std::shared_ptr<graphics::particleconf>
+    std::shared_ptr<graphics::particleprops>
   > get(const std::string& name, scenetype type) const;
 
   std::string name() const noexcept;

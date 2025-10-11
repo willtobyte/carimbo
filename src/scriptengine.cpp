@@ -736,15 +736,15 @@ void framework::scriptengine::run() {
     "cursor", sol::property([](graphics::overlay& o) { return cursorproxy{o}; })
   );
 
-  lua.new_usertype<graphics::particleconf>(
-    "ParticleConf",
+  lua.new_usertype<graphics::particleprops>(
+    "ParticleProps",
     sol::no_constructor,
-    "active", sol::property(&graphics::particleconf::active),
+    "active", sol::property(&graphics::particleprops::active),
     "placement", sol::property(
       []() {
         return nullptr;
       },
-      [](graphics::particleconf& self, sol::table table) {
+      [](graphics::particleprops& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
 

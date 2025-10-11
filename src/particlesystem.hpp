@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace graphics {
-struct particleconf final {
+struct particleprops final {
   float x, y;
   bool active;
   std::shared_ptr<pixmap> pixmap;
@@ -40,7 +40,7 @@ struct particleconf final {
 };
 
 struct particlebatch final {
-  std::shared_ptr<particleconf> conf;
+  std::shared_ptr<particleprops> props;
 
   std::vector<float> x, y;
   std::vector<float> vx, vy;
