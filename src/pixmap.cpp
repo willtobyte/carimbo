@@ -83,16 +83,16 @@ void pixmap::draw(
   const geometry::rectangle src{
     source.x(),
     source.y(),
-    width(),
-    height()
+    static_cast<float>(width()),
+    static_cast<float>(height())
   };
 
+  draw(
+    src, destination, angle, alpha, reflection
 #ifdef DEBUG
-  draw(src, destination, angle, alpha, reflection, outline);
-  return;
-#else
-  draw(src, destination, angle, alpha, reflection);
+    , outline
 #endif
+  );
 }
 
 void pixmap::draw(
