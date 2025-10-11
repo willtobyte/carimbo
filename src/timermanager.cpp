@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
+static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) noexcept {
   UNUSED(id);
 
   SDL_Event event{};
@@ -13,11 +13,11 @@ uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool
   return repeat ? interval : 0;
 }
 
-uint32_t wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
+uint32_t wrapper(void* userdata, SDL_TimerID id, uint32_t interval) noexcept {
   return generic_wrapper(userdata, id, interval, true);
 }
 
-uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
+uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) noexcept {
   return generic_wrapper(userdata, id, interval, false);
 }
 
@@ -25,24 +25,35 @@ timermanager::timermanager() noexcept
     : _envelopepool(envelopepool::instance()) {
 }
 
-uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) {
+uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) noexcept {
   return add_timer(interval, std::move(fn), true);
 }
 
-uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) {
+uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) noexcept {
   return add_timer(interval, std::move(fn), false);
 }
 
-void timermanager::clear(uint32_t id) {
+void timermanager::clear(uint32_t id) noexcept {
   SDL_RemoveTimer(id);
-
   const auto it = _envelopemapping.find(id);
-  if (it == _envelopemapping.end()) {
+  if (it == _envelopemapping.end()) [[unlikely]] {
     return;
   }
 
   _envelopepool->release(std::unique_ptr<envelope>(it->second));
   _envelopemapping.erase(it);
+}
+
+void timermanager::purge() noexcept {
+  for (auto& [id, ptr] : _envelopemapping) {
+    SDL_RemoveTimer(id);
+  }
+
+  for (auto& [_, ptr] : _envelopemapping) {
+    _envelopepool->release(std::unique_ptr<envelope>(ptr));
+  }
+
+  _envelopemapping.clear();
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {

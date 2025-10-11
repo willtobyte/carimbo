@@ -7,6 +7,7 @@
 #include "particlesystem.hpp"
 #include "resourcemanager.hpp"
 #include "scenemanager.hpp"
+#include "timermanager.hpp"
 #include "window.hpp"
 
 using namespace framework;
@@ -92,7 +93,8 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto statemanager = std::make_shared<framework::statemanager>();
   const auto objectmanager = std::make_shared<framework::objectmanager>(resourcemanager);
   const auto particlesystem = std::make_shared<graphics::particlesystem>(resourcemanager);
-  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager, objectmanager, particlesystem);
+  const auto timermanager = std::make_shared<framework::timermanager>();
+  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager);
 
   engine->set_audiodevice(audiodevice);
   engine->set_objectmanager(objectmanager);
@@ -103,6 +105,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->set_scenemanager(scenemanager);
   engine->set_statemanager(statemanager);
   engine->set_particlesystem(particlesystem);
+  engine->set_timermanager(timermanager);
   engine->set_window(window);
 
   engine->eventmanager()->add_receiver(engine->objectmanager());

@@ -8,6 +8,7 @@
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
 #include "statemanager.hpp"
+#include "timermanager.hpp"
 #include "window.hpp"
 
 using namespace framework;
@@ -122,6 +123,10 @@ void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept
   _renderer = std::move(renderer);
 
   _canvas = std::make_shared<graphics::canvas>(_renderer);
+}
+
+void engine::set_timermanager(std::shared_ptr<framework::timermanager> timermanager) noexcept {
+  _timermanager = std::move(timermanager);
 }
 
 void engine::add_loopable(std::shared_ptr<loopable> loopable) noexcept {

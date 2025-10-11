@@ -5,11 +5,13 @@ using namespace framework;
 scenemanager::scenemanager(
   std::shared_ptr<framework::resourcemanager> resourcemanager,
   std::shared_ptr<objectmanager> objectmanager,
-  std::shared_ptr<graphics::particlesystem> particlesystem
+  std::shared_ptr<graphics::particlesystem> particlesystem,
+  std::shared_ptr<framework::timermanager> timermanager
 )
   : _resourcemanager(std::move(resourcemanager)),
     _objectmanager(std::move(objectmanager)),
-    _particlesystem(std::move(particlesystem)) {
+    _particlesystem(std::move(particlesystem)),
+    _timermanager(std::move(timermanager)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
@@ -101,6 +103,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 void scenemanager::set(const std::string& name) {
   if (const auto active = _scene.lock()) {
     std::println("[scenemanager] left {}", active->name());
+    _timermanager->purge();
     active->on_leave();
   }
 

@@ -6,7 +6,7 @@
 #include "resourcemanager.hpp"
 #include "eventreceiver.hpp"
 #include "scene.hpp"
-#include "tilemap.hpp"
+#include "timermanager.hpp"
 
 namespace framework {
 class objectmanager;
@@ -16,7 +16,8 @@ public:
   scenemanager(
     std::shared_ptr<framework::resourcemanager> resourcemanager,
     std::shared_ptr<framework::objectmanager> objectmanager,
-    std::shared_ptr<graphics::particlesystem> particlesystem
+    std::shared_ptr<graphics::particlesystem> particlesystem,
+    std::shared_ptr<framework::timermanager> timermanager
   );
 
   ~scenemanager() noexcept = default;
@@ -45,6 +46,7 @@ private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::particlesystem> _particlesystem;
+  std::shared_ptr<framework::timermanager> _timermanager;
   std::unordered_map<std::string, std::shared_ptr<scene>> _scene_mapping;
   std::weak_ptr<scene> _scene;
   std::string _current;

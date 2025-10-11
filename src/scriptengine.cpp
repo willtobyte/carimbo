@@ -976,7 +976,8 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "set", &framework::timermanager::set,
     "singleshot", &framework::timermanager::singleshot,
-    "clear", &framework::timermanager::clear
+    "clear", &framework::timermanager::clear,
+    "purge", &framework::timermanager::purge
   );
 
   lua.new_usertype<algebra::vector2d>(
