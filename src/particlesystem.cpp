@@ -157,7 +157,7 @@ void particlesystem::draw() const noexcept {
   for (const auto& batch : _batches) {
     auto& c = batch->conf;
     if (!c->active) [[unlikely]] {
-      return;
+      continue;
     }
 
     const auto n = batch->size();
