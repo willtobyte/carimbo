@@ -23,6 +23,7 @@ uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) n
 
 timermanager::timermanager() noexcept
     : _envelopepool(envelopepool::instance()) {
+  _envelopemapping.reserve(16);
 }
 
 uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) noexcept {
