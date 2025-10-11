@@ -22,21 +22,21 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
-  const auto background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
+  auto background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
 
   geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
 
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects;
-  const auto& es = j.value("effects", nlohmann::json::array());
+  const auto es = j.value("effects", nlohmann::json::array());
   effects.reserve(es.size());
 
-  for (const auto& i : es) {
-    const std::string basename = i.get<std::string>();
-    const std::string f = std::format("blobs/{}/{}.ogg", name, basename);
-    effects.emplace_back(std::move(basename), _resourcemanager->soundmanager()->get(f));
+  for (const auto& e : es) {
+    const auto& basename = e.get_ref<const std::string&>();
+    const auto f = std::format("blobs/{}/{}.ogg", name, basename);
+    effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
   }
 
-  const auto& ps = j.value("particles", nlohmann::json::array());
+  const auto ps = j.value("particles", nlohmann::json::array());
   std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles;
   particles.reserve(ps.size());
 
@@ -51,9 +51,9 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     particles[name] = factory->create(kind, x, y);
   }
 
-  const auto& fs = j.value("fonts", nlohmann::json::array());
+  const auto fs = j.value("fonts", nlohmann::json::array());
   for (const auto& i : fs) {
-    _resourcemanager->fontfactory()->get(i);
+    _resourcemanager->fontfactory()->get(i.get_ref<const std::string&>());
   }
 
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
