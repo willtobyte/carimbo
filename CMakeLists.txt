@@ -53,24 +53,24 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   endif()
 endif()
 
-set(EMSCRIPTEN_LINK_FLAGS
-  "-sENVIRONMENT=web"
-  "-sINVOKE_RUN=0"
-  "-sEXIT_RUNTIME=0"
-  "-sEVAL_CTORS=1"
-  "-sINITIAL_MEMORY=256MB"
-  "-sALLOW_MEMORY_GROWTH=1"
-  "-sSTACK_SIZE=8MB"
-  "-sFILESYSTEM=1"
-  "-sEXPORTED_FUNCTIONS=['_main']"
-  "-sEXPORTED_RUNTIME_METHODS=['callMain']"
-  "-sUSE_SDL=3"
-  "-sWASM_BIGINT=1"
-  "-sWEBSOCKET_SUBPROTOCOL=text"
-  "-lwebsocket.js"
-)
 target_link_options(${PROJECT_NAME} PRIVATE
-  $<$<BOOL:${EMSCRIPTEN}>:${EMSCRIPTEN_LINK_FLAGS}>
+  $<$<STREQUAL:${CMAKE_SYSTEM_NAME},Emscripten>:
+    -sENVIRONMENT=web
+    -sINVOKE_RUN=0
+    -sEXIT_RUNTIME=0
+    -sEVAL_CTORS=1
+    -sINITIAL_MEMORY=256MB
+    -sALLOW_MEMORY_GROWTH=1
+    -sSTACK_SIZE=8MB
+    -sFILESYSTEM=1
+    -sEXPORTED_FUNCTIONS=['_main']
+    -sEXPORTED_RUNTIME_METHODS=['callMain']
+    -sUSE_SDL=3
+    -sWASM_BIGINT=1
+    -sWEBSOCKET_SUBPROTOCOL=text
+    -lwebsocket.js
+    $<$<CONFIG:Release>:-Oz -flto>
+  >
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
