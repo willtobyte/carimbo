@@ -34,27 +34,27 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   const auto& rforce = rotation.value("force", nlohmann::json::object());
   const auto& rvel = rotation.value("velocity", nlohmann::json::object());
 
-  const auto props = std::make_shared<particleprops>();
-  props->active = true;
-  props->x = x;
-  props->y = y;
-  props->pixmap = pixmap;
-  props->xspawnd = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
-  props->yspawnd = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
-  props->radiusd = std::uniform_real_distribution<float>(radius.value("start", .0f), radius.value("end", .0f));
-  props->angled = std::uniform_real_distribution<double>(angle.value("start", .0), angle.value("end", .0));
-  props->xveld = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
-  props->yveld = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
-  props->gxd = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
-  props->gyd = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
-  props->lifed = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
-  props->alphad = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
-  props->scaled = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
-  props->rotforced = std::uniform_real_distribution<double>(rforce.value("start", .0), rforce.value("end", .0));
-  props->rotveld = std::uniform_real_distribution<double>(rvel.value("start", .0),   rvel.value("end", .0));
+  const auto ps = std::make_shared<particleprops>();
+  ps->active = true;
+  ps->x = x;
+  ps->y = y;
+  ps->pixmap = pixmap;
+  ps->xspawnd = std::uniform_real_distribution<float>(xspawn.value("start", .0f), xspawn.value("end", .0f));
+  ps->yspawnd = std::uniform_real_distribution<float>(yspawn.value("start", .0f), yspawn.value("end", .0f));
+  ps->radiusd = std::uniform_real_distribution<float>(radius.value("start", .0f), radius.value("end", .0f));
+  ps->angled = std::uniform_real_distribution<double>(angle.value("start", .0), angle.value("end", .0));
+  ps->xveld = std::uniform_real_distribution<float>(xvel.value("start", .0f), xvel.value("end", .0f));
+  ps->yveld = std::uniform_real_distribution<float>(yvel.value("start", .0f), yvel.value("end", .0f));
+  ps->gxd = std::uniform_real_distribution<float>(gx.value("start", .0f), gx.value("end", .0f));
+  ps->gyd = std::uniform_real_distribution<float>(gy.value("start", .0f), gy.value("end", .0f));
+  ps->lifed = std::uniform_real_distribution<float>(life.value("start", 1.0f), life.value("end", 1.0f));
+  ps->alphad = std::uniform_int_distribution<unsigned int>(alpha.value("start", 255u), alpha.value("end", 255u));
+  ps->scaled = std::uniform_real_distribution<float>(scale.value("start", 1.0f), scale.value("end", 1.0f));
+  ps->rotforced = std::uniform_real_distribution<double>(rforce.value("start", .0), rforce.value("end", .0));
+  ps->rotveld = std::uniform_real_distribution<double>(rvel.value("start", .0),   rvel.value("end", .0));
 
   auto pb = std::make_shared<particlebatch>();
-  pb->props = std::move(props);
+  pb->props = std::move(ps);
   pb->x.resize(count);
   pb->y.resize(count);
   pb->vx.resize(count);
@@ -69,18 +69,18 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   pb->alpha.resize(count);
 
   for (auto i = count; i-- > 0uz;) {
-    pb->x[i] = x + props->randxspawn();
-    pb->y[i] = y + props->randyspawn();
-    pb->vx[i] = props->randxvel();
-    pb->vy[i] = props->randyvel();
-    pb->gx[i] = props->randgx();
-    pb->gy[i] = props->randgy();
-    pb->av[i] = props->randrotvel();
-    pb->af[i] = props->randrotforce();
-    pb->life[i] = props->randlife();
-    pb->alpha[i] = props->randalpha();
-    pb->scale[i] = props->randscale();
-    pb->angle[i] = props->randangle();
+    pb->x[i] = x + ps->randxspawn();
+    pb->y[i] = y + ps->randyspawn();
+    pb->vx[i] = ps->randxvel();
+    pb->vy[i] = ps->randyvel();
+    pb->gx[i] = ps->randgx();
+    pb->gy[i] = ps->randgy();
+    pb->av[i] = ps->randrotvel();
+    pb->af[i] = ps->randrotforce();
+    pb->life[i] = ps->randlife();
+    pb->alpha[i] = ps->randalpha();
+    pb->scale[i] = ps->randscale();
+    pb->angle[i] = ps->randangle();
   }
 
   return pb;
