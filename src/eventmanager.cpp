@@ -306,6 +306,10 @@ void eventmanager::update(float delta) noexcept {
 }
 
 void eventmanager::add_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept {
+  if (!receiver) [[unlikely]] {
+    return;
+  }
+
   _receivers.emplace_back(receiver);
 }
 
