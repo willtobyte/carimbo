@@ -116,7 +116,7 @@ void scenemanager::set(const std::string& name) {
 
 std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept {
   std::vector<std::string> result;
-
+  result.reserve(8);
   if (name.size() == 1 && name.front() == '*') {
     for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
       if (it->first == _current) { ++it; continue; }
