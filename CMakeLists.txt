@@ -53,12 +53,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -O0
     -g3
     -gsource-map
+    -fno-rtti
     -fno-omit-frame-pointer
   )
 
   set(EMSDK_LINK_DEBUG_FLAGS
     -g3
     -gsource-map
+    -fno-rtti
     -sASSERTIONS=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
@@ -67,9 +69,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -Oz
     -g0
     -flto
+    -fno-rtti
     -fstrict-aliasing
     -fomit-frame-pointer
-    -fno-rtti
     -fdata-sections
     -ffunction-sections
     -DNDEBUG
@@ -83,6 +85,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -Oz
     -g0
     -flto
+    -fno-rtti
     -s
     -sASSERTIONS=1
     -sDISABLE_EXCEPTION_CATCHING=0
@@ -154,7 +157,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       /fp:precise
       /Zc:inline
       /Zc:__cplusplus
-      /GR
+      /GR-
       /EHsc
       /DDEBUG
       /W4
@@ -231,6 +234,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       -g3
       -fno-inline
       -fstandalone-debug
+      -fno-rtti
       -fno-omit-frame-pointer
       -fstack-protector-strong
       -fno-elide-constructors
