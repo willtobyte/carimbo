@@ -155,13 +155,13 @@ void particlesystem::update(float delta) noexcept {
 
 void particlesystem::draw() const noexcept {
   for (const auto& batch : _batches) {
-    auto& p = batch->props;
-    if (!p->active) [[unlikely]] {
+    auto& props = batch->props;
+    if (!props->active) [[unlikely]] {
       continue;
     }
 
     const auto n = batch->size();
-    const auto& pixmap = *p->pixmap;
+    const auto& pixmap = *props->pixmap;
     const auto width = static_cast<float>(pixmap.width());
     const auto height = static_cast<float>(pixmap.height());
     const geometry::rectangle source{0, 0, width, height};
