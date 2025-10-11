@@ -68,7 +68,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   pb->angle.resize(count);
   pb->alpha.resize(count);
 
-  for (auto i = 0uz; i < count; ++i) {
+  for (auto i = count; i-- > 0uz;) {
     pb->x[i] = x + conf->randxspawn();
     pb->y[i] = y + conf->randyspawn();
     pb->vx[i] = conf->randxvel();
@@ -120,7 +120,7 @@ void particlesystem::update(float delta) noexcept {
     }
 
     const auto n = batch->size();
-    for (auto i = 0uz; i < n; ++i) {
+    for (auto i = n; i-- > 0uz;) {
       batch->life[i] -= delta;
       if (batch->life[i] > 0.f) {
         const auto d = static_cast<double>(delta);
@@ -172,7 +172,7 @@ void particlesystem::draw() const noexcept {
     const auto* angle = batch->angle.data();
     const auto* alpha = batch->alpha.data();
 
-    for (auto i = 0uz; i < n; ++i) {
+    for (auto i = n; i-- > 0uz;) {
       const geometry::rectangle destination{
         x[i], y[i],
         width  * scale[i],
