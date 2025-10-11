@@ -69,6 +69,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -flto
     -fstrict-aliasing
     -fomit-frame-pointer
+    -fno-rtti
     -fdata-sections
     -ffunction-sections
     -DNDEBUG
@@ -166,7 +167,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       /GL
       /Gw
       /Gy
-      /GR
+      /GR-
       /EHsc
       /DNDEBUG
       /W4
@@ -253,6 +254,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       -fvisibility=hidden
       -fvisibility-inlines-hidden
       -fomit-frame-pointer
+      -fno-rtti
       -DNDEBUG
       ${GENERIC_WARNINGS}
     )
