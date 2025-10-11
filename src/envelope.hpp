@@ -47,8 +47,16 @@ public:
     reset(std::forward<Args>(args)...);
   }
 
-  [[nodiscard]] inline const auto& as_collision() const noexcept { return std::get<collisionenvelope>(payload); }
-  [[nodiscard]] inline const auto& as_mail() const noexcept { return std::get<mailenvelope>(payload); }
-  [[nodiscard]] inline const auto& as_timer() const noexcept { return std::get<timerenvelope>(payload); }
+  [[nodiscard]] inline const collisionenvelope* try_collision() const noexcept {
+    return std::get_if<collisionenvelope>(&payload);
+  }
+
+  [[nodiscard]] inline const mailenvelope* try_mail() const noexcept {
+    return std::get_if<mailenvelope>(&payload);
+  }
+
+  [[nodiscard]] inline const timerenvelope* try_timer() const noexcept {
+    return std::get_if<timerenvelope>(&payload);
+  }
 };
 }
