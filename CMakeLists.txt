@@ -59,21 +59,26 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sINVOKE_RUN=0
     -sEXIT_RUNTIME=0
     -sEVAL_CTORS=1
+    
     -sINITIAL_MEMORY=256MB
     -sALLOW_MEMORY_GROWTH=1
-    -sFILESYSTEM=1
-    -sMALLOC=emmalloc
-    -sDISABLE_EXCEPTION_CATCHING=0
-    -sASSERTIONS=1
     -sSTACK_SIZE=8MB
-    -sEXPORTED_FUNCTIONS=['_main']
-    -sEXPORTED_RUNTIME_METHODS=['callMain']
+    -sMALLOC=emmalloc
+    
+    -sFILESYSTEM=1
     -sUSE_SDL=3
     -sUSE_OGG=1
     -sUSE_VORBIS=1
+    
     -sWASM_BIGINT=1
     -sWEBSOCKET_SUBPROTOCOL=text
     -lwebsocket.js
+    
+    -sDISABLE_EXCEPTION_CATCHING=0
+    -sASSERTIONS=1
+    
+    -sEXPORTED_FUNCTIONS=['_main']
+    -sEXPORTED_RUNTIME_METHODS=['callMain']
 
     -Wl,--gc-sections
     -s
