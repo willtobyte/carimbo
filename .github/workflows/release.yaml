@@ -341,8 +341,7 @@ jobs:
       - name: Strip webassembly
         working-directory: build
         run: |
-          cargo install cargo-binstall
-          cargo binstall wasm-tools
+          cargo install wasm-tools
           wasm-tools strip carimbo.wasm -o carimbo.wasm
 
       - name: Compress artifacts
