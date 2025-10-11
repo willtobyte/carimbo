@@ -81,6 +81,9 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
 
+    -Oz
+    -ffunction-sections
+    -fdata-sections
     -Wl,--gc-sections
     -s
     $<$<CONFIG:Release>:-Oz -flto>
@@ -95,7 +98,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   sol2::sol2
   spng::spng_static
   vorbis::vorbis
-  $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:Boost::boost;OpenAL::OpenAL;openssl::openssl>
+  $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:boost::boost;OpenAL::OpenAL;openssl::openssl>
   $<$<BOOL:${SOL_LUAJIT}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>
 )

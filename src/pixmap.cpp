@@ -70,6 +70,32 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& filename)
 }
 
 void pixmap::draw(
+    const geometry::point& source,
+    const geometry::rectangle& destination,
+    const double angle,
+    const uint8_t alpha,
+    reflection reflection
+#ifdef DEBUG
+    ,
+    const std::optional<geometry::rectangle>& outline
+#endif
+) const noexcept {
+  const geometry::rectangle src{
+    source.x(),
+    source.y(),
+    width(),
+    height()
+  };
+
+#ifdef DEBUG
+  draw(src, destination, angle, alpha, reflection, outline);
+  return;
+#else
+  draw(src, destination, angle, alpha, reflection);
+#endif
+}
+
+void pixmap::draw(
     const geometry::rectangle& source,
     const geometry::rectangle& destination,
     const double angle,

@@ -164,7 +164,7 @@ void particlesystem::draw() const noexcept {
     const auto& pixmap = *props->pixmap;
     const auto width = static_cast<float>(pixmap.width());
     const auto height = static_cast<float>(pixmap.height());
-    const geometry::rectangle source{0, 0, width, height};
+    static const geometry::point source{0, 0};
 
     const auto* x = batch->x.data();
     const auto* y = batch->y.data();
