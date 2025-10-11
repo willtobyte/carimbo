@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+
 set(SDL3_DIR "${CMAKE_BINARY_DIR}")
 
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
@@ -53,14 +55,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -O0
     -g3
     -gsource-map
-    -fno-rtti
     -fno-omit-frame-pointer
   )
 
   set(EMSDK_LINK_DEBUG_FLAGS
     -g3
     -gsource-map
-    -fno-rtti
     -sASSERTIONS=2
     -sDISABLE_EXCEPTION_CATCHING=0
   )
@@ -69,7 +69,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -Oz
     -g0
     -flto
-    -fno-rtti
     -fstrict-aliasing
     -fomit-frame-pointer
     -fdata-sections
@@ -85,7 +84,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     -Oz
     -g0
     -flto
-    -fno-rtti
     -s
     -sASSERTIONS=1
     -sDISABLE_EXCEPTION_CATCHING=0
@@ -157,7 +155,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       /fp:precise
       /Zc:inline
       /Zc:__cplusplus
-      /GR-
+      /GR
       /EHsc
       /DDEBUG
       /W4
@@ -170,7 +168,7 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       /GL
       /Gw
       /Gy
-      /GR-
+      /GR
       /EHsc
       /DNDEBUG
       /W4
@@ -234,7 +232,6 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       -g3
       -fno-inline
       -fstandalone-debug
-      -fno-rtti
       -fno-omit-frame-pointer
       -fstack-protector-strong
       -fno-elide-constructors
@@ -258,7 +255,6 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
       -fvisibility=hidden
       -fvisibility-inlines-hidden
       -fomit-frame-pointer
-      -fno-rtti
       -DNDEBUG
       ${GENERIC_WARNINGS}
     )
