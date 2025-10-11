@@ -314,19 +314,12 @@ void eventmanager::remove_receiver(std::shared_ptr<eventreceiver> receiver) {
     return;
   }
 
-  const auto it = std::find_if(_receivers.begin(), _receivers.end(),
-      [&](const std::weak_ptr<eventreceiver>& weak) {
-        if (weak.expired()) return false;
-        return !weak.owner_before(receiver) && !receiver.owner_before(weak);
-      });
-
-    if (it == _receivers.end()) {
-      return;
+  std::owner_less<void> less;
+  std::erase_if(_receivers, [&](const std::weak_ptr<eventreceiver>& weak) {
+    if (weak.expired()) {
+      return true;
     }
 
-    if (std::next(it) != _receivers.end()) {
-      *it = std::move(_receivers.back());
-    }
-
-    _receivers.pop_back();
+    return !less(weak, receiver) && !less(receiver, weak);
+  });
 }
