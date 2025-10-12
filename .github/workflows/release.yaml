@@ -291,10 +291,7 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-
-      - name: Install terser
-        run: npm install terser -g
+          node-version: 24
 
       - name: Setup Conan
         run: |
@@ -341,6 +338,8 @@ jobs:
       - name: Minifiy Carimbo JavaScript runtime
         working-directory: build
         run: |
+          npm install terser -g
+
           terser carimbo.js \
             --compress pure_funcs="console.log,assert" \
             --mangle \
