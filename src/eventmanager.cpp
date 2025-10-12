@@ -79,10 +79,12 @@ void eventmanager::update(float delta) noexcept {
 
       case SDL_EVENT_KEY_UP: {
         switch (event.key.key) {
-          case SDLK_F11:
+          case SDLK_F11: {
             auto* const window = static_cast<SDL_Window*>(*_renderer);
             const auto fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
             SDL_SetWindowFullscreen(window, !fullscreen);
+          } break;
+          default:
             break;
         }
 

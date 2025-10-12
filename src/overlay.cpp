@@ -8,10 +8,10 @@ overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, st
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
   const auto widget = [&]() {
     switch (type) {
+    case widgettype::cursor:
+      std::terminate();
     case widgettype::label:
       return std::make_shared<label>();
-    default:
-      std::terminate();
     }
   }();
 
@@ -67,10 +67,9 @@ void overlay::dispatch(widgettype type, const std::string& message) {
     if (const auto cursor = _cursor; cursor) {
       cursor->handle(message);
     }
-
   } break;
 
-  default:
-    break;
+  case widgettype::label: {
+  } break;
   }
 }

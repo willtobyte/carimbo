@@ -41,17 +41,18 @@ void cursor::on_mouse_press(const input::event::mouse::button& event) {
 
 void cursor::on_mouse_release(const mouse::button& event) {
   constexpr const auto left = mouse::button::which::left;
+  constexpr const auto middle = mouse::button::which::middle;
   constexpr const auto right = mouse::button::which::right;
 
   switch (event.button) {
   case left:
     _action = ACTION_LEFT;
     break;
+  case middle:
+    break;
   case right:
     _action = ACTION_RIGHT;
     break;
-  default:
-    return;
   }
 
   _frame = 0;

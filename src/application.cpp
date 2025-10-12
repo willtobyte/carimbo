@@ -2,7 +2,7 @@
 
 using namespace framework;
 
-[[noreturn]] void fail() {
+[[noreturn]] static void fail() {
   if (const auto ptr = std::current_exception()) {
     const char* error = nullptr;
 

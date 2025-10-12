@@ -4,16 +4,18 @@ using namespace network;
 
 static std::string encode(const std::string& value) {
   std::string encoded;
-  encoded.reserve(value.size());
+  encoded.reserve(value.size() * 3);
+
   for (char c : value) {
-    if (std::isalnum(static_cast<unsigned char>(c)) || c == '-' || c == '_' || c == '.' || c == '~') {
-      encoded += c;
-    } else {
-      encoded += '%';
-      encoded += static_cast<char>((c >> 4) < 10 ? '0' + ((c >> 4) & 0xF) : 'A' + (((c >> 4) & 0xF) - 10));
-      encoded += static_cast<char>((c & 0xF) < 10 ? '0' + (c & 0xF) : 'A' + ((c & 0xF) - 10));
+    const unsigned char uc = static_cast<unsigned char>(c);
+    if (std::isalnum(uc) || uc == '-' || uc == '_' || uc == '.' || uc == '~') {
+      encoded.push_back(c);
+      continue;
     }
+
+    std::format_to(std::back_inserter(encoded), "%{:02X}", static_cast<unsigned int>(uc));
   }
+
   return encoded;
 }
 

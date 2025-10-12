@@ -12,6 +12,9 @@ else
 EXTRA_FLAGS := -DSANDBOX=ON
 endif
 
+COMPILER_FLAGS := -Wpedantic -Werror -fsanitize=address,undefined -fsanitize-address-use-after-scope -fno-omit-frame-pointer
+LINKER_FLAGS := -fsanitize=address,undefined
+
 .PHONY: clean
 clean: ## Cleans build artifacts
 	@rm -rf build
@@ -19,12 +22,17 @@ clean: ## Cleans build artifacts
 
 .PHONY: conan
 conan: ## Installs dependencies
-	@conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
+	conan install . --output-folder=build --build=missing --profile=$(PROFILE) --settings build_type=$(BUILDTYPE)
 
 .PHONY: build
 build: ## Builds the project
-	@cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) $(EXTRA_FLAGS)
-	@cmake --build build --parallel $(NCPUS) --config $(BUILDTYPE) --verbose
+	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+	-DCMAKE_C_FLAGS_DEBUG="$(COMPILER_FLAGS)" \
+	-DCMAKE_CXX_FLAGS_DEBUG="$(COMPILER_FLAGS)" \
+	-DCMAKE_EXE_LINKER_FLAGS_DEBUG="$(LINKER_FLAGS)" \
+	$(EXTRA_FLAGS)
+
+	cmake --build build --parallel $(NCPUS) --config $(BUILDTYPE) --verbose
 
 .PHONY: help
 help:

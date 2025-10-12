@@ -20,8 +20,6 @@ void label::set_effect(fonteffect::type type) {
     case fonteffect::type::fadein:
       _effect = std::make_shared<fadeineffect>();
       break;
-    default:
-      break;
   }
 }
 
