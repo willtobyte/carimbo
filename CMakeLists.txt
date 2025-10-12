@@ -9,11 +9,6 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 
 set(SDL3_DIR "${CMAKE_BINARY_DIR}")
 
-set(EMSCRIPTEN FALSE)
-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  set(EMSCRIPTEN TRUE)
-endif()
-
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
@@ -45,6 +40,11 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
+
+set(EMSCRIPTEN FALSE)
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+  set(EMSCRIPTEN TRUE)
+endif()
 
 if(NOT EMSCRIPTEN)
   find_package(Boost CONFIG REQUIRED)
@@ -97,7 +97,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   spng::spng_static
   vorbis::vorbis
   $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:boost::boost;OpenAL::OpenAL;openssl::openssl>
-  $<$<BOOL:${HAVE_LUAJIT}>:luajit::luajit>
+  $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>
 )
 
