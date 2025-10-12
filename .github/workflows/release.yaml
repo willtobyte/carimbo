@@ -331,7 +331,11 @@ jobs:
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections" \
+            -DCMAKE_CXX_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections"
+
           cmake --build build --config Release --verbose
 
       - name: Minifiy Carimbo JavaScript runtime
