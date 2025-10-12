@@ -84,8 +84,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
 
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
-
-    $<$<CONFIG:Release>:-s -Oz -flto>
   >
 )
 
