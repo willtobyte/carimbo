@@ -76,11 +76,8 @@ socket::~socket() {
 void socket::connect() {
 #ifdef EMSCRIPTEN
   const std::string url =
-#ifdef SANDBOX
-      "http://localhost:3000/socket";
-#else
       "https://socket." + std::string(emscripten_run_script_string("window.location.hostname"));
-#endif
+
   EmscriptenWebSocketCreateAttributes attrs = {
       url.c_str(),
       nullptr,

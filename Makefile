@@ -6,12 +6,6 @@ NCPUS := 8
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
 
-ifeq ($(PROFILE),webassembly)
-EXTRA_FLAGS := -DSANDBOX=OFF
-else
-EXTRA_FLAGS := -DSANDBOX=ON
-endif
-
 DEBUG_COMPILER_FLAGS := -Wpedantic -Werror -fsanitize=address,undefined -fsanitize-address-use-after-scope -fno-omit-frame-pointer
 DEBUG_LINKER_FLAGS := -fsanitize=address,undefined
 

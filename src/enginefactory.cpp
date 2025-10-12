@@ -71,7 +71,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     emscripten_run_script(script.c_str());
   #endif
 
-  #if defined(HAVE_SENTRY) && !defined(SANDBOX)
+  #ifdef HAVE_SENTRY
     auto* options = sentry_options_new();
     sentry_options_set_dsn(options, dsn.c_str());
     // sentry_options_set_debug(options, 1);
