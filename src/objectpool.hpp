@@ -60,6 +60,8 @@ public:
       }
     }
 
+    object->reset();
+
     _objects.emplace_back(std::move(object));
   }
 

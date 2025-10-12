@@ -42,7 +42,6 @@ void timermanager::cancel(uint32_t id) noexcept {
   }
 
   const auto ptr = it->second;
-  ptr->reset();
   _envelopepool->release(std::unique_ptr<envelope>(ptr));
   _envelopemapping.erase(it);
 }
@@ -50,7 +49,6 @@ void timermanager::cancel(uint32_t id) noexcept {
 void timermanager::clear() noexcept {
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
-    ptr->reset();
     _envelopepool->release(std::unique_ptr<envelope>(ptr));
   }
 

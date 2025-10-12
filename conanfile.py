@@ -49,17 +49,7 @@ class Carimbo(ConanFile):
     def configure(self):
         self.options["boost"].header_only = True
 
-        physfs = self.options["physfs"]
-        physfs.sevenzip = False
-        physfs.grp = False
-        physfs.wad = False
-        physfs.hog = False
-        physfs.mvl = False
-        physfs.qpak = False
-        physfs.slb = False
-        physfs.iso9660 = False
-        physfs.vdf = False
-        physfs.zip = True
+        self.options["sevenzip"].zip = False
 
         if not self._is_webassembly() and self._is_jit_capable():
             self.options["sol2"].with_lua = "luajit"
