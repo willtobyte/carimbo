@@ -9,7 +9,10 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 
 set(SDL3_DIR "${CMAKE_BINARY_DIR}")
 
-set(EMSCRIPTEN $<STREQUAL:${CMAKE_SYSTEM_NAME},Emscripten>)
+set(EMSCRIPTEN FALSE)
+if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+  set(EMSCRIPTEN TRUE)
+endif()
 
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
@@ -81,13 +84,24 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
 
-    -Oz
-    -ffunction-sections
-    -fdata-sections
-    -Wl,--gc-sections
-    -s
-    $<$<CONFIG:Release>:-Oz -flto>
+    $<$<CONFIG:Release>:-s -Oz -flto>
   >
+)
+
+set(ENABLE_APPLE_SANITIZERS FALSE)
+if(NOT EMSCRIPTEN AND CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+  set(ENABLE_APPLE_SANITIZERS TRUE)
+endif()
+
+set(_SANITIZE_COMPILE_OPTS "-fsanitize=address,undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
+set(_SANITIZE_LINK_OPTS "-fsanitize=address,undefined")
+
+target_compile_options(${PROJECT_NAME} PRIVATE
+  $<$<AND:$<CONFIG:Debug>,$<BOOL:${ENABLE_APPLE_SANITIZERS}>>:${_SANITIZE_COMPILE_OPTS}>
+)
+
+target_link_options(${PROJECT_NAME} PRIVATE
+  $<$<AND:$<CONFIG:Debug>,$<BOOL:${ENABLE_APPLE_SANITIZERS}>>:${_SANITIZE_LINK_OPTS}>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
