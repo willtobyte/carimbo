@@ -340,13 +340,22 @@ jobs:
 
       - name: Minifiy Carimbo JavaScript runtime
         working-directory: build
-        run: terser carimbo.js --compress --mangle --output carimbo.js
+        run: |
+          terser carimbo.js \
+            --compress pure_funcs="console.log,assert" \
+            --mangle \
+            --mangle-props regex=/^_/ \
+            --toplevel \
+            --ecma 2020 \
+            --module \
+            --output carimbo.js
 
       - name: Strip webassembly
         working-directory: build
         run: |
-          cargo install wasm-tools
-          wasm-tools strip carimbo.wasm -o carimbo.wasm
+          cargo install wasm-tools wasm-opt
+          wasm-tools strip carimbo.wasm -o carimbo-stripped.wasm
+          wasm-opt carimbo-stripped.wasm -Oz --strip-debug --strip-producers -o carimbo.wasm
 
       - name: Compress artifacts
         working-directory: build
