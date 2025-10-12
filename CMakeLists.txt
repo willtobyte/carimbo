@@ -51,7 +51,7 @@ if(NOT EMSCRIPTEN)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
   find_package(sentry CONFIG QUIET)
-  if(SOL_LUAJIT)
+  if(HAVE_LUAJIT)
     find_package(luajit CONFIG REQUIRED)
   endif()
 endif()
@@ -97,7 +97,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   spng::spng_static
   vorbis::vorbis
   $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:boost::boost;OpenAL::OpenAL;openssl::openssl>
-  $<$<BOOL:${SOL_LUAJIT}>:luajit::luajit>
+  $<$<BOOL:${HAVE_LUAJIT}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>
 )
 
