@@ -108,6 +108,7 @@ private:
   friend class tilemap;
 
   uint64_t _id;
+  bool _visible;
   std::size_t _frame;
   uint64_t _last_frame;
   double _angle;

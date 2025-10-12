@@ -3,14 +3,15 @@
 using namespace framework;
 
 object::object() noexcept
-  : _frame(0),
+  : _visible(true),
+    _frame(0),
     _last_frame(SDL_GetTicks()),
     _angle(.0),
     _alpha(255),
     _scale(.0),
     _reflection(graphics::reflection::none),
-    _hover(false)
-{}
+    _hover(false) {
+}
 
 object::~object() noexcept {
   std::println("[object] gone {} {}", kind(), id());
@@ -125,6 +126,10 @@ void object::update(float delta) noexcept {
 }
 
 void object::draw() const noexcept {
+  if (!_visible) [[unlikely]] {
+    return;
+  }
+
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] {
     return;
@@ -152,16 +157,15 @@ void object::draw() const noexcept {
   destination.scale(_scale);
 
   #ifdef DEBUG
-    const auto& hitbox = it->second.hitbox;
-    std::optional<geometry::rectangle> debug;
-    if (hitbox) {
-      debug.emplace(
-        geometry::rectangle{
-          _position + hitbox->rectangle.position(),
-          hitbox->rectangle.size() * _scale
-        }
-      );
-    }
+  const auto& hitbox = it->second.hitbox;
+
+  std::optional<geometry::rectangle> debug =
+      hitbox ?
+        std::make_optional(geometry::rectangle{
+            _position + hitbox->rectangle.position(),
+            hitbox->rectangle.size() * _scale
+        })
+      : std::nullopt;
   #endif
 
   _spritesheet->draw(
@@ -217,13 +221,11 @@ graphics::reflection object::reflection() const noexcept {
 }
 
 void object::set_visible(bool value) noexcept {
-  if (!value) {
-    unset_action();
-  }
+  _visible = value;
 }
 
 bool object::visible() const noexcept {
-  return !_action.empty();
+  return _visible;
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
