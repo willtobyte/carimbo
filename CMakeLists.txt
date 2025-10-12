@@ -15,7 +15,11 @@ file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 
 add_executable(${PROJECT_NAME})
-target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES} ${HEADER_FILES} ${TEMPLATE_FILES})
+target_sources(${PROJECT_NAME} PRIVATE
+  ${SOURCE_FILES}
+  ${HEADER_FILES}
+  ${TEMPLATE_FILES}
+)
 
 execute_process(
   COMMAND git describe --tags --match "v*.*.*" --abbrev=0
