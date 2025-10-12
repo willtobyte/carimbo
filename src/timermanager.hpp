@@ -10,8 +10,8 @@ public:
 
   uint32_t set(uint32_t interval, std::function<void()>&& fn) noexcept;
   uint32_t singleshot(uint32_t timeout, std::function<void()>&& fn) noexcept;
-  void clear(uint32_t id) noexcept;
-  void purge() noexcept;
+  void cancel(uint32_t id) noexcept;
+  void clear() noexcept;
 
 protected:
   uint32_t add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat);

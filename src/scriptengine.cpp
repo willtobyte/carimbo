@@ -398,7 +398,7 @@ void framework::scriptengine::run() {
     "scale", sol::property(&framework::object::scale, &framework::object::set_scale),
     "angle", sol::property(&framework::object::angle, &framework::object::set_angle),
     "reflection", sol::property(&framework::object::reflection, &framework::object::set_reflection),
-    "hide", &framework::object::hide,
+    "visible", sol::property(&framework::object::visible, &framework::object::set_visible),
     "on_update", &framework::object::set_onupdate,
     "on_begin", &framework::object::set_onbegin,
     "on_end", &framework::object::set_onend,
@@ -976,8 +976,8 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "set", &framework::timermanager::set,
     "singleshot", &framework::timermanager::singleshot,
-    "clear", &framework::timermanager::clear,
-    "purge", &framework::timermanager::purge
+    "cancel", &framework::timermanager::cancel,
+    "clear", &framework::timermanager::clear
   );
 
   lua.new_usertype<algebra::vector2d>(

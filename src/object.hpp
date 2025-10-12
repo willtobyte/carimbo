@@ -75,9 +75,11 @@ public:
   void set_reflection(graphics::reflection reflection) noexcept;
   graphics::reflection reflection() const noexcept;
 
+  void set_visible(bool value) noexcept;
+  bool visible() const noexcept;
+
   void set_action(const std::optional<std::string>& action) noexcept;
   void unset_action() noexcept;
-  void hide() noexcept;
   std::string action() const noexcept;
 
   bool intersects(std::shared_ptr<object> other) const noexcept;

@@ -105,7 +105,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 void scenemanager::set(const std::string& name) {
   if (const auto active = _scene.lock()) {
     std::println("[scenemanager] left {}", active->name());
-    _timermanager->purge();
+    _timermanager->clear();
     active->on_leave();
   }
 

@@ -176,10 +176,6 @@ void object::draw() const noexcept {
   );
 }
 
-void object::hide() noexcept {
-  unset_action();
-}
-
 void object::set_placement(float x, float y) noexcept {
   _position.set(x, y);
 }
@@ -218,6 +214,16 @@ void object::set_reflection(graphics::reflection reflection) noexcept {
 
 graphics::reflection object::reflection() const noexcept {
   return _reflection;
+}
+
+void object::set_visible(bool value) noexcept {
+  if (!value) {
+    unset_action();
+  }
+}
+
+bool object::visible() const noexcept {
+  return !_action.empty();
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {

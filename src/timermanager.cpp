@@ -34,7 +34,7 @@ uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn)
   return add_timer(interval, std::move(fn), false);
 }
 
-void timermanager::clear(uint32_t id) noexcept {
+void timermanager::cancel(uint32_t id) noexcept {
   SDL_RemoveTimer(id);
   const auto it = _envelopemapping.find(id);
   if (it == _envelopemapping.end()) [[unlikely]] {
@@ -45,7 +45,7 @@ void timermanager::clear(uint32_t id) noexcept {
   _envelopemapping.erase(it);
 }
 
-void timermanager::purge() noexcept {
+void timermanager::clear() noexcept {
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
     _envelopepool->release(std::unique_ptr<envelope>(ptr));
