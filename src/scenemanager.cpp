@@ -62,24 +62,26 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto os = j.value("objects", nlohmann::json::array());
   objects.reserve(os.size());
 
-  for (const auto& i : os) {
-    if (!i.is_object()) continue;
-
-    std::string key = i["name"].get<std::string>();
-    std::string kind = i["kind"].get<std::string>();
-
-    const float x = i.value("x", 0.0f);
-    const float y = i.value("y", 0.0f);
-
-    std::string action = i.value("action", std::string{});
-
-    auto o = _objectmanager->create(kind, name, false);
-    o->set_placement(x, y);
-    if (!action.empty()) {
-      o->set_action(action);
+  for (const auto& o : os) {
+    if (!o.is_object()) [[unlikely]] {
+      continue;
     }
 
-    objects.emplace_back(std::move(key), std::move(o));
+    std::string key = o["name"].get<std::string>();
+    std::string kind = o["kind"].get<std::string>();
+
+    const float x = o.value("x", 0.0f);
+    const float y = o.value("y", 0.0f);
+
+    std::string action = o.value("action", std::string{});
+
+    auto object = _objectmanager->create(kind, name, false);
+    object->set_placement(x, y);
+    if (!action.empty()) {
+      object->set_action(action);
+    }
+
+    objects.emplace_back(std::move(key), std::move(object));
   }
 
   std::optional<std::shared_ptr<tilemap>> map;
