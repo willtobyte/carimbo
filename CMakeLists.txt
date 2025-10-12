@@ -88,22 +88,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
   >
 )
 
-set(ENABLE_APPLE_SANITIZERS FALSE)
-if(NOT EMSCRIPTEN AND CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-  set(ENABLE_APPLE_SANITIZERS TRUE)
-endif()
-
-set(_SANITIZE_COMPILE_OPTS "-fsanitize=address,undefined" "-fno-omit-frame-pointer" "-fno-sanitize-recover=all")
-set(_SANITIZE_LINK_OPTS "-fsanitize=address,undefined")
-
-target_compile_options(${PROJECT_NAME} PRIVATE
-  $<$<AND:$<CONFIG:Debug>,$<BOOL:${ENABLE_APPLE_SANITIZERS}>>:${_SANITIZE_COMPILE_OPTS}>
-)
-
-target_link_options(${PROJECT_NAME} PRIVATE
-  $<$<AND:$<CONFIG:Debug>,$<BOOL:${ENABLE_APPLE_SANITIZERS}>>:${_SANITIZE_LINK_OPTS}>
-)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE
   nlohmann_json::nlohmann_json
   Ogg::ogg
