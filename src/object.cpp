@@ -126,12 +126,8 @@ void object::update(float delta) noexcept {
 }
 
 void object::draw() const noexcept {
-  if (!_visible) [[unlikely]] {
-    return;
-  }
-
   const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] {
+  if (!_visible || it == _animations.end()) [[unlikely]] {
     return;
   }
 
