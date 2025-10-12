@@ -15,16 +15,16 @@ struct mailenvelope final {
   std::string kind;
   std::string body;
 
-  mailenvelope(uint64_t to_, const std::string& kind, const std::string& body) noexcept
-    : to(to_), kind(kind), body(body) {}
+  mailenvelope(uint64_t to, const std::string& kind, const std::string& body) noexcept
+    : to(to), kind(kind), body(body) {}
 };
 
 struct timerenvelope final {
   bool repeat;
   std::function<void()> fn;
 
-  timerenvelope(bool repeat_, std::function<void()>&& fn_) noexcept
-    : repeat(repeat_), fn(std::move(fn_)) {}
+  timerenvelope(bool repeat, std::function<void()>&& fn) noexcept
+    : repeat(repeat), fn(std::move(fn)) {}
 };
 
 using payload_t = std::variant<std::monostate, collisionenvelope, mailenvelope, timerenvelope>;
