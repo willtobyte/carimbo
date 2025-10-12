@@ -67,7 +67,7 @@ class Carimbo(ConanFile):
                 if dep.is_build_context or not dep.package_folder:
                     continue
 
-                package_id = f"{dep.ref.name}/{dep.ref.version}"
+                pid = f"{dep.ref.name}/{dep.ref.version}"
                 for file in Path(dep.package_folder).rglob("*"):
                     if not file.is_file():
                         continue
@@ -75,11 +75,9 @@ class Carimbo(ConanFile):
                     name = file.name.lower()
                     if name.startswith(("license", "copying", "copyright")):
                         text = file.read_text(encoding="utf-8", errors="ignore").strip()
-                        out.write(f"{package_id}\n{text}\n\n")
+                        out.write(f"{pid}\n{text}\n\n")
 
         toolchain = CMakeToolchain(self)
-
-        toolchain.preprocessor_definitions["SOL_USING_CXX_LUA"] = "ON"
 
         if not self._is_webassembly():
             toolchain.preprocessor_definitions["HAVE_BOOST"] = "ON"
