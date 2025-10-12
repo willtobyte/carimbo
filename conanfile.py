@@ -38,13 +38,13 @@ class Carimbo(ConanFile):
             return
 
         self.requires("boost/1.88.0")
-        self.requires("openssl/3.5.2")
+        self.requires("openssl/3.6.0")
 
         if self._is_jit_capable():
             self.requires("luajit/2.1.0-beta3")
 
         if self._have_sentry():
-            self.requires("sentry-native/0.10.0")
+            self.requires("sentry-native/0.11.1")
 
     def configure(self):
         self.options["boost"].header_only = True
