@@ -288,7 +288,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -336,7 +336,7 @@ jobs:
 
           cmake --build build --config Release --verbose
 
-      - name: Minifiy Carimbo JavaScript runtime
+      - name: Minify Carimbo's JavaScript runtime.
         working-directory: build
         run: |
           npx terser carimbo.js \
