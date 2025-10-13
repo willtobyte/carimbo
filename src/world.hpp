@@ -8,6 +8,8 @@ class world {
     void add(const std::shared_ptr<object>& object);
     void remove(const std::shared_ptr<object>& object);
 
+    // void set_camera(std::shared_ptr<camera> camera) noexcept;
+    
     void update(float delta) noexcept;
     void draw() const noexcept;
 
