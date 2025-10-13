@@ -13,5 +13,5 @@ class world {
 
   private:
     std::vector<std::weak_ptr<object>> _objects;
-}
+};
 }
