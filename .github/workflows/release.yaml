@@ -339,18 +339,13 @@ jobs:
       - name: Minifiy Carimbo JavaScript runtime
         working-directory: build
         run: |
-          ls -lah carimbo.js
           npm install terser -g
 
           terser carimbo.js \
-            --compress 'pure_funcs=["console.log","assert"]' \
-            --mangle \
-            --mangle-props regex=/^_/ \
-            --toplevel \
-            --ecma 2020 \
-            --module \
-            --output carimbo.js
-          ls -lah carimbo.js
+              --compress passes=3,ecma=2020,module=true \
+              --mangle toplevel \
+              --ecma 2020 \
+              --output carimbo.min.js
 
       - name: Compress artifacts
         working-directory: build
