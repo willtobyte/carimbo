@@ -1,7 +1,7 @@
 SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(buildtype),$(buildtype),Release)
-NCPUS := 8
+NCPUS := 4
 
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
@@ -11,8 +11,8 @@ DEBUG_LINKER_FLAGS := -fsanitize=address,undefined
 
 .PHONY: clean
 clean: ## Cleans build artifacts
-	@rm -rf build
-	@rm -rf ~/.conan2/p
+	rm -rf build
+	rm -rf ~/.conan2/p
 
 .PHONY: conan
 conan: ## Installs dependencies
