@@ -66,7 +66,6 @@ void object::update(float delta) noexcept {
     return;
   }
 
-  const auto now = SDL_GetTicks();
   const auto it = _animations.find(_action);
   if (it == _animations.end()) {
     return;
@@ -78,6 +77,7 @@ void object::update(float delta) noexcept {
     return;
   }
 
+  const auto now = SDL_GetTicks();
   const auto& frame = keyframes[_frame];
   const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
   if (!expired) {
