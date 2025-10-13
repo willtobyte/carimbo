@@ -339,14 +339,12 @@ jobs:
       - name: Minifiy Carimbo JavaScript runtime
         working-directory: build
         run: |
-          ls -lah *.js
           npx terser carimbo.js \
             --ecma 2022 --module \
             --compress passes=3 \
             --mangle toplevel \
             --comments false \
-            --output carimbo.min.js
-          ls -lah *.js
+            --output carimbo.js
 
       - name: Compress artifacts
         working-directory: build
