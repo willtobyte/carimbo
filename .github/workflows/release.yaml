@@ -345,7 +345,7 @@ jobs:
               --compress passes=3,ecma=2020,module=true \
               --mangle toplevel \
               --ecma 2020 \
-              --output carimbo.min.js
+              --output carimbo.js
 
       - name: Compress artifacts
         working-directory: build
