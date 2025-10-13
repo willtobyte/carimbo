@@ -330,8 +330,9 @@ jobs:
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections" \
-            -DCMAKE_CXX_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections"
+            -DCMAKE_C_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -g0" \
+              -DCMAKE_CXX_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -fvisibility-inlines-hidden -g0" \
+              -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="-fuse-ld=lld -Wl,-O2,--gc-sections,--icf=all,--as-needed,--build-id=none" \
 
           cmake --build build --config Release --verbose
 
