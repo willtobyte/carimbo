@@ -59,13 +59,13 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   for (const auto& item : j["animations"].items()) {
     const auto& key = item.key();
     const auto& a = item.value();
-    const auto hitbox = a.contains("hitbox") ? std::make_optional(a.at("hitbox").template get<framework::hitbox>()) : std::nullopt;
+    const auto bounds = a.contains("bounds") ? std::make_optional(a.at("bounds").template get<framework::bounds>()) : std::nullopt;
     const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(std::format("blobs/{}{}.ogg", scope ? std::format("{}/", scope->get()) : std::string(), a.at("effect").template get_ref<const std::string&>())) : nullptr;
     const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
     const bool oneshot = next.has_value() || a.value("oneshot", false);
     const auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
 
-    animations.emplace(key, animation{oneshot, next, hitbox, effect, std::move(keyframes)});
+    animations.emplace(key, animation{oneshot, next, bounds, effect, std::move(keyframes)});
   }
 
   auto o = std::make_shared<object>();
@@ -162,11 +162,11 @@ void objectmanager::update(float delta) noexcept {
   //   a->update(delta);
 
   //   const auto ita = a->_animations.find(a->_action);
-  //   if (ita == a->_animations.end() || !ita->second.hitbox) {
+  //   if (ita == a->_animations.end() || !ita->second.bounds) {
   //     continue;
   //   }
 
-  //   const auto& ha = *ita->second.hitbox;
+  //   const auto& ha = *ita->second.bounds;
   //   const auto ra =
   //     geometry::rectangle(
   //       a->position() + ha.rectangle.position() * a->_scale,
@@ -177,11 +177,11 @@ void objectmanager::update(float delta) noexcept {
   //     auto& b = *itob;
 
   //     const auto itb = b->_animations.find(b->_action);
-  //     if (itb == b->_animations.end() || !itb->second.hitbox) {
+  //     if (itb == b->_animations.end() || !itb->second.bounds) {
   //       continue;
   //     }
 
-  //     const auto& hb = *itb->second.hitbox;
+  //     const auto& hb = *itb->second.bounds;
 
   //     const bool react =
   //       (!ha.type || hb.reagents.test(ha.type.value())) ||
@@ -241,17 +241,19 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
     }
 
     const auto& animation = it->second;
-    if (!animation.hitbox) {
+    if (!animation.bounds) {
       return false;
     }
 
-    const auto hitbox =
+    auto bounds =
       geometry::rectangle {
-        o->_position + animation.hitbox->rectangle.position() * o->_scale,
-        animation.hitbox->rectangle.size() * o->_scale
+        o->_position + animation.bounds->rectangle.position(),
+        animation.bounds->rectangle.size()
       };
+    
+    bounds.scale(o->_scale);
 
-    if (!hitbox.contains(point)) {
+    if (!bounds.contains(point)) {
       return false;
     }
 

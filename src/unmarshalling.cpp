@@ -35,7 +35,7 @@ void from_json(const nlohmann::json& j, keyframe& o) {
   o.duration = j.at("duration").get<uint64_t>();
 }
 
-void from_json(const nlohmann::json& j, framework::hitbox& o) {
+void from_json(const nlohmann::json& j, framework::bounds& o) {
   if (j.contains("type")) {
     o.type = j.at("type").get<uint16_t>();
   }

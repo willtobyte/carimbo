@@ -143,20 +143,22 @@ std::vector<std::string> tilemap::under() const noexcept {
   }
 
   const auto& animation = ait->second;
-  if (!animation.hitbox) [[unlikely]] {
+  if (!animation.bounds) [[unlikely]] {
     return {};
   }
 
-  const auto hitbox =
+  auto bounds =
     geometry::rectangle{
-      _target->position() + animation.hitbox->rectangle.position() * _target->scale(),
-      animation.hitbox->rectangle.size() * _target->scale()
+      _target->position() + animation.bounds->rectangle.position(),
+      animation.bounds->rectangle.size()
     };
 
-  const auto x0 = hitbox.x();
-  const auto y0 = hitbox.y();
-  const auto x1 = x0 + hitbox.width();
-  const auto y1 = y0 + hitbox.height();
+  bounds.scale(_target->scale());
+
+  const auto x0 = bounds.x();
+  const auto y0 = bounds.y();
+  const auto x1 = x0 + bounds.width();
+  const auto y1 = y0 + bounds.height();
 
   const auto cstart = static_cast<size_t>(x0 / _size);
   const auto cend   = static_cast<size_t>(std::min(std::ceil(x1 / _size), _width));

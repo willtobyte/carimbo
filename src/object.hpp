@@ -18,18 +18,18 @@ struct keyframe final {
   friend void from_json(const nlohmann::json& j, keyframe& o);
 };
 
-struct hitbox final {
+struct bounds final {
   std::optional<uint8_t> type;
   std::bitset<256> reagents;
   geometry::rectangle rectangle;
 
-  friend void from_json(const nlohmann::json& j, framework::hitbox& o);
+  friend void from_json(const nlohmann::json& j, framework::bounds& o);
 };
 
 struct animation final {
   bool oneshot{false};
   std::optional<std::string> next;
-  std::optional<framework::hitbox> hitbox;
+  std::optional<framework::bounds> bounds;
   std::shared_ptr<audio::soundfx> effect;
   std::vector<keyframe> keyframes;
 };

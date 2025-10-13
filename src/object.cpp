@@ -153,13 +153,13 @@ void object::draw() const noexcept {
   destination.scale(_scale);
 
   #ifdef DEBUG
-  const auto& hitbox = it->second.hitbox;
+  const auto& bounds = it->second.bounds;
 
   std::optional<geometry::rectangle> debug =
-      hitbox ?
+      bounds ?
         std::make_optional(geometry::rectangle{
-            _position + hitbox->rectangle.position(),
-            hitbox->rectangle.size() * _scale
+            _position + bounds->rectangle.position(),
+            bounds->rectangle.size() * _scale
         })
       : std::nullopt;
   #endif
@@ -264,23 +264,23 @@ bool object::intersects(const std::shared_ptr<object> other) const noexcept {
   }
 
   const auto sit = _animations.find(_action);
-  if (sit == _animations.end() || !sit->second.hitbox) [[likely]] {
+  if (sit == _animations.end() || !sit->second.bounds) [[likely]] {
     return false;
   }
 
   const auto oit = other->_animations.find(other->_action);
-  if (oit == other->_animations.end() || !oit->second.hitbox) [[likely]] {
+  if (oit == other->_animations.end() || !oit->second.bounds) [[likely]] {
     return false;
   }
 
   return geometry::rectangle(
-    position() + sit->second.hitbox->rectangle.position() * _scale,
-    sit->second.hitbox->rectangle.size() * _scale
+    position() + sit->second.bounds->rectangle.position() * _scale,
+    sit->second.bounds->rectangle.size() * _scale
   )
   .intersects(
     geometry::rectangle(
-      other->position() + oit->second.hitbox->rectangle.position() * other->_scale,
-      oit->second.hitbox->rectangle.size() * other->_scale
+      other->position() + oit->second.bounds->rectangle.position() * other->_scale,
+      oit->second.bounds->rectangle.size() * other->_scale
     )
   );
 }
@@ -331,19 +331,19 @@ void object::on_touch(float x, float y) {
 
 void object::on_motion(float x, float y) {
   const auto it = _animations.find(_action);
-  if (it == _animations.end() || !it->second.hitbox) {
+  if (it == _animations.end() || !it->second.bounds) {
     return;
   }
 
   const auto& animation = it->second;
 
-  const auto hitbox =
+  const auto bounds =
     geometry::rectangle{
-      _position + animation.hitbox->rectangle.position() * _scale,
-      animation.hitbox->rectangle.size() * _scale
+      _position + animation.bounds->rectangle.position() * _scale,
+      animation.bounds->rectangle.size() * _scale
     };
 
-  const auto inside = hitbox.contains(x, y);
+  const auto inside = bounds.contains(x, y);
   if (inside != _hover) {
     _hover = inside;
     inside ? on_hover() : on_unhover();
