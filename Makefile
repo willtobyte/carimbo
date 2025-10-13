@@ -1,7 +1,7 @@
 SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(buildtype),$(buildtype),Release)
-NCPUS := 4
+NCPUS := 10
 
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help

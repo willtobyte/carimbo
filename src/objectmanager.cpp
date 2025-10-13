@@ -152,64 +152,69 @@ void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager)
 }
 
 void objectmanager::update(float delta) noexcept {
-  for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
-    const auto& a = *itoa;
-    a->update(delta);
-
-    const auto ita = a->_animations.find(a->_action);
-    if (ita == a->_animations.end() || !ita->second.hitbox) {
-      continue;
-    }
-
-    const auto& ha = *ita->second.hitbox;
-    const auto ra =
-      geometry::rectangle(
-        a->position() + ha.rectangle.position() * a->_scale,
-        ha.rectangle.size() * a->_scale
-      );
-
-    for (auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
-      auto& b = *itob;
-
-      const auto itb = b->_animations.find(b->_action);
-      if (itb == b->_animations.end() || !itb->second.hitbox) {
-        continue;
-      }
-
-      const auto& hb = *itb->second.hitbox;
-
-      const bool react =
-        (!ha.type || hb.reagents.test(ha.type.value())) ||
-        (!hb.type || ha.reagents.test(hb.type.value()));
-
-      if (!react) {
-        continue;
-      }
-
-      const auto rb =
-        geometry::rectangle{
-          b->position() + hb.rectangle.position() * b->_scale,
-          hb.rectangle.size() * b->_scale
-        };
-
-      if (!ra.intersects(rb)) {
-        continue;
-      }
-
-      if (const auto& callback = callback_or(a->_collisionmapping, b->kind(), std::nullopt); callback) {
-        (*callback)(a, b);
-      }
-
-      if (const auto& callback = callback_or(b->_collisionmapping, a->kind(), std::nullopt); callback) {
-        (*callback)(b, a);
-      }
-
-      SDL_Event event{};
-      event.type = static_cast<uint32_t>(type::collision);
-      event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
-      SDL_PushEvent(&event);
-    }
+  for (const auto& o : _objects) {
+    o->update(delta);
   }
+
+  // TODO refactor it
+  // for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
+  //   const auto& a = *itoa;
+  //   a->update(delta);
+
+  //   const auto ita = a->_animations.find(a->_action);
+  //   if (ita == a->_animations.end() || !ita->second.hitbox) {
+  //     continue;
+  //   }
+
+  //   const auto& ha = *ita->second.hitbox;
+  //   const auto ra =
+  //     geometry::rectangle(
+  //       a->position() + ha.rectangle.position() * a->_scale,
+  //       ha.rectangle.size() * a->_scale
+  //     );
+
+  //   for (auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
+  //     auto& b = *itob;
+
+  //     const auto itb = b->_animations.find(b->_action);
+  //     if (itb == b->_animations.end() || !itb->second.hitbox) {
+  //       continue;
+  //     }
+
+  //     const auto& hb = *itb->second.hitbox;
+
+  //     const bool react =
+  //       (!ha.type || hb.reagents.test(ha.type.value())) ||
+  //       (!hb.type || ha.reagents.test(hb.type.value()));
+
+  //     if (!react) {
+  //       continue;
+  //     }
+
+  //     const auto rb =
+  //       geometry::rectangle{
+  //         b->position() + hb.rectangle.position() * b->_scale,
+  //         hb.rectangle.size() * b->_scale
+  //       };
+
+  //     if (!ra.intersects(rb)) {
+  //       continue;
+  //     }
+
+  //     if (const auto& callback = callback_or(a->_collisionmapping, b->kind(), std::nullopt); callback) {
+  //       (*callback)(a, b);
+  //     }
+
+  //     if (const auto& callback = callback_or(b->_collisionmapping, a->kind(), std::nullopt); callback) {
+  //       (*callback)(b, a);
+  //     }
+
+  //     SDL_Event event{};
+  //     event.type = static_cast<uint32_t>(type::collision);
+  //     event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
+  //     SDL_PushEvent(&event);
+  //   }
+  // }
 }
 
 void objectmanager::draw() const noexcept {
