@@ -52,7 +52,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   const auto scale = j.value("scale", float{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
-  animation_map animations;
+  std::unordered_map<std::string, animation> animations;
   animations.reserve(j["animations"].size());
   for (const auto& item : j["animations"].items()) {
     const auto& key = item.key();
