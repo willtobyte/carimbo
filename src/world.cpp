@@ -35,8 +35,9 @@ void world::update(float delta) noexcept {
     }
 
     const auto dirty = ptr->dirty();
-
-    // update the tree
+    if (dirty) {
+      // update the tree
+    }
 
     return false;
   });
