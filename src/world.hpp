@@ -21,6 +21,8 @@ class world final {
     void add(const std::shared_ptr<object>& object);
     void remove(const std::shared_ptr<object>& object);
 
+    std::vector<std::weak_ptr<object>> query(float x, float y);
+    std::vector<std::weak_ptr<object>> query(float x, float y, float w, float h);
     // void set_camera(std::shared_ptr<camera> camera) noexcept;
 
     void update(float delta) noexcept;

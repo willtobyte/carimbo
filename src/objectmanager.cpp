@@ -13,6 +13,7 @@ std::optional<std::function<T>> operator||(const std::optional<std::function<T>>
 objectmanager::objectmanager() {
   _envelopepool->reserve(64);
   _objects.reserve(256);
+  _hovering.reserve(256);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
@@ -67,10 +68,9 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   std::println("[objectmanager] created {} {}", qualifier, o->id());
   if (manage) {
+    _world->add(o);
     _objects.emplace_back(o);
   }
-
-  _world->add(o);
 
   return o;
 }
@@ -146,66 +146,6 @@ void objectmanager::update(float delta) noexcept {
   for (const auto& o : _objects) {
     o->update(delta);
   }
-
-  // TODO refactor it
-  // for (auto itoa = _objects.begin(); itoa != _objects.end(); ++itoa) {
-  //   const auto& a = *itoa;
-  //   a->update(delta);
-
-  //   const auto ita = a->_animations.find(a->_action);
-  //   if (ita == a->_animations.end() || !ita->second.bounds) {
-  //     continue;
-  //   }
-
-  //   const auto& ha = *ita->second.bounds;
-  //   const auto ra =
-  //     geometry::rectangle(
-  //       a->position() + ha.rectangle.position() * a->_scale,
-  //       ha.rectangle.size() * a->_scale
-  //     );
-
-  //   for (auto itob = std::next(itoa); itob != _objects.end(); ++itob) {
-  //     auto& b = *itob;
-
-  //     const auto itb = b->_animations.find(b->_action);
-  //     if (itb == b->_animations.end() || !itb->second.bounds) {
-  //       continue;
-  //     }
-
-  //     const auto& hb = *itb->second.bounds;
-
-  //     const bool react =
-  //       (!ha.type || hb.reagents.test(ha.type.value())) ||
-  //       (!hb.type || ha.reagents.test(hb.type.value()));
-
-  //     if (!react) {
-  //       continue;
-  //     }
-
-  //     const auto rb =
-  //       geometry::rectangle{
-  //         b->position() + hb.rectangle.position() * b->_scale,
-  //         hb.rectangle.size() * b->_scale
-  //       };
-
-  //     if (!ra.intersects(rb)) {
-  //       continue;
-  //     }
-
-  //     if (const auto& callback = callback_or(a->_collisionmapping, b->kind(), std::nullopt); callback) {
-  //       (*callback)(a, b);
-  //     }
-
-  //     if (const auto& callback = callback_or(b->_collisionmapping, a->kind(), std::nullopt); callback) {
-  //       (*callback)(b, a);
-  //     }
-
-  //     SDL_Event event{};
-  //     event.type = static_cast<uint32_t>(type::collision);
-  //     event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
-  //     SDL_PushEvent(&event);
-  //   }
-  // }
 }
 
 void objectmanager::draw() const noexcept {
@@ -231,27 +171,51 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
     return;
   }
 
-  const geometry::point point{event.x, event.y};
+  const auto& x = event.x;
+  const auto& y = event.y;
+  const auto objects = _world->query(x, y);
 
-  const auto clicked = std::ranges::any_of(_objects, [&](const auto& o) {
-    const auto box = o->boundingbox();
-    if (!box || !box->contains(point)) {
-      return false;
-    }
+  if (objects.empty()) {
+    _scenemanager->on_touch(x, y);
+    return;
+  }
 
-    o->on_touch(event.x, event.y);
-
-    return true;
-  });
-
-  if (!clicked) {
-    _scenemanager->on_touch(event.x, event.y);
+  for (const auto& weak : objects) {
+    const auto object = weak.lock();
+    if (!object) continue;
+    object->on_touch(x, y);
   }
 }
 
 void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
-  for (const auto& o : _objects) {
-    o->on_motion(event.x, event.y);
+  const auto& x = event.x;
+  const auto& y = event.y;
+
+  const auto objects = _world->query(x, y);
+
+  static auto owner_eq = [](const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) {
+    return !a.owner_before(b) && !b.owner_before(a);
+  };
+
+  for (const auto& weak : _hovering) {
+    const auto prev = weak.lock();
+    if (!prev) continue;
+
+    bool over = false;
+    for (const auto& weak : objects) {
+      if (const auto current = weak.lock(); current && owner_eq(weak, prev)) { over = true; break; }
+    }
+
+    if (!over) prev->on_unhover();
+  }
+
+  _hovering.clear();
+
+  for (const auto& weak : objects) {
+    const auto object = weak.lock();
+    if (!object) continue;
+    object->on_hover();
+    _hovering.emplace_back(weak);
   }
 }
 

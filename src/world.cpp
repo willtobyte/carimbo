@@ -8,6 +8,29 @@ static box_t to_box(const geometry::rectangle& r) noexcept {
   return box_t(point_t(r.x(), r.y()), point_t(r.x() + r.width(), r.y() + r.height()));
 }
 
+template <class Pred>
+static inline std::vector<std::weak_ptr<object>>
+rtree_query_to_vector(bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>>& spatial,
+                   Pred&& pred,
+                   std::vector<std::pair<box_t, uint64_t>>& hits,
+                   const std::unordered_map<uint64_t, std::weak_ptr<object>>& index) {
+  hits.clear();
+  spatial.query(std::forward<Pred>(pred), std::back_inserter(hits));
+
+  std::vector<std::weak_ptr<object>> out;
+  if (hits.empty()) return out;
+
+  out.reserve(hits.size());
+  for (const auto& h : hits) {
+    const auto it = index.find(h.second);
+    if (it == index.end()) continue;
+    if (it->second.expired()) continue;
+    out.emplace_back(it->second);
+  }
+
+  return out;
+}
+
 template <class Map>
 static inline const typename Map::mapped_type* find_ptr(const Map& m,
                                                         const typename Map::key_type& k) noexcept {
@@ -45,6 +68,22 @@ void world::remove(const std::shared_ptr<object>& object) {
   }
 
   _index.erase(id);
+}
+
+std::vector<std::weak_ptr<object>> world::query(float x, float y) {
+  const point_t p{x, y};
+  return rtree_query_to_vector(_spatial, bgi::intersects(p), _hits, _index);
+}
+
+std::vector<std::weak_ptr<object>> world::query(float x, float y, float w, float h) {
+  const float x2 = x + w;
+  const float y2 = y + h;
+
+  const point_t minp(std::min(x, x2), std::min(y, y2));
+  const point_t maxp(std::max(x, x2), std::max(y, y2));
+  const box_t area(minp, maxp);
+
+  return rtree_query_to_vector(_spatial, bgi::intersects(area), _hits, _index);
 }
 
 void world::update(float delta) noexcept {

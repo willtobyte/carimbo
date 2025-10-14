@@ -1,5 +1,4 @@
 #include "object.hpp"
-#include "rectangle.hpp"
 
 using namespace framework;
 
@@ -342,29 +341,25 @@ void object::on_touch(float x, float y) {
   }
 }
 
-void object::on_motion(float x, float y) {
-  const auto it = _animations.find(_action);
-  if (it == _animations.end() || !it->second.bounds) {
+void object::on_hover() {
+  if (_hover) {
     return;
   }
 
-  const auto box = boundingbox();
-  const bool inside =
-    box && box->contains(x, y);
+  _hover = true;
 
-  if (inside != _hover) {
-    _hover = inside;
-    inside ? on_hover() : on_unhover();
-  }
-}
-
-void object::on_hover() {
   if (const auto& fn = _onhover; fn) {
     fn(shared_from_this());
   }
 }
 
 void object::on_unhover() {
+  if (!_hover) {
+    return;
+  }
+
+  _hover = false;
+
   if (const auto& fn = _onunhover; fn) {
     fn(shared_from_this());
   }

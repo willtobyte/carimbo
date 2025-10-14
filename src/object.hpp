@@ -97,7 +97,6 @@ public:
   void on_email(const std::string& message);
 
   void on_touch(float x, float y);
-  void on_motion(float x, float y);
   void on_hover();
   void on_unhover();
 
