@@ -161,8 +161,6 @@ void world::update(float delta) noexcept {
       SDL_PushEvent(&event);
     }
   }
-
-
 }
 
 void world::draw() const noexcept {
