@@ -99,6 +99,8 @@ public:
   void on_hover();
   void on_unhover();
 
+  bool dirty() noexcept;
+
   memory::kv& kv();
 
 protected:
@@ -116,7 +118,8 @@ private:
   uint8_t _alpha;
   float _scale;
   graphics::reflection _reflection;
-  bool _hover;
+  bool _hover{false};
+  bool _dirty{false};
 
   geometry::point _position;
   algebra::vector2d _velocity;

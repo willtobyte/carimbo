@@ -28,11 +28,18 @@ void world::remove(const std::shared_ptr<object>& object) {
 }
 
 void world::update(float delta) noexcept {
-  std::erase_if(_index, [](const auto& it) noexcept {
-    return it.second.expired();
-  });
+  std::erase_if(_index, [&](auto& it) noexcept {
+    auto ptr = it.second.lock();
+    if (!ptr) {
+      return true;
+    }
 
-  // TODO
+    const auto dirty = ptr->dirty();
+
+    // update the tree
+
+    return false;
+  });
 }
 
 void world::draw() const noexcept {
