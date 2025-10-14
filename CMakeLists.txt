@@ -38,6 +38,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
   $<$<CONFIG:Debug>:DEBUG>
 )
 
+find_package(Boost CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
@@ -52,7 +53,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
 endif()
 
 if(NOT EMSCRIPTEN)
-  find_package(Boost CONFIG REQUIRED)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
   find_package(sentry CONFIG QUIET)
@@ -92,6 +92,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
+  boost::boost
   nlohmann_json::nlohmann_json
   Ogg::ogg
   physfs-static
@@ -99,7 +100,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   sol2::sol2
   spng::spng_static
   vorbis::vorbis
-  $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:boost::boost;OpenAL::OpenAL;openssl::openssl>
+  $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
   $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>
 )

@@ -1,10 +1,16 @@
 #include "world.hpp"
+
 #include "object.hpp"
 
 using namespace framework;
 
+static box_t to_box(const geometry::rectangle& r) noexcept {
+  return box_t(point_t(r.x(), r.y()), point_t(r.x() + r.width(), r.y() + r.height()));
+}
+
 world::world() noexcept {
   _index.reserve(64);
+  _aabbs.reserve(64);
 }
 
 void world::add(const std::shared_ptr<object>& object) {
@@ -24,6 +30,11 @@ void world::remove(const std::shared_ptr<object>& object) {
 
   const auto id = object->id();
 
+  if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
+    _spatial.remove(std::make_pair(it->second, id));
+    _aabbs.erase(it);
+  }
+
   _index.erase(id);
 }
 
@@ -31,6 +42,12 @@ void world::update(float delta) noexcept {
   for (auto it = _index.begin(); it != _index.end(); ) {
     auto object = it->second.lock();
     if (!object) [[unlikely]] {
+      const auto id = it->first;
+      if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
+        _spatial.remove(std::make_pair(it->second, id));
+        _aabbs.erase(it);
+      }
+
       it = _index.erase(it);
       continue;
     }
@@ -46,16 +63,20 @@ void world::update(float delta) noexcept {
       continue;
     }
 
-    const auto& boundingbox = *boundingbox_opt;
-    // update tree
+    const auto id  = object->id();
+    const auto aabb = to_box(*boundingbox_opt);
+    if (auto it = _aabbs.find(id); it != _aabbs.end()) {
+      _spatial.remove(std::make_pair(it->second, id));
+    }
+
+    _spatial.insert(std::make_pair(aabb, id));
+    _aabbs.insert_or_assign(id, aabb);
 
     ++it;
   }
 
-  // SDL_Event event{};
-  // event.type = static_cast<uint32_t>(type::collision);
-  // event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
-  // SDL_PushEvent(&event);
+  // query entitis colliding
+
 }
 
 void world::draw() const noexcept {
