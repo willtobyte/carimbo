@@ -320,10 +320,10 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
     return;
   }
 
-  std::owner_less<void> less;
+  std::owner_less<void> cmp;
   for (auto i = _receivers.size(); i-- > 0; ) {
     auto& weak = _receivers[i];
-    if (weak.expired() || (!less(weak, receiver) && !less(receiver, weak))) {
+    if (weak.expired() || (!cmp(weak, receiver) && !cmp(receiver, weak))) {
       _receivers[i] = std::move(_receivers.back());
       _receivers.pop_back();
     }
