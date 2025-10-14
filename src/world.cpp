@@ -28,8 +28,8 @@ void world::remove(const std::shared_ptr<object>& object) {
 }
 
 void world::update(float delta) noexcept {
-  std::erase_if(_index, [](const auto& kv) noexcept {
-    return kv.second.expired();
+  std::erase_if(_index, [](const auto& it) noexcept {
+    return it.second.expired();
   });
 
   // TODO
