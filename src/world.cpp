@@ -41,6 +41,11 @@ void world::update(float delta) noexcept {
 
     return false;
   });
+
+  // SDL_Event event{};
+  // event.type = static_cast<uint32_t>(type::collision);
+  // event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
+  // SDL_PushEvent(&event);
 }
 
 void world::draw() const noexcept {
