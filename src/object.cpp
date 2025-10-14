@@ -280,15 +280,21 @@ std::optional<geometry::rectangle> object::boundingbox() const noexcept {
     return std::nullopt;
   }
 
-  const auto& animation = _animations.at(_action);
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) [[unlikely]] {
+    return std::nullopt;
+  }
+
+  const auto& animation = it->second;
   if (!animation.bounds) [[unlikely]] {
     return std::nullopt;
   }
 
-  const auto& bounds = animation.bounds->rectangle;
+  const auto& bounds = *animation.bounds;
+  const auto& rect = bounds.rectangle;
   return geometry::rectangle{
-    _position + bounds.position() * _scale,
-    bounds.size() * _scale
+    _position + rect.position() * _scale,
+    rect.size() * _scale
   };
 }
 
