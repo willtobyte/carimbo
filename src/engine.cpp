@@ -119,6 +119,10 @@ void engine::set_window(std::shared_ptr<graphics::window> window) noexcept {
   _window = std::move(window);
 }
 
+void engine::set_world(std::shared_ptr<framework::world> world) noexcept {
+  _world = std::move(world);
+}
+
 void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept {
   _renderer = std::move(renderer);
 

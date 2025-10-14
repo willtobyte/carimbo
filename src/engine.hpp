@@ -17,6 +17,7 @@ namespace framework {
   class scenemanager;
   class statemanager;
   class timermanager;
+  class world;
 }
 
 namespace graphics {
@@ -70,6 +71,7 @@ public:
   void set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem) noexcept;
   void set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept;
   void set_window(std::shared_ptr<graphics::window> window) noexcept;
+  void set_world(std::shared_ptr<framework::world> world) noexcept;
   void set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept;
   void set_timermanager(std::shared_ptr<framework::timermanager> timermanager) noexcept;
 
@@ -100,12 +102,9 @@ private:
   std::shared_ptr<graphics::canvas> _canvas;
   std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::shared_ptr<graphics::window> _window;
-  std::vector<std::shared_ptr<lifecycleobserver>> _observers;
+  std::shared_ptr<framework::world> _world;
+  std::vector<std::shared_ptr<framework::lifecycleobserver>> _observers;
   std::shared_ptr<framework::timermanager> _timermanager;
   std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();
-
-#ifdef EMSCRIPTEN
-  std::atomic_bool _scheduled_once{false};
-#endif
 };
 }

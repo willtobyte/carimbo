@@ -7,11 +7,13 @@
 #include "scenemanager.hpp"
 #include "resourcemanager.hpp"
 #include "objectpool.hpp"
+#include "world.hpp"
 
 namespace framework {
 class objectmanager final : public input::eventreceiver {
 public:
-  explicit objectmanager(std::shared_ptr<resourcemanager> resourcemanager);
+  objectmanager();
+
   virtual ~objectmanager() = default;
 
   std::shared_ptr<object> create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage = true);
@@ -24,11 +26,15 @@ public:
 
   std::shared_ptr<object> find(uint64_t id) const noexcept;
 
-  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept;
-
   void update(float delta) noexcept;
 
   void draw() const noexcept;
+
+  void set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
+
+  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept;
+
+  void set_world(std::shared_ptr<world> world) noexcept;
 
 protected:
   virtual void on_mouse_release(const input::event::mouse::button& event) override;
@@ -38,6 +44,7 @@ protected:
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<scenemanager> _scenemanager;
+  std::shared_ptr<world> _world;
   std::vector<std::shared_ptr<object>> _objects;
   std::atomic<uint64_t> _counter{0};
 

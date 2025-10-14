@@ -1,5 +1,7 @@
 #include "world.hpp"
 
+#include "object.hpp"
+
 using namespace framework;
 
 static inline bool owner_equal(const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) noexcept {
@@ -22,13 +24,13 @@ void world::remove(const std::shared_ptr<object>& object) {
     return;
   }
 
-  std::erase_if(_objects, [&](const std::weak_ptr<object>& ptr) noexcept {
+  std::erase_if(_objects, [&](const std::weak_ptr<framework::object>& ptr) noexcept {
     return owner_equal(ptr, object);
   });
 }
 
 void world::update(float delta) noexcept {
-  std::erase_if(_objects, [](const std::weak_ptr<object>& ptr) noexcept {
+  std::erase_if(_objects, [](const std::weak_ptr<framework::object>& ptr) noexcept {
     return ptr.expired();
   });
 

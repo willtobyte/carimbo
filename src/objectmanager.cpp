@@ -1,6 +1,5 @@
 #include "objectmanager.hpp"
 #include "object.hpp"
-#include <memory>
 
 using namespace framework;
 
@@ -20,8 +19,7 @@ static auto callback_or(const Map& m, const typename Map::key_type& key, std::op
   return fallback;
 }
 
-objectmanager::objectmanager(std::shared_ptr<resourcemanager> resourcemanager)
-    : _resourcemanager(resourcemanager) {
+objectmanager::objectmanager() {
   _envelopepool->reserve(64);
   _objects.reserve(256);
 }
@@ -81,6 +79,8 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     _objects.emplace_back(o);
   }
 
+  _world->add(o);
+
   return o;
 }
 
@@ -109,6 +109,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
 
   std::println("[objectmanager] clone {} from {}", o->id(), matrix->id());
 
+  _world->add(o);
   return o;
 }
 
@@ -117,6 +118,7 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
     return;
   }
 
+  _world->add(object);
   _objects.emplace_back(std::move(object));
 }
 
@@ -124,6 +126,8 @@ void objectmanager::remove(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return;
   }
+
+  _world->remove(object);
 
   const auto it = std::find(_objects.begin(), _objects.end(), object);
   if (it == _objects.end()) [[unlikely]] {
@@ -145,10 +149,6 @@ std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
   }
 
   return nullptr;
-}
-
-void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept {
-  _scenemanager = std::move(scenemanager);
 }
 
 void objectmanager::update(float delta) noexcept {
@@ -223,6 +223,18 @@ void objectmanager::draw() const noexcept {
   }
 }
 
+void objectmanager::set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept {
+  _resourcemanager = std::move(resourcemanager);
+}
+
+void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept {
+  _scenemanager = std::move(scenemanager);
+}
+
+void objectmanager::set_world(std::shared_ptr<world> world) noexcept {
+  _world = std::move(world);
+}
+
 void objectmanager::on_mouse_release(const mouse::button& event) {
   if (event.button != mouse::button::which::left) {
     return;
@@ -250,7 +262,7 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
         o->_position + animation.bounds->rectangle.position(),
         animation.bounds->rectangle.size()
       };
-    
+
     bounds.scale(o->_scale);
 
     if (!bounds.contains(point)) {
