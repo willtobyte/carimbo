@@ -243,29 +243,8 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   const geometry::point point{event.x, event.y};
 
   const auto clicked = std::ranges::any_of(_objects, [&](const auto& o) {
-    if (o->_action.empty()) {
-      return false;
-    }
-
-    const auto it = o->_animations.find(o->_action);
-    if (it == o->_animations.end()) {
-      return false;
-    }
-
-    const auto& animation = it->second;
-    if (!animation.bounds) {
-      return false;
-    }
-
-    auto bounds =
-      geometry::rectangle {
-        o->_position + animation.bounds->rectangle.position(),
-        animation.bounds->rectangle.size()
-      };
-
-    bounds.scale(o->_scale);
-
-    if (!bounds.contains(point)) {
+    const auto box = o->boundingbox();
+    if (!box || !box->contains(point)) {
       return false;
     }
 

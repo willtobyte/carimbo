@@ -82,6 +82,8 @@ public:
 
   bool intersects(std::shared_ptr<object> other) const noexcept;
 
+  std::optional<geometry::rectangle> boundingbox() const noexcept;
+
   void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn);
   void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
   void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);

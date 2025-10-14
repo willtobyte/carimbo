@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "rectangle.hpp"
 
 using namespace framework;
 
@@ -150,15 +151,7 @@ void object::draw() const noexcept {
   destination.scale(_scale);
 
   #ifdef DEBUG
-  const auto& bounds = it->second.bounds;
-
-  std::optional<geometry::rectangle> debug =
-      bounds ?
-        std::make_optional(geometry::rectangle{
-            _position + bounds->rectangle.position(),
-            bounds->rectangle.size() * _scale
-        })
-      : std::nullopt;
+  std::optional<geometry::rectangle> debug = boundingbox();
   #endif
 
   _spritesheet->draw(
@@ -282,6 +275,23 @@ bool object::intersects(const std::shared_ptr<object> other) const noexcept {
   );
 }
 
+std::optional<geometry::rectangle> object::boundingbox() const noexcept {
+  if (!_visible || _action.empty()) [[unlikely]] {
+    return std::nullopt;
+  }
+
+  const auto& animation = _animations.at(_action);
+  if (!animation.bounds) [[unlikely]] {
+    return std::nullopt;
+  }
+
+  const auto& bounds = animation.bounds->rectangle;
+  return geometry::rectangle{
+    _position + bounds.position() * _scale,
+    bounds.size() * _scale
+  };
+}
+
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onupdate = std::move(fn);
 }
@@ -332,15 +342,10 @@ void object::on_motion(float x, float y) {
     return;
   }
 
-  const auto& animation = it->second;
+  const auto box = boundingbox();
+  const bool inside =
+    box && box->contains(x, y);
 
-  const auto bounds =
-    geometry::rectangle{
-      _position + animation.bounds->rectangle.position() * _scale,
-      animation.bounds->rectangle.size() * _scale
-    };
-
-  const auto inside = bounds.contains(x, y);
   if (inside != _hover) {
     _hover = inside;
     inside ? on_hover() : on_unhover();
