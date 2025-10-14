@@ -181,9 +181,11 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 
   for (const auto& weak : objects) {
-    const auto object = weak.lock();
-    if (!object) continue;
-    object->on_touch(x, y);
+    if (auto o = weak.lock()) {
+      auto* p = o.get();
+      o.reset();
+      p->on_touch(x, y);
+    }
   }
 }
 

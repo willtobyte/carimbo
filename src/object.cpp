@@ -62,6 +62,8 @@ void object::move(const float delta) noexcept {
     _position.x() + _velocity.x() * delta,
     _position.y() + _velocity.y() * delta
   );
+
+  _dirty = true;
 }
 
 void object::update(const float delta) noexcept {
@@ -167,6 +169,7 @@ void object::draw() const noexcept {
 
 void object::set_placement(float x, float y) noexcept {
   _position.set(x, y);
+  _dirty = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -183,6 +186,7 @@ uint8_t object::alpha() const noexcept {
 
 void object::set_scale(float scale) noexcept {
   _scale = scale;
+  _dirty = true;
 }
 
 float object::scale() const noexcept {
@@ -191,6 +195,7 @@ float object::scale() const noexcept {
 
 void object::set_angle(double angle) noexcept {
   _angle = angle;
+  _dirty = true;
 }
 
 double object::angle() const noexcept {
@@ -199,6 +204,7 @@ double object::angle() const noexcept {
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
   _reflection = reflection;
+  _dirty = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -207,6 +213,7 @@ graphics::reflection object::reflection() const noexcept {
 
 void object::set_visible(bool value) noexcept {
   _visible = value;
+  _dirty = true;
 }
 
 bool object::visible() const noexcept {
@@ -235,43 +242,19 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   if (const auto& fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
   }
+
+  _dirty = true;
 }
 
 void object::unset_action() noexcept {
   _action.clear();
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _dirty = true;
 }
 
 std::string object::action() const noexcept {
   return _action;
-}
-
-bool object::intersects(const std::shared_ptr<object> other) const noexcept {
-  if (_action.empty() || other->_action.empty()) [[likely]] {
-    return false;
-  }
-
-  const auto sit = _animations.find(_action);
-  if (sit == _animations.end() || !sit->second.bounds) [[likely]] {
-    return false;
-  }
-
-  const auto oit = other->_animations.find(other->_action);
-  if (oit == other->_animations.end() || !oit->second.bounds) [[likely]] {
-    return false;
-  }
-
-  return geometry::rectangle(
-    position() + sit->second.bounds->rectangle.position() * _scale,
-    sit->second.bounds->rectangle.size() * _scale
-  )
-  .intersects(
-    geometry::rectangle(
-      other->position() + oit->second.bounds->rectangle.position() * other->_scale,
-      oit->second.bounds->rectangle.size() * other->_scale
-    )
-  );
 }
 
 std::optional<geometry::rectangle> object::boundingbox() const noexcept {
@@ -366,8 +349,7 @@ void object::on_unhover() {
 }
 
 bool object::dirty() noexcept {
-  return true;
-  //return std::exchange(_dirty, false);
+  return std::exchange(_dirty, false);
 }
 
 memory::kv& object::kv() {

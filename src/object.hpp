@@ -80,8 +80,6 @@ public:
   void unset_action() noexcept;
   std::string action() const noexcept;
 
-  bool intersects(std::shared_ptr<object> other) const noexcept;
-
   std::optional<geometry::rectangle> boundingbox() const noexcept;
 
   void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn);
