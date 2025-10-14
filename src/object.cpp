@@ -57,47 +57,47 @@ algebra::vector2d& object::velocity() noexcept {
   return _velocity;
 }
 
-void object::update(float delta) noexcept {
-  if (const auto& fn = _onupdate; fn) {
-    fn(shared_from_this());
-  }
+void object::move(const float delta) noexcept {
+  _position.set(
+    _position.x() + _velocity.x() * delta,
+    _position.y() + _velocity.y() * delta
+  );
+}
 
+void object::update(const float delta) noexcept {
   if (!_visible || _action.empty()) [[unlikely]] {
     return;
   }
 
+  if (const auto& fn = _onupdate; fn) {
+    fn(shared_from_this());
+  }
+
   const auto it = _animations.find(_action);
-  if (it == _animations.end()) {
+  if (it == _animations.end()) [[unlikely]] {
     return;
   }
 
-  const auto& animation = it->second;
-  const auto& keyframes = animation.keyframes;
-  if (_frame >= keyframes.size()) {
+  const auto& animation  = it->second;
+  const auto& keyframes  = animation.keyframes;
+  if (_frame >= keyframes.size()) [[unlikely]] {
     return;
   }
 
   const auto now = SDL_GetTicks();
   const auto& frame = keyframes[_frame];
   const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
-  if (!expired) {
-    _position.set(
-      _position.x() + _velocity.x() * delta,
-      _position.y() + _velocity.y() * delta
-    );
 
+  if (!expired) [[likely]] {
+    move(delta);
     return;
   }
 
   _last_frame = now;
   ++_frame;
 
-  if (_frame < keyframes.size()) {
-    _position.set(
-      _position.x() + _velocity.x() * delta,
-      _position.y() + _velocity.y() * delta
-    );
-
+  if (_frame < keyframes.size()) [[likely]] {
+    move(delta);
     return;
   }
 
@@ -119,10 +119,7 @@ void object::update(float delta) noexcept {
     _frame = 0;
   }
 
-  _position.set(
-    _position.x() + _velocity.x() * delta,
-    _position.y() + _velocity.y() * delta
-  );
+  move(delta);
 }
 
 void object::draw() const noexcept {

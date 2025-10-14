@@ -101,6 +101,9 @@ public:
 
   memory::kv& kv();
 
+protected:
+    void move(float delta) noexcept;
+
 private:
   friend class objectmanager;
   friend class tilemap;
