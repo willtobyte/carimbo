@@ -75,7 +75,31 @@ void world::update(float delta) noexcept {
     ++it;
   }
 
-  // query entitis colliding
+  /******************/
+  std::vector<std::pair<uint64_t, uint64_t>> out;
+  out.reserve(_aabbs.size());
+
+  std::vector<std::pair<box_t, uint64_t>> hits;
+  hits.reserve(32);
+
+  for (const auto& kv : _aabbs) {
+    const auto id = kv.first;
+    const auto& aabb = kv.second;
+
+    hits.clear();
+    _spatial.query(bgi::intersects(aabb), std::back_inserter(hits));
+
+    for (const auto& h : hits) {
+      const auto other = h.second;
+      if (other <= id) continue;
+      out.emplace_back(id, other);
+    }
+  }
+
+  /******************/
+
+  // std::println(">>> {}", out.size());
+
 
 }
 
