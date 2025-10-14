@@ -1,14 +1,10 @@
 #include "world.hpp"
-
 #include "object.hpp"
 
 using namespace framework;
 
-static inline bool owner_equal(const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) noexcept {
-  const auto& cmp = std::owner_less<void>{};
-  if (cmp(a, b)) return false;
-  if (cmp(b, a)) return false;
-  return true;
+world::world() noexcept {
+  _index.reserve(64);
 }
 
 void world::add(const std::shared_ptr<object>& object) {
@@ -16,7 +12,9 @@ void world::add(const std::shared_ptr<object>& object) {
     return;
   }
 
-  _objects.emplace_back(object);
+  const auto id = object->id();
+
+  _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
 }
 
 void world::remove(const std::shared_ptr<object>& object) {
@@ -24,33 +22,20 @@ void world::remove(const std::shared_ptr<object>& object) {
     return;
   }
 
-  std::erase_if(_objects, [&](const std::weak_ptr<framework::object>& ptr) noexcept {
-    return owner_equal(ptr, object);
-  });
+  const auto id = object->id();
+
+  _index.erase(id);
 }
 
 void world::update(float delta) noexcept {
-  std::erase_if(_objects, [](const std::weak_ptr<framework::object>& ptr) noexcept {
-    return ptr.expired();
+  std::erase_if(_index, [](const auto& kv) noexcept {
+    return kv.second.expired();
   });
 
-  for (const auto& o : _objects) {
-    const auto ptr = o.lock();
-    if (!ptr) [[unlikely]] {
-      continue;
-    }
-
-    ptr->update(delta);
-  }
+  // TODO
 }
 
 void world::draw() const noexcept {
-  for (const auto& o : _objects) {
-    const auto ptr = o.lock();
-    if (!ptr) [[unlikely]] {
-      continue;
-    }
-
-    ptr->draw();
-  }
+#ifdef DEBUG
+#endif
 }
