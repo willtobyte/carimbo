@@ -28,22 +28,29 @@ void world::remove(const std::shared_ptr<object>& object) {
 }
 
 void world::update(float delta) noexcept {
-  std::erase_if(_index, [&](auto& it) noexcept {
-    const auto object = it.second.lock();
+  for (auto it = _index.begin(); it != _index.end(); ) {
+    auto object = it->second.lock();
     if (!object) [[unlikely]] {
-      return true;
+      it = _index.erase(it);
+      continue;
     }
 
-    if (!object->dirty() || !object->boundingbox()) [[unlikely]] {
-      return false;
+    if (!object->dirty()) [[unlikely]] {
+      ++it;
+      continue;
     }
 
-    const auto& boundingbox = *object->boundingbox();
+    const auto boundingbox_opt = object->boundingbox();
+    if (!boundingbox_opt) [[unlikely]] {
+      ++it;
+      continue;
+    }
 
+    const auto& boundingbox = *boundingbox_opt;
     // update tree
 
-    return false;
-  });
+    ++it;
+  }
 
   // SDL_Event event{};
   // event.type = static_cast<uint32_t>(type::collision);
