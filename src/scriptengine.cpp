@@ -1076,9 +1076,9 @@ void framework::scriptengine::run() {
 
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
-  const auto scr = lua.safe_script(script, &sol::script_pass_on_error);
-  if (!scr.valid()) [[unlikely]] {
-    sol::error err = scr;
+  const auto source = lua.safe_script(script, &sol::script_pass_on_error);
+  if (!source.valid()) [[unlikely]] {
+    sol::error err = source;
     throw std::runtime_error(err.what());
   }
 
