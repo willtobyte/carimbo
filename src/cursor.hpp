@@ -30,8 +30,6 @@ struct animation final {
   std::vector<keyframe> keyframes;
 };
 
-using animation_map = std::unordered_map<std::string, animation>;
-
 class cursor final : public input::eventreceiver {
 public:
   explicit cursor(const std::string& name, std::shared_ptr<framework::resourcemanager> resourcemanager);
@@ -54,7 +52,7 @@ private:
   geometry::point _point;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<graphics::pixmap> _spritesheet;
-  animation_map _animations;
+  std::unordered_map<std::string, animation> _animations;
   std::optional<std::string> _queued_action;
 };
 }

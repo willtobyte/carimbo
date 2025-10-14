@@ -34,8 +34,6 @@ struct animation final {
   std::vector<keyframe> keyframes;
 };
 
-using animation_map = std::unordered_map<std::string, animation>;
-
 class object final : public std::enable_shared_from_this<object> {
 public:
   object() noexcept;
@@ -123,7 +121,7 @@ private:
   std::string _scope;
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
-  animation_map _animations;
+  std::unordered_map<std::string, animation> _animations;
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

@@ -238,8 +238,8 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _frame = 0;
   _last_frame = SDL_GetTicks();
 
-  const auto& a = _animations.at(_action);
-  if (const auto& e = a.effect; e) {
+  const auto& animation = _animations.at(_action);
+  if (const auto& e = animation.effect; e) {
     e->play();
   }
 
