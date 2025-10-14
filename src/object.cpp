@@ -371,7 +371,8 @@ void object::on_unhover() {
 }
 
 bool object::dirty() noexcept {
-  return std::exchange(_dirty, false);
+  return true;
+  //return std::exchange(_dirty, false);
 }
 
 memory::kv& object::kv() {

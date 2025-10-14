@@ -111,6 +111,7 @@ protected:
 private:
   friend class objectmanager;
   friend class tilemap;
+  friend class world;
 
   uint64_t _id;
   bool _visible;

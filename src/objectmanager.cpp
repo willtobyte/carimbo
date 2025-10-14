@@ -10,15 +10,6 @@ std::optional<std::function<T>> operator||(const std::optional<std::function<T>>
   return lhs ? lhs : rhs;
 }
 
-template <typename Map>
-static auto callback_or(const Map& m, const typename Map::key_type& key, std::optional<typename Map::mapped_type> fallback) {
-  if (const auto it = m.find(key); it != m.end()) {
-    return std::optional<typename Map::mapped_type>{it->second};
-  }
-
-  return fallback;
-}
-
 objectmanager::objectmanager() {
   _envelopepool->reserve(64);
   _objects.reserve(256);

@@ -8,9 +8,18 @@ static box_t to_box(const geometry::rectangle& r) noexcept {
   return box_t(point_t(r.x(), r.y()), point_t(r.x() + r.width(), r.y() + r.height()));
 }
 
+template <class Map>
+static inline const typename Map::mapped_type* find_ptr(const Map& m,
+                                                        const typename Map::key_type& k) noexcept {
+  const auto it = m.find(k);
+  if (it == m.end()) return nullptr;
+  return std::addressof(it->second);
+}
+
 world::world() noexcept {
   _index.reserve(64);
   _aabbs.reserve(64);
+  _hits.reserve(16);
 }
 
 void world::add(const std::shared_ptr<object>& object) {
@@ -39,6 +48,9 @@ void world::remove(const std::shared_ptr<object>& object) {
 }
 
 void world::update(float delta) noexcept {
+  _dirties.reserve(_index.size());
+  _dirties.clear();
+
   for (auto it = _index.begin(); it != _index.end(); ) {
     auto object = it->second.lock();
     if (!object) [[unlikely]] {
@@ -71,34 +83,45 @@ void world::update(float delta) noexcept {
 
     _spatial.insert(std::make_pair(aabb, id));
     _aabbs.insert_or_assign(id, aabb);
+    _dirties.emplace_back(id);
 
     ++it;
   }
 
-  /******************/
-  std::vector<std::pair<uint64_t, uint64_t>> out;
-  out.reserve(_aabbs.size());
+  for (const auto id : _dirties) {
+    const auto it = _aabbs.find(id);
+    if (it == _aabbs.end()) [[unlikely]] {
+      continue;
+    }
 
-  std::vector<std::pair<box_t, uint64_t>> hits;
-  hits.reserve(32);
+    const auto& aabb = it->second;
 
-  for (const auto& kv : _aabbs) {
-    const auto id = kv.first;
-    const auto& aabb = kv.second;
+    _hits.clear();
+    _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
 
-    hits.clear();
-    _spatial.query(bgi::intersects(aabb), std::back_inserter(hits));
-
-    for (const auto& h : hits) {
+    for (const auto& h : _hits) {
       const auto other = h.second;
-      if (other <= id) continue;
-      out.emplace_back(id, other);
+      if (other <= id) {
+        continue;
+      }
+
+      const auto aptr = _index.at(id);
+      const auto a = aptr.lock();
+      if (!a) [[unlikely]] continue;
+
+      const auto bptr = _index.at(other);
+      const auto b = bptr.lock();
+      if (!b) [[unlikely]] continue;
+
+      if (const auto* callback = find_ptr(a->_collisionmapping, b->kind())) (*callback)(a, b);
+      if (const auto* callback = find_ptr(b->_collisionmapping, a->kind())) (*callback)(b, a);
+
+      SDL_Event event{};
+      event.type = static_cast<uint32_t>(input::event::type::collision);
+      event.user.data1 = _envelopepool->acquire(collisionenvelope(id, other)).release();
+      SDL_PushEvent(&event);
     }
   }
-
-  /******************/
-
-  // std::println(">>> {}", out.size());
 
 
 }

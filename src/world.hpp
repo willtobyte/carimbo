@@ -27,11 +27,15 @@ class world final {
     void draw() const noexcept;
 
   private:
+    std::vector<uint64_t> _dirties;
+
     std::unordered_map<uint64_t, std::weak_ptr<object>> _index;
 
     std::unordered_map<uint64_t, box_t> _aabbs;
 
-    bgi::rtree<std::pair<box_t, uint64_t>, bgi::quadratic<16>> _spatial;
+    bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>> _spatial;
+
+    std::vector<std::pair<box_t, uint64_t>> _hits;
 
     std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };
