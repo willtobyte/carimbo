@@ -1082,6 +1082,20 @@ void framework::scriptengine::run() {
     throw std::runtime_error(err.what());
   }
 
+  const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
+
+  lua["canvas"] = engine->canvas();
+  lua["cassette"] = engine->cassette();
+  lua["fontfactory"] = engine->fontfactory();
+  lua["objectmanager"] = engine->objectmanager();
+  lua["overlay"] = engine->overlay();
+  lua["particlesystem"] = engine->particlesystem();
+  lua["resourcemanager"] = engine->resourcemanager();
+  lua["scenemanager"] = engine->scenemanager();
+  lua["soundmanager"] = engine->soundmanager();
+  lua["statemanager"] = engine->statemanager();
+  lua["timermanager"] = engine->timermanager();
+
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto sp = setup();
   if (!sp.valid()) [[unlikely]] {
@@ -1089,7 +1103,6 @@ void framework::scriptengine::run() {
     throw std::runtime_error(err.what());
   }
 
-  const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   const auto loop = lua["loop"].get<sol::function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
