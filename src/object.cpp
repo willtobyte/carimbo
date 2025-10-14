@@ -62,7 +62,7 @@ void object::update(float delta) noexcept {
     fn(shared_from_this());
   }
 
-  if (_action.empty()) {
+  if (!_visible || _action.empty()) [[unlikely]] {
     return;
   }
 
