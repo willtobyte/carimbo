@@ -30,14 +30,17 @@ void world::remove(const std::shared_ptr<object>& object) {
 void world::update(float delta) noexcept {
   std::erase_if(_index, [&](auto& it) noexcept {
     auto ptr = it.second.lock();
-    if (!ptr) {
+    if (!ptr) [[unlikely]] {
       return true;
     }
 
-    const auto dirty = ptr->dirty();
-    if (dirty) {
-      // update the tree
+    if (!ptr->dirty() || !ptr->boundingbox()) [[unlikely]] {
+      return false;
     }
+
+    const auto& boundingbox = *ptr->boundingbox();
+
+    // update tree
 
     return false;
   });
