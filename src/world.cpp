@@ -43,7 +43,7 @@ world::world() noexcept {
   _index.reserve(64);
   _aabbs.reserve(64);
   _hits.reserve(16);
-  _emitted.reserve(16);
+  _pairs.reserve(16);
 }
 
 void world::add(const std::shared_ptr<object>& object) {
