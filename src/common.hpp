@@ -9,24 +9,9 @@
  #endif
 #endif
 
-#ifdef HAVE_BOOST
- #include <boost/asio.hpp>
- #include <boost/asio/connect.hpp>
- #include <boost/asio/ssl.hpp>
- #include <boost/asio/strand.hpp>
- #include <boost/beast/core.hpp>
- #include <boost/beast/websocket.hpp>
- #include <boost/beast/websocket/ssl.hpp>
- #include <boost/config.hpp>
-#endif
-
-#ifdef HAVE_SENTRY
- #include <sentry.h>
-#endif
-
 #ifdef DEBUG
-  #define SOL_ALL_SAFETIES_ON 1
-  #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
+  #define SOL_ALL_SAFETIES_ON
+  #define SOL_EXCEPTIONS_SAFE_PROPAGATION
 #endif
 
 #ifdef HAVE_BOOST
@@ -34,6 +19,10 @@
   #include <boost/stacktrace.hpp>
 
   #define HAVE_STACKTRACE
+#endif
+
+#ifdef HAVE_SENTRY
+ #include <sentry.h>
 #endif
 
 extern "C" {
@@ -52,6 +41,17 @@ extern "C" {
 #include <spng.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
+
+#ifndef EMSCRIPTEN
+ #include <boost/asio.hpp>
+ #include <boost/asio/connect.hpp>
+ #include <boost/asio/ssl.hpp>
+ #include <boost/asio/strand.hpp>
+ #include <boost/beast/core.hpp>
+ #include <boost/beast/websocket.hpp>
+ #include <boost/beast/websocket/ssl.hpp>
+ #include <boost/config.hpp>
+#endif
 
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
