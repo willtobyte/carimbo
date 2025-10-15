@@ -147,7 +147,7 @@ void world::update(float delta) noexcept {
 
     const auto& aabb = it->second;
 
-    _emitted.clear();
+    _pairs.clear();
     _hits.clear();
     _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
 
@@ -155,7 +155,7 @@ void world::update(float delta) noexcept {
       const auto other = hit.second;
       const auto aid = std::min(id, other);
       const auto bid = std::max(id, other);
-      if (!_emitted.insert({aid, bid}).second) {
+      if (!_pairs.insert({aid, bid}).second) {
         continue;
       }
 
