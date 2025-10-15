@@ -53,6 +53,14 @@ extern "C" {
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/box.hpp>
+#include <boost/geometry/index/rtree.hpp>
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
+#include <boost/functional/hash.hpp>
+
 #include <algorithm>
 #include <array>
 #include <atomic>

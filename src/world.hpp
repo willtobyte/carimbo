@@ -2,13 +2,6 @@
 
 #include "common.hpp"
 
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/box.hpp>
-#include <boost/geometry/index/rtree.hpp>
-#include <boost/unordered_set.hpp>
-#include <boost/functional/hash.hpp>
-
 namespace bgi = boost::geometry::index;
 
 using point_t = boost::geometry::model::d2::point_xy<float>;
