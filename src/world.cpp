@@ -108,6 +108,8 @@ void world::update(float delta) noexcept {
       continue;
     }
 
+    std::println("[world] {} with id {} is dirty", object->kind(), object->id());
+
     const auto boundingbox_opt = object->boundingbox();
     if (!boundingbox_opt) [[unlikely]] {
       ++it;
@@ -138,9 +140,9 @@ void world::update(float delta) noexcept {
     _hits.clear();
     _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
 
-    for (const auto& h : _hits) {
-      const auto other = h.second;
-      if (other <= id) {
+    for (const auto& hit : _hits) {
+      const auto other = hit.second;
+      if (other == id) {
         continue;
       }
 

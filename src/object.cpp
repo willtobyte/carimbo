@@ -51,6 +51,7 @@ void object::set_y(float y) noexcept {
 
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
   _velocity = velocity;
+  // _dirty = true;
 }
 
 algebra::vector2d& object::velocity() noexcept {
@@ -62,8 +63,6 @@ void object::move(const float delta) noexcept {
     _position.x() + _velocity.x() * delta,
     _position.y() + _velocity.y() * delta
   );
-
-  _dirty = true;
 }
 
 void object::update(const float delta) noexcept {
@@ -169,7 +168,7 @@ void object::draw() const noexcept {
 
 void object::set_placement(float x, float y) noexcept {
   _position.set(x, y);
-  _dirty = true;
+  // _dirty = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -186,7 +185,7 @@ uint8_t object::alpha() const noexcept {
 
 void object::set_scale(float scale) noexcept {
   _scale = scale;
-  _dirty = true;
+  // _dirty = true;
 }
 
 float object::scale() const noexcept {
@@ -195,7 +194,7 @@ float object::scale() const noexcept {
 
 void object::set_angle(double angle) noexcept {
   _angle = angle;
-  _dirty = true;
+  // _dirty = true;
 }
 
 double object::angle() const noexcept {
@@ -204,7 +203,7 @@ double object::angle() const noexcept {
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
   _reflection = reflection;
-  _dirty = true;
+  // _dirty = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -213,7 +212,7 @@ graphics::reflection object::reflection() const noexcept {
 
 void object::set_visible(bool value) noexcept {
   _visible = value;
-  _dirty = true;
+  // _dirty = true;
 }
 
 bool object::visible() const noexcept {
@@ -243,14 +242,14 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
     fn(shared_from_this(), _action);
   }
 
-  _dirty = true;
+  // _dirty = true;
 }
 
 void object::unset_action() noexcept {
   _action.clear();
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _dirty = true;
+  // _dirty = true;
 }
 
 std::string object::action() const noexcept {
@@ -258,6 +257,18 @@ std::string object::action() const noexcept {
 }
 
 std::optional<geometry::rectangle> object::boundingbox() const noexcept {
+  std::optional<geometry::rectangle> result;
+
+  const auto previous = _boundingbox;
+    defer({
+      const bool changed =
+        (previous.has_value() != result.has_value()) ||
+        (previous && result && (*previous != *result));
+
+      _dirty = changed;
+      _boundingbox = result;
+    });
+
   if (!_visible || _action.empty()) [[unlikely]] {
     return std::nullopt;
   }
@@ -274,10 +285,12 @@ std::optional<geometry::rectangle> object::boundingbox() const noexcept {
 
   const auto& bounds = *animation.bounds;
   const auto& rect = bounds.rectangle;
-  return geometry::rectangle{
+  result = geometry::rectangle{
     _position + rect.position() * _scale,
     rect.size() * _scale
   };
+
+  return result;
 }
 
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) {

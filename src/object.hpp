@@ -119,7 +119,7 @@ private:
   float _scale;
   graphics::reflection _reflection;
   bool _hover{false};
-  bool _dirty{false};
+  mutable bool _dirty{true};
 
   geometry::point _position;
   algebra::vector2d _velocity;
@@ -128,6 +128,7 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
+  mutable std::optional<geometry::rectangle> _boundingbox{};
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

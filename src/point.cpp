@@ -2,6 +2,8 @@
 
 using namespace geometry;
 
+static constexpr auto epsilon = std::numeric_limits<float>::epsilon();
+
 point::point(float x, float y) noexcept
   : _x(x), _y(y) {}
 
@@ -56,4 +58,8 @@ point point::operator-(const size& rhs) const noexcept {
 
 point point::operator-(const point& rhs) const noexcept {
   return point(_x - rhs._x, _y - rhs._y);
+}
+
+bool point::operator==(const point& other) const noexcept {
+  return std::fabs(_x - other._x) <= epsilon && std::fabs(_y - other._y) <= epsilon;
 }

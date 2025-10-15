@@ -38,8 +38,8 @@ public:
   operator SDL_FRect() const noexcept;
 
   rectangle operator+(const geometry::point& offset) const noexcept;
-
-  auto operator<=>(const rectangle&) const noexcept = default;
+  bool operator==(const rectangle& other) const noexcept;
+  bool operator!=(const rectangle& other) const noexcept;
 
   friend void from_json(const nlohmann::json& j, rectangle& r);
 

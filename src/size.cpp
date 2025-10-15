@@ -2,6 +2,8 @@
 
 using namespace geometry;
 
+static constexpr auto epsilon = std::numeric_limits<float>::epsilon();
+
 size::size() noexcept
     : _width(0), _height(0) {}
 
@@ -25,7 +27,6 @@ float size::height() const noexcept {
 }
 
 bool size::operator==(const size& rhs) const noexcept {
-  constexpr float epsilon = std::numeric_limits<float>::epsilon();
   return std::abs(_width - rhs._width) < epsilon && std::abs(_height - rhs._height) < epsilon;
 }
 

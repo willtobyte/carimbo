@@ -30,7 +30,7 @@ public:
   point operator-(const size& rhs) const noexcept;
   point operator-(const point& rhs) const noexcept;
 
-  auto operator<=>(const point&) const noexcept = default;
+  bool operator==(const point& other) const noexcept;
 
   friend void from_json(const nlohmann::json& j, point& m);
 
