@@ -123,7 +123,7 @@ void world::update(float delta) noexcept {
       continue;
     }
 
-    std::println("[world] {} with id {} is dirty", object->kind(), object->id());
+    std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 
     const auto id  = object->id();
     const auto aabb = to_box(*boundingbox_opt);
