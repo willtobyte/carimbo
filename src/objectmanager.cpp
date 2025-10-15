@@ -110,7 +110,7 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   }
 
   _world->add(object);
-  _objects.emplace_back(std::move(object));
+  _objects.emplace_back(object);
 }
 
 void objectmanager::remove(std::shared_ptr<object> object) noexcept {

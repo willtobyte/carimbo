@@ -53,6 +53,15 @@ void world::add(const std::shared_ptr<object>& object) {
   const auto id = object->id();
 
   _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
+
+  const auto boundingbox_opt = object->boundingbox();
+  if (!boundingbox_opt) [[unlikely]] {
+    return;
+  }
+
+  const auto aabb = to_box(*boundingbox_opt);
+  _spatial.insert(std::make_pair(aabb, id));
+  _aabbs.insert_or_assign(id, aabb);
 }
 
 void world::remove(const std::shared_ptr<object>& object) {
