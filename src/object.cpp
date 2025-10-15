@@ -8,7 +8,7 @@ object::object() noexcept
     _last_frame(SDL_GetTicks()),
     _angle(.0),
     _alpha(255),
-    _scale(.0),
+    _scale(1.0f),
     _reflection(graphics::reflection::none),
     _hover(false) {
 }

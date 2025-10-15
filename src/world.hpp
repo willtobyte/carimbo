@@ -6,6 +6,8 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/index/rtree.hpp>
+#include <boost/unordered_set.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace bgi = boost::geometry::index;
 
@@ -38,6 +40,8 @@ class world final {
     bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>> _spatial;
 
     std::vector<std::pair<box_t, uint64_t>> _hits;
+
+    boost::unordered_set<std::pair<uint64_t,uint64_t>, boost::hash<std::pair<uint64_t,uint64_t>>> _emitted;
 
     std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };
