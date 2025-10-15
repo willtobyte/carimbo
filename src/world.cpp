@@ -118,7 +118,7 @@ void world::update(float delta) noexcept {
 
     const auto id  = object->id();
     const auto aabb = to_box(*boundingbox_opt);
-    if (auto it = _aabbs.find(id); it != _aabbs.end()) {
+    if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
       _spatial.remove(std::make_pair(it->second, id));
     }
 
