@@ -86,8 +86,8 @@ std::vector<std::weak_ptr<object>> world::query(float x, float y) {
 }
 
 std::vector<std::weak_ptr<object>> world::query(float x, float y, float w, float h) {
-  const float x2 = x + w;
-  const float y2 = y + h;
+  const auto x2 = x + w;
+  const auto y2 = y + h;
 
   const point_t minp(std::min(x, x2), std::min(y, y2));
   const point_t maxp(std::max(x, x2), std::max(y, y2));

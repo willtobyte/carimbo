@@ -14,13 +14,6 @@
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION
 #endif
 
-#ifdef HAVE_BOOST
-  #define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
-  #include <boost/stacktrace.hpp>
-
-  #define HAVE_STACKTRACE
-#endif
-
 #ifdef HAVE_SENTRY
  #include <sentry.h>
 #endif
@@ -60,6 +53,11 @@ extern "C" {
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/functional/hash.hpp>
+
+#define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
+#include <boost/stacktrace.hpp>
+
+#define HAVE_STACKTRACE
 
 #include <algorithm>
 #include <array>
