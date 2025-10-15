@@ -61,5 +61,10 @@ point point::operator-(const point& rhs) const noexcept {
 }
 
 bool point::operator==(const point& other) const noexcept {
-  return std::fabs(_x - other._x) <= epsilon && std::fabs(_y - other._y) <= epsilon;
+  return std::fabs(_x - other._x) <= epsilon * std::max(std::fabs(_x), std::fabs(other._x))
+    && std::fabs(_y - other._y) <= epsilon * std::max(std::fabs(_y), std::fabs(other._y));
+}
+
+bool point::operator!=(const point& other) const noexcept {
+  return !(*this == other);
 }

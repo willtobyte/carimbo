@@ -91,33 +91,7 @@ rectangle rectangle::operator+(const point& offset) const noexcept {
 }
 
 bool rectangle::operator==(const rectangle& other) const noexcept {
-  constexpr float epsilon = std::numeric_limits<float>::epsilon();
-
-  float ax = _position.x();
-  float bx = other._position.x();
-  float dx = std::fabs(ax - bx);
-  float maxx = std::fabs(ax) > std::fabs(bx) ? std::fabs(ax) : std::fabs(bx);
-  if (dx > epsilon * maxx && dx > epsilon) return false;
-
-  float ay = _position.y();
-  float by = other._position.y();
-  float dy = std::fabs(ay - by);
-  float maxy = std::fabs(ay) > std::fabs(by) ? std::fabs(ay) : std::fabs(by);
-  if (dy > epsilon * maxy && dy > epsilon) return false;
-
-  float aw = _size.width();
-  float bw = other._size.width();
-  float dw = std::fabs(aw - bw);
-  float maxw = std::fabs(aw) > std::fabs(bw) ? std::fabs(aw) : std::fabs(bw);
-  if (dw > epsilon * maxw && dw > epsilon) return false;
-
-  float ah = _size.height();
-  float bh = other._size.height();
-  float dh = std::fabs(ah - bh);
-  float maxh = std::fabs(ah) > std::fabs(bh) ? std::fabs(ah) : std::fabs(bh);
-  if (dh > epsilon * maxh && dh > epsilon) return false;
-
-  return true;
+  return _position == other._position && _size == other._size;
 }
 
 bool rectangle::operator!=(const rectangle& other) const noexcept {

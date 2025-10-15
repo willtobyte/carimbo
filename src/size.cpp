@@ -27,7 +27,8 @@ float size::height() const noexcept {
 }
 
 bool size::operator==(const size& rhs) const noexcept {
-  return std::abs(_width - rhs._width) < epsilon && std::abs(_height - rhs._height) < epsilon;
+  return std::fabs(_width - rhs._width) <= epsilon * std::max(std::fabs(_width), std::fabs(rhs._width))
+    && std::fabs(_height - rhs._height) <= epsilon * std::max(std::fabs(_height), std::fabs(rhs._height));
 }
 
 bool size::operator!=(const size& rhs) const noexcept {
