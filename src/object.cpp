@@ -84,6 +84,8 @@ void object::update(const float delta) noexcept {
     return;
   }
 
+  _current_rectangle = animation.bounds ? animation.bounds->rectangle : geometry::rectangle{};
+
   const auto now = SDL_GetTicks();
   const auto& frame = keyframes[_frame];
   const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
@@ -260,25 +262,9 @@ std::optional<geometry::rectangle> object::boundingbox() const noexcept {
       _boundingbox = result;
     });
 
-  if (!_visible || _action.empty()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  const auto& animation = it->second;
-  if (!animation.bounds) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  const auto& bounds = *animation.bounds;
-  const auto& rect = bounds.rectangle;
   result = geometry::rectangle{
-    _position + rect.position() * _scale,
-    rect.size() * _scale
+    _position + _current_rectangle.position() * _scale,
+    _current_rectangle.size() * _scale
   };
 
   return result;

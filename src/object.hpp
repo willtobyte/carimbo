@@ -128,6 +128,7 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
+  mutable geometry::rectangle _current_rectangle;
   mutable std::optional<geometry::rectangle> _boundingbox{};
 
   memory::kv _kv;
