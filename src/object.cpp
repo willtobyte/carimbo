@@ -51,7 +51,6 @@ void object::set_y(float y) noexcept {
 
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
   _velocity = velocity;
-  // _dirty = true;
 }
 
 algebra::vector2d& object::velocity() noexcept {
@@ -168,7 +167,6 @@ void object::draw() const noexcept {
 
 void object::set_placement(float x, float y) noexcept {
   _position.set(x, y);
-  // _dirty = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -185,7 +183,6 @@ uint8_t object::alpha() const noexcept {
 
 void object::set_scale(float scale) noexcept {
   _scale = scale;
-  // _dirty = true;
 }
 
 float object::scale() const noexcept {
@@ -194,7 +191,6 @@ float object::scale() const noexcept {
 
 void object::set_angle(double angle) noexcept {
   _angle = angle;
-  // _dirty = true;
 }
 
 double object::angle() const noexcept {
@@ -203,7 +199,6 @@ double object::angle() const noexcept {
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
   _reflection = reflection;
-  // _dirty = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -212,7 +207,6 @@ graphics::reflection object::reflection() const noexcept {
 
 void object::set_visible(bool value) noexcept {
   _visible = value;
-  // _dirty = true;
 }
 
 bool object::visible() const noexcept {
@@ -241,15 +235,12 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   if (const auto& fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
   }
-
-  // _dirty = true;
 }
 
 void object::unset_action() noexcept {
   _action.clear();
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  // _dirty = true;
 }
 
 std::string object::action() const noexcept {

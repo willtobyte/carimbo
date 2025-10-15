@@ -103,18 +103,18 @@ void world::update(float delta) noexcept {
       continue;
     }
 
+    const auto boundingbox_opt = object->boundingbox();
+    if (!boundingbox_opt) [[unlikely]] {
+      ++it;
+      continue;
+    }
+
     if (!object->dirty()) [[unlikely]] {
       ++it;
       continue;
     }
 
     std::println("[world] {} with id {} is dirty", object->kind(), object->id());
-
-    const auto boundingbox_opt = object->boundingbox();
-    if (!boundingbox_opt) [[unlikely]] {
-      ++it;
-      continue;
-    }
 
     const auto id  = object->id();
     const auto aabb = to_box(*boundingbox_opt);
