@@ -9,8 +9,7 @@ object::object() noexcept
     _angle(.0),
     _alpha(255),
     _scale(1.0f),
-    _reflection(graphics::reflection::none),
-    _hover(false) {
+    _reflection(graphics::reflection::none) {
 }
 
 object::~object() noexcept {

@@ -94,7 +94,6 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_scale = matrix->_scale;
   o->_reflection = matrix->_reflection;
   o->_alpha = matrix->_alpha;
-  o->_hover = matrix->_hover;
 
   _objects.emplace_back(o);
 
