@@ -108,8 +108,6 @@ void world::update(float delta) noexcept {
       continue;
     }
 
-    const auto boundingbox = object->boundingbox();
-
     if (!object->dirty()) [[unlikely]] {
       ++it;
       continue;
@@ -118,7 +116,7 @@ void world::update(float delta) noexcept {
     std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 
     const auto id  = object->id();
-    const auto aabb = to_box(boundingbox);
+    const auto aabb = to_box(object->boundingbox());
     if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
       _spatial.remove(std::make_pair(it->second, id));
     }
