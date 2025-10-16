@@ -189,6 +189,10 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 }
 
+constexpr auto owner_eq = [](const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) {
+  return !a.owner_before(b) && !b.owner_before(a);
+};
+
 void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   const auto& x = event.x;
   const auto& y = event.y;
@@ -196,10 +200,6 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   std::vector<std::weak_ptr<object>> objects;
   objects.reserve(16);
   _world->query(x, y, std::back_inserter(objects));
-
-  static auto owner_eq = [](const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) {
-    return !a.owner_before(b) && !b.owner_before(a);
-  };
 
   for (const auto& weak : _hovering) {
     const auto prev = weak.lock();

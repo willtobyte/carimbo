@@ -27,6 +27,11 @@ void world::add(const std::shared_ptr<object>& object) {
   _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
 
   const auto aabb = to_box(object->boundingbox());
+
+  if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
+    _spatial.remove(std::make_pair(it->second, id));
+  }
+
   _spatial.insert(std::make_pair(aabb, id));
   _aabbs.insert_or_assign(id, aabb);
 }
@@ -99,6 +104,10 @@ void world::update(float delta) noexcept {
 
     for (const auto& hit : _hits) {
       const auto other = hit.second;
+      if (other == id) {
+        continue;
+      }
+
       const auto aid = std::min(id, other);
       const auto bid = std::max(id, other);
       if (!_pairs.insert({aid, bid}).second) {
