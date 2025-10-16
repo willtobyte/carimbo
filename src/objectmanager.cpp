@@ -173,16 +173,16 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
 
   const auto& x = event.x;
   const auto& y = event.y;
-  std::vector<std::weak_ptr<object>> objects;
-  objects.reserve(16);
-  _world->query(x, y, std::back_inserter(objects));
+  std::vector<std::weak_ptr<object>> hits;
+  hits.reserve(16);
+  _world->query(x, y, std::back_inserter(hits));
 
-  if (objects.empty()) {
+  if (hits.empty()) {
     _scenemanager->on_touch(x, y);
     return;
   }
 
-  for (const auto& weak : objects) {
+  for (const auto& weak : hits) {
     if (auto o = weak.lock()) {
       o->on_touch(x, y);
     }
@@ -197,30 +197,34 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   const auto& x = event.x;
   const auto& y = event.y;
 
-  std::vector<std::weak_ptr<object>> objects;
-  objects.reserve(16);
-  _world->query(x, y, std::back_inserter(objects));
+  std::vector<std::weak_ptr<object>> hits;
+  hits.reserve(16);
+  _world->query(x, y, std::back_inserter(hits));
 
-  for (const auto& weak : _hovering) {
-    const auto prev = weak.lock();
-    if (!prev) continue;
+  std::unordered_set<uint64_t> current;
+  current.reserve(hits.size());
 
-    bool over = false;
-    for (const auto& weak : objects) {
-      if (const auto current = weak.lock(); current && owner_eq(weak, prev)) { over = true; break; }
-    }
-
-    if (!over) prev->on_unhover();
+  for (const auto& w : hits) {
+    const auto p = w.lock();
+    if (!p) continue;
+    current.insert(p->id());
   }
 
-  _hovering.clear();
-
-  for (const auto& weak : objects) {
-    const auto object = weak.lock();
-    if (!object) continue;
-    object->on_hover();
-    _hovering.emplace_back(weak);
+  for (const auto id : _hovering) {
+    if (current.find(id) != current.end()) continue;
+    const auto o = find(id);
+    if (!o) continue;
+    o->on_unhover();
   }
+
+  for (const auto id : current) {
+    if (_hovering.find(id) != _hovering.end()) continue;
+    const auto o = find(id);
+    if (!o) continue;
+    o->on_hover();
+  }
+
+  _hovering = std::move(current);
 }
 
 void objectmanager::on_mail(const input::event::mail& event) {

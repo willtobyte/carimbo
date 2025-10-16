@@ -46,7 +46,7 @@ private:
   std::shared_ptr<scenemanager> _scenemanager;
   std::shared_ptr<world> _world;
   std::vector<std::shared_ptr<object>> _objects;
-  std::vector<std::weak_ptr<object>> _hovering;
+  std::unordered_set<uint64_t> _hovering;
   std::atomic<uint64_t> _counter{0};
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
