@@ -15,8 +15,6 @@ static inline const typename Map::mapped_type* find_ptr(const Map& m,
 world::world() noexcept {
   _index.reserve(64);
   _aabbs.reserve(64);
-  _hits.reserve(16);
-  _pairs.reserve(16);
 }
 
 void world::add(const std::shared_ptr<object>& object) {
@@ -51,6 +49,9 @@ void world::remove(const std::shared_ptr<object>& object) {
 void world::update(float delta) noexcept {
   _dirties.reserve(_index.size());
   _dirties.clear();
+  _hits.reserve(_index.size());
+  _pairs.reserve(_index.size());
+  _pairs.clear();
 
   for (auto it = _index.begin(); it != _index.end(); ) {
     auto object = it->second.lock();
@@ -85,8 +86,6 @@ void world::update(float delta) noexcept {
     ++it;
   }
 
-  _pairs.clear();
-
   for (const auto id : _dirties) {
     const auto it = _aabbs.find(id);
     if (it == _aabbs.end()) [[unlikely]] {
@@ -106,13 +105,15 @@ void world::update(float delta) noexcept {
         continue;
       }
 
-      const auto aptr = _index.at(id);
-      const auto a = aptr.lock();
-      if (!a) [[unlikely]] continue;
+      const auto ait = _index.find(id);
+      if (ait == _index.end()) continue;
+      auto a = ait->second.lock();
+      if (!a) continue;
 
-      const auto bptr = _index.at(other);
-      const auto b = bptr.lock();
-      if (!b) [[unlikely]] continue;
+      const auto bit = _index.find(other);
+      if (bit == _index.end()) continue;
+      auto b = bit->second.lock();
+      if (!b) continue;
 
       if (const auto* callback = find_ptr(a->_collisionmapping, b->kind())) (*callback)(a, b);
       if (const auto* callback = find_ptr(b->_collisionmapping, a->kind())) (*callback)(b, a);
