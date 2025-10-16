@@ -71,7 +71,7 @@ void object::advance(const float delta) noexcept {
 }
 
 void object::update(const float delta) noexcept {
-  if (!_visible || _action.empty()) [[unlikely]] {
+  if (_action.empty()) [[unlikely]] {
     return;
   }
 
@@ -131,7 +131,7 @@ void object::update(const float delta) noexcept {
 
 void object::draw() const noexcept {
   const auto it = _animations.find(_action);
-  if (!_visible || it == _animations.end()) [[unlikely]] {
+  if (it == _animations.end()) [[unlikely]] {
     return;
   }
 
@@ -222,14 +222,8 @@ graphics::reflection object::reflection() const noexcept {
   return _reflection;
 }
 
-void object::set_visible(bool value) noexcept {
-  if (_visible == value) return;
-  _visible = value;
-  _dirty = true;
-}
-
 bool object::visible() const noexcept {
-  return _visible;
+  return !_action.empty();
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
@@ -246,7 +240,6 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _frame = 0;
   _last_frame = SDL_GetTicks();
   _dirty = true;
-  _visible = true;
 
   const auto& animation = _animations.at(_action);
   if (const auto& e = animation.effect; e) {
@@ -262,7 +255,6 @@ void object::unset_action() noexcept {
   _action.clear();
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _visible = false;
   _dirty = true;
 }
 
