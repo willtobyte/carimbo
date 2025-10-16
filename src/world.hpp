@@ -45,14 +45,14 @@ class world final {
     template <class OutIt>
     void query(float x, float y, OutIt out) {
       auto sink = resolve_out_iterator{out, &_index};
-      _spatial.query(bgi::intersects(point_t{x,y}), sink);
+      _spatial.query(bgi::intersects(point_t{x, y}), sink);
     }
 
     template <class OutIt>
     void query(float x, float y, float w, float h, OutIt out) {
       const box_t area(
-        point_t(std::min(x, x+w), std::min(y, y+h)),
-        point_t(std::max(x, x+w), std::max(y, y+h))
+        point_t(std::min(x, x + w), std::min(y, y + h)),
+        point_t(std::max(x, x + w), std::max(y, y + h))
       );
 
       auto sink = resolve_out_iterator{out, &_index};
