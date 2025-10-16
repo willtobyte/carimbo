@@ -80,7 +80,7 @@ void object::update(const float delta) noexcept {
 
   const auto& animation  = it->second;
   const auto& keyframes  = animation.keyframes;
-  if (_frame >= keyframes.size()) [[unlikely]] {
+  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] {
     return;
   }
 
@@ -103,24 +103,23 @@ void object::update(const float delta) noexcept {
     return;
   }
 
-  if (animation.oneshot) {
-    const auto action = std::exchange(_action, "");
-
-    if (const auto& fn = _onend; fn) {
-      fn(shared_from_this(), action);
-    }
-
-    if (!animation.next) {
-      return;
-    }
-
-    _action = *animation.next;
+  if (!animation.oneshot) {
     _frame = 0;
-    _last_frame = SDL_GetTicks();
-  } else {
-    _frame = 0;
+    move(delta);
+    return;
+  }
+  
+  const auto ended = std::exchange(_action, "");
+  if (const auto& fn = _onend; fn) {
+    fn(shared_from_this(), ended);
   }
 
+  if (!animation.next) return;
+  
+  _action = *animation.next;
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
+ 
   move(delta);
 }
 
@@ -250,24 +249,19 @@ std::string object::action() const noexcept {
 }
 
 std::optional<geometry::rectangle> object::boundingbox() const noexcept {
-  std::optional<geometry::rectangle> result;
-
-  const auto previous = _boundingbox;
-    defer({
-      const bool changed =
-        (previous.has_value() != result.has_value()) ||
-        (previous && result && (*previous != *result));
-
-      _dirty = changed;
-      _boundingbox = result;
-    });
-
-  result = geometry::rectangle{
+  const auto next = geometry::rectangle{
     _position + _current_rectangle.position() * _scale,
     _current_rectangle.size() * _scale
   };
 
-  return result;
+  const bool changed =
+    (!_boundingbox.has_value()) ||
+    (*_boundingbox != next);
+
+  _dirty = changed;
+  _boundingbox = next;
+
+   return _boundingbox;
 }
 
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) {
