@@ -321,24 +321,12 @@ void object::on_touch(float x, float y) noexcept {
 }
 
 void object::on_hover() noexcept {
-  if (_hover) {
-    return;
-  }
-
-  _hover = true;
-
   if (const auto& fn = _onhover; fn) {
     fn(shared_from_this());
   }
 }
 
 void object::on_unhover() noexcept {
-  if (!_hover) {
-    return;
-  }
-
-  _hover = false;
-
   if (const auto& fn = _onunhover; fn) {
     fn(shared_from_this());
   }

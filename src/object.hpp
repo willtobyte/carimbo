@@ -119,7 +119,6 @@ private:
   uint8_t _alpha;
   float _scale;
   graphics::reflection _reflection;
-  bool _hover{false};
 
   geometry::point _position;
   algebra::vector2d _velocity;
