@@ -8,6 +8,7 @@
 #include "vector2d.hpp"
 #include "pixmap.hpp"
 #include "soundfx.hpp"
+#include <cstdint>
 
 namespace framework {
 struct keyframe final {
@@ -80,30 +81,30 @@ public:
   void unset_action() noexcept;
   std::string action() const noexcept;
 
-  std::optional<geometry::rectangle> boundingbox() const noexcept;
+  geometry::rectangle boundingbox() const noexcept;
 
-  void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn);
-  void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn);
-  void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn);
-  void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn);
-  void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn);
-  void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)>&& fn);
+  void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
+  void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
+  void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
+  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
+  void set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) noexcept;
+  void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
+  void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
+  void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) noexcept;
+  void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
 
-  void on_email(const std::string& message);
+  void on_email(const std::string& message) noexcept;
 
-  void on_touch(float x, float y);
-  void on_hover();
-  void on_unhover();
+  void on_touch(float x, float y) noexcept;
+  void on_hover() noexcept;
+  void on_unhover() noexcept;
 
   bool dirty() noexcept;
 
-  memory::kv& kv();
+  memory::kv& kv() noexcept;
 
 protected:
-    void move(float delta) noexcept;
+    void advance(float delta) noexcept;
 
 private:
   friend class objectmanager;
@@ -119,7 +120,6 @@ private:
   float _scale;
   graphics::reflection _reflection;
   bool _hover{false};
-  mutable bool _dirty{true};
 
   geometry::point _position;
   algebra::vector2d _velocity;
@@ -128,8 +128,8 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
-  mutable geometry::rectangle _current_rectangle;
-  mutable std::optional<geometry::rectangle> _boundingbox{};
+  geometry::rectangle _current_rectangle;
+  bool _dirty{true};
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

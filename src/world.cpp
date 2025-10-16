@@ -55,12 +55,7 @@ void world::add(const std::shared_ptr<object>& object) {
 
   _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
 
-  const auto boundingbox_opt = object->boundingbox();
-  if (!boundingbox_opt) [[unlikely]] {
-    return;
-  }
-
-  const auto aabb = to_box(*boundingbox_opt);
+  const auto aabb = to_box(object->boundingbox());
   _spatial.insert(std::make_pair(aabb, id));
   _aabbs.insert_or_assign(id, aabb);
 }
@@ -113,11 +108,7 @@ void world::update(float delta) noexcept {
       continue;
     }
 
-    const auto boundingbox_opt = object->boundingbox();
-    if (!boundingbox_opt) [[unlikely]] {
-      ++it;
-      continue;
-    }
+    const auto boundingbox = object->boundingbox();
 
     if (!object->dirty()) [[unlikely]] {
       ++it;
@@ -127,7 +118,7 @@ void world::update(float delta) noexcept {
     std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 
     const auto id  = object->id();
-    const auto aabb = to_box(*boundingbox_opt);
+    const auto aabb = to_box(boundingbox);
     if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
       _spatial.remove(std::make_pair(it->second, id));
     }

@@ -38,7 +38,9 @@ float object::x() const noexcept {
 }
 
 void object::set_x(float x) noexcept {
+  if (_position.x() == x) return;
   _position.set_x(x);
+  _dirty = true;
 }
 
 float object::y() const noexcept {
@@ -46,7 +48,9 @@ float object::y() const noexcept {
 }
 
 void object::set_y(float y) noexcept {
+  if (_position.y() == y) return;
   _position.set_y(y);
+  _dirty = true;
 }
 
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
@@ -57,11 +61,14 @@ algebra::vector2d& object::velocity() noexcept {
   return _velocity;
 }
 
-void object::move(const float delta) noexcept {
+void object::advance(const float delta) noexcept {
+  if (_velocity.zero()) return;
+
   _position.set(
     _position.x() + _velocity.x() * delta,
     _position.y() + _velocity.y() * delta
   );
+  _dirty = true;
 }
 
 void object::update(const float delta) noexcept {
@@ -91,7 +98,7 @@ void object::update(const float delta) noexcept {
   const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
 
   if (!expired) [[likely]] {
-    move(delta);
+    advance(delta);
     return;
   }
 
@@ -99,28 +106,28 @@ void object::update(const float delta) noexcept {
   ++_frame;
 
   if (_frame < keyframes.size()) [[likely]] {
-    move(delta);
+    advance(delta);
     return;
   }
 
   if (!animation.oneshot) {
     _frame = 0;
-    move(delta);
+    advance(delta);
     return;
   }
-  
+
   const auto ended = std::exchange(_action, "");
   if (const auto& fn = _onend; fn) {
     fn(shared_from_this(), ended);
   }
 
   if (!animation.next) return;
-  
+
   _action = *animation.next;
   _frame = 0;
   _last_frame = SDL_GetTicks();
- 
-  move(delta);
+
+  advance(delta);
 }
 
 void object::draw() const noexcept {
@@ -167,7 +174,9 @@ void object::draw() const noexcept {
 }
 
 void object::set_placement(float x, float y) noexcept {
+  if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
+  _dirty = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -175,7 +184,9 @@ geometry::point object::placement() const noexcept {
 }
 
 void object::set_alpha(uint8_t alpha) noexcept {
+  if (_alpha == alpha) return;
   _alpha = alpha;
+  _dirty = true;
 }
 
 uint8_t object::alpha() const noexcept {
@@ -183,7 +194,9 @@ uint8_t object::alpha() const noexcept {
 }
 
 void object::set_scale(float scale) noexcept {
+  if (_scale == scale) return;
   _scale = scale;
+  _dirty = true;
 }
 
 float object::scale() const noexcept {
@@ -191,7 +204,9 @@ float object::scale() const noexcept {
 }
 
 void object::set_angle(double angle) noexcept {
+  if (_angle == angle) return;
   _angle = angle;
+  _dirty = true;
 }
 
 double object::angle() const noexcept {
@@ -199,7 +214,9 @@ double object::angle() const noexcept {
 }
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
+  if (_reflection == reflection) return;
   _reflection = reflection;
+  _dirty = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -207,7 +224,9 @@ graphics::reflection object::reflection() const noexcept {
 }
 
 void object::set_visible(bool value) noexcept {
+  if (_visible == value) return;
   _visible = value;
+  _dirty = true;
 }
 
 bool object::visible() const noexcept {
@@ -227,6 +246,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _action = *action;
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _dirty = true;
 
   const auto& animation = _animations.at(_action);
   if (const auto& e = animation.effect; e) {
@@ -242,73 +262,65 @@ void object::unset_action() noexcept {
   _action.clear();
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _dirty = true;
 }
 
 std::string object::action() const noexcept {
   return _action;
 }
 
-std::optional<geometry::rectangle> object::boundingbox() const noexcept {
-  const auto next = geometry::rectangle{
+geometry::rectangle object::boundingbox() const noexcept {
+  return {
     _position + _current_rectangle.position() * _scale,
     _current_rectangle.size() * _scale
   };
-
-  const bool changed =
-    (!_boundingbox.has_value()) ||
-    (*_boundingbox != next);
-
-  _dirty = changed;
-  _boundingbox = next;
-
-   return _boundingbox;
 }
 
-void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) {
+void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
   _onupdate = std::move(fn);
 }
 
-void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
+void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
   _onbegin = std::move(fn);
 }
 
-void object::set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
+void object::set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
   _onend = std::move(fn);
 }
 
-void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
+void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
   _onmail = std::move(fn);
 }
 
-void object::set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) {
+void object::set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) noexcept {
   _ontouch = std::move(fn);
 }
 
-void object::set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) {
+void object::set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
   _onhover = std::move(fn);
 }
 
-void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) {
+void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
   _onunhover = std::move(fn);
 }
 
-void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) {
+void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) noexcept {
   _collisionmapping.emplace(kind, std::move(fn));
 }
 
-void object::on_email(const std::string& message) {
+void object::on_email(const std::string& message) noexcept {
   if (const auto& fn = _onmail; fn) {
     fn(shared_from_this(), message);
   }
 }
 
-void object::on_touch(float x, float y) {
+void object::on_touch(float x, float y) noexcept {
   if (const auto& fn = _ontouch; fn) {
     fn(shared_from_this(), x, y);
   }
 }
 
-void object::on_hover() {
+void object::on_hover() noexcept {
   if (_hover) {
     return;
   }
@@ -320,7 +332,7 @@ void object::on_hover() {
   }
 }
 
-void object::on_unhover() {
+void object::on_unhover() noexcept {
   if (!_hover) {
     return;
   }
@@ -332,10 +344,10 @@ void object::on_unhover() {
   }
 }
 
-bool object::dirty() noexcept {
+bool object::dirty() noexcept{
   return std::exchange(_dirty, false);
 }
 
-memory::kv& object::kv() {
+memory::kv& object::kv() noexcept {
   return _kv;
 }
