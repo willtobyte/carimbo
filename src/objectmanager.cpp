@@ -173,7 +173,9 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
 
   const auto& x = event.x;
   const auto& y = event.y;
-  const auto objects = _world->query(x, y);
+  std::vector<std::weak_ptr<object>> objects;
+  objects.reserve(16);
+  _world->query(x, y, std::back_inserter(objects));
 
   if (objects.empty()) {
     _scenemanager->on_touch(x, y);
@@ -191,7 +193,9 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   const auto& x = event.x;
   const auto& y = event.y;
 
-  const auto objects = _world->query(x, y);
+  std::vector<std::weak_ptr<object>> objects;
+  objects.reserve(16);
+  _world->query(x, y, std::back_inserter(objects));
 
   static auto owner_eq = [](const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) {
     return !a.owner_before(b) && !b.owner_before(a);

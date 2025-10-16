@@ -8,6 +8,32 @@ using point_t = boost::geometry::model::d2::point_xy<float>;
 using box_t = boost::geometry::model::box<point_t>;
 
 namespace framework {
+static inline box_t to_box(const geometry::rectangle& r) noexcept {
+  return box_t(point_t(r.x(), r.y()), point_t(r.x() + r.width(), r.y() + r.height()));
+}
+
+template <class OutIt>
+struct resolve_out_iterator final {
+  OutIt out;
+  const std::unordered_map<uint64_t, std::weak_ptr<object>>* index;
+  using iterator_category = std::output_iterator_tag;
+  using difference_type = void;
+  using value_type = void;
+  using pointer = void;
+  using reference = void;
+  resolve_out_iterator& operator*() noexcept { return *this; }
+  resolve_out_iterator& operator++() noexcept { return *this; }
+  resolve_out_iterator operator++(int) noexcept { return *this; }
+  resolve_out_iterator& operator=(const std::pair<box_t, uint64_t>& p) {
+    const auto it = index->find(p.second);
+    if (it == index->end()) return *this;
+    if (it->second.expired()) return *this;
+    *out = it->second;
+    ++out;
+    return *this;
+  }
+};
+
 class world final {
   public:
     world() noexcept;
@@ -16,8 +42,23 @@ class world final {
     void add(const std::shared_ptr<object>& object);
     void remove(const std::shared_ptr<object>& object);
 
-    std::vector<std::weak_ptr<object>> query(float x, float y);
-    std::vector<std::weak_ptr<object>> query(float x, float y, float w, float h);
+    template <class OutIt>
+    void query(float x, float y, OutIt out) {
+      auto sink = resolve_out_iterator{out, &_index};
+      _spatial.query(bgi::intersects(point_t{x,y}), sink);
+    }
+
+    template <class OutIt>
+    void query(float x, float y, float w, float h, OutIt out) {
+      const box_t area(
+        point_t(std::min(x, x+w), std::min(y, y+h)),
+        point_t(std::max(x, x+w), std::max(y, y+h))
+      );
+
+      auto sink = resolve_out_iterator{out, &_index};
+      _spatial.query(bgi::intersects(area), sink);
+    }
+
     // void set_camera(std::shared_ptr<camera> camera) noexcept;
 
     void update(float delta) noexcept;
