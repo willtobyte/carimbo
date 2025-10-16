@@ -246,6 +246,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _frame = 0;
   _last_frame = SDL_GetTicks();
   _dirty = true;
+  _visible = true;
 
   const auto& animation = _animations.at(_action);
   if (const auto& e = animation.effect; e) {
@@ -261,6 +262,7 @@ void object::unset_action() noexcept {
   _action.clear();
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _visible = false;
   _dirty = true;
 }
 

@@ -71,6 +71,11 @@ void world::update(float delta) noexcept {
       continue;
     }
 
+    if (!object->visible()) [[unlikely]] {
+        ++it;
+        continue;
+    }
+
     if (!object->dirty()) [[unlikely]] {
       ++it;
       continue;
