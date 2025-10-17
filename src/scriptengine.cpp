@@ -386,9 +386,9 @@ void framework::scriptengine::run() {
     "velocity", sol::property(
       &framework::object::velocity,
       [](framework::object& self, sol::table table) {
-          const auto x = table.get_or<float>("x", table.get_or(1, 0));
-          const auto y = table.get_or<float>("y", table.get_or(2, 0));
-          self.set_velocity(algebra::vector2d{x, y});
+        const auto x = table.get_or<float>("x", table.get_or(1, 0));
+        const auto y = table.get_or<float>("y", table.get_or(2, 0));
+        self.set_velocity(algebra::vector2d{x, y});
       }
     ),
     sol::meta_function::index, metaobject::index,
