@@ -125,7 +125,7 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
-  geometry::rectangle _current_rectangle;
+  std::optional<geometry::rectangle> _current_rectangle;
   bool _dirty{true};
 
   memory::kv _kv;

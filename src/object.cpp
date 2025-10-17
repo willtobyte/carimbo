@@ -236,7 +236,11 @@ std::string object::action() const noexcept {
   return _action;
 }
 
-geometry::rectangle object::boundingbox() const noexcept {
+std::optional<geometry::rectangle> object::boundingbox() const noexcept {
+  if (!_current_rectangle.has_value()) {
+    return std::nullopt;
+  }
+
   return {
     _position + _current_rectangle.position() * _scale,
     _current_rectangle.size() * _scale

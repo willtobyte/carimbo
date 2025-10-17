@@ -114,7 +114,9 @@ void scenemanager::set(const std::string& name) {
     active->on_leave();
   }
 
-  const auto& ptr = _scene_mapping.find(std::string{name})->second;
+  const auto it = _scene_mapping.find(name);
+  if (it == _scene_mapping.end()) [[ unlikely ]] return;
+  const auto& ptr = ->second;
   _scene = ptr;
   _current = name;
 
