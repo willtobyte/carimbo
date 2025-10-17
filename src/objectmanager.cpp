@@ -49,10 +49,10 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   for (auto&& item : j["animations"].items()) {
     const std::string& key = item.key();
     const auto& a = item.value();
-  
+
     std::optional<framework::bounds> bounds;
     if (a.contains("bounds")) bounds.emplace(a.at("bounds").get<framework::bounds>());
-  
+
     std::shared_ptr<audio::soundfx> effect;
     if (a.contains("effect")) {
       const std::string e = a.at("effect").get<std::string>();
@@ -60,20 +60,20 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
         std::format("blobs/{}{}.ogg",
           (scope ? std::format("{}/", scope->get()) : std::string()), e));
     }
-  
+
     std::optional<std::string> next;
     if (a.contains("next")) next.emplace(a.at("next").get<std::string>());
-  
+
     const bool oneshot = next.has_value() || a.value("oneshot", false);
-  
+
     auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
     if (a.contains("bounds") && (!a.contains("frames") || a["frames"].empty())) {
       framework::keyframe k;
       k.duration = -1;
       k.frame = a.at("bounds").get<framework::bounds>().rectangle;
-      keyframes.push_back(k);
+      keyframes.emplace_back(k);
     }
-  
+
     animations.try_emplace(
       key,
       animation{
@@ -85,7 +85,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
       }
     );
   }
-  
+
   auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_scale = scale;
