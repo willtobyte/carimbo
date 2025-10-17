@@ -55,7 +55,7 @@ void object::set_velocity(const algebra::vector2d& velocity) noexcept {
   _velocity = velocity;
 }
 
-algebra::vector2d& object::velocity() noexcept {
+algebra::vector2d object::velocity() noexcept {
   return _velocity;
 }
 
