@@ -16,7 +16,7 @@ color::color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
 
 color::color(const std::string& hex)
     : _r(0), _g(0), _b(0), _a(255) {
-  const size_t n = hex.size();
+  const auto n = hex.size();
   if (n != 7 && n != 9) [[unlikely]] {
     throw std::runtime_error(std::format("invalid hex code: '{}'. Use #RRGGBB or #RRGGBBAA", hex));
   }
