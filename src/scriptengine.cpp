@@ -330,42 +330,6 @@ void framework::scriptengine::run() {
     "both", graphics::reflection::both
   );
 
-  struct velocityproxy {
-    framework::object& self;
-
-    float x() const { return self.velocity().x(); }
-    float y() const { return self.velocity().y(); }
-
-    void set_x(float x) {
-      auto v = self.velocity();
-      v.set_x(x);
-      self.set_velocity(v);
-    }
-
-    void set_y(float y) {
-      auto v = self.velocity();
-      v.set_y(y);
-      self.set_velocity(v);
-    }
-
-    void set(const sol::table& table) {
-      const auto x = table.get_or<float>("x", table.get_or(1, 0.0));
-      const auto y = table.get_or<float>("y", table.get_or(2, 0.0));
-      self.set_velocity(algebra::vector2d{x, y});
-    }
-
-    algebra::vector2d get() const {
-      return self.velocity();
-    }
-  };
-
-  lua.new_usertype<velocityproxy>("VelocityProxy",
-    "x", sol::property(&velocityproxy::x, &velocityproxy::set_x),
-    "y", sol::property(&velocityproxy::y, &velocityproxy::set_y),
-    "set", &velocityproxy::set,
-    "get", &velocityproxy::get
-  );
-
   struct metaobject {
     static sol::object index(framework::object& self, sol::stack_object key, sol::this_state state) {
       auto& store = self.kv();
@@ -420,24 +384,11 @@ void framework::scriptengine::run() {
       }
     ),
     "velocity", sol::property(
-      [](framework::object& o) {
-        return velocityproxy{o};
-      },
-      [](framework::object& self, const sol::object& value) {
-        if (value.is<sol::table>()) {
-          const auto table = value.as<sol::table>();
+      &framework::object::velocity,
+      [](framework::object& self, sol::table table) {
           const auto x = table.get_or<float>("x", table.get_or(1, 0));
           const auto y = table.get_or<float>("y", table.get_or(2, 0));
           self.set_velocity(algebra::vector2d{x, y});
-          return;
-        }
-
-        if (value.is<algebra::vector2d>()) {
-          self.set_velocity(value.as<algebra::vector2d>());
-          return;
-        }
-
-        throw std::runtime_error("invalid value for velocity");
       }
     ),
     sol::meta_function::index, metaobject::index,
