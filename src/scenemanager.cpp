@@ -108,15 +108,16 @@ void scenemanager::set(const std::string& name) {
     return;
   }
 
+  const auto it = _scene_mapping.find(name);
+  if (it == _scene_mapping.end()) [[ unlikely ]] return;
+
   if (const auto active = _scene.lock()) [[ likely ]] {
     std::println("[scenemanager] left {}", active->name());
     _timermanager->clear();
     active->on_leave();
   }
 
-  const auto it = _scene_mapping.find(name);
-  if (it == _scene_mapping.end()) [[ unlikely ]] return;
-  const auto& ptr = ->second;
+  const auto& ptr = it->second;
   _scene = ptr;
   _current = name;
 
