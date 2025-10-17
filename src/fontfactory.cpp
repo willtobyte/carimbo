@@ -116,10 +116,10 @@ void fontfactory::flush() noexcept {
 
 #ifdef DEBUG
 void fontfactory::debug() const noexcept {
-  std::println("fontfactory.debug total objects: {}", _pool.size());
+  std::println("[fontfactory.debug] total objects: {}", _pool.size());
 
   for (const auto& [key, ptr] : _pool) {
-    std::println("  [{}] use_count={}", key, ptr.use_count());
+    std::println("  {} use_count={}", key, ptr.use_count());
   }
 }
 #endif
