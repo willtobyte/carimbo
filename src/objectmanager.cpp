@@ -46,18 +46,46 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
   std::unordered_map<std::string, animation> animations;
   animations.reserve(j["animations"].size());
-  for (const auto& item : j["animations"].items()) {
-    const auto& key = item.key();
+  for (auto&& item : j["animations"].items()) {
+    const std::string& key = item.key();
     const auto& a = item.value();
-    const auto bounds = a.contains("bounds") ? std::make_optional(a.at("bounds").template get<framework::bounds>()) : std::nullopt;
-    const auto effect = a.contains("effect") ? _resourcemanager->soundmanager()->get(std::format("blobs/{}{}.ogg", scope ? std::format("{}/", scope->get()) : std::string(), a.at("effect").template get_ref<const std::string&>())) : nullptr;
-    const auto next = a.contains("next") ? std::make_optional(a.at("next").template get_ref<const std::string&>()) : std::nullopt;
+  
+    std::optional<framework::bounds> bounds;
+    if (a.contains("bounds")) bounds.emplace(a.at("bounds").get<framework::bounds>());
+  
+    std::shared_ptr<audio::soundfx> effect;
+    if (a.contains("effect")) {
+      const std::string e = a.at("effect").get<std::string>();
+      effect = _resourcemanager->soundmanager()->get(
+        std::format("blobs/{}{}.ogg",
+          (scope ? std::format("{}/", scope->get()) : std::string()), e));
+    }
+  
+    std::optional<std::string> next;
+    if (a.contains("next")) next.emplace(a.at("next").get<std::string>());
+  
     const bool oneshot = next.has_value() || a.value("oneshot", false);
-    const auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
-
-    animations.emplace(key, animation{oneshot, next, bounds, effect, std::move(keyframes)});
+  
+    auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
+    if (a.contains("bounds") && (!a.contains("frames") || a["frames"].empty())) {
+      framework::keyframe k;
+      k.duration = -1;
+      k.frame = a.at("bounds").get<framework::bounds>().rectangle;
+      keyframes.push_back(k);
+    }
+  
+    animations.try_emplace(
+      key,
+      animation{
+        oneshot,
+        std::move(next),
+        std::move(bounds),
+        std::move(effect),
+        std::move(keyframes)
+      }
+    );
   }
-
+  
   auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_scale = scale;
