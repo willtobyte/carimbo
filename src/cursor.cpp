@@ -64,9 +64,8 @@ void cursor::on_mouse_motion(const mouse::motion& event) {
 }
 
 void cursor::update(float delta) noexcept {
-  UNUSED(delta);
   const auto now = SDL_GetTicks();
-  const auto& animation = _animations.at(_action);
+  const auto& animation = _animations.find(_action)->second;
   const auto& frame = animation.keyframes[_frame];
 
   if (frame.duration == 0 || now - _last_frame < frame.duration) {
@@ -85,7 +84,7 @@ void cursor::update(float delta) noexcept {
 }
 
 void cursor::draw() const noexcept {
-  const auto& animation = _animations.at(_action).keyframes[_frame];
+  const auto& animation = _animations.find(_action)->second.keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
       geometry::rectangle{

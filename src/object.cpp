@@ -215,7 +215,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _last_frame = SDL_GetTicks();
   _dirty = true;
 
-  const auto& animation = _animations.at(_action);
+  const auto& animation = _animations.find(_action)->second;
   if (const auto& e = animation.effect; e) {
     e->play();
   }
