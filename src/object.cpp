@@ -71,7 +71,7 @@ void object::update(const float delta) noexcept {
   const auto& keyframes = animation.keyframes;
   if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
-  _current_rectangle = animation.bounds ? animation.bounds->rectangle : geometry::rectangle{};
+  _current_rectangle = animation.bounds ? animation.bounds->rectangle : geometry::rectangle();
 
   const auto now = SDL_GetTicks();
   const auto& frame = keyframes[_frame];

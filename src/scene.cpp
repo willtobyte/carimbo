@@ -50,11 +50,11 @@ void scene::update(float delta) noexcept {
 
 void scene::draw() const noexcept {
   const auto r =
-    geometry::rectangle{
+    geometry::rectangle(
       .0f, .0f,
       static_cast<float>(_background->width()),
       static_cast<float>(_background->height())
-    };
+    );
 
   _background->draw(r, r);
 }

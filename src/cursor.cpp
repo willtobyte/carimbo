@@ -60,7 +60,7 @@ void cursor::on_mouse_release(const mouse::button& event) {
 }
 
 void cursor::on_mouse_motion(const mouse::motion& event) {
-  _position = geometry::point{event.x, event.y};
+  _position = geometry::point(event.x, event.y);
 }
 
 void cursor::update(float delta) noexcept {
@@ -87,10 +87,10 @@ void cursor::draw() const noexcept {
   const auto& animation = _animations.find(_action)->second.keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
-      geometry::rectangle{
+      geometry::rectangle(
         _position - _point + animation.offset,
         animation.frame.size()
-      },
+      ),
       0,
       255,
       reflection::none

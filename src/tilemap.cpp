@@ -148,10 +148,10 @@ std::vector<std::string> tilemap::under() const noexcept {
   }
 
   auto bounds =
-    geometry::rectangle{
+    geometry::rectangle(
       _target->position() + animation.bounds->rectangle.position(),
       animation.bounds->rectangle.size()
-    };
+    );
 
   bounds.scale(_target->scale());
 
