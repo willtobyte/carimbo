@@ -54,7 +54,7 @@ void soundmanager::update(float delta) noexcept {
 
 #ifdef DEBUG
 void soundmanager::debug() const noexcept {
-  std::println("soundmanager::debug total objects: {}", _pool.size());
+  std::println("soundmanager.debug total objects: {}", _pool.size());
 
   for (const auto& [key, ptr] : _pool) {
     std::println("  [{}] use_count={}", key, ptr.use_count());

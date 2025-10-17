@@ -8,7 +8,7 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 {}
 
 std::shared_ptr<font> fontfactory::get(const std::string& family) {
-  std::filesystem::path p{family};
+  std::filesystem::path p(family);
   const std::string filename = p.has_extension()
     ? family
     : std::format("fonts/{}.json", family);
@@ -38,13 +38,13 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   const auto tw = static_cast<int32_t>(fw);
   const auto th = static_cast<int32_t>(fh);
 
-  std::unique_ptr<SDL_Texture, SDL_Deleter> target{
+  std::unique_ptr<SDL_Texture, SDL_Deleter> target(
     SDL_CreateTexture(
       *_renderer,
       SDL_PIXELFORMAT_RGBA32,
       SDL_TEXTUREACCESS_TARGET,
       tw, th)
-  };
+  );
   if (!target) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
@@ -57,7 +57,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   SDL_RenderTexture(*_renderer, *pixmap, nullptr, nullptr);
   SDL_RenderPresent(*_renderer);
 
-  std::unique_ptr<SDL_Surface, SDL_Deleter> surface{SDL_RenderReadPixels(*_renderer, nullptr)};
+  std::unique_ptr<SDL_Surface, SDL_Deleter> surface(SDL_RenderReadPixels(*_renderer, nullptr));
   if (!surface) [[unlikely]] {
     throw std::runtime_error(
       std::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
@@ -116,7 +116,7 @@ void fontfactory::flush() noexcept {
 
 #ifdef DEBUG
 void fontfactory::debug() const noexcept {
-  std::println("fontfactory::debug total objects: {}", _pool.size());
+  std::println("fontfactory.debug total objects: {}", _pool.size());
 
   for (const auto& [key, ptr] : _pool) {
     std::println("  [{}] use_count={}", key, ptr.use_count());
