@@ -3,8 +3,7 @@
 using namespace framework;
 
 object::object() noexcept
-  : _visible(true),
-    _frame(0),
+  : _frame(0),
     _last_frame(SDL_GetTicks()),
     _angle(.0),
     _alpha(255),
@@ -60,35 +59,17 @@ algebra::vector2d& object::velocity() noexcept {
   return _velocity;
 }
 
-void object::advance(const float delta) noexcept {
-  if (_velocity.zero()) return;
-
-  _position.set(
-    _position.x() + _velocity.x() * delta,
-    _position.y() + _velocity.y() * delta
-  );
-  _dirty = true;
-}
-
 void object::update(const float delta) noexcept {
-  if (_action.empty()) [[unlikely]] {
-    return;
-  }
+  if (_action.empty()) [[unlikely]] return;
 
-  if (const auto& fn = _onupdate; fn) {
-    fn(shared_from_this());
-  }
+  if (_onupdate) _onupdate(shared_from_this());
 
   const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] {
-    return;
-  }
+  if (it == _animations.end()) [[unlikely]] return;
 
-  const auto& animation  = it->second;
-  const auto& keyframes  = animation.keyframes;
-  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] {
-    return;
-  }
+  const auto& animation = it->second;
+  const auto& keyframes = animation.keyframes;
+  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
   _current_rectangle = animation.bounds ? animation.bounds->rectangle : geometry::rectangle{};
 
@@ -96,37 +77,30 @@ void object::update(const float delta) noexcept {
   const auto& frame = keyframes[_frame];
   const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
 
-  if (!expired) [[likely]] {
-    advance(delta);
-    return;
+  if (expired) {
+    ++_frame;
+
+    if (_frame >= keyframes.size()) {
+      if (animation.oneshot) {
+        const auto ended = std::exchange(_action, "");
+        if (_onend) _onend(shared_from_this(), ended);
+        if (!animation.next) return;
+        _action = *animation.next;
+      }
+      _frame = 0;
+    }
+
+    _last_frame = now;
   }
 
-  _last_frame = now;
-  ++_frame;
+  if (!_velocity.zero()) {
+    _position.set(
+      _position.x() + _velocity.x() * delta,
+      _position.y() + _velocity.y() * delta
+    );
 
-  if (_frame < keyframes.size()) [[likely]] {
-    advance(delta);
-    return;
+    _dirty = true;
   }
-
-  if (!animation.oneshot) {
-    _frame = 0;
-    advance(delta);
-    return;
-  }
-
-  const auto ended = std::exchange(_action, "");
-  if (const auto& fn = _onend; fn) {
-    fn(shared_from_this(), ended);
-  }
-
-  if (!animation.next) return;
-
-  _action = *animation.next;
-  _frame = 0;
-  _last_frame = SDL_GetTicks();
-
-  advance(delta);
 }
 
 void object::draw() const noexcept {
