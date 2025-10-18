@@ -5,8 +5,10 @@
 using namespace framework;
 
 template <class Map>
-static inline const typename Map::mapped_type* find_ptr(const Map& m,
-                                                        const typename Map::key_type& k) noexcept {
+static inline const typename Map::mapped_type* find_ptr(
+  const Map& m,
+  const typename Map::key_type& k
+) noexcept {
   const auto it = m.find(k);
   if (it == m.end()) return nullptr;
   return std::addressof(it->second);
@@ -26,12 +28,16 @@ void world::add(const std::shared_ptr<object>& object) {
 
   _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
 
-  const auto aabb = to_box(*object->boundingbox());
-
   if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
     _spatial.remove(std::make_pair(it->second, id));
   }
 
+  const auto boundingbox_opt = object->boundingbox();
+  if (!boundingbox_opt.has_value()) [[unlikely]] {
+    return;
+  }
+
+  const auto aabb = to_box(*boundingbox_opt);
   _spatial.insert(std::make_pair(aabb, id));
   _aabbs.insert_or_assign(id, aabb);
 }
