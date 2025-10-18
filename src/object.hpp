@@ -80,8 +80,6 @@ public:
   void set_action(const std::optional<std::string>& action) noexcept;
   std::string action() const noexcept;
 
-  std::optional<geometry::rectangle> boundingbox() const noexcept;
-
   void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
   void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
   void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
@@ -99,6 +97,7 @@ public:
   void on_unhover() noexcept;
 
   bool dirty() noexcept;
+  std::optional<geometry::rectangle> aabb() const;
 
   memory::kv& kv() noexcept;
 
@@ -126,7 +125,7 @@ private:
   std::string _previous_action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
-  std::optional<geometry::rectangle> _current_rectangle;
+  std::optional<geometry::rectangle> _aabb;
   bool _dirty{true};
 
   memory::kv _kv;

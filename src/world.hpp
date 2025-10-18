@@ -8,8 +8,17 @@ using point_t = boost::geometry::model::d2::point_xy<float>;
 using box_t = boost::geometry::model::box<point_t>;
 
 namespace framework {
-static inline box_t to_box(const geometry::rectangle& r) noexcept {
-  return box_t(point_t(r.x(), r.y()), point_t(r.x() + r.width(), r.y() + r.height()));
+static inline box_t to_box(const geometry::rectangle& rectangle) noexcept {
+  return box_t(
+    point_t(
+      rectangle.x(),
+      rectangle.y()
+    ),
+    point_t(
+      rectangle.x() + rectangle.width(),
+      rectangle.y() + rectangle.height()
+    )
+  );
 }
 
 template <class OutIt>

@@ -59,7 +59,7 @@ algebra::vector2d object::velocity() noexcept {
   return _velocity;
 }
 
-void object::update(const float delta) noexcept {
+void object::update(float delta) noexcept {
   if (_action.empty()) [[unlikely]] return;
 
   if (_onupdate) _onupdate(shared_from_this());
@@ -70,10 +70,6 @@ void object::update(const float delta) noexcept {
   const auto& animation = it->second;
   const auto& keyframes = animation.keyframes;
   if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
-
-  _current_rectangle = animation.bounds
-    ? std::make_optional(animation.bounds->rectangle)
-    : std::nullopt;
 
   const auto now = SDL_GetTicks();
   const auto& frame = keyframes[_frame];
@@ -133,7 +129,7 @@ void object::draw() const noexcept {
   destination.scale(_scale);
 
   #ifdef DEBUG
-  std::optional<geometry::rectangle> debug = boundingbox();
+  std::optional<geometry::rectangle> debug = aabb();
   #endif
 
   _spritesheet->draw(
@@ -241,17 +237,6 @@ std::string object::action() const noexcept {
   return _action;
 }
 
-std::optional<geometry::rectangle> object::boundingbox() const noexcept {
-  if (!_current_rectangle) {
-    return std::nullopt;
-  }
-
-  return geometry::rectangle{
-    _position + _current_rectangle->position() * _scale,
-    _current_rectangle->size() * _scale
-  };
-}
-
 void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
   _onupdate = std::move(fn);
 }
@@ -310,6 +295,10 @@ void object::on_unhover() noexcept {
 
 bool object::dirty() noexcept{
   return std::exchange(_dirty, false);
+}
+
+std::optional<geometry::rectangle> object::aabb() const {
+  return _aabb;
 }
 
 memory::kv& object::kv() noexcept {
