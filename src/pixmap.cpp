@@ -80,7 +80,7 @@ void pixmap::draw(
     const std::optional<geometry::rectangle>& outline
 #endif
 ) const noexcept {
-  const geometry::rectangle src{
+  const geometry::rectangle _source{
     source.x(),
     source.y(),
     static_cast<float>(width()),
@@ -88,7 +88,11 @@ void pixmap::draw(
   };
 
   draw(
-    src, destination, angle, alpha, reflection
+    _source,
+    destination,
+    angle,
+    alpha,
+    reflection
 #ifdef DEBUG
     , outline
 #endif

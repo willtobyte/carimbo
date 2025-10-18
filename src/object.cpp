@@ -99,6 +99,44 @@ void object::update(float delta) noexcept {
 
     _dirty = true;
   }
+
+  const auto& keyframe_cur = keyframes[_frame];
+  const auto& source = keyframe_cur.frame;
+  const auto& offset = keyframe_cur.offset;
+
+  geometry::rectangle destination{_position + offset, source.size()};
+
+  const auto ow = destination.width();
+  const auto oh = destination.height();
+  const auto sw = ow * _scale;
+  const auto sh = oh * _scale;
+  const auto dx = (ow - sw) * 0.5f;
+  const auto dy = (oh - sh) * 0.5f;
+
+  destination.set_position(destination.x() + dx, destination.y() + dy);
+  destination.scale(_scale);
+
+  const auto cx = destination.x() + sw * 0.5f;
+  const auto cy = destination.y() + sh * 0.5f;
+
+  const auto hx = sw * 0.5f;
+  const auto hy = sh * 0.5f;
+
+  const auto rad = _angle * (M_PI / 180.0);
+  const auto cos = static_cast<float>(std::cos(rad));
+  const auto sin = static_cast<float>(std::sin(rad));
+  const auto ac = std::fabs(cos);
+  const auto as = std::fabs(sin);
+
+  const auto ex = ac * hx + as * hy;
+  const auto ey = as * hx + ac * hy;
+
+  const auto minx = cx - ex;
+  const auto maxx = cx + ex;
+  const auto miny = cy - ey;
+  const auto maxy = cy + ey;
+
+  _aabb = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
 }
 
 void object::draw() const noexcept {
