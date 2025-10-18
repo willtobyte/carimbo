@@ -111,8 +111,8 @@ void object::update(float delta) noexcept {
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
-  const auto cx = destination.x() + sw * 0.5f;
-  const auto cy = destination.y() + sh * 0.5f;
+  const auto cx = destination.x() + sw * .5f;
+  const auto cy = destination.y() + sh * .5f;
 
   const auto hx = sw * 0.5f;
   const auto hy = sh * 0.5f;
