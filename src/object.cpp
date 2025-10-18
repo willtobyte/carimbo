@@ -105,8 +105,8 @@ void object::update(float delta) noexcept {
   const auto oh = destination.height();
   const auto sw = ow * _scale;
   const auto sh = oh * _scale;
-  const auto dx = (ow - sw) * 0.5f;
-  const auto dy = (oh - sh) * 0.5f;
+  const auto dx = (ow - sw) * .5f;
+  const auto dy = (oh - sh) * .5f;
 
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
@@ -114,10 +114,10 @@ void object::update(float delta) noexcept {
   const auto cx = destination.x() + sw * .5f;
   const auto cy = destination.y() + sh * .5f;
 
-  const auto hx = sw * 0.5f;
-  const auto hy = sh * 0.5f;
+  const auto hx = sw * .5f;
+  const auto hy = sh * .5f;
 
-  const auto rad = _angle * (M_PI / 180.0);
+  const auto rad = _angle * (std::numbers::pi_v<double> / 180.0);
   const auto c = static_cast<float>(std::cos(rad));
   const auto s = static_cast<float>(std::sin(rad));
   const auto ac = std::fabs(c);
