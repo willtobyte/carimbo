@@ -80,7 +80,7 @@ public:
   void unset_action() noexcept;
   std::string action() const noexcept;
 
-  geometry::rectangle boundingbox() const noexcept;
+  std::optional<geometry::rectangle> boundingbox() const noexcept;
 
   void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
   void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;

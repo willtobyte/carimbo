@@ -71,7 +71,9 @@ void object::update(const float delta) noexcept {
   const auto& keyframes = animation.keyframes;
   if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
-  _current_rectangle = animation.bounds ? animation.bounds->rectangle : geometry::rectangle();
+  _current_rectangle = animation.bounds
+    ? std::make_optional(animation.bounds->rectangle)
+    : std::nullopt;
 
   const auto now = SDL_GetTicks();
   const auto& frame = keyframes[_frame];
@@ -237,13 +239,13 @@ std::string object::action() const noexcept {
 }
 
 std::optional<geometry::rectangle> object::boundingbox() const noexcept {
-  if (!_current_rectangle.has_value()) {
+  if (!_current_rectangle) {
     return std::nullopt;
   }
 
-  return {
-    _position + _current_rectangle.position() * _scale,
-    _current_rectangle.size() * _scale
+  return geometry::rectangle{
+    _position + _current_rectangle->position() * _scale,
+    _current_rectangle->size() * _scale
   };
 }
 
