@@ -203,8 +203,8 @@ bool object::visible() const noexcept {
 }
 
 void object::set_visible(bool value) noexcept {
-  auto &source = value ? _previous_action : _action;
-  auto &destination = value ? _action : _previous_action;
+  auto& source = value ? _previous_action : _action;
+  auto& destination = value ? _action : _previous_action;
   destination = std::exchange(source, "");
 
   _frame = 0;
