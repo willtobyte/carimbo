@@ -75,9 +75,9 @@ public:
   graphics::reflection reflection() const noexcept;
 
   bool visible() const noexcept;
+  void set_visible(bool value) noexcept;
 
   void set_action(const std::optional<std::string>& action) noexcept;
-  void unset_action() noexcept;
   std::string action() const noexcept;
 
   std::optional<geometry::rectangle> boundingbox() const noexcept;
@@ -123,6 +123,7 @@ private:
   std::string _kind;
   std::string _scope;
   std::string _action;
+  std::string _previous_action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
   std::optional<geometry::rectangle> _current_rectangle;

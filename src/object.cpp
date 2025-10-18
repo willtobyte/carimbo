@@ -202,9 +202,19 @@ bool object::visible() const noexcept {
   return !_action.empty();
 }
 
+void object::set_visible(bool value) noexcept {
+  auto &source = value ? _previous_action : _action;
+  auto &destination = value ? _action : _previous_action;
+  destination = std::exchange(source, "");
+
+  _frame = 0;
+  _last_frame = SDL_GetTicks();
+  _dirty = true;
+}
+
 void object::set_action(const std::optional<std::string>& action) noexcept {
   if (!action.has_value()) {
-    unset_action();
+    set_visible(false);
     return;
   }
 
@@ -225,13 +235,6 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   if (const auto& fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
   }
-}
-
-void object::unset_action() noexcept {
-  _action.clear();
-  _frame = 0;
-  _last_frame = SDL_GetTicks();
-  _dirty = true;
 }
 
 std::string object::action() const noexcept {
