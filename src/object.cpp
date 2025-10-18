@@ -118,10 +118,10 @@ void object::update(float delta) noexcept {
   const auto hy = sh * 0.5f;
 
   const auto rad = _angle * (M_PI / 180.0);
-  const auto cos = static_cast<float>(std::cos(rad));
-  const auto sin = static_cast<float>(std::sin(rad));
-  const auto ac = std::fabs(cos);
-  const auto as = std::fabs(sin);
+  const auto c = static_cast<float>(std::cos(rad));
+  const auto s = static_cast<float>(std::sin(rad));
+  const auto ac = std::fabs(c);
+  const auto as = std::fabs(s);
 
   const auto ex = ac * hx + as * hy;
   const auto ey = as * hx + ac * hy;
