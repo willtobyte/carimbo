@@ -126,6 +126,7 @@ private:
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
   std::optional<geometry::rectangle> _aabb;
+  std::optional<geometry::rectangle> _previous_aabb;
   bool _dirty{true};
 
   memory::kv _kv;

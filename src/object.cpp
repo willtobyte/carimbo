@@ -36,9 +36,7 @@ float object::x() const noexcept {
 }
 
 void object::set_x(float x) noexcept {
-  if (_position.x() == x) return;
   _position.set_x(x);
-  _dirty = true;
 }
 
 float object::y() const noexcept {
@@ -46,9 +44,7 @@ float object::y() const noexcept {
 }
 
 void object::set_y(float y) noexcept {
-  if (_position.y() == y) return;
   _position.set_y(y);
-  _dirty = true;
 }
 
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
@@ -96,8 +92,6 @@ void object::update(float delta) noexcept {
       _position.x() + _velocity.x() * delta,
       _position.y() + _velocity.y() * delta
     );
-
-    _dirty = true;
   }
 
   if (!animation.bounds) {
@@ -138,6 +132,8 @@ void object::update(float delta) noexcept {
   const auto maxy = cy + ey;
 
   _aabb = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
+  _dirty = _aabb != _previous_aabb;
+  _previous_aabb = _aabb;
 }
 
 void object::draw() const noexcept {
@@ -184,9 +180,7 @@ void object::draw() const noexcept {
 }
 
 void object::set_placement(float x, float y) noexcept {
-  if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
-  _dirty = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -194,9 +188,7 @@ geometry::point object::placement() const noexcept {
 }
 
 void object::set_alpha(uint8_t alpha) noexcept {
-  if (_alpha == alpha) return;
   _alpha = alpha;
-  _dirty = true;
 }
 
 uint8_t object::alpha() const noexcept {
@@ -204,9 +196,7 @@ uint8_t object::alpha() const noexcept {
 }
 
 void object::set_scale(float scale) noexcept {
-  if (_scale == scale) return;
   _scale = scale;
-  _dirty = true;
 }
 
 float object::scale() const noexcept {
@@ -214,9 +204,7 @@ float object::scale() const noexcept {
 }
 
 void object::set_angle(double angle) noexcept {
-  if (_angle == angle) return;
   _angle = angle;
-  _dirty = true;
 }
 
 double object::angle() const noexcept {
@@ -224,9 +212,7 @@ double object::angle() const noexcept {
 }
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
-  if (_reflection == reflection) return;
   _reflection = reflection;
-  _dirty = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -244,7 +230,6 @@ void object::set_visible(bool value) noexcept {
 
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _dirty = true;
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
@@ -260,7 +245,6 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _action = *action;
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _dirty = true;
 
   const auto& animation = _animations.find(_action)->second;
   if (const auto& e = animation.effect; e) {
