@@ -72,8 +72,8 @@ void object::update(float delta) noexcept {
   if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
   const auto now = SDL_GetTicks();
-  const auto& frame = keyframes[_frame];
-  const bool expired = frame.duration > 0 && (now - _last_frame >= frame.duration);
+  const auto& keyframe = keyframes[_frame];
+  const bool expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
 
   if (expired) {
     ++_frame;
@@ -100,11 +100,12 @@ void object::update(float delta) noexcept {
     _dirty = true;
   }
 
-  const auto& keyframe_cur = keyframes[_frame];
-  const auto& source = keyframe_cur.frame;
-  const auto& offset = keyframe_cur.offset;
+  if (!animation.bounds) {
+    return;
+  }
 
-  geometry::rectangle destination{_position + offset, source.size()};
+  const auto& rectangle = animation.bounds->rectangle;
+  geometry::rectangle destination{_position + rectangle.position(), rectangle.size()};
 
   const auto ow = destination.width();
   const auto oh = destination.height();
