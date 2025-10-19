@@ -48,16 +48,17 @@ find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 
+set(IS_WINDOWS FALSE)
+set(IS_EMSCRIPTEN FALSE)
+
 if (WIN32)
+  set(IS_WINDOWS TRUE)
   set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+  set(IS_EMSCRIPTEN TRUE)
 endif()
 
-set(EMSCRIPTEN FALSE)
-if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
-  set(EMSCRIPTEN TRUE)
-endif()
-
-if(NOT EMSCRIPTEN)
+if(NOT IS_EMSCRIPTEN)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
   find_package(sentry CONFIG QUIET)
@@ -67,7 +68,7 @@ if(NOT EMSCRIPTEN)
 endif()
 
 target_link_options(${PROJECT_NAME} PRIVATE
-  $<$<BOOL:${EMSCRIPTEN}>:
+  $<$<BOOL:${IS_EMSCRIPTEN}>:
     -sENVIRONMENT=web
     -sINVOKE_RUN=0
     -sEXIT_RUNTIME=0
@@ -105,7 +106,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   sol2::sol2
   spng::spng_static
   vorbis::vorbis
-  $<$<NOT:$<BOOL:${EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
+  $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
   $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>
 )
