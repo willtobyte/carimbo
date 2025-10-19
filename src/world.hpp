@@ -48,8 +48,8 @@ class world final {
     world() noexcept;
     ~world() noexcept = default;
 
-    void add(const std::shared_ptr<object>& object);
-    void remove(const std::shared_ptr<object>& object);
+    void add(uint64_t id, const std::shared_ptr<object>& object);
+    void remove(uint64_t id);
 
     template <class OutIt>
     void query(float x, float y, OutIt out) {

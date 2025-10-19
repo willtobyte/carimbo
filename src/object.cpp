@@ -15,10 +15,6 @@ object::~object() noexcept {
   std::println("[object] gone {} {}", kind(), id());
 }
 
-uint64_t object::id() const noexcept {
-  return _id;
-}
-
 std::string object::kind() const noexcept {
   return _kind;
 }

@@ -101,6 +101,8 @@ public:
 
   memory::kv& kv() noexcept;
 
+  uint64_t id() { return 0; }
+
 protected:
     void advance(float delta) noexcept;
 
@@ -109,7 +111,6 @@ private:
   friend class tilemap;
   friend class world;
 
-  uint64_t _id;
   std::size_t _frame;
   uint64_t _last_frame;
   double _angle;

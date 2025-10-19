@@ -12,7 +12,6 @@ std::optional<std::function<T>> operator||(const std::optional<std::function<T>>
 
 objectmanager::objectmanager() {
   _envelopepool->reserve(64);
-  _objects.reserve(256);
   _hovering.reserve(256);
 }
 
@@ -20,19 +19,15 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   static const std::string empty;
   const auto& n = scope.value_or(std::cref(empty)).get();
   const auto& qualifier = n.empty() ? kind : std::format("{}/{}", n, kind);
-  for (const auto& o : _objects) {
-    if (o->_kind != kind) {
-      continue;
-    }
 
+  const auto& seq = _objects.get<by_seq>();
+  for (const auto& e : seq) {
+    const auto& o = e.value;
+    if (o->_kind != kind) continue;
     if (n.empty()) {
-      if (!o->_scope.empty()) {
-        continue;
-      }
+      if (!o->_scope.empty()) continue;
     } else {
-      if (o->_scope != n) {
-        continue;
-      }
+      if (o->_scope != n) continue;
     }
 
     return clone(o);
@@ -87,17 +82,17 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   }
 
   auto o = std::make_shared<object>();
-  o->_id = _counter++;
   o->_scale = scale;
   o->_kind = kind;
   o->_scope = n;
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
 
-  std::println("[objectmanager] created {} {}", qualifier, o->id());
+  const uint64_t id = _counter++;
+  std::println("[objectmanager] created {} {}", qualifier, id);
   if (manage) {
-    _world->add(o);
-    _objects.emplace_back(o);
+    _world->add(id, o);
+    _objects.get<by_seq>().push_back(node{id, o});
   }
 
   return o;
@@ -109,7 +104,6 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   }
 
   const auto o = std::make_shared<object>();
-  o->_id = _counter++;
   o->_angle = matrix->_angle;
   o->_kind = matrix->_kind;
   o->_scope = matrix->_scope;
@@ -123,11 +117,12 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_reflection = matrix->_reflection;
   o->_alpha = matrix->_alpha;
 
-  _objects.emplace_back(o);
+  const uint64_t id = _counter++;
+  _objects.get<by_seq>().push_back(node{id, o});
+  _world->add(id, o);
 
-  std::println("[objectmanager] clone {} from {}", o->id(), matrix->id());
+  std::println("[objectmanager] clone {}", matrix->kind());
 
-  _world->add(o);
   return o;
 }
 
@@ -136,10 +131,14 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
     return;
   }
 
-  if (std::find(_objects.begin(), _objects.end(), object) == _objects.end()) {
-    _objects.emplace_back(object);
-    _world->add(object);
+  auto& byptr = _objects.get<by_ptr>();
+  if (byptr.count(object)) [[unlikely]] {
+    return;
   }
+
+  const uint64_t id = _counter++;
+  _objects.get<by_seq>().push_back(node{id, object});
+  _world->add(id, object);
 }
 
 void objectmanager::remove(std::shared_ptr<object> object) noexcept {
@@ -147,38 +146,36 @@ void objectmanager::remove(std::shared_ptr<object> object) noexcept {
     return;
   }
 
-  _world->remove(object);
-
-  const auto it = std::find(_objects.begin(), _objects.end(), object);
-  if (it == _objects.end()) [[unlikely]] {
+  auto& byptr = _objects.get<by_ptr>();
+  auto it = byptr.find(object);
+  if (it == byptr.end()) [[unlikely]] {
     return;
   }
 
-  if (it != _objects.end() - 1) [[likely]] {
-    std::iter_swap(it, _objects.end() - 1);
-  }
-
-  _objects.pop_back();
+  const uint64_t id = it->id;
+  auto& byseq = _objects.get<by_seq>();
+  byseq.erase(_objects.project<by_seq>(it));
+  _world->remove(id);
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
-  auto it = std::ranges::lower_bound(_objects, id, {}, [](const auto& o){ return o->id(); });
-  if (it == _objects.end() || (*it)->id() != id) [[unlikely]] {
-    return nullptr;
-  }
-
-  return *it;
+  const auto& byid = _objects.get<by_id>();
+  auto it = byid.find(id);
+  if (it == byid.end()) [[unlikely]] return nullptr;
+  return it->value;
 }
 
 void objectmanager::update(float delta) noexcept {
-  for (const auto& o : _objects) {
-    o->update(delta);
+  const auto& byseq = _objects.get<by_seq>();
+  for (const auto& e : byseq) {
+    e.value->update(delta);
   }
 }
 
 void objectmanager::draw() const noexcept {
-  for (const auto& o : _objects) {
-    o->draw();
+  const auto& byseq = _objects.get<by_seq>();
+  for (const auto& e : byseq) {
+    e.value->draw();
   }
 }
 

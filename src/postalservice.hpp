@@ -13,7 +13,7 @@ struct mail final {
     std::optional<std::shared_ptr<object>> from,
     const std::string& body
   ) noexcept
-    : to(to->id()),
+    : to(0), // TODO
     kind(from && *from ? (*from)->kind() : "unknown"),
     body(body) {}
 };

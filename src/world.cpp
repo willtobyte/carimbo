@@ -19,12 +19,10 @@ world::world() noexcept {
   _aabbs.reserve(64);
 }
 
-void world::add(const std::shared_ptr<object>& object) {
+void world::add(uint64_t id, const std::shared_ptr<object>& object) {
   if (!object) [[unlikely]] {
     return;
   }
-
-  const auto id = object->id();
 
   _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
 
@@ -42,13 +40,7 @@ void world::add(const std::shared_ptr<object>& object) {
   _aabbs.insert_or_assign(id, aabb);
 }
 
-void world::remove(const std::shared_ptr<object>& object) {
-  if (!object) [[unlikely]] {
-    return;
-  }
-
-  const auto id = object->id();
-
+void world::remove(uint64_t id) {
   if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
     _spatial.remove(std::make_pair(it->second, id));
     _aabbs.erase(it);
@@ -94,13 +86,16 @@ void world::update(float delta) noexcept {
     }
 
 #ifdef DEBUG
-    std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
+  // TODO
+  // std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 #endif
 
-    const auto id  = object->id();
+    const auto id = it->first;
     const auto aabb = to_box(*aabb_opt);
-    if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
-      _spatial.remove(std::make_pair(it->second, id));
+
+    const auto found = _aabbs.find(id);
+    if (found != _aabbs.end()) {
+      _spatial.remove({found->second, id});
     }
 
     _spatial.insert(std::make_pair(aabb, id));
