@@ -103,13 +103,13 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 }
 
 void scenemanager::set(const std::string& name) {
-  if (_current == name) [[ unlikely ]] {
+  if (_current == name) [[unlikely]] {
     std::println("[scenemanager] already in {}", name);
     return;
   }
 
   const auto it = _scene_mapping.find(name);
-  if (it == _scene_mapping.end()) [[ unlikely ]] return;
+  if (it == _scene_mapping.end()) [[unlikely]] return;
 
   if (const auto active = _scene.lock()) [[ likely ]] {
     std::println("[scenemanager] left {}", active->name());

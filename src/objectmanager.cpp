@@ -136,8 +136,10 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
     return;
   }
 
-  _world->add(object);
-  _objects.emplace_back(object);
+  if (std::find(_objects.begin(), _objects.end(), object) == _objects.end()) {
+    _objects.emplace_back(object);
+    _world->add(object);
+  }
 }
 
 void objectmanager::remove(std::shared_ptr<object> object) noexcept {
@@ -160,13 +162,12 @@ void objectmanager::remove(std::shared_ptr<object> object) noexcept {
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
-  for (const auto& o : _objects) {
-    if (o->id() == id) {
-      return o;
-    }
+  auto it = std::ranges::lower_bound(_objects, id, {}, [](const auto& o){ return o->id(); });
+  if (it == _objects.end() || (*it)->id() != id) [[unlikely]] {
+    return nullptr;
   }
 
-  return nullptr;
+  return *it;
 }
 
 void objectmanager::update(float delta) noexcept {
@@ -194,64 +195,50 @@ void objectmanager::set_world(std::shared_ptr<world> world) noexcept {
 }
 
 void objectmanager::on_mouse_release(const mouse::button& event) {
-  if (event.button != mouse::button::which::left) {
-    return;
-  }
+  if (event.button != mouse::button::which::left) return;
 
-  const auto& x = event.x;
-  const auto& y = event.y;
-  std::vector<std::weak_ptr<object>> hits;
+  const auto x = event.x;
+  const auto y = event.y;
+
+  std::vector<uint64_t> hits;
   hits.reserve(16);
   _world->query(x, y, std::back_inserter(hits));
 
-  if (hits.empty()) {
+  if (hits.empty()) [[likely]] {
     _scenemanager->on_touch(x, y);
     return;
   }
 
-  for (const auto& weak : hits) {
-    if (auto o = weak.lock()) {
-      o->on_touch(x, y);
-    }
+  for (auto id : hits) {
+    const auto& o = find(id);
+    if (!o) [[unlikely]] continue;
+    o->on_touch(x, y);
   }
 }
 
-constexpr auto owner_eq = [](const std::weak_ptr<object>& a, const std::shared_ptr<object>& b) {
-  return !a.owner_before(b) && !b.owner_before(a);
-};
-
 void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
-  const auto& x = event.x;
-  const auto& y = event.y;
+  const auto x = event.x;
+  const auto y = event.y;
 
-  std::vector<std::weak_ptr<object>> hits;
+  std::unordered_set<uint64_t> hits;
   hits.reserve(16);
-  _world->query(x, y, std::back_inserter(hits));
-
-  std::unordered_set<uint64_t> current;
-  current.reserve(hits.size());
-
-  for (const auto& w : hits) {
-    const auto p = w.lock();
-    if (!p) continue;
-    current.insert(p->id());
-  }
+  _world->query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
-    if (current.find(id) != current.end()) continue;
-    const auto o = find(id);
-    if (!o) continue;
-    o->on_unhover();
+    if (hits.contains(id)) continue;
+    if (const auto& o = find(id)) [[likely]] {
+      o->on_unhover();
+    }
   }
 
-  for (const auto id : current) {
-    if (_hovering.find(id) != _hovering.end()) continue;
-    const auto o = find(id);
-    if (!o) continue;
-    o->on_hover();
+  for (const auto id : hits) {
+    if (_hovering.contains(id)) continue;
+    if (const auto& o = find(id)) [[likely]] {
+      o->on_hover();
+    }
   }
 
-  _hovering = std::move(current);
+  _hovering = std::move(hits);
 }
 
 void objectmanager::on_mail(const input::event::mail& event) {

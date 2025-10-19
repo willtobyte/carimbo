@@ -37,8 +37,8 @@ struct resolve_out_iterator final {
     const auto it = index->find(p.second);
     if (it == index->end()) return *this;
     if (it->second.expired()) return *this;
-    *out = it->second;
-    ++out;
+    *out++ = p.second;
+    //++out;
     return *this;
   }
 };
