@@ -48,6 +48,10 @@ find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(Vorbis CONFIG REQUIRED)
 
+if (WIN32)
+  set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
+
 set(EMSCRIPTEN FALSE)
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   set(EMSCRIPTEN TRUE)
