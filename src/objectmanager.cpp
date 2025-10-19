@@ -18,27 +18,14 @@ objectmanager::objectmanager() {
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
   static const std::string empty;
   const auto& n = scope.value_or(std::cref(empty)).get();
-  const auto& qualifier = n.empty() ? kind : std::format("{}/{}", n, kind);
+  const auto& fulln = n.empty() ? kind : std::format("{}/{}", n, kind);
 
-  const auto& seq = _objects.get<by_seq>();
-  for (const auto& e : seq) {
-    const auto& o = e.value;
-    if (o->_kind != kind) continue;
-    if (n.empty()) {
-      if (!o->_scope.empty()) continue;
-    } else {
-      if (o->_scope != n) continue;
-    }
-
-    return clone(o);
-  }
-
-  const auto& filename = std::format("objects/{}.json", qualifier);
+  const auto& filename = std::format("objects/{}.json", fulln);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float{1.f});
-  const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
+  const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", fulln));
   std::unordered_map<std::string, animation> animations;
   animations.reserve(j["animations"].size());
   for (auto&& item : j["animations"].items()) {
@@ -90,7 +77,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   const uint64_t id = _counter++;
   o->_id = id;
-  std::println("[objectmanager] created {} {}", qualifier, id);
+  std::println("[objectmanager] created {} {}", fulln, id);
   if (manage) {
     _world->add(o);
     _objects.get<by_seq>().push_back(node{id, o});
