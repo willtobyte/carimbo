@@ -56,7 +56,9 @@ algebra::vector2d object::velocity() noexcept {
 }
 
 void object::update(float delta) noexcept {
-  if (_action.empty()) [[unlikely]] return;
+  if (_action.empty()) [[unlikely]] {
+    return;
+  }
 
   if (_onupdate) _onupdate(shared_from_this());
 
@@ -231,6 +233,7 @@ void object::set_visible(bool value) noexcept {
 
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _aabb = std::nullopt;
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
