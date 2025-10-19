@@ -210,9 +210,9 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 
   for (auto id : hits) {
-    const auto& o = find(id);
-    if (!o) [[unlikely]] continue;
-    o->on_touch(x, y);
+    if (const auto& o = find(id)) [[likely]] {
+      o->on_touch(x, y);
+    }
   }
 }
 
