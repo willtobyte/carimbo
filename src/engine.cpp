@@ -7,6 +7,7 @@
 #include "particlesystem.hpp"
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
+#include "postalservice.hpp"
 #include "statemanager.hpp"
 #include "timermanager.hpp"
 #include "window.hpp"
@@ -35,6 +36,10 @@ std::shared_ptr<graphics::overlay> engine::overlay() const noexcept {
 
 std::shared_ptr<framework::resourcemanager> engine::resourcemanager() const noexcept {
   return _resourcemanager;
+}
+
+std::shared_ptr<framework::postalservice> engine::postalservice() const noexcept {
+  return _postalservice;
 }
 
 std::shared_ptr<framework::scenemanager> engine::scenemanager() const noexcept {
@@ -107,6 +112,10 @@ void engine::set_scenemanager(std::shared_ptr<framework::scenemanager> scenemana
 
 void engine::set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem) noexcept {
   _particlesystem = std::move(particlesystem);
+}
+
+void engine::set_postalservice(std::shared_ptr<framework::postalservice> postalservice) noexcept {
+  _postalservice = std::move(postalservice);
 }
 
 void engine::set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept {

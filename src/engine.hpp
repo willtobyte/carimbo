@@ -14,6 +14,7 @@ namespace framework {
   class loopable;
   class objectmanager;
   class resourcemanager;
+  class postalservice;
   class scenemanager;
   class statemanager;
   class timermanager;
@@ -49,6 +50,7 @@ public:
   std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
   std::shared_ptr<graphics::overlay> overlay() const noexcept;
   std::shared_ptr<framework::resourcemanager> resourcemanager() const noexcept;
+  std::shared_ptr<framework::postalservice> postalservice() const noexcept;
   std::shared_ptr<framework::scenemanager> scenemanager() const noexcept;
   std::shared_ptr<framework::statemanager> statemanager() const noexcept;
   std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
@@ -69,6 +71,7 @@ public:
   void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
   void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept;
   void set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem) noexcept;
+  void set_postalservice(std::shared_ptr<framework::postalservice> postalservice) noexcept;
   void set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept;
   void set_window(std::shared_ptr<graphics::window> window) noexcept;
   void set_world(std::shared_ptr<framework::world> world) noexcept;
@@ -96,6 +99,7 @@ private:
   std::vector<std::shared_ptr<loopable>> _loopables;
   std::shared_ptr<graphics::overlay> _overlay;
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
+  std::shared_ptr<framework::postalservice> _postalservice;
   std::shared_ptr<framework::scenemanager> _scenemanager;
   std::shared_ptr<framework::statemanager> _statemanager;
   std::shared_ptr<graphics::renderer> _renderer;

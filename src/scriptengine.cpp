@@ -1043,6 +1043,7 @@ void framework::scriptengine::run() {
   lua["overlay"] = engine->overlay();
   lua["particlesystem"] = engine->particlesystem();
   lua["resourcemanager"] = engine->resourcemanager();
+  lua["postalservice"] = engine->postalservice();
   lua["scenemanager"] = engine->scenemanager();
   lua["soundmanager"] = engine->soundmanager();
   lua["statemanager"] = engine->statemanager();

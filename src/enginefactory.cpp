@@ -6,6 +6,7 @@
 #include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "resourcemanager.hpp"
+#include "postalservice.hpp"
 #include "scenemanager.hpp"
 #include "timermanager.hpp"
 #include "window.hpp"
@@ -87,6 +88,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto renderer = window->create_renderer(_scale);
   const auto eventmanager = std::make_shared<input::eventmanager>(renderer);
   const auto resourcemanager = std::make_shared<framework::resourcemanager>(renderer, audiodevice, engine);
+  const auto postalservice = std::make_shared<framework::postalservice>();
   const auto overlay = std::make_shared<graphics::overlay>(resourcemanager, eventmanager);
   const auto statemanager = std::make_shared<framework::statemanager>();
   const auto objectmanager = std::make_shared<framework::objectmanager>();
@@ -104,6 +106,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->set_scenemanager(scenemanager);
   engine->set_statemanager(statemanager);
   engine->set_particlesystem(particlesystem);
+  engine->set_postalservice(postalservice);
   engine->set_timermanager(timermanager);
   engine->set_window(window);
   engine->set_world(world);
