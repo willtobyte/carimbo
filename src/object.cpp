@@ -95,6 +95,7 @@ void object::update(float delta) noexcept {
   }
 
   if (!animation.bounds) {
+    _aabb = std::nullopt;
     return;
   }
 
