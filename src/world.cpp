@@ -19,10 +19,12 @@ world::world() noexcept {
   _aabbs.reserve(64);
 }
 
-void world::add(uint64_t id, const std::shared_ptr<object>& object) {
+void world::add(const std::shared_ptr<object>& object) {
   if (!object) [[unlikely]] {
     return;
   }
+
+  const auto id = object->id();
 
   _index.insert_or_assign(id, std::weak_ptr<framework::object>(object));
 
@@ -86,8 +88,7 @@ void world::update(float delta) noexcept {
     }
 
 #ifdef DEBUG
-  // TODO
-  // std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
+  std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 #endif
 
     const auto id = it->first;

@@ -4,7 +4,7 @@
 
 namespace framework {
 struct mail final {
-  uint64_t to{0};
+  uint64_t to;
   std::string kind;
   std::string body;
 
@@ -13,9 +13,9 @@ struct mail final {
     std::optional<std::shared_ptr<object>> from,
     const std::string& body
   ) noexcept
-    : to(0), // TODO
-    kind(from && *from ? (*from)->kind() : "unknown"),
-    body(body) {}
+    : to(to->id()),
+      kind(from && *from ? (*from)->kind() : "unknown"),
+      body(body) {}
 };
 
 class postalservice final {

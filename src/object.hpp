@@ -40,8 +40,6 @@ public:
   object() noexcept;
   virtual ~object() noexcept;
 
-  uint64_t id() const noexcept;
-
   std::string kind() const noexcept;
 
   std::string scope() const noexcept;
@@ -101,7 +99,7 @@ public:
 
   memory::kv& kv() noexcept;
 
-  uint64_t id() { return 0; }
+  uint64_t id() const noexcept;
 
 protected:
     void advance(float delta) noexcept;
@@ -130,6 +128,7 @@ private:
   std::optional<geometry::rectangle> _previous_aabb;
   bool _dirty{true};
 
+  uint64_t _id{0};
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;

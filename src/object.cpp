@@ -327,3 +327,7 @@ std::optional<geometry::rectangle> object::aabb() const {
 memory::kv& object::kv() noexcept {
   return _kv;
 }
+
+uint64_t object::id() const noexcept {
+  return _id;
+}

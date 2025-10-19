@@ -48,7 +48,7 @@ class world final {
     world() noexcept;
     ~world() noexcept = default;
 
-    void add(uint64_t id, const std::shared_ptr<object>& object);
+    void add(const std::shared_ptr<object>& object);
     void remove(uint64_t id);
 
     template <class OutIt>
