@@ -79,7 +79,12 @@ void object::update(float delta, uint64_t now) noexcept {
     }
   }
 
-  if (!_needs_aabb || !animation.bounds) [[likely]] {
+  if (!animation.bounds) [[unlikely]] {
+    _aabb = std::nullopt;
+    return;
+  }
+
+  if (!_needs_aabb) [[likely]] {
     return;
   }
 
