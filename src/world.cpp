@@ -115,11 +115,9 @@ void world::update(float delta) noexcept {
     const auto& aabb = ait->second;
 
     const auto aidx = _index.find(id);
-    if (aidx == _index.end()) continue;
+    if (aidx == _index.end()) [[unlikely]] continue;
     auto a = aidx->second.lock();
     if (!a) continue;
-
-    const auto akind = a->kind();
 
     _hits.clear();
     _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
@@ -128,17 +126,15 @@ void world::update(float delta) noexcept {
       const auto other = hit.second;
       if (other == id) continue;
 
-      const auto aid = std::min(id, other);
-      const auto bid = std::max(id, other);
-      if (!_pairs.emplace(aid, bid).second) continue;
+      if (!_pairs.emplace(std::min(id, other), std::max(id, other)).second) continue;
 
       const auto bidx = _index.find(other);
       if (bidx == _index.end()) continue;
       auto b = bidx->second.lock();
       if (!b) continue;
 
-      if (const auto* cb = find_ptr(a->_collisionmapping, b->kind())) (*cb)(a, b);
-      if (const auto* cb = find_ptr(b->_collisionmapping, akind))     (*cb)(b, a);
+      if (const auto* callback = find_ptr(a->_collisionmapping, b->kind())) (*callback)(a, b);
+      if (const auto* callback = find_ptr(b->_collisionmapping, a->kind())) (*callback)(b, a);
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(input::event::type::collision);
