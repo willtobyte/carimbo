@@ -53,100 +53,92 @@ void world::remove(uint64_t id) {
 }
 
 void world::update(float delta) noexcept {
-  _dirties.reserve(_index.size());
-  _hits.reserve(_index.size());
-  _pairs.reserve(_index.size());
   _dirties.clear();
+  _dirties.reserve(_index.size());
+
+  _hits.clear();
+  _hits.reserve(_index.size());
+
   _pairs.clear();
+  _pairs.reserve(_index.size());
 
   for (auto it = _index.begin(); it != _index.end(); ) {
-    auto object = it->second.lock();
-    if (!object) [[unlikely]] {
-      const auto id = it->first;
-      if (const auto it = _aabbs.find(id); it != _aabbs.end()) {
-        _spatial.remove(std::make_pair(it->second, id));
-        _aabbs.erase(it);
-      }
+    const auto id = it->first;
+    std::weak_ptr<object> weak = it->second;
+    auto object = weak.lock();
 
-      it = _index.erase(it);
-      continue;
-    }
+    std::optional<geometry::rectangle> aabb_opt;
+    if (!object) goto remove;
+    if (!object->visible()) goto remove;
 
-    if (!object->visible()) {
-      const auto id = it->first;
-      if (const auto ait = _aabbs.find(id); ait != _aabbs.end()) {
-        _spatial.remove(std::make_pair(ait->second, id));
-        _aabbs.erase(ait);
-      }
-
-      ++it;
-      continue;
-    }
-
-    const auto aabb_opt = object->aabb();
-    if (!aabb_opt.has_value()) {
-      ++it;
-      continue;
-    }
-
-    if (!object->dirty()) [[unlikely]] {
+    aabb_opt = object->aabb();
+    if (!aabb_opt.has_value()) goto remove;
+    if (!object->dirty()) {
       ++it;
       continue;
     }
 
 #ifdef DEBUG
-  std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
+    std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 #endif
 
-    const auto id = it->first;
-    const auto aabb = to_box(*aabb_opt);
-    const auto found = _aabbs.find(id);
-    if (found != _aabbs.end()) {
-      _spatial.remove({found->second, id});
-    }
-
-    _spatial.insert(std::make_pair(aabb, id));
-    _aabbs.insert_or_assign(id, aabb);
-    _dirties.emplace_back(id);
-
-    ++it;
-  }
-
-  for (const auto id : _dirties) {
-    const auto it = _aabbs.find(id);
-    if (it == _aabbs.end()) [[unlikely]] {
+    {
+      const auto aabb = to_box(*aabb_opt);
+      const auto found = _aabbs.find(id);
+      if (found != _aabbs.end()) _spatial.remove({found->second, id});
+      _spatial.insert({aabb, id});
+      _aabbs.insert_or_assign(id, aabb);
+      _dirties.emplace_back(id);
+      ++it;
       continue;
     }
 
-    const auto& aabb = it->second;
+  remove:
+    {
+      const auto ait = _aabbs.find(id);
+      if (ait != _aabbs.end()) {
+        _spatial.remove({ait->second, id});
+        _aabbs.erase(ait);
+      }
+      if (!object) {
+        it = _index.erase(it);
+        continue;
+      }
+      ++it;
+    }
+  }
+
+  for (const auto id : _dirties) {
+    const auto ait = _aabbs.find(id);
+    if (ait == _aabbs.end()) [[unlikely]] continue;
+
+    const auto& aabb = ait->second;
+
+    const auto aidx = _index.find(id);
+    if (aidx == _index.end()) continue;
+    auto a = aidx->second.lock();
+    if (!a) continue;
+
+    const auto akind = a->kind();
 
     _hits.clear();
     _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
 
     for (const auto& hit : _hits) {
       const auto other = hit.second;
-      if (other == id) {
-        continue;
-      }
+      if (other == id) continue;
 
       const auto aid = std::min(id, other);
       const auto bid = std::max(id, other);
-      if (!_pairs.insert({aid, bid}).second) {
-        continue;
-      }
+      if (!_pairs.emplace(aid, bid).second) continue;
 
-      const auto ait = _index.find(id);
-      if (ait == _index.end()) continue;
-      auto a = ait->second.lock();
-      if (!a) continue;
-
-      const auto bit = _index.find(other);
-      if (bit == _index.end()) continue;
-      auto b = bit->second.lock();
+      const auto bidx = _index.find(other);
+      if (bidx == _index.end()) continue;
+      auto b = bidx->second.lock();
       if (!b) continue;
 
-      if (const auto* callback = find_ptr(a->_collisionmapping, b->kind())) (*callback)(a, b);
-      if (const auto* callback = find_ptr(b->_collisionmapping, a->kind())) (*callback)(b, a);
+      if (const auto* cb = find_ptr(a->_collisionmapping, b->kind())) (*cb)(a, b);
+      if (const auto* cb = find_ptr(b->_collisionmapping, akind))     (*cb)(b, a);
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(input::event::type::collision);
