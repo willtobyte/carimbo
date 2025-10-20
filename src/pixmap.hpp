@@ -25,10 +25,6 @@ public:
       double angle = 0.0L,
       uint8_t alpha = 255,
       reflection reflection = reflection::none
-#ifdef DEBUG
-      ,
-      const std::optional<geometry::rectangle>& outline = std::nullopt
-#endif
   ) const noexcept;
 
   void draw(
@@ -37,10 +33,6 @@ public:
       double angle = 0.0L,
       uint8_t alpha = 255,
       reflection reflection = reflection::none
-#ifdef DEBUG
-      ,
-      const std::optional<geometry::rectangle>& outline = std::nullopt
-#endif
   ) const noexcept;
 
   operator SDL_Texture* () const noexcept;

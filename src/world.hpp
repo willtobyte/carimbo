@@ -45,7 +45,7 @@ struct resolve_out_iterator final {
 
 class world final {
   public:
-    world() noexcept;
+    world(std::shared_ptr<graphics::renderer> renderer) noexcept;
     ~world() noexcept = default;
 
     void add(const std::shared_ptr<object>& object);
@@ -74,6 +74,8 @@ class world final {
     void draw() const noexcept;
 
   private:
+    std::shared_ptr<graphics::renderer> _renderer;
+
     std::vector<uint64_t> _dirties;
 
     std::unordered_map<uint64_t, std::weak_ptr<object>> _index;

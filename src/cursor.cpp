@@ -94,10 +94,6 @@ void cursor::draw() const noexcept {
       0,
       255,
       reflection::none
-#ifdef DEBUG
-      ,
-      std::nullopt
-#endif
   );
 }
 

@@ -14,7 +14,8 @@ static inline const typename Map::mapped_type* find_ptr(
   return std::addressof(it->second);
 }
 
-world::world() noexcept {
+world::world(std::shared_ptr<graphics::renderer> renderer) noexcept
+    : _renderer(std::move(renderer)) {
   _index.reserve(64);
   _aabbs.reserve(64);
 }
@@ -53,9 +54,9 @@ void world::remove(uint64_t id) {
 
 void world::update(float delta) noexcept {
   _dirties.reserve(_index.size());
-  _dirties.clear();
   _hits.reserve(_index.size());
   _pairs.reserve(_index.size());
+  _dirties.clear();
   _pairs.clear();
 
   for (auto it = _index.begin(); it != _index.end(); ) {
@@ -71,12 +72,13 @@ void world::update(float delta) noexcept {
       continue;
     }
 
-    if (!object->visible()) [[unlikely]] {
-        ++it;
-        continue;
-    }
+    if (!object->visible()) {
+      const auto id = it->first;
+      if (const auto ait = _aabbs.find(id); ait != _aabbs.end()) {
+        _spatial.remove(std::make_pair(ait->second, id));
+        _aabbs.erase(ait);
+      }
 
-    if (!object->dirty()) [[unlikely]] {
       ++it;
       continue;
     }
@@ -87,13 +89,17 @@ void world::update(float delta) noexcept {
       continue;
     }
 
+    if (!object->dirty()) [[unlikely]] {
+      ++it;
+      continue;
+    }
+
 #ifdef DEBUG
   std::println("[world] object {} with id {} is dirty", object->kind(), object->id());
 #endif
 
     const auto id = it->first;
     const auto aabb = to_box(*aabb_opt);
-
     const auto found = _aabbs.find(id);
     if (found != _aabbs.end()) {
       _spatial.remove({found->second, id});
@@ -152,5 +158,16 @@ void world::update(float delta) noexcept {
 
 void world::draw() const noexcept {
 #ifdef DEBUG
+  SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
+  for (const auto& kv : _aabbs) {
+    const auto& aabb = kv.second;
+
+    SDL_FRect rect;
+    rect.x = aabb.min_corner().x();
+    rect.y = aabb.min_corner().y();
+    rect.w = aabb.max_corner().x() - rect.x;
+    rect.h = aabb.max_corner().y() - rect.y;
+    SDL_RenderRect(*_renderer, &rect);
+  }
 #endif
 }

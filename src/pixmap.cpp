@@ -75,10 +75,6 @@ void pixmap::draw(
     const double angle,
     const uint8_t alpha,
     reflection reflection
-#ifdef DEBUG
-    ,
-    const std::optional<geometry::rectangle>& outline
-#endif
 ) const noexcept {
   const geometry::rectangle _source{
     source.x(),
@@ -93,9 +89,6 @@ void pixmap::draw(
     angle,
     alpha,
     reflection
-#ifdef DEBUG
-    , outline
-#endif
   );
 }
 
@@ -105,25 +98,12 @@ void pixmap::draw(
     const double angle,
     const uint8_t alpha,
     reflection reflection
-#ifdef DEBUG
-    ,
-    const std::optional<geometry::rectangle>& outline
-#endif
 ) const noexcept {
   const SDL_FRect& _source = source;
   const SDL_FRect& _destination = destination;
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &_source, &_destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
-
-#ifdef DEBUG
-  if (outline) {
-    const SDL_FRect& debug = *outline;
-
-    SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
-    SDL_RenderRect(*_renderer, &debug);
-  }
-#endif
 }
 
 pixmap::operator SDL_Texture* () const noexcept {

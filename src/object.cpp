@@ -147,19 +147,12 @@ void object::draw() const noexcept {
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
-  #ifdef DEBUG
-  std::optional<geometry::rectangle> debug = aabb();
-  #endif
-
   _spritesheet->draw(
     source,
     destination,
     _angle,
     _alpha,
     _reflection
-    #ifdef DEBUG
-      , debug
-    #endif
   );
 }
 
@@ -214,7 +207,7 @@ graphics::reflection object::reflection() const noexcept {
 }
 
 bool object::visible() const noexcept {
-  return !_action.empty();
+  return !_action.empty() || _alpha != 0;
 }
 
 void object::set_visible(bool value) noexcept {

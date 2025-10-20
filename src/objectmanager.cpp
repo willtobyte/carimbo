@@ -187,7 +187,6 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   std::vector<uint64_t> hits;
   hits.reserve(16);
   _world->query(x, y, std::back_inserter(hits));
-
   if (hits.empty()) [[likely]] {
     _scenemanager->on_touch(x, y);
     return;
