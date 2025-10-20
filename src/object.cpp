@@ -287,7 +287,7 @@ void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) no
 }
 
 void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) noexcept {
-  _collisionmapping.emplace(kind, std::move(fn));
+  _collision_mapping.emplace(kind, std::move(fn));
 }
 
 void object::on_email(const std::string& message) noexcept {

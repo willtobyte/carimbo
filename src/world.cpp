@@ -133,8 +133,8 @@ void world::update(float delta) noexcept {
       auto b = bi->second.lock();
       if (!b) continue;
 
-      if (const auto* callback = find_ptr(a->_collisionmapping, b->kind())) (*callback)(a, b);
-      if (const auto* callback = find_ptr(b->_collisionmapping, a->kind())) (*callback)(b, a);
+      if (const auto* callback = find_ptr(a->_collision_mapping, b->kind())) (*callback)(a, b);
+      if (const auto* callback = find_ptr(b->_collision_mapping, a->kind())) (*callback)(b, a);
 
       SDL_Event event{};
       event.type = static_cast<uint32_t>(input::event::type::collision);

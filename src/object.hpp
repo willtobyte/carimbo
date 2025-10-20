@@ -135,6 +135,6 @@ private:
   std::function<void(std::shared_ptr<object>, const std::string& )> _onbegin;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onend;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onmail;
-  std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>> _collisionmapping;
+  std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>> _collision_mapping;
 };
 }
