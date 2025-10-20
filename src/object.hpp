@@ -122,6 +122,7 @@ private:
   std::string _scope;
   std::string _action;
   std::string _previous_action;
+  std::optional<int> _previous_alpha;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
   std::optional<geometry::rectangle> _aabb;

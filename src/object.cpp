@@ -92,7 +92,7 @@ void object::update(float delta) noexcept {
     );
   }
 
-  if (!animation.bounds) {
+  if (!animation.bounds || _alpha == 0) {
     _aabb = std::nullopt;
     return;
   }
@@ -225,11 +225,20 @@ bool object::visible() const noexcept {
 void object::set_visible(bool value) noexcept {
   auto& source = value ? _previous_action : _action;
   auto& destination = value ? _action : _previous_action;
-  destination = std::exchange(source, "");
+  destination = std::exchange(source, std::string{});
 
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _aabb = std::nullopt;
+
+  if (!value) [[unlikely]] {
+    _previous_alpha = _alpha;
+    _alpha = 0;
+    return;
+  }
+
+  if (_previous_alpha.has_value()) [[likely]] {
+    _alpha = *_previous_alpha;
+  }
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
