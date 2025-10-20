@@ -125,9 +125,7 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
     return;
   }
 
-  const uint64_t id = _counter++;
-  object->_id = id;
-  _objects.get<by_seq>().push_back(node{id, object});
+  _objects.get<by_seq>().push_back(node{object->id(), object});
   _world->add(object);
 }
 
