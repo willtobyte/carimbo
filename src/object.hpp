@@ -105,6 +105,8 @@ private:
   friend class tilemap;
   friend class world;
 
+  uint64_t _id{0};
+
   std::size_t _frame;
   uint64_t _last_frame;
   double _angle;
@@ -125,9 +127,6 @@ private:
   bool _dirty{true};
   bool _needs_recalc{true};
 
-  keyframe _keyframe;
-
-  uint64_t _id{0};
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;

@@ -235,7 +235,6 @@ void object::set_visible(bool value) noexcept {
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
   if (!action) {
-    //set_visible(false);
     return;
   }
 
