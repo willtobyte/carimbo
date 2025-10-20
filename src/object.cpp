@@ -64,10 +64,9 @@ void object::update(float delta, uint64_t now) noexcept {
   if (expired) {
     ++_frame;
 
-    const auto end = _frame >= keyframes.size();
     auto proceed = true;
-
-    if (end && animation.oneshot) {
+    const auto done = _frame >= keyframes.size();
+    if (done && animation.oneshot) {
       const auto ended = std::exchange(_action, std::string{});
       if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
       if (!animation.next) proceed = false;
@@ -75,7 +74,7 @@ void object::update(float delta, uint64_t now) noexcept {
     }
 
     if (proceed) {
-      if (end) _frame = 0;
+      if (done) _frame = 0;
       _last_frame = now;
     }
   }
