@@ -123,7 +123,7 @@ private:
   std::optional<geometry::rectangle> _aabb;
   std::optional<geometry::rectangle> _previous_aabb;
   bool _dirty{true};
-  bool _needs_aabb{true};
+  bool _needs_recalc{true};
 
   keyframe _keyframe;
 

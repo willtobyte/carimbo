@@ -34,7 +34,7 @@ float object::x() const noexcept {
 void object::set_x(float x) noexcept {
   if (_position.x() == x) return;
   _position.set_x(x);
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 float object::y() const noexcept {
@@ -44,7 +44,7 @@ float object::y() const noexcept {
 void object::set_y(float y) noexcept {
   if (_position.y() == y) return;
   _position.set_y(y);
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 void object::update(float delta, uint64_t now) noexcept {
@@ -84,7 +84,7 @@ void object::update(float delta, uint64_t now) noexcept {
     return;
   }
 
-  if (!_needs_aabb) [[likely]] {
+  if (!_needs_recalc) [[likely]] {
     return;
   }
 
@@ -122,7 +122,7 @@ void object::update(float delta, uint64_t now) noexcept {
   _aabb = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
   _dirty = _aabb != _previous_aabb;
   _previous_aabb = _aabb;
-  _needs_aabb = false;
+  _needs_recalc = false;
 }
 
 void object::draw() const noexcept {
@@ -164,7 +164,7 @@ void object::draw() const noexcept {
 void object::set_placement(float x, float y) noexcept {
   if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -174,7 +174,7 @@ geometry::point object::placement() const noexcept {
 void object::set_alpha(uint8_t alpha) noexcept {
   if (_alpha == alpha) return;
   _alpha = alpha;
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 uint8_t object::alpha() const noexcept {
@@ -184,7 +184,7 @@ uint8_t object::alpha() const noexcept {
 void object::set_scale(float scale) noexcept {
   if (_scale == scale) return;
   _scale = scale;
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 float object::scale() const noexcept {
@@ -194,7 +194,7 @@ float object::scale() const noexcept {
 void object::set_angle(double angle) noexcept {
   if (_angle == angle) return;
   _angle = angle;
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 double object::angle() const noexcept {
@@ -204,7 +204,7 @@ double object::angle() const noexcept {
 void object::set_reflection(graphics::reflection reflection) noexcept {
   if (_reflection == reflection) return;
   _reflection = reflection;
-  _needs_aabb = true;
+  _needs_recalc = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -222,7 +222,7 @@ void object::set_visible(bool value) noexcept {
 
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _needs_aabb = value;
+  _needs_recalc = value;
 
   if (!value) [[unlikely]] {
     _previous_alpha = std::exchange(_alpha, 0);
@@ -246,7 +246,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _action = *action;
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _needs_aabb = true;
+  _needs_recalc = true;
 
   const auto& animation = _animations.find(_action)->second;
   if (const auto& e = animation.effect; e) {
