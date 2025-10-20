@@ -98,8 +98,11 @@ void object::update(float delta) noexcept {
     _needs_aabb = true;
   }
 
-  if (!_needs_aabb || !animation.bounds) [[likely]] {
-    _aabb = std::nullopt;
+  if (!_needs_aabb) [[likely]] {
+    if (!animation.bounds) {
+      _aabb = std::nullopt;
+    }
+
     _dirty = true;
     return;
   }
