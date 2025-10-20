@@ -61,7 +61,6 @@ void object::update(float delta, uint64_t now) noexcept {
 
   const auto& keyframe = keyframes[_frame];
   const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
-
   if (expired) {
     ++_frame;
 
