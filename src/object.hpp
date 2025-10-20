@@ -54,9 +54,6 @@ public:
   float y() const noexcept;
   void set_y(float y) noexcept;
 
-  void set_velocity(const algebra::vector2d& velocity) noexcept;
-  algebra::vector2d velocity() noexcept;
-
   void set_placement(float x, float y) noexcept;
   geometry::point placement() const noexcept;
 
@@ -116,7 +113,6 @@ private:
   graphics::reflection _reflection;
 
   geometry::point _position;
-  algebra::vector2d _velocity;
   std::string _kind;
   std::string _scope;
   std::string _action;

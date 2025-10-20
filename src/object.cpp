@@ -47,14 +47,6 @@ void object::set_y(float y) noexcept {
   _needs_aabb = true;
 }
 
-void object::set_velocity(const algebra::vector2d& velocity) noexcept {
-  _velocity = velocity;
-}
-
-algebra::vector2d object::velocity() noexcept {
-  return _velocity;
-}
-
 void object::update(float delta, uint64_t now) noexcept {
   if (_action.empty()) [[unlikely]] {
     return;

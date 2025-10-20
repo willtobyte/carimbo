@@ -354,7 +354,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::object>(
     "Object",
     sol::no_constructor,
-    //"id", sol::property(&framework::object::id),
+    "id", sol::property(&framework::object::id),
     "kind", sol::property(&framework::object::kind),
     "x", sol::property(&framework::object::x, &framework::object::set_x),
     "y", sol::property(&framework::object::y, &framework::object::set_y),
@@ -380,15 +380,6 @@ void framework::scriptengine::run() {
         const auto y = table.get_or("y", table.get_or(2, .0f));
 
         self.set_placement(x, y);
-      }
-    ),
-    "velocity", sol::property(
-      &framework::object::velocity,
-      [](framework::object& self, sol::table table) {
-        const auto x = table.get_or<float>("x", table.get_or(1, 0));
-        const auto y = table.get_or<float>("y", table.get_or(2, 0));
-
-        self.set_velocity(algebra::vector2d{x, y});
       }
     ),
     sol::meta_function::index, metaobject::index,
