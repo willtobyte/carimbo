@@ -138,6 +138,9 @@ void object::update(float delta) noexcept {
   _aabb = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
   _dirty = _aabb != _previous_aabb;
   _previous_aabb = _aabb;
+#ifndef DEBUG
+  _needs_aabb = false;
+#endif
 }
 
 void object::draw() const noexcept {
