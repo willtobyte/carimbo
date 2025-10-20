@@ -237,14 +237,12 @@ void object::set_visible(bool value) noexcept {
   _needs_aabb = value;
 
   if (!value) [[unlikely]] {
-    _previous_alpha = _alpha;
-    _alpha = 0;
+    _previous_alpha = std::exchange(_alpha, 0);
     return;
   }
 
-  if (_previous_alpha.has_value()) [[likely]] {
+  if (_previous_alpha.has_value()) [[likely]]
     _alpha = *_previous_alpha;
-  }
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {

@@ -121,13 +121,15 @@ private:
   std::string _scope;
   std::string _action;
   std::string _previous_action;
-  std::optional<int> _previous_alpha;
+  std::optional<uint8_t> _previous_alpha;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
   std::optional<geometry::rectangle> _aabb;
   std::optional<geometry::rectangle> _previous_aabb;
   bool _dirty{true};
   bool _needs_aabb{true};
+
+  keyframe _keyframe;
 
   uint64_t _id{0};
   memory::kv _kv;
