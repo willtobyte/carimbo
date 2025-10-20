@@ -128,6 +128,7 @@ private:
   std::optional<geometry::rectangle> _aabb;
   std::optional<geometry::rectangle> _previous_aabb;
   bool _dirty{true};
+  bool _needs_aabb{true};
 
   uint64_t _id{0};
   memory::kv _kv;

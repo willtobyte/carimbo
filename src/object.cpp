@@ -32,7 +32,9 @@ float object::x() const noexcept {
 }
 
 void object::set_x(float x) noexcept {
+  if (_position.x() == x) return;
   _position.set_x(x);
+  _needs_aabb = true;
 }
 
 float object::y() const noexcept {
@@ -40,7 +42,9 @@ float object::y() const noexcept {
 }
 
 void object::set_y(float y) noexcept {
+  if (_position.y() == y) return;
   _position.set_y(y);
+  _needs_aabb = true;
 }
 
 void object::set_velocity(const algebra::vector2d& velocity) noexcept {
@@ -90,10 +94,13 @@ void object::update(float delta) noexcept {
       _position.x() + _velocity.x() * delta,
       _position.y() + _velocity.y() * delta
     );
+
+    _needs_aabb = true;
   }
 
-  if (!animation.bounds || _alpha == 0) {
+  if (!_needs_aabb || !animation.bounds) [[likely]] {
     _aabb = std::nullopt;
+    _dirty = true;
     return;
   }
 
@@ -116,14 +123,12 @@ void object::update(float delta) noexcept {
   const auto hx = sw * .5f;
   const auto hy = sh * .5f;
 
-  const auto rad = _angle * (std::numbers::pi_v<double> / 180.0);
-  const auto c = static_cast<float>(std::cos(rad));
-  const auto s = static_cast<float>(std::sin(rad));
-  const auto ac = std::fabs(c);
-  const auto as = std::fabs(s);
+  const float r = _angle * (std::numbers::pi_v<float> / 180.0f);
+  const float c = std::cos(r);
+  const float s = std::sin(r);
 
-  const auto ex = ac * hx + as * hy;
-  const auto ey = as * hx + ac * hy;
+  const auto ex = std::fma(std::abs(c), hx, std::abs(s) * hy);
+  const auto ey = std::fma(std::abs(s), hx, std::abs(c) * hy);
 
   const auto minx = cx - ex;
   const auto maxx = cx + ex;
@@ -179,7 +184,9 @@ void object::draw() const noexcept {
 }
 
 void object::set_placement(float x, float y) noexcept {
+  if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
+  _needs_aabb = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -187,7 +194,9 @@ geometry::point object::placement() const noexcept {
 }
 
 void object::set_alpha(uint8_t alpha) noexcept {
+  if (_alpha == alpha) return;
   _alpha = alpha;
+  _needs_aabb = true;
 }
 
 uint8_t object::alpha() const noexcept {
@@ -195,7 +204,9 @@ uint8_t object::alpha() const noexcept {
 }
 
 void object::set_scale(float scale) noexcept {
+  if (_scale == scale) return;
   _scale = scale;
+  _needs_aabb = true;
 }
 
 float object::scale() const noexcept {
@@ -203,7 +214,9 @@ float object::scale() const noexcept {
 }
 
 void object::set_angle(double angle) noexcept {
+  if (_angle == angle) return;
   _angle = angle;
+  _needs_aabb = true;
 }
 
 double object::angle() const noexcept {
@@ -211,7 +224,9 @@ double object::angle() const noexcept {
 }
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
+  if (_reflection == reflection) return;
   _reflection = reflection;
+  _needs_aabb = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -229,6 +244,7 @@ void object::set_visible(bool value) noexcept {
 
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _needs_aabb = value;
 
   if (!value) [[unlikely]] {
     _previous_alpha = _alpha;
@@ -242,8 +258,8 @@ void object::set_visible(bool value) noexcept {
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
-  if (!action.has_value()) {
-    set_visible(false);
+  if (!action) {
+    //set_visible(false);
     return;
   }
 
@@ -254,6 +270,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _action = *action;
   _frame = 0;
   _last_frame = SDL_GetTicks();
+  _needs_aabb = true;
 
   const auto& animation = _animations.find(_action)->second;
   if (const auto& e = animation.effect; e) {
