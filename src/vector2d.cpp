@@ -114,9 +114,9 @@ bool vector2d::zero() const noexcept {
 }
 
 vector2d vector2d::rotated(float angle) const noexcept {
-  const auto cos_a = std::cos(angle);
-  const auto sin_a = std::sin(angle);
-  return vector2d(_x * cos_a - _y * sin_a, _x * sin_a + _y * cos_a);
+  const auto c = std::cos(angle);
+  const auto s = std::sin(angle);
+  return vector2d(_x * c - _y * s, _x * s + _y * c);
 }
 
 float vector2d::cross(const vector2d& other) const noexcept {
