@@ -114,9 +114,9 @@ void world::update(float delta) noexcept {
 
     const auto& aabb = ait->second;
 
-    const auto aidx = _index.find(id);
-    if (aidx == _index.end()) [[unlikely]] continue;
-    auto a = aidx->second.lock();
+    const auto ai = _index.find(id);
+    if (ai == _index.end()) [[unlikely]] continue;
+    auto a = ai->second.lock();
     if (!a) continue;
 
     _hits.clear();
@@ -128,9 +128,9 @@ void world::update(float delta) noexcept {
 
       if (!_pairs.emplace(std::min(id, other), std::max(id, other)).second) continue;
 
-      const auto bidx = _index.find(other);
-      if (bidx == _index.end()) continue;
-      auto b = bidx->second.lock();
+      const auto bi = _index.find(other);
+      if (bi == _index.end()) continue;
+      auto b = bi->second.lock();
       if (!b) continue;
 
       if (const auto* callback = find_ptr(a->_collisionmapping, b->kind())) (*callback)(a, b);
