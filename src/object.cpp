@@ -55,12 +55,10 @@ algebra::vector2d object::velocity() noexcept {
   return _velocity;
 }
 
-void object::update(float delta) noexcept {
+void object::update(float delta, uint64_t now) noexcept {
   if (_action.empty()) [[unlikely]] {
     return;
   }
-
-  if (_onupdate) _onupdate(shared_from_this());
 
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] return;
@@ -69,41 +67,29 @@ void object::update(float delta) noexcept {
   const auto& keyframes = animation.keyframes;
   if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
-  const auto now = SDL_GetTicks();
   const auto& keyframe = keyframes[_frame];
-  const bool expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
+  const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
 
   if (expired) {
     ++_frame;
 
-    if (_frame >= keyframes.size()) {
-      if (animation.oneshot) {
-        const auto ended = std::exchange(_action, "");
-        if (_onend) _onend(shared_from_this(), ended);
-        if (!animation.next) return;
-        _action = *animation.next;
-      }
-      _frame = 0;
+    const auto end = _frame >= keyframes.size();
+    auto proceed = true;
+
+    if (end && animation.oneshot) {
+      const auto ended = std::exchange(_action, std::string{});
+      if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
+      if (!animation.next) proceed = false;
+      else _action = *animation.next;
     }
 
-    _last_frame = now;
-  }
-
-  if (!_velocity.zero()) {
-    _position.set(
-      _position.x() + _velocity.x() * delta,
-      _position.y() + _velocity.y() * delta
-    );
-
-    _needs_aabb = true;
-  }
-
-  if (!_needs_aabb) [[likely]] {
-    if (!animation.bounds) {
-      _aabb = std::nullopt;
+    if (proceed) {
+      if (end) _frame = 0;
+      _last_frame = now;
     }
+  }
 
-    _dirty = true;
+  if (!_needs_aabb || !animation.bounds) [[likely]] {
     return;
   }
 
@@ -141,9 +127,7 @@ void object::update(float delta) noexcept {
   _aabb = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
   _dirty = _aabb != _previous_aabb;
   _previous_aabb = _aabb;
-#ifndef DEBUG
   _needs_aabb = false;
-#endif
 }
 
 void object::draw() const noexcept {
@@ -290,10 +274,6 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
 
 std::string object::action() const noexcept {
   return _action;
-}
-
-void object::set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
-  _onupdate = std::move(fn);
 }
 
 void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {

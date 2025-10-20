@@ -154,9 +154,10 @@ std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
 }
 
 void objectmanager::update(float delta) noexcept {
+  const auto now = SDL_GetTicks();
   const auto& byseq = _objects.get<by_seq>();
   for (const auto& e : byseq) {
-    e.value->update(delta);
+    e.value->update(delta, now);
   }
 }
 

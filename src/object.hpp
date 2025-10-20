@@ -44,7 +44,7 @@ public:
 
   std::string scope() const noexcept;
 
-  void update(float delta) noexcept;
+  void update(float delta, uint64_t now) noexcept;
 
   void draw() const noexcept;
 
@@ -78,7 +78,6 @@ public:
   void set_action(const std::optional<std::string>& action) noexcept;
   std::string action() const noexcept;
 
-  void set_onupdate(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
   void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
   void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
@@ -135,7 +134,6 @@ private:
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
-  std::function<void(std::shared_ptr<object>)> _onupdate;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onbegin;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onend;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onmail;

@@ -363,7 +363,6 @@ void framework::scriptengine::run() {
     "angle", sol::property(&framework::object::angle, &framework::object::set_angle),
     "reflection", sol::property(&framework::object::reflection, &framework::object::set_reflection),
     "visible", sol::property(&framework::object::visible, &framework::object::set_visible),
-    "on_update", &framework::object::set_onupdate,
     "on_begin", &framework::object::set_onbegin,
     "on_end", &framework::object::set_onend,
     "on_mail", &framework::object::set_onmail,
