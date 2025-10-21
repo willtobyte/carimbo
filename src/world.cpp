@@ -113,12 +113,12 @@ void world::update(float delta) noexcept {
     const auto ait = _aabbs.find(id);
     if (ait == _aabbs.end()) [[unlikely]] continue;
 
-    const auto& aabb = ait->second;
-
     const auto ai = _index.find(id);
     if (ai == _index.end()) [[unlikely]] continue;
     auto a = ai->second.lock();
     if (!a) continue;
+
+    const auto& aabb = ait->second;
 
     _hits.clear();
     _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
