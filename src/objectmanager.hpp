@@ -36,9 +36,7 @@ public:
   void draw() const noexcept;
 
   void set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
-
   void set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept;
-
   void set_world(std::shared_ptr<world> world) noexcept;
 
 protected:
@@ -49,7 +47,7 @@ protected:
 private:
   struct node {
     std::shared_ptr<framework::object> object;
-    explicit node(std::shared_ptr<framework::object> obj) : object(std::move(obj)) {}
+    explicit node(std::shared_ptr<framework::object> o) : object(std::move(o)) {}
   };
 
   struct by_id;
