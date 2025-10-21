@@ -19,14 +19,14 @@ objectmanager::objectmanager() {
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
   static const std::string empty;
   const auto& n = scope.value_or(std::cref(empty)).get();
-  const auto& fulln = n.empty() ? kind : std::format("{}/{}", n, kind);
+  const auto& qualifier = n.empty() ? kind : std::format("{}/{}", n, kind);
 
-  const auto& filename = std::format("objects/{}.json", fulln);
+  const auto& filename = std::format("objects/{}.json", qualifier);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float{1.f});
-  const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", fulln));
+  const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
   std::unordered_map<std::string, animation> animations;
   animations.reserve(j["animations"].size());
   for (auto&& item : j["animations"].items()) {
@@ -78,7 +78,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   const uint64_t id = _counter++;
   o->_id = id;
-  std::println("[objectmanager] created {} {}", fulln, id);
+  std::println("[objectmanager] created {} {}", kind, id);
   if (manage) {
     _world->add(o);
     _objects.emplace(o);

@@ -12,7 +12,7 @@ object::object() noexcept
 }
 
 object::~object() noexcept {
-  std::println("[object] destroyed (kind={}, id={})", kind(), id());
+  std::println("[object] destroyed {} {}", kind(), id());
 }
 
 std::string object::kind() const noexcept {
