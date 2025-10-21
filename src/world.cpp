@@ -116,8 +116,8 @@ void world::update(float delta) noexcept {
   }
 
   for (const auto& pair : _pairs) {
-    auto a = _index.at(pair.first).lock();
-    auto b = _index.at(pair.second).lock();
+    auto a = _index.find(pair.first)->second.lock();
+    auto b = _index.find(pair.second)->second.lock();
     if (!a || !b) [[unlikely]] continue;
 
     if (const auto* cb = find_ptr(a->_collision_mapping, b->kind())) (*cb)(a, b);

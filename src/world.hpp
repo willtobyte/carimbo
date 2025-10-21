@@ -65,11 +65,7 @@ struct collide_set_out_iterator final {
     if (it == index->end()) return *this;
     if (it->second.expired()) return *this;
 
-    auto a = source;
-    auto b = p.second;
-    if (a > b) std::swap(a, b);
-    pairs->emplace_back(a, b);
-
+    pairs->emplace_back(std::min(source, p.second), std::max(source, p.second));
     return *this;
   }
 };
