@@ -54,13 +54,14 @@ void world::remove(uint64_t id) {
 }
 
 void world::update(float delta) noexcept {
+  // _candidates.clear();
+  // _candidates.reserve(_index.size() * 4);
+
+  _dirties.clear();
   _dirties.reserve(_index.size());
 
-  _hits.clear();
-  _hits.reserve(_index.size() * 4);
-
   _pairs.clear();
-  _pairs.reserve(_index.size());
+  _pairs.reserve(_index.size() * 2);
 
   for (auto it = _index.begin(); it != _index.end(); ) {
     const auto id = it->first;
@@ -88,7 +89,7 @@ void world::update(float delta) noexcept {
       if (found != _aabbs.end()) _spatial.remove({found->second, id});
       _spatial.insert({aabb, id});
       _aabbs.insert_or_assign(id, aabb);
-      _dirties.emplace_back(id, object);
+      _dirties.emplace_back(id);
       ++it;
       continue;
     }
@@ -108,37 +109,37 @@ void world::update(float delta) noexcept {
     }
   }
 
-  for (const auto [id, a] : _dirties) {
-    const auto aabbit = _aabbs.find(id);
-    if (aabbit == _aabbs.end()) [[unlikely]] continue;
+  for (const auto id : _dirties) {
+    const auto it = _aabbs.find(id);
+    if (it == _aabbs.end()) [[unlikely]] continue;
+    const auto& aabb = it->second;
 
-    const auto& aabb = aabbit->second;
-
-    _hits.clear();
-    _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
-
-    for (const auto& hit : _hits) {
-      const auto other = hit.second;
-      if (other == id) [[likely]] continue;
-
-      if (!_pairs.emplace(std::min(id, other), std::max(id, other)).second) continue;
-
-      const auto bit = _index.find(other);
-      if (bit == _index.end()) continue;
-      auto b = bit->second.lock();
-      if (!b) continue;
-
-      if (const auto* callback = find_ptr(a->_collision_mapping, b->kind())) (*callback)(a, b);
-      if (const auto* callback = find_ptr(b->_collision_mapping, a->kind())) (*callback)(b, a);
-
-      SDL_Event event{};
-      event.type = static_cast<uint32_t>(input::event::type::collision);
-      event.user.data1 = _envelopepool->acquire(collisionenvelope(id, other)).release();
-      SDL_PushEvent(&event);
-    }
+    auto sink = collide_set_out_iterator<decltype(_pairs)>{id, &_pairs, &_index};
+    _spatial.query(bgi::intersects(aabb), sink);
   }
 
-  _dirties.clear();
+  for (const auto& pair : _pairs) {
+    const auto aid = pair.first;
+    const auto bid = pair.second;
+
+    const auto ait = _index.find(aid);
+    if (ait == _index.end()) continue;
+    const auto bit = _index.find(bid);
+    if (bit == _index.end()) continue;
+
+    auto a = ait->second.lock();
+    if (!a) continue;
+    auto b = bit->second.lock();
+    if (!b) continue;
+
+    if (const auto* cb = find_ptr(a->_collision_mapping, b->kind())) (*cb)(a, b);
+    if (const auto* cb = find_ptr(b->_collision_mapping, a->kind())) (*cb)(b, a);
+
+    SDL_Event event{};
+    event.type = static_cast<uint32_t>(input::event::type::collision);
+    event.user.data1 = _envelopepool->acquire(collisionenvelope(aid, bid)).release();
+    SDL_PushEvent(&event);
+  }
 }
 
 void world::draw() const noexcept {

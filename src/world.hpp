@@ -43,6 +43,36 @@ struct resolve_out_iterator final {
   }
 };
 
+template <class Set>
+struct collide_set_out_iterator final {
+  uint64_t source;
+  Set* pairs;
+  const std::unordered_map<uint64_t, std::weak_ptr<object>>* index;
+
+  using iterator_category = std::output_iterator_tag;
+  using difference_type = void;
+  using value_type = void;
+  using pointer = void;
+  using reference = void;
+
+  collide_set_out_iterator& operator*() noexcept { return *this; }
+  collide_set_out_iterator& operator++() noexcept { return *this; }
+  collide_set_out_iterator operator++(int) noexcept { return *this; }
+
+  collide_set_out_iterator& operator=(const std::pair<box_t, uint64_t>& p) {
+    if (p.second == source) return *this;
+
+    const auto it = index->find(p.second);
+    if (it == index->end()) return *this;
+    if (it->second.expired()) return *this;
+
+    const auto a = std::min(source, p.second);
+    const auto b = std::max(source, p.second);
+    pairs->emplace(a, b);
+    return *this;
+  }
+};
+
 class world final {
   public:
     world(std::shared_ptr<graphics::renderer> renderer) noexcept;
@@ -76,7 +106,7 @@ class world final {
   private:
     std::shared_ptr<graphics::renderer> _renderer;
 
-    std::vector<std::pair<uint64_t, std::shared_ptr<object>>> _dirties;
+    std::vector<uint64_t> _dirties;
 
     std::unordered_map<uint64_t, std::weak_ptr<object>> _index;
 
@@ -84,7 +114,7 @@ class world final {
 
     bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>> _spatial;
 
-    std::vector<std::pair<box_t, uint64_t>> _hits;
+    // std::vector<std::pair<uint64_t, uint64_t>> _candidates;
 
     boost::unordered_set<std::pair<uint64_t,uint64_t>, boost::hash<std::pair<uint64_t,uint64_t>>> _pairs;
 
