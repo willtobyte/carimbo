@@ -12,7 +12,7 @@ object::object() noexcept
 }
 
 object::~object() noexcept {
-  std::println("[object] gone {} {}", kind(), id());
+  std::println("[object] destroyed (kind={}, id={})", kind(), id());
 }
 
 std::string object::kind() const noexcept {
@@ -229,8 +229,9 @@ void object::set_visible(bool value) noexcept {
     return;
   }
 
-  if (_previous_alpha.has_value()) [[likely]]
+  if (_previous_alpha.has_value()) [[likely]] {
     _alpha = *_previous_alpha;
+  }
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
