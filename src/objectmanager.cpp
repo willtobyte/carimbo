@@ -184,8 +184,9 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   const auto x = event.x;
   const auto y = event.y;
 
-  std::vector<uint64_t> hits;
-  hits.reserve(16);
+  static std::unordered_set<uint64_t> hits;
+  hits.clear();
+  hits.reserve(64);
   _world->query(x, y, std::back_inserter(hits));
   if (hits.empty()) [[likely]] {
     _scenemanager->on_touch(x, y);
@@ -199,12 +200,14 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 }
 
+
 void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   const auto x = event.x;
   const auto y = event.y;
 
-  std::unordered_set<uint64_t> hits;
-  hits.reserve(16);
+  static std::unordered_set<uint64_t> hits;
+  hits.clear();
+  hits.reserve(64);
   _world->query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
