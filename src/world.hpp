@@ -65,9 +65,11 @@ struct collide_set_out_iterator final {
     if (it == index->end()) return *this;
     if (it->second.expired()) return *this;
 
-    const auto a = std::min(source, p.second);
-    const auto b = std::max(source, p.second);
-    pairs->emplace(a, b);
+    auto a = source;
+    auto b = p.second;
+    if (a > b) std::swap(a, b);
+    pairs->emplace_back(a, b);
+
     return *this;
   }
 };
@@ -113,7 +115,7 @@ class world final {
 
     bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>> _spatial;
 
-    boost::unordered_set<std::pair<uint64_t,uint64_t>, boost::hash<std::pair<uint64_t,uint64_t>>> _pairs;
+    std::vector<std::pair<uint64_t,uint64_t>> _pairs;
 
     std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };

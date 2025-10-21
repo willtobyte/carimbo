@@ -54,9 +54,6 @@ void world::remove(uint64_t id) {
 }
 
 void world::update(float delta) noexcept {
-  // _candidates.clear();
-  // _candidates.reserve(_index.size() * 4);
-
   _dirties.clear();
   _dirties.reserve(_index.size());
 
@@ -119,9 +116,9 @@ void world::update(float delta) noexcept {
   }
 
   for (const auto& pair : _pairs) {
-    auto a = _index[pair.first].lock();
-    auto b = _index[pair.second].lock();
-    if (!a || !b) continue;
+    auto a = _index.at(pair.first).lock();
+    auto b = _index.at(pair.second).lock();
+    if (!a || !b) [[unlikely]] continue;
 
     if (const auto* cb = find_ptr(a->_collision_mapping, b->kind())) (*cb)(a, b);
     if (const auto* cb = find_ptr(b->_collision_mapping, a->kind())) (*cb)(b, a);
