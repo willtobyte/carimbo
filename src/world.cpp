@@ -110,15 +110,15 @@ void world::update(float delta) noexcept {
   }
 
   for (const auto id : _dirties) {
-    const auto ait = _aabbs.find(id);
-    if (ait == _aabbs.end()) [[unlikely]] continue;
+    const auto aabbit = _aabbs.find(id);
+    if (aabbit == _aabbs.end()) [[unlikely]] continue;
 
-    const auto ai = _index.find(id);
-    if (ai == _index.end()) [[unlikely]] continue;
-    auto a = ai->second.lock();
+    const auto ait = _index.find(id);
+    if (ait == _index.end()) [[unlikely]] continue;
+    auto a = ait->second.lock();
     if (!a) continue;
 
-    const auto& aabb = ait->second;
+    const auto& aabb = aabbit->second;
 
     _hits.clear();
     _spatial.query(bgi::intersects(aabb), std::back_inserter(_hits));
@@ -129,9 +129,9 @@ void world::update(float delta) noexcept {
 
       if (!_pairs.emplace(std::min(id, other), std::max(id, other)).second) continue;
 
-      const auto bi = _index.find(other);
-      if (bi == _index.end()) continue;
-      auto b = bi->second.lock();
+      const auto bit = _index.find(other);
+      if (bit == _index.end()) continue;
+      auto b = bit->second.lock();
       if (!b) continue;
 
       if (const auto* callback = find_ptr(a->_collision_mapping, b->kind())) (*callback)(a, b);
