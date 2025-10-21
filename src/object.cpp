@@ -234,21 +234,22 @@ void object::set_visible(bool value) noexcept {
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
-  if (!action) {
+  if (!action || action->empty()) {
+    _action.clear();
     return;
   }
 
-  if (_action == *action) {
+  const auto it = _animations.find(*action);
+  if (it == _animations.end()) [[unlikely]] {
     return;
   }
 
-  _action = *action;
+  _action = it->first;
   _frame = 0;
   _last_frame = SDL_GetTicks();
   _needs_recalc = true;
 
-  const auto& animation = _animations.find(_action)->second;
-  if (const auto& e = animation.effect; e) {
+  if (const auto& e = it->second.effect; e) {
     e->play();
   }
 
