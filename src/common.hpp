@@ -65,7 +65,6 @@ extern "C" {
 #include <chrono>
 #include <cmath>
 #include <cstdint>
-#include <numbers>
 #include <csignal>
 #include <execution>
 #include <filesystem>
@@ -78,6 +77,7 @@ extern "C" {
 #include <map>
 #include <memory>
 #include <mutex>
+#include <numbers>
 #include <optional>
 #include <print>
 #include <random>

@@ -16,8 +16,9 @@ static inline const typename Map::mapped_type* find_ptr(
 
 world::world(std::shared_ptr<graphics::renderer> renderer) noexcept
     : _renderer(std::move(renderer)) {
-  _index.reserve(64);
-  _aabbs.reserve(64);
+  constexpr auto capacity = 128uz;
+  _index.reserve(capacity);
+  _aabbs.reserve(capacity);
 }
 
 void world::add(const std::shared_ptr<object>& object) {
@@ -73,7 +74,7 @@ void world::update(float delta) noexcept {
 
     aabb_opt = object->aabb();
     if (!aabb_opt.has_value()) goto remove;
-    if (!object->dirty()) {
+    if (!object->dirty()) [[unlikely]] {
       ++it;
       continue;
     }
@@ -124,7 +125,7 @@ void world::update(float delta) noexcept {
 
     for (const auto& hit : _hits) {
       const auto other = hit.second;
-      if (other == id) continue;
+      if (other == id) [[likely]] continue;
 
       if (!_pairs.emplace(std::min(id, other), std::max(id, other)).second) continue;
 
