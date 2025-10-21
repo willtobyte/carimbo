@@ -38,7 +38,6 @@ struct resolve_out_iterator final {
     if (it == index->end()) return *this;
     if (it->second.expired()) return *this;
     *out++ = p.second;
-    //++out;
     return *this;
   }
 };
@@ -113,8 +112,6 @@ class world final {
     std::unordered_map<uint64_t, box_t> _aabbs;
 
     bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>> _spatial;
-
-    // std::vector<std::pair<uint64_t, uint64_t>> _candidates;
 
     boost::unordered_set<std::pair<uint64_t,uint64_t>, boost::hash<std::pair<uint64_t,uint64_t>>> _pairs;
 

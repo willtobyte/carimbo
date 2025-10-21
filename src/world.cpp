@@ -119,25 +119,16 @@ void world::update(float delta) noexcept {
   }
 
   for (const auto& pair : _pairs) {
-    const auto aid = pair.first;
-    const auto bid = pair.second;
-
-    const auto ait = _index.find(aid);
-    if (ait == _index.end()) continue;
-    const auto bit = _index.find(bid);
-    if (bit == _index.end()) continue;
-
-    auto a = ait->second.lock();
-    if (!a) continue;
-    auto b = bit->second.lock();
-    if (!b) continue;
+    auto a = _index[pair.first].lock();
+    auto b = _index[pair.second].lock();
+    if (!a || !b) continue;
 
     if (const auto* cb = find_ptr(a->_collision_mapping, b->kind())) (*cb)(a, b);
     if (const auto* cb = find_ptr(b->_collision_mapping, a->kind())) (*cb)(b, a);
 
     SDL_Event event{};
     event.type = static_cast<uint32_t>(input::event::type::collision);
-    event.user.data1 = _envelopepool->acquire(collisionenvelope(aid, bid)).release();
+    event.user.data1 = _envelopepool->acquire(collisionenvelope(a->id(), b->id())).release();
     SDL_PushEvent(&event);
   }
 }
