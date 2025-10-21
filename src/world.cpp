@@ -54,7 +54,6 @@ void world::remove(uint64_t id) {
 }
 
 void world::update(float delta) noexcept {
-  _dirties.clear();
   _dirties.reserve(_index.size());
 
   _hits.clear();
@@ -138,6 +137,8 @@ void world::update(float delta) noexcept {
       SDL_PushEvent(&event);
     }
   }
+
+  _dirties.clear();
 }
 
 void world::draw() const noexcept {
