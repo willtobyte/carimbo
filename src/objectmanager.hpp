@@ -27,7 +27,7 @@ public:
 
   void manage(std::shared_ptr<object> object) noexcept;
 
-  void remove(std::shared_ptr<object> object) noexcept;
+  bool remove(std::shared_ptr<object> object) noexcept;
 
   std::shared_ptr<object> find(uint64_t id) const noexcept;
 
@@ -48,27 +48,27 @@ protected:
 
 private:
   struct node {
-    uint64_t id;
-    std::shared_ptr<object> value;
+    std::shared_ptr<framework::object> object;
+    explicit node(std::shared_ptr<framework::object> obj) : object(std::move(obj)) {}
   };
 
   struct by_id;
   struct by_seq;
-  struct by_ptr;
+
+  struct id_key {
+    using result_type = uint64_t;
+    result_type operator()(const node& n) const noexcept { return n.object->_id; }
+  };
 
   using container_t = boost::multi_index::multi_index_container<
     node,
     boost::multi_index::indexed_by<
       boost::multi_index::hashed_unique<
         boost::multi_index::tag<by_id>,
-        boost::multi_index::member<node, uint64_t, &node::id>
+        id_key
       >,
       boost::multi_index::sequenced<
         boost::multi_index::tag<by_seq>
-      >,
-      boost::multi_index::hashed_non_unique<
-        boost::multi_index::tag<by_ptr>,
-        boost::multi_index::member<node, std::shared_ptr<object>, &node::value>
       >
     >
   >;

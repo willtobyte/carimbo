@@ -13,6 +13,7 @@ std::optional<std::function<T>> operator||(const std::optional<std::function<T>>
 objectmanager::objectmanager() {
   _envelopepool->reserve(64);
   _hovering.reserve(256);
+  _objects.get<by_id>().rehash(128);
 }
 
 std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
@@ -80,7 +81,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   std::println("[objectmanager] created {} {}", fulln, id);
   if (manage) {
     _world->add(o);
-    _objects.get<by_seq>().push_back(node{id, o});
+    _objects.emplace(o);
   }
 
   return o;
@@ -105,7 +106,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
 
   const uint64_t id = _counter++;
   o->_id = id;
-  _objects.get<by_seq>().push_back(node{id, o});
+  _objects.emplace(o);
   _world->add(o);
 
   std::println("[objectmanager] clone {} to {}", matrix->kind(), o->id());
@@ -118,51 +119,40 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
     return;
   }
 
-  auto& byptr = _objects.get<by_ptr>();
-  if (byptr.count(object)) [[unlikely]] {
-    return;
-  }
-
-  _objects.get<by_seq>().push_back(node{object->id(), object});
+  _objects.emplace(object);
   _world->add(object);
 }
 
-void objectmanager::remove(std::shared_ptr<object> object) noexcept {
+bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
-    return;
+    return false;
   }
 
-  auto& byptr = _objects.get<by_ptr>();
-  auto it = byptr.find(object);
-  if (it == byptr.end()) [[unlikely]] {
-    return;
-  }
+  const auto id = object->id();
 
-  const uint64_t id = it->id;
-  auto& byseq = _objects.get<by_seq>();
-  byseq.erase(_objects.project<by_seq>(it));
   _world->remove(id);
+  return _objects.get<by_id>().erase(id) > 0;
 }
 
 std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
   const auto& byid = _objects.get<by_id>();
   auto it = byid.find(id);
   if (it == byid.end()) [[unlikely]] return nullptr;
-  return it->value;
+  return it->object;
 }
 
 void objectmanager::update(float delta) noexcept {
   const auto now = SDL_GetTicks();
   const auto& byseq = _objects.get<by_seq>();
   for (const auto& e : byseq) {
-    e.value->update(delta, now);
+    e.object->update(delta, now);
   }
 }
 
 void objectmanager::draw() const noexcept {
   const auto& byseq = _objects.get<by_seq>();
   for (const auto& e : byseq) {
-    e.value->draw();
+    e.object->draw();
   }
 }
 
@@ -184,7 +174,7 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   const auto x = event.x;
   const auto y = event.y;
 
-  static std::unordered_set<uint64_t> hits;
+  static std::vector<uint64_t> hits;
   hits.clear();
   hits.reserve(64);
   _world->query(x, y, std::back_inserter(hits));
@@ -224,7 +214,7 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
     }
   }
 
-  _hovering = std::move(hits);
+  _hovering.swap(hits);
 }
 
 void objectmanager::on_mail(const input::event::mail& event) {
