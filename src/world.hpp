@@ -76,7 +76,7 @@ class world final {
   private:
     std::shared_ptr<graphics::renderer> _renderer;
 
-    std::vector<uint64_t> _dirties;
+    std::vector<std::pair<uint64_t, std::shared_ptr<object>>> _dirties;
 
     std::unordered_map<uint64_t, std::weak_ptr<object>> _index;
 

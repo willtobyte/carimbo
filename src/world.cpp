@@ -58,7 +58,7 @@ void world::update(float delta) noexcept {
   _dirties.reserve(_index.size());
 
   _hits.clear();
-  _hits.reserve(_index.size());
+  _hits.reserve(_index.size() * 4);
 
   _pairs.clear();
   _pairs.reserve(_index.size());
@@ -89,7 +89,7 @@ void world::update(float delta) noexcept {
       if (found != _aabbs.end()) _spatial.remove({found->second, id});
       _spatial.insert({aabb, id});
       _aabbs.insert_or_assign(id, aabb);
-      _dirties.emplace_back(id);
+      _dirties.emplace_back(id, object);
       ++it;
       continue;
     }
@@ -109,14 +109,9 @@ void world::update(float delta) noexcept {
     }
   }
 
-  for (const auto id : _dirties) {
+  for (const auto [id, a] : _dirties) {
     const auto aabbit = _aabbs.find(id);
     if (aabbit == _aabbs.end()) [[unlikely]] continue;
-
-    const auto ait = _index.find(id);
-    if (ait == _index.end()) [[unlikely]] continue;
-    auto a = ait->second.lock();
-    if (!a) continue;
 
     const auto& aabb = aabbit->second;
 
