@@ -190,7 +190,6 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 }
 
-
 void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   const auto x = event.x;
   const auto y = event.y;
