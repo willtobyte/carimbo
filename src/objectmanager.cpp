@@ -176,7 +176,7 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
 
   static std::vector<uint64_t> hits;
   hits.clear();
-  hits.reserve(64);
+  hits.reserve(32);
   _world->query(x, y, std::back_inserter(hits));
   if (hits.empty()) [[likely]] {
     _scenemanager->on_touch(x, y);
@@ -197,7 +197,7 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
 
   static std::unordered_set<uint64_t> hits;
   hits.clear();
-  hits.reserve(64);
+  hits.reserve(32);
   _world->query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
