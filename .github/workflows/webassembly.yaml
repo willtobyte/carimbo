@@ -61,8 +61,8 @@ jobs:
             --settings build_type=Release \
             --build=missing || true
 
-            find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0 \
-              | xargs -0 sed -i -E 's/if\s*\(\s*BOX2D_DISABLE_SIMD\s+OFF\s*\)/if(BOX2D_DISABLE_SIMD)/g'
+          find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0 \
+            | xargs -0 sed -i '1i set(BOX2D_DISABLE_SIMD ON)'
 
           conan install . \
             --output-folder=build \
