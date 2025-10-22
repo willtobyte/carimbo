@@ -64,12 +64,10 @@ protected:
   void notify(uint64_t aid, uint64_t bid) const;
 
 private:
+  b2WorldId _world;
   std::shared_ptr<graphics::renderer> _renderer;
   std::vector<uint64_t> _dirties;
-
-  b2WorldId _world;
   std::unordered_map<uint64_t, b2BodyId> _bodies;
-
   std::unordered_map<uint64_t, std::weak_ptr<object>> _objects;
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
