@@ -102,7 +102,7 @@ void world::update(float delta) noexcept {
         b2DestroyBody(bit->second);
         _bodies.erase(bit);
       }
-      ++it;
+      it = _objects.erase(it);
       continue;
     }
 
@@ -156,7 +156,6 @@ void world::update(float delta) noexcept {
     const auto first = static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(ua));
     const auto second = static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(ub));
 
-    std::println(">>> contact");
     notify(first, second);
   }
 }

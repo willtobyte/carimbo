@@ -24,9 +24,10 @@ public:
       }
     };
 
+    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
     b2AABB aabb{};
-    aabb.lowerBound = b2Vec2(x, y);
-    aabb.upperBound = b2Vec2(x, y);
+    aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
+    aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
 
     b2QueryFilter filter = b2DefaultQueryFilter();
     b2World_OverlapAABB(_world, aabb, filter, &Helper::callback, &out);
@@ -34,10 +35,11 @@ public:
 
   template <class OutIt>
   void query(float x, float y, float w, float h, OutIt out) {
-    const float x0 = std::min(x, x + w);
-    const float y0 = std::min(y, y + h);
-    const float x1 = std::max(x, x + w);
-    const float y1 = std::max(y, y + h);
+    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
+    const auto x0 = std::min(x, x + w) - epsilon;
+    const auto y0 = std::min(y, y + h) - epsilon;
+    const auto x1 = std::max(x, x + w) + epsilon;
+    const auto y1 = std::max(y, y + h) + epsilon;
 
     struct Helper {
       static bool callback(b2ShapeId shapeId, void* ctx) {
