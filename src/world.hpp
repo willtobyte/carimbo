@@ -3,6 +3,22 @@
 #include <box2d/box2d.h>
 
 namespace framework {
+static inline b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
+  b2AABB a{};
+  a.lowerBound = b2Vec2(x0, y0);
+  a.upperBound = b2Vec2(x1, y1);
+  return a;
+}
+
+template <class OutIt>
+static bool collect(b2ShapeId shapeId, void* ctx) {
+  auto* it = static_cast<OutIt*>(ctx);
+  const b2BodyId bodyId = b2Shape_GetBody(shapeId);
+  const uint64_t id = static_cast<uint64_t>(
+    reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
+  *(*it)++ = id;
+  return true;
+}
 
 class world final {
 public:
@@ -14,49 +30,25 @@ public:
 
   template <class OutIt>
   void query(float x, float y, OutIt out) {
-    struct Helper {
-      static bool callback(b2ShapeId shapeId, void* ctx) {
-        auto* it = static_cast<OutIt*>(ctx);
-        const b2BodyId bodyId = b2Shape_GetBody(shapeId);
-        const uint64_t id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
-        *(*it)++ = id;
-        return true;
-      }
-    };
-
-    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
-    b2AABB aabb{};
-    aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
-    aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
-
+    constexpr float epsilon = std::numeric_limits<float>::epsilon();
+    const b2AABB aabb = to_aabb(x - epsilon, y - epsilon, x + epsilon, y + epsilon);
     b2QueryFilter filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &Helper::callback, &out);
+    b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
   }
 
   template <class OutIt>
   void query(float x, float y, float w, float h, OutIt out) {
     constexpr auto epsilon = std::numeric_limits<float>::epsilon();
-    const auto x0 = std::min(x, x + w) - epsilon;
-    const auto y0 = std::min(y, y + h) - epsilon;
-    const auto x1 = std::max(x, x + w) + epsilon;
-    const auto y1 = std::max(y, y + h) + epsilon;
+    const auto xw = x + w;
+    const auto yh = y + h;
+    const auto x0 = (x < xw ? x : xw) - epsilon;
+    const auto y0 = (y < yh ? y : yh) - epsilon;
+    const auto x1 = (x > xw ? x : xw) + epsilon;
+    const auto y1 = (y > yh ? y : yh) + epsilon;
 
-    struct Helper {
-      static bool callback(b2ShapeId shapeId, void* ctx) {
-        auto* it = static_cast<OutIt*>(ctx);
-        const b2BodyId bodyId = b2Shape_GetBody(shapeId);
-        const uint64_t id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
-        *(*it)++ = id;
-        return true;
-      }
-    };
-
-    b2AABB aabb{};
-    aabb.lowerBound = b2Vec2(x0, y0);
-    aabb.upperBound = b2Vec2(x1, y1);
-
-    b2QueryFilter filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &Helper::callback, &out);
+    const auto aabb = to_aabb(x0, y0, x1, y1);
+    auto filter = b2DefaultQueryFilter();
+    b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
   }
 
   void update(float delta) noexcept;
