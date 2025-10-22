@@ -70,8 +70,11 @@ void world::add(const std::shared_ptr<object>& object) {
   const auto id = object->id();
   _objects[id] = object;
 
-  const auto box = object->aabb();
-  if (!box.has_value()) [[unlikely]] return;
+  const auto box = object->shape();
+  if (!box.has_value()) [[unlikely]] {
+    std::println(">>> object {} {} no shape", object->kind(), object->id());
+    return;
+  }
 
   const auto body = get_or_create_body(_world, _bodies, id);
   assign_fixture(body, *box);
@@ -101,7 +104,6 @@ void world::update(float delta) noexcept {
         _bodies.erase(bit);
       }
       it = _objects.erase(it);
-      std::println("NO OBJECT");
       continue;
     }
 
@@ -112,33 +114,31 @@ void world::update(float delta) noexcept {
         _bodies.erase(bit);
       }
       it = _objects.erase(it);
-      std::println("NO VISIBLE");
       continue;
     }
 
-    const auto aabb = object->aabb();
-    if (!aabb.has_value()) {
+    const auto shape = object->shape();
+    if (!shape.has_value()) {
       const auto bit = _bodies.find(id);
       if (bit != _bodies.end()) {
         b2DestroyBody(bit->second);
         _bodies.erase(bit);
       }
       it = _objects.erase(it);
-      std::println("NO AABB");
       continue;
     }
 
-    if (!object->dirty()) {
-      ++it;
-      std::println("NO DIRTY");
-      continue;
-    }
+    // if (!object->dirty()) {
+    //   ++it;
+    //   std::println("NO DIRTY");
+    //   continue;
+    // }
 
 #ifdef DEBUG
     std::println("[world] dirty object {} ({})", object->kind(), id);
 #endif
     const b2BodyId body = get_or_create_body(_world, _bodies, id);
-    assign_fixture(body, *aabb);
+    assign_fixture(body, *shape);
     _dirties.emplace_back(id);
     ++it;
   }

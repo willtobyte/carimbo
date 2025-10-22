@@ -91,7 +91,7 @@ public:
   void on_unhover() noexcept;
 
   bool dirty() noexcept;
-  std::optional<geometry::rectangle> aabb() const;
+  std::optional<geometry::rectangle> shape() const;
 
   memory::kv& kv() noexcept;
 
@@ -122,8 +122,8 @@ private:
   std::optional<uint8_t> _previous_alpha;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
-  std::optional<geometry::rectangle> _aabb;
-  std::optional<geometry::rectangle> _previous_aabb;
+  std::optional<geometry::rectangle> _shape;
+  std::optional<geometry::rectangle> _previous_shape;
   bool _dirty{true};
   bool _needs_recalc{true};
 

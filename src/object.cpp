@@ -76,13 +76,13 @@ void object::update(float delta, uint64_t now) noexcept {
   }
 
   if (!animation.bounds) [[unlikely]] {
-    _aabb = std::nullopt;
+    _shape = std::nullopt;
     return;
   }
 
-  // if (!_needs_recalc) [[likely]] {
-  //   return;
-  // }
+  if (!_needs_recalc) [[likely]] {
+    return;
+  }
 
   const auto& rectangle = animation.bounds->rectangle;
   geometry::rectangle destination{_position + rectangle.position(), rectangle.size()};
@@ -115,9 +115,9 @@ void object::update(float delta, uint64_t now) noexcept {
   const auto miny = cy - ey;
   const auto maxy = cy + ey;
 
-  _aabb = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
-  _dirty = _aabb != _previous_aabb;
-  _previous_aabb = _aabb;
+  _shape = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
+  _dirty = _shape != _previous_shape;
+  _previous_shape = _shape;
   _needs_recalc = false;
 }
 
@@ -316,8 +316,8 @@ bool object::dirty() noexcept{
   return std::exchange(_dirty, false);
 }
 
-std::optional<geometry::rectangle> object::aabb() const {
-  return _aabb;
+std::optional<geometry::rectangle> object::shape() const {
+  return _shape;
 }
 
 memory::kv& object::kv() noexcept {
