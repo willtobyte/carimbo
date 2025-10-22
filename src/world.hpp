@@ -11,11 +11,11 @@ static inline b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
 }
 
 template <class OutIt>
-static bool collect(b2ShapeId shapeId, void* ctx) {
-  auto* it = static_cast<OutIt*>(ctx);
-  const b2BodyId bodyId = b2Shape_GetBody(shapeId);
-  const uint64_t id = static_cast<uint64_t>(
-    reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
+static bool collect(b2ShapeId shape, void* context) {
+  auto* it = static_cast<OutIt*>(context);
+  const auto body = b2Shape_GetBody(shape);
+  const auto id = static_cast<uint64_t>(
+    reinterpret_cast<uintptr_t>(b2Body_GetUserData(body)));
   *(*it)++ = id;
   return true;
 }
@@ -30,9 +30,9 @@ public:
 
   template <class OutIt>
   void query(float x, float y, OutIt out) {
-    constexpr float epsilon = std::numeric_limits<float>::epsilon();
-    const b2AABB aabb = to_aabb(x - epsilon, y - epsilon, x + epsilon, y + epsilon);
-    b2QueryFilter filter = b2DefaultQueryFilter();
+    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
+    const auto aabb = to_aabb(x - epsilon, y - epsilon, x + epsilon, y + epsilon);
+    auto filter = b2DefaultQueryFilter();
     b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
   }
 
