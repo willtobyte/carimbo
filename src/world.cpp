@@ -35,7 +35,7 @@ static inline b2BodyId get_or_create_body(b2WorldId world, std::unordered_map<ui
   if (it != map.end()) return it->second;
 
   auto def = b2DefaultBodyDef();
-  def.type = b2_kinematicBody; // TODO b2_staticBody;
+  def.type = b2_staticBody; // TODO b2_kinematicBody;
   def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id));
   const auto body = b2CreateBody(world, &def);
   map.emplace(id, body);

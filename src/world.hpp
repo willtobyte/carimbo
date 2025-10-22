@@ -15,7 +15,7 @@ public:
   template <class OutIt>
   void query(float x, float y, OutIt out) {
     struct Helper {
-      static bool cb(b2ShapeId shapeId, void* ctx) {
+      static bool callback(b2ShapeId shapeId, void* ctx) {
         auto* it = static_cast<OutIt*>(ctx);
         const b2BodyId bodyId = b2Shape_GetBody(shapeId);
         const uint64_t id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
@@ -29,7 +29,7 @@ public:
     aabb.upperBound = b2Vec2(x, y);
 
     b2QueryFilter filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &Helper::cb, &out);
+    b2World_OverlapAABB(_world, aabb, filter, &Helper::callback, &out);
   }
 
   template <class OutIt>
@@ -40,7 +40,7 @@ public:
     const float y1 = std::max(y, y + h);
 
     struct Helper {
-      static bool cb(b2ShapeId shapeId, void* ctx) {
+      static bool callback(b2ShapeId shapeId, void* ctx) {
         auto* it = static_cast<OutIt*>(ctx);
         const b2BodyId bodyId = b2Shape_GetBody(shapeId);
         const uint64_t id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
@@ -54,7 +54,7 @@ public:
     aabb.upperBound = b2Vec2(x1, y1);
 
     b2QueryFilter filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &Helper::cb, &out);
+    b2World_OverlapAABB(_world, aabb, filter, &Helper::callback, &out);
   }
 
   void update(float delta) noexcept;
