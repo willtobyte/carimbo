@@ -333,7 +333,7 @@ jobs:
             --build=missing
         continue-on-error: true
 
-      - name: Patch CMake
+      - name: Patch Box2D CMake
         run: |
           find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0 \
             | xargs -0 sed -i -E '
