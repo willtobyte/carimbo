@@ -40,6 +40,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 find_package(Boost CONFIG REQUIRED)
+find_package(box2d CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
@@ -94,6 +95,7 @@ target_link_options(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   boost::boost
+  box2d::box2d
   nlohmann_json::nlohmann_json
   Ogg::ogg
   physfs-static

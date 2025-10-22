@@ -48,10 +48,6 @@ void object::set_y(float y) noexcept {
 }
 
 void object::update(float delta, uint64_t now) noexcept {
-  if (_action.empty()) [[unlikely]] {
-    return;
-  }
-
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] return;
 
@@ -84,9 +80,9 @@ void object::update(float delta, uint64_t now) noexcept {
     return;
   }
 
-  if (!_needs_recalc) [[likely]] {
-    return;
-  }
+  // if (!_needs_recalc) [[likely]] {
+  //   return;
+  // }
 
   const auto& rectangle = animation.bounds->rectangle;
   geometry::rectangle destination{_position + rectangle.position(), rectangle.size()};
@@ -237,6 +233,7 @@ void object::set_visible(bool value) noexcept {
 void object::set_action(const std::optional<std::string>& action) noexcept {
   if (!action || action->empty()) {
     _action.clear();
+    _needs_recalc = true;
     return;
   }
 

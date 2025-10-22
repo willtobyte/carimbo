@@ -1,112 +1,77 @@
 #pragma once
 
-#include "common.hpp"
-
-namespace bgi = boost::geometry::index;
-
-using point_t = boost::geometry::model::d2::point_xy<float>;
-using box_t = boost::geometry::model::box<point_t>;
+#include <box2d/box2d.h>
 
 namespace framework {
-static inline box_t to_box(const geometry::rectangle& rectangle) noexcept {
-  return box_t(
-    point_t(
-      rectangle.x(),
-      rectangle.y()
-    ),
-    point_t(
-      rectangle.x() + rectangle.width(),
-      rectangle.y() + rectangle.height()
-    )
-  );
-}
-
-template <class OutIt>
-struct resolve_out_iterator final {
-  OutIt out;
-  const std::unordered_map<uint64_t, std::weak_ptr<object>>* index;
-  using iterator_category = std::output_iterator_tag;
-  using difference_type = void;
-  using value_type = void;
-  using pointer = void;
-  using reference = void;
-  resolve_out_iterator& operator*() noexcept { return *this; }
-  resolve_out_iterator& operator++() noexcept { return *this; }
-  resolve_out_iterator operator++(int) noexcept { return *this; }
-  resolve_out_iterator& operator=(const std::pair<box_t, uint64_t>& p) {
-    const auto it = index->find(p.second);
-    if (it == index->end()) return *this;
-    if (it->second.expired()) return *this;
-    *out++ = p.second;
-    return *this;
-  }
-};
-
-template <class Set>
-struct collide_set_out_iterator final {
-  uint64_t source;
-  Set* pairs;
-  const std::unordered_map<uint64_t, std::weak_ptr<object>>* index;
-
-  using iterator_category = std::output_iterator_tag;
-  using difference_type = void;
-  using value_type = void;
-  using pointer = void;
-  using reference = void;
-
-  collide_set_out_iterator& operator*() noexcept { return *this; }
-  collide_set_out_iterator& operator++() noexcept { return *this; }
-  collide_set_out_iterator operator++(int) noexcept { return *this; }
-
-  collide_set_out_iterator& operator=(const std::pair<box_t, uint64_t>& p) {
-    if (p.second == source) return *this;
-
-    const auto it = index->find(p.second);
-    if (it == index->end()) return *this;
-    if (it->second.expired()) return *this;
-
-    pairs->emplace_back(std::min(source, p.second), std::max(source, p.second));
-    return *this;
-  }
-};
 
 class world final {
-  public:
-    world(std::shared_ptr<graphics::renderer> renderer) noexcept;
-    ~world() noexcept = default;
+public:
+  world(std::shared_ptr<graphics::renderer> renderer) noexcept;
+  ~world() noexcept;
 
-    void add(const std::shared_ptr<object>& object);
-    void remove(uint64_t id);
+  void add(const std::shared_ptr<object>& object);
+  void remove(uint64_t id);
 
-    template <class OutIt>
-    void query(float x, float y, OutIt out) {
-      auto sink = resolve_out_iterator{out, &_index};
-      _spatial.query(bgi::intersects(point_t{x, y}), sink);
-    }
+  template <class OutIt>
+  void query(float x, float y, OutIt out) {
+    struct Helper {
+      static bool cb(b2ShapeId shapeId, void* ctx) {
+        auto* it = static_cast<OutIt*>(ctx);
+        const b2BodyId bodyId = b2Shape_GetBody(shapeId);
+        const uint64_t id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
+        *(*it)++ = id;
+        return true;
+      }
+    };
 
-    template <class OutIt>
-    void query(float x, float y, float w, float h, OutIt out) {
-      const box_t area(
-        point_t(std::min(x, x + w), std::min(y, y + h)),
-        point_t(std::max(x, x + w), std::max(y, y + h))
-      );
+    b2AABB aabb{};
+    aabb.lowerBound = b2Vec2(x, y);
+    aabb.upperBound = b2Vec2(x, y);
 
-      auto sink = resolve_out_iterator{out, &_index};
-      _spatial.query(bgi::intersects(area), sink);
-    }
+    b2QueryFilter filter = b2DefaultQueryFilter();
+    b2World_OverlapAABB(_world, aabb, filter, &Helper::cb, &out);
+  }
 
-    // void set_camera(std::shared_ptr<camera> camera) noexcept;
+  template <class OutIt>
+  void query(float x, float y, float w, float h, OutIt out) {
+    const float x0 = std::min(x, x + w);
+    const float y0 = std::min(y, y + h);
+    const float x1 = std::max(x, x + w);
+    const float y1 = std::max(y, y + h);
 
-    void update(float delta) noexcept;
-    void draw() const noexcept;
+    struct Helper {
+      static bool cb(b2ShapeId shapeId, void* ctx) {
+        auto* it = static_cast<OutIt*>(ctx);
+        const b2BodyId bodyId = b2Shape_GetBody(shapeId);
+        const uint64_t id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(b2Body_GetUserData(bodyId)));
+        *(*it)++ = id;
+        return true;
+      }
+    };
 
-  private:
-    std::shared_ptr<graphics::renderer> _renderer;
-    std::vector<uint64_t> _dirties;
-    std::unordered_map<uint64_t, std::weak_ptr<object>> _index;
-    std::unordered_map<uint64_t, box_t> _aabbs;
-    bgi::rtree<std::pair<box_t, uint64_t>, bgi::rstar<16>> _spatial;
-    std::vector<std::pair<uint64_t,uint64_t>> _pairs;
-    std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
+    b2AABB aabb{};
+    aabb.lowerBound = b2Vec2(x0, y0);
+    aabb.upperBound = b2Vec2(x1, y1);
+
+    b2QueryFilter filter = b2DefaultQueryFilter();
+    b2World_OverlapAABB(_world, aabb, filter, &Helper::cb, &out);
+  }
+
+  void update(float delta) noexcept;
+  void draw() const noexcept;
+
+protected:
+  void notify(uint64_t aid, uint64_t bid) const;
+
+private:
+  std::shared_ptr<graphics::renderer> _renderer;
+  std::vector<uint64_t> _dirties;
+
+  b2WorldId _world;
+  std::unordered_map<uint64_t, b2BodyId> _bodies;
+
+  std::unordered_map<uint64_t, std::weak_ptr<object>> _objects;
+
+  std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };
 }

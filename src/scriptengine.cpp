@@ -75,7 +75,7 @@ static sol::object _to_lua(const nlohmann::json& value, sol::state_view lua) {
         table[i + 1] = _to_lua(value[i], lua);
       }
 
-      return sol::make_object(lua, lua);
+      return sol::make_object(lua, table);
     }
 
     case json::value_t::string:
