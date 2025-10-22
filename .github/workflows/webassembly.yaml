@@ -54,10 +54,27 @@ jobs:
 
       - name: Install dependencies
         run: |
-          conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release \
-            --conf "tools.build:cxxflags=['-DBOX2D_DISABLE_SIMD']" \
-            --conf "tools.build:cflags=['-DBOX2D_DISABLE_SIMD']"
+          conan install . \
+            --output-folder=build \
+            --profile=webassembly \
+            --settings compiler.cppstd=23 \
+            --settings build_type=Release \
+            --build=never
 
+          patch_cache() {
+            local CACHE_DIR="$1"
+            [ -d "$CACHE_DIR" ] || return 0
+            find "$CACHE_DIR/p" -type f -name "CMakeLists.txt" -print0 \
+            | xargs -0 sed -i -E 's/if\s*\(\s*BOX2D_DISABLE_SIMD\s+OFF\s*\)/if(BOX2D_DISABLE_SIMD)/g'
+          }
+          patch_cache "$HOME/.conan2"
+
+          conan install . \
+            --output-folder=build \
+            --profile=webassembly \
+            --settings compiler.cppstd=23 \
+            --settings build_type=Release \
+            --build=missing
 
       - name: Build
         run: |
