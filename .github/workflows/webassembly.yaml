@@ -64,7 +64,7 @@ jobs:
 
       - name: Patch CMake
         run: |
-          find "$ROOT" -type f -name "CMakeLists.txt" -print0 \
+          find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0 \
             | xargs -0 sed -i -E '
               s/^[[:space:]]*option\s*\(\s*BOX2D_DISABLE_SIMD\s+"[^"]*"\s+OFF\s*\)/option(BOX2D_DISABLE_SIMD "Disable SIMD" ON)/g;
               s/^[[:space:]]*set\s*\(\s*BOX2D_DISABLE_SIMD\s+OFF\s*\)/set(BOX2D_DISABLE_SIMD ON)/g;
@@ -73,7 +73,7 @@ jobs:
           while IFS= read -r -d '' f; do
             grep -q '^set(BOX2D_DISABLE_SIMD ON CACHE BOOL "" FORCE)$' "$f" && continue
             sed -i -E '/^[[:space:]]*cmake_minimum_required.*/a set(BOX2D_DISABLE_SIMD ON CACHE BOOL "" FORCE)' "$f"
-          done < <(find "$ROOT" -type f -name "CMakeLists.txt" -print0)
+          done < <(find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0)
 
       - name: Install dependencies
         run: |
