@@ -81,7 +81,7 @@ class Carimbo(ConanFile):
         toolchain = CMakeToolchain(self)
 
         if self._is_webassembly():
-            toolchain.variables["BOX2D_DISABLE_SIMD"] = "ON"
+            toolchain.variables["BOX2D_DISABLE_SIMD"] = True
         else:
             toolchain.preprocessor_definitions["HAVE_BOOST"] = "ON"
             toolchain.cache_variables["HAVE_BOOST"] = "ON"
