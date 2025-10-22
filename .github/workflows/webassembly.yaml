@@ -53,7 +53,11 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.cmake.cmaketoolchain:extra_defines=['BOX2D_DISABLE_SIMD=ON']"
+        run: |
+          conan install . --output-folder=build --build=missing --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release \
+            --conf "tools.build:cxxflags=['-DBOX2D_DISABLE_SIMD']" \
+            --conf "tools.build:cflags=['-DBOX2D_DISABLE_SIMD']"
+
 
       - name: Build
         run: |
