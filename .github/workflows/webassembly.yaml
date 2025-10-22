@@ -59,7 +59,7 @@ jobs:
             --profile=webassembly \
             --settings compiler.cppstd=23 \
             --settings build_type=Release \
-            --build=never || true
+            --build=missing || true
 
             find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0 \
               | xargs -0 sed -i -E 's/if\s*\(\s*BOX2D_DISABLE_SIMD\s+OFF\s*\)/if(BOX2D_DISABLE_SIMD)/g'
