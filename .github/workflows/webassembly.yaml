@@ -59,15 +59,10 @@ jobs:
             --profile=webassembly \
             --settings compiler.cppstd=23 \
             --settings build_type=Release \
-            --build=never
+            --build=never || true
 
-          patch_cache() {
-            local CACHE_DIR="$1"
-            [ -d "$CACHE_DIR" ] || return 0
-            find "$CACHE_DIR/p" -type f -name "CMakeLists.txt" -print0 \
-            | xargs -0 sed -i -E 's/if\s*\(\s*BOX2D_DISABLE_SIMD\s+OFF\s*\)/if(BOX2D_DISABLE_SIMD)/g'
-          }
-          patch_cache "$HOME/.conan2"
+            find "$HOME/.conan2/p" -type f -name "CMakeLists.txt" -print0 \
+              | xargs -0 sed -i -E 's/if\s*\(\s*BOX2D_DISABLE_SIMD\s+OFF\s*\)/if(BOX2D_DISABLE_SIMD)/g'
 
           conan install . \
             --output-folder=build \
