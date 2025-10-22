@@ -35,7 +35,9 @@ static inline b2BodyId get_or_create_body(b2WorldId world, std::unordered_map<ui
   if (it != map.end()) return it->second;
 
   auto def = b2DefaultBodyDef();
-  def.type = b2_staticBody; // TODO b2_kinematicBody;
+  def.type = b2_dynamicBody;
+  def.gravityScale = 0.0f;
+  def.fixedRotation = true;
   def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id));
   const auto body = b2CreateBody(world, &def);
   map.emplace(id, body);
@@ -144,13 +146,13 @@ void world::update(float delta) noexcept {
     ++it;
   }
 
-  b2World_Step(_world, std::max(0.0f, delta), 4);
+  b2World_Step(_world, std::max(.0f, delta), 4);
 
-  const auto events = b2World_GetSensorEvents(_world);
+  const auto events = b2World_GetContactEvents(_world);
   for (auto i = events.beginCount; i-- > 0; ) {
     const auto& e = events.beginEvents[i];
-    const auto a = b2Shape_GetBody(e.sensorShapeId);
-    const auto b = b2Shape_GetBody(e.visitorShapeId);
+    const auto a = b2Shape_GetBody(e.shapeIdA);
+    const auto b = b2Shape_GetBody(e.shapeIdB);
     const auto ua = b2Body_GetUserData(a);
     const auto ub = b2Body_GetUserData(b);
     const auto first = static_cast<uint64_t>(reinterpret_cast<std::uintptr_t>(ua));

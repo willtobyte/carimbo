@@ -8,7 +8,6 @@
 #include "vector2d.hpp"
 #include "pixmap.hpp"
 #include "soundfx.hpp"
-#include <cstdint>
 
 namespace framework {
 struct keyframe final {
