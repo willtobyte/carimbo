@@ -13,6 +13,9 @@ public:
 
   void update(float delta) noexcept;
 
+  void set_volume(float gain) noexcept;
+  float volume() const noexcept;
+    
   void set_onbegin(std::function<void()>&& callback) noexcept;
   void set_onend(std::function<void()>&& callback) noexcept;
 

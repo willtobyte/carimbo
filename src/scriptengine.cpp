@@ -285,6 +285,7 @@ void framework::scriptengine::run() {
        self.play(loop);
      },
      "stop", &audio::soundfx::stop,
+     "volume", sol::property(&audio::soundfx::volume, &audio::soundfx::set_volume),
      "on_begin", &audio::soundfx::set_onbegin,
      "on_end", &audio::soundfx::set_onend
   );

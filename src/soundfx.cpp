@@ -206,6 +206,17 @@ void soundfx::update(float delta) noexcept {
   }
 }
 
+void soundfx::set_volume(float gain) noexcept {
+  const float clamped = std::clamp(gain, 0.0f, 1.0f);
+  alSourcef(_source, AL_GAIN, clamped);
+}
+
+float soundfx::volume() const noexcept {
+  float gain;
+  alGetSourcef(_source, AL_GAIN, &gain);
+  return gain;
+}
+
 void soundfx::set_onbegin(std::function<void()>&& callback) noexcept {
   _onbegin = std::move(callback);
 }
