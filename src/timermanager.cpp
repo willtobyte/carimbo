@@ -41,7 +41,6 @@ void timermanager::cancel(uint32_t id) noexcept {
     return;
   }
 
-  const auto ptr = it->second;
   _envelopemapping.erase(it);
 }
 
