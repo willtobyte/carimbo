@@ -27,6 +27,8 @@ protected:
       if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) _objects.emplace_back(std::make_shared<T>());
     }
 
+    assert(_objects.size() == target);
+
     std::println("[pool<{}>] expanded to {} objects", Name, target);
   }
 
