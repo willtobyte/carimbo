@@ -42,7 +42,6 @@ void timermanager::cancel(uint32_t id) noexcept {
   }
 
   const auto ptr = it->second;
-  _envelopepool->release(std::unique_ptr<envelope>(ptr));
   _envelopemapping.erase(it);
 }
 
