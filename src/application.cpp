@@ -48,9 +48,6 @@ using namespace framework;
 }
 
 application::application(int argc, char** argv) {
-  UNUSED(argc);
-  UNUSED(argv);
-
   std::set_terminate(fail);
 
   constexpr const auto fn = [](int) {

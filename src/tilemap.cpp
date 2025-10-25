@@ -36,8 +36,6 @@ tilemap::tilemap(
 }
 
 void tilemap::update(float delta) noexcept {
-  UNUSED(delta);
-
   const auto now = SDL_GetTicks();
 
   if (_last_tick == 0) {

@@ -3,8 +3,6 @@
 using namespace framework;
 
 static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) noexcept {
-  UNUSED(id);
-
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::timer);
   event.user.data1 = userdata;

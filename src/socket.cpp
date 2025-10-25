@@ -126,7 +126,6 @@ void socket::rpc(const std::string& method, const std::string& arguments, std::f
 
 #ifdef EMSCRIPTEN
 void socket::handle_open(const EmscriptenWebSocketOpenEvent* event) {
-  UNUSED(event);
   _connected = true;
 
   for (const auto& message : _queue) {
@@ -146,19 +145,15 @@ void socket::handle_message(const EmscriptenWebSocketMessageEvent* event) {
 }
 
 void socket::handle_error(const EmscriptenWebSocketErrorEvent* event) {
-  UNUSED(event);
   invoke("error", "WebSocket error occurred");
 }
 
 void socket::handle_close(const EmscriptenWebSocketCloseEvent* event) {
-  UNUSED(event);
 }
 #endif
 
 #ifndef EMSCRIPTEN
 void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type results) {
-  UNUSED(results);
-
   if (ec) {
     if (ec == boost::asio::error::operation_aborted)
       return;
@@ -178,8 +173,6 @@ void socket::on_resolve(beast::error_code ec, tcp::resolver::results_type result
 }
 
 void socket::on_connect(beast::error_code ec, const tcp::resolver::results_type::endpoint_type& endpoint) {
-  UNUSED(endpoint);
-
   if (ec) {
     if (ec == boost::asio::error::operation_aborted)
       return;
@@ -234,8 +227,6 @@ void socket::on_handshake(beast::error_code ec) {
 }
 
 void socket::on_read(beast::error_code ec, std::size_t bytes_transferred) {
-  UNUSED(bytes_transferred);
-
   if (ec) {
     if (ec == boost::asio::error::operation_aborted)
       return;
@@ -316,8 +307,6 @@ void socket::send(const std::string& message) {
     self->_ws.async_write(
         net::buffer(message),
         [](boost::system::error_code ec, std::size_t bytes_transferred) {
-          UNUSED(bytes_transferred);
-
           if (ec) [[unlikely]] {
             std::println(stderr, "[socket] write error: {}", ec.message());
             return;

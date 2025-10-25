@@ -43,8 +43,6 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
 }
 
 void eventmanager::update(float delta) noexcept {
-  UNUSED(delta);
-
   _receivers.erase(
     std::remove_if(
       _receivers.begin(),

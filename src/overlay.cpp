@@ -60,8 +60,6 @@ void overlay::hide() {
 }
 
 void overlay::dispatch(widgettype type, const std::string& message) {
-  UNUSED(message);
-
   switch (type) {
   case widgettype::cursor: {
     if (const auto cursor = _cursor; cursor) {

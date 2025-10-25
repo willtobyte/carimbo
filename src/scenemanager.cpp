@@ -191,16 +191,12 @@ void scenemanager::on_text(const std::string& text) {
 void scenemanager::on_mouse_press(const input::event::mouse::button& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
-  UNUSED(event);
-  UNUSED(ptr);
   // ptr->on_mouse_press(event.x, event.y);
 }
 
 void scenemanager::on_mouse_release(const input::event::mouse::button& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
-  UNUSED(event);
-  UNUSED(ptr);
   // ptr->on_mouse_release(event.x, event.y);
 }
 

@@ -187,8 +187,6 @@ void soundfx::stop() const noexcept {
 }
 
 void soundfx::update(float delta) noexcept {
-  UNUSED(delta);
-
   if (_notified.load(std::memory_order_relaxed)) {
     return;
   }
