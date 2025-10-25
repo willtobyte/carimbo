@@ -293,7 +293,9 @@ void eventmanager::update(float delta) noexcept {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
 
         if (const auto* payload = ptr->try_timer(); payload) {
-          std::invoke(payload->fn);
+          if (const auto& fn = payload->fn; fn) {
+            fn();
+          }
 
           if (!payload->repeat) {
             _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
