@@ -45,17 +45,21 @@ void timermanager::cancel(uint32_t id) noexcept {
 }
 
 void timermanager::clear() noexcept {
-  _eventmanager->purge(event_type);
+  SDL_Event event;
+  while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, event_type, event_type) > 0) {
+    if (!event.user.data1) {
+      continue;
+    }
+
+    auto* ptr = static_cast<framework::envelope*>(event.user.data1);
+    _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
+  }
 
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
   }
 
   _envelopemapping.clear();
-}
-
-void timermanager::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept {
-  _eventmanager = std::move(eventmanager);
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
