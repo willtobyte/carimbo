@@ -1,5 +1,9 @@
 #include "scriptengine.hpp"
 
+inline constexpr char bootstrap[] =
+#include "bootstrap.lua"
+;
+
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
@@ -1049,6 +1053,19 @@ void framework::scriptengine::run() {
 
   const auto loop = lua["loop"].get<sol::function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
+
+  const auto loader = lua.load(std::string_view{bootstrap}, "@bootstrap");
+  if (!loader.valid()) [[unlikely]] {
+    sol::error err = loader;
+    throw std::runtime_error(err.what());
+  }
+
+  const auto pf = loader.get<sol::protected_function>();
+  const auto exec = pf();
+  if (!exec.valid()) [[unlikely]] {
+    sol::error err = exec;
+    throw std::runtime_error(err.what());
+  }
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =
