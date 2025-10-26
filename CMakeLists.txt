@@ -39,11 +39,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
   $<$<CONFIG:Debug>:DEBUG>
 )
 
-# if(WIN32)
-#   set_target_properties(${PROJECT_NAME} PROPERTIES
-#     WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
-#   )
-# endif()
+if(WIN32)
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+    WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
+  )
+endif()
 
 set(IS_EMSCRIPTEN FALSE)
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
