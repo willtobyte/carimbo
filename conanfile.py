@@ -91,5 +91,9 @@ class Carimbo(ConanFile):
             toolchain.preprocessor_definitions["HAVE_STEAM"] = "ON"
             toolchain.cache_variables["HAVE_STEAM"] = "ON"
 
+        if self._have_sentry():
+            toolchain.preprocessor_definitions["HAVE_SENTRY"] = "ON"
+            toolchain.cache_variables["HAVE_SENTRY"] = "ON"
+
         toolchain.generate()
         CMakeDeps(self).generate()
