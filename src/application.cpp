@@ -64,7 +64,7 @@ using namespace framework;
 
 application::application(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IONBF, 0);
-#ifndef LOCAL_DEVELOPMENT
+#ifndef DEVELOPMENT
   REDIR("stdout.txt", 1);
   REDIR("stderr.txt", 2);
 #endif
