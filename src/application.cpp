@@ -23,9 +23,6 @@
 using namespace framework;
 
 [[noreturn]] static void fail() {
-  std::cout.flush();
-  std::cerr.flush();
-
   if (const auto ptr = std::current_exception()) {
     const char* error = nullptr;
 
@@ -68,6 +65,7 @@ using namespace framework;
 }
 
 application::application(int argc, char** argv) {
+  std::setvbuf(stdout, nullptr, _IONBF, 0);
   REDIR("stdout.txt", 1);
   REDIR("stderr.txt", 2);
 
