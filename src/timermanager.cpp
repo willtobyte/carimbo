@@ -2,9 +2,11 @@
 
 using namespace framework;
 
+constexpr auto event_type = static_cast<uint32_t>(input::event::type::timer);
+
 static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) noexcept {
   SDL_Event event{};
-  event.type = static_cast<uint32_t>(input::event::type::timer);
+  event.type = event_type;
   event.user.data1 = userdata;
   SDL_PushEvent(&event);
 
@@ -43,7 +45,7 @@ void timermanager::cancel(uint32_t id) noexcept {
 }
 
 void timermanager::clear() noexcept {
-  _eventmanager->purge(static_cast<uint32_t>(input::event::type::timer));
+  _eventmanager->purge(event_type);
 
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);

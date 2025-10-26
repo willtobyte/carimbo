@@ -27,7 +27,7 @@ public:
 
   void remove_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept;
 
-  void purge(uint32_t type) noexcept;
+  void purge(uint32_t begin_event, uint32_t end_event = 0) noexcept;
 
 private:
   std::shared_ptr<graphics::renderer> _renderer;

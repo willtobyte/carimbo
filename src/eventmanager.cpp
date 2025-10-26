@@ -330,12 +330,17 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
   }
 }
 
-void eventmanager::purge(uint32_t type) noexcept {
+void eventmanager::purge(uint32_t begin_event, uint32_t end_event) noexcept {
+  if (end_event == 0) end_event = begin_event;
+
   SDL_Event event;
-  while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, type, type) > 0) {
-    if (event.user.data1) {
-      auto* ptr = static_cast<framework::envelope*>(event.user.data1);
-      _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
+  while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, begin_event, end_event) > 0) {
+    if (!event.user.data1) {
+      continue;
     }
+
+    auto* ptr = static_cast<framework::envelope*>(event.user.data1);
+
+    _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
   }
 }
