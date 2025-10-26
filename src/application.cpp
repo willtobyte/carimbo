@@ -1,5 +1,25 @@
 #include "application.hpp"
 
+#ifdef _WIN32
+  #include <io.h>
+  #include <fcntl.h>
+  #define OPEN   _open
+  #define DUP2   _dup2
+  #define CLOSE  _close
+  #define FLAGS (_O_RDWR|_O_CREAT|_O_TRUNC|_O_BINARY)
+  #define MODE  (_S_IREAD|_S_IWRITE)
+#else
+  #include <unistd.h>
+  #include <fcntl.h>
+  #define OPEN   open
+  #define DUP2   dup2
+  #define CLOSE  close
+  #define FLAGS (O_RDWR|O_CREAT|O_TRUNC)
+  #define MODE  0600
+#endif
+
+#define REDIR(PATH, FD) do{ int _t = OPEN((PATH), FLAGS, MODE); if(_t>=0){ DUP2(_t,(FD)); CLOSE(_t);} }while(0)
+
 using namespace framework;
 
 [[noreturn]] static void fail() {
@@ -48,8 +68,8 @@ using namespace framework;
 }
 
 application::application(int argc, char** argv) {
-  dup2(open("stdout.txt", O_RDWR | O_CREAT | O_TRUNC, 0600), STDOUT_FILENO);
-  dup2(open("stderr.txt", O_RDWR | O_CREAT | O_TRUNC, 0600), STDERR_FILENO);
+  REDIR("stdout.txt", 1);
+  REDIR("stderr.txt", 2);
 
   std::set_terminate(fail);
 
