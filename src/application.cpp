@@ -2,19 +2,19 @@
 
 using namespace framework;
 
-static std::ostringstream g_stdout_capture;
-static std::ostringstream g_stderr_capture;
+static std::ostringstream _stdout_capture;
+static std::ostringstream _stderr_capture;
 
 struct capture_stream final {
-  std::streambuf* old_buf;
+  std::streambuf* old_buffer;
   std::ostringstream& stream;
-  capture_stream(std::ostream& os, std::ostringstream& s)
-      : old_buf(os.rdbuf(s.rdbuf())), stream(s) {}
-  ~capture_stream() { std::cout.rdbuf(old_buf); }
+  capture_stream(std::ostream& os, std::ostringstream& stream)
+      : old_buffer(os.rdbuf(stream.rdbuf())), stream(stream) {}
+  ~capture_stream() { std::cout.rdbuf(old_buffer); }
 };
 
-capture_stream capture_out(std::cout, g_stdout_capture);
-capture_stream capture_err(std::cerr, g_stderr_capture);
+capture_stream capture_out(std::cout, _stdout_capture);
+capture_stream capture_err(std::cerr, _stderr_capture);
 
 [[noreturn]] static void fail() {
   if (const auto ptr = std::current_exception()) {
@@ -34,11 +34,9 @@ capture_stream capture_err(std::cerr, g_stderr_capture);
       const auto exc = sentry_value_new_exception("exception", error);
       const auto ev = sentry_value_new_event();
 
-      auto captured_out = g_stdout_capture.str();
-      auto captured_err = g_stderr_capture.str();
       sentry_value_t extras = sentry_value_new_object();
-      sentry_value_set_by_key(extras, "stdout", sentry_value_new_string(captured_out.c_str()));
-      sentry_value_set_by_key(extras, "stderr", sentry_value_new_string(captured_err.c_str()));
+      sentry_value_set_by_key(extras, "stdout", sentry_value_new_string(_stdout_capture.str().c_str()));
+      sentry_value_set_by_key(extras, "stderr", sentry_value_new_string(_stderr_capture.str().c_str()));
       sentry_event_set_extra(ev, "output", extras);
 
       sentry_event_add_exception(ev, exc);
