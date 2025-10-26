@@ -30,11 +30,6 @@ using namespace framework;
       sentry_capture_event(ev);
       #endif
 
-      #ifdef HAVE_BOOST
-      boost::stacktrace::stacktrace st;
-      std::println(stderr, "{}", boost::stacktrace::to_string(st));
-      #endif
-
       std::println(stderr, "{}", error);
 
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);

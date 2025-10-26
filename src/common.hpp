@@ -54,11 +54,6 @@ extern "C" {
 #include <boost/unordered_set.hpp>
 #include <boost/functional/hash.hpp>
 
-#define BOOST_STACKTRACE_GNU_SOURCE_NOT_REQUIRED
-#include <boost/stacktrace.hpp>
-
-#define HAVE_STACKTRACE
-
 #include <algorithm>
 #include <array>
 #include <atomic>
