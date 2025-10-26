@@ -19,10 +19,7 @@ using namespace framework;
     }
 
     if (error) {
-      std::cout.flush();
-      std::cerr.flush();
       std::fflush(stdout);
-      std::fflush(stderr);
 
       #ifdef HAVE_SENTRY
       const auto ev = sentry_value_new_event();
