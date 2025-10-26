@@ -31,3 +31,7 @@ cassette.json
 # Python
 .ropeproject/
 .ruff_cache/
+
+# Carimbo
+stdout.txt
+stderr.txt
