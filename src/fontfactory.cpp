@@ -26,7 +26,7 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   const auto& glyphs = j["glyphs"].get_ref<const std::string&>();
   const auto spacing = j.value("spacing", int16_t{0});
   const auto leading = j.value("leading", int16_t{0});
-  const auto scale   = j.value("scale",   float{1.0f});
+  const auto scale   = j.value("scale",   float{1.f});
 
   const auto pixmap = _pixmappool->get(std::format("blobs/overlay/{}.png", family));
   const auto width = pixmap->width();
