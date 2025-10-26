@@ -2,21 +2,10 @@
 
 using namespace framework;
 
-static std::ostringstream _stdout_capture;
-static std::ostringstream _stderr_capture;
-
-struct capture_stream final {
-  std::streambuf* old_buffer;
-  std::ostringstream& stream;
-  capture_stream(std::ostream& os, std::ostringstream& stream)
-      : old_buffer(os.rdbuf(stream.rdbuf())), stream(stream) {}
-  ~capture_stream() { std::cout.rdbuf(old_buffer); }
-};
-
-capture_stream capture_out(std::cout, _stdout_capture);
-capture_stream capture_err(std::cerr, _stderr_capture);
-
 [[noreturn]] static void fail() {
+  std::cout.flush();
+  std::cerr.flush();
+
   if (const auto ptr = std::current_exception()) {
     const char* error = nullptr;
 
@@ -30,13 +19,13 @@ capture_stream capture_err(std::cerr, _stderr_capture);
     }
 
     if (error) {
+      std::cout.flush();
+      std::cerr.flush();
+      std::fflush(stdout);
+      std::fflush(stderr);
+
       #ifdef HAVE_SENTRY
       const auto ev = sentry_value_new_event();
-
-      const auto console = sentry_value_new_object();
-      sentry_value_set_by_key(console, "stdout", sentry_value_new_string(_stdout_capture.str().c_str()));
-      sentry_value_set_by_key(console, "stderr", sentry_value_new_string(_stderr_capture.str().c_str()));
-      sentry_value_set_by_key(ev, "extra", console);
 
       const auto exc = sentry_value_new_exception("exception", error);
       sentry_event_add_exception(ev, exc);
@@ -44,9 +33,9 @@ capture_stream capture_err(std::cerr, _stderr_capture);
       sentry_capture_event(ev);
       #endif
 
-      #ifdef HAVE_STACKTRACE
+      #ifdef HAVE_BOOST
       boost::stacktrace::stacktrace st;
-      std::println(stderr, "Stack trace:\n{}\n", boost::stacktrace::to_string(st));
+      std::println(stderr, "{}", boost::stacktrace::to_string(st));
       #endif
 
       std::println(stderr, "{}", error);
@@ -67,6 +56,9 @@ capture_stream capture_err(std::cerr, _stderr_capture);
 }
 
 application::application(int argc, char** argv) {
+  dup2(open("stdout.txt", O_RDWR | O_CREAT | O_TRUNC, 0600), STDOUT_FILENO);
+  dup2(open("stderr.txt", O_RDWR | O_CREAT | O_TRUNC, 0600), STDERR_FILENO);
+
   std::set_terminate(fail);
 
   constexpr const auto fn = [](int) {

@@ -77,6 +77,8 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     // sentry_options_set_debug(options, true);
     sentry_options_set_enable_logs(options, true);
     sentry_options_set_dsn(options, dsn.c_str());
+    sentry_options_add_attachment(options, "stdout.txt");
+    sentry_options_add_attachment(options, "stderr.txt");
     sentry_init(options);
   #endif
 
