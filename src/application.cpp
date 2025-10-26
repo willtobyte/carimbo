@@ -36,7 +36,7 @@ capture_stream capture_err(std::cerr, _stderr_capture);
       const auto console = sentry_value_new_object();
       sentry_value_set_by_key(console, "stdout", sentry_value_new_string(_stdout_capture.str().c_str()));
       sentry_value_set_by_key(console, "stderr", sentry_value_new_string(_stderr_capture.str().c_str()));
-      sentry_value_set_by_key(ev, "output", console);
+      sentry_value_set_by_key(ev, "extra", console);
 
       const auto exc = sentry_value_new_exception("exception", error);
       sentry_event_add_exception(ev, exc);
