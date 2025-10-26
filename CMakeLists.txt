@@ -39,15 +39,11 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
   $<$<CONFIG:Debug>:DEBUG>
 )
 
-find_package(Boost CONFIG REQUIRED)
-find_package(box2d CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(Ogg CONFIG REQUIRED)
-find_package(PhysFS CONFIG REQUIRED)
-find_package(SDL3 CONFIG REQUIRED)
-find_package(sol2 CONFIG REQUIRED)
-find_package(SPNG CONFIG REQUIRED)
-find_package(Vorbis CONFIG REQUIRED)
+if(WIN32)
+  set_target_properties(${PROJECT_NAME} PROPERTIES
+    WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
+  )
+endif()
 
 set(IS_EMSCRIPTEN FALSE)
 if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
@@ -57,7 +53,7 @@ endif()
 if(NOT IS_EMSCRIPTEN)
   find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
-  find_package(sentry CONFIG REQUIRED)
+  find_package(sentry CONFIG QUIET)
   if(HAVE_LUAJIT)
     find_package(luajit CONFIG REQUIRED)
   endif()
