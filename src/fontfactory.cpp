@@ -29,21 +29,17 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   const auto scale   = j.value("scale",   float{1.0f});
 
   const auto pixmap = _pixmappool->get(std::format("blobs/overlay/{}.png", family));
-
-  float fw, fh;
-  if (!SDL_GetTextureSize(*pixmap, &fw, &fh)) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_GetTextureSize] {}", SDL_GetError()));
-  }
-
-  const auto tw = static_cast<int32_t>(fw);
-  const auto th = static_cast<int32_t>(fh);
+  const auto width = pixmap->width();
+  const auto height = pixmap->height();
 
   std::unique_ptr<SDL_Texture, SDL_Deleter> target(
     SDL_CreateTexture(
       *_renderer,
       SDL_PIXELFORMAT_RGBA32,
       SDL_TEXTUREACCESS_TARGET,
-      tw, th)
+      width,
+      height
+    )
   );
   if (!target) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
@@ -51,10 +47,11 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
 
   auto* const origin = SDL_GetRenderTarget(*_renderer);
 
+  SDL_FRect destination{0, 0, static_cast<float>(width), static_cast<float>(height)};
   SDL_SetRenderTarget(*_renderer, target.get());
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
   SDL_RenderClear(*_renderer);
-  SDL_RenderTexture(*_renderer, *pixmap, nullptr, nullptr);
+  SDL_RenderTexture(*_renderer, *pixmap, nullptr, &destination);
   SDL_RenderPresent(*_renderer);
 
   std::unique_ptr<SDL_Surface, SDL_Deleter> surface(SDL_RenderReadPixels(*_renderer, nullptr));
@@ -71,20 +68,20 @@ std::shared_ptr<font> fontfactory::get(const std::string& family) {
   glyphmap map;
   auto x = 0, y = 0;
   for (char glyph : glyphs) {
-    while (x < tw && color(pixels[y * tw + x]) == separator) {
+    while (x < width && color(pixels[y * width + x]) == separator) {
       ++x;
     }
-    if (x >= tw) [[unlikely]] {
+    if (x >= width) [[unlikely]] {
       throw std::runtime_error(std::format("missing glyph for '{}'", glyph));
     }
 
     auto w = 0;
-    while (x + w < tw && color(pixels[y * tw + x + w]) != separator) {
+    while (x + w < width && color(pixels[y * width + x + w]) != separator) {
       ++w;
     }
 
     auto h = 0;
-    while (y + h < th && color(pixels[(y + h) * tw + x]) != separator) {
+    while (y + h < height && color(pixels[(y + h) * width + x]) != separator) {
       ++h;
     }
 
