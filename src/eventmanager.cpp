@@ -329,3 +329,13 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
     }
   }
 }
+
+void eventmanager::purge(uint32_t type) noexcept {
+  SDL_Event event;
+  while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, type, type) > 0) {
+    if (event.user.data1) {
+      auto* ptr = static_cast<framework::envelope*>(event.user.data1);
+      _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
+    }
+  }
+}

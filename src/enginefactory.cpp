@@ -111,15 +111,17 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->set_window(window);
   engine->set_world(world);
 
-  engine->eventmanager()->add_receiver(engine->objectmanager());
-  engine->eventmanager()->add_receiver(engine);
-  engine->eventmanager()->add_receiver(engine->statemanager());
-  engine->eventmanager()->add_receiver(overlay);
-  engine->eventmanager()->add_receiver(scenemanager);
+  eventmanager->add_receiver(engine->objectmanager());
+  eventmanager->add_receiver(engine);
+  eventmanager->add_receiver(engine->statemanager());
+  eventmanager->add_receiver(overlay);
+  eventmanager->add_receiver(scenemanager);
 
   objectmanager->set_resourcemanager(resourcemanager);
   objectmanager->set_scenemanager(scenemanager);
   objectmanager->set_world(world);
+
+  timermanager->set_eventmanager(eventmanager);
 
   return engine;
 }

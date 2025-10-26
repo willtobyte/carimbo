@@ -43,11 +43,17 @@ void timermanager::cancel(uint32_t id) noexcept {
 }
 
 void timermanager::clear() noexcept {
+  _eventmanager->purge(static_cast<uint32_t>(input::event::type::timer));
+
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
   }
 
   _envelopemapping.clear();
+}
+
+void timermanager::set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept {
+  _eventmanager = std::move(eventmanager);
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {

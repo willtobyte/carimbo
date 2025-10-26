@@ -27,6 +27,8 @@ public:
 
   void remove_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept;
 
+  void purge(uint32_t type) noexcept;
+
 private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::vector<std::weak_ptr<eventreceiver>> _receivers;
