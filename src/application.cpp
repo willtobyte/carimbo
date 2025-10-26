@@ -18,7 +18,7 @@
   #define MODE  0600
 #endif
 
-#define REDIR(PATH, FD) do{ int _t = OPEN((PATH), FLAGS, MODE); if(_t>=0){ DUP2(_t,(FD)); CLOSE(_t);} }while(0)
+#define REDIR(PATH, FD) do{ int _r = OPEN((PATH), FLAGS, MODE); if(_r>=0){ DUP2(_r,(FD)); CLOSE(_r);} }while(0)
 
 using namespace framework;
 
@@ -36,8 +36,6 @@ using namespace framework;
     }
 
     if (error) {
-      std::fflush(stdout);
-
       #ifdef HAVE_SENTRY
       const auto ev = sentry_value_new_event();
 
@@ -66,8 +64,10 @@ using namespace framework;
 
 application::application(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IONBF, 0);
+#ifndef LOCAL_DEVELOPMENT
   REDIR("stdout.txt", 1);
   REDIR("stderr.txt", 2);
+#endif
 
   std::set_terminate(fail);
 

@@ -20,7 +20,9 @@ conan: ## Installs dependencies
 
 .PHONY: build
 build: ## Builds the project
-	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+	cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
+	-DLOCAL_DEVELOPMENT=TRUE \
+	-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
 	-DCMAKE_C_FLAGS_DEBUG="$(DEBUG_COMPILER_FLAGS)" \
 	-DCMAKE_CXX_FLAGS_DEBUG="$(DEBUG_COMPILER_FLAGS)" \
 	-DCMAKE_EXE_LINKER_FLAGS_DEBUG="$(DEBUG_LINKER_FLAGS)" \

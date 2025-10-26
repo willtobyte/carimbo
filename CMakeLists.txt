@@ -35,7 +35,7 @@ execute_process(
 add_compile_definitions(GIT_VERSION="${latest_tag}+${commit_short}")
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-  $<$<BOOL:${TODO}>:TODO>
+  $<$<BOOL:${LOCAL_DEVELOPMENT}>:LOCAL_DEVELOPMENT>
   $<$<CONFIG:Debug>:DEBUG>
 )
 
