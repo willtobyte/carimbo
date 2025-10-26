@@ -1,9 +1,5 @@
 #include "scriptengine.hpp"
 
-// inline constexpr char bootstrap[] =
-// #include "bootstrap.lua.hpp"
-// ;
-
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
