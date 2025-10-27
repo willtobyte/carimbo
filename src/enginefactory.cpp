@@ -48,50 +48,52 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     return *this;
   }
 
-  #ifdef EMSCRIPTEN
-    const auto script = R"javascript(
-      (function(){
-        const __dsn="{}";
-        if (window.Sentry && window.__sentry_inited__) return;
-        const script = document.createElement('script');
-        script.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
-        script.crossOrigin = 'anonymous';
-        script.defer = true;
-        script.onload = function(){
-          if (!window.Sentry) return;
-          window.Sentry.init({ dsn: __dsn });
+#ifdef EMSCRIPTEN
+  static constexpr auto script = R"javascript(
+    (function(){{
+      const __dsn="{}";
+      if (window.Sentry && window.__sentry_inited__) return;
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
+      script.crossOrigin = 'anonymous';
+      script.defer = true;
+      script.onload = function(){{
+        if (!window.Sentry) return;
+        window.Sentry.init({{ dsn: __dsn }});
 
-          const wrap = (original, level) => function(...arguments) {
-            original.apply(console, arguments);
-            try {
-              window.Sentry.captureMessage(`console.${level}: ${arguments.map(argument=>String(argument)).join(' ')}`, level);
-            } catch(error) { }
-          };
+        const wrap = (original, level) => function(){{
+          original.apply(console, arguments);
+          try {{
+            var parts = Array.prototype.map.call(arguments, function(a) {{ return String(a); }});
+            var message = 'console.' + level + ': ' + parts.join(' ');
+            window.Sentry.captureMessage(message, level);
+          }} catch (error) {{}}
+        }};
 
-          console.log = wrap(console.log,  'info');
-          console.warn = wrap(console.warn, 'warning');
-          console.error = wrap(console.error,'error');
+        console.log  = wrap(console.log,  'info');
+        console.warn = wrap(console.warn, 'warning');
+        console.error = wrap(console.error,'error');
 
-          window.__sentry_inited__ = true;
-        };
-        document.head.appendChild(script);
-      })();
-    )javascript";
+        window.__sentry_inited__ = true;
+      }};
+      document.head.appendChild(script);
+    }})();
+  )javascript";
 
-    emscripten_run_script(std::vformat(script, std::make_format_args(dsn)).c_str());
-  #endif
+  emscripten_run_script(std::format(script, dsn).c_str());
+#endif
 
-  #ifdef HAVE_SENTRY
-    auto* options = sentry_options_new();
-    sentry_options_set_debug(options, true);
-    sentry_options_set_enable_logs(options, true);
-    sentry_options_set_dsn(options, dsn.c_str());
-    sentry_options_add_attachment(options, "cassette.json");
-    sentry_options_add_attachment(options, "stdout.txt");
-    sentry_options_add_attachment(options, "stderr.txt");
-    sentry_options_add_attachment(options, "VERSION");
-    sentry_init(options);
-  #endif
+#ifdef HAVE_SENTRY
+  auto* options = sentry_options_new();
+  sentry_options_set_debug(options, true);
+  sentry_options_set_enable_logs(options, true);
+  sentry_options_set_dsn(options, dsn.c_str());
+  sentry_options_add_attachment(options, "cassette.json");
+  sentry_options_add_attachment(options, "stdout.txt");
+  sentry_options_add_attachment(options, "stderr.txt");
+  sentry_options_add_attachment(options, "VERSION");
+  sentry_init(options);
+#endif
 
   return *this;
 }
