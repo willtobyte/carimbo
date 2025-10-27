@@ -27,7 +27,7 @@ public:
   void prefetch();
   void prefetch(const std::vector<std::string>& filenames);
 
-  #ifdef DEBUG
+  #ifndef NDEBUG
   void debug() const noexcept;
   #endif
 

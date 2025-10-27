@@ -86,7 +86,7 @@ void eventmanager::update(float delta) noexcept {
             break;
         }
 
-        #ifdef DEBUG
+        #ifndef NDEBUG
           case SDLK_D: {
             if (event.key.mod & SDL_KMOD_CTRL) {
               for (const auto& weak : _receivers) {

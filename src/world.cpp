@@ -136,7 +136,7 @@ void world::update(float delta) noexcept {
       continue;
     }
 
-#ifdef DEBUG
+#ifndef NDEBUG
     std::println("[world] dirty object {} {}", object->kind(), id);
 #endif
 

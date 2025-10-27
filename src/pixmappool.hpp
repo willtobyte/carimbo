@@ -17,7 +17,7 @@ public:
 
   void flush() noexcept;
 
-#ifdef DEBUG
+#ifndef NDEBUG
   void debug() const noexcept;
 #endif
 

@@ -3,7 +3,7 @@
 #include "application.hpp"
 
 int main(int argc, char **argv) {
-  #ifndef DEBUG
+  #ifdef NDEBUG
   #ifndef EMSCRIPTEN
   auto* out = std::freopen("stdout.txt", "w", stdout);
   if (out) setvbuf(out, nullptr, _IONBF, 0);

@@ -87,7 +87,7 @@ public:
 protected:
   virtual void on_quit() override;
 
-#ifdef DEBUG
+#ifndef NDEBUG
   virtual void on_debug() override;
 #endif
 

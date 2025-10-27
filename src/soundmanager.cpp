@@ -52,7 +52,7 @@ void soundmanager::update(float delta) noexcept {
   }
 }
 
-#ifdef DEBUG
+#ifndef NDEBUG
 void soundmanager::debug() const noexcept {
   std::println("[soundmanager.debug] total objects: {}", _pool.size());
 

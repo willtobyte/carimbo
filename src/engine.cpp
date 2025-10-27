@@ -215,7 +215,7 @@ void engine::on_quit() {
   _running = false;
 }
 
-#ifdef DEBUG
+#ifndef NDEBUG
 void engine::on_debug() {
   _resourcemanager->debug();
 }

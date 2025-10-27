@@ -26,7 +26,7 @@ void pixmappool::flush() noexcept {
   std::println("[pixmappool] {} objects have been flushed", count);
 }
 
-#ifdef DEBUG
+#ifndef NDEBUG
 void pixmappool::debug() const noexcept {
   std::println("[pixmappool.debug] total objects: {}", _pool.size());
 

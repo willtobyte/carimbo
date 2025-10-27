@@ -111,7 +111,7 @@ void fontfactory::flush() noexcept {
   std::println("[fontfactory] {} objects have been flushed", count);
 }
 
-#ifdef DEBUG
+#ifndef NDEBUG
 void fontfactory::debug() const noexcept {
   std::println("[fontfactory.debug] total objects: {}", _pool.size());
 

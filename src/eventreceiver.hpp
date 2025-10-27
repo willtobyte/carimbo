@@ -22,7 +22,7 @@ public:
   virtual void on_mail(const event::mail& event);
   virtual void on_collision(const event::collision& event);
 
-#ifdef DEBUG
+#ifndef NDEBUG
   virtual void on_debug();
 #endif
 };

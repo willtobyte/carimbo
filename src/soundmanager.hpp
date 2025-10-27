@@ -18,7 +18,7 @@ public:
 
   void update(float delta) noexcept;
 
-#ifdef DEBUG
+#ifndef NDEBUG
   void debug() const noexcept;
 #endif
 

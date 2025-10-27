@@ -9,7 +9,7 @@
  #endif
 #endif
 
-#ifdef DEBUG
+#ifndef NDEBUG
   #define SOL_ALL_SAFETIES_ON 1
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #endif

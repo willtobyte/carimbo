@@ -31,7 +31,7 @@ using namespace framework;
 
       SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
 
-      #ifdef DEBUG
+      #ifndef NDEBUG
         #ifdef _MSC_VER
           __debugbreak();
         #else
