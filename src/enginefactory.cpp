@@ -85,7 +85,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
 
 #ifdef HAVE_SENTRY
   auto* options = sentry_options_new();
-  sentry_options_set_debug(options, true);
+  // sentry_options_set_debug(options, true);
   sentry_options_set_enable_logs(options, true);
   sentry_options_set_dsn(options, dsn.c_str());
   sentry_options_add_attachment(options, "cassette.json");
