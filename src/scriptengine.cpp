@@ -1054,7 +1054,7 @@ void framework::scriptengine::run() {
   const auto loop = lua["loop"].get<sol::function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
 
-  const auto loader = lua.load(std::string_view{bootstrap}, "@bootstrap");
+  const auto loader = lua.load(bootstrap, "@bootstrap");
   if (!loader.valid()) [[unlikely]] {
     sol::error err = loader;
     throw std::runtime_error(err.what());
