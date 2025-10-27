@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "noncopyable.hpp"
+
 namespace framework {
 class application final : private noncopyable {
 public:
