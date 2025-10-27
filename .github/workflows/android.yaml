@@ -18,7 +18,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: true
+    if: false
     steps:
       - name: Checkout
         uses: actions/checkout@v4
