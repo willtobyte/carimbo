@@ -64,6 +64,18 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
               dsn: __dsn,
               integrations: [Sentry.captureConsoleIntegration()],
             }});
+
+            const wrap = (orig, level) => function(...args) {{
+              orig.apply(console, arguments);
+              try {{
+                window.Sentry.captureMessage(`console.${level}: ${arguments.map(argument=>String(argument)).join(' ')}`, level);
+              }} catch(e) {{ }}
+            }};
+
+            console.log = wrap(console.log,  'info');
+            console.warn = wrap(console.warn, 'warning');
+            console.error = wrap(console.error,'error');
+
             window.__sentry_inited__ = true;
           }};
           document.head.appendChild(script);
