@@ -63,7 +63,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
             window.Sentry.init({{
               dsn: __dsn,
               integrations: [
-                window.Sentry.captureConsoleIntegration({ levels: ['error', 'warn', 'log', 'info'] })
+                window.Sentry.captureConsoleIntegration({{ levels: ['error', 'warn', 'log', 'info'] }})
               ]
             }});
             window.__sentry_inited__ = true;
