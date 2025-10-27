@@ -67,8 +67,8 @@ using namespace framework;
 application::application(int argc, char **argv) noexcept {
   std::setvbuf(stdout, nullptr, _IONBF, 0);
 #ifndef DEVELOPMENT
-  REDIR("stdout.txt", 1);
-  REDIR("stderr.txt", 2);
+  // REDIR("stdout.txt", 1);
+  // REDIR("stderr.txt", 2);
 #endif
 
   std::set_terminate(fail);
