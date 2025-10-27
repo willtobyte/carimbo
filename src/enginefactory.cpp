@@ -78,7 +78,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
       })();
     )javascript";
 
-    emscripten_run_script(std::vformat(script, std::make_format_args(dsn)));
+    emscripten_run_script(std::vformat(script, std::make_format_args(dsn)).c_str());
   #endif
 
   #ifdef HAVE_SENTRY
