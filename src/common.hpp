@@ -26,6 +26,7 @@ extern "C" {
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <SDL3/SDL_main.h>
 #include <SDL3/SDL.h>
 #include <nlohmann/json.hpp>
 #include <ogg/ogg.h>

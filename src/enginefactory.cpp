@@ -80,6 +80,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
     sentry_options_add_attachment(options, "cassette.json");
     sentry_options_add_attachment(options, "stdout.txt");
     sentry_options_add_attachment(options, "stderr.txt");
+    sentry_options_add_attachment(options, "VERSION");
     sentry_init(options);
   #endif
 

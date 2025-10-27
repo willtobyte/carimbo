@@ -1,8 +1,6 @@
-#include <SDL3/SDL_main.h>
-
 #include "application.hpp"
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   framework::application app(argc, argv);
   return app.run();
 }
