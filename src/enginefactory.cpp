@@ -60,20 +60,6 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
       script.onload = function(){{
         if (!window.Sentry) return;
         window.Sentry.init({{ dsn: __dsn }});
-
-        const wrap = (original, level) => function(){{
-          original.apply(console, arguments);
-          try {{
-            var parts = Array.prototype.map.call(arguments, function(a) {{ return String(a); }});
-            var message = 'console.' + level + ': ' + parts.join(' ');
-            window.Sentry.captureMessage(message, level);
-          }} catch (error) {{}}
-        }};
-
-        console.log  = wrap(console.log,  'info');
-        console.warn = wrap(console.warn, 'warning');
-        console.error = wrap(console.error,'error');
-
         window.__sentry_inited__ = true;
       }};
       document.head.appendChild(script);
