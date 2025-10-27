@@ -49,42 +49,36 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
   }
 
   #ifdef EMSCRIPTEN
-    const auto script = std::format(
-      R"javascript(
-        (function(){{
-          const __dsn="{}";
-          if (window.Sentry && window.__sentry_inited__) return;
-          const script = document.createElement('script');
-          script.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
-          script.crossOrigin = 'anonymous';
-          script.defer = true;
-          script.onload = function(){{
-            if (!window.Sentry) return;
-            window.Sentry.init({{
-              dsn: __dsn,
-              integrations: [Sentry.captureConsoleIntegration()],
-            }});
+    const auto script = R"javascript(
+      (function(){
+        const __dsn="{}";
+        if (window.Sentry && window.__sentry_inited__) return;
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@sentry/browser@latest/build/bundle.min.js';
+        script.crossOrigin = 'anonymous';
+        script.defer = true;
+        script.onload = function(){
+          if (!window.Sentry) return;
+          window.Sentry.init({ dsn: __dsn });
 
-            const wrap = (original, level) => function(...arguments) {{
-              original.apply(console, arguments);
-              try {{
-                window.Sentry.captureMessage(`console.${level}: ${arguments.map(argument=>String(argument)).join(' ')}`, level);
-              }} catch(error) {{ }}
-            }};
+          const wrap = (original, level) => function(...arguments) {
+            original.apply(console, arguments);
+            try {
+              window.Sentry.captureMessage(`console.${level}: ${arguments.map(argument=>String(argument)).join(' ')}`, level);
+            } catch(error) { }
+          };
 
-            console.log = wrap(console.log,  'info');
-            console.warn = wrap(console.warn, 'warning');
-            console.error = wrap(console.error,'error');
+          console.log = wrap(console.log,  'info');
+          console.warn = wrap(console.warn, 'warning');
+          console.error = wrap(console.error,'error');
 
-            window.__sentry_inited__ = true;
-          }};
-          document.head.appendChild(script);
-        }})();
-      )javascript",
-      dsn
-    );
+          window.__sentry_inited__ = true;
+        };
+        document.head.appendChild(script);
+      })();
+    )javascript";
 
-    emscripten_run_script(script.c_str());
+    emscripten_run_script(std::vformat(script, std::make_format_args(dsn)));
   #endif
 
   #ifdef HAVE_SENTRY
