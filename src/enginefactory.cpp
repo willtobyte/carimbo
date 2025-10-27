@@ -60,7 +60,10 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
           script.defer = true;
           script.onload = function(){{
             if (!window.Sentry) return;
-            window.Sentry.init({{ dsn: __dsn }});
+            window.Sentry.init({{
+              dsn: __dsn,
+              integrations: [Sentry.captureConsoleIntegration()],
+            }});
             window.__sentry_inited__ = true;
           }};
           document.head.appendChild(script);
