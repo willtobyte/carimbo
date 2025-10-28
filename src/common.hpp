@@ -26,6 +26,10 @@ extern "C" {
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
+#ifdef EMSCRIPTEN
+ #include <emscripten.h>
+#endif
+
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/functional/hash.hpp>
