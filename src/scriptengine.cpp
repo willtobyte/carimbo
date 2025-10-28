@@ -844,8 +844,7 @@ void framework::scriptengine::run() {
     "b", sol::property(&graphics::color::b, &graphics::color::set_b),
     "a", sol::property(&graphics::color::a, &graphics::color::set_a),
 
-    sol::meta_function::equal_to,
-    &graphics::color::operator==
+    sol::meta_function::equal_to, &graphics::color::operator==
   );
 
   lua.new_enum(
@@ -860,6 +859,55 @@ void framework::scriptengine::run() {
     "enter", input::event::keyboard::key::enter,
     "escape", input::event::keyboard::key::escape
   );
+
+  struct mouse final {
+  private:
+    [[nodiscard]] static std::tuple<float, float, uint32_t> state() noexcept {
+      float x{}, y{};
+      const auto s = SDL_GetMouseState(&x, &y);
+      return {x, y, s};
+    }
+
+  public:
+    static float x() noexcept {
+      const auto [x, y, s] = state();
+      return x;
+    }
+
+    static float y() noexcept {
+      const auto [x, y, s] = state();
+      return y;
+    }
+
+    static std::tuple<float, float> xy() noexcept {
+      const auto [x, y, s] = state();
+      return {x, y};
+    }
+
+    static int button() noexcept {
+      const auto [x, y, s] = state();
+      if (s & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
+      if (s & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;
+      if (s & SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) return SDL_BUTTON_RIGHT;
+      return 0;
+    }
+  };
+
+  lua.new_enum("MouseButton",
+    "none",   0,
+    "left",   SDL_BUTTON_LEFT,
+    "middle", SDL_BUTTON_MIDDLE,
+    "right",  SDL_BUTTON_RIGHT
+  );
+
+  lua.new_usertype<mouse>("Mouse",
+    "x", sol::property(&mouse::x),
+    "y", sol::property(&mouse::y),
+    "xy", &mouse::xy,
+    "button", sol::property(&mouse::button)
+  );
+
+  lua["mouse"] = mouse{};
 
   lua.new_usertype<framework::mail>(
     "Mail",
