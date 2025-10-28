@@ -835,48 +835,6 @@ void framework::scriptengine::run() {
     }
   );
 
-  lua.new_usertype<network::socket>(
-    "Socket",
-    sol::constructors<network::socket()>(),
-    "connect", &network::socket::connect,
-    "emit", [](
-      network::socket& self,
-      const std::string& event,
-      const sol::table& data
-    ) {
-      const auto j = _to_json(data);
-      self.emit(event, j.dump());
-    },
-    "on", [](
-      network::socket& self,
-      const std::string& event,
-      const sol::function& callback,
-      sol::this_state state
-    ) {
-      sol::state_view lua(state);
-
-      self.on(event, [callback, lua](const std::string& json) {
-        const auto& j = nlohmann::json::parse(json);
-        callback(_to_lua(j, lua));
-      });
-    },
-    "rpc", [](
-      network::socket& self,
-      const std::string& method,
-      const sol::table& arguments,
-      const sol::function& callback,
-      sol::this_state state
-    ) {
-      sol::state_view lua(state);
-      const auto j = _to_json(arguments);
-
-      self.rpc(method, j.dump(), [callback, lua](const std::string& response) {
-        const auto& j = nlohmann::json::parse(response);
-        callback(_to_lua(j, lua));
-      });
-    }
-  );
-
   lua.new_usertype<graphics::color>(
     "Color",
     "color", sol::constructors<graphics::color(const std::string& )>(),

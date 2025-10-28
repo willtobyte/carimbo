@@ -1,14 +1,5 @@
 #pragma once
 
-#define WEBSOCKET
-
-#ifdef EMSCRIPTEN
- #include <emscripten.h>
- #ifdef WEBSOCKET
-  #include <emscripten/websocket.h>
- #endif
-#endif
-
 #ifndef NDEBUG
   #define SOL_ALL_SAFETIES_ON 1
   #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
@@ -35,21 +26,6 @@ extern "C" {
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 
-#ifndef EMSCRIPTEN
- #include <boost/asio.hpp>
- #include <boost/asio/connect.hpp>
- #include <boost/asio/ssl.hpp>
- #include <boost/asio/strand.hpp>
- #include <boost/beast/core.hpp>
- #include <boost/beast/websocket.hpp>
- #include <boost/beast/websocket/ssl.hpp>
- #include <boost/config.hpp>
-#endif
-
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/box.hpp>
-#include <boost/geometry/index/rtree.hpp>
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/functional/hash.hpp>

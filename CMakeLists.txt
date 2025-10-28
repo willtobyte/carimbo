@@ -88,9 +88,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
 
     -sWASM_BIGINT=1
 
-    -sWEBSOCKET_SUBPROTOCOL=text
-    -lwebsocket.js
-
     -sDISABLE_EXCEPTION_CATCHING=0
     -sASSERTIONS=1
 
