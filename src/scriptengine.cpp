@@ -919,41 +919,41 @@ void framework::scriptengine::run() {
         {"q", SDL_SCANCODE_Q}, {"r", SDL_SCANCODE_R}, {"s", SDL_SCANCODE_S}, {"t", SDL_SCANCODE_T},
         {"u", SDL_SCANCODE_U}, {"v", SDL_SCANCODE_V}, {"w", SDL_SCANCODE_W}, {"x", SDL_SCANCODE_X},
         {"y", SDL_SCANCODE_Y}, {"z", SDL_SCANCODE_Z},
-    
+
         {"0", SDL_SCANCODE_0}, {"1", SDL_SCANCODE_1}, {"2", SDL_SCANCODE_2}, {"3", SDL_SCANCODE_3},
         {"4", SDL_SCANCODE_4}, {"5", SDL_SCANCODE_5}, {"6", SDL_SCANCODE_6}, {"7", SDL_SCANCODE_7},
         {"8", SDL_SCANCODE_8}, {"9", SDL_SCANCODE_9},
-    
+
         {"f1", SDL_SCANCODE_F1}, {"f2", SDL_SCANCODE_F2}, {"f3", SDL_SCANCODE_F3}, {"f4", SDL_SCANCODE_F4},
         {"f5", SDL_SCANCODE_F5}, {"f6", SDL_SCANCODE_F6}, {"f7", SDL_SCANCODE_F7}, {"f8", SDL_SCANCODE_F8},
         {"f9", SDL_SCANCODE_F9}, {"f10", SDL_SCANCODE_F10}, {"f11", SDL_SCANCODE_F11}, {"f12", SDL_SCANCODE_F12},
-    
+
         {"up", SDL_SCANCODE_UP}, {"down", SDL_SCANCODE_DOWN}, {"left", SDL_SCANCODE_LEFT}, {"right", SDL_SCANCODE_RIGHT},
-    
+
         {"lshift", SDL_SCANCODE_LSHIFT}, {"rshift", SDL_SCANCODE_RSHIFT},
         {"lctrl", SDL_SCANCODE_LCTRL}, {"rctrl", SDL_SCANCODE_RCTRL},
         {"lalt", SDL_SCANCODE_LALT}, {"ralt", SDL_SCANCODE_RALT},
         {"lgui", SDL_SCANCODE_LGUI}, {"rgui", SDL_SCANCODE_RGUI},
-    
+
         {"escape", SDL_SCANCODE_ESCAPE}, {"space", SDL_SCANCODE_SPACE}, {"return", SDL_SCANCODE_RETURN},
         {"enter", SDL_SCANCODE_RETURN}, {"tab", SDL_SCANCODE_TAB}, {"backspace", SDL_SCANCODE_BACKSPACE},
         {"capslock", SDL_SCANCODE_CAPSLOCK}, {"delete", SDL_SCANCODE_DELETE}, {"insert", SDL_SCANCODE_INSERT},
         {"home", SDL_SCANCODE_HOME}, {"end", SDL_SCANCODE_END}, {"pageup", SDL_SCANCODE_PAGEUP},
         {"pagedown", SDL_SCANCODE_PAGEDOWN},
-    
+
         {"minus", SDL_SCANCODE_MINUS}, {"equals", SDL_SCANCODE_EQUALS}, {"leftbracket", SDL_SCANCODE_LEFTBRACKET},
         {"rightbracket", SDL_SCANCODE_RIGHTBRACKET}, {"backslash", SDL_SCANCODE_BACKSLASH},
         {"semicolon", SDL_SCANCODE_SEMICOLON}, {"apostrophe", SDL_SCANCODE_APOSTROPHE},
         {"grave", SDL_SCANCODE_GRAVE}, {"comma", SDL_SCANCODE_COMMA}, {"period", SDL_SCANCODE_PERIOD},
         {"slash", SDL_SCANCODE_SLASH},
-    
+
         {"kp_0", SDL_SCANCODE_KP_0}, {"kp_1", SDL_SCANCODE_KP_1}, {"kp_2", SDL_SCANCODE_KP_2},
         {"kp_3", SDL_SCANCODE_KP_3}, {"kp_4", SDL_SCANCODE_KP_4}, {"kp_5", SDL_SCANCODE_KP_5},
         {"kp_6", SDL_SCANCODE_KP_6}, {"kp_7", SDL_SCANCODE_KP_7}, {"kp_8", SDL_SCANCODE_KP_8},
         {"kp_9", SDL_SCANCODE_KP_9}, {"kp_period", SDL_SCANCODE_KP_PERIOD}, {"kp_divide", SDL_SCANCODE_KP_DIVIDE},
         {"kp_multiply", SDL_SCANCODE_KP_MULTIPLY}, {"kp_minus", SDL_SCANCODE_KP_MINUS},
         {"kp_plus", SDL_SCANCODE_KP_PLUS}, {"kp_enter", SDL_SCANCODE_KP_ENTER}, {"kp_equals", SDL_SCANCODE_KP_EQUALS},
-    
+
         {"printscreen", SDL_SCANCODE_PRINTSCREEN}, {"scrolllock", SDL_SCANCODE_SCROLLLOCK},
         {"pause", SDL_SCANCODE_PAUSE}, {"numlock", SDL_SCANCODE_NUMLOCKCLEAR},
         {"menu", SDL_SCANCODE_MENU}, {"application", SDL_SCANCODE_APPLICATION}
@@ -979,6 +979,106 @@ void framework::scriptengine::run() {
   );
 
   lua["keyboard"] = keyboard{};
+
+  struct joystick final {
+    static sol::object index(sol::this_state state, const sol::object& key) {
+      sol::state_view lua(state);
+
+      if (key.is<std::string>()) {
+        const auto& prop = key.as<std::string>();
+
+        if (prop == "count") {
+          int count;
+          SDL_GetJoysticks(&count);
+          return sol::make_object(lua, count);
+        }
+      }
+
+      if (key.is<int>()) {
+        int idx = key.as<int>();
+        return sol::make_object(lua, instance{idx});
+      }
+
+      return sol::lua_nil;
+    }
+
+    struct instance final {
+      int i;
+
+      explicit instance(int index) : i(index) {}
+
+      sol::object index(sol::this_state state, const sol::object& key) {
+        sol::state_view lua(state);
+
+        if (!key.is<std::string>()) {
+          return sol::lua_nil;
+        }
+
+        const auto& name = key.as<std::string>();
+
+        int count;
+        SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
+        if (!joysticks || i < 1 || i > count) {
+          SDL_free(joysticks);
+          return sol::lua_nil;
+        }
+
+        SDL_JoystickID joy_id = joysticks[i - 1];
+        SDL_free(joysticks);
+
+        auto joy = std::unique_ptr<SDL_Joystick, SDL_Deleter>(
+          SDL_OpenJoystick(joy_id)
+        );
+
+        if (!joy) {
+          return sol::lua_nil;
+        }
+
+        int buttons = SDL_GetNumJoystickButtons(joy.get());
+
+        int number = -1;
+
+        if (name.size() > 6 && name.substr(0, 6) == "button") {
+          try {
+            number = std::stoi(name.substr(6)) - 1;
+          } catch (...) {
+            return sol::lua_nil;
+          }
+        } else {
+          static const std::unordered_map<std::string, int> button_map = {
+            {"a", 0}, {"b", 1}, {"x", 2}, {"y", 3},
+            {"back", 4}, {"guide", 5}, {"start", 6},
+            {"leftstick", 7}, {"rightstick", 8},
+            {"leftshoulder", 9}, {"rightshoulder", 10}
+          };
+
+          auto it = button_map.find(name);
+          if (it != button_map.end()) {
+            number = it->second;
+          }
+        }
+
+        if (number < 0 || number >= buttons) {
+          return sol::lua_nil;
+        }
+
+        bool pressed = SDL_GetJoystickButton(joy.get(), number);
+        return sol::make_object(lua, pressed);
+      }
+    };
+  };
+
+  lua.new_usertype<joystick::instance>(
+    "JoystickInstance",
+    sol::no_constructor,
+    sol::meta_function::index, &joystick::instance::index
+  );
+
+  lua.new_usertype<joystick>(
+    "Joystick",
+    sol::no_constructor,
+    sol::meta_function::index, &joystick::index
+  );
 
   lua.new_usertype<framework::mail>(
     "Mail",
