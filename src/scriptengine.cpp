@@ -988,8 +988,12 @@ void framework::scriptengine::run() {
         const auto& prop = key.as<std::string>();
 
         if (prop == "count") {
-          int count;
-          SDL_GetJoysticks(&count);
+          int count = 0;
+          SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
+          if (!joysticks) {
+            return sol::make_object(lua, 0);
+          }
+          SDL_free(joysticks);
           return sol::make_object(lua, count);
         }
       }
