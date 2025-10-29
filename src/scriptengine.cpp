@@ -1032,8 +1032,8 @@ void framework::scriptengine::run() {
         }
 
         static const std::unordered_map<std::string, SDL_GamepadButton> map = {
-          {"south", SDL_GAMEPAD_BUTTON_SOUTH}, {"b", SDL_GAMEPAD_BUTTON_EAST}, {"x", SDL_GAMEPAD_BUTTON_WEST},
-          {"y", SDL_GAMEPAD_BUTTON_NORTH}, {"back", SDL_GAMEPAD_BUTTON_BACK}, {"guide", SDL_GAMEPAD_BUTTON_GUIDE},
+          {"south", SDL_GAMEPAD_BUTTON_SOUTH}, {"east", SDL_GAMEPAD_BUTTON_EAST}, {"west", SDL_GAMEPAD_BUTTON_WEST},
+          {"north", SDL_GAMEPAD_BUTTON_NORTH}, {"back", SDL_GAMEPAD_BUTTON_BACK}, {"guide", SDL_GAMEPAD_BUTTON_GUIDE},
           {"start", SDL_GAMEPAD_BUTTON_START}, {"leftstick", SDL_GAMEPAD_BUTTON_LEFT_STICK}, {"rightstick", SDL_GAMEPAD_BUTTON_RIGHT_STICK},
           {"leftshoulder", SDL_GAMEPAD_BUTTON_LEFT_SHOULDER}, {"rightshoulder", SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER}, {"dpad_up", SDL_GAMEPAD_BUTTON_DPAD_UP},
           {"dpad_down", SDL_GAMEPAD_BUTTON_DPAD_DOWN}, {"dpad_left", SDL_GAMEPAD_BUTTON_DPAD_LEFT}, {"dpad_right", SDL_GAMEPAD_BUTTON_DPAD_RIGHT}
