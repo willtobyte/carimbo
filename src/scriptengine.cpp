@@ -981,7 +981,7 @@ void framework::scriptengine::run() {
   lua["keyboard"] = keyboard{};
 
   struct joystick final {
-    static sol::object index(sol::this_state state, const sol::object& key) {
+    sol::object index(sol::this_state state, const sol::object& key) {
       sol::state_view lua(state);
 
       if (key.is<std::string>()) {
@@ -990,11 +990,11 @@ void framework::scriptengine::run() {
         if (prop == "count") {
           int count = 0;
           SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
-          if (!joysticks) {
-            return sol::make_object(lua, 0);
+          int result = joysticks ? count : 0;
+          if (joysticks) {
+            SDL_free(joysticks);
           }
-          SDL_free(joysticks);
-          return sol::make_object(lua, count);
+          return sol::make_object(lua, result);
         }
       }
 
