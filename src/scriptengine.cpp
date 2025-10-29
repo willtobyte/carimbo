@@ -1005,7 +1005,7 @@ void framework::scriptengine::run() {
       std::vector<SDL_JoystickID> cached_ids;
       std::unordered_map<SDL_JoystickID, std::shared_ptr<SDL_Gamepad>> gamepads;
 
-      void refresh_cache() {
+      void refresh() {
         int count;
         auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(
           SDL_GetJoysticks(&count)
@@ -1021,7 +1021,7 @@ void framework::scriptengine::run() {
         cached_ids.assign(joysticks.get(), joysticks.get() + count);
       }
 
-      bool is_cache_valid() {
+      bool is_valid() {
         int count;
         auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(
           SDL_GetJoysticks(&count)
@@ -1031,15 +1031,16 @@ void framework::scriptengine::run() {
       }
 
       int count() {
-        if (cached_count == -1 || !is_cache_valid()) {
-          refresh_cache();
+        if (cached_count == -1 || !is_valid()) {
+          refresh();
         }
+
         return cached_count;
       }
 
       SDL_Gamepad* get(int index) {
-        if (cached_count == -1 || !is_cache_valid()) {
-          refresh_cache();
+        if (cached_count == -1 || !is_valid()) {
+          refresh();
         }
 
         if (cached_ids.empty() || index < 1 || index > cached_count) {
