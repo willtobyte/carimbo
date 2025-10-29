@@ -988,25 +988,87 @@ void framework::scriptengine::run() {
         const auto& prop = key.as<std::string>();
 
         if (prop == "count") {
-          int count;
-          auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(SDL_GetJoysticks(&count));
-          int result = joysticks.get() ? count : 0;
-          return sol::make_object(lua, result);
+          return sol::make_object(lua, _manager.count());
         }
       }
 
       if (key.is<int>()) {
         const auto index = key.as<int>();
-        return sol::make_object(lua, instance{index});
+        return sol::make_object(lua, instance{_manager, index});
       }
 
       return sol::lua_nil;
     }
 
+    struct manager final {
+      int cached_count = -1;
+      std::vector<SDL_JoystickID> cached_ids;
+      std::unordered_map<SDL_JoystickID, std::shared_ptr<SDL_Gamepad>> gamepads;
+
+      void refresh_cache() {
+        int count;
+        auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(
+          SDL_GetJoysticks(&count)
+        );
+
+        if (!joysticks) {
+          cached_count = 0;
+          cached_ids.clear();
+          return;
+        }
+
+        cached_count = count;
+        cached_ids.assign(joysticks.get(), joysticks.get() + count);
+      }
+
+      bool is_cache_valid() {
+        int count;
+        auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(
+          SDL_GetJoysticks(&count)
+        );
+
+        return joysticks && count == cached_count;
+      }
+
+      int count() {
+        if (cached_count == -1 || !is_cache_valid()) {
+          refresh_cache();
+        }
+        return cached_count;
+      }
+
+      SDL_Gamepad* get(int index) {
+        if (cached_count == -1 || !is_cache_valid()) {
+          refresh_cache();
+        }
+
+        if (cached_ids.empty() || index < 1 || index > cached_count) {
+          return nullptr;
+        }
+
+        const auto id = cached_ids[index - 1];
+
+        if (auto it = gamepads.find(id); it != gamepads.end()) {
+          return it->second.get();
+        }
+
+        if (SDL_IsGamepad(id)) {
+          auto gamepad = std::shared_ptr<SDL_Gamepad>(SDL_OpenGamepad(id), SDL_Deleter());
+          if (gamepad) {
+            gamepads[id] = gamepad;
+            return gamepad.get();
+          }
+        }
+
+        return nullptr;
+      }
+    };
+
     struct instance final {
+      manager& _manager;
       int i;
 
-      explicit instance(int index) : i(index) {}
+      explicit instance(manager& manager, int index) : _manager(manager), i(index) {}
 
       sol::object index(sol::this_state state, const sol::object& key) {
         sol::state_view lua(state);
@@ -1015,18 +1077,7 @@ void framework::scriptengine::run() {
           return sol::lua_nil;
         }
 
-        int count;
-        const auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(SDL_GetJoysticks(&count));
-        if (!joysticks || i < 1 || i > count) [[unlikely]] {
-            return sol::lua_nil;
-        }
-
-        const auto id = joysticks[i - 1];
-        if (!SDL_IsGamepad(id)) [[unlikely]] {
-          return sol::lua_nil;
-        }
-
-        const auto gamepad = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(SDL_OpenGamepad(id));
+        auto* gamepad = _manager.get(i);
         if (!gamepad) [[unlikely]] {
           return sol::lua_nil;
         }
@@ -1045,10 +1096,12 @@ void framework::scriptengine::run() {
           return sol::lua_nil;
         }
 
-        bool pressed = SDL_GetGamepadButton(gamepad.get(), it->second);
+        bool pressed = SDL_GetGamepadButton(gamepad, it->second);
         return sol::make_object(lua, pressed);
       }
     };
+
+    manager _manager;
   };
 
   lua.new_usertype<joystick::instance>(
