@@ -1080,6 +1080,8 @@ void framework::scriptengine::run() {
     sol::meta_function::index, &joystick::index
   );
 
+  lua["joystick"] = joystick{};
+
   lua.new_usertype<framework::mail>(
     "Mail",
     sol::constructors<framework::mail(
