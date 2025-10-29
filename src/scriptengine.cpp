@@ -988,19 +988,16 @@ void framework::scriptengine::run() {
         const auto& prop = key.as<std::string>();
 
         if (prop == "count") {
-          int count = 0;
-          SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
-          int result = joysticks ? count : 0;
-          if (joysticks) {
-            SDL_free(joysticks);
-          }
+          int count;
+          auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(SDL_GetJoysticks(&count));
+          int result = joysticks.get() ? count : 0;
           return sol::make_object(lua, result);
         }
       }
 
       if (key.is<int>()) {
-        int idx = key.as<int>();
-        return sol::make_object(lua, instance{idx});
+        const auto index = key.as<int>();
+        return sol::make_object(lua, instance{index});
       }
 
       return sol::lua_nil;
@@ -1018,55 +1015,37 @@ void framework::scriptengine::run() {
           return sol::lua_nil;
         }
 
-        const auto& name = key.as<std::string>();
-
         int count;
-        SDL_JoystickID* joysticks = SDL_GetJoysticks(&count);
-        if (!joysticks || i < 1 || i > count) {
-          SDL_free(joysticks);
-          return sol::lua_nil;
-        }
-
-        SDL_JoystickID joy_id = joysticks[i - 1];
-        SDL_free(joysticks);
-
-        auto joy = std::unique_ptr<SDL_Joystick, SDL_Deleter>(
-          SDL_OpenJoystick(joy_id)
-        );
-
-        if (!joy) {
-          return sol::lua_nil;
-        }
-
-        int buttons = SDL_GetNumJoystickButtons(joy.get());
-
-        int number = -1;
-
-        if (name.size() > 6 && name.substr(0, 6) == "button") {
-          try {
-            number = std::stoi(name.substr(6)) - 1;
-          } catch (...) {
+        const auto joysticks = std::unique_ptr<SDL_JoystickID[], decltype([](SDL_JoystickID* ptr) { SDL_free(ptr); })>(SDL_GetJoysticks(&count));
+        if (!joysticks || i < 1 || i > count) [[unlikely]] {
             return sol::lua_nil;
-          }
-        } else {
-          static const std::unordered_map<std::string, int> button_map = {
-            {"a", 0}, {"b", 1}, {"x", 2}, {"y", 3},
-            {"back", 4}, {"guide", 5}, {"start", 6},
-            {"leftstick", 7}, {"rightstick", 8},
-            {"leftshoulder", 9}, {"rightshoulder", 10}
-          };
-
-          auto it = button_map.find(name);
-          if (it != button_map.end()) {
-            number = it->second;
-          }
         }
 
-        if (number < 0 || number >= buttons) {
+        const auto id = joysticks[i - 1];
+        if (!SDL_IsGamepad(id)) [[unlikely]] {
           return sol::lua_nil;
         }
 
-        bool pressed = SDL_GetJoystickButton(joy.get(), number);
+        const auto gamepad = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(SDL_OpenGamepad(id));
+        if (!gamepad) [[unlikely]] {
+          return sol::lua_nil;
+        }
+
+        static const std::unordered_map<std::string, SDL_GamepadButton> map = {
+          {"south", SDL_GAMEPAD_BUTTON_SOUTH}, {"b", SDL_GAMEPAD_BUTTON_EAST}, {"x", SDL_GAMEPAD_BUTTON_WEST},
+          {"y", SDL_GAMEPAD_BUTTON_NORTH}, {"back", SDL_GAMEPAD_BUTTON_BACK}, {"guide", SDL_GAMEPAD_BUTTON_GUIDE},
+          {"start", SDL_GAMEPAD_BUTTON_START}, {"leftstick", SDL_GAMEPAD_BUTTON_LEFT_STICK}, {"rightstick", SDL_GAMEPAD_BUTTON_RIGHT_STICK},
+          {"leftshoulder", SDL_GAMEPAD_BUTTON_LEFT_SHOULDER}, {"rightshoulder", SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER}, {"dpad_up", SDL_GAMEPAD_BUTTON_DPAD_UP},
+          {"dpad_down", SDL_GAMEPAD_BUTTON_DPAD_DOWN}, {"dpad_left", SDL_GAMEPAD_BUTTON_DPAD_LEFT}, {"dpad_right", SDL_GAMEPAD_BUTTON_DPAD_RIGHT}
+        };
+
+        const auto& name = key.as<std::string>();
+        const auto it = map.find(name);
+        if (it == map.end()) [[likely]] {
+          return sol::lua_nil;
+        }
+
+        bool pressed = SDL_GetGamepadButton(gamepad.get(), it->second);
         return sol::make_object(lua, pressed);
       }
     };
