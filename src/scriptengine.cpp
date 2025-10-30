@@ -467,16 +467,24 @@ void framework::scriptengine::run() {
     "two", input::event::player::two
   );
 
+  std::unordered_map<uint8_t, playerwrapper> playermapping;
+
   lua.new_usertype<framework::statemanager>(
     "StateManager",
     sol::no_constructor,
     "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
-    "player", [](
+    "player", [playermapping = std::make_shared<std::unordered_map<uint8_t, playerwrapper>>()](
       framework::statemanager& self,
       input::event::player player
     ) {
-      return playerwrapper(player, self);
+      auto index = static_cast<uint8_t>(player);
+      auto it = playermapping->find(index);
+      if (it == playermapping->end()) [[unlikely]] {
+        it = playermapping->emplace(index, playerwrapper(player, self)).first;
+      }
+
+      return it->second;
     }
   );
 
