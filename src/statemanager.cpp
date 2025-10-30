@@ -3,17 +3,12 @@
 using namespace framework;
 using namespace input::event;
 
-static constexpr inline std::pair<uint64_t, uint64_t> make_key(uint64_t a, uint64_t b) noexcept {
-  return (a <= b) ? std::make_pair(a, b) : std::make_pair(b, a);
-}
-
 statemanager::statemanager() noexcept {
   _collision_mapping.reserve(64);
 }
 
 bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept {
-  auto it = _collision_mapping.find(make_key(a->id(), b->id()));
-  return (it != _collision_mapping.end()) ? it->second : false;
+  return _collision_mapping.contains(std::make_pair(a->id(), b->id()));
 }
 
 bool statemanager::on(uint8_t player, gamepad::button type) const noexcept {
@@ -30,7 +25,7 @@ uint8_t statemanager::players() const noexcept {
   return static_cast<uint8_t>(_state.size());
 }
 
-constexpr std::optional<input::event::gamepad::button> keytoctrl(const keyboard::key& event) {
+static constexpr inline std::optional<input::event::gamepad::button> keytoctrl(const keyboard::key& event) {
   using namespace input;
 
   switch (event) {
@@ -108,7 +103,7 @@ void statemanager::on_gamepad_motion(uint8_t who, const gamepad::motion& event) 
 }
 
 void statemanager::on_collision(const input::event::collision& event) {
-  _collision_mapping[make_key(event.a, event.b)] = true;
+  _collision_mapping.insert({event.a, event.b});
 }
 
 void statemanager::on_endupdate() {

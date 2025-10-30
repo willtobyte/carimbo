@@ -33,6 +33,7 @@ extern "C" {
 #include <boost/unordered_map.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/functional/hash.hpp>
+#include <boost/unordered/unordered_flat_set.hpp>
 
 #include <algorithm>
 #include <array>
