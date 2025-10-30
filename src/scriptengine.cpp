@@ -467,20 +467,16 @@ void framework::scriptengine::run() {
     "two", input::event::player::two
   );
 
-  std::unordered_map<input::event::player, playerwrapper> player_mapping;
-
   lua.new_usertype<framework::statemanager>(
     "StateManager",
     sol::no_constructor,
     "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
-    "player", [&player_mapping](
+    "player", [](
       framework::statemanager& self,
       input::event::player player
     ) {
-      const auto it = player_mapping.try_emplace(player, player, self).first;
-
-      return it->second;
+      return playerwrapper(player, self);
     }
   );
 
