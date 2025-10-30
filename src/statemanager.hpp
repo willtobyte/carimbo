@@ -7,19 +7,38 @@
 #include "lifecycleobserver.hpp"
 
 namespace framework {
+struct collision_pair {
+  uint64_t a, b;
+
+  collision_pair(uint64_t x, uint64_t y) noexcept
+    : a(std::min(x, y)), b(std::max(x, y)) {}
+
+  bool operator==(const collision_pair& other) const noexcept = default;
+};
+
 struct collision_hash final {
-  std::size_t operator()(const std::pair<uint64_t, uint64_t>& p) const noexcept {
-    const auto h1 = std::hash<uint64_t>{}(p.first);
-    const auto h2 = std::hash<uint64_t>{}(p.second);
-    return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+  using is_transparent = void;
+
+  std::size_t operator()(const collision_pair& p) const noexcept {
+    return std::hash<uint64_t>{}(p.a) ^ (std::hash<uint64_t>{}(p.b) << 1);
+  }
+
+  std::size_t operator()(std::pair<uint64_t, uint64_t> p) const noexcept {
+    auto normalized = std::minmax(p.first, p.second);
+    return std::hash<uint64_t>{}(normalized.first) ^ (std::hash<uint64_t>{}(normalized.second) << 1);
   }
 };
 
 struct collision_equal final {
-  bool operator()(const std::pair<uint64_t, uint64_t>& lhs,
-                  const std::pair<uint64_t, uint64_t>& rhs) const noexcept {
-    return (lhs.first == rhs.first && lhs.second == rhs.second) ||
-            (lhs.first == rhs.second && lhs.second == rhs.first);
+  using is_transparent = void;
+
+  bool operator()(const collision_pair& lhs, const collision_pair& rhs) const noexcept {
+    return lhs.a == rhs.a && lhs.b == rhs.b;
+  }
+
+  bool operator()(std::pair<uint64_t, uint64_t> lhs, const collision_pair& rhs) const noexcept {
+    auto normalized = std::minmax(lhs.first, lhs.second);
+    return normalized.first == rhs.a && normalized.second == rhs.b;
   }
 };
 
@@ -28,7 +47,7 @@ public:
   statemanager() noexcept;
   virtual ~statemanager() noexcept = default;
 
-  bool collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept;
+  bool collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const noexcept;
 
   bool on(uint8_t player, const input::event::gamepad::button type) const noexcept;
 
@@ -52,6 +71,6 @@ protected:
 private:
   std::unordered_map<uint8_t, std::unordered_map<input::event::gamepad::button, bool>> _state;
 
-  boost::unordered_flat_set<std::pair<uint64_t, uint64_t>, collision_hash, collision_equal> _collision_mapping;
+  std::unordered_set<collision_pair, collision_hash, collision_equal> _collision_mapping;
 };
 }

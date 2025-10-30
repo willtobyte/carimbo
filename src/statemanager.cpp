@@ -7,8 +7,8 @@ statemanager::statemanager() noexcept {
   _collision_mapping.reserve(64);
 }
 
-bool statemanager::collides(std::shared_ptr<object> a, std::shared_ptr<object> b) const noexcept {
-  return _collision_mapping.contains(std::make_pair(a->id(), b->id()));
+bool statemanager::collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const noexcept {
+  return _collision_mapping.contains(std::pair{a->id(), b->id()});
 }
 
 bool statemanager::on(uint8_t player, gamepad::button type) const noexcept {
@@ -103,7 +103,7 @@ void statemanager::on_gamepad_motion(uint8_t who, const gamepad::motion& event) 
 }
 
 void statemanager::on_collision(const input::event::collision& event) {
-  _collision_mapping.insert({event.a, event.b});
+  _collision_mapping.emplace(event.a, event.b);
 }
 
 void statemanager::on_endupdate() {
