@@ -37,8 +37,12 @@ struct collision_equal final {
   }
 
   bool operator()(std::pair<uint64_t, uint64_t> lhs, const collision_pair& rhs) const noexcept {
-    auto normalized = std::minmax(lhs.first, lhs.second);
-    return normalized.first == rhs.a && normalized.second == rhs.b;
+    auto [a, b] = std::minmax(lhs.first, lhs.second);
+    return a == rhs.a && b == rhs.b;
+  }
+
+  bool operator()(const collision_pair& lhs, std::pair<uint64_t, uint64_t> rhs) const noexcept {
+    return operator()(rhs, lhs);
   }
 };
 
