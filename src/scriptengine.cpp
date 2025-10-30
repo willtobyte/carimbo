@@ -475,7 +475,7 @@ void framework::scriptengine::run() {
     "player", [cache = std::make_shared<std::unordered_map<uint8_t, playerwrapper>>()](
       framework::statemanager& self,
       input::event::player player
-    ) {
+    ) mutable {
       auto index = static_cast<uint8_t>(player);
       auto it = cache->find(index);
       if (it == cache->end()) [[unlikely]] {
