@@ -863,32 +863,32 @@ void framework::scriptengine::run() {
   struct mouse final {
   private:
     [[nodiscard]] static std::tuple<float, float, uint32_t> state() noexcept {
-      float x{}, y{};
-      const auto s = SDL_GetMouseState(&x, &y);
-      return {x, y, s};
+      float x, y;
+      const auto b = SDL_GetMouseState(&x, &y);
+      return {x, y, b};
     }
 
   public:
     static float x() noexcept {
-      const auto [x, y, s] = state();
+      const auto [x, y, b] = state();
       return x;
     }
 
     static float y() noexcept {
-      const auto [x, y, s] = state();
+      const auto [x, y, b] = state();
       return y;
     }
 
     static std::tuple<float, float> xy() noexcept {
-      const auto [x, y, s] = state();
+      const auto [x, y, b] = state();
       return {x, y};
     }
 
     static int button() noexcept {
-      const auto [x, y, s] = state();
-      if (s & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
-      if (s & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;
-      if (s & SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) return SDL_BUTTON_RIGHT;
+      const auto [x, y, b] = state();
+      if (b & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
+      if (b & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;
+      if (b & SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) return SDL_BUTTON_RIGHT;
       return 0;
     }
   };
