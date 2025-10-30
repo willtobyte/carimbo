@@ -4,6 +4,10 @@ inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
 
+inline constexpr auto debugger =
+#include "debugger.lua"
+;
+
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
@@ -1097,6 +1101,9 @@ void framework::scriptengine::run() {
   std::println("License: MIT");
   std::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
+  lua.script(bootstrap, "@bootstrap");
+  lua.script(debugger, "@debugger");
+
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
   const auto source = lua.safe_script(script, &sol::script_pass_on_error);
@@ -1129,19 +1136,6 @@ void framework::scriptengine::run() {
 
   const auto loop = lua["loop"].get<sol::function>();
   engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
-
-  const auto loader = lua.load(bootstrap, "@bootstrap");
-  if (!loader.valid()) [[unlikely]] {
-    sol::error err = loader;
-    throw std::runtime_error(err.what());
-  }
-
-  const auto pf = loader.get<sol::protected_function>();
-  const auto exec = pf();
-  if (!exec.valid()) [[unlikely]] {
-    sol::error err = exec;
-    throw std::runtime_error(err.what());
-  }
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =
