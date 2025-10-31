@@ -14,6 +14,10 @@ scenemanager::scenemanager(
     _timermanager(std::move(timermanager)) {
 }
 
+std::string scenemanager::current() const noexcept {
+  return _current;
+}
+
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name, nullptr);
   if (!inserted) {

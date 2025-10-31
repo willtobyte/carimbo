@@ -22,6 +22,8 @@ public:
 
   ~scenemanager() noexcept = default;
 
+  std::string current() const noexcept;
+
   std::shared_ptr<scene> load(const std::string& name);
 
   void set(const std::string& name);
