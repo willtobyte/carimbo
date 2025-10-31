@@ -185,6 +185,10 @@ void world::draw() const noexcept {
 #endif
 }
 
+world::operator b2WorldId() const noexcept {
+  return _world;
+}
+
 void world::notify(uint64_t first, uint64_t second) const {
   auto a = _objects.find(first)->second.lock();
   auto b = _objects.find(second)->second.lock();

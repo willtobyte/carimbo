@@ -150,6 +150,10 @@ void object::draw() const noexcept {
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
+  auto position = b2Body_GetPosition(body);
+  auto rotation = b2Body_GetRotation(body);
+  printf("%4.2f %4.2f %4.2f\n", position.x, position.y, b2Rot_GetAngle(rotation));
+  
   _spritesheet->draw(
     source,
     destination,

@@ -77,6 +77,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_spritesheet = std::move(spritesheet);
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
+
   if (manage) {
     _world->add(o);
     _objects.emplace(o);
