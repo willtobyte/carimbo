@@ -1127,7 +1127,6 @@ void framework::scriptengine::run() {
   }
 
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
-
   lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
