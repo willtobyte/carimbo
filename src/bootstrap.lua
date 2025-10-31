@@ -2,7 +2,7 @@ R"lua(
 local state = {}
 
 local function _wrap_key(k)
-  return scenemanager.current.name .. '/' .. k
+  return scenemanager.current .. '/' .. k
 end
 
 setmetatable(state, {

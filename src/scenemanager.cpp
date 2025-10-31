@@ -14,10 +14,6 @@ scenemanager::scenemanager(
     _timermanager(std::move(timermanager)) {
 }
 
-std::string scenemanager::current() const noexcept {
-  return _current;
-}
-
 std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name, nullptr);
   if (!inserted) {
@@ -108,6 +104,10 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   );
 }
 
+std::string scenemanager::current() const noexcept {
+  return _current;
+}
+
 void scenemanager::set(const std::string& name) {
   if (_current == name) [[unlikely]] {
     std::println("[scenemanager] already in {}", name);
@@ -129,6 +129,15 @@ void scenemanager::set(const std::string& name) {
 
   std::println("[scenemanager] entered {}", name);
   ptr->on_enter();
+}
+
+std::shared_ptr<scene> scenemanager::get(const std::string& name) const noexcept {
+  const auto it = _scene_mapping.find(name);
+  if (it == _scene_mapping.end()) [[unlikely]] {
+    return nullptr;
+  }
+
+  return it->second;
 }
 
 std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept {

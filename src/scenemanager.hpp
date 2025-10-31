@@ -22,11 +22,13 @@ public:
 
   ~scenemanager() noexcept = default;
 
-  std::string current() const noexcept;
-
   std::shared_ptr<scene> load(const std::string& name);
 
+  std::string current() const noexcept;
+
   void set(const std::string& name);
+
+  std::shared_ptr<scene> get(const std::string& name) const noexcept;
 
   std::vector<std::string> destroy(const std::string& name) noexcept;
 
