@@ -8,14 +8,13 @@ inline constexpr auto debugger =
 #ifdef EMSCRIPTEN
   R"lua(
     local noop = function() end
-    local dbg = setmetatable({}, {
+
+    _G.dbg = setmetatable({}, {
       __index = function(table, key)
         return noop
       end,
       __call = noop
     })
-
-    _G.dbg = dbg
   )lua";
 #else
 #include "debugger.lua"
