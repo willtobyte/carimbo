@@ -6,7 +6,7 @@ particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> res
   : _resourcemanager(std::move(resourcemanager)) {
 }
 
-std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, float x, float y) const {
+std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, float x, float y, bool emitting) const {
   const auto& filename = std::format("particles/{}.json", kind);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
@@ -36,7 +36,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto ps = std::make_shared<particleprops>();
   ps->active = true;
-  ps->emitting = true;
+  ps->emitting = emitting;
   ps->x = x;
   ps->y = y;
   ps->pixmap = pixmap;
@@ -69,20 +69,20 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   pb->angle.resize(count);
   pb->alpha.resize(count);
 
-  for (auto i = count; i-- > 0uz;) {
-    pb->x[i] = x + ps->randxspawn();
-    pb->y[i] = y + ps->randyspawn();
-    pb->vx[i] = ps->randxvel();
-    pb->vy[i] = ps->randyvel();
-    pb->gx[i] = ps->randgx();
-    pb->gy[i] = ps->randgy();
-    pb->av[i] = ps->randrotvel();
-    pb->af[i] = ps->randrotforce();
-    pb->life[i] = ps->randlife();
-    pb->alpha[i] = ps->randalpha();
-    pb->scale[i] = ps->randscale();
-    pb->angle[i] = ps->randangle();
-  }
+  // for (auto i = count; i-- > 0uz;) {
+  //   pb->x[i] = x + ps->randxspawn();
+  //   pb->y[i] = y + ps->randyspawn();
+  //   pb->vx[i] = ps->randxvel();
+  //   pb->vy[i] = ps->randyvel();
+  //   pb->gx[i] = ps->randgx();
+  //   pb->gy[i] = ps->randgy();
+  //   pb->av[i] = ps->randrotvel();
+  //   pb->af[i] = ps->randrotforce();
+  //   pb->life[i] = ps->randlife();
+  //   pb->alpha[i] = ps->randalpha();
+  //   pb->scale[i] = ps->randscale();
+  //   pb->angle[i] = ps->randangle();
+  // }
 
   return pb;
 }

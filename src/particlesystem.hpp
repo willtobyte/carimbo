@@ -61,7 +61,7 @@ class particlefactory final {
   public:
     explicit particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
 
-    std::shared_ptr<particlebatch> create(const std::string& kind, float x, float y) const;
+    std::shared_ptr<particlebatch> create(const std::string& kind, float x, float y, bool emitting = true) const;
 
   private:
     std::shared_ptr<framework::resourcemanager> _resourcemanager;
