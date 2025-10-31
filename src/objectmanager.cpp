@@ -76,6 +76,11 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
 
+  auto bodyDef = b2DefaultBodyDef();
+  bodyDef.type = b2_dynamicBody;
+  bodyDef.position = b2Vec2{0.0f, 0.0f}; // TODO
+  o->body = b2CreateBody(*_world, &bodyDef);
+
   const uint64_t id = _counter++;
   o->_id = id;
   std::println("[objectmanager] created {} {}", kind, id);

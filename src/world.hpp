@@ -54,6 +54,8 @@ public:
   void update(float delta) noexcept;
   void draw() const noexcept;
 
+  operator b2WorldId() const noexcept;
+
 protected:
   void notify(uint64_t aid, uint64_t bid) const;
 
