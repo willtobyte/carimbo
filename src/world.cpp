@@ -18,10 +18,10 @@ world::world(std::shared_ptr<graphics::renderer> renderer) noexcept
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 
-  constexpr auto capacity = 128uz;
-  _bodies.reserve(capacity);
-  _objects.reserve(capacity);
-  _dirties.reserve(capacity);
+  // constexpr auto capacity = 128uz;
+  // _bodies.reserve(capacity);
+  // _objects.reserve(capacity);
+  // _dirties.reserve(capacity);
 }
 
 world::~world() noexcept {
@@ -30,121 +30,121 @@ world::~world() noexcept {
   }
 }
 
-static inline b2BodyId get_or_create_body(b2WorldId world, std::unordered_map<uint64_t, b2BodyId>& map, uint64_t id) noexcept {
-  const auto it = map.find(id);
-  if (it != map.end()) return it->second;
+// static inline b2BodyId get_or_create_body(b2WorldId world, std::unordered_map<uint64_t, b2BodyId>& map, uint64_t id) noexcept {
+//   const auto it = map.find(id);
+//   if (it != map.end()) return it->second;
 
-  auto def = b2DefaultBodyDef();
-  def.type = b2_dynamicBody;
-  def.gravityScale = 0.0f;
-  def.fixedRotation = true;
-  def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id));
-  const auto body = b2CreateBody(world, &def);
-  map.emplace(id, body);
-  return body;
-}
+//   auto def = b2DefaultBodyDef();
+//   def.type = b2_dynamicBody;
+//   def.gravityScale = 0.0f;
+//   def.fixedRotation = true;
+//   def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id));
+//   const auto body = b2CreateBody(world, &def);
+//   map.emplace(id, body);
+//   return body;
+// }
 
-static inline void assign_fixture(b2BodyId body, const geometry::rectangle& rectangle, bool isSensor = true) noexcept {
-  const auto count = b2Body_GetShapeCount(body);
-  if (count > 0) {
-    std::vector<b2ShapeId> shapes(count);
-    const int n = b2Body_GetShapes(body, shapes.data(), count);
-    for (int i = 0; i < n; ++i) b2DestroyShape(shapes[i], false);
-  }
+// static inline void assign_fixture(b2BodyId body, const geometry::rectangle& rectangle, bool isSensor = true) noexcept {
+//   const auto count = b2Body_GetShapeCount(body);
+//   if (count > 0) {
+//     std::vector<b2ShapeId> shapes(count);
+//     const int n = b2Body_GetShapes(body, shapes.data(), count);
+//     for (int i = 0; i < n; ++i) b2DestroyShape(shapes[i], false);
+//   }
 
-  const auto hx = 0.5f * rectangle.width();
-  const auto hy = 0.5f * rectangle.height();
-  if (hx <= 0.0f || hy <= 0.0f) return;
+//   const auto hx = 0.5f * rectangle.width();
+//   const auto hy = 0.5f * rectangle.height();
+//   if (hx <= 0.0f || hy <= 0.0f) return;
 
-  const auto cx = rectangle.x() + hx;
-  const auto cy = rectangle.y() + hy;
+//   const auto cx = rectangle.x() + hx;
+//   const auto cy = rectangle.y() + hy;
 
-  auto sd = b2DefaultShapeDef();
-  sd.isSensor = isSensor;
+//   auto sd = b2DefaultShapeDef();
+//   sd.isSensor = isSensor;
 
-  const auto box = b2MakeOffsetBox(hx, hy, b2Vec2{cx, cy}, b2MakeRot(0));
-  b2CreatePolygonShape(body, &sd, &box);
-}
+//   const auto box = b2MakeOffsetBox(hx, hy, b2Vec2{cx, cy}, b2MakeRot(0));
+//   b2CreatePolygonShape(body, &sd, &box);
+// }
 
 void world::add(const std::shared_ptr<object>& object) {
-  if (!object) [[unlikely]] return;
+  // if (!object) [[unlikely]] return;
 
-  const auto id = object->id();
-  _objects[id] = object;
+  // const auto id = object->id();
+  // _objects[id] = object;
 
-  const auto box = object->shape();
-  if (!box.has_value()) [[unlikely]] {
-    return;
-  }
+  // const auto box = object->shape();
+  // if (!box.has_value()) [[unlikely]] {
+  //   return;
+  // }
 
-  const auto body = get_or_create_body(_world, _bodies, id);
-  assign_fixture(body, *box);
+  // const auto body = get_or_create_body(_world, _bodies, id);
+  // assign_fixture(body, *box);
 }
 
 void world::remove(uint64_t id) {
-  const auto it = _bodies.find(id);
-  if (it != _bodies.end()) [[likely]] {
-    b2DestroyBody(it->second);
-    _bodies.erase(it);
-  }
+  // const auto it = _bodies.find(id);
+  // if (it != _bodies.end()) [[likely]] {
+  //   b2DestroyBody(it->second);
+  //   _bodies.erase(it);
+  // }
 
-  _objects.erase(id);
+  // _objects.erase(id);
 }
 
 void world::update(float delta) noexcept {
-  _dirties.clear();
-  _dirties.reserve(_objects.size());
+//   _dirties.clear();
+//   _dirties.reserve(_objects.size());
 
-  for (auto it = _objects.begin(); it != _objects.end();) {
-    const auto id = it->first;
-    auto object = it->second.lock();
-    if (!object) [[unlikely]] {
-      const auto bit = _bodies.find(id);
-      if (bit != _bodies.end()) {
-        b2DestroyBody(bit->second);
-        _bodies.erase(bit);
-      }
-      it = _objects.erase(it);
-      continue;
-    }
+//   for (auto it = _objects.begin(); it != _objects.end();) {
+//     const auto id = it->first;
+//     auto object = it->second.lock();
+//     if (!object) [[unlikely]] {
+//       const auto bit = _bodies.find(id);
+//       if (bit != _bodies.end()) {
+//         b2DestroyBody(bit->second);
+//         _bodies.erase(bit);
+//       }
+//       it = _objects.erase(it);
+//       continue;
+//     }
 
-    if (!object->visible()) [[unlikely]] {
-      const auto bit = _bodies.find(id);
-      if (bit != _bodies.end()) {
-        b2DestroyBody(bit->second);
-        _bodies.erase(bit);
-      }
+//     if (!object->visible()) [[unlikely]] {
+//       const auto bit = _bodies.find(id);
+//       if (bit != _bodies.end()) {
+//         b2DestroyBody(bit->second);
+//         _bodies.erase(bit);
+//       }
 
-      ++it;
-      continue;
-    }
+//       ++it;
+//       continue;
+//     }
 
-    const auto shape = object->shape();
-    if (!shape.has_value()) [[unlikely]] {
-      const auto bit = _bodies.find(id);
-      if (bit != _bodies.end()) {
-        b2DestroyBody(bit->second);
-        _bodies.erase(bit);
-      }
+//     const auto shape = object->shape();
+//     if (!shape.has_value()) [[unlikely]] {
+//       const auto bit = _bodies.find(id);
+//       if (bit != _bodies.end()) {
+//         b2DestroyBody(bit->second);
+//         _bodies.erase(bit);
+//       }
 
-      ++it;
-      continue;
-    }
+//       ++it;
+//       continue;
+//     }
 
-    if (!object->dirty()) [[unlikely]] {
-      ++it;
-      continue;
-    }
+//     if (!object->dirty()) [[unlikely]] {
+//       ++it;
+//       continue;
+//     }
 
-#ifndef NDEBUG
-    std::println("[world] dirty object {} {}", object->kind(), id);
-#endif
+// #ifndef NDEBUG
+//     std::println("[world] dirty object {} {}", object->kind(), id);
+// #endif
 
-    const auto body = get_or_create_body(_world, _bodies, id);
-    assign_fixture(body, *shape);
-    _dirties.emplace_back(id);
-    ++it;
-  }
+//     const auto body = get_or_create_body(_world, _bodies, id);
+//     assign_fixture(body, *shape);
+//     _dirties.emplace_back(id);
+//     ++it;
+//   }
 
   b2World_Step(_world, std::max(.0f, delta), 4);
 
