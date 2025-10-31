@@ -40,13 +40,9 @@ static sol::object searcher(sol::this_state state, const std::string& module) {
 
 class lua_loopable final : public framework::loopable {
 public:
-  explicit lua_loopable(const sol::state_view lua, sol::function function)
-    : _L(lua),
-      _function(std::move(function)) {}
+  explicit lua_loopable(const sol::state_view lua) : _L(lua) {}
 
   void loop(float delta) override {
-    _function(delta);
-
     _frames++;
     const auto now = SDL_GetTicks();
     _elapsed += now - _start;
@@ -72,7 +68,6 @@ public:
 
 private:
   lua_State* _L;
-  sol::function _function;
   uint64_t _frames{0};
   uint64_t _elapsed{0};
   uint64_t _start{SDL_GetTicks()};
@@ -1141,14 +1136,13 @@ void framework::scriptengine::run() {
   lua["timermanager"] = engine->timermanager();
 
   const auto setup = lua["setup"].get<sol::protected_function>();
-  const auto sp = setup();
-  if (!sp.valid()) [[unlikely]] {
-    sol::error err = sp;
+  const auto result = setup();
+  if (!result.valid()) [[unlikely]] {
+    sol::error err = result;
     throw std::runtime_error(err.what());
   }
 
-  const auto loop = lua["loop"].get<sol::function>();
-  engine->add_loopable(std::make_shared<lua_loopable>(lua, loop));
+  engine->add_loopable(std::make_shared<lua_loopable>(lua));
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =
