@@ -1,13 +1,16 @@
 R"lua(
 local state = {}
-local prefix = scenemanager.current .. '/'
+
+local function wrap(k)
+  return scenemanager.current.name .. '/' .. k
+end
 
 setmetatable(state, {
   __newindex = function(t, k, v)
-    cassette:set(prefix .. k, v)
+    cassette:set(wrap(k), v)
   end,
   __index = function(t, k)
-    return cassette:get(prefix .. k, nil)
+    return cassette:get(wrap(k), nil)
   end,
 })
 
