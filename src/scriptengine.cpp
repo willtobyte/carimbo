@@ -6,17 +6,17 @@ inline constexpr auto bootstrap =
 
 inline constexpr auto debugger =
 #ifdef EMSCRIPTEN
-R"lua(
-  local noop = function() end
-  local dbg = setmetatable({}, {
-    __index = function(table, key)
-      return noop
-    end,
-    __call = noop
-  })
+  R"lua(
+    local noop = function() end
+    local dbg = setmetatable({}, {
+      __index = function(table, key)
+        return noop
+      end,
+      __call = noop
+    })
 
-  _G.dbg = dbg
-)lua";
+    _G.dbg = dbg
+  )lua";
 #else
 #include "debugger.lua"
 #endif
@@ -216,38 +216,38 @@ void framework::scriptengine::run() {
   lua["moment"] = &moment;
 
   lua["openurl"] = [](const std::string& url) {
-    #ifdef EMSCRIPTEN
-      const auto script = std::format(R"javascript(window.open('{}', '_blank', 'noopener,noreferrer');)javascript", url);
-      emscripten_run_script(script.c_str());
-    #else
-      SDL_OpenURL(url.c_str());
-    #endif
+#ifdef EMSCRIPTEN
+    const auto script = std::format(R"javascript(window.open('{}', '_blank', 'noopener,noreferrer');)javascript", url);
+    emscripten_run_script(script.c_str());
+#else
+    SDL_OpenURL(url.c_str());
+#endif
   };
 
   lua["queryparam"] = [](const std::string& key, const std::string& defval) {
     auto out = defval;
 
-    #ifdef EMSCRIPTEN
-      const auto script = std::format(
-          R"javascript(
-            new URLSearchParams(location.search).get("{}") ?? "{}"
-          )javascript",
-          key,
-          defval
-      );
+#ifdef EMSCRIPTEN
+    const auto script = std::format(
+        R"javascript(
+          new URLSearchParams(location.search).get("{}") ?? "{}"
+        )javascript",
+        key,
+        defval
+    );
 
-      if (const auto* result = emscripten_run_script_string(script.c_str()); result && *result) {
-        out.assign(result);
-      }
-    #else
-      auto uppercase_key = key;
-      std::ranges::transform(uppercase_key, uppercase_key.begin(),
-                            [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+    if (const auto* result = emscripten_run_script_string(script.c_str()); result && *result) {
+      out.assign(result);
+    }
+#else
+    auto uppercase_key = key;
+    std::ranges::transform(uppercase_key, uppercase_key.begin(),
+                          [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
 
-      if (const auto* value = std::getenv(uppercase_key.c_str()); value && *value) {
-        out.assign(value);
-      }
-    #endif
+    if (const auto* value = std::getenv(uppercase_key.c_str()); value && *value) {
+      out.assign(value);
+    }
+#endif
 
     return out;
   };

@@ -206,9 +206,9 @@ void engine::_loop() {
     observer->on_enddraw();
   }
 
-  #ifdef HAVE_STEAM
+#ifdef HAVE_STEAM
   SteamAPI_RunCallbacks();
-  #endif
+#endif
 }
 
 void engine::on_quit() {

@@ -86,18 +86,18 @@ void eventmanager::update(float delta) noexcept {
             break;
         }
 
-        #ifndef NDEBUG
-          case SDLK_D: {
-            if (event.key.mod & SDL_KMOD_CTRL) {
-              for (const auto& weak : _receivers) {
-                if (auto receiver = weak.lock(); receiver) {
-                  receiver->on_debug();
-                }
+#ifndef NDEBUG
+        case SDLK_D: {
+          if (event.key.mod & SDL_KMOD_CTRL) {
+            for (const auto& weak : _receivers) {
+              if (auto receiver = weak.lock(); receiver) {
+                receiver->on_debug();
               }
-              break;
             }
+            break;
           }
-        #endif
+        }
+#endif
 
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
 

@@ -1,12 +1,12 @@
 #pragma once
 
 #ifndef NDEBUG
-  #define SOL_ALL_SAFETIES_ON 1
-  #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
+#define SOL_ALL_SAFETIES_ON 1
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #endif
 
 #ifdef HAVE_SENTRY
- #include <sentry.h>
+#include <sentry.h>
 #endif
 
 extern "C" {
@@ -27,7 +27,7 @@ extern "C" {
 #include <vorbis/vorbisfile.h>
 
 #ifdef EMSCRIPTEN
- #include <emscripten.h>
+#include <emscripten.h>
 #endif
 
 #include <boost/unordered_map.hpp>
