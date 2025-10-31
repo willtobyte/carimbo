@@ -3,7 +3,7 @@
 #include <box2d/box2d.h>
 
 namespace framework {
-static inline b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
+static b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
   b2AABB a{};
   a.lowerBound = b2Vec2(x0, y0);
   a.upperBound = b2Vec2(x1, y1);
@@ -61,10 +61,10 @@ protected:
 
 private:
   b2WorldId _world;
-  std::shared_ptr<graphics::renderer> _renderer;
-  std::vector<uint64_t> _dirties;
-  std::unordered_map<uint64_t, b2BodyId> _bodies;
-  std::unordered_map<uint64_t, std::weak_ptr<object>> _objects;
+  // std::shared_ptr<graphics::renderer> _renderer;
+  // std::vector<uint64_t> _dirties;
+  // std::unordered_map<uint64_t, b2BodyId> _bodies;
+  // std::unordered_map<uint64_t, std::weak_ptr<object>> _objects;
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };

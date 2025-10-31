@@ -50,11 +50,17 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     const bool oneshot = next.has_value() || a.value("oneshot", false);
 
     auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
-    if (a.contains("bounds") && (!a.contains("frames") || a["frames"].empty())) {
-      framework::keyframe k;
-      k.duration = -1;
-      k.frame = a.at("bounds").get<framework::bounds>().rectangle;
-      keyframes.emplace_back(k);
+    if (a.contains("bounds") /* && (!a.contains("frames") || a["frames"].empty()) */) {
+      auto bodyDef = b2DefaultBodyDef();
+      bodyDef.type = b2_dynamicBody;
+      bodyDef.position = b2Vec2{0.0f, 0.0f}; // TODO
+      o->body = b2CreateBody(*_world, &bodyDef);
+
+      // framework::keyframe k;
+      //k.duration = -1;
+      //k.frame = a.at("bounds").get<framework::bounds>().rectangle;
+      //
+      //keyframes.emplace_back(k);
     }
 
     animations.try_emplace(
