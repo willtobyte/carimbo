@@ -6,6 +6,7 @@ namespace graphics {
 struct particleprops final {
   float x, y;
   bool active;
+  bool emitting;
   std::shared_ptr<pixmap> pixmap;
   std::minstd_rand rng{std::random_device{}()};
   std::uniform_real_distribution<float> xspawnd;

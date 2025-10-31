@@ -702,6 +702,7 @@ void framework::scriptengine::run() {
     "ParticleProps",
     sol::no_constructor,
     "active", sol::property(&graphics::particleprops::active),
+    "emitting", sol::property(&graphics::particleprops::emitting),
     "placement", sol::property(
       []() {
         return nullptr;

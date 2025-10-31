@@ -36,6 +36,7 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
 
   const auto ps = std::make_shared<particleprops>();
   ps->active = true;
+  ps->emitting = true;
   ps->x = x;
   ps->y = y;
   ps->pixmap = pixmap;
@@ -134,6 +135,10 @@ void particlesystem::update(float delta) noexcept {
 
         const auto a = 255.f * batch->life[i];
         batch->alpha[i] = static_cast<std::uint8_t>(std::clamp(a, .0f, 255.f));
+        continue;
+      }
+
+      if (!props->emitting) [[unlikely]] {
         continue;
       }
 
