@@ -424,7 +424,7 @@ local function cmd_where(context_lines)
   local info = debug.getinfo(stack_inspect_offset + CMD_STACK_LEVEL)
   return (info and where(info, tonumber(context_lines) or 5))
 end
-)lua";
+)lua"
 R"lua(
 local function cmd_trace()
   dbg_writeln("Inspecting frame %d", stack_inspect_offset - stack_top)
