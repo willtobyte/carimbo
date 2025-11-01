@@ -5,7 +5,7 @@
 namespace memory {
 class observable final {
 public:
-  ~observable() noexcept;
+  ~observable() noexcept = default;
   sol::object value() const;
   void set(const sol::object& value);
   void subscribe(const std::function<void(const sol::object&)>&& callback) noexcept;

@@ -2,10 +2,6 @@
 
 using namespace memory;
 
-observable::~observable() noexcept {
-  unsubscribe();
-}
-
 sol::object observable::value() const {
   return _value;
 }
