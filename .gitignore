@@ -35,3 +35,6 @@ cassette.json
 # Carimbo
 stdout.txt
 stderr.txt
+
+# Sentry
+.sentry-native
