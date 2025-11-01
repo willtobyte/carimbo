@@ -7,7 +7,8 @@ class observable final {
 public:
   sol::object value() const;
   void set(const sol::object& value);
-  void subscribe(const std::function<void(const sol::object&)>&& callback);
+  void subscribe(const std::function<void(const sol::object&)>&& callback) noexcept;
+  void unsubscribe() noexcept;
 
 private:
   sol::object _value;

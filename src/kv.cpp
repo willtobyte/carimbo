@@ -14,8 +14,12 @@ void observable::set(const sol::object& value) {
   }
 }
 
-void observable::subscribe(const std::function<void(const sol::object&)>&& callback) {
+void observable::subscribe(const std::function<void(const sol::object&)>&& callback) noexcept {
   _subscriber = std::move(callback);
+}
+
+void observable::unsubscribe() noexcept {
+  _subscriber = nullptr;
 }
 
 std::shared_ptr<memory::observable> kv::get(const std::string& key, const sol::object& default_value) {

@@ -369,7 +369,8 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "value", sol::property(&memory::observable::value),
     "set", &memory::observable::set,
-    "subscribe", &memory::observable::subscribe
+    "subscribe", &memory::observable::subscribe,
+    "unsubscribe", &memory::observable::unsubscribe
   );
 
   lua.new_usertype<framework::object>(
@@ -508,6 +509,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::scenemanager>(
     "SceneManager",
     sol::no_constructor,
+    "current", sol::property(&framework::scenemanager::current),
     "set", &framework::scenemanager::set,
     "get", &framework::scenemanager::get,
     "destroy", [&lua](
