@@ -6,6 +6,15 @@ local function _wrap_key(k)
   return scene.name .. '/' .. k
 end
 
+setmetatable(state.system, {
+  __newindex = function(t, k, v)
+    cassette:set('system/' .. k, v)
+  end,
+  __index = function(t, k)
+    return cassette:get('system/' .. k, nil)
+  end,
+})
+
 setmetatable(state, {
   __newindex = function(t, k, v)
     cassette:set(_wrap_key(k), v)
