@@ -131,13 +131,8 @@ void scenemanager::set(const std::string& name) {
   ptr->on_enter();
 }
 
-std::shared_ptr<scene> scenemanager::get(const std::string& name) const noexcept {
-  const auto it = _scene_mapping.find(name);
-  if (it == _scene_mapping.end()) [[unlikely]] {
-    return nullptr;
-  }
-
-  return it->second;
+std::shared_ptr<scene> scenemanager::get() const noexcept {
+  return _scene.lock();
 }
 
 std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept {

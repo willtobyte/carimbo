@@ -499,10 +499,16 @@ void framework::scriptengine::run() {
     }
   );
 
+  lua.new_usertype<framework::scene>(
+    "Scene",
+    sol::no_constructor,
+    "name", sol::property(&framework::scene::name)
+  );
+
   lua.new_usertype<framework::scenemanager>(
     "SceneManager",
     sol::no_constructor,
-    "current", sol::property(&framework::scenemanager::current, &framework::scenemanager::set),
+    "set", &framework::scenemanager::set,
     "get", &framework::scenemanager::get,
     "destroy", [&lua](
       framework::scenemanager& self,
