@@ -667,6 +667,11 @@ void framework::scriptengine::run() {
         };
 
         scene->set_onleave(std::move(sfn));
+
+        lua["pool"] = lua.create_table();
+
+        lua.collect_garbage();
+        lua.collect_garbage();
       }
 
       const auto end = SDL_GetPerformanceCounter();

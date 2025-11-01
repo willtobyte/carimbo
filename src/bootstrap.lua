@@ -1,10 +1,16 @@
 R"lua(
+local pool = {}
+
+_G.pool = pool
+
 local state = {}
 
 local function _wrap_key(k)
   local scene = scenemanager:get()
   return scene.name .. '/' .. k
 end
+
+state.system = {}
 
 setmetatable(state.system, {
   __newindex = function(t, k, v)
