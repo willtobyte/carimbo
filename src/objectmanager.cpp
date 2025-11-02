@@ -76,9 +76,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
 
-  const uint64_t id = _counter++;
-  o->_id = id;
-  std::println("[objectmanager] created {} {}", kind, id);
+  std::println("[objectmanager] created {} {}", o->kind(), o->id());
   if (manage) {
     _world->add(o);
     _objects.emplace(o);
@@ -104,8 +102,6 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_reflection = matrix->_reflection;
   o->_alpha = matrix->_alpha;
 
-  const uint64_t id = _counter++;
-  o->_id = id;
   _objects.emplace(o);
   _world->add(o);
 

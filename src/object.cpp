@@ -314,5 +314,5 @@ memory::kv& object::kv() noexcept {
 }
 
 uint64_t object::id() const noexcept {
-  return _id;
+  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
 }

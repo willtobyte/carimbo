@@ -104,8 +104,6 @@ private:
   friend class tilemap;
   friend class world;
 
-  uint64_t _id{0};
-
   std::size_t _frame;
   uint64_t _last_frame;
   double _angle;

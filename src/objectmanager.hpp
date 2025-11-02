@@ -55,7 +55,9 @@ private:
 
   struct id_key {
     using result_type = uint64_t;
-    result_type operator()(const node& n) const noexcept { return n.object->_id; }
+    result_type operator()(const node& n) const noexcept {
+      return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(n.object.get()));
+    }
   };
 
   using container_t = boost::multi_index::multi_index_container<
@@ -77,7 +79,6 @@ private:
   std::shared_ptr<scenemanager> _scenemanager;
   std::shared_ptr<world> _world;
   std::unordered_set<uint64_t> _hovering;
-  std::atomic<uint64_t> _counter{0};
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };
