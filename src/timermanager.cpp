@@ -47,6 +47,10 @@ void timermanager::cancel(uint32_t id) noexcept {
 void timermanager::clear() noexcept {
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
+
+    if (ptr) {
+      _envelopepool->release(std::unique_ptr<envelope>(ptr));
+    }
   }
 
   SDL_FilterEvents(
@@ -55,12 +59,6 @@ void timermanager::clear() noexcept {
     },
     nullptr
   );
-
-  for (auto& [_, ptr] : _envelopemapping) {
-    if (ptr) {
-      _envelopepool->release(std::unique_ptr<envelope>(ptr));
-    }
-  }
 
   _envelopemapping.clear();
 }
