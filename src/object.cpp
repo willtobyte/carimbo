@@ -48,7 +48,6 @@ void object::set_y(float y) noexcept {
 }
 
 void object::update(float delta, uint64_t now) noexcept {
-  if (!_visible) [[unlikely]] return;
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] return;
 
