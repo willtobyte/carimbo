@@ -48,6 +48,7 @@ void object::set_y(float y) noexcept {
 }
 
 void object::update(float delta, uint64_t now) noexcept {
+  if (!_visible) [[unlikely]] return;
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] return;
 
@@ -122,6 +123,8 @@ void object::update(float delta, uint64_t now) noexcept {
 }
 
 void object::draw() const noexcept {
+  if (!_visible) [[unlikely]] return;
+
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] {
     return;
@@ -208,26 +211,13 @@ graphics::reflection object::reflection() const noexcept {
 }
 
 bool object::visible() const noexcept {
-  return !_action.empty() || _alpha != 0;
+  return !_action.empty() || _alpha != 0 || !_visible;
 }
 
 void object::set_visible(bool value) noexcept {
-  auto& source = value ? _previous_action : _action;
-  auto& destination = value ? _action : _previous_action;
-  destination = std::exchange(source, std::string{});
-
-  _frame = 0;
-  _last_frame = SDL_GetTicks();
-  _needs_recalc = value;
-
-  if (!value) [[unlikely]] {
-    _previous_alpha = std::exchange(_alpha, 0);
-    return;
-  }
-
-  if (_previous_alpha.has_value()) [[likely]] {
-    _alpha = *_previous_alpha;
-  }
+  if (value == _visible) return;
+  _visible = value;
+  _needs_recalc = true;
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {

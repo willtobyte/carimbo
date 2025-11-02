@@ -112,13 +112,12 @@ private:
   uint8_t _alpha;
   float _scale;
   graphics::reflection _reflection;
+  bool _visible{true};
 
   geometry::point _position;
   std::string _kind;
   std::string _scope;
   std::string _action;
-  std::string _previous_action;
-  std::optional<uint8_t> _previous_alpha;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
   std::optional<geometry::rectangle> _shape;
