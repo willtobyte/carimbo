@@ -249,39 +249,6 @@ std::string object::action() const noexcept {
   return _action;
 }
 
-void object::set_rectangle(const geometry::rectangle rectangle) noexcept {
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] {
-    return;
-  }
-
-  auto& animation = it->second;
-  if (!animation.bounds) {
-    animation.bounds.emplace();
-  }
-
-  if (animation.bounds->rectangle == rectangle) [[likely]] {
-    return;
-  }
-
-  animation.bounds->rectangle = rectangle;
-  _needs_recalc = true;
-}
-
-geometry::rectangle object::rectangle() const noexcept {
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] {
-    return geometry::rectangle{};
-  }
-
-  const auto& animation = it->second;
-  if (!animation.bounds) [[unlikely]] {
-    return geometry::rectangle{};
-  }
-
-  return animation.bounds->rectangle;
-}
-
 void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
   _onbegin = std::move(fn);
 }
