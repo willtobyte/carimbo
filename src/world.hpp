@@ -21,7 +21,7 @@ static bool collect(b2ShapeId shape, void* context) {
   return true;
 }
 
-class world final : public std::enable_shared_from_this<world> {
+class world final {
 public:
   world(std::shared_ptr<graphics::renderer> renderer) noexcept;
   ~world() noexcept;
@@ -58,7 +58,7 @@ public:
   operator b2WorldId() const noexcept;
 
 protected:
-  void notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const;
+  void notify(object* obj_a, object* obj_b) const;
 
 private:
   b2WorldId _world;

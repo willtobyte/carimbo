@@ -25,36 +25,20 @@ world::~world() noexcept {
   }
 }
 
-
-
-
-
-
-
-
 void world::add(const std::shared_ptr<object>& object) {
-  if (!object) [[unlikely]] return;
-  object->_world = shared_from_this();
+  // if (!object) [[unlikely]] return;
+  // object->_world = shared_from_this();
 }
 
 void world::remove(uint64_t id) {
 }
 
 void world::update(float delta) noexcept {
-
-
-
-
-
-
-
-
-
   b2World_Step(_world, std::max(.0f, delta), 4);
 
-  const auto sensor_events = b2World_GetSensorEvents(_world);
-  for (auto i = sensor_events.beginCount; i-- > 0; ) {
-    const auto& e = sensor_events.beginEvents[i];
+  const auto events = b2World_GetSensorEvents(_world);
+  for (auto i = events.beginCount; i-- > 0; ) {
+    const auto& e = events.beginEvents[i];
 
     if (!b2Shape_IsValid(e.sensorShapeId) || !b2Shape_IsValid(e.visitorShapeId)) continue;
 
@@ -65,8 +49,8 @@ void world::update(float delta) noexcept {
 
     if (!user_data_a || !user_data_b) continue;
 
-    auto obj_a = static_cast<object*>(user_data_a)->shared_from_this();
-    auto obj_b = static_cast<object*>(user_data_b)->shared_from_this();
+    auto obj_a = static_cast<object*>(user_data_a);
+    auto obj_b = static_cast<object*>(user_data_b);
 
     notify(obj_a, obj_b);
   }
@@ -91,11 +75,12 @@ void world::draw() const noexcept {
     const auto* self = static_cast<const world*>(ctx);
     const b2AABB aabb = b2Shape_GetAABB(shape);
 
-    SDL_FRect r;
-    r.x = aabb.lowerBound.x;
-    r.y = aabb.lowerBound.y;
-    r.w = aabb.upperBound.x - r.x;
-    r.h = aabb.upperBound.y - r.y;
+    SDL_FRect r{
+      aabb.lowerBound.x,
+      aabb.lowerBound.y,
+      aabb.upperBound.x - r.x,
+      aabb.upperBound.y - r.y
+    };
 
     SDL_RenderRect(*self->_renderer, &r);
     return true;
@@ -103,15 +88,13 @@ void world::draw() const noexcept {
 
   b2World_OverlapAABB(_world, aabb, filter, fun, const_cast<world*>(this));
 #endif
-
-
 }
 
 world::operator b2WorldId() const noexcept {
   return _world;
 }
 
-void world::notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const {
+void world::notify(object* obj_a, object* obj_b) const {
   if (!obj_a || !obj_b) [[unlikely]] return;
 
   if (const auto* callback = find_ptr(obj_a->_collision_mapping, obj_b->kind())) (*callback)(obj_a, obj_b);
