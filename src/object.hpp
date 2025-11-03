@@ -74,6 +74,9 @@ public:
   void set_action(const std::optional<std::string>& action) noexcept;
   std::string action() const noexcept;
 
+  void set_rectangle(const geometry::rectangle rectangle) noexcept;
+  geometry::rectangle rectangle() const noexcept;
+
   void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
   void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
   void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
