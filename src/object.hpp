@@ -10,6 +10,12 @@
 #include "soundfx.hpp"
 
 namespace framework {
+class world;
+
+struct pose final {
+  float px, py, radians, hx, hy;
+};
+
 struct keyframe final {
   geometry::rectangle frame;
   geometry::point offset;
@@ -38,9 +44,7 @@ class object final : public std::enable_shared_from_this<object> {
 public:
   object() noexcept;
   virtual ~object() noexcept;
-
   std::string kind() const noexcept;
-
   std::string scope() const noexcept;
 
   void update(float delta, uint64_t now) noexcept;
@@ -55,6 +59,8 @@ public:
 
   void set_placement(float x, float y) noexcept;
   geometry::point placement() const noexcept;
+
+  void apply_velocity(float vx, float vy) noexcept;
 
   void set_alpha(uint8_t alpha) noexcept;
   uint8_t alpha() const noexcept;
@@ -81,7 +87,6 @@ public:
   void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
   void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
   void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) noexcept;
-  void set_onnthtick(uint64_t n, std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
 
   void on_email(const std::string& message) noexcept;
 
@@ -89,15 +94,15 @@ public:
   void on_hover() noexcept;
   void on_unhover() noexcept;
 
-  bool dirty() noexcept;
-  std::optional<geometry::rectangle> shape() const;
-
   memory::kv& kv() noexcept;
 
   uint64_t id() const noexcept;
 
 protected:
-    void advance(float delta) noexcept;
+  std::optional<pose> compute_pose() const noexcept;
+  void sync_position_from_body() noexcept;
+  void sync_body_transform() noexcept;
+  void update_body_shape() noexcept;
 
 private:
   friend class objectmanager;
@@ -105,6 +110,7 @@ private:
   friend class world;
 
   b2BodyId body;
+  std::weak_ptr<world> _world;
 
   std::size_t _frame;
   uint64_t _last_frame;
@@ -120,10 +126,7 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
-  std::optional<geometry::rectangle> _shape;
-  std::optional<geometry::rectangle> _previous_shape;
-  bool _dirty{true};
-  bool _needs_recalc{true};
+
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

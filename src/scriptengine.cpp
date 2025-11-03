@@ -1101,7 +1101,6 @@ void framework::scriptengine::run() {
     "Canvas",
     sol::no_constructor,
     "clear", &graphics::canvas::clear,
-    // TODO "mode": sol::property(...)
     "pixels", sol::property(
       [](const graphics::canvas&) {
         return nullptr;

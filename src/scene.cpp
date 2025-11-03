@@ -143,17 +143,7 @@ void scene::on_text(const std::string& text) const {
   }
 }
 
-// void scene::on_mouse_press(float x, float y) {
-//   if (const auto& fn = _onmousepress; fn) {
-//     fn(x, y);
-//   }
-// }
 
-// void scene::on_mouse_relese(float x, float y) {
-//   if (const auto& fn = _onmouserelease; fn) {
-//     fn(x, y);
-//   }
-// }
 
 void scene::on_motion(float x, float y) const {
   if (const auto& fn = _onmotion; fn) {
@@ -189,13 +179,7 @@ void scene::set_ontext(std::function<void(const std::string& )>&& fn) {
   _ontext = std::move(fn);
 }
 
-// void scene::set_onmousepress(std::function<void(float, float)> fn) {
-// _onmousepress = std::move(fn);
-// }
 
-// void scene::set_onmouserelease(std::function<void(float, float)> fn) {
-// _onmouserelease = std::move(fn);
-// }
 
 void scene::set_onmotion(std::function<void(float, float)>&& fn) {
   _onmotion = std::move(fn);

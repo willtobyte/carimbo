@@ -2,6 +2,8 @@
 
 using namespace framework;
 
+
+
 object::object() noexcept
   : _frame(0),
     _last_frame(SDL_GetTicks()),
@@ -12,6 +14,10 @@ object::object() noexcept
 }
 
 object::~object() noexcept {
+  if (b2Body_IsValid(body)) {
+    b2DestroyBody(body);
+  }
+
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
@@ -23,102 +29,215 @@ std::string object::scope() const noexcept {
   return _scope;
 }
 
+std::optional<pose> object::compute_pose() const noexcept {
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) return std::nullopt;
+  const auto& a = it->second;
+  if (!a.bounds) return std::nullopt;
+  const auto& r = a.bounds->rectangle;
+  const auto sw = r.width() * _scale;
+  const auto sh = r.height() * _scale;
+  const auto hx = 0.5f * sw;
+  const auto hy = 0.5f * sh;
+  const auto px = _position.x() + r.x() * _scale + hx;
+  const auto py = _position.y() + r.y() * _scale + hy;
+  const auto radians = static_cast<float>(_angle * (std::numbers::pi_v<float> / 180.0f));
+  return pose{px, py, radians, hx, hy};
+}
+
+void object::sync_position_from_body() noexcept {
+  if (!b2Body_IsValid(body)) return;
+
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) return;
+  const auto& a = it->second;
+  if (!a.bounds) return;
+
+  const auto pos = b2Body_GetPosition(body);
+  const auto& r = a.bounds->rectangle;
+  const auto sw = r.width() * _scale;
+  const auto sh = r.height() * _scale;
+  const auto hx = 0.5f * sw;
+  const auto hy = 0.5f * sh;
+
+  _position.set_x(pos.x - r.x() * _scale - hx);
+  _position.set_y(pos.y - r.y() * _scale - hy);
+}
+
+void object::sync_body_transform() noexcept {
+  if (!b2Body_IsValid(body)) return;
+
+  const auto pose = compute_pose();
+  if (!pose) return;
+
+  b2Body_SetTransform(body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
+}
+
+void object::update_body_shape() noexcept {
+  if (!b2Body_IsValid(body)) return;
+
+  const auto pose = compute_pose();
+  if (!pose) return;
+
+  const auto count = b2Body_GetShapeCount(body);
+  if (count > 0) {
+    std::vector<b2ShapeId> shapes(count);
+    const auto n = b2Body_GetShapes(body, shapes.data(), count);
+    for (int i = 0; i < n; ++i) {
+      b2DestroyShape(shapes[i], false);
+    }
+  }
+
+  auto sd = b2DefaultShapeDef();
+  sd.isSensor = true;
+  sd.enableSensorEvents = true;
+  const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
+  b2CreatePolygonShape(body, &sd, &box);
+}
+
 geometry::point object::position() const noexcept {
   return _position;
 }
 
 float object::x() const noexcept {
+  if (b2Body_IsValid(body)) {
+    const auto it = _animations.find(_action);
+    if (it != _animations.end() && it->second.bounds) {
+      const auto pos = b2Body_GetPosition(body);
+      const auto& r = it->second.bounds->rectangle;
+      const auto sw = r.width() * _scale;
+      const auto hx = 0.5f * sw;
+      return pos.x - r.x() * _scale - hx;
+    }
+  }
   return _position.x();
 }
 
 void object::set_x(float x) noexcept {
   if (_position.x() == x) return;
   _position.set_x(x);
-  _needs_recalc = true;
+  sync_body_transform();
 }
 
 float object::y() const noexcept {
+  if (b2Body_IsValid(body)) {
+    const auto it = _animations.find(_action);
+    if (it != _animations.end() && it->second.bounds) {
+      const auto pos = b2Body_GetPosition(body);
+      const auto& r = it->second.bounds->rectangle;
+      const auto sh = r.height() * _scale;
+      const auto hy = 0.5f * sh;
+      return pos.y - r.y() * _scale - hy;
+    }
+  }
   return _position.y();
 }
 
 void object::set_y(float y) noexcept {
   if (_position.y() == y) return;
   _position.set_y(y);
-  _needs_recalc = true;
+  sync_body_transform();
+}
+
+void object::set_placement(float x, float y) noexcept {
+  if (_position.x() == x && _position.y() == y) return;
+  _position.set(x, y);
+  sync_body_transform();
+}
+
+geometry::point object::placement() const noexcept {
+  if (b2Body_IsValid(body)) {
+    const auto it = _animations.find(_action);
+    if (it != _animations.end() && it->second.bounds) {
+      const auto pos = b2Body_GetPosition(body);
+      const auto& r = it->second.bounds->rectangle;
+      const auto sw = r.width() * _scale;
+      const auto sh = r.height() * _scale;
+      const auto hx = 0.5f * sw;
+      const auto hy = 0.5f * sh;
+      return geometry::point(pos.x - r.x() * _scale - hx, pos.y - r.y() * _scale - hy);
+    }
+  }
+  return _position;
+}
+
+void object::apply_velocity(float vx, float vy) noexcept {
+  if (!b2Body_IsValid(body)) return;
+  b2Body_SetLinearVelocity(body, b2Vec2{vx, vy});
 }
 
 void object::update(float delta, uint64_t now) noexcept {
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] return;
+  const auto it0 = _animations.find(_action);
+  if (it0 == _animations.end()) return;
 
-  const auto& animation = it->second;
-  const auto& keyframes = animation.keyframes;
-  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
+  const auto& keyframes0 = it0->second.keyframes;
+  if (keyframes0.empty() || _frame >= keyframes0.size()) return;
 
-  const auto& keyframe = keyframes[_frame];
-  const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
+  const auto& kf = keyframes0[_frame];
+  const auto expired = kf.duration > 0 && (now - _last_frame >= kf.duration);
   if (expired) {
     ++_frame;
-
     auto proceed = true;
-    const auto done = _frame >= keyframes.size();
-    if (done && animation.oneshot) {
+    const auto done = _frame >= keyframes0.size();
+    if (done && it0->second.oneshot) {
       const auto ended = std::exchange(_action, std::string{});
-      if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
-      if (!animation.next) proceed = false;
-      else _action = *animation.next;
+      if (const auto& fn = _onend; fn) {
+        fn(shared_from_this(), ended);
+      }
+      if (!it0->second.next) {
+        proceed = false;
+      } else {
+        _action = *it0->second.next;
+      }
     }
-
     if (proceed) {
       if (done) _frame = 0;
       _last_frame = now;
     }
   }
 
-  if (!animation.bounds) [[unlikely]] {
-    _shape = std::nullopt;
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) return;
+
+  const auto& a = it->second;
+
+  if (!a.bounds) {
+    if (b2Body_IsValid(body)) {
+      b2DestroyBody(body);
+      body = b2BodyId{};
+    }
     return;
   }
 
-  if (!_needs_recalc) [[likely]] {
+  const auto pose = compute_pose();
+  if (!pose) {
+    if (b2Body_IsValid(body)) {
+      b2DestroyBody(body);
+      body = b2BodyId{};
+    }
     return;
   }
 
-  const auto& rectangle = animation.bounds->rectangle;
-  geometry::rectangle destination{_position + rectangle.position(), rectangle.size()};
+  if (!b2Body_IsValid(body)) {
+    if (auto w = _world.lock()) {
+      auto def = b2DefaultBodyDef();
+      def.type = b2_dynamicBody;
+      def.gravityScale = 0.0f;
+      def.fixedRotation = true;
+      def.userData = this;
+      def.position = b2Vec2{pose->px, pose->py};
+      def.rotation = b2MakeRot(pose->radians);
+      body = b2CreateBody(*w, &def);
+    }
+  } else {
+    b2Body_SetTransform(body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
+  }
 
-  const auto ow = destination.width();
-  const auto oh = destination.height();
-  const auto sw = ow * _scale;
-  const auto sh = oh * _scale;
-  const auto dx = (ow - sw) * .5f;
-  const auto dy = (oh - sh) * .5f;
+  if (b2Body_IsValid(body)) {
+    update_body_shape();
+  }
 
-  destination.set_position(destination.x() + dx, destination.y() + dy);
-  destination.scale(_scale);
-
-  const auto cx = destination.x() + sw * .5f;
-  const auto cy = destination.y() + sh * .5f;
-
-  const auto hx = sw * .5f;
-  const auto hy = sh * .5f;
-
-  const float r = _angle * (std::numbers::pi_v<float> / 180.0f);
-  const float c = std::cos(r);
-  const float s = std::sin(r);
-
-  const auto ex = std::fma(std::abs(c), hx, std::abs(s) * hy);
-  const auto ey = std::fma(std::abs(s), hx, std::abs(c) * hy);
-
-  const auto minx = cx - ex;
-  const auto maxx = cx + ex;
-  const auto miny = cy - ey;
-  const auto maxy = cy + ey;
-
-  _shape = geometry::rectangle{minx, miny, maxx - minx, maxy - miny};
-  _dirty = _shape != _previous_shape;
-  _previous_shape = _shape;
-  _needs_recalc = false;
+  sync_position_from_body();
 }
 
 void object::draw() const noexcept {
@@ -150,10 +269,6 @@ void object::draw() const noexcept {
   destination.set_position(destination.x() + dx, destination.y() + dy);
   destination.scale(_scale);
 
-  auto position = b2Body_GetPosition(body);
-  auto rotation = b2Body_GetRotation(body);
-  printf("%4.2f %4.2f %4.2f\n", position.x, position.y, b2Rot_GetAngle(rotation));
-  
   _spritesheet->draw(
     source,
     destination,
@@ -163,20 +278,9 @@ void object::draw() const noexcept {
   );
 }
 
-void object::set_placement(float x, float y) noexcept {
-  if (_position.x() == x && _position.y() == y) return;
-  _position.set(x, y);
-  _needs_recalc = true;
-}
-
-geometry::point object::placement() const noexcept {
-  return _position;
-}
-
 void object::set_alpha(uint8_t alpha) noexcept {
   if (_alpha == alpha) return;
   _alpha = alpha;
-  _needs_recalc = true;
 }
 
 uint8_t object::alpha() const noexcept {
@@ -186,7 +290,11 @@ uint8_t object::alpha() const noexcept {
 void object::set_scale(float scale) noexcept {
   if (_scale == scale) return;
   _scale = scale;
-  _needs_recalc = true;
+
+  if (b2Body_IsValid(body)) {
+    sync_body_transform();
+    update_body_shape();
+  }
 }
 
 float object::scale() const noexcept {
@@ -196,17 +304,21 @@ float object::scale() const noexcept {
 void object::set_angle(double angle) noexcept {
   if (_angle == angle) return;
   _angle = angle;
-  _needs_recalc = true;
+  sync_body_transform();
 }
 
 double object::angle() const noexcept {
+  if (b2Body_IsValid(body)) {
+    const auto rot = b2Body_GetRotation(body);
+    const auto radians = b2Rot_GetAngle(rot);
+    return radians * (180.0 / std::numbers::pi_v<double>);
+  }
   return _angle;
 }
 
 void object::set_reflection(graphics::reflection reflection) noexcept {
   if (_reflection == reflection) return;
   _reflection = reflection;
-  _needs_recalc = true;
 }
 
 graphics::reflection object::reflection() const noexcept {
@@ -220,13 +332,15 @@ bool object::visible() const noexcept {
 void object::set_visible(bool value) noexcept {
   if (value == _visible) return;
   _visible = value;
-  _needs_recalc = true;
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {
   if (!action || action->empty()) {
     _action.clear();
-    _needs_recalc = true;
+    if (b2Body_IsValid(body)) {
+      b2DestroyBody(body);
+      body = b2BodyId{};
+    }
     return;
   }
 
@@ -238,7 +352,6 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   _action = it->first;
   _frame = 0;
   _last_frame = SDL_GetTicks();
-  _needs_recalc = true;
 
   if (const auto& e = it->second.effect; e) {
     e->play();
@@ -246,6 +359,43 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
 
   if (const auto& fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
+  }
+
+  const auto& a = it->second;
+  if (!a.bounds) {
+    if (b2Body_IsValid(body)) {
+      b2DestroyBody(body);
+      body = b2BodyId{};
+    }
+    return;
+  }
+
+  const auto pose = compute_pose();
+  if (!pose) {
+    if (b2Body_IsValid(body)) {
+      b2DestroyBody(body);
+      body = b2BodyId{};
+    }
+    return;
+  }
+
+  if (!b2Body_IsValid(body)) {
+    if (auto w = _world.lock()) {
+      auto def = b2DefaultBodyDef();
+      def.type = b2_dynamicBody;
+      def.gravityScale = 0.0f;
+      def.fixedRotation = true;
+      def.userData = this;
+      def.position = b2Vec2{pose->px, pose->py};
+      def.rotation = b2MakeRot(pose->radians);
+      body = b2CreateBody(*w, &def);
+    }
+  } else {
+    b2Body_SetTransform(body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
+  }
+
+  if (b2Body_IsValid(body)) {
+    update_body_shape();
   }
 }
 
@@ -303,14 +453,6 @@ void object::on_unhover() noexcept {
   if (const auto& fn = _onunhover; fn) {
     fn(shared_from_this());
   }
-}
-
-bool object::dirty() noexcept{
-  return std::exchange(_dirty, false);
-}
-
-std::optional<geometry::rectangle> object::shape() const {
-  return _shape;
 }
 
 memory::kv& object::kv() noexcept {

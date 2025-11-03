@@ -50,18 +50,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     const bool oneshot = next.has_value() || a.value("oneshot", false);
 
     auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
-    // if (a.contains("bounds") /* && (!a.contains("frames") || a["frames"].empty()) */) {
-    //   auto bodyDef = b2DefaultBodyDef();
-    //   bodyDef.type = b2_dynamicBody;
-    //   bodyDef.position = b2Vec2{0.0f, 0.0f}; // TODO
-    //   o->body = b2CreateBody(*_world, &bodyDef);
 
-    //   // framework::keyframe k;
-    //   //k.duration = -1;
-    //   //k.frame = a.at("bounds").get<framework::bounds>().rectangle;
-    //   //
-    //   //keyframes.emplace_back(k);
-    // }
 
     animations.try_emplace(
       key,
@@ -81,6 +70,8 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_scope = n;
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
+
+  o->_world = _world;
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
 
@@ -108,6 +99,8 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_scale = matrix->_scale;
   o->_reflection = matrix->_reflection;
   o->_alpha = matrix->_alpha;
+
+  o->_world = _world;
 
   _objects.emplace(o);
   _world->add(o);

@@ -119,9 +119,9 @@ soundfx::soundfx(const std::string& filename) {
       vf.get(),
       buffer.data(),
       static_cast<int>(buffer.size()),
-      0,  // little-endian
-      2,  // 16-bit
-      1,  // signed
+      0, // little-endian
+      2, // 16-bit
+      1, // signed
       nullptr
     );
 

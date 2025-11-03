@@ -1,8 +1,9 @@
 #pragma once
 
-#include <box2d/box2d.h>
+#include "common.hpp"
 
 namespace framework {
+
 static b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
   b2AABB a{};
   a.lowerBound = b2Vec2(x0, y0);
@@ -20,7 +21,7 @@ static bool collect(b2ShapeId shape, void* context) {
   return true;
 }
 
-class world final {
+class world final : public std::enable_shared_from_this<world> {
 public:
   world(std::shared_ptr<graphics::renderer> renderer) noexcept;
   ~world() noexcept;
@@ -57,14 +58,11 @@ public:
   operator b2WorldId() const noexcept;
 
 protected:
-  void notify(uint64_t aid, uint64_t bid) const;
+  void notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const;
 
 private:
   b2WorldId _world;
-  // std::shared_ptr<graphics::renderer> _renderer;
-  // std::vector<uint64_t> _dirties;
-  // std::unordered_map<uint64_t, b2BodyId> _bodies;
-  // std::unordered_map<uint64_t, std::weak_ptr<object>> _objects;
+  std::shared_ptr<graphics::renderer> _renderer;
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };
