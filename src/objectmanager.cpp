@@ -6,11 +6,6 @@ using namespace framework;
 
 using namespace input::event;
 
-template <typename T>
-std::optional<std::function<T>> operator||(const std::optional<std::function<T>>& lhs, const std::optional<std::function<T>>& rhs) {
-  return lhs ? lhs : rhs;
-}
-
 objectmanager::objectmanager() {
   _envelopepool->reserve(64);
   _hovering.reserve(256);
@@ -121,6 +116,8 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return false;
   }
+
+  object->disable_physics();
 
   const auto id = object->id();
   _hovering.erase(id);
