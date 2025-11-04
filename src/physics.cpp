@@ -2,14 +2,6 @@
 
 namespace framework::physics {
 
-uint64_t userdata_to_id(void* userdata) noexcept {
-  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata));
-}
-
-void* id_to_userdata(uint64_t id) noexcept {
-  return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
-}
-
 body_transform body_transform::compute(
   float position_x,
   float position_y,
@@ -28,7 +20,7 @@ body_transform body_transform::compute(
   result.hy = 0.5f * sh;
   result.px = position_x + bounds_x * scale + result.hx;
   result.py = position_y + bounds_y * scale + result.hy;
-  result.radians = static_cast<float>(angle_degrees * DEG_TO_RAD);
+  result.radians = static_cast<float>(angle_degrees * DEGREES_TO_RADIANS);
 
   return result;
 }

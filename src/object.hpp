@@ -93,6 +93,7 @@ public:
   uint64_t id() const noexcept;
 
 protected:
+  void disable_physics_body() noexcept;
   void create_physics_body() noexcept;
   void update_physics_body() noexcept;
   void destroy_physics_body() noexcept;
@@ -100,6 +101,7 @@ protected:
 private:
   friend class objectmanager;
   friend class tilemap;
+  friend class scene;
   friend class world;
 
   b2BodyId _body;

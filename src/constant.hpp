@@ -6,4 +6,8 @@ inline constexpr auto WORLD_SUBSTEPS = 1;
 
 inline constexpr auto FLUSH_INTERVAL = 10000u;
 
+inline constexpr float DEGREES_TO_RADIANS = std::numbers::pi_v<float> / 180.0f;
+
+inline constexpr float RADIANS_TO_DEGREES = 180.0f / std::numbers::pi_v<float>;
+
 inline constexpr auto epsilon = std::numeric_limits<float>::epsilon();

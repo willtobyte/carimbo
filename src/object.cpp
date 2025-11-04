@@ -176,7 +176,7 @@ double object::angle() const noexcept {
   if (b2Body_IsValid(_body)) {
     const auto rot = b2Body_GetRotation(_body);
     const auto radians = b2Rot_GetAngle(rot);
-    return radians * physics::RAD_TO_DEG;
+    return radians * RADIANS_TO_DEGREES;
   }
   return _angle;
 }
@@ -288,6 +288,12 @@ memory::kv& object::kv() noexcept {
 
 uint64_t object::id() const noexcept {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
+}
+
+void object::disable_physics_body() noexcept {
+  if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
+    b2Body_Disable(_body);
+  }
 }
 
 void object::create_physics_body() noexcept {

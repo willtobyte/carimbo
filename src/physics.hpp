@@ -3,12 +3,13 @@
 #include "common.hpp"
 
 namespace framework::physics {
+inline constexpr uint64_t userdata_to_id(void* userdata) noexcept {
+  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata));
+}
 
-inline constexpr float DEG_TO_RAD = std::numbers::pi_v<float> / 180.0f;
-inline constexpr float RAD_TO_DEG = 180.0f / std::numbers::pi_v<float>;
-
-uint64_t userdata_to_id(void* userdata) noexcept;
-void* id_to_userdata(uint64_t id) noexcept;
+inline constexpr void* id_to_userdata(uint64_t id) noexcept {
+  return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
+}
 
 struct body_transform final {
   float px{0.0f};
