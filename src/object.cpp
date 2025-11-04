@@ -147,7 +147,7 @@ void object::update(float delta, uint64_t now) noexcept {
   if (!animation.bounds) {
     if (b2Body_IsValid(_body)) {
       b2DestroyBody(_body);
-      _body = b2BodyId{};
+      _body = b2_nullBodyId;
     }
     return;
   }
@@ -156,7 +156,7 @@ void object::update(float delta, uint64_t now) noexcept {
   if (!pose) {
     if (b2Body_IsValid(_body)) {
       b2DestroyBody(_body);
-      _body = b2BodyId{};
+      _body = b2_nullBodyId;
     }
 
     return;
@@ -283,7 +283,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
     _action.clear();
     if (b2Body_IsValid(_body)) {
       b2DestroyBody(_body);
-      _body = b2BodyId{};
+      _body = b2_nullBodyId;
     }
     return;
   }

@@ -129,7 +129,7 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
 
   if (b2Body_IsValid(object->_body)) {
     b2DestroyBody(object->_body);
-    object->_body = b2BodyId{};
+    object->_body = b2_nullBodyId;
   }
 
   return _objects.get<by_id>().erase(id) > 0;
