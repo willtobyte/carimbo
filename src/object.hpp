@@ -93,10 +93,7 @@ public:
   uint64_t id() const noexcept;
 
 protected:
-  void disable_physics() noexcept;
-  void create_physics() noexcept;
-  void update_physics() noexcept;
-  void destroy_physics() noexcept;
+  void suspend() noexcept;
 
 private:
   friend class objectmanager;
@@ -124,6 +121,7 @@ private:
   std::unordered_map<std::string, animation> _animations;
 
   std::optional<physics::body_transform> _last_synced_transform;
+  bool _need_update_physics{false};
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

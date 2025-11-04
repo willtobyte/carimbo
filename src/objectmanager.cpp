@@ -117,7 +117,7 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
     return false;
   }
 
-  object->disable_physics();
+  object->suspend();
 
   const auto id = object->id();
   _hovering.erase(id);

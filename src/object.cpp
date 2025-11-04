@@ -14,7 +14,17 @@ object::object() noexcept
 }
 
 object::~object() noexcept {
-  destroy_physics();
+  if (b2Shape_IsValid(_collision_shape)) {
+    b2DestroyShape(_collision_shape, false);
+    _collision_shape = b2_nullShapeId;
+  }
+
+  if (b2Body_IsValid(_body)) {
+    b2DestroyBody(_body);
+    _body = b2_nullBodyId;
+    _last_synced_transform.reset();
+  }
+
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
@@ -37,8 +47,7 @@ float object::x() const noexcept {
 void object::set_x(float x) noexcept {
   if (_position.x() == x) return;
   _position.set_x(x);
-  if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics();
+  _need_update_physics = true;
 }
 
 float object::y() const noexcept {
@@ -48,15 +57,13 @@ float object::y() const noexcept {
 void object::set_y(float y) noexcept {
   if (_position.y() == y) return;
   _position.set_y(y);
-  if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics();
+  _need_update_physics = true;
 }
 
 void object::set_placement(float x, float y) noexcept {
   if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
-  if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics();
+  _need_update_physics = true;
 }
 
 geometry::point object::placement() const noexcept {
@@ -103,12 +110,78 @@ void object::update(float delta, uint64_t now) noexcept {
   }
 
   if (!b2Body_IsValid(_body)) {
-    create_physics();
+    if (b2Body_IsValid(_body)) return;
+
+    const auto it = _animations.find(_action);
+    if (it == _animations.end() || !it->second.bounds) return;
+
+    const auto world = _world.lock();
+    if (!world) return;
+
+    if (b2Shape_IsValid(_collision_shape)) {
+      std::println("[object] warning: orphaned shape for {} {}", kind(), id());
+      b2DestroyShape(_collision_shape, false);
+      _collision_shape = b2_nullShapeId;
+    }
+
+    const auto& r = it->second.bounds->rectangle;
+    const auto transform = physics::body_transform::compute(
+      _position.x(), _position.y(),
+      r.x(), r.y(), r.width(), r.height(),
+      _scale, _angle
+    );
+
+    auto def = b2DefaultBodyDef();
+    def.type = b2_kinematicBody;
+    def.gravityScale = 0.0f;
+    def.fixedRotation = true;
+    def.userData = physics::id_to_userdata(id());
+    def.position = b2Vec2{transform.px, transform.py};
+    def.rotation = b2MakeRot(transform.radians);
+    _body = b2CreateBody(*world, &def);
+
+    auto sd = b2DefaultShapeDef();
+    sd.isSensor = true;
+    sd.enableSensorEvents = true;
+    const auto box = b2MakeBox(transform.hx, transform.hy);
+
+    _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
+
+    _last_synced_transform = transform;
   } else if (!b2Body_IsEnabled(_body)) {
     b2Body_Enable(_body);
   }
 
-  update_physics();
+  if (_need_update_physics) {
+    if (!b2Body_IsValid(_body)) return;
+
+    _need_update_physics = false;
+
+    const auto it = _animations.find(_action);
+    if (it == _animations.end() || !it->second.bounds) return;
+
+    const auto& r = it->second.bounds->rectangle;
+    const auto transform = physics::body_transform::compute(
+      _position.x(), _position.y(),
+      r.x(), r.y(), r.width(), r.height(),
+      _scale, _angle
+    );
+
+    const auto rotation = _last_synced_transform && !transform.rotation_differs(*_last_synced_transform)
+      ? b2Body_GetRotation(_body)
+      : b2MakeRot(transform.radians);
+
+    b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, rotation);
+
+    if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
+      if (b2Shape_IsValid(_collision_shape)) {
+        const auto box = b2MakeBox(transform.hx, transform.hy);
+        b2Shape_SetPolygon(_collision_shape, &box);
+      }
+    }
+
+    _last_synced_transform = transform;
+  }
 }
 
 void object::draw() const noexcept {
@@ -161,8 +234,7 @@ uint8_t object::alpha() const noexcept {
 void object::set_scale(float scale) noexcept {
   if (_scale == scale) return;
   _scale = scale;
-  if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics();
+  _need_update_physics = true;
 }
 
 float object::scale() const noexcept {
@@ -172,8 +244,7 @@ float object::scale() const noexcept {
 void object::set_angle(double angle) noexcept {
   if (_angle == angle) return;
   _angle = angle;
-  if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics();
+  _need_update_physics = true;
 }
 
 double object::angle() const noexcept {
@@ -296,91 +367,8 @@ uint64_t object::id() const noexcept {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
 }
 
-void object::disable_physics() noexcept {
+void object::suspend() noexcept {
   if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
     b2Body_Disable(_body);
-  }
-}
-
-void object::create_physics() noexcept {
-  if (b2Body_IsValid(_body)) return;
-
-  const auto it = _animations.find(_action);
-  if (it == _animations.end() || !it->second.bounds) return;
-
-  const auto world = _world.lock();
-  if (!world) return;
-
-  if (b2Shape_IsValid(_collision_shape)) {
-    std::println("[object] warning: orphaned shape detected in create_physics() for {} {}", kind(), id());
-    b2DestroyShape(_collision_shape, false);
-    _collision_shape = b2_nullShapeId;
-  }
-
-  const auto& r = it->second.bounds->rectangle;
-  const auto transform = physics::body_transform::compute(
-    _position.x(), _position.y(),
-    r.x(), r.y(), r.width(), r.height(),
-    _scale, _angle
-  );
-
-  auto def = b2DefaultBodyDef();
-  def.type = b2_kinematicBody;
-  def.gravityScale = 0.0f;
-  def.fixedRotation = true;
-  def.userData = physics::id_to_userdata(id());
-  def.position = b2Vec2{transform.px, transform.py};
-  def.rotation = b2MakeRot(transform.radians);
-  _body = b2CreateBody(*world, &def);
-
-  auto sd = b2DefaultShapeDef();
-  sd.isSensor = true;
-  sd.enableSensorEvents = true;
-  const auto box = b2MakeBox(transform.hx, transform.hy);
-
-  _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
-
-  _last_synced_transform = transform;
-}
-
-void object::update_physics() noexcept {
-  if (!b2Body_IsValid(_body)) return;
-
-  const auto it = _animations.find(_action);
-  if (it == _animations.end() || !it->second.bounds) return;
-
-  const auto& r = it->second.bounds->rectangle;
-  const auto transform = physics::body_transform::compute(
-    _position.x(), _position.y(),
-    r.x(), r.y(), r.width(), r.height(),
-    _scale, _angle
-  );
-
-  const auto rotation = _last_synced_transform && !transform.rotation_differs(*_last_synced_transform)
-    ? b2Body_GetRotation(_body)
-    : b2MakeRot(transform.radians);
-
-  b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, rotation);
-
-  if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
-    if (b2Shape_IsValid(_collision_shape)) {
-      const auto box = b2MakeBox(transform.hx, transform.hy);
-      b2Shape_SetPolygon(_collision_shape, &box);
-    }
-  }
-
-  _last_synced_transform = transform;
-}
-
-void object::destroy_physics() noexcept {
-  if (b2Shape_IsValid(_collision_shape)) {
-    b2DestroyShape(_collision_shape, false);
-    _collision_shape = b2_nullShapeId;
-  }
-
-  if (b2Body_IsValid(_body)) {
-    b2DestroyBody(_body);
-    _body = b2_nullBodyId;
-    _last_synced_transform.reset();
   }
 }
