@@ -30,12 +30,11 @@ public:
   bool rotation_differs(const body_transform& other) const noexcept;
   bool differs(const body_transform& other) const noexcept;
 
-private:
-  float px{0.0f};
-  float py{0.0f};
-  float hx{0.0f};
-  float hy{0.0f};
-  float radians{0.0f};
+  float px{.0f};
+  float py{.0f};
+  float hx{.0f};
+  float hy{.0f};
+  float radians{.0f};
 };
 
 }

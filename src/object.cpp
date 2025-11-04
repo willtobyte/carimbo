@@ -206,6 +206,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
       b2Body_Disable(_body);
     }
+
     return;
   }
 
