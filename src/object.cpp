@@ -137,10 +137,10 @@ void object::update(float delta, uint64_t now) noexcept {
   if (!_need_update_physics) return;
   _need_update_physics = false;
 
-  const auto& r = animation.bounds->rectangle;
+  const auto& rectangle = animation.bounds->rectangle;
   const auto transform = physics::body_transform::compute(
     _position.x(), _position.y(),
-    r.x(), r.y(), r.width(), r.height(),
+    rectangle.x(), rectangle.y(), rectangle.width(), rectangle.height(),
     _scale, _angle
   );
 
