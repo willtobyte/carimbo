@@ -14,7 +14,7 @@ object::object() noexcept
 }
 
 object::~object() noexcept {
-  destroy_physics_body();
+  destroy_physics();
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
@@ -38,7 +38,7 @@ void object::set_x(float x) noexcept {
   if (_position.x() == x) return;
   _position.set_x(x);
   if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics_body();
+  update_physics();
 }
 
 float object::y() const noexcept {
@@ -49,14 +49,14 @@ void object::set_y(float y) noexcept {
   if (_position.y() == y) return;
   _position.set_y(y);
   if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics_body();
+  update_physics();
 }
 
 void object::set_placement(float x, float y) noexcept {
   if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
   if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics_body();
+  update_physics();
 }
 
 geometry::point object::placement() const noexcept {
@@ -99,12 +99,12 @@ void object::update(float delta, uint64_t now) noexcept {
   }
 
   if (!b2Body_IsValid(_body)) {
-    create_physics_body();
+    create_physics();
   } else if (!b2Body_IsEnabled(_body)) {
     b2Body_Enable(_body);
   }
 
-  update_physics_body();
+  update_physics();
 }
 
 void object::draw() const noexcept {
@@ -158,7 +158,7 @@ void object::set_scale(float scale) noexcept {
   if (_scale == scale) return;
   _scale = scale;
   if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics_body();
+  update_physics();
 }
 
 float object::scale() const noexcept {
@@ -169,13 +169,13 @@ void object::set_angle(double angle) noexcept {
   if (_angle == angle) return;
   _angle = angle;
   if (!b2Body_IsValid(_body) || !b2Body_IsEnabled(_body)) return;
-  update_physics_body();
+  update_physics();
 }
 
 double object::angle() const noexcept {
   if (b2Body_IsValid(_body)) {
-    const auto rot = b2Body_GetRotation(_body);
-    const auto radians = b2Rot_GetAngle(rot);
+    const auto rotation = b2Body_GetRotation(_body);
+    const auto radians = b2Rot_GetAngle(rotation);
     return radians * RADIANS_TO_DEGREES;
   }
 
@@ -292,13 +292,13 @@ uint64_t object::id() const noexcept {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
 }
 
-void object::disable_physics_body() noexcept {
+void object::disable_physics() noexcept {
   if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
     b2Body_Disable(_body);
   }
 }
 
-void object::create_physics_body() noexcept {
+void object::create_physics() noexcept {
   if (b2Body_IsValid(_body)) return;
 
   const auto it = _animations.find(_action);
@@ -332,7 +332,7 @@ void object::create_physics_body() noexcept {
   _last_synced_transform = transform;
 }
 
-void object::update_physics_body() noexcept {
+void object::update_physics() noexcept {
   if (!b2Body_IsValid(_body)) return;
 
   const auto it = _animations.find(_action);
@@ -359,7 +359,7 @@ void object::update_physics_body() noexcept {
   _last_synced_transform = transform;
 }
 
-void object::destroy_physics_body() noexcept {
+void object::destroy_physics() noexcept {
   if (b2Body_IsValid(_body)) {
     b2DestroyBody(_body);
     _body = b2_nullBodyId;

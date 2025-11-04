@@ -111,7 +111,7 @@ void scene::on_leave() const {
   _particlesystem->clear();
 
   for (const auto& [_, o] : _objects) {
-    o->disable_physics_body();
+    o->disable_physics();
     _objectmanager->remove(o);
   }
 

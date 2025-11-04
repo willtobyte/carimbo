@@ -93,10 +93,10 @@ public:
   uint64_t id() const noexcept;
 
 protected:
-  void disable_physics_body() noexcept;
-  void create_physics_body() noexcept;
-  void update_physics_body() noexcept;
-  void destroy_physics_body() noexcept;
+  void disable_physics() noexcept;
+  void create_physics() noexcept;
+  void update_physics() noexcept;
+  void destroy_physics() noexcept;
 
 private:
   friend class objectmanager;
