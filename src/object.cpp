@@ -178,6 +178,7 @@ double object::angle() const noexcept {
     const auto radians = b2Rot_GetAngle(rot);
     return radians * RADIANS_TO_DEGREES;
   }
+
   return _angle;
 }
 
