@@ -28,7 +28,7 @@ world::~world() noexcept {
 }
 
 void world::update(float delta) noexcept {
-  b2World_Step(_world, std::max(0.0f, delta), WORLD_SUBSTEPS);
+  b2World_Step(_world, std::clamp(delta, .0f, .1f), WORLD_SUBSTEPS);
 
   const auto events = b2World_GetSensorEvents(_world);
   for (auto i = events.beginCount; i-- > 0; ) {
