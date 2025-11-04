@@ -58,7 +58,7 @@ public:
   operator b2WorldId() const noexcept;
 
 protected:
-  void notify(object* obj_a, object* obj_b) const;
+  void notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const;
 
 private:
   b2WorldId _world;

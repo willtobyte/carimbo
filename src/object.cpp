@@ -15,6 +15,9 @@ object::object() noexcept
 
 object::~object() noexcept {
   if (b2Body_IsValid(body)) {
+    // Clean up the shared_ptr stored in userData
+    auto* ptr = static_cast<std::shared_ptr<object>*>(b2Body_GetUserData(body));
+    delete ptr;
     b2DestroyBody(body);
   }
 
@@ -224,7 +227,7 @@ void object::update(float delta, uint64_t now) noexcept {
       def.type = b2_dynamicBody;
       def.gravityScale = 0.0f;
       def.fixedRotation = true;
-      def.userData = this;
+      def.userData = new std::shared_ptr<object>(shared_from_this());
       def.position = b2Vec2{pose->px, pose->py};
       def.rotation = b2MakeRot(pose->radians);
       body = b2CreateBody(*w, &def);
@@ -385,7 +388,7 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
       def.type = b2_dynamicBody;
       def.gravityScale = 0.0f;
       def.fixedRotation = true;
-      def.userData = this;
+      def.userData = new std::shared_ptr<object>(shared_from_this());
       def.position = b2Vec2{pose->px, pose->py};
       def.rotation = b2MakeRot(pose->radians);
       body = b2CreateBody(*w, &def);

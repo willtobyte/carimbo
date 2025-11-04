@@ -49,10 +49,11 @@ void world::update(float delta) noexcept {
 
     if (!user_data_a || !user_data_b) continue;
 
-    auto obj_a = static_cast<object*>(user_data_a);
-    auto obj_b = static_cast<object*>(user_data_b);
+    // Extract shared_ptr from userData
+    auto* ptr_a = static_cast<std::shared_ptr<object>*>(user_data_a);
+    auto* ptr_b = static_cast<std::shared_ptr<object>*>(user_data_b);
 
-    notify(obj_a, obj_b);
+    notify(*ptr_a, *ptr_b);
   }
 }
 
@@ -94,7 +95,7 @@ world::operator b2WorldId() const noexcept {
   return _world;
 }
 
-void world::notify(object* obj_a, object* obj_b) const {
+void world::notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const {
   if (!obj_a || !obj_b) [[unlikely]] return;
 
   if (const auto* callback = find_ptr(obj_a->_collision_mapping, obj_b->kind())) (*callback)(obj_a, obj_b);
