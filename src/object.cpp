@@ -82,41 +82,24 @@ void object::update(float delta, uint64_t now) noexcept {
   const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
   if (expired) {
     ++_frame;
-
-    auto proceed = true;
     const auto done = _frame >= keyframes.size();
     if (done && animation.oneshot) {
       const auto ended = std::exchange(_action, std::string{});
       if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
-      if (!animation.next) proceed = false;
-      else _action = *animation.next;
+      if (!animation.next) return;
+      _action = *animation.next;
     }
-
-    if (proceed) {
-      if (done) {
-        _frame = 0;
-      }
-
-      _last_frame = now;
-    }
+    if (done) _frame = 0;
+    _last_frame = now;
   }
 
   if (!animation.bounds) {
-    if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
-      b2Body_Disable(_body);
-    }
-
+    if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) b2Body_Disable(_body);
     return;
   }
 
   if (!b2Body_IsValid(_body)) {
-    if (b2Body_IsValid(_body)) return;
-
-    const auto it = _animations.find(_action);
-    if (it == _animations.end() || !it->second.bounds) return;
-
     const auto world = _world.lock();
-    if (!world) return;
 
     if (b2Shape_IsValid(_collision_shape)) {
       std::println("[object] warning: orphaned shape for {} {}", kind(), id());
@@ -124,7 +107,7 @@ void object::update(float delta, uint64_t now) noexcept {
       _collision_shape = b2_nullShapeId;
     }
 
-    const auto& r = it->second.bounds->rectangle;
+    const auto& r = animation.bounds->rectangle;
     const auto transform = physics::body_transform::compute(
       _position.x(), _position.y(),
       r.x(), r.y(), r.width(), r.height(),
@@ -144,44 +127,37 @@ void object::update(float delta, uint64_t now) noexcept {
     sd.isSensor = true;
     sd.enableSensorEvents = true;
     const auto box = b2MakeBox(transform.hx, transform.hy);
-
     _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
-
     _last_synced_transform = transform;
-  } else if (!b2Body_IsEnabled(_body)) {
-    b2Body_Enable(_body);
+    return;
   }
 
-  if (_need_update_physics) {
-    if (!b2Body_IsValid(_body)) return;
+  if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
 
-    _need_update_physics = false;
+  if (!_need_update_physics) return;
+  _need_update_physics = false;
 
-    const auto it = _animations.find(_action);
-    if (it == _animations.end() || !it->second.bounds) return;
+  const auto& r = animation.bounds->rectangle;
+  const auto transform = physics::body_transform::compute(
+    _position.x(), _position.y(),
+    r.x(), r.y(), r.width(), r.height(),
+    _scale, _angle
+  );
 
-    const auto& r = it->second.bounds->rectangle;
-    const auto transform = physics::body_transform::compute(
-      _position.x(), _position.y(),
-      r.x(), r.y(), r.width(), r.height(),
-      _scale, _angle
-    );
+  const auto rotation = _last_synced_transform && !transform.rotation_differs(*_last_synced_transform)
+    ? b2Body_GetRotation(_body)
+    : b2MakeRot(transform.radians);
 
-    const auto rotation = _last_synced_transform && !transform.rotation_differs(*_last_synced_transform)
-      ? b2Body_GetRotation(_body)
-      : b2MakeRot(transform.radians);
+  b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, rotation);
 
-    b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, rotation);
-
-    if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
-      if (b2Shape_IsValid(_collision_shape)) {
-        const auto box = b2MakeBox(transform.hx, transform.hy);
-        b2Shape_SetPolygon(_collision_shape, &box);
-      }
+  if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
+    if (b2Shape_IsValid(_collision_shape)) {
+      const auto box = b2MakeBox(transform.hx, transform.hy);
+      b2Shape_SetPolygon(_collision_shape, &box);
     }
-
-    _last_synced_transform = transform;
   }
+
+  _last_synced_transform = transform;
 }
 
 void object::draw() const noexcept {
