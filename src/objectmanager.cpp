@@ -127,9 +127,9 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
 
   _hovering.erase(id);
 
-  if (b2Body_IsValid(object->body)) {
-    b2DestroyBody(object->body);
-    object->body = b2BodyId{};
+  if (b2Body_IsValid(object->_body)) {
+    b2DestroyBody(object->_body);
+    object->_body = b2BodyId{};
   }
 
   return _objects.get<by_id>().erase(id) > 0;

@@ -107,7 +107,8 @@ private:
   friend class tilemap;
   friend class world;
 
-  b2BodyId body;
+  b2BodyId _body;
+  b2ShapeId _collision_shape;
   std::weak_ptr<world> _world;
   std::weak_ptr<objectmanager> _objectmanager;
 
