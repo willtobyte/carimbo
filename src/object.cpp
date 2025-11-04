@@ -348,12 +348,12 @@ void object::sync_body() noexcept {
   b2Body_SetTransform(_body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
 
   const auto epsilon = std::numeric_limits<float>::epsilon();
-  const bool dimensions_changed =
+  const bool changed =
     (std::abs(_last_synced_scale - _scale) > epsilon) ||
     (std::abs(_last_synced_hx - pose->hx) > epsilon) ||
     (std::abs(_last_synced_hy - pose->hy) > epsilon);
 
-  if (dimensions_changed) {
+  if (changed) {
     if (b2Shape_IsValid(_collision_shape)) {
       const auto box = b2MakeBox(pose->hx, pose->hy);
       b2Shape_SetPolygon(_collision_shape, &box);
