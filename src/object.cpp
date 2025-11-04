@@ -1,9 +1,6 @@
 #include "object.hpp"
-#include <limits>
 
 using namespace framework;
-
-
 
 object::object() noexcept
   : _frame(0),
@@ -33,9 +30,9 @@ std::string object::scope() const noexcept {
 std::optional<pose> object::compute_pose() const noexcept {
   const auto it = _animations.find(_action);
   if (it == _animations.end()) return std::nullopt;
-  const auto& a = it->second;
-  if (!a.bounds) return std::nullopt;
-  const auto& r = a.bounds->rectangle;
+  const auto& animation = it->second;
+  if (!animation.bounds) return std::nullopt;
+  const auto& r = animation.bounds->rectangle;
   const auto sw = r.width() * _scale;
   const auto sh = r.height() * _scale;
   const auto hx = 0.5f * sw;
@@ -170,7 +167,7 @@ void object::update(float delta, uint64_t now) noexcept {
   if (!b2Body_IsValid(body)) {
     if (auto objectmanager = _objectmanager.lock()) {
       if (!objectmanager->find(id())) return;
-      if (auto w = _world.lock()) {
+      if (auto world = _world.lock()) {
         auto def = b2DefaultBodyDef();
         def.type = b2_dynamicBody;
         def.gravityScale = 0.0f;
@@ -178,7 +175,7 @@ void object::update(float delta, uint64_t now) noexcept {
         def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id()));
         def.position = b2Vec2{pose->px, pose->py};
         def.rotation = b2MakeRot(pose->radians);
-        body = b2CreateBody(*w, &def);
+        body = b2CreateBody(*world, &def);
 
         auto sd = b2DefaultShapeDef();
         sd.isSensor = true;
@@ -311,53 +308,6 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
 
   if (const auto& fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
-  }
-
-  const auto& a = it->second;
-  if (!a.bounds) {
-    if (b2Body_IsValid(body)) {
-      b2DestroyBody(body);
-      body = b2BodyId{};
-    }
-    return;
-  }
-
-  const auto pose = compute_pose();
-  if (!pose) {
-    if (b2Body_IsValid(body)) {
-      b2DestroyBody(body);
-      body = b2BodyId{};
-    }
-    return;
-  }
-
-  if (!b2Body_IsValid(body)) {
-    if (auto objectmanager = _objectmanager.lock()) {
-      if (!objectmanager->find(id())) return;
-      if (auto w = _world.lock()) {
-        auto def = b2DefaultBodyDef();
-        def.type = b2_dynamicBody;
-        def.gravityScale = 0.0f;
-        def.fixedRotation = true;
-        def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id()));
-        def.position = b2Vec2{pose->px, pose->py};
-        def.rotation = b2MakeRot(pose->radians);
-        body = b2CreateBody(*w, &def);
-
-        // Create the shape for the new body
-        auto sd = b2DefaultShapeDef();
-        sd.isSensor = true;
-        sd.enableSensorEvents = true;
-        const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
-        b2CreatePolygonShape(body, &sd, &box);
-
-        _last_synced_scale = _scale;
-        _last_synced_hx = pose->hx;
-        _last_synced_hy = pose->hy;
-      }
-    }
-  } else {
-    sync_body();
   }
 }
 
