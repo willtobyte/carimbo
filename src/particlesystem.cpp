@@ -69,20 +69,6 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   pb->angle.resize(count);
   pb->alpha.resize(count);
 
-  // for (auto i = count; i-- > 0uz;) {
-  //   pb->x[i] = x + ps->randxspawn();
-  //   pb->y[i] = y + ps->randyspawn();
-  //   pb->vx[i] = ps->randxvel();
-  //   pb->vy[i] = ps->randyvel();
-  //   pb->gx[i] = ps->randgx();
-  //   pb->gy[i] = ps->randgy();
-  //   pb->av[i] = ps->randrotvel();
-  //   pb->af[i] = ps->randrotforce();
-  //   pb->life[i] = ps->randlife();
-  //   pb->alpha[i] = ps->randalpha();
-  //   pb->scale[i] = ps->randscale();
-  //   pb->angle[i] = ps->randangle();
-  // }
 
   return pb;
 }

@@ -51,8 +51,6 @@ public:
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;
   void on_motion(float x, float y) const;
-  // void on_mouse_press(float x, float y) const;
-  // void on_mouse_relese(float x, float y) const;
 
   void set_onenter(std::function<void()>&& fn);
   void set_onloop(std::function<void(float)>&& fn);
@@ -82,8 +80,6 @@ private:
   std::function<void(int32_t)> _onkeypress;
   std::function<void(int32_t)> _onkeyrelease;
   std::function<void(const std::string& )> _ontext;
-  // std::function<void(float, float, int32_t button)> _onmousepress;
-  // std::function<void(float, float, int32_t button)> _onmouserelease;
   std::function<void(float, float)> _onmotion;
 };
 }

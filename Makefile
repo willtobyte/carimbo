@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
-BUILDTYPE := $(if $(buildtype),$(buildtype),Release)
+BUILDTYPE := $(if $(buildtype),$(buildtype),Debug)
 NCPUS := 10
 
 .SHELLFLAGS := -eu -o pipefail -c

@@ -15,7 +15,7 @@
 #include <boost/multi_index/member.hpp>
 
 namespace framework {
-class objectmanager final : public input::eventreceiver {
+class objectmanager final : public input::eventreceiver, public std::enable_shared_from_this<objectmanager> {
 public:
   objectmanager();
 
@@ -45,13 +45,12 @@ protected:
   virtual void on_mail(const input::event::mail& event) override;
 
 private:
+  struct by_id;
+  struct by_seq;
   struct node {
     std::shared_ptr<framework::object> object;
     explicit node(std::shared_ptr<framework::object> o) : object(std::move(o)) {}
   };
-
-  struct by_id;
-  struct by_seq;
 
   struct id_key {
     using result_type = uint64_t;

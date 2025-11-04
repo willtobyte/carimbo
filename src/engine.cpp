@@ -177,8 +177,8 @@ void engine::_loop() {
   _resourcemanager->update(delta);
   _overlay->update(delta);
   _scenemanager->update(delta);
-  _objectmanager->update(delta);
   _world->update(delta);
+  _objectmanager->update(delta);
   _particlesystem->update(delta);
 
   for (const auto& loopable : _loopables) {

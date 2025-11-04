@@ -1,9 +1,11 @@
 #pragma once
 
-#include <box2d/box2d.h>
+#include "common.hpp"
 
 namespace framework {
-static inline b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
+class objectmanager;
+
+static b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
   b2AABB a{};
   a.lowerBound = b2Vec2(x0, y0);
   a.upperBound = b2Vec2(x1, y1);
@@ -14,8 +16,10 @@ template <class OutIt>
 static bool collect(b2ShapeId shape, void* context) {
   auto* it = static_cast<OutIt*>(context);
   const auto body = b2Shape_GetBody(shape);
-  const auto id = static_cast<uint64_t>(
-    reinterpret_cast<uintptr_t>(b2Body_GetUserData(body)));
+  const auto data = b2Body_GetUserData(body);
+  if (!data) return true;
+
+  const auto id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(data));
   *(*it)++ = id;
   return true;
 }
@@ -24,9 +28,6 @@ class world final {
 public:
   world(std::shared_ptr<graphics::renderer> renderer) noexcept;
   ~world() noexcept;
-
-  void add(const std::shared_ptr<object>& object);
-  void remove(uint64_t id);
 
   template <class OutIt>
   void query(float x, float y, OutIt out) {
@@ -54,15 +55,17 @@ public:
   void update(float delta) noexcept;
   void draw() const noexcept;
 
+  void set_objectmanager(std::weak_ptr<objectmanager> objectmanager) noexcept;
+
+  operator b2WorldId() const noexcept;
+
 protected:
-  void notify(uint64_t aid, uint64_t bid) const;
+  void notify(uint64_t id_a, uint64_t id_b) const;
 
 private:
   b2WorldId _world;
   std::shared_ptr<graphics::renderer> _renderer;
-  std::vector<uint64_t> _dirties;
-  std::unordered_map<uint64_t, b2BodyId> _bodies;
-  std::unordered_map<uint64_t, std::weak_ptr<object>> _objects;
+  std::weak_ptr<objectmanager> _objectmanager;
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };

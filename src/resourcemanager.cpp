@@ -33,19 +33,8 @@ resourcemanager::resourcemanager(
       _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
       _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
       _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
-  // TODO
-  // const auto loop = [ptr = std::weak_ptr<framework::engine>(_engine)] {
-  //   auto e = ptr.lock();
-  //   if (!e) [[unlikely]] {
-  //     return;
-  //   }
 
-  //   e->_loop();
-  // };
 
-  // _pixmappool->set_loop(loop);
-  // _soundmanager->set_loop(loop);
-  // _fontfactory->set_loop(loop);
 }
 
 void resourcemanager::flush() noexcept {

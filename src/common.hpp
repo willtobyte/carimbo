@@ -17,6 +17,7 @@ extern "C" {
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <box2d/box2d.h>
 #include <SDL3/SDL.h>
 #include <nlohmann/json.hpp>
 #include <ogg/ogg.h>

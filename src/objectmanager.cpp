@@ -50,12 +50,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
     const bool oneshot = next.has_value() || a.value("oneshot", false);
 
     auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
-    if (a.contains("bounds") && (!a.contains("frames") || a["frames"].empty())) {
-      framework::keyframe k;
-      k.duration = -1;
-      k.frame = a.at("bounds").get<framework::bounds>().rectangle;
-      keyframes.emplace_back(k);
-    }
+
 
     animations.try_emplace(
       key,
@@ -76,9 +71,12 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
 
+  o->_world = _world;
+  o->_objectmanager = shared_from_this();
+
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
+
   if (manage) {
-    _world->add(o);
     _objects.emplace(o);
   }
 
@@ -102,8 +100,10 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_reflection = matrix->_reflection;
   o->_alpha = matrix->_alpha;
 
+  o->_world = _world;
+  o->_objectmanager = shared_from_this();
+
   _objects.emplace(o);
-  _world->add(o);
 
   std::println("[objectmanager] clone {} to {}", matrix->kind(), o->id());
 
@@ -116,7 +116,6 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   }
 
   _objects.emplace(object);
-  _world->add(object);
 }
 
 bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
@@ -126,7 +125,13 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
 
   const auto id = object->id();
 
-  _world->remove(id);
+  _hovering.erase(id);
+
+  if (b2Body_IsValid(object->_body)) {
+    b2DestroyBody(object->_body);
+    object->_body = b2_nullBodyId;
+  }
+
   return _objects.get<by_id>().erase(id) > 0;
 }
 
