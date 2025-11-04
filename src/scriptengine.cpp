@@ -1032,34 +1032,6 @@ void framework::scriptengine::run() {
     "clear", &framework::timermanager::clear
   );
 
-  lua.new_usertype<algebra::vector2d>(
-    "Vector2D",
-    sol::constructors<algebra::vector2d(), algebra::vector2d(float, float)>(),
-
-    "x", sol::property(&algebra::vector2d::x, &algebra::vector2d::set_x),
-    "y", sol::property(&algebra::vector2d::y, &algebra::vector2d::set_y),
-    "set", &algebra::vector2d::set,
-
-    "magnitude", &algebra::vector2d::magnitude,
-    "unit", &algebra::vector2d::unit,
-    "dot", &algebra::vector2d::dot,
-
-    sol::meta_function::addition, &algebra::vector2d::operator+,
-    sol::meta_function::subtraction, &algebra::vector2d::operator-,
-
-    "add_assign", &algebra::vector2d::operator+=,
-    "sub_assign", &algebra::vector2d::operator-=,
-    "mul_assign", &algebra::vector2d::operator*=,
-    "div_assign", &algebra::vector2d::operator/=,
-
-    sol::meta_function::equal_to, &algebra::vector2d::operator==,
-
-    "zero", &algebra::vector2d::zero,
-    "moving", &algebra::vector2d::moving,
-    "right", &algebra::vector2d::right,
-    "left", &algebra::vector2d::left
-  );
-
   lua.new_usertype<graphics::label>(
     "Label",
     sol::no_constructor,

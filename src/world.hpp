@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "physics.hpp"
 
 namespace framework {
 class objectmanager;
@@ -31,7 +32,6 @@ public:
 
   template <class OutIt>
   void query(float x, float y, OutIt out) {
-    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
     const auto aabb = to_aabb(x - epsilon, y - epsilon, x + epsilon, y + epsilon);
     auto filter = b2DefaultQueryFilter();
     b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
@@ -39,7 +39,6 @@ public:
 
   template <class OutIt>
   void query(float x, float y, float w, float h, OutIt out) {
-    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
     const auto xw = x + w;
     const auto yh = y + h;
     const auto x0 = (x < xw ? x : xw) - epsilon;

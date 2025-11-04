@@ -2,8 +2,6 @@
 
 using namespace geometry;
 
-static constexpr auto epsilon = std::numeric_limits<float>::epsilon();
-
 point::point(float x, float y) noexcept
   : _x(x), _y(y) {}
 

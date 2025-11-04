@@ -2,8 +2,6 @@
 
 using namespace geometry;
 
-static constexpr auto epsilon = std::numeric_limits<float>::epsilon();
-
 size::size() noexcept
     : _width(0), _height(0) {}
 

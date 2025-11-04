@@ -1,5 +1,6 @@
 #include "world.hpp"
 #include "objectmanager.hpp"
+#include "physics.hpp"
 
 using namespace framework;
 
@@ -16,7 +17,7 @@ static inline const typename Map::mapped_type* find_ptr(
 world::world(std::shared_ptr<graphics::renderer> renderer) noexcept
     : _renderer(std::move(renderer)) {
   auto def = b2DefaultWorldDef();
-  def.gravity = b2Vec2{.0f, .0f};
+  def.gravity = b2Vec2{0.0f, 0.0f};
   _world = b2CreateWorld(&def);
 }
 
@@ -27,7 +28,7 @@ world::~world() noexcept {
 }
 
 void world::update(float delta) noexcept {
-  b2World_Step(_world, std::max(.0f, delta), 4);
+  b2World_Step(_world, std::max(0.0f, delta), WORLD_SUBSTEPS);
 
   const auto events = b2World_GetSensorEvents(_world);
   for (auto i = events.beginCount; i-- > 0; ) {
@@ -42,9 +43,8 @@ void world::update(float delta) noexcept {
 
     if (!user_data_a || !user_data_b) continue;
 
-    // Extract IDs from userData
-    const auto id_a = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(user_data_a));
-    const auto id_b = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(user_data_b));
+    const auto id_a = physics::userdata_to_id(user_data_a);
+    const auto id_b = physics::userdata_to_id(user_data_b);
 
     notify(id_a, id_b);
   }
@@ -72,8 +72,8 @@ void world::draw() const noexcept {
     SDL_FRect r{
       aabb.lowerBound.x,
       aabb.lowerBound.y,
-      aabb.upperBound.x - r.x,
-      aabb.upperBound.y - r.y
+      aabb.upperBound.x - aabb.lowerBound.x,
+      aabb.upperBound.y - aabb.lowerBound.y
     };
 
     SDL_RenderRect(*self->_renderer, &r);

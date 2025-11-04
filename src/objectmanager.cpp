@@ -1,5 +1,6 @@
 #include "objectmanager.hpp"
 #include "object.hpp"
+#include "physics.hpp"
 
 using namespace framework;
 
@@ -122,13 +123,7 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
   }
 
   const auto id = object->id();
-
   _hovering.erase(id);
-
-  if (b2Body_IsValid(object->_body)) {
-    b2DestroyBody(object->_body);
-    object->_body = b2_nullBodyId;
-  }
 
   return _objects.get<by_id>().erase(id) > 0;
 }

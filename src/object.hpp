@@ -3,6 +3,7 @@
 #include "common.hpp"
 
 #include "kv.hpp"
+#include "physics.hpp"
 #include "rectangle.hpp"
 #include "reflection.hpp"
 #include "pixmap.hpp"
@@ -10,10 +11,6 @@
 
 namespace framework {
 class world;
-
-struct pose final {
-  float px, py, radians, hx, hy;
-};
 
 struct keyframe final {
   geometry::rectangle frame;
@@ -59,8 +56,6 @@ public:
   void set_placement(float x, float y) noexcept;
   geometry::point placement() const noexcept;
 
-  void apply_velocity(float vx, float vy) noexcept;
-
   void set_alpha(uint8_t alpha) noexcept;
   uint8_t alpha() const noexcept;
 
@@ -98,8 +93,9 @@ public:
   uint64_t id() const noexcept;
 
 protected:
-  std::optional<pose> compute_pose() const noexcept;
-  void sync_body() noexcept;
+  void create_physics_body() noexcept;
+  void update_physics_body() noexcept;
+  void destroy_physics_body() noexcept;
 
 private:
   friend class objectmanager;
@@ -125,9 +121,7 @@ private:
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
 
-  float _last_synced_scale{-1.0f};
-  float _last_synced_hx{0.0f};
-  float _last_synced_hy{0.0f};
+  std::optional<physics::body_transform> _last_synced_transform;
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

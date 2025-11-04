@@ -1,6 +1,7 @@
 #include "engine.hpp"
 
 #include "audiodevice.hpp"
+#include "constant.hpp"
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "objectmanager.hpp"
@@ -167,6 +168,11 @@ void engine::_loop() {
   const auto ticks = SDL_GetTicks();
   static auto prior = ticks;
   const auto delta = static_cast<float>(ticks - prior) * 0.001f;
+
+  if (ticks - prior >= FLUSH_INTERVAL) {
+    _resourcemanager->flush();
+  }
+
   prior = ticks;
 
   for (const auto& observer : _observers) {
