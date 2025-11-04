@@ -65,7 +65,7 @@ void world::draw() const noexcept {
   const auto aabb = to_aabb(x0, y0, x1, y1);
   auto filter = b2DefaultQueryFilter();
 
-  auto fun = [](b2ShapeId shape, void* ctx) -> bool {
+  auto fn = [](b2ShapeId shape, void* ctx) -> bool {
     const auto* self = static_cast<const world*>(ctx);
     const b2AABB aabb = b2Shape_GetAABB(shape);
 
@@ -80,7 +80,7 @@ void world::draw() const noexcept {
     return true;
   };
 
-  b2World_OverlapAABB(_world, aabb, filter, fun, const_cast<world*>(this));
+  b2World_OverlapAABB(_world, aabb, filter, fn, const_cast<world*>(this));
 #endif
 }
 
