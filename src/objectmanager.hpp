@@ -15,7 +15,7 @@
 #include <boost/multi_index/member.hpp>
 
 namespace framework {
-class objectmanager final : public input::eventreceiver {
+class objectmanager final : public input::eventreceiver, public std::enable_shared_from_this<objectmanager> {
 public:
   objectmanager();
 

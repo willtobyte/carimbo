@@ -3,6 +3,7 @@
 #include "common.hpp"
 
 namespace framework {
+class objectmanager;
 
 static b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
   b2AABB a{};
@@ -15,8 +16,10 @@ template <class OutIt>
 static bool collect(b2ShapeId shape, void* context) {
   auto* it = static_cast<OutIt*>(context);
   const auto body = b2Shape_GetBody(shape);
-  const auto id = static_cast<uint64_t>(
-    reinterpret_cast<uintptr_t>(b2Body_GetUserData(body)));
+  const auto data = b2Body_GetUserData(body);
+  if (!data) return true;
+
+  const auto id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(data));
   *(*it)++ = id;
   return true;
 }
@@ -25,9 +28,6 @@ class world final {
 public:
   world(std::shared_ptr<graphics::renderer> renderer) noexcept;
   ~world() noexcept;
-
-  void add(const std::shared_ptr<object>& object);
-  void remove(uint64_t id);
 
   template <class OutIt>
   void query(float x, float y, OutIt out) {
@@ -55,14 +55,17 @@ public:
   void update(float delta) noexcept;
   void draw() const noexcept;
 
+  void set_objectmanager(std::weak_ptr<objectmanager> objectmanager) noexcept;
+
   operator b2WorldId() const noexcept;
 
 protected:
-  void notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const;
+  void notify(uint64_t id_a, uint64_t id_b) const;
 
 private:
   b2WorldId _world;
   std::shared_ptr<graphics::renderer> _renderer;
+  std::weak_ptr<objectmanager> _objectmanager;
 
   std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
 };

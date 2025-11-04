@@ -72,11 +72,11 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_spritesheet = std::move(spritesheet);
 
   o->_world = _world;
+  o->_objectmanager = shared_from_this();
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
 
   if (manage) {
-    _world->add(o);
     _objects.emplace(o);
   }
 
@@ -101,9 +101,9 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_alpha = matrix->_alpha;
 
   o->_world = _world;
+  o->_objectmanager = shared_from_this();
 
   _objects.emplace(o);
-  _world->add(o);
 
   std::println("[objectmanager] clone {} to {}", matrix->kind(), o->id());
 
@@ -116,7 +116,6 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   }
 
   _objects.emplace(object);
-  _world->add(object);
 }
 
 bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
@@ -126,7 +125,13 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
 
   const auto id = object->id();
 
-  _world->remove(id);
+  _hovering.erase(id);
+
+  if (b2Body_IsValid(object->body)) {
+    b2DestroyBody(object->body);
+    object->body = b2BodyId{};
+  }
+
   return _objects.get<by_id>().erase(id) > 0;
 }
 

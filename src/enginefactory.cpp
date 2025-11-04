@@ -124,5 +124,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   objectmanager->set_scenemanager(scenemanager);
   objectmanager->set_world(world);
 
+  world->set_objectmanager(objectmanager);
+
   return engine;
 }

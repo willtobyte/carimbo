@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include <limits>
 
 using namespace framework;
 
@@ -15,9 +16,6 @@ object::object() noexcept
 
 object::~object() noexcept {
   if (b2Body_IsValid(body)) {
-    // Clean up the shared_ptr stored in userData
-    auto* ptr = static_cast<std::shared_ptr<object>*>(b2Body_GetUserData(body));
-    delete ptr;
     b2DestroyBody(body);
   }
 
@@ -48,54 +46,40 @@ std::optional<pose> object::compute_pose() const noexcept {
   return pose{px, py, radians, hx, hy};
 }
 
-void object::sync_position_from_body() noexcept {
-  if (!b2Body_IsValid(body)) return;
-
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) return;
-  const auto& a = it->second;
-  if (!a.bounds) return;
-
-  const auto pos = b2Body_GetPosition(body);
-  const auto& r = a.bounds->rectangle;
-  const auto sw = r.width() * _scale;
-  const auto sh = r.height() * _scale;
-  const auto hx = 0.5f * sw;
-  const auto hy = 0.5f * sh;
-
-  _position.set_x(pos.x - r.x() * _scale - hx);
-  _position.set_y(pos.y - r.y() * _scale - hy);
-}
-
-void object::sync_body_transform() noexcept {
+void object::sync_body() noexcept {
   if (!b2Body_IsValid(body)) return;
 
   const auto pose = compute_pose();
   if (!pose) return;
 
   b2Body_SetTransform(body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
-}
 
-void object::update_body_shape() noexcept {
-  if (!b2Body_IsValid(body)) return;
+  const auto epsilon = std::numeric_limits<float>::epsilon();
+  const bool dimensions_changed =
+    (std::abs(_last_synced_scale - _scale) > epsilon) ||
+    (std::abs(_last_synced_hx - pose->hx) > epsilon) ||
+    (std::abs(_last_synced_hy - pose->hy) > epsilon);
 
-  const auto pose = compute_pose();
-  if (!pose) return;
-
-  const auto count = b2Body_GetShapeCount(body);
-  if (count > 0) {
-    std::vector<b2ShapeId> shapes(count);
-    const auto n = b2Body_GetShapes(body, shapes.data(), count);
-    for (int i = 0; i < n; ++i) {
-      b2DestroyShape(shapes[i], false);
+  if (dimensions_changed) {
+    const auto count = b2Body_GetShapeCount(body);
+    if (count > 0) {
+      std::vector<b2ShapeId> shapes(count);
+      const auto n = b2Body_GetShapes(body, shapes.data(), count);
+      for (int i = 0; i < n; ++i) {
+        b2DestroyShape(shapes[i], false);
+      }
     }
-  }
 
-  auto sd = b2DefaultShapeDef();
-  sd.isSensor = true;
-  sd.enableSensorEvents = true;
-  const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
-  b2CreatePolygonShape(body, &sd, &box);
+    auto sd = b2DefaultShapeDef();
+    sd.isSensor = true;
+    sd.enableSensorEvents = true;
+    const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
+    b2CreatePolygonShape(body, &sd, &box);
+
+    _last_synced_scale = _scale;
+    _last_synced_hx = pose->hx;
+    _last_synced_hy = pose->hy;
+  }
 }
 
 geometry::point object::position() const noexcept {
@@ -103,64 +87,32 @@ geometry::point object::position() const noexcept {
 }
 
 float object::x() const noexcept {
-  if (b2Body_IsValid(body)) {
-    const auto it = _animations.find(_action);
-    if (it != _animations.end() && it->second.bounds) {
-      const auto pos = b2Body_GetPosition(body);
-      const auto& r = it->second.bounds->rectangle;
-      const auto sw = r.width() * _scale;
-      const auto hx = 0.5f * sw;
-      return pos.x - r.x() * _scale - hx;
-    }
-  }
   return _position.x();
 }
 
 void object::set_x(float x) noexcept {
   if (_position.x() == x) return;
   _position.set_x(x);
-  sync_body_transform();
+  sync_body();
 }
 
 float object::y() const noexcept {
-  if (b2Body_IsValid(body)) {
-    const auto it = _animations.find(_action);
-    if (it != _animations.end() && it->second.bounds) {
-      const auto pos = b2Body_GetPosition(body);
-      const auto& r = it->second.bounds->rectangle;
-      const auto sh = r.height() * _scale;
-      const auto hy = 0.5f * sh;
-      return pos.y - r.y() * _scale - hy;
-    }
-  }
   return _position.y();
 }
 
 void object::set_y(float y) noexcept {
   if (_position.y() == y) return;
   _position.set_y(y);
-  sync_body_transform();
+  sync_body();
 }
 
 void object::set_placement(float x, float y) noexcept {
   if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
-  sync_body_transform();
+  sync_body();
 }
 
 geometry::point object::placement() const noexcept {
-  if (b2Body_IsValid(body)) {
-    const auto it = _animations.find(_action);
-    if (it != _animations.end() && it->second.bounds) {
-      const auto pos = b2Body_GetPosition(body);
-      const auto& r = it->second.bounds->rectangle;
-      const auto sw = r.width() * _scale;
-      const auto sh = r.height() * _scale;
-      const auto hx = 0.5f * sw;
-      const auto hy = 0.5f * sh;
-      return geometry::point(pos.x - r.x() * _scale - hx, pos.y - r.y() * _scale - hy);
-    }
-  }
   return _position;
 }
 
@@ -170,41 +122,34 @@ void object::apply_velocity(float vx, float vy) noexcept {
 }
 
 void object::update(float delta, uint64_t now) noexcept {
-  const auto it0 = _animations.find(_action);
-  if (it0 == _animations.end()) return;
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) [[unlikely]] return;
 
-  const auto& keyframes0 = it0->second.keyframes;
-  if (keyframes0.empty() || _frame >= keyframes0.size()) return;
+  const auto& animation = it->second;
+  const auto& keyframes = animation.keyframes;
+  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
-  const auto& kf = keyframes0[_frame];
-  const auto expired = kf.duration > 0 && (now - _last_frame >= kf.duration);
+  const auto& keyframe = keyframes[_frame];
+  const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
   if (expired) {
     ++_frame;
+
     auto proceed = true;
-    const auto done = _frame >= keyframes0.size();
-    if (done && it0->second.oneshot) {
+    const auto done = _frame >= keyframes.size();
+    if (done && animation.oneshot) {
       const auto ended = std::exchange(_action, std::string{});
-      if (const auto& fn = _onend; fn) {
-        fn(shared_from_this(), ended);
-      }
-      if (!it0->second.next) {
-        proceed = false;
-      } else {
-        _action = *it0->second.next;
-      }
+      if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
+      if (!animation.next) proceed = false;
+      else _action = *animation.next;
     }
+
     if (proceed) {
       if (done) _frame = 0;
       _last_frame = now;
     }
   }
 
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) return;
-
-  const auto& a = it->second;
-
-  if (!a.bounds) {
+  if (!animation.bounds) {
     if (b2Body_IsValid(body)) {
       b2DestroyBody(body);
       body = b2BodyId{};
@@ -218,29 +163,37 @@ void object::update(float delta, uint64_t now) noexcept {
       b2DestroyBody(body);
       body = b2BodyId{};
     }
+
     return;
   }
 
   if (!b2Body_IsValid(body)) {
-    if (auto w = _world.lock()) {
-      auto def = b2DefaultBodyDef();
-      def.type = b2_dynamicBody;
-      def.gravityScale = 0.0f;
-      def.fixedRotation = true;
-      def.userData = new std::shared_ptr<object>(shared_from_this());
-      def.position = b2Vec2{pose->px, pose->py};
-      def.rotation = b2MakeRot(pose->radians);
-      body = b2CreateBody(*w, &def);
+    if (auto objectmanager = _objectmanager.lock()) {
+      if (!objectmanager->find(id())) return;
+      if (auto w = _world.lock()) {
+        auto def = b2DefaultBodyDef();
+        def.type = b2_dynamicBody;
+        def.gravityScale = 0.0f;
+        def.fixedRotation = true;
+        def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id()));
+        def.position = b2Vec2{pose->px, pose->py};
+        def.rotation = b2MakeRot(pose->radians);
+        body = b2CreateBody(*w, &def);
+
+        auto sd = b2DefaultShapeDef();
+        sd.isSensor = true;
+        sd.enableSensorEvents = true;
+        const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
+        b2CreatePolygonShape(body, &sd, &box);
+
+        _last_synced_scale = _scale;
+        _last_synced_hx = pose->hx;
+        _last_synced_hy = pose->hy;
+      }
     }
   } else {
-    b2Body_SetTransform(body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
+    sync_body();
   }
-
-  if (b2Body_IsValid(body)) {
-    update_body_shape();
-  }
-
-  sync_position_from_body();
 }
 
 void object::draw() const noexcept {
@@ -293,11 +246,7 @@ uint8_t object::alpha() const noexcept {
 void object::set_scale(float scale) noexcept {
   if (_scale == scale) return;
   _scale = scale;
-
-  if (b2Body_IsValid(body)) {
-    sync_body_transform();
-    update_body_shape();
-  }
+  sync_body();
 }
 
 float object::scale() const noexcept {
@@ -307,7 +256,7 @@ float object::scale() const noexcept {
 void object::set_angle(double angle) noexcept {
   if (_angle == angle) return;
   _angle = angle;
-  sync_body_transform();
+  sync_body();
 }
 
 double object::angle() const noexcept {
@@ -383,22 +332,32 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   }
 
   if (!b2Body_IsValid(body)) {
-    if (auto w = _world.lock()) {
-      auto def = b2DefaultBodyDef();
-      def.type = b2_dynamicBody;
-      def.gravityScale = 0.0f;
-      def.fixedRotation = true;
-      def.userData = new std::shared_ptr<object>(shared_from_this());
-      def.position = b2Vec2{pose->px, pose->py};
-      def.rotation = b2MakeRot(pose->radians);
-      body = b2CreateBody(*w, &def);
+    if (auto objectmanager = _objectmanager.lock()) {
+      if (!objectmanager->find(id())) return;
+      if (auto w = _world.lock()) {
+        auto def = b2DefaultBodyDef();
+        def.type = b2_dynamicBody;
+        def.gravityScale = 0.0f;
+        def.fixedRotation = true;
+        def.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(id()));
+        def.position = b2Vec2{pose->px, pose->py};
+        def.rotation = b2MakeRot(pose->radians);
+        body = b2CreateBody(*w, &def);
+
+        // Create the shape for the new body
+        auto sd = b2DefaultShapeDef();
+        sd.isSensor = true;
+        sd.enableSensorEvents = true;
+        const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
+        b2CreatePolygonShape(body, &sd, &box);
+
+        _last_synced_scale = _scale;
+        _last_synced_hx = pose->hx;
+        _last_synced_hy = pose->hy;
+      }
     }
   } else {
-    b2Body_SetTransform(body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
-  }
-
-  if (b2Body_IsValid(body)) {
-    update_body_shape();
+    sync_body();
   }
 }
 

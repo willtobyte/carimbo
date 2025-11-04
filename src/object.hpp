@@ -100,9 +100,7 @@ public:
 
 protected:
   std::optional<pose> compute_pose() const noexcept;
-  void sync_position_from_body() noexcept;
-  void sync_body_transform() noexcept;
-  void update_body_shape() noexcept;
+  void sync_body() noexcept;
 
 private:
   friend class objectmanager;
@@ -111,6 +109,7 @@ private:
 
   b2BodyId body;
   std::weak_ptr<world> _world;
+  std::weak_ptr<objectmanager> _objectmanager;
 
   std::size_t _frame;
   uint64_t _last_frame;
@@ -127,6 +126,9 @@ private:
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
 
+  float _last_synced_scale{-1.0f};
+  float _last_synced_hx{0.0f};
+  float _last_synced_hy{0.0f};
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

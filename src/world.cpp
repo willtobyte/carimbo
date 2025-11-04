@@ -1,4 +1,5 @@
 #include "world.hpp"
+#include "objectmanager.hpp"
 
 using namespace framework;
 
@@ -25,14 +26,6 @@ world::~world() noexcept {
   }
 }
 
-void world::add(const std::shared_ptr<object>& object) {
-  // if (!object) [[unlikely]] return;
-  // object->_world = shared_from_this();
-}
-
-void world::remove(uint64_t id) {
-}
-
 void world::update(float delta) noexcept {
   b2World_Step(_world, std::max(.0f, delta), 4);
 
@@ -49,11 +42,11 @@ void world::update(float delta) noexcept {
 
     if (!user_data_a || !user_data_b) continue;
 
-    // Extract shared_ptr from userData
-    auto* ptr_a = static_cast<std::shared_ptr<object>*>(user_data_a);
-    auto* ptr_b = static_cast<std::shared_ptr<object>*>(user_data_b);
+    // Extract IDs from userData
+    const auto id_a = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(user_data_a));
+    const auto id_b = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(user_data_b));
 
-    notify(*ptr_a, *ptr_b);
+    notify(id_a, id_b);
   }
 }
 
@@ -95,14 +88,24 @@ world::operator b2WorldId() const noexcept {
   return _world;
 }
 
-void world::notify(const std::shared_ptr<object>& obj_a, const std::shared_ptr<object>& obj_b) const {
-  if (!obj_a || !obj_b) [[unlikely]] return;
+void world::notify(uint64_t id_a, uint64_t id_b) const {
+  auto objectmanager = _objectmanager.lock();
+  if (!objectmanager) [[unlikely]] return;
 
-  if (const auto* callback = find_ptr(obj_a->_collision_mapping, obj_b->kind())) (*callback)(obj_a, obj_b);
-  if (const auto* callback = find_ptr(obj_b->_collision_mapping, obj_a->kind())) (*callback)(obj_b, obj_a);
+  auto object_a = objectmanager->find(id_a);
+  auto object_b = objectmanager->find(id_b);
+
+  if (!object_a || !object_b) [[unlikely]] return;
+
+  if (const auto* callback = find_ptr(object_a->_collision_mapping, object_b->kind())) (*callback)(object_a, object_b);
+  if (const auto* callback = find_ptr(object_b->_collision_mapping, object_a->kind())) (*callback)(object_b, object_a);
 
   SDL_Event event{};
   event.type = static_cast<uint32_t>(input::event::type::collision);
-  event.user.data1 = _envelopepool->acquire(collisionenvelope(obj_a->id(), obj_b->id())).release();
+  event.user.data1 = _envelopepool->acquire(collisionenvelope(id_a, id_b)).release();
   SDL_PushEvent(&event);
+}
+
+void world::set_objectmanager(std::weak_ptr<objectmanager> objectmanager) noexcept {
+  _objectmanager = std::move(objectmanager);
 }
