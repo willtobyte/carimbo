@@ -1,6 +1,6 @@
 #include "physics.hpp"
 
-namespace framework::physics {
+using namespace framework::physics;
 
 body_transform body_transform::compute(
   float position_x,
@@ -36,6 +36,4 @@ bool body_transform::rotation_differs(const body_transform& other) const noexcep
 
 bool body_transform::differs(const body_transform& other) const noexcept {
   return shape_differs(other) || rotation_differs(other);
-}
-
 }
