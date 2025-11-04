@@ -86,7 +86,10 @@ void object::update(float delta, uint64_t now) noexcept {
     }
 
     if (proceed) {
-      if (done) _frame = 0;
+      if (done) {
+        _frame = 0;
+      }
+
       _last_frame = now;
     }
   }
