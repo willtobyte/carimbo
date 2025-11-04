@@ -110,7 +110,6 @@ private:
   b2BodyId _body;
   b2ShapeId _collision_shape;
   std::weak_ptr<world> _world;
-  std::weak_ptr<objectmanager> _objectmanager;
 
   std::size_t _frame;
   uint64_t _last_frame;

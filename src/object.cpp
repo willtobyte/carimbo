@@ -29,54 +29,6 @@ std::string object::scope() const noexcept {
   return _scope;
 }
 
-std::optional<pose> object::compute_pose() const noexcept {
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) return std::nullopt;
-  const auto& animation = it->second;
-  if (!animation.bounds) return std::nullopt;
-  const auto& r = animation.bounds->rectangle;
-  const auto sw = r.width() * _scale;
-  const auto sh = r.height() * _scale;
-  const auto hx = 0.5f * sw;
-  const auto hy = 0.5f * sh;
-  const auto px = _position.x() + r.x() * _scale + hx;
-  const auto py = _position.y() + r.y() * _scale + hy;
-  const auto radians = static_cast<float>(_angle * (std::numbers::pi_v<float> / 180.0f));
-  return pose{px, py, radians, hx, hy};
-}
-
-void object::sync_body() noexcept {
-  if (!b2Body_IsValid(_body)) return;
-
-  const auto pose = compute_pose();
-  if (!pose) return;
-
-  b2Body_SetTransform(_body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
-
-  const auto epsilon = std::numeric_limits<float>::epsilon();
-  const bool dimensions_changed =
-    (std::abs(_last_synced_scale - _scale) > epsilon) ||
-    (std::abs(_last_synced_hx - pose->hx) > epsilon) ||
-    (std::abs(_last_synced_hy - pose->hy) > epsilon);
-
-  if (dimensions_changed) {
-    if (b2Shape_IsValid(_collision_shape)) {
-      const auto box = b2MakeBox(pose->hx, pose->hy);
-      b2Shape_SetPolygon(_collision_shape, &box);
-    } else {
-      auto sd = b2DefaultShapeDef();
-      sd.isSensor = true;
-      sd.enableSensorEvents = true;
-      const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
-      _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
-    }
-
-    _last_synced_scale = _scale;
-    _last_synced_hx = pose->hx;
-    _last_synced_hy = pose->hy;
-  }
-}
-
 geometry::point object::position() const noexcept {
   return _position;
 }
@@ -368,4 +320,52 @@ memory::kv& object::kv() noexcept {
 
 uint64_t object::id() const noexcept {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
+}
+
+std::optional<pose> object::compute_pose() const noexcept {
+  const auto it = _animations.find(_action);
+  if (it == _animations.end()) return std::nullopt;
+  const auto& animation = it->second;
+  if (!animation.bounds) return std::nullopt;
+  const auto& r = animation.bounds->rectangle;
+  const auto sw = r.width() * _scale;
+  const auto sh = r.height() * _scale;
+  const auto hx = 0.5f * sw;
+  const auto hy = 0.5f * sh;
+  const auto px = _position.x() + r.x() * _scale + hx;
+  const auto py = _position.y() + r.y() * _scale + hy;
+  const auto radians = static_cast<float>(_angle * (std::numbers::pi_v<float> / 180.0f));
+  return pose{px, py, radians, hx, hy};
+}
+
+void object::sync_body() noexcept {
+  if (!b2Body_IsValid(_body)) return;
+
+  const auto pose = compute_pose();
+  if (!pose) return;
+
+  b2Body_SetTransform(_body, b2Vec2{pose->px, pose->py}, b2MakeRot(pose->radians));
+
+  const auto epsilon = std::numeric_limits<float>::epsilon();
+  const bool dimensions_changed =
+    (std::abs(_last_synced_scale - _scale) > epsilon) ||
+    (std::abs(_last_synced_hx - pose->hx) > epsilon) ||
+    (std::abs(_last_synced_hy - pose->hy) > epsilon);
+
+  if (dimensions_changed) {
+    if (b2Shape_IsValid(_collision_shape)) {
+      const auto box = b2MakeBox(pose->hx, pose->hy);
+      b2Shape_SetPolygon(_collision_shape, &box);
+    } else {
+      auto sd = b2DefaultShapeDef();
+      sd.isSensor = true;
+      sd.enableSensorEvents = true;
+      const auto box = b2MakeOffsetBox(pose->hx, pose->hy, b2Vec2{0.f, 0.f}, b2MakeRot(0));
+      _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
+    }
+
+    _last_synced_scale = _scale;
+    _last_synced_hx = pose->hx;
+    _last_synced_hy = pose->hy;
+  }
 }
