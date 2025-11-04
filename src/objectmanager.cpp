@@ -72,7 +72,6 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
   o->_spritesheet = std::move(spritesheet);
 
   o->_world = _world;
-  o->_objectmanager = shared_from_this();
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
 
@@ -101,7 +100,6 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_alpha = matrix->_alpha;
 
   o->_world = _world;
-  o->_objectmanager = shared_from_this();
 
   _objects.emplace(o);
 

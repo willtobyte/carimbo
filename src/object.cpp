@@ -101,6 +101,7 @@ void object::update(float delta, uint64_t now) noexcept {
       b2DestroyBody(_body);
       _body = b2_nullBodyId;
     }
+
     return;
   }
 
