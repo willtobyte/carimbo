@@ -95,6 +95,7 @@ void object::update(float delta, uint64_t now) noexcept {
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
       b2Body_Disable(_body);
     }
+
     return;
   }
 
@@ -307,6 +308,12 @@ void object::create_physics() noexcept {
   const auto world = _world.lock();
   if (!world) return;
 
+  if (b2Shape_IsValid(_collision_shape)) {
+    std::println("[object] warning: orphaned shape detected in create_physics() for {} {}", kind(), id());
+    b2DestroyShape(_collision_shape, false);
+    _collision_shape = b2_nullShapeId;
+  }
+
   const auto& r = it->second.bounds->rectangle;
   const auto transform = physics::body_transform::compute(
     _position.x(), _position.y(),
@@ -327,6 +334,7 @@ void object::create_physics() noexcept {
   sd.isSensor = true;
   sd.enableSensorEvents = true;
   const auto box = b2MakeBox(transform.hx, transform.hy);
+
   _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
 
   _last_synced_transform = transform;
@@ -352,18 +360,24 @@ void object::update_physics() noexcept {
   b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, rotation);
 
   if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
-    const auto box = b2MakeBox(transform.hx, transform.hy);
-    b2Shape_SetPolygon(_collision_shape, &box);
+    if (b2Shape_IsValid(_collision_shape)) {
+      const auto box = b2MakeBox(transform.hx, transform.hy);
+      b2Shape_SetPolygon(_collision_shape, &box);
+    }
   }
 
   _last_synced_transform = transform;
 }
 
 void object::destroy_physics() noexcept {
+  if (b2Shape_IsValid(_collision_shape)) {
+    b2DestroyShape(_collision_shape, false);
+    _collision_shape = b2_nullShapeId;
+  }
+
   if (b2Body_IsValid(_body)) {
     b2DestroyBody(_body);
     _body = b2_nullBodyId;
-    _collision_shape = b2_nullShapeId;
     _last_synced_transform.reset();
   }
 }

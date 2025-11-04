@@ -2,7 +2,7 @@
 
 inline constexpr auto MINIMAL_USE_COUNT = 1L;
 
-inline constexpr auto WORLD_SUBSTEPS = 1;
+inline constexpr auto WORLD_SUBSTEPS = 4;
 
 inline constexpr auto FLUSH_INTERVAL = 10000u;
 
