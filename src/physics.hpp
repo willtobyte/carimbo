@@ -11,13 +11,8 @@ inline void* id_to_userdata(uint64_t id) noexcept {
   return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
 }
 
-struct body_transform final {
-  float px{0.0f};
-  float py{0.0f};
-  float hx{0.0f};
-  float hy{0.0f};
-  float radians{0.0f};
-
+class body_transform final {
+public:
   body_transform() = default;
 
   static body_transform compute(
@@ -34,6 +29,13 @@ struct body_transform final {
   bool shape_differs(const body_transform& other) const noexcept;
   bool rotation_differs(const body_transform& other) const noexcept;
   bool differs(const body_transform& other) const noexcept;
+
+private:
+  float px{0.0f};
+  float py{0.0f};
+  float hx{0.0f};
+  float hy{0.0f};
+  float radians{0.0f};
 };
 
 }
