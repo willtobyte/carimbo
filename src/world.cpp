@@ -62,7 +62,7 @@ void world::update(float delta) noexcept {
 }
 
 #ifdef DEBUG
-static bool debug_draw_callback(b2ShapeId shape, void* ctx) {
+static bool _draw_callback(b2ShapeId shape, void* ctx) {
   auto* renderer = static_cast<SDL_Renderer*>(ctx);
   const b2AABB aabb = b2Shape_GetAABB(shape);
 
@@ -93,7 +93,7 @@ void world::draw() const noexcept {
   const auto aabb = to_aabb(x0, y0, x1, y1);
   auto filter = b2DefaultQueryFilter();
 
-  b2World_OverlapAABB(_world, aabb, filter, debug_draw_callback, static_cast<SDL_Renderer*>(*_renderer));
+  b2World_OverlapAABB(_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
 #endif
 }
 
