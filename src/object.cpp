@@ -116,8 +116,8 @@ void object::update(float delta, uint64_t now) noexcept {
 
     auto def = b2DefaultBodyDef();
     def.type = b2_kinematicBody;
-    def.gravityScale = 0.0f;
-    def.fixedRotation = true;
+    // def.gravityScale = 0.0f;
+    // def.fixedRotation = true;
     def.userData = physics::id_to_userdata(id());
     def.position = b2Vec2{transform.px, transform.py};
     def.rotation = b2MakeRot(transform.radians);
@@ -126,6 +126,8 @@ void object::update(float delta, uint64_t now) noexcept {
     auto sd = b2DefaultShapeDef();
     sd.isSensor = true;
     sd.enableSensorEvents = true;
+    sd.filter.categoryBits = 0x0001; // TODO change it
+    sd.filter.maskBits = 0x0001; // TODO change it
     const auto box = b2MakeBox(transform.hx, transform.hy);
     _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
     _last_synced_transform = transform;
@@ -144,11 +146,7 @@ void object::update(float delta, uint64_t now) noexcept {
     _scale, _angle
   );
 
-  const auto rotation = _last_synced_transform && !transform.rotation_differs(*_last_synced_transform)
-    ? b2Body_GetRotation(_body)
-    : b2MakeRot(transform.radians);
-
-  b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, rotation);
+  b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, b2MakeRot(transform.radians));
 
   if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
     if (b2Shape_IsValid(_collision_shape)) {
