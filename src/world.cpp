@@ -28,36 +28,36 @@ world::~world() noexcept {
 }
 
 void world::update(float delta) noexcept {
-  constexpr float FIXED_TIMESTEP = 1.0f / 60.0f;
   _accumulator += std::min(delta, 0.1f);
 
   while (_accumulator >= FIXED_TIMESTEP) {
     b2World_Step(_world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
-    _accumulator -= FIXED_TIMESTEP;
-  }
 
-  std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
-  collisions.reserve(8);
+    std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
+    collisions.reserve(8);
 
-  const auto events = b2World_GetSensorEvents(_world);
-  for (auto i = events.beginCount; i-- > 0; ) {
-    const auto& e = events.beginEvents[i];
+    const auto events = b2World_GetSensorEvents(_world);
+    for (auto i = events.beginCount; i-- > 0; ) {
+      const auto& e = events.beginEvents[i];
 
-    const auto body_a = b2Shape_GetBody(e.sensorShapeId);
-    const auto body_b = b2Shape_GetBody(e.visitorShapeId);
+      const auto body_a = b2Shape_GetBody(e.sensorShapeId);
+      const auto body_b = b2Shape_GetBody(e.visitorShapeId);
 
-    const auto user_data_a = b2Body_GetUserData(body_a);
-    const auto user_data_b = b2Body_GetUserData(body_b);
+      const auto user_data_a = b2Body_GetUserData(body_a);
+      const auto user_data_b = b2Body_GetUserData(body_b);
 
-    if (!user_data_a || !user_data_b) [[unlikely]] continue;
+      if (!user_data_a || !user_data_b) [[unlikely]] continue;
 
-    const auto id_a = physics::userdata_to_id(user_data_a);
-    const auto id_b = physics::userdata_to_id(user_data_b);
+      const auto id_a = physics::userdata_to_id(user_data_a);
+      const auto id_b = physics::userdata_to_id(user_data_b);
 
-    auto pair = std::minmax(id_a, id_b);
-    if (collisions.insert(pair).second) {
-      notify(id_a, id_b);
+      auto pair = std::minmax(id_a, id_b);
+      if (collisions.insert(pair).second) {
+        notify(id_a, id_b);
+      }
     }
+
+    _accumulator -= FIXED_TIMESTEP;
   }
 }
 
