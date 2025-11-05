@@ -107,11 +107,11 @@ void object::update(float delta, uint64_t now) noexcept {
       _collision_shape = b2_nullShapeId;
     }
 
-    const auto& r = animation.bounds->rectangle;
+    const auto& rectangle = animation.bounds->rectangle;
     const auto& offset = keyframe.offset;
     const auto transform = physics::body_transform::compute(
-      _position.x() + r.x(), _position.y() + r.y(),
-      0, 0, r.width(), r.height(),
+      _position.x() + rectangle.x(), _position.y() + rectangle.y(),
+      0, 0, rectangle.width(), rectangle.height(),
       _scale, _angle
     );
 
@@ -249,7 +249,7 @@ bool object::visible() const noexcept {
 void object::set_visible(bool value) noexcept {
   if (value == _visible) return;
   _visible = value;
-  
+
   if (b2Body_IsValid(_body)) {
     if (_visible) {
       b2Body_Enable(_body);
