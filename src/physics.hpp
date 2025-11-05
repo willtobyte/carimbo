@@ -11,7 +11,7 @@ inline void* id_to_userdata(uint64_t id) noexcept {
   return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
 }
 
-enum class collisioncategory : uint32_t {
+enum collisioncategory : uint32_t {
   Player = 0x0001,
   Enemy = 0x0002,
   Projectile = 0x0004,

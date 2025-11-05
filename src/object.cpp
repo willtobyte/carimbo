@@ -1,4 +1,5 @@
 #include "object.hpp"
+#include "physics.hpp"
 
 using namespace framework;
 
@@ -131,8 +132,8 @@ void object::update(float delta, uint64_t now) noexcept {
     auto sd = b2DefaultShapeDef();
     sd.isSensor = true;
     sd.enableSensorEvents = true;
-    sd.filter.categoryBits = 0x0001; // TODO change it
-    sd.filter.maskBits = 0x0001; // TODO change it
+    sd.filter.categoryBits = physics::collisioncategory::Player; // TODO change it
+    sd.filter.maskBits = physics::collisioncategory::Player; // TODO change it
     const auto box = b2MakeBox(transform.hx, transform.hy);
     _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
     _last_synced_transform = transform;
