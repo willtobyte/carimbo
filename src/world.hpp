@@ -63,6 +63,7 @@ protected:
 
 private:
   b2WorldId _world;
+  float _accumulator{.0f};
   std::shared_ptr<graphics::renderer> _renderer;
   std::weak_ptr<objectmanager> _objectmanager;
 

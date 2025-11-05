@@ -28,7 +28,13 @@ world::~world() noexcept {
 }
 
 void world::update(float delta) noexcept {
-  b2World_Step(_world, std::clamp(delta, .0f, .1f), WORLD_SUBSTEPS);
+  constexpr float FIXED_TIMESTEP = 1.0f / 60.0f;
+  _accumulator += std::min(delta, 0.1f);
+
+  while (_accumulator >= FIXED_TIMESTEP) {
+    b2World_Step(_world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
+    _accumulator -= FIXED_TIMESTEP;
+  }
 
   std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
   collisions.reserve(8);
