@@ -82,13 +82,13 @@ void world::draw() const noexcept {
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
 
-  int w = 0, h = 0;
-  SDL_GetRenderOutputSize(*_renderer, &w, &h);
+  int width, height;
+  SDL_GetRenderOutputSize(*_renderer, &width, &height);
 
   const auto x0 = 0.0f;
   const auto y0 = 0.0f;
-  const auto x1 = static_cast<float>(w);
-  const auto y1 = static_cast<float>(h);
+  const auto x1 = static_cast<float>(width);
+  const auto y1 = static_cast<float>(height);
 
   const auto aabb = to_aabb(x0, y0, x1, y1);
   auto filter = b2DefaultQueryFilter();
