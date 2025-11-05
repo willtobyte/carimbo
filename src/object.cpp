@@ -110,8 +110,8 @@ void object::update(float delta, uint64_t now) noexcept {
     const auto& r = animation.bounds->rectangle;
     const auto& offset = keyframe.offset;
     const auto transform = physics::body_transform::compute(
-      _position.x() + offset.x(), _position.y() + offset.y(),
-      r.x(), r.y(), r.width(), r.height(),
+      _position.x() + r.x(), _position.y() + r.y(),
+      0, 0, r.width(), r.height(),
       _scale, _angle
     );
 
@@ -143,8 +143,8 @@ void object::update(float delta, uint64_t now) noexcept {
   const auto& rectangle = animation.bounds->rectangle;
   const auto& offset = keyframe.offset;
   const auto transform = physics::body_transform::compute(
-    _position.x() + offset.x(), _position.y() + offset.y(),
-    rectangle.x(), rectangle.y(), rectangle.width(), rectangle.height(),
+    _position.x() + rectangle.x(), _position.y() + rectangle.y(),
+    0, 0, rectangle.width(), rectangle.height(),
     _scale, _angle
   );
 
