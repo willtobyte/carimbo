@@ -2,7 +2,7 @@
 
 inline constexpr auto MINIMAL_USE_COUNT = 1L;
 
-inline constexpr auto WORLD_SUBSTEPS = 8;
+inline constexpr auto WORLD_SUBSTEPS = 4;
 
 inline constexpr float FIXED_TIMESTEP = 1.0f / 60.0f;
 

@@ -93,8 +93,15 @@ void object::update(float delta, uint64_t now) noexcept {
     _last_frame = now;
   }
 
-  if (!animation.bounds || !_visible) {
+  if (!animation.bounds) [[unlikely]] return;
+
+  if (!_visible) [[unlikely]] {
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) b2Body_Disable(_body);
+    return;
+  }
+
+  if (b2Body_IsValid(_body) && !_need_update_physics) {
+    if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
     return;
   }
 
@@ -116,8 +123,6 @@ void object::update(float delta, uint64_t now) noexcept {
 
     auto def = b2DefaultBodyDef();
     def.type = b2_kinematicBody;
-    // def.gravityScale = 0.0f;
-    // def.fixedRotation = true;
     def.userData = physics::id_to_userdata(id());
     def.position = b2Vec2{transform.px, transform.py};
     def.rotation = b2MakeRot(transform.radians);
@@ -134,9 +139,8 @@ void object::update(float delta, uint64_t now) noexcept {
     return;
   }
 
-  if (!b2Body_IsEnabled(_body) && _visible) b2Body_Enable(_body);
+  if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
 
-  if (!_need_update_physics) return;
   _need_update_physics = false;
 
   b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, b2MakeRot(transform.radians));
