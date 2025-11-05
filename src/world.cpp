@@ -85,8 +85,8 @@ void world::draw() const noexcept {
   int width, height;
   SDL_GetRenderOutputSize(*_renderer, &width, &height);
 
-  const auto x0 = 0.0f;
-  const auto y0 = 0.0f;
+  const auto x0 = .0f;
+  const auto y0 = .0f;
   const auto x1 = static_cast<float>(width);
   const auto y1 = static_cast<float>(height);
 
