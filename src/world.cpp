@@ -28,14 +28,14 @@ world::~world() noexcept {
 }
 
 void world::update(float delta) noexcept {
+  static std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
+  collisions.clear();
+  collisions.reserve(16);
+
   _accumulator += std::min(delta, 0.1f);
 
   while (_accumulator >= FIXED_TIMESTEP) {
     b2World_Step(_world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
-
-    std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
-    collisions.reserve(8);
-
     const auto events = b2World_GetSensorEvents(_world);
     for (auto i = events.beginCount; i-- > 0; ) {
       const auto& e = events.beginEvents[i];
@@ -61,6 +61,23 @@ void world::update(float delta) noexcept {
   }
 }
 
+#ifdef DEBUG
+static bool debug_callback(b2ShapeId shape, void* ctx) {
+  auto* renderer = static_cast<SDL_Renderer*>(ctx);
+  const b2AABB aabb = b2Shape_GetAABB(shape);
+
+  SDL_FRect r{
+    aabb.lowerBound.x,
+    aabb.lowerBound.y,
+    aabb.upperBound.x - aabb.lowerBound.x,
+    aabb.upperBound.y - aabb.lowerBound.y
+  };
+
+  SDL_RenderRect(renderer, &r);
+  return true;
+};
+#endif
+
 void world::draw() const noexcept {
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
@@ -76,22 +93,7 @@ void world::draw() const noexcept {
   const auto aabb = to_aabb(x0, y0, x1, y1);
   auto filter = b2DefaultQueryFilter();
 
-  auto fn = [](b2ShapeId shape, void* ctx) -> bool {
-    const auto* self = static_cast<const world*>(ctx);
-    const b2AABB aabb = b2Shape_GetAABB(shape);
-
-    SDL_FRect r{
-      aabb.lowerBound.x,
-      aabb.lowerBound.y,
-      aabb.upperBound.x - aabb.lowerBound.x,
-      aabb.upperBound.y - aabb.lowerBound.y
-    };
-
-    SDL_RenderRect(*self->_renderer, &r);
-    return true;
-  };
-
-  b2World_OverlapAABB(_world, aabb, filter, fn, const_cast<world*>(this));
+  b2World_OverlapAABB(_world, aabb, filter, debug_callback, static_cast<SDL_Renderer*>(*_renderer));
 #endif
 }
 
