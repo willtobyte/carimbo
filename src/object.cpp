@@ -93,7 +93,7 @@ void object::update(float delta, uint64_t now) noexcept {
     _last_frame = now;
   }
 
-  if (!animation.bounds) {
+  if (!animation.bounds || !_visible) {
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) b2Body_Disable(_body);
     return;
   }
@@ -108,8 +108,9 @@ void object::update(float delta, uint64_t now) noexcept {
     }
 
     const auto& r = animation.bounds->rectangle;
+    const auto& offset = keyframe.offset;
     const auto transform = physics::body_transform::compute(
-      _position.x(), _position.y(),
+      _position.x() + offset.x(), _position.y() + offset.y(),
       r.x(), r.y(), r.width(), r.height(),
       _scale, _angle
     );
@@ -134,14 +135,15 @@ void object::update(float delta, uint64_t now) noexcept {
     return;
   }
 
-  if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
+  if (!b2Body_IsEnabled(_body) && _visible) b2Body_Enable(_body);
 
   if (!_need_update_physics) return;
   _need_update_physics = false;
 
   const auto& rectangle = animation.bounds->rectangle;
+  const auto& offset = keyframe.offset;
   const auto transform = physics::body_transform::compute(
-    _position.x(), _position.y(),
+    _position.x() + offset.x(), _position.y() + offset.y(),
     rectangle.x(), rectangle.y(), rectangle.width(), rectangle.height(),
     _scale, _angle
   );
@@ -247,6 +249,14 @@ bool object::visible() const noexcept {
 void object::set_visible(bool value) noexcept {
   if (value == _visible) return;
   _visible = value;
+  
+  if (b2Body_IsValid(_body)) {
+    if (_visible) {
+      b2Body_Enable(_body);
+    } else {
+      b2Body_Disable(_body);
+    }
+  }
 }
 
 void object::set_action(const std::optional<std::string>& action) noexcept {

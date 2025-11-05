@@ -34,10 +34,9 @@ void world::update(float delta) noexcept {
   for (auto i = events.beginCount; i-- > 0; ) {
     const auto& e = events.beginEvents[i];
 
-    if (!b2Shape_IsValid(e.sensorShapeId) || !b2Shape_IsValid(e.visitorShapeId)) continue;
-
     const auto body_a = b2Shape_GetBody(e.sensorShapeId);
     const auto body_b = b2Shape_GetBody(e.visitorShapeId);
+    
     const auto user_data_a = b2Body_GetUserData(body_a);
     const auto user_data_b = b2Body_GetUserData(body_b);
 

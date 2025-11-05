@@ -18,8 +18,11 @@ body_transform body_transform::compute(
   const auto sh = bounds_height * scale;
   result.hx = 0.5f * sw;
   result.hy = 0.5f * sh;
-  result.px = position_x + bounds_x * scale + result.hx;
-  result.py = position_y + bounds_y * scale + result.hy;
+  
+  const auto center_x = bounds_width * 0.5f;
+  const auto center_y = bounds_height * 0.5f;
+  result.px = position_x + center_x;
+  result.py = position_y + center_y;
   result.radians = static_cast<float>(angle_degrees * DEGREES_TO_RADIANS);
 
   return result;
@@ -28,12 +31,4 @@ body_transform body_transform::compute(
 bool body_transform::shape_differs(const body_transform& other) const noexcept {
   return std::abs(hx - other.hx) > epsilon ||
          std::abs(hy - other.hy) > epsilon;
-}
-
-bool body_transform::rotation_differs(const body_transform& other) const noexcept {
-  return std::abs(radians - other.radians) > epsilon;
-}
-
-bool body_transform::differs(const body_transform& other) const noexcept {
-  return shape_differs(other) || rotation_differs(other);
 }
