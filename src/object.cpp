@@ -98,6 +98,13 @@ void object::update(float delta, uint64_t now) noexcept {
     return;
   }
 
+  const auto& rectangle = animation.bounds->rectangle;
+  const auto transform = physics::body_transform::compute(
+    _position.x() + rectangle.x(), _position.y() + rectangle.y(),
+    0, 0, rectangle.width(), rectangle.height(),
+    _scale, _angle
+  );
+
   if (!b2Body_IsValid(_body)) {
     const auto world = _world.lock();
 
@@ -106,14 +113,6 @@ void object::update(float delta, uint64_t now) noexcept {
       b2DestroyShape(_collision_shape, false);
       _collision_shape = b2_nullShapeId;
     }
-
-    const auto& rectangle = animation.bounds->rectangle;
-    const auto& offset = keyframe.offset;
-    const auto transform = physics::body_transform::compute(
-      _position.x() + rectangle.x(), _position.y() + rectangle.y(),
-      0, 0, rectangle.width(), rectangle.height(),
-      _scale, _angle
-    );
 
     auto def = b2DefaultBodyDef();
     def.type = b2_kinematicBody;
@@ -139,14 +138,6 @@ void object::update(float delta, uint64_t now) noexcept {
 
   if (!_need_update_physics) return;
   _need_update_physics = false;
-
-  const auto& rectangle = animation.bounds->rectangle;
-  const auto& offset = keyframe.offset;
-  const auto transform = physics::body_transform::compute(
-    _position.x() + rectangle.x(), _position.y() + rectangle.y(),
-    0, 0, rectangle.width(), rectangle.height(),
-    _scale, _angle
-  );
 
   b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, b2MakeRot(transform.radians));
 
@@ -224,12 +215,6 @@ void object::set_angle(double angle) noexcept {
 }
 
 double object::angle() const noexcept {
-  if (b2Body_IsValid(_body)) {
-    const auto rotation = b2Body_GetRotation(_body);
-    const auto radians = b2Rot_GetAngle(rotation);
-    return radians * RADIANS_TO_DEGREES;
-  }
-
   return _angle;
 }
 
