@@ -49,17 +49,13 @@ class Carimbo(ConanFile):
 
         self.options["sevenzip"].zip = False
 
-        if self._is_webassembly():
-            self.options["sol2"].with_lua = "lua"
-
-        if self._is_jit_capable():
-            self.options["sol2"].with_lua = "luajit"
+        self.options["sol2"].with_lua = "luajit" if self._is_jit_capable() else "lua"
 
         if self._is_ios():
             self.options["sdl"].opengl = False
 
         if self._have_sentry():
-            self.options["sentry-native"].backend = "crashpad"
+            self.options["sentry-native"].backend = "inproc"
 
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
