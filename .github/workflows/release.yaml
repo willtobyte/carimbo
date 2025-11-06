@@ -66,12 +66,12 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Compress artifacts
         working-directory: build
@@ -124,16 +124,16 @@ jobs:
           compiler=apple-clang
           compiler.version=17.0
           compiler.libcxx=libc++
-          build_type=Release
+          build_type=RelWithDebInfo
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
   macOS:
     runs-on: macos-latest
@@ -159,12 +159,12 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Strip binary
         working-directory: build
@@ -212,12 +212,12 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Compress artifacts
         working-directory: build
@@ -260,12 +260,12 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Compress artifacts
         working-directory: build
@@ -330,7 +330,7 @@ jobs:
       - name: Build
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
-            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_C_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -g0 -ffast-math -fno-stack-protector -msimd128" \
             -DCMAKE_CXX_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -fvisibility-inlines-hidden -g0 -ffast-math -fno-stack-protector -msimd128" \
             -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="-fuse-ld=lld -flto -Wl,-O2,--gc-sections,-s --strip-al --strip-debug -Wl,--compress-relocations -Wl,--strip-all -Wl,--lto-O3"
@@ -384,12 +384,12 @@ jobs:
           EOF
 
       - name: Install dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Strip binary
         working-directory: build/Release
