@@ -59,7 +59,7 @@ class Carimbo(ConanFile):
             self.options["sdl"].opengl = False
 
         if self._have_sentry():
-            self.options["sentry-native"].backend = "inproc"
+            self.options["sentry-native"].backend = "crashpad"
 
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
