@@ -432,8 +432,8 @@ jobs:
         shell: powershell
         working-directory: build/RelWithDebInfo
         run: |
-          New-Item -ItemType Directory -Path "../artifacts" -Force
-          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', 'carimbo.pdb', '../LICENSES' -DestinationPath "../artifacts/Windows.zip"
+          New-Item -ItemType Directory -Path "../../artifacts" -Force
+          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', 'carimbo.pdb', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
