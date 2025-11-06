@@ -66,12 +66,12 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
+        run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
 
       - name: Package artifacts
         working-directory: build
@@ -129,16 +129,16 @@ jobs:
           compiler=apple-clang
           compiler.version=17.0
           compiler.libcxx=libc++
-          build_type=RelWithDebInfo
+          build_type=Release
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
+        run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
 
   macOS:
     runs-on: macos-latest
@@ -169,12 +169,12 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
 
       - name: Copy Crashpad handler from Conan
         run: |
@@ -227,12 +227,12 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
 
       - name: Package artifacts
         working-directory: build
@@ -280,12 +280,12 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
 
       - name: Package artifacts
         working-directory: build
@@ -414,23 +414,23 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="//bigobj"
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="//bigobj"
+          cmake --build build --config Release --verbose
 
       - name: Copy Crashpad handler from Conan
         shell: powershell
         working-directory: build
         run: |
           $crashpadHandler = Get-ChildItem -Path ~/.conan2/p -Filter crashpad_handler.exe -Recurse | Where-Object { $_.DirectoryName -like '*\bin' } | Select-Object -First 1
-          Copy-Item $crashpadHandler.FullName RelWithDebInfo/crashpad_handler.exe
+          Copy-Item $crashpadHandler.FullName Release/crashpad_handler.exe
 
       - name: Package artifacts
         shell: powershell
-        working-directory: build/RelWithDebInfo
+        working-directory: build/Release
         run: |
           New-Item -ItemType Directory -Path "../../artifacts" -Force
           Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', 'carimbo.pdb', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
