@@ -27,11 +27,11 @@ application::application(int argc, char **argv) {
 int32_t application::run() {
   static_assert(std::endian::native == std::endian::little);
 
-  const auto* p = std::getenv("CARTRIDGE");
-
-  storage::filesystem::mount(p ? p : "cartridge.rom", "/");
-
   try {
+    const auto* p = std::getenv("CARTRIDGE");
+
+    storage::filesystem::mount(p ? p : "cartridge.rom", "/");
+
     auto se = scriptengine();
     se.run();
   } catch (const std::exception& e) {
@@ -48,6 +48,7 @@ int32_t application::run() {
     std::println(stderr, "{}", error);
 
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
+  }
 
   return 0;
 }
