@@ -176,9 +176,9 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Copy Crashpad
+      - name: Copy Crashpad handler from Conan
         run: |
-          cp ~/.conan2/p/*/p/bin/crashpad_handler build/
+          find ~/.conan2/p -path '*/bin/crashpad_handler' -type f -exec cp {} build/ \;
 
       - name: Package artifacts
         working-directory: build
@@ -428,11 +428,11 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="//bigobj"
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Copy Crashpad
+      - name: Copy Crashpad handler from Conan
         shell: powershell
         run: |
-          $crashpadHandler = Get-ChildItem -Path ~/.conan2/p/*/p/bin/crashpad_handler.exe -Recurse | Select-Object -First 1
-          Copy-Item $crashpadHandler.FullName build/RelWithDebInfo/
+          $crashpadHandler = Get-ChildItem -Path ~/.conan2/p -Filter crashpad_handler.exe -Recurse | Where-Object { $_.DirectoryName -like '*\bin' } | Select-Object -First 1
+          Copy-Item $crashpadHandler.FullName build/RelWithDebInfo/crashpad_handler.exe
 
       - name: Package artifacts
         working-directory: build
