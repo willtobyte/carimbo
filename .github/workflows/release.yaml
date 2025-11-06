@@ -166,11 +166,6 @@ jobs:
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Strip binary
-        working-directory: build
-        run: |
-          strip -S -x carimbo
-
       - name: Compress artifacts
         working-directory: build
         run: |
@@ -388,32 +383,8 @@ jobs:
 
       - name: Build
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="/bigobj"
           cmake --build build --config RelWithDebInfo --verbose
-
-      - name: Strip binary
-        working-directory: build/Release
-        shell: powershell
-        run: |
-          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          if (-Not (Test-Path $vswhere)) {
-            Write-Error "vswhere.exe not found. Aborting."
-            exit 1
-          }
-
-          $installPath = & "$vswhere" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Llvm.Clang -property installationPath
-          if (-Not $installPath) {
-            Write-Error "Visual Studio with LLVM component not found."
-            exit 1
-          }
-
-          $llvmStrip = Join-Path $installPath "VC\Tools\Llvm\x64\bin\llvm-strip.exe"
-          if (-Not (Test-Path $llvmStrip)) {
-            Write-Error "llvm-strip not found at expected location: $llvmStrip"
-            exit 1
-          }
-
-          & "$llvmStrip" --strip-all carimbo.exe
 
       - name: Compress artifacts
         working-directory: build
