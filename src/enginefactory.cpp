@@ -75,6 +75,14 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) noexcept {
   sentry_options_set_enable_logs(options, true);
   sentry_options_set_dsn(options, dsn.c_str());
   sentry_options_set_sample_rate(options, 1.0);
+
+#ifdef _WIN32
+  sentry_options_set_handler_path(options, "crashpad.exe");
+#else
+  sentry_options_set_handler_path(options, "crashpad");
+#endif
+  sentry_options_set_database_path(options, ".sentry");
+
   sentry_options_add_attachment(options, "cassette.tape");
   sentry_options_add_attachment(options, "stdout.txt");
   sentry_options_add_attachment(options, "stderr.txt");

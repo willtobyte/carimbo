@@ -176,6 +176,16 @@ jobs:
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
+      - name: Package Crashpad binary
+        working-directory: build
+        run: |
+          if [ -f "crashpad_handler" ]; then
+            cp crashpad_handler crashpad
+            chmod +x crashpad
+            tar -cpzvf CrashpadMacOS.tar.gz crashpad
+            mv CrashpadMacOS.tar.gz ../artifacts
+          fi
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -392,6 +402,15 @@ jobs:
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'RelWithDebInfo/carimbo.exe', 'RelWithDebInfo/carimbo.pdb', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
+
+      - name: Package Crashpad binary
+        working-directory: build
+        shell: powershell
+        run: |
+          if (Test-Path "RelWithDebInfo/crashpad_handler.exe") {
+            Copy-Item "RelWithDebInfo/crashpad_handler.exe" "RelWithDebInfo/crashpad.exe"
+            Compress-Archive -LiteralPath "RelWithDebInfo/crashpad.exe" -DestinationPath "../artifacts/CrashpadWindows.zip"
+          }
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
