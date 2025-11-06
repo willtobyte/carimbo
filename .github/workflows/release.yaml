@@ -391,7 +391,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
-          Compress-Archive -LiteralPath 'Release/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
+          Compress-Archive -LiteralPath 'RelWithDebInfo/carimbo.exe', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
