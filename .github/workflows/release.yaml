@@ -65,7 +65,7 @@ jobs:
           user.sdl:android=True
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build binary
@@ -132,7 +132,7 @@ jobs:
           build_type=RelWithDebInfo
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build binary
@@ -168,7 +168,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build binary
@@ -226,7 +226,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build binary
@@ -279,7 +279,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
       - name: Build binary
@@ -348,7 +348,7 @@ jobs:
           *: emsdk/3.1.73
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: |
           conan install . --output-folder=build --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release --build=missing
 
@@ -413,7 +413,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install project dependencies with Conan
+      - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build Windows binary
@@ -430,10 +430,10 @@ jobs:
 
       - name: Package artifacts
         shell: powershell
-        working-directory: build
+        working-directory: build/RelWithDebInfo
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
-          Compress-Archive -LiteralPath 'RelWithDebInfo/carimbo.exe', 'RelWithDebInfo/crashpad_handler.exe', 'RelWithDebInfo/carimbo.pdb', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
+          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', 'carimbo.pdb', '../LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
       - name: Package Crashpad handler
         working-directory: build
