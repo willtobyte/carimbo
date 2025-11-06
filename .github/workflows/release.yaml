@@ -17,23 +17,23 @@ jobs:
     runs-on: ubuntu-latest
     if: false
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
 
-      - name: Install Conan
+      - name: Install Conan package manager
         run: pip install conan
 
-      - name: Configure Conan
+      - name: Detect and configure Conan profile
         run: |
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure build tools and CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
@@ -44,7 +44,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Conan profile
+      - name: Create Conan profile
         run: |
           cat > ~/.conan2/profiles/android <<EOF
           include(default)
@@ -65,15 +65,15 @@ jobs:
           user.sdl:android=True
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
-      - name: Build
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Compress artifacts
+      - name: Package artifacts
         working-directory: build
         run: |
           mkdir -p ../artifacts
@@ -91,16 +91,21 @@ jobs:
     runs-on: macos-latest
     if: false
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Conan
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install and configure Conan
         run: |
           brew install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure build tools and CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
@@ -111,7 +116,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Conan profile
+      - name: Create Conan profile
         run: |
           cat > ~/.conan2/profiles/ios <<EOF
           include(default)
@@ -127,10 +132,10 @@ jobs:
           build_type=RelWithDebInfo
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
-      - name: Build
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
@@ -138,16 +143,21 @@ jobs:
   macOS:
     runs-on: macos-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Conan
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install and configure Conan
         run: |
           brew install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure build tools and CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
@@ -158,15 +168,15 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
-      - name: Build
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Compress artifacts
+      - name: Package artifacts
         working-directory: build
         run: |
           mkdir -p ../artifacts
@@ -176,15 +186,13 @@ jobs:
           tar -cpzvf macOS.tar.gz carimbo LICENSES
           mv macOS.tar.gz ../artifacts
 
-      - name: Package Crashpad binary
+      - name: Package Crashpad handler
         working-directory: build
         run: |
-          if [ -f "crashpad_handler" ]; then
-            cp crashpad_handler crashpad
-            chmod +x crashpad
-            tar -cpzvf CrashpadMacOS.tar.gz crashpad
-            mv CrashpadMacOS.tar.gz ../artifacts
-          fi
+          cp crashpad_handler crashpad
+          chmod +x crashpad
+          tar -cpzvf CrashpadMacOS.tar.gz crashpad
+          mv CrashpadMacOS.tar.gz ../artifacts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -196,16 +204,21 @@ jobs:
     runs-on: ubuntu-latest
     if: false
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Conan
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install and configure Conan
         run: |
           pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure build tools and CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
@@ -216,15 +229,15 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
-      - name: Build
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Compress artifacts
+      - name: Package artifacts
         working-directory: build
         run: |
           mkdir -p ../artifacts
@@ -243,36 +256,41 @@ jobs:
     runs-on: ubuntu-24.04-arm
     if: false
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install GCC 14
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install and configure GCC 14
         run: |
           update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
           update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
 
-      - name: Setup Conan
+      - name: Install and configure Conan
         run: |
           pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure CMake tool requirements
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [tool_requires]
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
 
-      - name: Build
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Compress artifacts
+      - name: Package artifacts
         working-directory: build
         run: |
           mkdir -p ../artifacts
@@ -290,21 +308,26 @@ jobs:
   WebAssembly:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
 
-      - name: Setup Conan
+      - name: Install and configure Conan
         run: |
           pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure build tools and CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
@@ -315,7 +338,7 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Conan profile
+      - name: Create Conan profile
         run: |
           cat > ~/.conan2/profiles/webassembly <<EOF
           include(default)
@@ -328,11 +351,11 @@ jobs:
           *: emsdk/3.1.73
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: |
           conan install . --output-folder=build --profile=webassembly --settings compiler.cppstd=23 --settings build_type=Release --build=missing
 
-      - name: Build
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
             -DCMAKE_BUILD_TYPE=Release \
@@ -342,7 +365,7 @@ jobs:
 
           cmake --build build --config Release --verbose
 
-      - name: Minify Carimbo's JavaScript runtime.
+      - name: Minify JavaScript runtime
         working-directory: build
         run: |
           npx terser carimbo.js \
@@ -352,7 +375,7 @@ jobs:
             --comments false \
             --output carimbo.js
 
-      - name: Compress artifacts
+      - name: Package artifacts
         working-directory: build
         run: |
           mkdir -p ../artifacts
@@ -368,16 +391,21 @@ jobs:
   Windows:
     runs-on: windows-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Conan
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install and configure Conan
         run: |
           pip install conan
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+      - name: Configure build tools and CMake
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
@@ -388,29 +416,27 @@ jobs:
           !cmake/*: cmake/[>=3 <4]
           EOF
 
-      - name: Install dependencies
+      - name: Install project dependencies with Conan
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
-      - name: Build
+      - name: Build Windows binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="//bigobj"
           cmake --build build --config RelWithDebInfo --verbose
 
-      - name: Compress artifacts
+      - name: Package artifacts
         working-directory: build
         shell: powershell
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'RelWithDebInfo/carimbo.exe', 'RelWithDebInfo/carimbo.pdb', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
-      - name: Package Crashpad binary
+      - name: Package Crashpad handler
         working-directory: build
         shell: powershell
         run: |
-          if (Test-Path "RelWithDebInfo/crashpad_handler.exe") {
-            Copy-Item "RelWithDebInfo/crashpad_handler.exe" "RelWithDebInfo/crashpad.exe"
-            Compress-Archive -LiteralPath "RelWithDebInfo/crashpad.exe" -DestinationPath "../artifacts/CrashpadWindows.zip"
-          }
+          Copy-Item "RelWithDebInfo/crashpad_handler.exe" "RelWithDebInfo/crashpad.exe"
+          Compress-Archive -LiteralPath "RelWithDebInfo/crashpad.exe" -DestinationPath "../artifacts/CrashpadWindows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -432,12 +458,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download all artifacts
+      - name: Download all build artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
 
-      - name: Upload release
+      - name: Create GitHub release with artifacts
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
