@@ -187,16 +187,9 @@ jobs:
           chmod -R a+rwx carimbo
           chmod 644 LICENSES
           chmod +x carimbo
-          tar -cpzvf macOS.tar.gz carimbo LICENSES
+          chmod +x crashpad_handler
+          tar -cpzvf macOS.tar.gz carimbo crashpad_handler LICENSES
           mv macOS.tar.gz ../artifacts
-
-      - name: Package Crashpad handler
-        working-directory: build
-        run: |
-          cp crashpad_handler crashpad
-          chmod +x crashpad
-          tar -cpzvf CrashpadMacOS.tar.gz crashpad
-          mv CrashpadMacOS.tar.gz ../artifacts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -430,16 +423,17 @@ jobs:
 
       - name: Copy Crashpad handler from Conan
         shell: powershell
+        working-directory: build
         run: |
           $crashpadHandler = Get-ChildItem -Path ~/.conan2/p -Filter crashpad_handler.exe -Recurse | Where-Object { $_.DirectoryName -like '*\bin' } | Select-Object -First 1
-          Copy-Item $crashpadHandler.FullName build/RelWithDebInfo/crashpad_handler.exe
+          Copy-Item $crashpadHandler.FullName RelWithDebInfo/crashpad_handler.exe
 
       - name: Package artifacts
-        working-directory: build
         shell: powershell
+        working-directory: build
         run: |
           New-Item -ItemType Directory -Path "../artifacts" -Force
-          Compress-Archive -LiteralPath 'RelWithDebInfo/carimbo.exe', 'RelWithDebInfo/carimbo.pdb', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
+          Compress-Archive -LiteralPath 'RelWithDebInfo/carimbo.exe', 'RelWithDebInfo/crashpad_handler.exe', 'RelWithDebInfo/carimbo.pdb', 'LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
       - name: Package Crashpad handler
         working-directory: build
