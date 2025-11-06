@@ -73,7 +73,7 @@ int32_t application::run() {
 
   const auto* p = std::getenv("CARTRIDGE");
 
-  storage::filesystem::mount(p ? p : "cartridge.zip", "/");
+  storage::filesystem::mount(p ? p : "cartridge.rom", "/");
 
   auto se = scriptengine();
   se.run();

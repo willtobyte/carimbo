@@ -26,7 +26,7 @@ tmp/
 .cpp-linter_cache
 
 # Misc
-cassette.json
+cassette.tap
 
 # Python
 .ropeproject/

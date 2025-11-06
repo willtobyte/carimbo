@@ -18,7 +18,7 @@ public:
 private:
   nlohmann::json _j;
 #ifndef EMSCRIPTEN
-  static constexpr const char* _filename = "cassette.json";
+  static constexpr const char* _filename = "cassette.tap";
 #else
   static constexpr const char* _cookiekey = "cassette=";
 #endif
