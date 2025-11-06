@@ -31,9 +31,8 @@ int32_t application::run() {
 
   storage::filesystem::mount(p ? p : "cartridge.rom", "/");
 
-  auto se = scriptengine();
-
   try {
+    auto se = scriptengine();
     se.run();
   } catch (const std::exception& e) {
     const auto* error = e.what();
