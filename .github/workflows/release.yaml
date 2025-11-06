@@ -433,7 +433,7 @@ jobs:
         working-directory: build/Release
         run: |
           New-Item -ItemType Directory -Path "../../artifacts" -Force
-          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', 'carimbo.pdb', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
+          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
