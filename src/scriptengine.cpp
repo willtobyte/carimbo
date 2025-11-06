@@ -21,6 +21,11 @@ inline constexpr auto debugger =
 #endif
 ;
 
+static int on_panic(lua_State* L) {
+  const auto message = lua_tostring(L, -1);
+  throw std::runtime_error(message ? message : "Lua panic: unknown error");
+}
+
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
 
@@ -188,7 +193,7 @@ void framework::scriptengine::run() {
   sol::state lua;
 
   lua.open_libraries();
-
+  lua.set_panic(&on_panic);
   lua["searcher"] = &searcher;
 
   const auto inject = std::format(R"lua(
