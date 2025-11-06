@@ -416,7 +416,7 @@ jobs:
       - name: Install project dependencies
         run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
-      - name: Build Windows binary
+      - name: Build binary
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="//bigobj"
           cmake --build build --config RelWithDebInfo --verbose
