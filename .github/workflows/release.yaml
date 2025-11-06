@@ -435,13 +435,6 @@ jobs:
           New-Item -ItemType Directory -Path "../artifacts" -Force
           Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', 'carimbo.pdb', '../LICENSES' -DestinationPath "../artifacts/Windows.zip"
 
-      - name: Package Crashpad handler
-        working-directory: build
-        shell: powershell
-        run: |
-          Copy-Item "RelWithDebInfo/crashpad_handler.exe" "RelWithDebInfo/crashpad.exe"
-          Compress-Archive -LiteralPath "RelWithDebInfo/crashpad.exe" -DestinationPath "../artifacts/CrashpadWindows.zip"
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
