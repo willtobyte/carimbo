@@ -3,7 +3,7 @@
 
 using namespace framework;
 
-object::object() noexcept
+object::object()
   : _frame(0),
     _last_frame(SDL_GetTicks()),
     _angle(.0),
@@ -14,7 +14,7 @@ object::object() noexcept
     _collision_shape(b2_nullShapeId) {
 }
 
-object::~object() noexcept {
+object::~object() {
   if (b2Shape_IsValid(_collision_shape)) {
     b2DestroyShape(_collision_shape, false);
     _collision_shape = b2_nullShapeId;
@@ -29,49 +29,49 @@ object::~object() noexcept {
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
-std::string object::kind() const noexcept {
+std::string object::kind() const {
   return _kind;
 }
 
-std::string object::scope() const noexcept {
+std::string object::scope() const {
   return _scope;
 }
 
-geometry::point object::position() const noexcept {
+geometry::point object::position() const {
   return _position;
 }
 
-float object::x() const noexcept {
+float object::x() const {
   return _position.x();
 }
 
-void object::set_x(float x) noexcept {
+void object::set_x(float x) {
   if (_position.x() == x) return;
   _position.set_x(x);
   _need_update_physics = true;
 }
 
-float object::y() const noexcept {
+float object::y() const {
   return _position.y();
 }
 
-void object::set_y(float y) noexcept {
+void object::set_y(float y) {
   if (_position.y() == y) return;
   _position.set_y(y);
   _need_update_physics = true;
 }
 
-void object::set_placement(float x, float y) noexcept {
+void object::set_placement(float x, float y) {
   if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
   _need_update_physics = true;
 }
 
-geometry::point object::placement() const noexcept {
+geometry::point object::placement() const {
   return _position;
 }
 
-void object::update(float delta, uint64_t now) noexcept {
+void object::update(float delta, uint64_t now) {
   const auto it = _animations.find(_action);
   if (it == _animations.end()) [[unlikely]] return;
 
@@ -156,7 +156,7 @@ void object::update(float delta, uint64_t now) noexcept {
   _last_synced_transform = transform;
 }
 
-void object::draw() const noexcept {
+void object::draw() const {
   if (!_visible) [[unlikely]] return;
 
   const auto it = _animations.find(_action);
@@ -194,49 +194,49 @@ void object::draw() const noexcept {
   );
 }
 
-void object::set_alpha(uint8_t alpha) noexcept {
+void object::set_alpha(uint8_t alpha) {
   if (_alpha == alpha) return;
   _alpha = alpha;
 }
 
-uint8_t object::alpha() const noexcept {
+uint8_t object::alpha() const {
   return _alpha;
 }
 
-void object::set_scale(float scale) noexcept {
+void object::set_scale(float scale) {
   if (_scale == scale) return;
   _scale = scale;
   _need_update_physics = true;
 }
 
-float object::scale() const noexcept {
+float object::scale() const {
   return _scale;
 }
 
-void object::set_angle(double angle) noexcept {
+void object::set_angle(double angle) {
   if (_angle == angle) return;
   _angle = angle;
   _need_update_physics = true;
 }
 
-double object::angle() const noexcept {
+double object::angle() const {
   return _angle;
 }
 
-void object::set_reflection(graphics::reflection reflection) noexcept {
+void object::set_reflection(graphics::reflection reflection) {
   if (_reflection == reflection) return;
   _reflection = reflection;
 }
 
-graphics::reflection object::reflection() const noexcept {
+graphics::reflection object::reflection() const {
   return _reflection;
 }
 
-bool object::visible() const noexcept {
+bool object::visible() const {
   return !_action.empty() || _alpha != 0 || !_visible;
 }
 
-void object::set_visible(bool value) noexcept {
+void object::set_visible(bool value) {
   if (value == _visible) return;
   _visible = value;
 
@@ -249,7 +249,7 @@ void object::set_visible(bool value) noexcept {
   }
 }
 
-void object::set_action(const std::optional<std::string>& action) noexcept {
+void object::set_action(const std::optional<std::string>& action) {
   if (!action || action->empty()) {
     _action.clear();
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
@@ -277,71 +277,71 @@ void object::set_action(const std::optional<std::string>& action) noexcept {
   }
 }
 
-std::string object::action() const noexcept {
+std::string object::action() const {
   return _action;
 }
 
-void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
+void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
   _onbegin = std::move(fn);
 }
 
-void object::set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
+void object::set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
   _onend = std::move(fn);
 }
 
-void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept {
+void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
   _onmail = std::move(fn);
 }
 
-void object::set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) noexcept {
+void object::set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) {
   _ontouch = std::move(fn);
 }
 
-void object::set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
+void object::set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onhover = std::move(fn);
 }
 
-void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept {
+void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) {
   _onunhover = std::move(fn);
 }
 
-void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) noexcept {
+void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) {
   _collision_mapping.emplace(kind, std::move(fn));
 }
 
-void object::on_email(const std::string& message) noexcept {
+void object::on_email(const std::string& message) {
   if (const auto& fn = _onmail; fn) {
     fn(shared_from_this(), message);
   }
 }
 
-void object::on_touch(float x, float y) noexcept {
+void object::on_touch(float x, float y) {
   if (const auto& fn = _ontouch; fn) {
     fn(shared_from_this(), x, y);
   }
 }
 
-void object::on_hover() noexcept {
+void object::on_hover() {
   if (const auto& fn = _onhover; fn) {
     fn(shared_from_this());
   }
 }
 
-void object::on_unhover() noexcept {
+void object::on_unhover() {
   if (const auto& fn = _onunhover; fn) {
     fn(shared_from_this());
   }
 }
 
-memory::kv& object::kv() noexcept {
+memory::kv& object::kv() {
   return _kv;
 }
 
-uint64_t object::id() const noexcept {
+uint64_t object::id() const {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
 }
 
-void object::suspend() noexcept {
+void object::suspend() {
   if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
     b2Body_Disable(_body);
   }

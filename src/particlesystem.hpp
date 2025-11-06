@@ -23,21 +23,21 @@ struct particleprops final {
   std::uniform_real_distribution<double> rotforced;
   std::uniform_real_distribution<double> rotveld;
 
-  auto randradius() noexcept { return radiusd(rng); }
-  auto randangle() noexcept { return angled(rng); }
-  auto randxspawn() noexcept { return xspawnd(rng); }
-  auto randyspawn() noexcept { return yspawnd(rng); }
-  auto randxvel() noexcept { return xveld(rng); }
-  auto randyvel() noexcept { return yveld(rng); }
-  auto randgx() noexcept { return gxd(rng); }
-  auto randgy() noexcept { return gyd(rng); }
-  auto randscale() noexcept { return scaled(rng); }
-  auto randlife() noexcept { return lifed(rng); }
-  auto randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
-  auto randrotforce() noexcept { return rotforced(rng); }
-  auto randrotvel() noexcept { return rotveld(rng); }
+  auto randradius() { return radiusd(rng); }
+  auto randangle() { return angled(rng); }
+  auto randxspawn() { return xspawnd(rng); }
+  auto randyspawn() { return yspawnd(rng); }
+  auto randxvel() { return xveld(rng); }
+  auto randyvel() { return yveld(rng); }
+  auto randgx() { return gxd(rng); }
+  auto randgy() { return gyd(rng); }
+  auto randscale() { return scaled(rng); }
+  auto randlife() { return lifed(rng); }
+  auto randalpha() { return static_cast<uint8_t>(alphad(rng)); }
+  auto randrotforce() { return rotforced(rng); }
+  auto randrotvel() { return rotveld(rng); }
 
-  void set_placement(float xv, float yv) noexcept { x = xv; y = yv; }
+  void set_placement(float xv, float yv) { x = xv; y = yv; }
 };
 
 struct particlebatch final {
@@ -52,14 +52,14 @@ struct particlebatch final {
   std::vector<double> angle;
   std::vector<std::uint8_t> alpha;
 
-  std::size_t size() const noexcept {
+  std::size_t size() const {
     return x.size();
   }
 };
 
 class particlefactory final {
   public:
-    explicit particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
+    explicit particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager);
 
     std::shared_ptr<particlebatch> create(const std::string& kind, float x, float y, bool emitting = true) const;
 
@@ -69,20 +69,20 @@ class particlefactory final {
 
 class particlesystem final {
   public:
-    explicit particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
-    ~particlesystem() noexcept = default;
+    explicit particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager);
+    ~particlesystem() = default;
 
-    void add(const std::shared_ptr<particlebatch>& batch) noexcept;
+    void add(const std::shared_ptr<particlebatch>& batch);
 
-    void set(const std::vector<std::shared_ptr<particlebatch>>& batches) noexcept;
+    void set(const std::vector<std::shared_ptr<particlebatch>>& batches);
 
-    void clear() noexcept;
+    void clear();
 
-    void update(float delta) noexcept;
+    void update(float delta);
 
-    void draw() const noexcept;
+    void draw() const;
 
-    std::shared_ptr<particlefactory> factory() const noexcept;
+    std::shared_ptr<particlefactory> factory() const;
 
   private:
     std::shared_ptr<particlefactory> _factory;

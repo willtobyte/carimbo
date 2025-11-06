@@ -5,20 +5,20 @@
 namespace geometry {
 class margin final {
 public:
-  margin() noexcept = default;
-  ~margin() noexcept = default;
+  margin() = default;
+  ~margin() = default;
 
-  float top() const noexcept;
-  void set_top(float value) noexcept;
+  float top() const;
+  void set_top(float value);
 
-  float left() const noexcept;
-  void set_left(float value) noexcept;
+  float left() const;
+  void set_left(float value);
 
-  float bottom() const noexcept;
-  void set_bottom(float value) noexcept;
+  float bottom() const;
+  void set_bottom(float value);
 
-  float right() const noexcept;
-  void set_right(float value) noexcept;
+  float right() const;
+  void set_right(float value);
 
   friend void from_json(const nlohmann::json& j, margin& m);
 

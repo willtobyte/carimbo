@@ -5,13 +5,13 @@
 namespace framework {
 class timermanager final {
 public:
-  explicit timermanager() noexcept;
-  ~timermanager() noexcept = default;
+  explicit timermanager();
+  ~timermanager() = default;
 
-  uint32_t set(uint32_t interval, std::function<void()>&& fn) noexcept;
-  uint32_t singleshot(uint32_t timeout, std::function<void()>&& fn) noexcept;
-  void cancel(uint32_t id) noexcept;
-  void clear() noexcept;
+  uint32_t set(uint32_t interval, std::function<void()>&& fn);
+  uint32_t singleshot(uint32_t timeout, std::function<void()>&& fn);
+  void cancel(uint32_t id);
+  void clear();
 
 protected:
   uint32_t add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat);

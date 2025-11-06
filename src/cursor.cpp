@@ -59,7 +59,7 @@ void cursor::on_mouse_motion(const mouse::motion& event) {
   _position = geometry::point(event.x, event.y);
 }
 
-void cursor::update(float delta) noexcept {
+void cursor::update(float delta) {
   const auto now = SDL_GetTicks();
   const auto& animation = _animations.find(_action)->second;
   const auto& frame = animation.keyframes[_frame];
@@ -79,7 +79,7 @@ void cursor::update(float delta) noexcept {
   _frame = (_frame + 1) % animation.keyframes.size();
 }
 
-void cursor::draw() const noexcept {
+void cursor::draw() const {
   const auto& animation = _animations.find(_action)->second.keyframes[_frame];
   _spritesheet->draw(
       animation.frame,
@@ -93,6 +93,6 @@ void cursor::draw() const noexcept {
   );
 }
 
-void cursor::handle(const std::string& message) noexcept {
+void cursor::handle(const std::string& message) {
   _queued_action = message;
 }

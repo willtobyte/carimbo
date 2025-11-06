@@ -13,8 +13,8 @@ public:
   widget() = default;
   virtual ~widget() = default;
 
-  virtual void update(float delta) noexcept = 0;
+  virtual void update(float delta) = 0;
 
-  virtual void draw() const noexcept = 0;
+  virtual void draw() const = 0;
 };
 }

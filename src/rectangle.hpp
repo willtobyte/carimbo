@@ -8,38 +8,38 @@
 namespace geometry {
 class rectangle final {
 public:
-  rectangle() noexcept = default;
-  rectangle(const rectangle& other) noexcept = default;
-  rectangle(float x, float y, float width, float height) noexcept;
-  rectangle(const geometry::point& position, const geometry::size& size) noexcept;
+  rectangle() = default;
+  rectangle(const rectangle& other) = default;
+  rectangle(float x, float y, float width, float height);
+  rectangle(const geometry::point& position, const geometry::size& size);
 
-  ~rectangle() noexcept = default;
+  ~rectangle() = default;
 
-  float x() const noexcept;
-  float y() const noexcept;
-  float width() const noexcept;
-  float height() const noexcept;
+  float x() const;
+  float y() const;
+  float width() const;
+  float height() const;
 
-  void set_position(float x, float y) noexcept;
-  void set_position(const geometry::point& position) noexcept;
-  geometry::point position() const noexcept;
+  void set_position(float x, float y);
+  void set_position(const geometry::point& position);
+  geometry::point position() const;
 
-  void set_size(float width, float height) noexcept;
-  void set_size(const geometry::size& size) noexcept;
-  geometry::size size() const noexcept;
+  void set_size(float width, float height);
+  void set_size(const geometry::size& size);
+  geometry::size size() const;
 
-  void scale(float factor) noexcept;
+  void scale(float factor);
 
-  bool intersects(const rectangle& other) const noexcept;
+  bool intersects(const rectangle& other) const;
 
-  bool contains(const geometry::point& point) const noexcept;
-  bool contains(float x, float y) const noexcept;
+  bool contains(const geometry::point& point) const;
+  bool contains(float x, float y) const;
 
-  operator SDL_FRect() const noexcept;
+  operator SDL_FRect() const;
 
-  rectangle operator+(const geometry::point& offset) const noexcept;
-  bool operator==(const rectangle& other) const noexcept;
-  bool operator!=(const rectangle& other) const noexcept;
+  rectangle operator+(const geometry::point& offset) const;
+  bool operator==(const rectangle& other) const;
+  bool operator!=(const rectangle& other) const;
 
   friend void from_json(const nlohmann::json& j, rectangle& r);
 

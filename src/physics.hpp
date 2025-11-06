@@ -3,11 +3,11 @@
 #include "common.hpp"
 
 namespace framework::physics {
-inline uint64_t userdata_to_id(void* userdata) noexcept {
+inline uint64_t userdata_to_id(void* userdata) {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata));
 }
 
-inline void* id_to_userdata(uint64_t id) noexcept {
+inline void* id_to_userdata(uint64_t id) {
   return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
 }
 
@@ -32,11 +32,11 @@ public:
     float bounds_height,
     float scale,
     double angle_degrees
-  ) noexcept;
+  );
 
-  bool shape_differs(const body_transform& other) const noexcept;
-  bool rotation_differs(const body_transform& other) const noexcept;
-  bool differs(const body_transform& other) const noexcept;
+  bool shape_differs(const body_transform& other) const;
+  bool rotation_differs(const body_transform& other) const;
+  bool differs(const body_transform& other) const;
 
   float px{.0f};
   float py{.0f};

@@ -26,4 +26,4 @@ struct SDL_Deleter {
 template <typename... Ts>
 constexpr void UNUSED(const Ts&...) {}
 
-inline uint64_t moment() noexcept { return SDL_GetTicks(); }
+inline uint64_t moment() { return SDL_GetTicks(); }

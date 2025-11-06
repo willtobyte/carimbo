@@ -153,7 +153,7 @@ soundfx::soundfx(const std::string& filename) {
   alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));
 }
 
-soundfx::~soundfx() noexcept {
+soundfx::~soundfx() {
   if (_source == 0) {
     goto freebuffer;
   }
@@ -172,7 +172,7 @@ soundfx::~soundfx() noexcept {
     }
 }
 
-void soundfx::play(bool loop) const noexcept {
+void soundfx::play(bool loop) const {
   _notified.store(false, std::memory_order_relaxed);
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
@@ -182,11 +182,11 @@ void soundfx::play(bool loop) const noexcept {
   }
 }
 
-void soundfx::stop() const noexcept {
+void soundfx::stop() const {
   alSourceStop(_source);
 }
 
-void soundfx::update(float delta) noexcept {
+void soundfx::update(float delta) {
   if (_notified.load(std::memory_order_relaxed)) {
     return;
   }
@@ -204,20 +204,20 @@ void soundfx::update(float delta) noexcept {
   }
 }
 
-void soundfx::set_volume(float gain) noexcept {
+void soundfx::set_volume(float gain) {
   alSourcef(_source, AL_GAIN, std::clamp(gain, 0.0f, 1.0f));
 }
 
-float soundfx::volume() const noexcept {
+float soundfx::volume() const {
   float gain;
   alGetSourcef(_source, AL_GAIN, &gain);
   return gain;
 }
 
-void soundfx::set_onbegin(std::function<void()>&& callback) noexcept {
+void soundfx::set_onbegin(std::function<void()>&& callback) {
   _onbegin = std::move(callback);
 }
 
-void soundfx::set_onend(std::function<void()>&& callback) noexcept {
+void soundfx::set_onend(std::function<void()>&& callback) {
   _onend = std::move(callback);
 }

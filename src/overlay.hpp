@@ -12,16 +12,16 @@
 namespace graphics {
 class overlay final : public input::eventreceiver {
 public:
-  explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager) noexcept;
-  virtual ~overlay() noexcept = default;
+  explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager);
+  virtual ~overlay() = default;
 
   std::variant<std::shared_ptr<label>> create(widgettype type);
 
   void destroy(const std::variant<std::shared_ptr<label>>& widget);
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
   void set_cursor(const std::string& name);
 

@@ -18,23 +18,23 @@ public:
     std::shared_ptr<engine> engine
   );
 
-  ~resourcemanager() noexcept = default;
+  ~resourcemanager() = default;
 
-  void flush() noexcept;
+  void flush();
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
   void prefetch();
   void prefetch(const std::vector<std::string>& filenames);
 
   #ifndef NDEBUG
-  void debug() const noexcept;
+  void debug() const;
   #endif
 
-  std::shared_ptr<graphics::renderer> renderer() const noexcept;
-  std::shared_ptr<graphics::pixmappool> pixmappool() const noexcept;
-  std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
+  std::shared_ptr<graphics::renderer> renderer() const;
+  std::shared_ptr<graphics::pixmappool> pixmappool() const;
+  std::shared_ptr<audio::soundmanager> soundmanager() const;
+  std::shared_ptr<graphics::fontfactory> fontfactory() const;
 
 private:
   std::shared_ptr<graphics::renderer> _renderer;

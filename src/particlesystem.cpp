@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
+particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager)
   : _resourcemanager(std::move(resourcemanager)) {
 }
 
@@ -73,12 +73,12 @@ std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, 
   return pb;
 }
 
-particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept
+particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager)
   : _factory(std::make_shared<particlefactory>(resourcemanager)) {
   _batches.reserve(16);
 }
 
-void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) noexcept {
+void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) {
   if (!batch) [[unlikely]] {
     return;
   }
@@ -86,7 +86,7 @@ void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) 
   _batches.emplace_back(batch);
 }
 
-void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) noexcept {
+void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) {
   if (batches.empty()) {
     _batches.clear();
     return;
@@ -95,11 +95,11 @@ void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebat
   _batches = batches;
 }
 
-void graphics::particlesystem::clear() noexcept {
+void graphics::particlesystem::clear() {
   _batches.clear();
 }
 
-void particlesystem::update(float delta) noexcept {
+void particlesystem::update(float delta) {
   for (const auto& batch : _batches) {
     auto& props = batch->props;
     if (!props->active) [[unlikely]] {
@@ -144,7 +144,7 @@ void particlesystem::update(float delta) noexcept {
   }
 }
 
-void particlesystem::draw() const noexcept {
+void particlesystem::draw() const {
   for (const auto& batch : _batches) {
     auto& props = batch->props;
     if (!props->active) [[unlikely]] {
@@ -180,6 +180,6 @@ void particlesystem::draw() const noexcept {
   }
 }
 
-std::shared_ptr<particlefactory> particlesystem::factory() const noexcept {
+std::shared_ptr<particlefactory> particlesystem::factory() const {
   return _factory;
 }

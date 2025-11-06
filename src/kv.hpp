@@ -5,11 +5,11 @@
 namespace memory {
 class observable final {
 public:
-  ~observable() noexcept = default;
+  ~observable() = default;
   sol::object value() const;
   void set(const sol::object& value);
-  void subscribe(const std::function<void(const sol::object&)>&& callback) noexcept;
-  void unsubscribe() noexcept;
+  void subscribe(const std::function<void(const sol::object&)>&& callback);
+  void unsubscribe();
 
 private:
   std::function<void(const sol::object&)> _subscriber;
@@ -18,7 +18,7 @@ private:
 
 class kv final {
 public:
-  ~kv() noexcept = default;
+  ~kv() = default;
   std::shared_ptr<memory::observable> get(const std::string& key, const sol::object& default_value = sol::lua_nil);
   void set(const std::string& key, const sol::object& value);
 

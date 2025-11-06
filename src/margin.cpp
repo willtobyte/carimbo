@@ -2,34 +2,34 @@
 
 using namespace geometry;
 
-float margin::top() const noexcept {
+float margin::top() const {
   return _top;
 }
 
-void margin::set_top(float value) noexcept {
+void margin::set_top(float value) {
   _top = value;
 }
 
-float margin::left() const noexcept {
+float margin::left() const {
   return _left;
 }
 
-void margin::set_left(float value) noexcept {
+void margin::set_left(float value) {
   _left = value;
 }
 
-float margin::bottom() const noexcept {
+float margin::bottom() const {
   return _bottom;
 }
 
-void margin::set_bottom(float value) noexcept {
+void margin::set_bottom(float value) {
   _bottom = value;
 }
 
-float margin::right() const noexcept {
+float margin::right() const {
   return _right;
 }
 
-void margin::set_right(float value) noexcept {
+void margin::set_right(float value) {
   _right = value;
 }

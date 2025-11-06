@@ -3,8 +3,8 @@
 namespace framework {
 class loopable {
 public:
-  loopable() noexcept = default;
-  virtual ~loopable() noexcept = default;
+  loopable() = default;
+  virtual ~loopable() = default;
 
   virtual void loop(float delta) = 0;
 };

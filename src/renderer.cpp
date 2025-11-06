@@ -22,18 +22,18 @@ renderer::renderer(std::shared_ptr<window> window)
   _renderer.reset(renderer);
 }
 
-renderer::operator SDL_Renderer* () const noexcept {
+renderer::operator SDL_Renderer* () const {
   return _renderer.get();
 }
 
-renderer::operator SDL_Window* () const noexcept {
+renderer::operator SDL_Window* () const {
   return *_window;
 }
 
-void renderer::begin() const noexcept {
+void renderer::begin() const {
   SDL_RenderClear(*this);
 }
 
-void renderer::end() const noexcept {
+void renderer::end() const {
   SDL_RenderPresent(*this);
 }

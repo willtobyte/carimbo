@@ -5,21 +5,21 @@
 namespace platform {
 class desktop {
   public:
-    desktop() noexcept = default;
-    ~desktop() noexcept = default;
+    desktop() = default;
+    ~desktop() = default;
 
-    std::optional<std::string> folder() const noexcept;
+    std::optional<std::string> folder() const;
 };
 
 class operatingsystem {
   public:
-    operatingsystem() noexcept = default;
-    ~operatingsystem() noexcept = default;
+    operatingsystem() = default;
+    ~operatingsystem() = default;
 
-    int32_t compute() const noexcept;
+    int32_t compute() const;
 
-    int32_t memory() const noexcept;
+    int32_t memory() const;
 
-    std::string name() const noexcept;
+    std::string name() const;
 };
 }

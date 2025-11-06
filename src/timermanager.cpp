@@ -4,7 +4,7 @@ using namespace framework;
 
 constexpr auto event_type = static_cast<uint32_t>(input::event::type::timer);
 
-static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) noexcept {
+static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
   SDL_Event event{};
   event.type = event_type;
   event.user.data1 = userdata;
@@ -13,28 +13,28 @@ static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interva
   return repeat ? interval : 0;
 }
 
-uint32_t wrapper(void* userdata, SDL_TimerID id, uint32_t interval) noexcept {
+uint32_t wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, true);
 }
 
-uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) noexcept {
+uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, false);
 }
 
-timermanager::timermanager() noexcept
+timermanager::timermanager()
     : _envelopepool(envelopepool::instance()) {
   _envelopemapping.reserve(16);
 }
 
-uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) noexcept {
+uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) {
   return add_timer(interval, std::move(fn), true);
 }
 
-uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) noexcept {
+uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) {
   return add_timer(interval, std::move(fn), false);
 }
 
-void timermanager::cancel(uint32_t id) noexcept {
+void timermanager::cancel(uint32_t id) {
   SDL_RemoveTimer(id);
   const auto it = _envelopemapping.find(id);
   if (it == _envelopemapping.end()) [[unlikely]] {
@@ -44,7 +44,7 @@ void timermanager::cancel(uint32_t id) noexcept {
   _envelopemapping.erase(it);
 }
 
-void timermanager::clear() noexcept {
+void timermanager::clear() {
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
 

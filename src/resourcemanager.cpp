@@ -37,13 +37,13 @@ resourcemanager::resourcemanager(
 
 }
 
-void resourcemanager::flush() noexcept {
+void resourcemanager::flush() {
   _pixmappool->flush();
   _soundmanager->flush();
   _fontfactory->flush();
 }
 
-void resourcemanager::update(float delta) noexcept {
+void resourcemanager::update(float delta) {
   _soundmanager->update(delta);
 }
 
@@ -71,25 +71,25 @@ void resourcemanager::prefetch(const std::vector<std::string>& filenames) {
 }
 
 #ifndef NDEBUG
-void resourcemanager::debug() const noexcept {
+void resourcemanager::debug() const {
   _pixmappool->debug();
   _soundmanager->debug();
   _fontfactory->debug();
 }
 #endif
 
-std::shared_ptr<graphics::renderer> resourcemanager::renderer() const noexcept {
+std::shared_ptr<graphics::renderer> resourcemanager::renderer() const {
   return _renderer;
 }
 
-std::shared_ptr<graphics::pixmappool> resourcemanager::pixmappool() const noexcept {
+std::shared_ptr<graphics::pixmappool> resourcemanager::pixmappool() const {
   return _pixmappool;
 }
 
-std::shared_ptr<audio::soundmanager> resourcemanager::soundmanager() const noexcept {
+std::shared_ptr<audio::soundmanager> resourcemanager::soundmanager() const {
   return _soundmanager;
 }
 
-std::shared_ptr<graphics::fontfactory> resourcemanager::fontfactory() const noexcept {
+std::shared_ptr<graphics::fontfactory> resourcemanager::fontfactory() const {
   return _fontfactory;
 }

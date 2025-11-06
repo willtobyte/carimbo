@@ -44,7 +44,7 @@ using namespace framework;
   std::exit(EXIT_FAILURE);
 }
 
-application::application(int argc, char **argv) noexcept {
+application::application(int argc, char **argv) {
   std::set_terminate(fail);
 
   constexpr const auto fn = [](int) {

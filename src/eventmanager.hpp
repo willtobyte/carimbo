@@ -19,15 +19,15 @@ namespace input {
 class eventmanager final : private framework::noncopyable {
 public:
   explicit eventmanager(std::shared_ptr<graphics::renderer> renderer);
-  virtual ~eventmanager() noexcept = default;
+  virtual ~eventmanager() = default;
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
-  void add_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept;
+  void add_receiver(const std::shared_ptr<eventreceiver>& receiver);
 
-  void remove_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept;
+  void remove_receiver(const std::shared_ptr<eventreceiver>& receiver);
 
-  void purge(uint32_t begin_event, uint32_t end_event = 0) noexcept;
+  void purge(uint32_t begin_event, uint32_t end_event = 0);
 
 private:
   std::shared_ptr<graphics::renderer> _renderer;

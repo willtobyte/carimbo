@@ -2,11 +2,11 @@
 
 using namespace framework;
 
-postalservice::postalservice() noexcept
+postalservice::postalservice()
     : _envelopepool(envelopepool::instance()) {
 }
 
-void postalservice::post(const mail& message) noexcept {
+void postalservice::post(const mail& message) {
   auto envelope = _envelopepool->acquire(mailenvelope(message.to, message.kind, message.body));
 
   SDL_Event event{};

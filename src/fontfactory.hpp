@@ -11,16 +11,16 @@ namespace graphics {
 namespace graphics {
 class fontfactory final {
 public:
-  fontfactory() noexcept = delete;
+  fontfactory() = delete;
   explicit fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool);
-  ~fontfactory() noexcept = default;
+  ~fontfactory() = default;
 
   std::shared_ptr<font> get(const std::string& family);
 
-  void flush() noexcept;
+  void flush();
 
   #ifndef NDEBUG
-  void debug() const noexcept;
+  void debug() const;
   #endif
 
 private:

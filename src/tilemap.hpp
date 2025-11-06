@@ -27,11 +27,11 @@ class tilemap final {
     );
     ~tilemap() = default;
 
-    void update(float delta) noexcept;
-    void draw() const noexcept;
+    void update(float delta);
+    void draw() const;
     void set_target(std::shared_ptr<object> object);
 
-    std::vector<std::string> under() const noexcept;
+    std::vector<std::string> under() const;
 
   private:
     float _size;

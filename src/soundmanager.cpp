@@ -2,10 +2,10 @@
 
 using namespace audio;
 
-soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice) noexcept
+soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
     : _audiodevice(std::move(audiodevice)) {}
 
-std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) noexcept {
+std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) {
   const auto [it, inserted] = _pool.try_emplace(filename);
   if (!inserted) [[unlikely]] {
     return it->second;
@@ -17,26 +17,26 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) noexcept
   return it->second = std::make_shared<soundfx>(filename);
 }
 
-void soundmanager::play(const std::string& filename, bool loop) noexcept {
+void soundmanager::play(const std::string& filename, bool loop) {
   if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->play(loop);
   }
 }
 
-void soundmanager::stop(const std::string& filename) noexcept {
+void soundmanager::stop(const std::string& filename) {
   if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->stop();
   }
 }
 
-void soundmanager::flush() noexcept {
+void soundmanager::flush() {
   std::println("[soundmanager] actual size {}", _pool.size());
 
   const auto count = std::erase_if(_pool, [](const auto& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
   std::println("[soundmanager] {} objects have been flushed", count);
 }
 
-void soundmanager::update(float delta) noexcept {
+void soundmanager::update(float delta) {
   for (auto& entry : _pool) {
     const auto& e = entry.second;
 
@@ -53,7 +53,7 @@ void soundmanager::update(float delta) noexcept {
 }
 
 #ifndef NDEBUG
-void soundmanager::debug() const noexcept {
+void soundmanager::debug() const {
   std::println("[soundmanager.debug] total objects: {}", _pool.size());
 
   for (const auto& [key, ptr] : _pool) {

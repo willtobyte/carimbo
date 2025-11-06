@@ -12,7 +12,7 @@ struct mail final {
     std::shared_ptr<object> to,
     std::optional<std::shared_ptr<object>> from,
     const std::string& body
-  ) noexcept
+  )
     : to(to->id()),
       kind(from && *from ? (*from)->kind() : "unknown"),
       body(body) {}
@@ -20,9 +20,9 @@ struct mail final {
 
 class postalservice final {
 public:
-  postalservice() noexcept;
+  postalservice();
 
-  void post(const mail& message) noexcept;
+  void post(const mail& message);
 
 private:
   std::shared_ptr<uniquepool<envelope, envelope_pool_name>> _envelopepool;

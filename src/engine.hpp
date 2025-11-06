@@ -42,43 +42,43 @@ namespace framework {
 class engine final : public input::eventreceiver {
 public:
   engine() = default;
-  virtual ~engine() noexcept = default;
+  virtual ~engine() = default;
 
-  std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
-  std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;
-  std::shared_ptr<input::eventmanager> eventmanager() const noexcept;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
-  std::shared_ptr<graphics::overlay> overlay() const noexcept;
-  std::shared_ptr<framework::resourcemanager> resourcemanager() const noexcept;
-  std::shared_ptr<framework::postalservice> postalservice() const noexcept;
-  std::shared_ptr<framework::scenemanager> scenemanager() const noexcept;
-  std::shared_ptr<framework::statemanager> statemanager() const noexcept;
-  std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
-  std::shared_ptr<graphics::window> window() const noexcept;
-  std::shared_ptr<graphics::renderer> renderer() const noexcept;
-  std::shared_ptr<graphics::canvas> canvas() const noexcept;
-  std::shared_ptr<graphics::particlesystem> particlesystem() const noexcept;
-  std::shared_ptr<storage::cassette> cassette() const noexcept;
-  std::shared_ptr<framework::timermanager> timermanager() const noexcept;
+  std::shared_ptr<audio::audiodevice> audiodevice() const;
+  std::shared_ptr<framework::objectmanager> objectmanager() const;
+  std::shared_ptr<input::eventmanager> eventmanager() const;
+  std::shared_ptr<graphics::fontfactory> fontfactory() const;
+  std::shared_ptr<graphics::overlay> overlay() const;
+  std::shared_ptr<framework::resourcemanager> resourcemanager() const;
+  std::shared_ptr<framework::postalservice> postalservice() const;
+  std::shared_ptr<framework::scenemanager> scenemanager() const;
+  std::shared_ptr<framework::statemanager> statemanager() const;
+  std::shared_ptr<audio::soundmanager> soundmanager() const;
+  std::shared_ptr<graphics::window> window() const;
+  std::shared_ptr<graphics::renderer> renderer() const;
+  std::shared_ptr<graphics::canvas> canvas() const;
+  std::shared_ptr<graphics::particlesystem> particlesystem() const;
+  std::shared_ptr<storage::cassette> cassette() const;
+  std::shared_ptr<framework::timermanager> timermanager() const;
 
-  int32_t height() const noexcept;
-  int32_t width() const noexcept;
+  int32_t height() const;
+  int32_t width() const;
 
-  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) noexcept;
-  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager) noexcept;
-  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager) noexcept;
-  void set_overlay(std::shared_ptr<graphics::overlay> overlay) noexcept;
-  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager) noexcept;
-  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager) noexcept;
-  void set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem) noexcept;
-  void set_postalservice(std::shared_ptr<framework::postalservice> postalservice) noexcept;
-  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager) noexcept;
-  void set_window(std::shared_ptr<graphics::window> window) noexcept;
-  void set_world(std::shared_ptr<framework::world> world) noexcept;
-  void set_renderer(std::shared_ptr<graphics::renderer> renderer) noexcept;
-  void set_timermanager(std::shared_ptr<framework::timermanager> timermanager) noexcept;
+  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
+  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);
+  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager);
+  void set_overlay(std::shared_ptr<graphics::overlay> overlay);
+  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager);
+  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager);
+  void set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem);
+  void set_postalservice(std::shared_ptr<framework::postalservice> postalservice);
+  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager);
+  void set_window(std::shared_ptr<graphics::window> window);
+  void set_world(std::shared_ptr<framework::world> world);
+  void set_renderer(std::shared_ptr<graphics::renderer> renderer);
+  void set_timermanager(std::shared_ptr<framework::timermanager> timermanager);
 
-  void add_loopable(std::shared_ptr<loopable> loopable) noexcept;
+  void add_loopable(std::shared_ptr<loopable> loopable);
 
   void run();
 

@@ -10,15 +10,15 @@ using pixmap_ptr = std::shared_ptr<pixmap>;
 
 class pixmappool final {
 public:
-  explicit pixmappool(std::shared_ptr<renderer> renderer) noexcept;
-  ~pixmappool() noexcept = default;
+  explicit pixmappool(std::shared_ptr<renderer> renderer);
+  ~pixmappool() = default;
 
   std::shared_ptr<pixmap> get(const std::string& filename);
 
-  void flush() noexcept;
+  void flush();
 
 #ifndef NDEBUG
-  void debug() const noexcept;
+  void debug() const;
 #endif
 
 private:

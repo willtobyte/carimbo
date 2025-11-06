@@ -31,7 +31,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   std::fill(_transparent.get(), _transparent.get() + count, pixel);
 }
 
-void canvas::set_pixels(const char* pixels) noexcept {
+void canvas::set_pixels(const char* pixels) {
   if (!pixels) [[unlikely]] {
     return;
   }
@@ -45,10 +45,10 @@ void canvas::set_pixels(const char* pixels) noexcept {
   SDL_UnlockTexture(ptr);
 }
 
-void canvas::clear() noexcept {
+void canvas::clear() {
   set_pixels(reinterpret_cast<const char*>(_transparent.get()));
 }
 
-void canvas::draw() const noexcept {
+void canvas::draw() const {
   SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }

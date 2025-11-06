@@ -6,7 +6,7 @@
 namespace framework {
 class objectmanager;
 
-static b2AABB to_aabb(float x0, float y0, float x1, float y1) noexcept {
+static b2AABB to_aabb(float x0, float y0, float x1, float y1) {
   b2AABB a{};
   a.lowerBound = b2Vec2(x0, y0);
   a.upperBound = b2Vec2(x1, y1);
@@ -27,8 +27,8 @@ static bool collect(b2ShapeId shape, void* context) {
 
 class world final {
 public:
-  world(std::shared_ptr<graphics::renderer> renderer) noexcept;
-  ~world() noexcept;
+  world(std::shared_ptr<graphics::renderer> renderer);
+  ~world();
 
   template <class OutIt>
   void query(float x, float y, OutIt out) {
@@ -51,12 +51,12 @@ public:
     b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
   }
 
-  void update(float delta) noexcept;
-  void draw() const noexcept;
+  void update(float delta);
+  void draw() const;
 
-  void set_objectmanager(std::weak_ptr<objectmanager> objectmanager) noexcept;
+  void set_objectmanager(std::weak_ptr<objectmanager> objectmanager);
 
-  operator b2WorldId() const noexcept;
+  operator b2WorldId() const;
 
 protected:
   void notify(uint64_t id_a, uint64_t id_b) const;

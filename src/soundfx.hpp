@@ -6,18 +6,18 @@ namespace audio {
 class soundfx final {
 public:
   explicit soundfx(const std::string& filename);
-  ~soundfx() noexcept;
+  ~soundfx();
 
-  void play(bool loop = false) const noexcept;
-  void stop() const noexcept;
+  void play(bool loop = false) const;
+  void stop() const;
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
-  void set_volume(float gain) noexcept;
-  float volume() const noexcept;
+  void set_volume(float gain);
+  float volume() const;
     
-  void set_onbegin(std::function<void()>&& callback) noexcept;
-  void set_onend(std::function<void()>&& callback) noexcept;
+  void set_onbegin(std::function<void()>&& callback);
+  void set_onend(std::function<void()>&& callback);
 
 private:
   ALuint _source{0};

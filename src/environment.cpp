@@ -2,7 +2,7 @@
 
 using namespace platform;
 
-std::optional<std::string> desktop::folder() const noexcept {
+std::optional<std::string> desktop::folder() const {
   const auto* folder = SDL_GetUserFolder(SDL_FOLDER_DESKTOP);
   if (!folder) {
     return std::nullopt;
@@ -11,14 +11,14 @@ std::optional<std::string> desktop::folder() const noexcept {
   return std::string{folder};
 }
 
-int32_t operatingsystem::compute() const noexcept {
+int32_t operatingsystem::compute() const {
   return SDL_GetNumLogicalCPUCores();
 }
 
-int32_t operatingsystem::memory() const noexcept {
+int32_t operatingsystem::memory() const {
   return SDL_GetSystemRAM();
 }
 
-std::string operatingsystem::name() const noexcept {
+std::string operatingsystem::name() const {
   return std::string{SDL_GetPlatform()};
 }

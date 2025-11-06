@@ -21,9 +21,9 @@ public:
 
   void clear();
 
-  virtual void update(float delta) noexcept override;
+  virtual void update(float delta) override;
 
-  virtual void draw() const noexcept override;
+  virtual void draw() const override;
 
 private:
   std::shared_ptr<font> _font;

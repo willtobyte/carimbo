@@ -104,7 +104,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   return o;
 }
 
-void objectmanager::manage(std::shared_ptr<object> object) noexcept {
+void objectmanager::manage(std::shared_ptr<object> object) {
   if (!object) [[unlikely]] {
     return;
   }
@@ -112,7 +112,7 @@ void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   _objects.emplace(object);
 }
 
-bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
+bool objectmanager::remove(std::shared_ptr<object> object) {
   if (!object) [[unlikely]] {
     return false;
   }
@@ -125,14 +125,14 @@ bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
   return _objects.get<by_id>().erase(id) > 0;
 }
 
-std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
+std::shared_ptr<object> objectmanager::find(uint64_t id) const {
   const auto& byid = _objects.get<by_id>();
   auto it = byid.find(id);
   if (it == byid.end()) [[unlikely]] return nullptr;
   return it->object;
 }
 
-void objectmanager::update(float delta) noexcept {
+void objectmanager::update(float delta) {
   const auto now = SDL_GetTicks();
   const auto& byseq = _objects.get<by_seq>();
   for (const auto& e : byseq) {
@@ -140,22 +140,22 @@ void objectmanager::update(float delta) noexcept {
   }
 }
 
-void objectmanager::draw() const noexcept {
+void objectmanager::draw() const {
   const auto& byseq = _objects.get<by_seq>();
   for (const auto& e : byseq) {
     e.object->draw();
   }
 }
 
-void objectmanager::set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept {
+void objectmanager::set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) {
   _resourcemanager = std::move(resourcemanager);
 }
 
-void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept {
+void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) {
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::set_world(std::shared_ptr<world> world) noexcept {
+void objectmanager::set_world(std::shared_ptr<world> world) {
   _world = std::move(world);
 }
 

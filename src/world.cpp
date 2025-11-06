@@ -8,26 +8,26 @@ template <class Map>
 static inline const typename Map::mapped_type* find_ptr(
   const Map& m,
   const typename Map::key_type& k
-) noexcept {
+) {
   const auto it = m.find(k);
   if (it == m.end()) return nullptr;
   return std::addressof(it->second);
 }
 
-world::world(std::shared_ptr<graphics::renderer> renderer) noexcept
+world::world(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{0.0f, 0.0f};
   _world = b2CreateWorld(&def);
 }
 
-world::~world() noexcept {
+world::~world() {
   if (b2World_IsValid(_world)) {
     b2DestroyWorld(_world);
   }
 }
 
-void world::update(float delta) noexcept {
+void world::update(float delta) {
   static std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
   collisions.clear();
   collisions.reserve(16);
@@ -78,7 +78,7 @@ static bool _draw_callback(b2ShapeId shape, void* ctx) {
 };
 #endif
 
-void world::draw() const noexcept {
+void world::draw() const {
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
 
@@ -97,7 +97,7 @@ void world::draw() const noexcept {
 #endif
 }
 
-world::operator b2WorldId() const noexcept {
+world::operator b2WorldId() const {
   return _world;
 }
 
@@ -119,6 +119,6 @@ void world::notify(uint64_t id_a, uint64_t id_b) const {
   SDL_PushEvent(&event);
 }
 
-void world::set_objectmanager(std::weak_ptr<objectmanager> objectmanager) noexcept {
+void world::set_objectmanager(std::weak_ptr<objectmanager> objectmanager) {
   _objectmanager = std::move(objectmanager);
 }

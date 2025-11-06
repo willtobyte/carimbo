@@ -13,15 +13,15 @@ class fonteffect {
 
     virtual void set(const std::string& text, geometry::point position) = 0;
 
-    virtual void update(float delta) noexcept = 0;
+    virtual void update(float delta) = 0;
 
-    virtual float scale() noexcept { return 1.f; };
+    virtual float scale() { return 1.f; };
 
-    virtual double angle() noexcept { return .0L; };
+    virtual double angle() { return .0L; };
 
-    virtual reflection reflection() noexcept { return reflection::none; };
+    virtual reflection reflection() { return reflection::none; };
 
-    virtual uint8_t alpha() noexcept { return 255; };
+    virtual uint8_t alpha() { return 255; };
 };
 
 class fadeineffect final : public fonteffect {
@@ -30,9 +30,9 @@ class fadeineffect final : public fonteffect {
 
     virtual void set(const std::string& text, geometry::point position) override;
 
-    virtual void update(float delta) noexcept override;
+    virtual void update(float delta) override;
 
-    virtual uint8_t alpha() noexcept override;
+    virtual uint8_t alpha() override;
 
   private:
     std::string _text;

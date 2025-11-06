@@ -7,16 +7,16 @@ class engine;
 
 class enginefactory final {
 public:
-  enginefactory() noexcept = default;
-  virtual ~enginefactory() noexcept = default;
+  enginefactory() = default;
+  virtual ~enginefactory() = default;
 
-  enginefactory& with_title(const std::string& title) noexcept;
-  enginefactory& with_width(int32_t width) noexcept;
-  enginefactory& with_height(int32_t height) noexcept;
-  enginefactory& with_scale(float scale) noexcept;
-  enginefactory& with_gravity(float gravity) noexcept;
-  enginefactory& with_fullscreen(bool fullscreen) noexcept;
-  enginefactory& with_sentry(const std::string& dsn) noexcept;
+  enginefactory& with_title(const std::string& title);
+  enginefactory& with_width(int32_t width);
+  enginefactory& with_height(int32_t height);
+  enginefactory& with_scale(float scale);
+  enginefactory& with_gravity(float gravity);
+  enginefactory& with_fullscreen(bool fullscreen);
+  enginefactory& with_sentry(const std::string& dsn);
 
   std::shared_ptr<engine> create() const;
 

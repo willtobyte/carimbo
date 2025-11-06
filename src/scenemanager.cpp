@@ -104,7 +104,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
   );
 }
 
-std::string scenemanager::current() const noexcept {
+std::string scenemanager::current() const {
   return _current;
 }
 
@@ -131,11 +131,11 @@ void scenemanager::set(const std::string& name) {
   ptr->on_enter();
 }
 
-std::shared_ptr<scene> scenemanager::get() const noexcept {
+std::shared_ptr<scene> scenemanager::get() const {
   return _scene.lock();
 }
 
-std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept {
+std::vector<std::string> scenemanager::destroy(const std::string& name) {
   std::vector<std::string> result;
   result.reserve(8);
   if (name.size() == 1 && name.front() == '*') {
@@ -162,13 +162,13 @@ std::vector<std::string> scenemanager::destroy(const std::string& name) noexcept
   return result;
 }
 
-void scenemanager::update(float delta) noexcept {
+void scenemanager::update(float delta) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->update(delta);
 }
 
-void scenemanager::draw() const noexcept {
+void scenemanager::draw() const {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->draw();

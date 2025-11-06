@@ -38,62 +38,62 @@ struct animation final {
 
 class object final : public std::enable_shared_from_this<object> {
 public:
-  object() noexcept;
-  virtual ~object() noexcept;
-  std::string kind() const noexcept;
-  std::string scope() const noexcept;
+  object();
+  virtual ~object();
+  std::string kind() const;
+  std::string scope() const;
 
-  void update(float delta, uint64_t now) noexcept;
+  void update(float delta, uint64_t now);
 
-  void draw() const noexcept;
+  void draw() const;
 
-  geometry::point position() const noexcept;
-  float x() const noexcept;
-  void set_x(float x) noexcept;
-  float y() const noexcept;
-  void set_y(float y) noexcept;
+  geometry::point position() const;
+  float x() const;
+  void set_x(float x);
+  float y() const;
+  void set_y(float y);
 
-  void set_placement(float x, float y) noexcept;
-  geometry::point placement() const noexcept;
+  void set_placement(float x, float y);
+  geometry::point placement() const;
 
-  void set_alpha(uint8_t alpha) noexcept;
-  uint8_t alpha() const noexcept;
+  void set_alpha(uint8_t alpha);
+  uint8_t alpha() const;
 
-  void set_scale(float scale) noexcept;
-  float scale() const noexcept;
+  void set_scale(float scale);
+  float scale() const;
 
-  void set_angle(double angle) noexcept;
-  double angle() const noexcept;
+  void set_angle(double angle);
+  double angle() const;
 
-  void set_reflection(graphics::reflection reflection) noexcept;
-  graphics::reflection reflection() const noexcept;
+  void set_reflection(graphics::reflection reflection);
+  graphics::reflection reflection() const;
 
-  bool visible() const noexcept;
-  void set_visible(bool value) noexcept;
+  bool visible() const;
+  void set_visible(bool value);
 
-  void set_action(const std::optional<std::string>& action) noexcept;
-  std::string action() const noexcept;
+  void set_action(const std::optional<std::string>& action);
+  std::string action() const;
 
-  void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
-  void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
-  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) noexcept;
-  void set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) noexcept;
-  void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
-  void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) noexcept;
-  void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) noexcept;
+  void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
+  void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
+  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
+  void set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn);
+  void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn);
+  void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn);
+  void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn);
 
-  void on_email(const std::string& message) noexcept;
+  void on_email(const std::string& message);
 
-  void on_touch(float x, float y) noexcept;
-  void on_hover() noexcept;
-  void on_unhover() noexcept;
+  void on_touch(float x, float y);
+  void on_hover();
+  void on_unhover();
 
-  memory::kv& kv() noexcept;
+  memory::kv& kv();
 
-  uint64_t id() const noexcept;
+  uint64_t id() const;
 
 protected:
-  void suspend() noexcept;
+  void suspend();
 
 private:
   friend class objectmanager;

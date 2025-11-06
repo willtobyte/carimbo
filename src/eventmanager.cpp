@@ -42,7 +42,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   }
 }
 
-void eventmanager::update(float delta) noexcept {
+void eventmanager::update(float delta) {
   _receivers.erase(
     std::remove_if(
       _receivers.begin(),
@@ -307,7 +307,7 @@ void eventmanager::update(float delta) noexcept {
   }
 }
 
-void eventmanager::add_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept {
+void eventmanager::add_receiver(const std::shared_ptr<eventreceiver>& receiver) {
   if (!receiver) [[unlikely]] {
     return;
   }
@@ -315,7 +315,7 @@ void eventmanager::add_receiver(const std::shared_ptr<eventreceiver>& receiver) 
   _receivers.emplace_back(receiver);
 }
 
-void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receiver) noexcept {
+void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receiver) {
   if (!receiver) [[unlikely]] {
     return;
   }
@@ -330,7 +330,7 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
   }
 }
 
-void eventmanager::purge(uint32_t begin_event, uint32_t end_event) noexcept {
+void eventmanager::purge(uint32_t begin_event, uint32_t end_event) {
   if (end_event == 0) end_event = begin_event;
 
   SDL_Event event;

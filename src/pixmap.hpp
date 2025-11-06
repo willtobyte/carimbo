@@ -17,7 +17,7 @@ class pixmap final {
 public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, const std::string& filename);
-  ~pixmap() noexcept = default;
+  ~pixmap() = default;
 
   void draw(
       const geometry::point& source,
@@ -25,7 +25,7 @@ public:
       double angle = 0.0L,
       uint8_t alpha = 255,
       reflection reflection = reflection::none
-  ) const noexcept;
+  ) const;
 
   void draw(
       const geometry::rectangle& source,
@@ -33,13 +33,13 @@ public:
       double angle = 0.0L,
       uint8_t alpha = 255,
       reflection reflection = reflection::none
-  ) const noexcept;
+  ) const;
 
-  operator SDL_Texture* () const noexcept;
+  operator SDL_Texture* () const;
 
-  int32_t width() const noexcept;
+  int32_t width() const;
 
-  int32_t height() const noexcept;
+  int32_t height() const;
 
   void set_blendmode(blendmode mode);
 

@@ -20,21 +20,21 @@ public:
     std::shared_ptr<framework::timermanager> timermanager
   );
 
-  ~scenemanager() noexcept = default;
+  ~scenemanager() = default;
 
   std::shared_ptr<scene> load(const std::string& name);
 
-  std::string current() const noexcept;
+  std::string current() const;
 
   void set(const std::string& name);
 
-  std::shared_ptr<scene> get() const noexcept;
+  std::shared_ptr<scene> get() const;
 
-  std::vector<std::string> destroy(const std::string& name) noexcept;
+  std::vector<std::string> destroy(const std::string& name);
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
   void on_touch(float x, float y) const;
 

@@ -11,7 +11,7 @@ body_transform body_transform::compute(
   float bounds_height,
   float scale,
   double angle_degrees
-) noexcept {
+) {
   body_transform result;
 
   const auto sw = bounds_width * scale;
@@ -28,7 +28,7 @@ body_transform body_transform::compute(
   return result;
 }
 
-bool body_transform::shape_differs(const body_transform& other) const noexcept {
+bool body_transform::shape_differs(const body_transform& other) const {
   return std::abs(hx - other.hx) > epsilon ||
          std::abs(hy - other.hy) > epsilon;
 }

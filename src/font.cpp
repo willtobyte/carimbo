@@ -18,7 +18,7 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const noexcept {
+void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const {
   if (text.empty()) {
     return;
   }

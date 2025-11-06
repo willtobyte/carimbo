@@ -7,13 +7,13 @@ class renderer;
 class canvas final {
 public:
   explicit canvas(std::shared_ptr<renderer> renderer);
-  ~canvas() noexcept = default;
+  ~canvas() = default;
 
-  void set_pixels(const char* pixels) noexcept;
+  void set_pixels(const char* pixels);
 
-  void clear() noexcept;
+  void clear();
 
-  void draw() const noexcept;
+  void draw() const;
 
 private:
   std::shared_ptr<renderer> _renderer;

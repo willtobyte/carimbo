@@ -25,7 +25,7 @@ public:
 
   ~font() = default;
 
-  void draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const noexcept;
+  void draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const;
 
   std::string glyphs() const;
 

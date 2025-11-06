@@ -8,14 +8,14 @@ class window;
 class renderer final {
 public:
   explicit renderer(std::shared_ptr<window> window);
-  ~renderer() noexcept = default;
+  ~renderer() = default;
 
-  operator SDL_Renderer* () const noexcept;
+  operator SDL_Renderer* () const;
 
-  operator SDL_Window* () const noexcept;
+  operator SDL_Window* () const;
 
-  void begin() const noexcept;
-  void end() const noexcept;
+  void begin() const;
+  void end() const;
 
 private:
   std::unique_ptr<SDL_Renderer, SDL_Deleter> _renderer;

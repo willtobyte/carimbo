@@ -25,19 +25,19 @@ public:
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
 
-  void manage(std::shared_ptr<object> object) noexcept;
+  void manage(std::shared_ptr<object> object);
 
-  bool remove(std::shared_ptr<object> object) noexcept;
+  bool remove(std::shared_ptr<object> object);
 
-  std::shared_ptr<object> find(uint64_t id) const noexcept;
+  std::shared_ptr<object> find(uint64_t id) const;
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
-  void set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept;
-  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept;
-  void set_world(std::shared_ptr<world> world) noexcept;
+  void set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager);
+  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
+  void set_world(std::shared_ptr<world> world);
 
 protected:
   virtual void on_mouse_release(const input::event::mouse::button& event) override;
@@ -54,7 +54,7 @@ private:
 
   struct id_key {
     using result_type = uint64_t;
-    result_type operator()(const node& n) const noexcept {
+    result_type operator()(const node& n) const {
       return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(n.object.get()));
     }
   };

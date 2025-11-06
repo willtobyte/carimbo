@@ -35,7 +35,7 @@ tilemap::tilemap(
   }
 }
 
-void tilemap::update(float delta) noexcept {
+void tilemap::update(float delta) {
   const auto now = SDL_GetTicks();
 
   if (_last_tick == 0) {
@@ -74,7 +74,7 @@ void tilemap::update(float delta) noexcept {
   }
 }
 
-void tilemap::draw() const noexcept {
+void tilemap::draw() const {
   if (!_pixmap) [[unlikely]] {
     return;
   }
@@ -124,7 +124,7 @@ void tilemap::set_target(std::shared_ptr<object> object) {
   _target = std::move(object);
 }
 
-std::vector<std::string> tilemap::under() const noexcept {
+std::vector<std::string> tilemap::under() const {
   if (!_target || _layers.empty()) [[unlikely]] {
     return {};
   }

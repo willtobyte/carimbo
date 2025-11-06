@@ -33,15 +33,15 @@ struct animation final {
 class cursor final : public input::eventreceiver {
 public:
   explicit cursor(const std::string& name, std::shared_ptr<framework::resourcemanager> resourcemanager);
-  virtual ~cursor() noexcept = default;
+  virtual ~cursor() = default;
 
   virtual void on_mouse_release(const input::event::mouse::button& event) override;
   virtual void on_mouse_motion(const input::event::mouse::motion& event) override;
 
-  void update(float delta) noexcept;
-  void draw() const noexcept;
+  void update(float delta);
+  void draw() const;
 
-  void handle(const std::string& message) noexcept;
+  void handle(const std::string& message);
 
 private:
   geometry::point _position{0, 0};

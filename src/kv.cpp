@@ -14,11 +14,11 @@ void observable::set(const sol::object& value) {
   }
 }
 
-void observable::subscribe(const std::function<void(const sol::object&)>&& callback) noexcept {
+void observable::subscribe(const std::function<void(const sol::object&)>&& callback) {
   _subscriber = std::move(callback);
 }
 
-void observable::unsubscribe() noexcept {
+void observable::unsubscribe() {
   _subscriber = nullptr;
 }
 

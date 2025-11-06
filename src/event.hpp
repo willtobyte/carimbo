@@ -84,20 +84,20 @@ struct motion {
 }
 
 struct mail final {
-  mail(uint64_t to, const std::string& body) noexcept
+  mail(uint64_t to, const std::string& body)
       : to(to), body(body) {}
 
-  mail(const mail& other) noexcept = default;
+  mail(const mail& other) = default;
 
   uint64_t to;
   std::string body;
 };
 
 struct collision final {
-  collision(uint64_t a, uint64_t b) noexcept
+  collision(uint64_t a, uint64_t b)
       : a(a), b(b) {}
 
-  collision(const collision& other) noexcept = default;
+  collision(const collision& other) = default;
 
   uint64_t a;
   uint64_t b;

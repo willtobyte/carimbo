@@ -30,11 +30,11 @@ public:
     geometry::size size
   );
 
-  ~scene() noexcept;
+  ~scene();
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
-  void draw() const noexcept;
+  void draw() const;
 
   std::variant<
     std::shared_ptr<object>,
@@ -42,7 +42,7 @@ public:
     std::shared_ptr<graphics::particleprops>
   > get(const std::string& name, scenetype type) const;
 
-  std::string name() const noexcept;
+  std::string name() const;
 
   void on_enter() const;
   void on_leave() const;

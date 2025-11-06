@@ -24,7 +24,7 @@ scene::scene(
     _size(std::move(size)) {
 }
 
-scene::~scene() noexcept {
+scene::~scene() {
   auto objects = std::exchange(_objects, {});
   for (const auto& [_, o] : objects) {
     _objectmanager->remove(o);
@@ -38,7 +38,7 @@ scene::~scene() noexcept {
   _particlesystem->clear();
 }
 
-void scene::update(float delta) noexcept {
+void scene::update(float delta) {
   if (const auto& fn = _onloop; fn) [[likely]] {
     fn(delta);
   }
@@ -48,7 +48,7 @@ void scene::update(float delta) noexcept {
   }
 }
 
-void scene::draw() const noexcept {
+void scene::draw() const {
   const auto r =
     geometry::rectangle(
       .0f, .0f,
@@ -85,7 +85,7 @@ std::variant<
   throw std::out_of_range(std::format("[scene] resource {} not found", id));
 }
 
-std::string scene::name() const noexcept {
+std::string scene::name() const {
   return _name;
 }
 

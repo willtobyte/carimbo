@@ -3,7 +3,7 @@
 using namespace steam;
 
 #ifdef HAVE_STEAM
-void achievement::unlock(const std::string& id) noexcept {
+void achievement::unlock(const std::string& id) {
   if (!SteamUserStats()) {
     return;
   }
@@ -20,5 +20,5 @@ void achievement::unlock(const std::string& id) noexcept {
   StoreStats();
 }
 #else
-void achievement::unlock(const std::string&) noexcept {}
+void achievement::unlock(const std::string&) {}
 #endif

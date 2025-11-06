@@ -177,7 +177,7 @@ struct sentinel final {
   explicit sentinel(std::string name)
       : _name(std::move(name)) {}
 
-  ~sentinel() noexcept {
+  ~sentinel() {
     std::println("[garbagecollector] collected {}", _name);
   }
 };
@@ -890,29 +890,29 @@ void framework::scriptengine::run() {
 
   struct mouse final {
   private:
-    [[nodiscard]] static std::tuple<float, float, uint32_t> state() noexcept {
+    [[nodiscard]] static std::tuple<float, float, uint32_t> state() {
       float x, y;
       const auto b = SDL_GetMouseState(&x, &y);
       return {x, y, b};
     }
 
   public:
-    static float x() noexcept {
+    static float x() {
       const auto [x, y, b] = state();
       return x;
     }
 
-    static float y() noexcept {
+    static float y() {
       const auto [x, y, b] = state();
       return y;
     }
 
-    static std::tuple<float, float> xy() noexcept {
+    static std::tuple<float, float> xy() {
       const auto [x, y, b] = state();
       return {x, y};
     }
 
-    static int button() noexcept {
+    static int button() {
       const auto [x, y, b] = state();
       if (b & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
       if (b & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;

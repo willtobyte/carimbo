@@ -4,14 +4,14 @@ template <typename F>
 struct _defer {
   [[no_unique_address]] F f;
 
-  explicit _defer(F&& fn) noexcept(std::is_nothrow_move_constructible_v<F>)
+  explicit _defer(F&& fn)
       : f(std::move(fn)) {}
 
   _defer(const _defer&) = delete;
   _defer& operator=(const _defer&) = delete;
   _defer(_defer&&) = delete;
 
-  ~_defer() noexcept(noexcept(std::declval<F&>()())) {
+  ~_defer() {
     f();
   }
 };

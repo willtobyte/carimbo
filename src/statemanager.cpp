@@ -3,15 +3,15 @@
 using namespace framework;
 using namespace input::event;
 
-statemanager::statemanager() noexcept {
+statemanager::statemanager() {
   _collision_mapping.reserve(64);
 }
 
-bool statemanager::collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const noexcept {
+bool statemanager::collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const {
   return _collision_mapping.contains(std::pair{a->id(), b->id()});
 }
 
-bool statemanager::on(uint8_t player, gamepad::button type) const noexcept {
+bool statemanager::on(uint8_t player, gamepad::button type) const {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -21,7 +21,7 @@ bool statemanager::on(uint8_t player, gamepad::button type) const noexcept {
   return false;
 }
 
-uint8_t statemanager::players() const noexcept {
+uint8_t statemanager::players() const {
   return static_cast<uint8_t>(_state.size());
 }
 

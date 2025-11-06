@@ -5,23 +5,23 @@
 namespace geometry {
 class size final {
 public:
-  size() noexcept;
-  size(const size&) noexcept = default;
-  size(float width, float height) noexcept;
+  size();
+  size(const size&) = default;
+  size(float width, float height);
 
-  ~size() noexcept = default;
+  ~size() = default;
 
-  void set_width(float width) noexcept;
-  [[nodiscard]] float width() const noexcept;
+  void set_width(float width);
+  [[nodiscard]] float width() const;
 
-  void set_height(float height) noexcept;
-  [[nodiscard]] float height() const noexcept;
+  void set_height(float height);
+  [[nodiscard]] float height() const;
 
-  bool operator==(const size& rhs) const noexcept;
-  bool operator!=(const size& rhs) const noexcept;
+  bool operator==(const size& rhs) const;
+  bool operator!=(const size& rhs) const;
 
-  size operator*(float factor) const noexcept;
-  size operator/(float factor) const noexcept;
+  size operator*(float factor) const;
+  size operator/(float factor) const;
 
   friend void from_json(const nlohmann::json& j, size& s);
 
