@@ -9,12 +9,6 @@
 #include <sentry.h>
 #endif
 
-extern "C" {
-  #include <lua.h>
-  #include <lauxlib.h>
-  #include <lualib.h>
-}
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <box2d/box2d.h>
@@ -22,6 +16,7 @@ extern "C" {
 #include <nlohmann/json.hpp>
 #include <ogg/ogg.h>
 #include <physfs.h>
+#include <lua.hpp>
 #include <sol/sol.hpp>
 #include <spng.h>
 #include <vorbis/codec.h>

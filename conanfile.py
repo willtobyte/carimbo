@@ -36,9 +36,6 @@ class Carimbo(ConanFile):
         self.requires("sol2/3.5.0")
         self.requires("vorbis/1.3.7")
 
-        if self._is_webassembly():
-            return
-
         self.requires("openssl/3.6.0")
 
         if self._is_jit_capable():
@@ -52,7 +49,10 @@ class Carimbo(ConanFile):
 
         self.options["sevenzip"].zip = False
 
-        if not self._is_webassembly() and self._is_jit_capable():
+        if self._is_webassembly():
+            self.options["sol2"].with_lua = "lua"
+
+        if self._is_jit_capable():
             self.options["sol2"].with_lua = "luajit"
 
         if self._is_ios():
