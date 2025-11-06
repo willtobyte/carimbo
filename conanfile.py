@@ -47,9 +47,10 @@ class Carimbo(ConanFile):
     def configure(self):
         self.options["boost"].header_only = True
 
-        self.options["physfs"].sevenzip = False
-
         self.options["sol2"].with_lua = "luajit" if self._is_jit_capable() else "lua"
+
+        for opt in ["sevenzip", "grp", "wad", "hog", "mvl", "qpak", "slb", "iso9660", "vdf"]:
+            setattr(self.options["physfs"], opt, False)
 
         if self._is_ios():
             self.options["sdl"].opengl = False
