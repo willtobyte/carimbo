@@ -2,51 +2,7 @@
 
 using namespace framework;
 
-[[noreturn]] static void fail() {
-  if (const auto ptr = std::current_exception()) {
-    const char* error = nullptr;
-
-    try {
-      std::rethrow_exception(ptr);
-    } catch (const std::bad_exception&) {
-    } catch (const std::exception& e) {
-      error = e.what();
-    } catch (...) {
-      error = "Unhandled unknown exception";
-    }
-
-    if (error) {
-#ifdef HAVE_SENTRY
-      const auto ev = sentry_value_new_event();
-
-      const auto exc = sentry_value_new_exception("exception", error);
-      sentry_event_add_exception(ev, exc);
-
-#ifndef DEVELOPMENT
-      sentry_capture_event(ev);
-#endif
-#endif
-
-      std::println(stderr, "{}", error);
-
-      SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
-
-#ifndef NDEBUG
-#ifdef _MSC_VER
-      __debugbreak();
-#else
-      raise(SIGTRAP);
-#endif
-#endif
-    }
-  }
-
-  std::exit(EXIT_FAILURE);
-}
-
 application::application(int argc, char **argv) {
-  std::set_terminate(fail);
-
   constexpr const auto fn = [](int) {
     std::exit(EXIT_SUCCESS);
   };
@@ -76,7 +32,23 @@ int32_t application::run() {
   storage::filesystem::mount(p ? p : "cartridge.rom", "/");
 
   auto se = scriptengine();
-  se.run();
+
+  try {
+    se.run();
+  } catch (const std::exception& e) {
+    const auto* error = e.what();
+
+#ifdef HAVE_SENTRY
+    const auto ev = sentry_value_new_event();
+
+    const auto exc = sentry_value_new_exception("exception", error);
+    sentry_event_add_exception(ev, exc);
+    sentry_capture_event(ev);
+#endif
+
+    std::println(stderr, "{}", error);
+
+    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
 
   return 0;
 }
