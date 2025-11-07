@@ -135,31 +135,38 @@ std::shared_ptr<scene> scenemanager::get() const {
   return _scene.lock();
 }
 
-std::vector<std::string> scenemanager::destroy(const std::string& name) {
+std::vector<std::string> scenemanager::query(const std::string& name) const {
   std::vector<std::string> result;
   result.reserve(8);
   if (name.size() == 1 && name.front() == '*') {
-    for (auto it = _scene_mapping.begin(); it != _scene_mapping.end(); ) {
-      if (it->first == _current) { ++it; continue; }
-      std::println("[scenemanager] destroyed {}", it->first);
-      result.emplace_back(it->first);
-      it = _scene_mapping.erase(it);
+    for (const auto& [key, _] : _scene_mapping) {
+      if (key == _current) continue;
+      result.emplace_back(key);
     }
-
-    _resourcemanager->flush();
     return result;
   }
 
-  if (_scene_mapping.erase(name) == 0) {
-    std::println("[scenemanager] {} not found, nothing to destroy", name);
-    return result;
+  if (_scene_mapping.contains(name)) {
+    result.emplace_back(name);
   }
 
-  std::println("[scenemanager] destroyed {}", name);
-  result.emplace_back(name);
-
-  _resourcemanager->flush();
   return result;
+}
+
+std::vector<std::string> scenemanager::destroy(const std::string& name) {
+  const auto scenes = query(name);
+
+  for (const auto& scene : scenes) {
+    if (_scene_mapping.erase(scene) > 0) {
+      std::println("[scenemanager] destroyed {}", scene);
+    }
+  }
+
+  if (!scenes.empty()) {
+    _resourcemanager->flush();
+  }
+
+  return scenes;
 }
 
 void scenemanager::update(float delta) {

@@ -30,6 +30,8 @@ public:
 
   std::shared_ptr<scene> get() const;
 
+  std::vector<std::string> query(const std::string& name) const;
+
   std::vector<std::string> destroy(const std::string& name);
 
   void update(float delta);
