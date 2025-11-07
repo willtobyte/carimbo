@@ -4,6 +4,31 @@ using namespace framework;
 
 constexpr auto event_type = static_cast<uint32_t>(input::event::type::timer);
 
+struct context final {
+  uniquepool<envelope, envelope_pool_name>* pool;
+  envelope* target_ptr;
+};
+
+static bool filter(void* userdata, SDL_Event* e) {
+  if (e->type != event_type) {
+    return true;
+  }
+
+  if (!e->user.data1) {
+    return false;
+  }
+
+  auto* ctx = static_cast<context*>(userdata);
+  auto* ptr = static_cast<envelope*>(e->user.data1);
+
+  if (ctx->target_ptr && ptr != ctx->target_ptr) {
+    return true;
+  }
+
+  ctx->pool->release(std::unique_ptr<envelope>(ptr));
+  return false;
+}
+
 static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
   SDL_Event event{};
   event.type = event_type;
@@ -41,24 +66,22 @@ void timermanager::cancel(uint32_t id) {
     return;
   }
 
+  auto* ptr = it->second;
   _envelopemapping.erase(it);
+
+  if (ptr) {
+    context ctx{_envelopepool.get(), ptr};
+    SDL_FilterEvents(filter, &ctx);
+  }
 }
 
 void timermanager::clear() {
   for (auto& [id, ptr] : _envelopemapping) {
     SDL_RemoveTimer(id);
-
-    if (ptr) {
-      _envelopepool->release(std::unique_ptr<envelope>(ptr));
-    }
   }
 
-  SDL_FilterEvents(
-    [](void*, SDL_Event* e) {
-      return e->type != event_type;
-    },
-    nullptr
-  );
+  context ctx{_envelopepool.get(), nullptr};
+  SDL_FilterEvents(filter, &ctx);
 
   _envelopemapping.clear();
 }
