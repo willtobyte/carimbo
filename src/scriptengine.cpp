@@ -1003,12 +1003,8 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::timermanager>(
     "TimerManager",
     sol::no_constructor,
-    "set", [](framework::timermanager& self, uint32_t interval, sol::protected_function fn) {
-      return self.set(interval, wrap_pf(std::move(fn)));
-    },
-    "singleshot", [](framework::timermanager& self, uint32_t timeout, sol::protected_function fn) {
-      return self.singleshot(timeout, wrap_pf(std::move(fn)));
-    },
+    "set", &framework::timermanager::set,
+    "singleshot", &framework::timermanager::singleshot,
     "cancel", &framework::timermanager::cancel,
     "clear", &framework::timermanager::clear
   );
