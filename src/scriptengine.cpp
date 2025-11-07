@@ -225,10 +225,10 @@ void framework::scriptengine::run() {
   lua.script(inject);
 
   lua["sentinel"] = [&lua](sol::object object, sol::object name) {
-    auto u = sol::make_object<sentinel>(lua, name.as<std::string>());
-    object.as<sol::table>().raw_set("__sentinel", u);
+    auto instance = sol::make_object<sentinel>(lua, name.as<std::string>());
+    object.as<sol::table>().raw_set("__sentinel", instance);
 
-    return u;
+    return instance;
   };
 
   lua["_"] = &localization::text;
