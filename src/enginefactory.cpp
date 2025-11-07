@@ -72,7 +72,6 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) {
 #ifdef HAVE_SENTRY
   auto* options = sentry_options_new();
   sentry_options_set_debug(options, true);
-  sentry_options_set_enable_logs(options, true);
   sentry_options_set_dsn(options, dsn.c_str());
   sentry_options_set_sample_rate(options, 1.0);
 
@@ -90,6 +89,9 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) {
   sentry_options_add_attachment(options, "stdout.txt");
   sentry_options_add_attachment(options, "stderr.txt");
   sentry_options_add_attachment(options, "VERSION");
+
+  sentry_options_set_system_crash_reporter_enabled(options, true);
+
   sentry_init(options);
 #endif
 

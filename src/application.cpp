@@ -38,12 +38,13 @@ int32_t application::run() {
     const auto* error = e.what();
 
 #ifdef HAVE_SENTRY
-    const auto ev = sentry_value_new_event();
-    const auto exc = sentry_value_new_exception("exception", error);
+  const auto event = sentry_value_new_message_event(
+    SENTRY_LEVEL_ERROR,
+    "exception",
+    error
+  );
 
-    sentry_event_add_exception(ev, exc);
-    sentry_capture_event(ev);
-    sentry_flush(3000);
+  sentry_capture_event(event);
 #endif
 
     std::println(stderr, "{}", error);
