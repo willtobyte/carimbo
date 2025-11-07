@@ -650,11 +650,10 @@ void framework::scriptengine::run() {
       }
 
       if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        auto sfn = [fn = wrap_fn(std::move(fn)), &lua]() mutable {
-          fn();
-          lua.collect_garbage();
-          lua.collect_garbage();
-        };
+        auto sfn = wrap_fn(std::move(fn));
+
+        lua.collect_garbage();
+        lua.collect_garbage();
 
         scene->set_onleave(std::move(sfn));
 

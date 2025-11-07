@@ -119,8 +119,8 @@ void scenemanager::set(const std::string& name) {
 
   if (const auto active = _scene.lock()) [[ likely ]] {
     std::println("[scenemanager] left {}", active->name());
-    _timermanager->clear();
     active->on_leave();
+    _timermanager->clear();
   }
 
   const auto& ptr = it->second;
