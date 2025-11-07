@@ -169,12 +169,12 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Copy Crashpad handler from Conan
         run: |
@@ -197,110 +197,7 @@ jobs:
           name: macOS
           path: artifacts/*
 
-  Ubuntu:
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install and configure Conan
-        run: |
-          pip install conan
-          conan profile detect --force
-          conan config install https://github.com/willtobyte/conan-configs.git --type git
-
-      - name: Configure build tools and CMake
-        run: |
-          cat <<'EOF' >> ~/.conan2/profiles/default
-          [replace_tool_requires]
-          meson/*: meson/[*]
-          pkgconf/*: pkgconf/[*]
-
-          [tool_requires]
-          !cmake/*: cmake/[>=3 <4]
-          EOF
-
-      - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
-
-      - name: Build binary
-        run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
-
-      - name: Package artifacts
-        working-directory: build
-        run: |
-          mkdir -p ../artifacts
-          chmod +x carimbo
-          chmod 644 LICENSES
-          tar -czvf Ubuntu.tar.gz carimbo LICENSES
-          mv Ubuntu.tar.gz ../artifacts
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: Ubuntu
-          path: artifacts/*
-
-  UbuntuARM:
-    runs-on: ubuntu-24.04-arm
-    if: false
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-
-      - name: Install and configure GCC 14
-        run: |
-          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
-          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100
-
-      - name: Install and configure Conan
-        run: |
-          pip install conan
-          conan profile detect --force
-          conan config install https://github.com/willtobyte/conan-configs.git --type git
-
-      - name: Configure CMake tool requirements
-        run: |
-          cat <<'EOF' >> ~/.conan2/profiles/default
-          [tool_requires]
-          !cmake/*: cmake/[>=3 <4]
-          EOF
-
-      - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release --conf "tools.system.package_manager:mode=install" --conf "tools.system.package_manager:sudo=True"
-
-      - name: Build binary
-        run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --config Release --verbose
-
-      - name: Package artifacts
-        working-directory: build
-        run: |
-          mkdir -p ../artifacts
-          chmod +x carimbo
-          chmod 644 LICENSES
-          tar -czvf UbuntuARM.tar.gz carimbo LICENSES
-          mv UbuntuARM.tar.gz ../artifacts
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: UbuntuARM
-          path: artifacts/*
 
   WebAssembly:
     runs-on: ubuntu-latest
@@ -414,26 +311,26 @@ jobs:
           EOF
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="//bigobj"
-          cmake --build build --config Release --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="//bigobj"
+          cmake --build build --config RelWithDebInfo --verbose
 
       - name: Copy Crashpad handler from Conan
         shell: powershell
         working-directory: build
         run: |
           $crashpadHandler = Get-ChildItem -Path ~/.conan2/p -Filter crashpad_handler.exe -Recurse | Where-Object { $_.DirectoryName -like '*\bin' } | Select-Object -First 1
-          Copy-Item $crashpadHandler.FullName Release/crashpad_handler.exe
+          Copy-Item $crashpadHandler.FullName RelWithDebInfo/crashpad_handler.exe
 
       - name: Package artifacts
         shell: powershell
-        working-directory: build/Release
+        working-directory: build/RelWithDebInfo
         run: |
           New-Item -ItemType Directory -Path "../../artifacts" -Force
-          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
+          Compress-Archive -LiteralPath 'carimbo.exe', 'carimbo.pdb', 'crashpad_handler.exe', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -447,8 +344,6 @@ jobs:
       - Android
       - iOS
       - macOS
-      - Ubuntu
-      - UbuntuARM
       - WebAssembly
       - Windows
     runs-on: ubuntu-latest
