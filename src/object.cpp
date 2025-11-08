@@ -100,7 +100,13 @@ void object::update(float delta, uint64_t now) {
     }
   }
 
-  if (!animation.bounds) [[unlikely]] return;
+  if (!animation.bounds) [[unlikely]] {
+    if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
+      b2Body_Disable(_body);
+    }
+
+    return;
+  }
 
   if (!_visible) [[unlikely]] {
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) b2Body_Disable(_body);
