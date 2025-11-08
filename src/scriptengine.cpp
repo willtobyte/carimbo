@@ -28,7 +28,7 @@ static auto make_lua_error_with_traceback(lua_State* L, std::string_view message
     : description;
 
   const auto error = make_lua_error_with_traceback(L, message);
-  std::println(">>> AQUI");
+
   throw std::runtime_error(error);
 }
 
