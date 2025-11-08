@@ -1,5 +1,37 @@
 #include "scriptengine.hpp"
 
+static constexpr auto lua_tostring_or(lua_State* L, int index, std::string_view fallback = "") {
+  const auto* str = lua_tostring(L, index);
+  return str ? std::string_view{str} : fallback;
+}
+
+static auto make_lua_error_with_traceback(lua_State* L, std::string_view message) {
+  luaL_traceback(L, L, nullptr, 1);
+  const auto traceback = lua_tostring_or(L, -1);
+  lua_pop(L, 1);
+
+  return std::format("{}\n{}", message, traceback);
+}
+
+[[noreturn]] static int on_panic(lua_State* L) {
+  const auto message = lua_tostring_or(L, -1, "Lua panic: unknown error");
+  throw std::runtime_error(make_lua_error_with_traceback(L, message));
+}
+
+[[noreturn]] static int on_exception_handler(
+  lua_State* L,
+  sol::optional<const std::exception&> maybe_exception,
+  sol::string_view description
+) {
+  const auto message = maybe_exception
+    ? std::string_view{maybe_exception->what()}
+    : description;
+
+  const auto error = make_lua_error_with_traceback(L, message);
+  std::println(">>> AQUI");
+  throw std::runtime_error(error);
+}
+
 static auto wrap_fn(sol::protected_function pf) {
   return [pf = std::move(pf)](auto&&... args) mutable {
     auto result = pf(std::forward<decltype(args)>(args)...);
@@ -41,11 +73,6 @@ inline constexpr auto debugger =
 #include "debugger.lua"
 #endif
 ;
-
-static int on_panic(lua_State* L) {
-  const auto message = lua_tostring(L, -1);
-  throw std::runtime_error(message ? message : "Lua panic: unknown error");
-}
 
 static sol::object searcher(sol::this_state state, const std::string& module) {
   sol::state_view lua{state};
@@ -215,6 +242,8 @@ void framework::scriptengine::run() {
 
   lua.open_libraries();
   lua.set_panic(&on_panic);
+  lua.set_exception_handler(on_exception_handler);
+
   lua["searcher"] = &searcher;
 
   const auto inject = std::format(R"lua(
