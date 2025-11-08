@@ -75,13 +75,14 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) {
   sentry_options_set_dsn(options, dsn.c_str());
   sentry_options_set_sample_rate(options, 1.0);
 
-  sentry_options_set_handler_path(options,
 #ifdef _WIN32
-    "crashpad_handler.exe"
+  static constexpr auto program = "crashpad_handler.exe";
 #else
-    "crashpad_handler"
+  static constexpr auto program = "crashpad_handler";
 #endif
-  );
+
+  const auto crashpad = std::filesystem::current_path() / program;
+  sentry_options_set_handler_path(options, crashpad.string().c_str());
 
   sentry_options_set_database_path(options, ".sentry");
 

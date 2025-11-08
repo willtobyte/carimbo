@@ -10,12 +10,12 @@ application::application(int argc, char **argv) {
   std::signal(SIGINT, fn);
   std::signal(SIGTERM, fn);
 
-#ifdef HAVE_SENTRY
-  std::atexit([] { sentry_close(); });
-#endif
-
   std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });
+
+  #ifdef HAVE_SENTRY
+    std::atexit([] { sentry_close(); });
+  #endif
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
