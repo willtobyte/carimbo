@@ -3,19 +3,16 @@
 using namespace framework;
 
 application::application(int argc, char **argv) {
-  constexpr const auto fn = [](int) {
-    std::exit(EXIT_SUCCESS);
-  };
-
-  std::signal(SIGINT, fn);
-  std::signal(SIGTERM, fn);
-
-  std::atexit([] { PHYSFS_deinit(); });
   std::atexit([] { SDL_Quit(); });
+  std::atexit([] { PHYSFS_deinit(); });
 
-  #ifdef HAVE_SENTRY
-    std::atexit([] { sentry_close(); });
-  #endif
+#ifdef HAVE_SENTRY
+  std::atexit([] { sentry_close(); });
+#endif
+
+#ifdef HAVE_STEAM
+  std::atexit([] { SteamAPI_Shutdown(); });
+#endif
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
@@ -49,6 +46,8 @@ int32_t application::run() {
   sentry_capture_event(event);
   sentry_flush(3000);
 #endif
+
+    return 1;
   }
 
   return 0;
