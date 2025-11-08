@@ -12,7 +12,6 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) {
   }
 
   std::println("[soundmanager] cache miss {}", filename);
-  assert(_audiodevice);
 
   return it->second = std::make_shared<soundfx>(filename);
 }
