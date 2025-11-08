@@ -17,13 +17,10 @@ object::object()
 object::~object() {
   if (b2Shape_IsValid(_collision_shape)) {
     b2DestroyShape(_collision_shape, false);
-    _collision_shape = b2_nullShapeId;
   }
 
   if (b2Body_IsValid(_body)) {
     b2DestroyBody(_body);
-    _body = b2_nullBodyId;
-    _last_synced_transform.reset();
   }
 
   std::println("[object] destroyed {} {}", kind(), id());
@@ -100,15 +97,7 @@ void object::update(float delta, uint64_t now) {
     }
   }
 
-  if (!animation.bounds) [[unlikely]] {
-    if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
-      b2Body_Disable(_body);
-    }
-
-    return;
-  }
-
-  if (!_visible) [[unlikely]] {
+  if (!animation.bounds || !_visible) [[unlikely]] {
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) b2Body_Disable(_body);
     return;
   }
