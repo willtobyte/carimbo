@@ -26,6 +26,7 @@ static bool filter(void* userdata, SDL_Event* e) {
   }
 
   ctx->pool->release(std::unique_ptr<envelope>(ptr));
+
   return false;
 }
 
@@ -82,6 +83,12 @@ void timermanager::clear() {
 
   context ctx{_envelopepool.get(), nullptr};
   SDL_FilterEvents(filter, &ctx);
+
+  for (auto& [id, ptr] : _envelopemapping) {
+    if (ptr) {
+      _envelopepool->release(std::unique_ptr<envelope>(ptr));
+    }
+  }
 
   _envelopemapping.clear();
 }

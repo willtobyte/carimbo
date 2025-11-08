@@ -291,12 +291,19 @@ void eventmanager::update(float delta) {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
 
         if (const auto* payload = ptr->try_timer(); payload) {
+          std::function<void()> copy_fn;
+          auto release = !payload->repeat;
+
           if (const auto& fn = payload->fn; fn) {
-            fn();
+            copy_fn = fn;
           }
 
-          if (!payload->repeat) {
+          if (release) {
             _envelopepool->release(std::unique_ptr<framework::envelope>(ptr));
+          }
+
+          if (copy_fn) {
+            copy_fn();
           }
         }
       } break;
