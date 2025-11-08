@@ -1,6 +1,6 @@
 #include "scriptengine.hpp"
 
-static constexpr auto lua_tostring_or(lua_State* L, int index, std::string_view fallback = "") {
+static auto lua_tostring_or(lua_State* L, int index, std::string_view fallback = "") {
   const auto* str = lua_tostring(L, index);
   return str ? std::string_view{str} : fallback;
 }

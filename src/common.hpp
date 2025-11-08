@@ -1,7 +1,5 @@
 #pragma once
 
-#define SOL_ALL_SAFETIES_ON 1
-
 #ifdef HAVE_SENTRY
 #include <sentry.h>
 #endif
