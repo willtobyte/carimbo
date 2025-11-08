@@ -39,12 +39,12 @@ int32_t application::run() {
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
 
 #ifdef HAVE_SENTRY
-  const auto event = sentry_value_new_event();
-  const auto exc = sentry_value_new_exception("Exception", error);
-  sentry_value_set_stacktrace(exc, NULL, 0);
-  sentry_event_add_exception(event, exc);
-  sentry_capture_event(event);
-  sentry_flush(3000);
+    const auto event = sentry_value_new_event();
+    const auto exc = sentry_value_new_exception("Exception", error);
+    sentry_value_set_stacktrace(exc, NULL, 0);
+    sentry_event_add_exception(event, exc);
+    sentry_capture_event(event);
+    sentry_flush(3000);
 #endif
 
     return 1;
