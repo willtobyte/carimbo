@@ -2,8 +2,8 @@
 
 #ifndef NDEBUG
   #define SOL_ALL_SAFETIES_ON 1
-  #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 #endif
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 
 #ifdef HAVE_SENTRY
 #include <sentry.h>
