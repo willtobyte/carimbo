@@ -77,21 +77,22 @@ void object::update(float delta, uint64_t now) {
 
   const auto& animation = it->second;
   const auto& keyframes = animation.keyframes;
-  if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] return;
 
-  const auto& keyframe = keyframes[_frame];
-  const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
-  if (expired) {
-    ++_frame;
-    const auto done = _frame >= keyframes.size();
-    if (done && animation.oneshot) {
-      const auto ended = std::exchange(_action, std::string{});
-      if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
-      if (!animation.next) return;
-      _action = *animation.next;
+  if (!keyframes.empty() && _frame < keyframes.size()) {
+    const auto& keyframe = keyframes[_frame];
+    const auto expired = keyframe.duration > 0 && (now - _last_frame >= keyframe.duration);
+    if (expired) {
+      ++_frame;
+      const auto done = _frame >= keyframes.size();
+      if (done && animation.oneshot) {
+        const auto ended = std::exchange(_action, std::string{});
+        if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
+        if (!animation.next) return;
+        _action = *animation.next;
+      }
+      if (done) _frame = 0;
+      _last_frame = now;
     }
-    if (done) _frame = 0;
-    _last_frame = now;
   }
 
   if (!animation.bounds) [[unlikely]] return;
