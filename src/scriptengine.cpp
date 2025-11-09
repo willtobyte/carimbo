@@ -2,22 +2,9 @@
 
 using namespace framework;
 
-static auto lua_tostring_or(lua_State* L, int index, std::string_view fallback = "") {
-  const auto* str = lua_tostring(L, index);
-  return str ? std::string_view{str} : fallback;
-}
-
-static auto make_lua_error_with_traceback(lua_State* L, std::string_view message) {
-  luaL_traceback(L, L, nullptr, 1);
-  const auto traceback = lua_tostring_or(L, -1);
-  lua_pop(L, 1);
-
-  return std::format("{}\n{}", message, traceback);
-}
-
 static int on_panic(lua_State* L) {
-  const auto msg = lua_tostring_or(L, -1, "unknown error");
-  throw std::runtime_error(std::format("Lua panic: {}", msg));
+  const auto* message = lua_tostring(L, -1);
+  throw std::runtime_error(std::format("Lua panic: {}", message));
 }
 
 static int on_exception_handler(
