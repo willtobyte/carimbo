@@ -4,10 +4,10 @@
 
 using namespace framework;
 
-template <class Map>
+template <class Map, class Key>
 static inline const typename Map::mapped_type* find_ptr(
   const Map& m,
-  const typename Map::key_type& k
+  const Key& k
 ) {
   const auto it = m.find(k);
   if (it == m.end()) return nullptr;

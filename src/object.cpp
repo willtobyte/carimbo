@@ -12,6 +12,7 @@ object::object()
     _reflection(graphics::reflection::none),
     _body(b2_nullBodyId),
     _collision_shape(b2_nullShapeId) {
+  _collision_mapping.reserve(8);
 }
 
 object::~object() {
@@ -303,8 +304,8 @@ void object::set_onunhover(sol::protected_function fn) {
   _onunhover = interop::wrap_fn<std::shared_ptr<object>>(std::move(fn));
 }
 
-void object::set_oncollision(const std::string& kind, sol::protected_function fn) {
-  _collision_mapping.insert_or_assign(kind, interop::wrap_fn<std::shared_ptr<object>, std::shared_ptr<object>>(std::move(fn)));
+void object::set_oncollision(std::string kind, sol::protected_function fn) {
+  _collision_mapping.insert_or_assign(std::move(kind), interop::wrap_fn<std::shared_ptr<object>, std::shared_ptr<object>>(std::move(fn)));
 }
 
 void object::on_email(const std::string& message) {
