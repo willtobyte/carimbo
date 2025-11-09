@@ -537,7 +537,7 @@ void framework::scriptengine::run() {
       try {
         self.set(name);
       } catch (const std::exception& e) {
-        luaL_error(lua, "[scenemanager] set error: %s", e.what());
+        luaL_error(lua, e.what());
       }
     },
     "get", &framework::scenemanager::get,
@@ -562,81 +562,86 @@ void framework::scriptengine::run() {
       const std::string& name
     ) {
       const auto start = SDL_GetPerformanceCounter();
-      const auto scene = self.load(name);
-      if (!scene) [[unlikely]] {
-        return;
-      }
 
-      const auto filename = std::format("scenes/{}.lua", name);
-      const auto buffer = storage::io::read(filename);
-      std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
-      const auto result = lua.load(script, std::format("@{}", filename));
-      const auto pf = result.get<sol::protected_function>();
-      const auto exec = pf();
-      if (!exec.valid()) [[unlikely]] {
-        sol::error err = exec;
-        throw std::runtime_error(err.what());
-      }
-
-      auto module = exec.get<sol::table>();
-
-      auto loaded = lua["package"]["loaded"];
-      loaded[std::format("scenes/{}", name)] = module;
-      auto ptr = std::weak_ptr<framework::scene>(scene);
-
-      module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
-        if (auto scene = ptr.lock()) [[likely]] {
-          return scene->get(id, type);
+      try {
+        const auto scene = self.load(name);
+        if (!scene) [[unlikely]] {
+          return;
         }
 
-        throw std::runtime_error(std::format(
-          "[scriptengine] scene '{}' expired while accessing object '{}'",
-          name,
-          id
-        ));
-      };
+        const auto filename = std::format("scenes/{}.lua", name);
+        const auto buffer = storage::io::read(filename);
+        std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
+        const auto result = lua.load(script, std::format("@{}", filename));
+        const auto pf = result.get<sol::protected_function>();
+        const auto exec = pf();
+        if (!exec.valid()) [[unlikely]] {
+          sol::error err = exec;
+          throw std::runtime_error(err.what());
+        }
 
-      if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_onenter(std::move(fn));
+        auto module = exec.get<sol::table>();
 
-        lua.collect_garbage();
-        lua.collect_garbage();
+        auto loaded = lua["package"]["loaded"];
+        loaded[std::format("scenes/{}", name)] = module;
+        auto ptr = std::weak_ptr<framework::scene>(scene);
+
+        module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
+          if (auto scene = ptr.lock()) [[likely]] {
+            return scene->get(id, type);
+          }
+
+          throw std::runtime_error(std::format(
+            "[scriptengine] scene '{}' expired while accessing object '{}'",
+            name,
+            id
+          ));
+        };
+
+        if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_onenter(std::move(fn));
+
+          lua.collect_garbage();
+          lua.collect_garbage();
+        }
+
+        if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_onloop(std::move(fn));
+        }
+
+        if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_ontext(std::move(fn));
+        }
+
+        if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_ontouch(std::move(fn));
+        }
+
+        if (auto fn = module["on_keypress"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_onkeypress(std::move(fn));
+        }
+
+        if (auto fn = module["on_keyrelease"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_onkeyrelease(std::move(fn));
+        }
+
+        if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_onmotion(std::move(fn));
+        }
+
+        if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_onleave(std::move(fn));
+
+          lua.collect_garbage();
+          lua.collect_garbage();
+        }
+
+        const auto end = SDL_GetPerformanceCounter();
+        const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
+        std::println("[scriptengine] {} took {:.3f}ms", name, elapsed);
+      } catch (const std::exception& e) {
+        luaL_error(lua, e.what());
       }
-
-      if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_onloop(std::move(fn));
-      }
-
-      if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_ontext(std::move(fn));
-      }
-
-      if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_ontouch(std::move(fn));
-      }
-
-      if (auto fn = module["on_keypress"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_onkeypress(std::move(fn));
-      }
-
-      if (auto fn = module["on_keyrelease"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_onkeyrelease(std::move(fn));
-      }
-
-      if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_onmotion(std::move(fn));
-      }
-
-      if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-        scene->set_onleave(std::move(fn));
-
-        lua.collect_garbage();
-        lua.collect_garbage();
-      }
-
-      const auto end = SDL_GetPerformanceCounter();
-      const auto elapsed = static_cast<double>(end - start) * 1000.0 / static_cast<double>(SDL_GetPerformanceFrequency());
-      std::println("[scriptengine] {} took {:.3f}ms", name, elapsed);
     });
 
   lua.new_enum(
