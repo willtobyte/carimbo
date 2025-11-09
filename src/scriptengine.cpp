@@ -613,13 +613,10 @@ void framework::scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          auto sfn = [fn = interop::wrap_fn(std::move(fn)), &lua]() mutable {
-            fn();
-            lua.collect_garbage();
-            lua.collect_garbage();
-          };
+          scene->set_onenter(interop::wrap_fn(std::move(fn)));
 
-          scene->set_onenter(std::move(sfn));
+          lua.collect_garbage();
+          lua.collect_garbage();
         }
 
         if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
