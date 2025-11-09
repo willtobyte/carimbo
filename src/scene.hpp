@@ -53,13 +53,13 @@ public:
   void on_motion(float x, float y) const;
 
   void set_onenter(std::function<void()>&& fn);
-  void set_onloop(std::function<void(float)>&& fn);
+  void set_onloop(sol::protected_function fn);
   void set_onleave(std::function<void()>&& fn);
-  void set_ontouch(std::function<void(float, float)>&& fn);
-  void set_onkeypress(std::function<void(int32_t)>&& fn);
-  void set_onkeyrelease(std::function<void(int32_t)>&& fn);
-  void set_ontext(std::function<void(const std::string& )>&& fn);
-  void set_onmotion(std::function<void(float, float)>&& fn);
+  void set_ontouch(sol::protected_function fn);
+  void set_onkeypress(sol::protected_function fn);
+  void set_onkeyrelease(sol::protected_function fn);
+  void set_ontext(sol::protected_function fn);
+  void set_onmotion(sol::protected_function fn);
 
 private:
   std::string _name;

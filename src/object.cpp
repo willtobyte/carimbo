@@ -279,32 +279,32 @@ std::string object::action() const {
   return _action;
 }
 
-void object::set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
-  _onbegin = std::move(fn);
+void object::set_onbegin(sol::protected_function fn) {
+  _onbegin = framework::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
 }
 
-void object::set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
-  _onend = std::move(fn);
+void object::set_onend(sol::protected_function fn) {
+  _onend = framework::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
 }
 
-void object::set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn) {
-  _onmail = std::move(fn);
+void object::set_onmail(sol::protected_function fn) {
+  _onmail = framework::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
 }
 
-void object::set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn) {
-  _ontouch = std::move(fn);
+void object::set_ontouch(sol::protected_function fn) {
+  _ontouch = framework::wrap_fn<std::shared_ptr<object>, float, float>(std::move(fn));
 }
 
-void object::set_onhover(std::function<void(std::shared_ptr<object>)>&& fn) {
-  _onhover = std::move(fn);
+void object::set_onhover(sol::protected_function fn) {
+  _onhover = framework::wrap_fn<std::shared_ptr<object>>(std::move(fn));
 }
 
-void object::set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn) {
-  _onunhover = std::move(fn);
+void object::set_onunhover(sol::protected_function fn) {
+  _onunhover = framework::wrap_fn<std::shared_ptr<object>>(std::move(fn));
 }
 
-void object::set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn) {
-  _collision_mapping.emplace(kind, std::move(fn));
+void object::set_oncollision(const std::string& kind, sol::protected_function fn) {
+  _collision_mapping.emplace(kind, framework::wrap_fn<std::shared_ptr<object>, std::shared_ptr<object>>(std::move(fn)));
 }
 
 void object::on_email(const std::string& message) {

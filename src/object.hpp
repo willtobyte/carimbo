@@ -74,13 +74,13 @@ public:
   void set_action(const std::optional<std::string>& action);
   std::string action() const;
 
-  void set_onbegin(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_onend(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_onmail(std::function<void(std::shared_ptr<object>, const std::string& )>&& fn);
-  void set_ontouch(std::function<void(std::shared_ptr<object>, float, float)>&& fn);
-  void set_onhover(std::function<void(std::shared_ptr<object>)>&& fn);
-  void set_onunhover(std::function<void(std::shared_ptr<object>)>&& fn);
-  void set_oncollision(const std::string& kind, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>&& fn);
+  void set_onbegin(sol::protected_function fn);
+  void set_onend(sol::protected_function fn);
+  void set_onmail(sol::protected_function fn);
+  void set_ontouch(sol::protected_function fn);
+  void set_onhover(sol::protected_function fn);
+  void set_onunhover(sol::protected_function fn);
+  void set_oncollision(const std::string& kind, sol::protected_function fn);
 
   void on_email(const std::string& message);
 

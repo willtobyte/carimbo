@@ -8,7 +8,7 @@ public:
   ~observable() = default;
   sol::object value() const;
   void set(const sol::object& value);
-  void subscribe(const std::function<void(const sol::object&)>&& callback);
+  void subscribe(sol::protected_function callback);
   void unsubscribe();
 
 private:

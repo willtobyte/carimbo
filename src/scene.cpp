@@ -155,32 +155,32 @@ void scene::set_onenter(std::function<void()>&& fn) {
   _onenter = std::move(fn);
 }
 
-void scene::set_onloop(std::function<void(float)>&& fn) {
-  _onloop = std::move(fn);
+void scene::set_onloop(sol::protected_function fn) {
+  _onloop = framework::wrap_fn<float>(std::move(fn));
 }
 
 void scene::set_onleave(std::function<void()>&& fn) {
   _onleave = std::move(fn);
 }
 
-void scene::set_ontouch(std::function<void(float, float)>&& fn) {
-  _ontouch = std::move(fn);
+void scene::set_ontouch(sol::protected_function fn) {
+  _ontouch = framework::wrap_fn<float, float>(std::move(fn));
 }
 
-void scene::set_onkeypress(std::function<void(int32_t)>&& fn) {
-  _onkeypress = std::move(fn);
+void scene::set_onkeypress(sol::protected_function fn) {
+  _onkeypress = framework::wrap_fn<int32_t>(std::move(fn));
 }
 
-void scene::set_onkeyrelease(std::function<void(int32_t)>&& fn) {
-  _onkeyrelease = std::move(fn);
+void scene::set_onkeyrelease(sol::protected_function fn) {
+  _onkeyrelease = framework::wrap_fn<int32_t>(std::move(fn));
 }
 
-void scene::set_ontext(std::function<void(const std::string& )>&& fn) {
-  _ontext = std::move(fn);
+void scene::set_ontext(sol::protected_function fn) {
+  _ontext = framework::wrap_fn<const std::string&>(std::move(fn));
 }
 
 
 
-void scene::set_onmotion(std::function<void(float, float)>&& fn) {
-  _onmotion = std::move(fn);
+void scene::set_onmotion(sol::protected_function fn) {
+  _onmotion = framework::wrap_fn<float, float>(std::move(fn));
 }

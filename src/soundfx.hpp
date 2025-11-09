@@ -16,8 +16,8 @@ public:
   void set_volume(float gain);
   float volume() const;
     
-  void set_onbegin(std::function<void()>&& callback);
-  void set_onend(std::function<void()>&& callback);
+  void set_onbegin(sol::protected_function callback);
+  void set_onend(sol::protected_function callback);
 
 private:
   ALuint _source{0};

@@ -214,10 +214,10 @@ float soundfx::volume() const {
   return gain;
 }
 
-void soundfx::set_onbegin(std::function<void()>&& callback) {
-  _onbegin = std::move(callback);
+void soundfx::set_onbegin(sol::protected_function callback) {
+  _onbegin = framework::wrap_fn(std::move(callback));
 }
 
-void soundfx::set_onend(std::function<void()>&& callback) {
-  _onend = std::move(callback);
+void soundfx::set_onend(sol::protected_function callback) {
+  _onend = framework::wrap_fn(std::move(callback));
 }

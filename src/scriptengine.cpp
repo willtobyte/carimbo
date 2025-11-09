@@ -38,27 +38,6 @@ static int on_exception_handler(
   return lua_error(L);
 }
 
-static auto wrap_fn(sol::protected_function pf) {
-  return [pf = std::move(pf)](auto&&... args) mutable {
-    auto result = pf(std::forward<decltype(args)>(args)...);
-    if (!result.valid()) [[unlikely]] {
-      sol::error error = result;
-      throw std::runtime_error(error.what());
-    }
-  };
-}
-
-template<typename... Args>
-static auto wrap_fn(sol::protected_function pf) -> std::function<void(Args...)> {
-  return [pf = std::move(pf)](Args&&... args) mutable {
-    auto result = pf(std::forward<Args>(args)...);
-    if (!result.valid()) [[unlikely]] {
-      sol::error error = result;
-      throw std::runtime_error(error.what());
-    }
-  };
-}
-
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
@@ -367,12 +346,8 @@ void framework::scriptengine::run() {
      },
      "stop", &audio::soundfx::stop,
      "volume", sol::property(&audio::soundfx::volume, &audio::soundfx::set_volume),
-     "on_begin", [](audio::soundfx& self, sol::protected_function fn) {
-       self.set_onbegin(wrap_fn(std::move(fn)));
-     },
-     "on_end", [](audio::soundfx& self, sol::protected_function fn) {
-       self.set_onend(wrap_fn(std::move(fn)));
-     }
+     "on_begin", &audio::soundfx::set_onbegin,
+     "on_end", &audio::soundfx::set_onend
   );
 
   lua.new_usertype<audio::soundmanager>(
@@ -434,9 +409,7 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "value", sol::property(&memory::observable::value),
     "set", &memory::observable::set,
-    "subscribe", [](memory::observable& self, sol::protected_function fn) {
-      self.subscribe(wrap_fn(std::move(fn)));
-    },
+    "subscribe", &memory::observable::subscribe,
     "unsubscribe", &memory::observable::unsubscribe
   );
 
@@ -452,27 +425,13 @@ void framework::scriptengine::run() {
     "angle", sol::property(&framework::object::angle, &framework::object::set_angle),
     "reflection", sol::property(&framework::object::reflection, &framework::object::set_reflection),
     "visible", sol::property(&framework::object::visible, &framework::object::set_visible),
-    "on_begin", [](framework::object& self, sol::protected_function fn) {
-      self.set_onbegin(wrap_fn(std::move(fn)));
-    },
-    "on_end", [](framework::object& self, sol::protected_function fn) {
-      self.set_onend(wrap_fn(std::move(fn)));
-    },
-    "on_mail", [](framework::object& self, sol::protected_function fn) {
-      self.set_onmail(wrap_fn(std::move(fn)));
-    },
-    "on_touch", [](framework::object& self, sol::protected_function fn) {
-      self.set_ontouch(wrap_fn(std::move(fn)));
-    },
-    "on_hover", [](framework::object& self, sol::protected_function fn) {
-      self.set_onhover(wrap_fn(std::move(fn)));
-    },
-    "on_unhover", [](framework::object& self, sol::protected_function fn) {
-      self.set_onunhover(wrap_fn(std::move(fn)));
-    },
-    "on_collision", [](framework::object& self, const std::string& kind, sol::protected_function fn) {
-      self.set_oncollision(kind, wrap_fn(std::move(fn)));
-    },
+    "on_begin", &framework::object::set_onbegin,
+    "on_end", &framework::object::set_onend,
+    "on_mail", &framework::object::set_onmail,
+    "on_touch", &framework::object::set_ontouch,
+    "on_hover", &framework::object::set_onhover,
+    "on_unhover", &framework::object::set_onunhover,
+    "on_collision", &framework::object::set_oncollision,
     "action", sol::property(&framework::object::action, &framework::object::set_action),
     "placement", sol::property(
       [](framework::object& o) {
@@ -654,7 +613,7 @@ void framework::scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          auto sfn = [fn = wrap_fn(std::move(fn)), &lua]() mutable {
+          auto sfn = [fn = framework::wrap_fn(std::move(fn)), &lua]() mutable {
             fn();
             lua.collect_garbage();
             lua.collect_garbage();
@@ -664,31 +623,31 @@ void framework::scriptengine::run() {
         }
 
         if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onloop(wrap_fn(std::move(fn)));
+          scene->set_onloop(std::move(fn));
         }
 
         if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_ontext(wrap_fn(std::move(fn)));
+          scene->set_ontext(std::move(fn));
         }
 
         if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_ontouch(wrap_fn(std::move(fn)));
+          scene->set_ontouch(std::move(fn));
         }
 
         if (auto fn = module["on_keypress"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onkeypress(wrap_fn(std::move(fn)));
+          scene->set_onkeypress(std::move(fn));
         }
 
         if (auto fn = module["on_keyrelease"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onkeyrelease(wrap_fn(std::move(fn)));
+          scene->set_onkeyrelease(std::move(fn));
         }
 
         if (auto fn = module["on_motion"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onmotion(wrap_fn(std::move(fn)));
+          scene->set_onmotion(std::move(fn));
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          auto sfn = wrap_fn(std::move(fn));
+          auto sfn = framework::wrap_fn(std::move(fn));
 
           lua.collect_garbage();
           lua.collect_garbage();
