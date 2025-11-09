@@ -596,7 +596,7 @@ void framework::scriptengine::run() {
         loaded[std::format("scenes/{}", name)] = module;
         auto ptr = std::weak_ptr<framework::scene>(scene);
 
-        module["get"] = [ptr, name](sol::this_state, const std::string& id, framework::scenetype type) {
+        module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
           if (auto scene = ptr.lock()) [[likely]] {
             return scene->get(id, type);
           }
