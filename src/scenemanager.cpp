@@ -128,6 +128,7 @@ void scenemanager::set(const std::string& name) {
   _current = name;
 
   std::println("[scenemanager] entered {}", name);
+
   ptr->on_enter();
 }
 
