@@ -160,7 +160,7 @@ void scene::set_onloop(sol::protected_function fn) {
 }
 
 void scene::set_onleave(sol::protected_function fn) {
-  _onleave = std::move(fn);
+  _onleave = interop::wrap_fn(std::move(fn));
 }
 
 void scene::set_ontouch(sol::protected_function fn) {
