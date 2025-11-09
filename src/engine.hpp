@@ -60,6 +60,7 @@ public:
   std::shared_ptr<graphics::particlesystem> particlesystem() const;
   std::shared_ptr<storage::cassette> cassette() const;
   std::shared_ptr<framework::timermanager> timermanager() const;
+  std::shared_ptr<graphics::camera> camera() const;
 
   int32_t height() const;
   int32_t width() const;
@@ -75,6 +76,7 @@ public:
   void set_statemanager(std::shared_ptr<framework::statemanager> statemanager);
   void set_window(std::shared_ptr<graphics::window> window);
   void set_world(std::shared_ptr<framework::world> world);
+  void set_camera(std::shared_ptr<graphics::camera> camera);
   void set_renderer(std::shared_ptr<graphics::renderer> renderer);
   void set_timermanager(std::shared_ptr<framework::timermanager> timermanager);
 
@@ -107,6 +109,7 @@ private:
   std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::shared_ptr<graphics::window> _window;
   std::shared_ptr<framework::world> _world;
+  std::shared_ptr<graphics::camera> _camera;
   std::vector<std::shared_ptr<framework::lifecycleobserver>> _observers;
   std::shared_ptr<framework::timermanager> _timermanager;
   std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();

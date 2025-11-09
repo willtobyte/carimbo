@@ -79,6 +79,10 @@ std::shared_ptr<framework::timermanager> engine::timermanager() const {
   return _timermanager;
 }
 
+std::shared_ptr<graphics::camera> engine::camera() const {
+  return _camera;
+}
+
 int32_t engine::height() const {
   return _window->height();
 }
@@ -131,6 +135,10 @@ void engine::set_window(std::shared_ptr<graphics::window> window) {
 
 void engine::set_world(std::shared_ptr<framework::world> world) {
   _world = std::move(world);
+}
+
+void engine::set_camera(std::shared_ptr<graphics::camera> camera) {
+  _camera = std::move(camera);
 }
 
 void engine::set_renderer(std::shared_ptr<graphics::renderer> renderer) {

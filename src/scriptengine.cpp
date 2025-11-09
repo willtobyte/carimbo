@@ -972,6 +972,12 @@ void framework::scriptengine::run() {
 
   lua["keyboard"] = keyboard{};
 
+  lua.new_usertype<graphics::camera>(
+    "Camera",
+    sol::no_constructor,
+    "on_request_position", &graphics::camera::set_onrequestposition
+  );
+
   lua.new_usertype<framework::mail>(
     "Mail",
     sol::constructors<framework::mail(
@@ -1085,6 +1091,7 @@ void framework::scriptengine::run() {
   lua["soundmanager"] = engine->soundmanager();
   lua["statemanager"] = engine->statemanager();
   lua["timermanager"] = engine->timermanager();
+  lua["camera"] = engine->camera();
 
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
