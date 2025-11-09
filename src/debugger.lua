@@ -1,4 +1,4 @@
-R"lua(
+R"(
 -- SPDX-License-Identifier: MIT
 -- Copyright (c) 2024 Scott Lembcke and Howling Moon Software
 
@@ -801,4 +801,4 @@ if jit then -- LuaJIT
 end
 
 _G.dbg = dbg
-)lua";
+)";
