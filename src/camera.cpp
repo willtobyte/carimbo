@@ -19,11 +19,12 @@ std::tuple<float, float> camera::viewport() const {
 }
 /*
 
+local w, h = camera.viewport
+
 local function calculateCameraPosition(delta)
-  const w, h = camera.viewport
-  return 90, 10
+  return 90 + w, 10 + h
 end
 
-camera:on_position(calculateCameraPosition)
+camera:on_request_position(calculateCameraPosition)
 
 */
