@@ -18,13 +18,14 @@ std::tuple<float, float> camera::viewport() const {
   return std::make_tuple(1.1f, 2.2f);
 }
 /*
+-- camera.lua
 
 local w, h = camera.viewport
 
-local function calculateCameraPosition(delta)
-  return 90 + w, 10 + h
+local function calculate(delta)
+  return player.x + 90 + w, player.y + 10 + h
 end
 
-camera:on_request_position(calculateCameraPosition)
+camera:on_request_position(calculate)
 
 */
