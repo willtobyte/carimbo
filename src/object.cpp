@@ -280,31 +280,31 @@ std::string object::action() const {
 }
 
 void object::set_onbegin(sol::protected_function fn) {
-  _onbegin = framework::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
+  _onbegin = interop::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
 }
 
 void object::set_onend(sol::protected_function fn) {
-  _onend = framework::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
+  _onend = interop::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
 }
 
 void object::set_onmail(sol::protected_function fn) {
-  _onmail = framework::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
+  _onmail = interop::wrap_fn<std::shared_ptr<object>, const std::string&>(std::move(fn));
 }
 
 void object::set_ontouch(sol::protected_function fn) {
-  _ontouch = framework::wrap_fn<std::shared_ptr<object>, float, float>(std::move(fn));
+  _ontouch = interop::wrap_fn<std::shared_ptr<object>, float, float>(std::move(fn));
 }
 
 void object::set_onhover(sol::protected_function fn) {
-  _onhover = framework::wrap_fn<std::shared_ptr<object>>(std::move(fn));
+  _onhover = interop::wrap_fn<std::shared_ptr<object>>(std::move(fn));
 }
 
 void object::set_onunhover(sol::protected_function fn) {
-  _onunhover = framework::wrap_fn<std::shared_ptr<object>>(std::move(fn));
+  _onunhover = interop::wrap_fn<std::shared_ptr<object>>(std::move(fn));
 }
 
 void object::set_oncollision(const std::string& kind, sol::protected_function fn) {
-  _collision_mapping.emplace(kind, framework::wrap_fn<std::shared_ptr<object>, std::shared_ptr<object>>(std::move(fn)));
+  _collision_mapping.insert_or_assign(kind, interop::wrap_fn<std::shared_ptr<object>, std::shared_ptr<object>>(std::move(fn)));
 }
 
 void object::on_email(const std::string& message) {

@@ -613,7 +613,7 @@ void framework::scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          auto sfn = [fn = framework::wrap_fn(std::move(fn)), &lua]() mutable {
+          auto sfn = [fn = interop::wrap_fn(std::move(fn)), &lua]() mutable {
             fn();
             lua.collect_garbage();
             lua.collect_garbage();
@@ -647,7 +647,7 @@ void framework::scriptengine::run() {
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          auto sfn = framework::wrap_fn(std::move(fn));
+          auto sfn = interop::wrap_fn(std::move(fn));
 
           lua.collect_garbage();
           lua.collect_garbage();
@@ -1019,14 +1019,14 @@ void framework::scriptengine::run() {
       uint32_t interval,
       sol::protected_function pf
     ) {
-      return self.set(interval, wrap_fn<>(std::move(pf)));
+      return self.set(interval, interop::wrap_fn<>(std::move(pf)));
     },
     "singleshot", [](
       framework::timermanager& self,
       uint32_t interval,
       sol::protected_function pf
     ) {
-      return self.singleshot(interval, wrap_fn<>(std::move(pf)));
+      return self.singleshot(interval, interop::wrap_fn<>(std::move(pf)));
     }
   );
 

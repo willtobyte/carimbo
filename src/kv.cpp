@@ -15,7 +15,7 @@ void observable::set(const sol::object& value) {
 }
 
 void observable::subscribe(sol::protected_function callback) {
-  _subscriber = framework::wrap_fn<const sol::object&>(std::move(callback));
+  _subscriber = interop::wrap_fn<const sol::object&>(std::move(callback));
 }
 
 void observable::unsubscribe() {

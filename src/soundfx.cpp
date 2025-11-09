@@ -215,9 +215,9 @@ float soundfx::volume() const {
 }
 
 void soundfx::set_onbegin(sol::protected_function callback) {
-  _onbegin = framework::wrap_fn(std::move(callback));
+  _onbegin = interop::wrap_fn(std::move(callback));
 }
 
 void soundfx::set_onend(sol::protected_function callback) {
-  _onend = framework::wrap_fn(std::move(callback));
+  _onend = interop::wrap_fn(std::move(callback));
 }
