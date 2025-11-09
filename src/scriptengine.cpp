@@ -975,6 +975,7 @@ void framework::scriptengine::run() {
   lua.new_usertype<graphics::camera>(
     "Camera",
     sol::no_constructor,
+    "viewport", sol::property(&graphics::camera::viewport),
     "on_request_position", &graphics::camera::set_onrequestposition
   );
 
