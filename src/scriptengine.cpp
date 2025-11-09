@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include "timermanager.hpp"
 
 using namespace framework;
 
@@ -1002,20 +1003,8 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "cancel", &framework::timermanager::cancel,
     "clear", &framework::timermanager::clear,
-    "set", [](
-      framework::timermanager& self,
-      uint32_t interval,
-      sol::protected_function pf
-    ) {
-      return self.set(interval, interop::wrap_fn<>(std::move(pf)));
-    },
-    "singleshot", [](
-      framework::timermanager& self,
-      uint32_t interval,
-      sol::protected_function pf
-    ) {
-      return self.singleshot(interval, interop::wrap_fn<>(std::move(pf)));
-    }
+    "set", &framework::timermanager::set,
+    "singleshot", &framework::timermanager::singleshot
   );
 
   lua.new_usertype<graphics::label>(

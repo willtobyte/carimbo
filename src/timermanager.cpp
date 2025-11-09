@@ -52,12 +52,12 @@ timermanager::timermanager()
   _envelopemapping.reserve(16);
 }
 
-uint32_t timermanager::set(uint32_t interval, std::function<void()>&& fn) {
-  return add_timer(interval, std::move(fn), true);
+uint32_t timermanager::set(uint32_t interval, sol::protected_function fn) {
+  return add_timer(interval, std::move(interop::wrap_fn(fn)), true);
 }
 
-uint32_t timermanager::singleshot(uint32_t interval, std::function<void()>&& fn) {
-  return add_timer(interval, std::move(fn), false);
+uint32_t timermanager::singleshot(uint32_t interval, sol::protected_function fn) {
+  return add_timer(interval, std::move(interop::wrap_fn(fn)), false);
 }
 
 void timermanager::cancel(uint32_t id) {

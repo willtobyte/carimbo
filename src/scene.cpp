@@ -1,6 +1,4 @@
 #include "scene.hpp"
-#include "scriptengine.hpp"
-#include <sol/forward.hpp>
 
 using namespace framework;
 
@@ -180,8 +178,6 @@ void scene::set_onkeyrelease(sol::protected_function fn) {
 void scene::set_ontext(sol::protected_function fn) {
   _ontext = interop::wrap_fn<const std::string&>(std::move(fn));
 }
-
-
 
 void scene::set_onmotion(sol::protected_function fn) {
   _onmotion = interop::wrap_fn<float, float>(std::move(fn));

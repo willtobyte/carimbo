@@ -8,8 +8,8 @@ public:
   explicit timermanager();
   ~timermanager() = default;
 
-  uint32_t set(uint32_t interval, std::function<void()>&& fn);
-  uint32_t singleshot(uint32_t timeout, std::function<void()>&& fn);
+  uint32_t set(uint32_t interval, sol::protected_function fn);
+  uint32_t singleshot(uint32_t timeout, sol::protected_function fn);
   void cancel(uint32_t id);
   void clear();
 
