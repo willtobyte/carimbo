@@ -646,9 +646,6 @@ void framework::scriptengine::run() {
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
           auto sfn = interop::wrap_fn(std::move(fn));
 
-          lua.collect_garbage();
-          lua.collect_garbage();
-
           scene->set_onleave(std::move(sfn));
 
           lua.collect_garbage();
