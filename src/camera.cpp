@@ -6,7 +6,7 @@ void camera::update(float delta) {
   if (const auto& fn = _on_camera; fn) {
     const auto [x, y] = fn(delta);
 
-    // TODO set render
+    std::println("camera at {} {}", x, y);
   }
 }
 

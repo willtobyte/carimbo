@@ -1,11 +1,8 @@
 #pragma once
 
 #include "common.hpp"
-#include <concepts>
-#include <type_traits>
 
 namespace interop {
-
 template<typename Signature>
 struct wrap_fn_impl;
 
@@ -31,17 +28,18 @@ struct wrap_fn_impl<ReturnType(Args...)> {
         sol::error error = result;
         throw std::runtime_error(error.what());
       }
+
       return result.template get<ReturnType>();
     };
   }
 };
 
 template<typename Signature>
-auto wrap_fn(sol::protected_function pf) -> std::function<Signature> {
+static auto wrap_fn(sol::protected_function pf) -> std::function<Signature> {
   return wrap_fn_impl<Signature>::wrap(std::move(pf));
 }
 
-auto wrap_fn(sol::protected_function pf) {
+static auto wrap_fn(sol::protected_function pf) {
   return [pf = std::move(pf)](auto&&... args) mutable {
     auto result = pf(std::forward<decltype(args)>(args)...);
     if (!result.valid()) [[unlikely]] {
