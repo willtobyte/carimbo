@@ -5,7 +5,7 @@
 namespace interop {
 template<typename... Args>
 static auto wrap_fn(sol::protected_function pf) -> std::function<void(Args...)> {
-  return [pf = std::move(pf)](Args&&... args) mutable {
+  return [pf = std::move(pf)](Args... args) mutable {
     auto result = pf(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
       sol::error error = result;
