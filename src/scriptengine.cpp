@@ -563,9 +563,6 @@ void framework::scriptengine::run() {
         loaded[std::format("scenes/{}", scene)] = sol::lua_nil;
       }
 
-      lua.collect_garbage();
-      lua.collect_garbage();
-
       self.destroy(name);
 
       lua.collect_garbage();
@@ -600,20 +597,19 @@ void framework::scriptengine::run() {
         auto ptr = std::weak_ptr<framework::scene>(scene);
 
         module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
-          auto scene = ptr.lock();
-          if (!scene) {
-            throw std::runtime_error(std::format(
-              "[scriptengine] scene {} expired while accessing object {}",
-                name,
-                id
-            ));
+          if (auto scene = ptr.lock()) [[likely]] {
+            return scene->get(id, type);
           }
 
-          return scene->get(id, type);
+          throw std::runtime_error(std::format(
+            "[scriptengine] scene '{}' expired while accessing object '{}'",
+            name,
+            id
+          ));
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onenter(interop::wrap_fn(std::move(fn)));
+          scene->set_onenter(std::move(fn));
 
           lua.collect_garbage();
           lua.collect_garbage();
@@ -644,9 +640,7 @@ void framework::scriptengine::run() {
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          auto sfn = interop::wrap_fn(std::move(fn));
-
-          scene->set_onleave(std::move(sfn));
+          scene->set_onleave(fn);
 
           lua.collect_garbage();
           lua.collect_garbage();

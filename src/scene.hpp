@@ -6,6 +6,7 @@
 #include "pixmap.hpp"
 #include "size.hpp"
 #include "tilemap.hpp"
+#include <sol/forward.hpp>
 
 namespace framework {
 class objectmanager;
@@ -52,9 +53,9 @@ public:
   void on_key_release(int32_t code) const;
   void on_motion(float x, float y) const;
 
-  void set_onenter(std::function<void()>&& fn);
+  void set_onenter(sol::protected_function fn);
   void set_onloop(sol::protected_function fn);
-  void set_onleave(std::function<void()>&& fn);
+  void set_onleave(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);
   void set_onkeypress(sol::protected_function fn);
   void set_onkeyrelease(sol::protected_function fn);

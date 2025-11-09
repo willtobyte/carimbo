@@ -1,4 +1,6 @@
 #include "scene.hpp"
+#include "scriptengine.hpp"
+#include <sol/forward.hpp>
 
 using namespace framework;
 
@@ -151,15 +153,15 @@ void scene::on_motion(float x, float y) const {
   }
 }
 
-void scene::set_onenter(std::function<void()>&& fn) {
-  _onenter = std::move(fn);
+void scene::set_onenter(sol::protected_function fn) {
+  _onenter = interop::wrap_fn(std::move(fn));
 }
 
 void scene::set_onloop(sol::protected_function fn) {
   _onloop = interop::wrap_fn<float>(std::move(fn));
 }
 
-void scene::set_onleave(std::function<void()>&& fn) {
+void scene::set_onleave(sol::protected_function fn) {
   _onleave = std::move(fn);
 }
 
