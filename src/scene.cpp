@@ -143,8 +143,6 @@ void scene::on_text(const std::string& text) const {
   }
 }
 
-
-
 void scene::on_motion(float x, float y) const {
   if (const auto& fn = _onmotion; fn) {
     fn(x, y);
