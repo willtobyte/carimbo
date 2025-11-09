@@ -502,10 +502,10 @@ void framework::scriptengine::run() {
 
   struct playerwrapper {
     uint8_t index;
-    const framework::statemanager& e;
+    const framework::statemanager* e;
 
     bool on(input::event::gamepad::button type) {
-      return e.on(index, type);
+      return e->on(index, type);
     }
   };
 
@@ -533,7 +533,7 @@ void framework::scriptengine::run() {
       auto index = static_cast<uint8_t>(player);
       auto it = cache->find(index);
       if (it == cache->end()) [[unlikely]] {
-        it = cache->emplace(index, playerwrapper{static_cast<uint8_t>(player), self}).first;
+        it = cache->emplace(index, playerwrapper{static_cast<uint8_t>(player), &self}).first;
       }
 
       return it->second;
