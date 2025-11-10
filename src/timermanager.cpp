@@ -73,6 +73,7 @@ void timermanager::cancel(uint32_t id) {
   if (ptr) {
     context ctx{_envelopepool.get(), ptr};
     SDL_FilterEvents(filter, &ctx);
+    _envelopepool->release(std::unique_ptr<envelope>(ptr));
   }
 }
 
