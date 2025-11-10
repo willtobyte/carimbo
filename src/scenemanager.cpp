@@ -72,8 +72,8 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
     std::string key = o["name"].get<std::string>();
     std::string kind = o["kind"].get<std::string>();
 
-    const float x = o.value("x", 0.0f);
-    const float y = o.value("y", 0.0f);
+    const float x = o.value("x", .0f);
+    const float y = o.value("y", .0f);
 
     std::string action = o.value("action", std::string{});
 

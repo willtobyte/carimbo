@@ -205,7 +205,7 @@ void soundfx::update(float delta) {
 }
 
 void soundfx::set_volume(float gain) {
-  alSourcef(_source, AL_GAIN, std::clamp(gain, 0.0f, 1.0f));
+  alSourcef(_source, AL_GAIN, std::clamp(gain, .0f, 1.0f));
 }
 
 float soundfx::volume() const {

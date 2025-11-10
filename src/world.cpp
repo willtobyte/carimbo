@@ -17,7 +17,7 @@ static inline const typename Map::mapped_type* find_ptr(
 world::world(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)) {
   auto def = b2DefaultWorldDef();
-  def.gravity = b2Vec2{0.0f, 0.0f};
+  def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 }
 
