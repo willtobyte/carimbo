@@ -62,9 +62,6 @@ public:
   std::shared_ptr<framework::timermanager> timermanager() const;
   std::shared_ptr<graphics::camera> camera() const;
 
-  int32_t height() const;
-  int32_t width() const;
-
   void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
   void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);
   void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager);

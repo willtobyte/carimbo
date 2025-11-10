@@ -1094,6 +1094,12 @@ void framework::scriptengine::run() {
   lua["timermanager"] = engine->timermanager();
   lua["camera"] = engine->camera();
 
+  auto viewport = lua.create_table();
+  viewport["width"] = engine->window()->width();
+  viewport["height"] = engine->window()->height();
+
+  lua["viewport"] = viewport;
+
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
   if (!result.valid()) [[unlikely]] {

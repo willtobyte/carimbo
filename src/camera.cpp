@@ -20,7 +20,7 @@ std::tuple<float, float> camera::viewport() const {
 /*
 -- camera.lua
 
-local w, h = camera.viewport
+local w, h = viewport.width, viewport.height
 
 local function calculate(delta)
   return player.x + 90 + w, player.y + 10 + h

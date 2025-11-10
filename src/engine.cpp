@@ -83,14 +83,6 @@ std::shared_ptr<graphics::camera> engine::camera() const {
   return _camera;
 }
 
-int32_t engine::height() const {
-  return _window->height();
-}
-
-int32_t engine::width() const {
-  return _window->width();
-}
-
 void engine::set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) {
   _audiodevice = std::move(audiodevice);
 }
