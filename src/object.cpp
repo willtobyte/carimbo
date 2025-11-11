@@ -112,9 +112,9 @@ void object::update(float delta, uint64_t now) {
     _scale, _angle
   );
 
-  const auto box = b2MakeBox(transform.hx, transform.hy);
-  const auto rotation = b2MakeRot(transform.radians);
-  const auto position = b2Vec2{transform.px, transform.py};
+  const auto box = b2MakeBox(transform.hx(), transform.hy());
+  const auto rotation = b2MakeRot(transform.radians());
+  const auto position = b2Vec2{transform.px(), transform.py()};
 
   if (!b2Body_IsValid(_body)) {
     const auto world = _world.lock();

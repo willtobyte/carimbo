@@ -34,11 +34,18 @@ public:
     double angle_degrees
   );
 
-  float px{.0f};
-  float py{.0f};
-  float hx{.0f};
-  float hy{.0f};
-  float radians{.0f};
+  float px() const { return _px; }
+  float py() const { return _py; }
+  float hx() const { return _hx; }
+  float hy() const { return _hy; }
+  float radians() const { return _radians; }
+
+private:
+  float _px{.0f};
+  float _py{.0f};
+  float _hx{.0f};
+  float _hy{.0f};
+  float _radians{.0f};
 };
 
 }

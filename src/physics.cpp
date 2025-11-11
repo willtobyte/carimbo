@@ -16,14 +16,14 @@ body_transform body_transform::compute(
 
   const auto sw = bounds_width * scale;
   const auto sh = bounds_height * scale;
-  result.hx = 0.5f * sw;
-  result.hy = 0.5f * sh;
+  result._hx = 0.5f * sw;
+  result._hy = 0.5f * sh;
   
   const auto center_x = bounds_width * 0.5f;
   const auto center_y = bounds_height * 0.5f;
-  result.px = position_x + center_x;
-  result.py = position_y + center_y;
-  result.radians = static_cast<float>(angle_degrees * DEGREES_TO_RADIANS);
+  result._px = position_x + center_x;
+  result._py = position_y + center_y;
+  result._radians = static_cast<float>(angle_degrees * DEGREES_TO_RADIANS);
 
   return result;
 }
