@@ -37,17 +37,22 @@ point point::operator+(const point& other) const {
 point& point::operator+=(const point& other) {
   _x += other._x;
   _y += other._y;
-
   return *this;
 }
 
 point& point::operator+=(const std::pair<char, float>& o) {
-  switch (o.first) {
-    case 'x': _x += o.second; return *this;
-    case 'y': _y += o.second; return *this;
+  auto [axis, value] = o;
+
+  switch (axis) {
+    case 'x':
+      _x += value;
+      return *this;
+    case 'y':
+      _y += value;
+      return *this;
   }
 
-  return *this;
+  std::unreachable();
 }
 
 point point::operator-(const size& rhs) const {
@@ -61,8 +66,4 @@ point point::operator-(const point& rhs) const {
 bool point::operator==(const point& other) const {
   return std::fabs(_x - other._x) <= epsilon * std::max(std::fabs(_x), std::fabs(other._x))
     && std::fabs(_y - other._y) <= epsilon * std::max(std::fabs(_y), std::fabs(other._y));
-}
-
-bool point::operator!=(const point& other) const {
-  return !(*this == other);
 }
