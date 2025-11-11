@@ -47,7 +47,17 @@ class Carimbo(ConanFile):
 
         self.options["sol2"].with_lua = "luajit" if self._is_jit_capable() else "lua"
 
-        for opt in ["sevenzip", "grp", "wad", "hog", "mvl", "qpak", "slb", "iso9660", "vdf"]:
+        for opt in [
+            "sevenzip",
+            "grp",
+            "wad",
+            "hog",
+            "mvl",
+            "qpak",
+            "slb",
+            "iso9660",
+            "vdf",
+        ]:
             setattr(self.options["physfs"], opt, False)
 
         if self._is_ios():
@@ -57,6 +67,9 @@ class Carimbo(ConanFile):
             self.options["sentry-native"].backend = "crashpad"
             self.options["sentry-native"].with_crashpad = "sentry"
             self.options["sentry-native"].shared = False
+
+        if not self._is_webassembly():
+            self.requires("openssl/3.6.0")
 
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
