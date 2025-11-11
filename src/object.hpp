@@ -120,8 +120,7 @@ private:
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
 
-  std::optional<physics::body_transform> _last_synced_transform;
-  bool _need_update_physics{false};
+  bool _need_update_physics{true};
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;

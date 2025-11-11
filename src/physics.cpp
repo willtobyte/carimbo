@@ -28,7 +28,3 @@ body_transform body_transform::compute(
   return result;
 }
 
-bool body_transform::shape_differs(const body_transform& other) const {
-  return std::abs(hx - other.hx) > epsilon ||
-         std::abs(hy - other.hy) > epsilon;
-}

@@ -112,47 +112,41 @@ void object::update(float delta, uint64_t now) {
     _scale, _angle
   );
 
+  const auto box = b2MakeBox(transform.hx, transform.hy);
+  const auto rotation = b2MakeRot(transform.radians);
+  const auto position = b2Vec2{transform.px, transform.py};
+
   if (!b2Body_IsValid(_body)) {
     const auto world = _world.lock();
 
     if (b2Shape_IsValid(_collision_shape)) {
       std::println("[object] warning: orphaned shape for {} {}", kind(), id());
       b2DestroyShape(_collision_shape, false);
-      _collision_shape = b2_nullShapeId;
     }
 
     auto def = b2DefaultBodyDef();
     def.type = b2_kinematicBody;
     def.userData = physics::id_to_userdata(id());
-    def.position = b2Vec2{transform.px, transform.py};
-    def.rotation = b2MakeRot(transform.radians);
+    def.position = position;
+    def.rotation = rotation;
     _body = b2CreateBody(*world, &def);
 
     auto sd = b2DefaultShapeDef();
     sd.isSensor = true;
     sd.enableSensorEvents = true;
-    sd.filter.categoryBits = physics::collisioncategory::Player; // TODO change it
-    sd.filter.maskBits = physics::collisioncategory::Player; // TODO change it
-    const auto box = b2MakeBox(transform.hx, transform.hy);
+    sd.filter.categoryBits = physics::collisioncategory::Player;
+    sd.filter.maskBits = physics::collisioncategory::Player;
     _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
-    _last_synced_transform = transform;
     return;
   }
 
   if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
 
   _need_update_physics = false;
+  b2Body_SetTransform(_body, position, rotation);
 
-  b2Body_SetTransform(_body, b2Vec2{transform.px, transform.py}, b2MakeRot(transform.radians));
-
-  if (!_last_synced_transform || transform.shape_differs(*_last_synced_transform)) {
-    if (b2Shape_IsValid(_collision_shape)) {
-      const auto box = b2MakeBox(transform.hx, transform.hy);
-      b2Shape_SetPolygon(_collision_shape, &box);
-    }
-  }
-
-  _last_synced_transform = transform;
+  if (b2Shape_IsValid(_collision_shape))
+    b2Shape_SetPolygon(_collision_shape, &box);
 }
 
 void object::draw() const {

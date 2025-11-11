@@ -34,10 +34,6 @@ public:
     double angle_degrees
   );
 
-  bool shape_differs(const body_transform& other) const;
-  bool rotation_differs(const body_transform& other) const;
-  bool differs(const body_transform& other) const;
-
   float px{.0f};
   float py{.0f};
   float hx{.0f};
