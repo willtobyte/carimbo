@@ -4,7 +4,7 @@
 
 namespace framework::physics {
 constexpr uint64_t userdata_to_id(void* userdata) {
-  return std::bit_cast<uint64_t>(userdata);
+  return static_cast<uint64_t>(std::bit_cast<uintptr_t>(userdata));
 }
 
 constexpr void* id_to_userdata(uint64_t id) {
