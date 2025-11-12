@@ -15,8 +15,9 @@ void camera::set_onrequestposition(sol::protected_function fn) {
 }
 
 std::tuple<float, float> camera::viewport() const {
-  return std::make_tuple(1.1f, 2.2f);
+  return {1.1f, 2.2f};
 }
+
 /*
 -- camera.lua
 
