@@ -3,23 +3,23 @@
 #include "common.hpp"
 
 namespace platform {
-class desktop {
+class desktop final {
   public:
-    desktop() = default;
-    ~desktop() = default;
+    constexpr desktop() noexcept = default;
+    constexpr ~desktop() noexcept = default;
 
-    std::optional<std::string> folder() const;
+    [[nodiscard]] std::optional<std::string_view> folder() const noexcept;
 };
 
-class operatingsystem {
+class operatingsystem final {
   public:
-    operatingsystem() = default;
-    ~operatingsystem() = default;
+    constexpr operatingsystem() noexcept = default;
+    constexpr ~operatingsystem() noexcept = default;
 
-    int32_t compute() const;
+    [[nodiscard]] int32_t compute() const noexcept;
 
-    int32_t memory() const;
+    [[nodiscard]] int32_t memory() const noexcept;
 
-    std::string name() const;
+    [[nodiscard]] std::string_view name() const noexcept;
 };
 }

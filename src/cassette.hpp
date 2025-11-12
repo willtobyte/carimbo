@@ -8,11 +8,6 @@ public:
   cassette();
   ~cassette() = default;
 
-  cassette(const cassette&) = default;
-  cassette& operator=(const cassette&) = default;
-  cassette(cassette&&) noexcept = default;
-  cassette& operator=(cassette&&) noexcept = default;
-
   template <typename T>
   void set(std::string_view key, const T& value);
 

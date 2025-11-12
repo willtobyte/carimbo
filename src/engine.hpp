@@ -44,11 +44,6 @@ public:
   engine() = default;
   virtual ~engine() = default;
 
-  engine(const engine&) = delete;
-  engine& operator=(const engine&) = delete;
-  engine(engine&&) = delete;
-  engine& operator=(engine&&) = delete;
-
   std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
   std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;
   std::shared_ptr<input::eventmanager> eventmanager() const noexcept;

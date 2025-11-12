@@ -9,11 +9,6 @@ public:
   explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() = default;
 
-  canvas(const canvas&) = delete;
-  canvas& operator=(const canvas&) = delete;
-  canvas(canvas&&) noexcept = default;
-  canvas& operator=(canvas&&) noexcept = default;
-
   void set_pixels(const char* pixels);
 
   void clear();

@@ -12,11 +12,6 @@ public:
   explicit color(std::string_view hex) noexcept;
   ~color() = default;
 
-  color(const color&) noexcept = default;
-  color& operator=(const color&) noexcept = default;
-  color(color&&) noexcept = default;
-  color& operator=(color&&) noexcept = default;
-
   uint8_t r() const noexcept;
   uint8_t g() const noexcept;
   uint8_t b() const noexcept;

@@ -7,10 +7,6 @@ class camera final {
   public:
     camera() = default;
     ~camera() = default;
-    camera(const camera&) = default;
-    camera& operator=(const camera&) = default;
-    camera(camera&&) noexcept = default;
-    camera& operator=(camera&&) noexcept = default;
 
     void update(float delta);
 

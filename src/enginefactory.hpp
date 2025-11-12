@@ -10,11 +10,6 @@ public:
   enginefactory() = default;
   ~enginefactory() = default;
 
-  enginefactory(const enginefactory&) = default;
-  enginefactory& operator=(const enginefactory&) = default;
-  enginefactory(enginefactory&&) noexcept = default;
-  enginefactory& operator=(enginefactory&&) noexcept = default;
-
   enginefactory& with_title(std::string_view title) noexcept;
   enginefactory& with_width(int32_t width) noexcept;
   enginefactory& with_height(int32_t height) noexcept;
