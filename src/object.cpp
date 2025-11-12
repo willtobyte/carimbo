@@ -1,5 +1,13 @@
 #include "object.hpp"
+
+#include "kv.hpp"
 #include "physics.hpp"
+#include "pixmap.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "reflection.hpp"
+#include "soundfx.hpp"
+#include "world.hpp"
 
 using namespace framework;
 

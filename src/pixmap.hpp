@@ -2,11 +2,10 @@
 
 #include "common.hpp"
 
-#include "rectangle.hpp"
 #include "reflection.hpp"
-#include "renderer.hpp"
 
 namespace graphics {
+
 enum class blendmode : SDL_BlendMode {
   None = SDL_BLENDMODE_NONE,
   Blend = SDL_BLENDMODE_BLEND,

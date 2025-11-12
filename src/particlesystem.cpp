@@ -1,5 +1,12 @@
 #include "particlesystem.hpp"
 
+#include "io.hpp"
+#include "pixmap.hpp"
+#include "pixmappool.hpp"
+#include "rectangle.hpp"
+#include "reflection.hpp"
+#include "resourcemanager.hpp"
+
 using namespace graphics;
 
 particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager)

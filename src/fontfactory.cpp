@@ -1,5 +1,13 @@
 #include "fontfactory.hpp"
 
+#include "font.hpp"
+#include "io.hpp"
+#include "pixmap.hpp"
+#include "pixmappool.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "renderer.hpp"
+
 using namespace graphics;
 
 fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool)

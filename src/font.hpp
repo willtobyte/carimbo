@@ -2,9 +2,6 @@
 
 #include "common.hpp"
 
-#include "fonteffect.hpp"
-#include "point.hpp"
-
 namespace graphics {
 class pixmap;
 

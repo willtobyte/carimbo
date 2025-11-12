@@ -3,8 +3,6 @@
 #include "common.hpp"
 
 #include "noncopyable.hpp"
-
-#include "envelope.hpp"
 #include "objectpool.hpp"
 
 namespace graphics {

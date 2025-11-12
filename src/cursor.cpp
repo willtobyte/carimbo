@@ -1,5 +1,14 @@
 #include "cursor.hpp"
 
+#include "eventreceiver.hpp"
+#include "io.hpp"
+#include "pixmap.hpp"
+#include "pixmappool.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "reflection.hpp"
+#include "resourcemanager.hpp"
+
 using namespace graphics;
 
 using namespace input::event;

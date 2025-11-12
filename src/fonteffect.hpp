@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "reflection.hpp"
+
 namespace graphics {
 class fonteffect {
   public:

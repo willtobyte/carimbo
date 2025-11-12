@@ -3,10 +3,7 @@
 using namespace storage;
 
 std::vector<uint8_t> io::read(std::string_view filename) {
-  // Garantir null-terminated string para PHYSFS
-  std::string filename_str{filename};
-  
-  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename_str.c_str()));
+  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data()));
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(
@@ -41,10 +38,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
 }
 
 std::vector<std::string> io::enumerate(std::string_view directory) {
-  // Garantir null-terminated string para PHYSFS
-  std::string directory_str{directory};
-  
-  const std::unique_ptr<char*[], PHYSFS_Deleter> ptr(PHYSFS_enumerateFiles(directory_str.c_str()));
+  const std::unique_ptr<char*[], PHYSFS_Deleter> ptr(PHYSFS_enumerateFiles(directory.data()));
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(

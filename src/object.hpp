@@ -3,11 +3,6 @@
 #include "common.hpp"
 
 #include "kv.hpp"
-#include "physics.hpp"
-#include "rectangle.hpp"
-#include "reflection.hpp"
-#include "pixmap.hpp"
-#include "soundfx.hpp"
 
 namespace framework {
 class world;

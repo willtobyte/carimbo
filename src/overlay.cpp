@@ -1,5 +1,12 @@
 #include "overlay.hpp"
 
+#include "cursor.hpp"
+#include "eventmanager.hpp"
+#include "eventreceiver.hpp"
+#include "label.hpp"
+#include "resourcemanager.hpp"
+#include "widget.hpp"
+
 using namespace graphics;
 
 overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager)

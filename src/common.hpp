@@ -65,3 +65,92 @@
 #include "constant.hpp"
 #include "defer.hpp"
 #include "helper.hpp"
+
+namespace audio {
+  class audiodevice;
+  class soundfx;
+  class soundmanager;
+}
+
+namespace framework {
+  class application;
+  class engine;
+  class enginefactory;
+  class lifecycleobserver;
+  class loopable;
+  class object;
+  class objectmanager;
+  class resourcemanager;
+  class postalservice;
+  class scene;
+  class scenemanager;
+  class statemanager;
+  class timermanager;
+  class world;
+  class querybuilder;
+  struct collisionenvelope;
+  struct mailenvelope;
+  struct timerenvelope;
+  class envelope;
+}
+
+namespace geometry {
+  class point;
+  class rectangle;
+  class size;
+  class margin;
+}
+
+namespace graphics {
+  class camera;
+  class canvas;
+  class color;
+  class cursor;
+  class font;
+  class fonteffect;
+  class fontfactory;
+  class label;
+  class overlay;
+  class particlesystem;
+  class pixmap;
+  class pixmappool;
+  class renderer;
+  class tilemap;
+  class window;
+  enum class reflection : int32_t;
+}
+
+namespace input {
+  class eventmanager;
+  class eventreceiver;
+}
+
+namespace storage {
+  class cassette;
+  class filesystem;
+}
+
+namespace memory {
+  class kv;
+}
+
+namespace platform {
+  class desktop;
+  class operatingsystem;
+}
+
+namespace steam {
+  class achievement;
+}
+
+namespace i18n {
+  class locales;
+}
+
+namespace lua {
+  class scriptengine;
+}
+
+namespace widget {
+  class widget;
+}

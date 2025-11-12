@@ -1,5 +1,10 @@
 #include "label.hpp"
 
+#include "font.hpp"
+#include "fonteffect.hpp"
+#include "point.hpp"
+#include "widget.hpp"
+
 using namespace graphics;
 
 void label::set_font(std::shared_ptr<font> font) {

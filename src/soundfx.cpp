@@ -86,9 +86,7 @@ namespace {
 }
 
 soundfx::soundfx(std::string_view filename) {
-  // Garantir null-terminated string para PHYSFS
-  std::string filename_str{filename};
-  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename_str.c_str()));
+  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data()));
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(

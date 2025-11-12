@@ -1,17 +1,23 @@
 #include "engine.hpp"
 
 #include "audiodevice.hpp"
+#include "canvas.hpp"
+#include "cassette.hpp"
 #include "constant.hpp"
 #include "eventmanager.hpp"
+#include "eventreceiver.hpp"
+#include "lifecycleobserver.hpp"
 #include "loopable.hpp"
 #include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
 #include "postalservice.hpp"
+#include "scenemanager.hpp"
 #include "statemanager.hpp"
 #include "timermanager.hpp"
 #include "window.hpp"
+#include "world.hpp"
 
 using namespace framework;
 

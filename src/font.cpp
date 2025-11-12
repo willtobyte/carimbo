@@ -1,5 +1,12 @@
 #include "font.hpp"
 
+#include "fonteffect.hpp"
+#include "pixmap.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "reflection.hpp"
+#include "size.hpp"
+
 using namespace graphics;
 
 font::font(

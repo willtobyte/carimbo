@@ -1,5 +1,9 @@
 #include "soundmanager.hpp"
 
+#include "audiodevice.hpp"
+#include "io.hpp"
+#include "soundfx.hpp"
+
 using namespace audio;
 
 soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)

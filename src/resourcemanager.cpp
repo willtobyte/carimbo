@@ -1,5 +1,12 @@
 #include "resourcemanager.hpp"
+
+#include "audiodevice.hpp"
 #include "engine.hpp"
+#include "fontfactory.hpp"
+#include "io.hpp"
+#include "pixmappool.hpp"
+#include "renderer.hpp"
+#include "soundmanager.hpp"
 
 using namespace framework;
 

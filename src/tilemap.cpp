@@ -1,5 +1,13 @@
 #include "tilemap.hpp"
 
+#include "io.hpp"
+#include "pixmap.hpp"
+#include "pixmappool.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "resourcemanager.hpp"
+#include "size.hpp"
+
 using namespace framework;
 
 tilemap::tilemap(

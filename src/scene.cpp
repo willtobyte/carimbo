@@ -1,5 +1,15 @@
 #include "scene.hpp"
 
+#include "object.hpp"
+#include "objectmanager.hpp"
+#include "particlesystem.hpp"
+#include "pixmap.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "size.hpp"
+#include "soundfx.hpp"
+#include "tilemap.hpp"
+
 using namespace framework;
 
 scene::scene(

@@ -2,14 +2,13 @@
 
 #include "common.hpp"
 
-#include "object.hpp"
-#include "pixmap.hpp"
-#include "size.hpp"
-#include "tilemap.hpp"
-#include <sol/forward.hpp>
+namespace audio {
+  class soundfx;
+}
 
 namespace framework {
 class objectmanager;
+class tilemap;
 
 enum class scenetype : uint8_t {
   object = 0,

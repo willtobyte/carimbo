@@ -2,10 +2,6 @@
 
 #include "common.hpp"
 
-#include "event.hpp"
-#include "eventreceiver.hpp"
-#include "lifecycleobserver.hpp"
-
 namespace framework {
 struct collision_pair {
   uint64_t a, b;

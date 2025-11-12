@@ -1,6 +1,10 @@
 #include "world.hpp"
+
+#include "envelope.hpp"
 #include "objectmanager.hpp"
+#include "objectpool.hpp"
 #include "physics.hpp"
+#include "renderer.hpp"
 
 using namespace framework;
 

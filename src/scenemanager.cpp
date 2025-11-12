@@ -1,5 +1,14 @@
 #include "scenemanager.hpp"
 
+#include "event.hpp"
+#include "eventreceiver.hpp"
+#include "io.hpp"
+#include "objectmanager.hpp"
+#include "particlesystem.hpp"
+#include "resourcemanager.hpp"
+#include "scene.hpp"
+#include "timermanager.hpp"
+
 using namespace framework;
 
 scenemanager::scenemanager(

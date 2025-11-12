@@ -1,6 +1,20 @@
 #include "objectmanager.hpp"
+
+#include "envelope.hpp"
+#include "event.hpp"
+#include "eventreceiver.hpp"
+#include "io.hpp"
 #include "object.hpp"
+#include "objectpool.hpp"
 #include "physics.hpp"
+#include "pixmap.hpp"
+#include "pixmappool.hpp"
+#include "point.hpp"
+#include "rectangle.hpp"
+#include "resourcemanager.hpp"
+#include "scenemanager.hpp"
+#include "soundfx.hpp"
+#include "world.hpp"
 
 using namespace framework;
 

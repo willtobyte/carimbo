@@ -2,11 +2,10 @@
 
 #include "common.hpp"
 
-#include "object.hpp"
-#include "pixmap.hpp"
-#include "resourcemanager.hpp"
-
 namespace framework {
+class object;
+class resourcemanager;
+
 struct transaction final {
   std::vector<std::string> path;
   uint16_t delay;

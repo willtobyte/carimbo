@@ -2,12 +2,6 @@
 
 #include "common.hpp"
 
-#include "particlesystem.hpp"
-#include "resourcemanager.hpp"
-#include "eventreceiver.hpp"
-#include "scene.hpp"
-#include "timermanager.hpp"
-
 namespace framework {
 class objectmanager;
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include "soundfx.hpp"
 
 namespace audio {
 class soundmanager final {

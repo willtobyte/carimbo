@@ -1,5 +1,8 @@
 #include "pixmappool.hpp"
+
+#include "io.hpp"
 #include "pixmap.hpp"
+#include "renderer.hpp"
 
 using namespace graphics;
 

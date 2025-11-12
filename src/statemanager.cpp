@@ -1,5 +1,10 @@
 #include "statemanager.hpp"
 
+#include "event.hpp"
+#include "eventreceiver.hpp"
+#include "lifecycleobserver.hpp"
+#include "object.hpp"
+
 using namespace framework;
 using namespace input::event;
 

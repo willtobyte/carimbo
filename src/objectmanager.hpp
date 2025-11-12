@@ -2,12 +2,7 @@
 
 #include "common.hpp"
 
-#include "event.hpp"
-#include "eventreceiver.hpp"
-#include "scenemanager.hpp"
-#include "resourcemanager.hpp"
 #include "objectpool.hpp"
-#include "world.hpp"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>

@@ -1,5 +1,7 @@
 #include "fonteffect.hpp"
 
+#include "point.hpp"
+
 using namespace graphics;
 
 void fadeineffect::set(std::string_view text, geometry::point position) {

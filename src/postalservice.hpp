@@ -3,6 +3,8 @@
 #include "common.hpp"
 
 namespace framework {
+class envelope;
+
 struct mail final {
   uint64_t to;
   std::string kind;
