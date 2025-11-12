@@ -1,5 +1,18 @@
 #pragma once
 
+struct ALC_Deleter {
+  template <typename T>
+  void operator()(T* ptr) const noexcept {
+    if (!ptr) return;
+
+    if constexpr (requires { alcCloseDevice(ptr); }) alcCloseDevice(ptr);
+    if constexpr (requires { alcDestroyContext(ptr); }) {
+      alcMakeContextCurrent(nullptr);
+      alcDestroyContext(ptr);
+    }
+  }
+};
+
 struct SDL_Deleter {
   template <typename T>
   void operator()(T* ptr) const {
