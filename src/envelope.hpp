@@ -7,7 +7,7 @@ struct collisionenvelope final {
   uint64_t a;
   uint64_t b;
 
-  constexpr collisionenvelope(uint64_t a, uint64_t b) : a(a), b(b) {}
+  constexpr collisionenvelope(const uint64_t a, const uint64_t b) noexcept : a(a), b(b) {}
 };
 
 struct mailenvelope final {
@@ -15,7 +15,7 @@ struct mailenvelope final {
   std::string kind;
   std::string body;
 
-  mailenvelope(uint64_t to, std::string_view kind, std::string_view body)
+  constexpr mailenvelope(const uint64_t to, const std::string_view kind, const std::string_view body)
     : to(to), kind(kind), body(body) {}
 };
 
@@ -23,7 +23,7 @@ struct timerenvelope final {
   bool repeat;
   std::function<void()> fn;
 
-  timerenvelope(bool repeat, std::function<void()>&& fn)
+  constexpr timerenvelope(const bool repeat, std::function<void()>&& fn) noexcept
     : repeat(repeat), fn(std::move(fn)) {}
 };
 
@@ -33,29 +33,40 @@ class envelope final {
 public:
   payload_t payload;
 
-  void reset(collisionenvelope&& envelope);
-  void reset(mailenvelope&& envelope);
-  void reset(timerenvelope&& envelope);
-  void reset();
+  constexpr void reset(collisionenvelope&& envelope) noexcept {
+    payload.emplace<collisionenvelope>(std::move(envelope));
+  }
 
-  envelope() = default;
-  ~envelope() = default;
+  constexpr void reset(mailenvelope&& envelope) {
+    payload.emplace<mailenvelope>(std::move(envelope));
+  }
 
-  template<typename... Args,
-           typename = std::enable_if_t<!std::disjunction_v<std::is_same<std::decay_t<Args>, envelope>...>>>
-  explicit envelope(Args&&... args) {
+  constexpr void reset(timerenvelope&& envelope) noexcept {
+    payload.emplace<timerenvelope>(std::move(envelope));
+  }
+
+  constexpr void reset() noexcept {
+    payload.emplace<std::monostate>();
+  }
+
+  constexpr envelope() noexcept = default;
+  constexpr ~envelope() = default;
+
+  template<typename... Args>
+    requires (!std::same_as<std::decay_t<Args>, envelope> && ...)
+  constexpr explicit envelope(Args&&... args) {
     reset(std::forward<Args>(args)...);
   }
 
-  [[nodiscard]] inline const collisionenvelope* try_collision() const {
+  [[nodiscard]] constexpr const collisionenvelope* try_collision() const noexcept {
     return std::get_if<collisionenvelope>(&payload);
   }
 
-  [[nodiscard]] inline const mailenvelope* try_mail() const {
+  [[nodiscard]] constexpr const mailenvelope* try_mail() const noexcept {
     return std::get_if<mailenvelope>(&payload);
   }
 
-  [[nodiscard]] inline const timerenvelope* try_timer() const {
+  [[nodiscard]] constexpr const timerenvelope* try_timer() const noexcept {
     return std::get_if<timerenvelope>(&payload);
   }
 };
