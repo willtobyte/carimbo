@@ -14,7 +14,7 @@ void camera::set_onrequestposition(sol::protected_function fn) {
   _on_request_position = interop::wrap_fn<std::tuple<float, float>(float)>(std::move(fn));
 }
 
-std::tuple<float, float> camera::viewport() const {
+std::tuple<float, float> camera::viewport() const noexcept {
   return {1.1f, 2.2f};
 }
 
