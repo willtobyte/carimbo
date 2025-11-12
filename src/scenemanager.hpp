@@ -18,7 +18,7 @@ public:
 
   std::shared_ptr<scene> load(std::string_view name);
 
-  std::string current() const;
+  std::string_view current() const;
 
   void set(std::string_view name);
 

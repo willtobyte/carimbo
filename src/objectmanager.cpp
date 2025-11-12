@@ -47,14 +47,14 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
 
     std::shared_ptr<audio::soundfx> effect;
     if (a.contains("effect")) {
-      const std::string e = a.at("effect").get<std::string>();
+      const auto e = a.at("effect").get<std::string_view>();
       effect = _resourcemanager->soundmanager()->get(
         std::format("blobs/{}{}.ogg",
           (scope ? std::format("{}/", *scope) : std::string()), e));
     }
 
     std::optional<std::string> next;
-    if (a.contains("next")) next.emplace(a.at("next").get<std::string>());
+    if (a.contains("next")) next.emplace(a.at("next").get<std::string_view>());
 
     const bool oneshot = next.has_value() || a.value("oneshot", false);
 

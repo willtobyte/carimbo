@@ -42,7 +42,7 @@ public:
     std::shared_ptr<graphics::particleprops>
   > get(std::string_view name, scenetype type) const;
 
-  std::string name() const;
+  std::string_view name() const;
 
   void on_enter() const;
   void on_leave() const;

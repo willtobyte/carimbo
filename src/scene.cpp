@@ -95,7 +95,7 @@ std::variant<
   throw std::out_of_range(std::format("[scene] resource {} not found", id));
 }
 
-std::string scene::name() const {
+std::string_view scene::name() const {
   return _name;
 }
 

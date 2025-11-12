@@ -113,7 +113,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   );
 }
 
-std::string scenemanager::current() const {
+std::string_view scenemanager::current() const {
   return _current;
 }
 
