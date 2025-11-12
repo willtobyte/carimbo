@@ -33,12 +33,16 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
 
     _animations.emplace(key, graphics::animation{oneshot, keyframes});
   }
+
+  if (const auto it = _animations.find(ACTION_DEFAULT); it != _animations.end()) {
+    _current_animation = it->second;
+  }
 }
 
 void cursor::on_mouse_release(const mouse::button& event) {
-  constexpr const auto left = mouse::button::which::left;
-  constexpr const auto middle = mouse::button::which::middle;
-  constexpr const auto right = mouse::button::which::right;
+  constexpr auto left = mouse::button::which::left;
+  constexpr auto middle = mouse::button::which::middle;
+  constexpr auto right = mouse::button::which::right;
 
   switch (event.button) {
   case left:
@@ -51,6 +55,10 @@ void cursor::on_mouse_release(const mouse::button& event) {
     break;
   }
 
+  if (const auto it = _animations.find(_action); it != _animations.end()) {
+    _current_animation = it->second;
+  }
+
   _frame = 0;
   _last_frame = SDL_GetTicks();
 }
@@ -60,9 +68,15 @@ void cursor::on_mouse_motion(const mouse::motion& event) {
 }
 
 void cursor::update(float delta) {
+  if (!_current_animation) [[unlikely]] return;
+
   const auto now = SDL_GetTicks();
-  const auto& animation = _animations.find(_action)->second;
-  const auto& frame = animation.keyframes[_frame];
+  auto& animation = _current_animation->get();
+  const auto& keyframes = animation.keyframes;
+
+  if (_frame >= keyframes.size()) [[unlikely]] return;
+
+  const auto& frame = keyframes[_frame];
 
   if (frame.duration == 0 || now - _last_frame < frame.duration) {
     return;
@@ -70,22 +84,31 @@ void cursor::update(float delta) {
 
   _last_frame = now;
 
-  if (animation.oneshot && (_frame + 1 >= animation.keyframes.size())) {
+  if (animation.oneshot && (_frame + 1 >= keyframes.size())) {
     _action = std::exchange(_queued_action, std::nullopt).value_or(ACTION_DEFAULT);
+    if (const auto it = _animations.find(_action); it != _animations.end()) {
+      _current_animation = it->second;
+    }
     _frame = 0;
     return;
   }
 
-  _frame = (_frame + 1) % animation.keyframes.size();
+  _frame = (_frame + 1) % keyframes.size();
 }
 
 void cursor::draw() const {
-  const auto& animation = _animations.find(_action)->second.keyframes[_frame];
+  if (!_current_animation) [[unlikely]] return;
+
+  const auto& keyframes = _current_animation->get().keyframes;
+  if (_frame >= keyframes.size()) [[unlikely]] return;
+
+  const auto& keyframe = keyframes[_frame];
+
   _spritesheet->draw(
-      animation.frame,
+      keyframe.frame,
       geometry::rectangle(
-        _position - _point + animation.offset,
-        animation.frame.size()
+        _position - _point + keyframe.offset,
+        keyframe.frame.size()
       ),
       0,
       255,
@@ -93,6 +116,6 @@ void cursor::draw() const {
   );
 }
 
-void cursor::handle(std::string_view message) {
-  _queued_action = message;
+void cursor::handle(const std::string_view message) {
+  _queued_action = std::string(message);
 }

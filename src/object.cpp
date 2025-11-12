@@ -70,10 +70,9 @@ geometry::point object::placement() const {
 }
 
 void object::update(float delta, uint64_t now) {
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] return;
+  if (!_current_animation) [[unlikely]] return;
 
-  const auto& animation = it->second;
+  auto& animation = _current_animation->get();
   const auto& keyframes = animation.keyframes;
   if (!keyframes.empty() && _frame < keyframes.size()) {
     const auto& keyframe = keyframes[_frame];
@@ -86,7 +85,8 @@ void object::update(float delta, uint64_t now) {
           const auto ended = std::exchange(_action, std::string{});
           if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
           if (!animation.next) return;
-          _action = *animation.next;
+          set_action(*animation.next);
+          return;
         }
         _frame = 0;
       }
@@ -150,14 +150,9 @@ void object::update(float delta, uint64_t now) {
 }
 
 void object::draw() const {
-  if (!_visible) [[unlikely]] return;
+  if (!_visible || !_current_animation) [[unlikely]] return;
 
-  const auto it = _animations.find(_action);
-  if (it == _animations.end()) [[unlikely]] {
-    return;
-  }
-
-  const auto& keyframes = it->second.keyframes;
+  const auto& keyframes = _current_animation->get().keyframes;
   if (keyframes.empty() || _frame >= keyframes.size()) [[unlikely]] {
     return;
   }
@@ -245,6 +240,7 @@ void object::set_visible(bool value) {
 void object::set_action(std::optional<std::string_view> action) {
   if (!action || action->empty()) {
     _action.clear();
+    _current_animation = std::nullopt;
 
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
       b2Body_Disable(_body);
@@ -259,10 +255,11 @@ void object::set_action(std::optional<std::string_view> action) {
   }
 
   _action = it->first;
+  _current_animation = it->second;
   _frame = 0;
   _last_frame = SDL_GetTicks();
 
-  if (const auto& e = it->second.effect; e) {
+  if (const auto& e = _current_animation->get().effect; e) {
     e->play();
   }
 

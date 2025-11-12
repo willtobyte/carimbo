@@ -121,6 +121,7 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   animation_map _animations;
+  std::optional<std::reference_wrapper<animation>> _current_animation;
 
   bool _need_update_physics{true};
 

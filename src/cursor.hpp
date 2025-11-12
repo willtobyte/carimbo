@@ -52,6 +52,7 @@ private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;
+  std::optional<std::reference_wrapper<animation>> _current_animation;
   std::optional<std::string> _queued_action;
 };
 }
