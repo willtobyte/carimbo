@@ -14,7 +14,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   const auto width = static_cast<int32_t>(std::lround(static_cast<float>(lw) / sx));
   const auto height = static_cast<int32_t>(std::lround(static_cast<float>(lh) / sy));
 
-  auto* texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
+  auto* const texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
   if (!texture) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
@@ -36,9 +36,9 @@ void canvas::set_pixels(const char* pixels) {
     return;
   }
 
-  const auto ptr = _framebuffer.get();
-  void* buffer = nullptr;
-  auto pitch = 0;
+  auto* const ptr = _framebuffer.get();
+  auto* buffer = static_cast<void*>(nullptr);
+  auto pitch = int{};
 
   SDL_LockTexture(ptr, nullptr, &buffer, &pitch);
   std::memcpy(buffer, pixels, static_cast<size_t>(pitch) * static_cast<size_t>(ptr->h));
@@ -49,6 +49,6 @@ void canvas::clear() {
   set_pixels(reinterpret_cast<const char*>(_transparent.get()));
 }
 
-void canvas::draw() const {
+void canvas::draw() const noexcept {
   SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
 }
