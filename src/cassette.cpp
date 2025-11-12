@@ -5,9 +5,9 @@ using namespace storage;
 cassette::cassette() {
 #ifdef EMSCRIPTEN
   const auto* const raw = emscripten_run_script_string("document.cookie");
-  const auto cookie = std::string(raw ? raw : "");
+  const auto cookie = std::string_view(raw ? raw : "");
   const auto position = cookie.find(_cookiekey);
-  if (position == std::string::npos) {
+  if (position == std::string_view::npos) {
     _j = nlohmann::json::object();
     return;
   }
@@ -15,7 +15,7 @@ cassette::cassette() {
   const auto length = std::char_traits<char>::length(_cookiekey);
   const auto start = position + length;
   const auto end = cookie.find(';', start);
-  const auto value = cookie.substr(start, (end == std::string::npos ? cookie.size() - start : end - start));
+  const auto value = cookie.substr(start, (end == std::string_view::npos ? cookie.size() - start : end - start));
 
   if (nlohmann::json::accept(value)) {
     _j = nlohmann::json::parse(value);
@@ -32,13 +32,9 @@ cassette::cassette() {
   }
 
   std::ifstream file(_filename);
-  const auto content = std::string(
-    (std::istreambuf_iterator<char>(file)),
-    std::istreambuf_iterator<char>()
-  );
-
-  if (nlohmann::json::accept(content)) {
-    _j = nlohmann::json::parse(content);
+  if (nlohmann::json::accept(file)) {
+    file.seekg(0);
+    _j = nlohmann::json::parse(file);
     return;
   }
 

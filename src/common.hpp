@@ -83,6 +83,7 @@ namespace framework {
   class postalservice;
   class scene;
   class scenemanager;
+  class scriptengine;
   class statemanager;
   class timermanager;
   class world;
@@ -144,10 +145,6 @@ namespace steam {
 
 namespace i18n {
   class locales;
-}
-
-namespace lua {
-  class scriptengine;
 }
 
 namespace widget {

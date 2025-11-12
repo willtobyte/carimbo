@@ -116,11 +116,9 @@ void eventmanager::update(float delta) {
       } break;
 
       case SDL_EVENT_TEXT_INPUT: {
-        const std::string t{event.text.text};
-
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
-            receiver->on_text(t);
+            receiver->on_text(event.text.text);
           }
         }
       } break;

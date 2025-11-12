@@ -1,6 +1,6 @@
 #include "locales.hpp"
 
-static std::string language() {
+static std::string_view language() {
   auto count = 0;
   const auto locales = SDL_GetPreferredLocales(&count);
   if (!locales || count == 0) {
@@ -33,14 +33,14 @@ static const nlohmann::json& mapping() {
 }
 
 namespace localization {
-std::string text(std::string_view key) {
+std::string_view text(std::string_view key) {
   const auto& j = mapping();
   const auto it = j.find(key);
 
   if (it == j.end()) {
-    return std::string(key);
+    return key;
   }
 
-  return it.value().get<std::string>();
+  return it.value().get<std::string_view>();
 }
 }

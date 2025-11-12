@@ -37,8 +37,8 @@ class object final : public std::enable_shared_from_this<object> {
 public:
   object();
   virtual ~object();
-  std::string kind() const;
-  std::string scope() const;
+  std::string_view kind() const;
+  std::string_view scope() const;
 
   void update(float delta, uint64_t now);
 
@@ -69,7 +69,7 @@ public:
   void set_visible(bool value);
 
   void set_action(std::optional<std::string_view> action);
-  std::string action() const;
+  std::string_view action() const;
 
   void set_onbegin(sol::protected_function fn);
   void set_onend(sol::protected_function fn);

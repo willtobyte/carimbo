@@ -126,5 +126,5 @@ void cursor::draw() const {
 }
 
 void cursor::handle(const std::string_view message) {
-  _queued_action = std::string(message);
+  _queued_action = message;
 }

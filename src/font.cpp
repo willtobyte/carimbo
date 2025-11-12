@@ -72,6 +72,6 @@ void font::draw(std::string_view text, const geometry::point& position, const st
   }
 }
 
-std::string font::glyphs() const {
+std::string_view font::glyphs() const {
   return _glyphs;
 }

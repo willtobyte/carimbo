@@ -24,7 +24,7 @@ public:
 
   void draw(std::string_view text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const;
 
-  std::string glyphs() const;
+  std::string_view glyphs() const;
 
 private:
   std::string _glyphs;
