@@ -33,6 +33,35 @@ struct SDL_Deleter {
     if constexpr (requires { SDL_DestroySurface(ptr); }) SDL_DestroySurface(ptr);
     if constexpr (requires { SDL_DestroyTexture(ptr); }) SDL_DestroyTexture(ptr);
     if constexpr (requires { SDL_DestroyWindow(ptr); }) SDL_DestroyWindow(ptr);
+    if constexpr (requires { SDL_free(ptr); }) SDL_free(ptr);
+  }
+};
+
+struct OggVorbis_Deleter {
+  template <typename T>
+  void operator()(T* ptr) const noexcept {
+    if (!ptr) return;
+
+    if constexpr (requires { ov_clear(ptr); }) ov_clear(ptr);
+  }
+};
+
+struct SPNG_Deleter {
+  template <typename T>
+  void operator()(T* ptr) const noexcept {
+    if (!ptr) return;
+
+    if constexpr (requires { spng_ctx_free(ptr); }) spng_ctx_free(ptr);
+  }
+};
+
+struct PHYSFS_Deleter {
+  template <typename T>
+  void operator()(T* ptr) const noexcept {
+    if (!ptr) return;
+
+    if constexpr (requires { PHYSFS_close(ptr); }) PHYSFS_close(ptr);
+    if constexpr (requires { PHYSFS_freeList(ptr); }) PHYSFS_freeList(ptr);
   }
 };
 

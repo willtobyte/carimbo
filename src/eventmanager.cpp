@@ -14,7 +14,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   _joystickmapping.reserve(rc);
   _joystickgorder.reserve(rc);
 
-  std::unique_ptr<SDL_JoystickID[], decltype(&SDL_free)> joysticks(SDL_GetGamepads(&number), SDL_free);
+  std::unique_ptr<SDL_JoystickID[], SDL_Deleter> joysticks(SDL_GetGamepads(&number));
 
   if (joysticks) {
     for (auto index = 0; index < number; ++index) {

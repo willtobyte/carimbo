@@ -86,7 +86,7 @@ namespace {
 }
 
 soundfx::soundfx(std::string_view filename) {
-  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.data()), PHYSFS_close);
+  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data()));
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(
@@ -97,7 +97,7 @@ soundfx::soundfx(std::string_view filename) {
 
   PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
 
-  std::unique_ptr<OggVorbis_File, decltype(&ov_clear)> vf{new OggVorbis_File, ov_clear};
+  std::unique_ptr<OggVorbis_File, OggVorbis_Deleter> vf{new OggVorbis_File};
   ov_callbacks callbacks = {cb_read, cb_seek, cb_close, cb_tell};
   ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 

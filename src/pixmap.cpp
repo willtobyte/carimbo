@@ -6,10 +6,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     : _renderer(std::move(renderer)) {
   const auto buffer = storage::io::read(filename);
 
-  const auto ctx = std::unique_ptr<spng_ctx, decltype(&spng_ctx_free)>(
-    spng_ctx_new(SPNG_CTX_IGNORE_ADLER32),
-    spng_ctx_free
-  );
+  const auto ctx = std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32));
 
   if (const auto error = spng_set_png_buffer(ctx.get(), buffer.data(), buffer.size()); error != SPNG_OK) [[unlikely]] {
     throw std::runtime_error(
