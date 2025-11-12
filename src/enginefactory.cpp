@@ -13,7 +13,7 @@
 
 using namespace framework;
 
-enginefactory& enginefactory::with_title(const std::string& title) {
+enginefactory& enginefactory::with_title(const std::string_view title) noexcept {
   _title = title;
   return *this;
 }
@@ -43,7 +43,7 @@ enginefactory& enginefactory::with_fullscreen(const bool fullscreen) noexcept {
   return *this;
 }
 
-enginefactory& enginefactory::with_sentry(const std::string& dsn) {
+enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
   if (dsn.empty()) {
     return *this;
   }
@@ -72,7 +72,7 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) {
 #ifdef HAVE_SENTRY
   auto* options = sentry_options_new();
   sentry_options_set_debug(options, true);
-  sentry_options_set_dsn(options, dsn.c_str());
+  sentry_options_set_dsn(options, dsn.data());
   sentry_options_set_sample_rate(options, 1.0);
 
 #ifdef _WIN32
@@ -82,7 +82,8 @@ enginefactory& enginefactory::with_sentry(const std::string& dsn) {
 #endif
 
   const auto crashpad = std::filesystem::current_path() / program;
-  sentry_options_set_handler_path(options, crashpad.string().c_str());
+  const auto handler_path = crashpad.string();
+  sentry_options_set_handler_path(options, handler_path.c_str());
 
   sentry_options_set_database_path(options, ".sentry");
 

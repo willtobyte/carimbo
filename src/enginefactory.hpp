@@ -15,13 +15,13 @@ public:
   enginefactory(enginefactory&&) noexcept = default;
   enginefactory& operator=(enginefactory&&) noexcept = default;
 
-  enginefactory& with_title(const std::string& title);
+  enginefactory& with_title(std::string_view title) noexcept;
   enginefactory& with_width(int32_t width) noexcept;
   enginefactory& with_height(int32_t height) noexcept;
   enginefactory& with_scale(float scale) noexcept;
   enginefactory& with_gravity(float gravity) noexcept;
   enginefactory& with_fullscreen(bool fullscreen) noexcept;
-  enginefactory& with_sentry(const std::string& dsn);
+  enginefactory& with_sentry(std::string_view dsn) noexcept;
 
   std::shared_ptr<engine> create() const;
 
