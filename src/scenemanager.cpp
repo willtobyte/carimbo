@@ -59,7 +59,6 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     const auto x = i["x"].get<float>();
     const auto y = i["y"].get<float>();
     const auto emitting = i.value("emitting", true);
-    std::println("Emitter: {}", emitting);
 
     particles[std::string{name}] = factory->create(kind, x, y, emitting);
   }
