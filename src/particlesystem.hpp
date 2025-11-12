@@ -40,20 +40,24 @@ struct particleprops final {
   void set_placement(float xv, float yv) { x = xv; y = yv; }
 };
 
+struct alignas(64) particle final {
+  float x, y;
+  float vx, vy;
+  float gx, gy;
+  float life;
+  float scale;
+  double angle;
+  double av, af;
+  uint8_t alpha;
+  uint8_t _padding[7];
+};
+
 struct particlebatch final {
   std::shared_ptr<particleprops> props;
-
-  std::vector<float> x, y;
-  std::vector<float> vx, vy;
-  std::vector<float> gx, gy;
-  std::vector<double> av, af;
-  std::vector<float> life;
-  std::vector<float> scale;
-  std::vector<double> angle;
-  std::vector<std::uint8_t> alpha;
+  std::vector<particle> particles;
 
   std::size_t size() const {
-    return x.size();
+    return particles.size();
   }
 };
 

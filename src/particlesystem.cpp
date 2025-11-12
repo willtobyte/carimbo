@@ -56,19 +56,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
 
   auto pb = std::make_shared<particlebatch>();
   pb->props = std::move(ps);
-  pb->x.resize(count);
-  pb->y.resize(count);
-  pb->vx.resize(count);
-  pb->vy.resize(count);
-  pb->gx.resize(count);
-  pb->gy.resize(count);
-  pb->av.resize(count);
-  pb->af.resize(count);
-  pb->life.resize(count);
-  pb->scale.resize(count);
-  pb->angle.resize(count);
-  pb->alpha.resize(count);
-
+  pb->particles.resize(count);
 
   return pb;
 }
@@ -100,27 +88,32 @@ void graphics::particlesystem::clear() {
 }
 
 void particlesystem::update(float delta) {
+  const auto d = static_cast<double>(delta);
+
   for (const auto& batch : _batches) {
     auto& props = batch->props;
     if (!props->active) [[unlikely]] {
       continue;
     }
 
+    auto* particles = batch->particles.data();
     const auto n = batch->size();
+
     for (auto i = n; i-- > 0uz;) {
-      batch->life[i] -= delta;
-      if (batch->life[i] > 0.f) {
-        const auto d = static_cast<double>(delta);
-        batch->av[i] += batch->af[i] * d;
-        batch->angle[i] += batch->av[i] * d;
+      auto& p = particles[i];
 
-        batch->vx[i] += batch->gx[i] * delta;
-        batch->vy[i] += batch->gy[i] * delta;
-        batch->x[i] += batch->vx[i] * delta;
-        batch->y[i] += batch->vy[i] * delta;
+      p.life -= delta;
+      if (p.life > 0.f) {
+        p.av += p.af * d;
+        p.angle += p.av * d;
 
-        const auto a = 255.f * batch->life[i];
-        batch->alpha[i] = static_cast<std::uint8_t>(std::clamp(a, .0f, 255.f));
+        p.vx += p.gx * delta;
+        p.vy += p.gy * delta;
+        p.x += p.vx * delta;
+        p.y += p.vy * delta;
+
+        const auto a = 255.f * p.life;
+        p.alpha = static_cast<uint8_t>(std::clamp(a, .0f, 255.f));
         continue;
       }
 
@@ -128,18 +121,18 @@ void particlesystem::update(float delta) {
         continue;
       }
 
-      batch->x[i] = props->x + props->randxspawn();
-      batch->y[i] = props->y + props->randyspawn();
-      batch->vx[i] = props->randxvel();
-      batch->vy[i] = props->randyvel();
-      batch->gx[i] = props->randgx();
-      batch->gy[i] = props->randgy();
-      batch->av[i] = props->randrotvel();
-      batch->af[i] = props->randrotforce();
-      batch->life[i] = props->randlife();
-      batch->alpha[i] = props->randalpha();
-      batch->scale[i] = props->randscale();
-      batch->angle[i] = props->randangle();
+      p.x = props->x + props->randxspawn();
+      p.y = props->y + props->randyspawn();
+      p.vx = props->randxvel();
+      p.vy = props->randyvel();
+      p.gx = props->randgx();
+      p.gy = props->randgy();
+      p.av = props->randrotvel();
+      p.af = props->randrotforce();
+      p.life = props->randlife();
+      p.alpha = props->randalpha();
+      p.scale = props->randscale();
+      p.angle = props->randangle();
     }
   }
 }
@@ -157,24 +150,22 @@ void particlesystem::draw() const {
     const auto height = static_cast<float>(pixmap.height());
     static const geometry::point source{0, 0};
 
-    const auto* x = batch->x.data();
-    const auto* y = batch->y.data();
-    const auto* scale = batch->scale.data();
-    const auto* angle = batch->angle.data();
-    const auto* alpha = batch->alpha.data();
+    const auto* particles = batch->particles.data();
 
     for (auto i = n; i-- > 0uz;) {
+      const auto& p = particles[i];
+
       const geometry::rectangle destination{
-        x[i], y[i],
-        width  * scale[i],
-        height * scale[i]
+        p.x, p.y,
+        width * p.scale,
+        height * p.scale
       };
 
       pixmap.draw(
         source,
         destination,
-        angle[i],
-        alpha[i]
+        p.angle,
+        p.alpha
       );
     }
   }
