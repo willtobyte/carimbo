@@ -4,7 +4,7 @@ using namespace storage;
 
 cassette::cassette() {
 #ifdef EMSCRIPTEN
-  const auto* raw = emscripten_run_script_string("document.cookie");
+  const auto* const raw = emscripten_run_script_string("document.cookie");
   const auto cookie = std::string(raw ? raw : "");
   const auto position = cookie.find(_cookiekey);
   if (position == std::string::npos) {
@@ -32,7 +32,7 @@ cassette::cassette() {
   }
 
   std::ifstream file(_filename);
-  const std::string content(
+  const auto content = std::string(
     (std::istreambuf_iterator<char>(file)),
     std::istreambuf_iterator<char>()
   );
@@ -47,7 +47,7 @@ cassette::cassette() {
 #endif
 }
 
-void cassette::persist() const {
+void cassette::persist() const noexcept {
 #ifdef EMSCRIPTEN
   constexpr auto path = "; path=/";
   const auto value = std::format("{}{}{}", _cookiekey, _j.dump(), path);
@@ -59,8 +59,8 @@ void cassette::persist() const {
 #endif
 }
 
-void cassette::clear(const std::string& key) {
-  if (key.empty()) {
+void cassette::clear(const std::string& key) noexcept {
+  if (key.empty()) [[unlikely]] {
     return;
   }
 

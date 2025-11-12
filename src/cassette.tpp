@@ -18,5 +18,5 @@ T cassette::get(const std::string& key, const T& default_value) const {
 
   const auto& entry = _j.at(key);
 
-  return entry.get<T>();
+  return entry.template get<T>();
 }

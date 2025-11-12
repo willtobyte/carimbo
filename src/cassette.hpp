@@ -6,6 +6,12 @@ namespace storage {
 class cassette final {
 public:
   cassette();
+  ~cassette() = default;
+
+  cassette(const cassette&) = default;
+  cassette& operator=(const cassette&) = default;
+  cassette(cassette&&) noexcept = default;
+  cassette& operator=(cassette&&) noexcept = default;
 
   template <typename T>
   void set(const std::string& key, const T& value);
@@ -13,7 +19,7 @@ public:
   template <typename T>
   T get(const std::string& key, const T& default_value) const;
 
-  void clear(const std::string& key);
+  void clear(const std::string& key) noexcept;
 
 private:
   nlohmann::json _j;
@@ -23,7 +29,7 @@ private:
   static constexpr const char* _cookiekey = "cassette=";
 #endif
 
-  void persist() const;
+  void persist() const noexcept;
 };
 
 #include "cassette.tpp"
