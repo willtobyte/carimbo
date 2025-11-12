@@ -1,6 +1,6 @@
 #pragma once
 
-struct ALC_Deleter {
+struct ALC_Deleter final {
   template <typename T>
   void operator()(T* ptr) const noexcept {
     if (!ptr) return;
@@ -13,7 +13,7 @@ struct ALC_Deleter {
   }
 };
 
-struct SDL_Deleter {
+struct SDL_Deleter final {
   template <typename T>
   void operator()(T* ptr) const {
     if (!ptr) return;
@@ -37,7 +37,7 @@ struct SDL_Deleter {
   }
 };
 
-struct OggVorbis_Deleter {
+struct OggVorbis_Deleter final {
   template <typename T>
   void operator()(T* ptr) const noexcept {
     if (!ptr) return;
@@ -46,7 +46,7 @@ struct OggVorbis_Deleter {
   }
 };
 
-struct SPNG_Deleter {
+struct SPNG_Deleter final {
   template <typename T>
   void operator()(T* ptr) const noexcept {
     if (!ptr) return;
@@ -55,7 +55,7 @@ struct SPNG_Deleter {
   }
 };
 
-struct PHYSFS_Deleter {
+struct PHYSFS_Deleter final {
   template <typename T>
   void operator()(T* ptr) const noexcept {
     if (!ptr) return;
@@ -68,18 +68,18 @@ struct PHYSFS_Deleter {
   }
 };
 
-struct string_hash {
+struct string_hash final {
   using is_transparent = void;
   using hash_type = std::hash<std::string_view>;
-  
+
   size_t operator()(std::string_view str) const noexcept {
     return hash_type{}(str);
   }
-  
+
   size_t operator()(const std::string& str) const noexcept {
     return hash_type{}(str);
   }
-  
+
   size_t operator()(const char* str) const noexcept {
     return hash_type{}(str);
   }
@@ -87,5 +87,3 @@ struct string_hash {
 
 template <typename... Ts>
 constexpr void UNUSED(const Ts&...) {}
-
-inline uint64_t moment() { return SDL_GetTicks(); }

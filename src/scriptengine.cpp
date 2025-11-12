@@ -230,7 +230,7 @@ void framework::scriptengine::run() {
 
   lua["_"] = &localization::text;
 
-  lua["moment"] = &moment;
+  lua["moment"] = []() noexcept { return SDL_GetTicks(); };
 
   lua["openurl"] = [](std::string_view url) {
 #ifdef EMSCRIPTEN
