@@ -6,12 +6,16 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <boost/functional/hash.hpp>
+#include <boost/unordered/unordered_flat_set.hpp>
+#include <boost/unordered_map.hpp>
+#include <boost/unordered_set.hpp>
 #include <box2d/box2d.h>
-#include <SDL3/SDL.h>
+#include <lua.hpp>
 #include <nlohmann/json.hpp>
 #include <ogg/ogg.h>
 #include <physfs.h>
-#include <lua.hpp>
+#include <SDL3/SDL.h>
 #include <sol/sol.hpp>
 #include <spng.h>
 #include <vorbis/codec.h>
@@ -21,18 +25,13 @@
 #include <emscripten.h>
 #endif
 
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
-#include <boost/functional/hash.hpp>
-#include <boost/unordered/unordered_flat_set.hpp>
-
 #include <algorithm>
 #include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
-#include <cstdint>
 #include <csignal>
+#include <cstdint>
 #include <execution>
 #include <filesystem>
 #include <format>
