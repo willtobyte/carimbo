@@ -2,15 +2,18 @@
 
 using namespace steam;
 
-#ifdef HAVE_STEAM
-void achievement::unlock(const std::string& id) {
-  if (!SteamUserStats()) {
+void achievement::unlock(std::string_view id) noexcept {
+#ifndef HAVE_STEAM
+  return;
+#endif
+
+  if (!SteamUserStats()) [[unlikely]] {
     return;
   }
 
-  const auto* ptr = id.c_str();
+  const auto* ptr = id.data();
 
-  if (GetAchievement(ptr)) {
+  if (GetAchievement(ptr)) [[unlikely]] {
     return;
   }
 
@@ -19,6 +22,3 @@ void achievement::unlock(const std::string& id) {
   SetAchievement(ptr);
   StoreStats();
 }
-#else
-void achievement::unlock(const std::string&) {}
-#endif

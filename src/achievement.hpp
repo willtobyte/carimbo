@@ -3,11 +3,12 @@
 #include "common.hpp"
 
 namespace steam {
+
 class achievement final {
 public:
   achievement() = default;
   ~achievement() = default;
 
-  void unlock(const std::string& id);
+  void unlock(std::string_view id) noexcept;
 };
 }
