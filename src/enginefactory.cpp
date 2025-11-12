@@ -18,27 +18,27 @@ enginefactory& enginefactory::with_title(const std::string& title) {
   return *this;
 }
 
-enginefactory& enginefactory::with_width(int32_t width) {
+enginefactory& enginefactory::with_width(const int32_t width) noexcept {
   _width = width;
   return *this;
 }
 
-enginefactory& enginefactory::with_height(int32_t height) {
+enginefactory& enginefactory::with_height(const int32_t height) noexcept {
   _height = height;
   return *this;
 }
 
-enginefactory& enginefactory::with_scale(float scale) {
+enginefactory& enginefactory::with_scale(const float scale) noexcept {
   _scale = scale;
   return *this;
 }
 
-enginefactory& enginefactory::with_gravity(float gravity) {
+enginefactory& enginefactory::with_gravity(const float gravity) noexcept {
   _gravity = gravity;
   return *this;
 }
 
-enginefactory& enginefactory::with_fullscreen(bool fullscreen) {
+enginefactory& enginefactory::with_fullscreen(const bool fullscreen) noexcept {
   _fullscreen = fullscreen;
   return *this;
 }
