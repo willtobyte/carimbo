@@ -7,9 +7,9 @@
 namespace framework {
 class application final : private noncopyable {
 public:
-  application(int argc, char **argv);
-  virtual ~application() = default;
+  application(int argc, char** argv);
+  ~application() = default;
 
-  int32_t run();
+  [[nodiscard]] int32_t run();
 };
 }
