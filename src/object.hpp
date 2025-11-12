@@ -126,9 +126,9 @@ private:
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
-  std::function<void(std::shared_ptr<object>, const std::string& )> _onbegin;
-  std::function<void(std::shared_ptr<object>, const std::string& )> _onend;
-  std::function<void(std::shared_ptr<object>, const std::string& )> _onmail;
+  std::function<void(std::shared_ptr<object>, std::string_view)> _onbegin;
+  std::function<void(std::shared_ptr<object>, std::string_view)> _onend;
+  std::function<void(std::shared_ptr<object>, std::string_view)> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, std::equal_to<>> _collision_mapping;
 };
 }

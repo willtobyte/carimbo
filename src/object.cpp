@@ -245,6 +245,7 @@ void object::set_visible(bool value) {
 void object::set_action(std::optional<std::string_view> action) {
   if (!action || action->empty()) {
     _action.clear();
+
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
       b2Body_Disable(_body);
     }
@@ -275,15 +276,15 @@ std::string object::action() const {
 }
 
 void object::set_onbegin(sol::protected_function fn) {
-  _onbegin = interop::wrap_fn<void(std::shared_ptr<object>, const std::string&)>(std::move(fn));
+  _onbegin = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
 }
 
 void object::set_onend(sol::protected_function fn) {
-  _onend = interop::wrap_fn<void(std::shared_ptr<object>, const std::string&)>(std::move(fn));
+  _onend = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
 }
 
 void object::set_onmail(sol::protected_function fn) {
-  _onmail = interop::wrap_fn<void(std::shared_ptr<object>, const std::string&)>(std::move(fn));
+  _onmail = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
 }
 
 void object::set_ontouch(sol::protected_function fn) {
@@ -304,7 +305,7 @@ void object::set_oncollision(std::string_view kind, sol::protected_function fn) 
 
 void object::on_email(std::string_view message) {
   if (const auto& fn = _onmail; fn) {
-    fn(shared_from_this(), std::string(message));
+    fn(shared_from_this(), message);
   }
 }
 
