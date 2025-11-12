@@ -343,7 +343,7 @@ void object::on_unhover() {
   }
 }
 
-memory::kv& object::kv() const noexcept {
+memory::kv& object::kv() noexcept {
   return _kv;
 }
 

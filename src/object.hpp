@@ -85,7 +85,7 @@ public:
   void on_hover();
   void on_unhover();
 
-  memory::kv& kv() const noexcept;
+  memory::kv& kv() noexcept;
 
   uint64_t id() const noexcept;
 
