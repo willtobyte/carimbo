@@ -50,8 +50,8 @@ void overlay::draw() const {
   }
 }
 
-void overlay::set_cursor(const std::string& name) {
-  _cursor = std::make_shared<cursor>(std::move(name), _resourcemanager);
+void overlay::set_cursor(std::string_view name) {
+  _cursor = std::make_shared<cursor>(name, _resourcemanager);
   _eventmanager->add_receiver(_cursor);
 }
 
@@ -59,7 +59,7 @@ void overlay::hide() {
   SDL_HideCursor();
 }
 
-void overlay::dispatch(widgettype type, const std::string& message) {
+void overlay::dispatch(widgettype type, std::string_view message) {
   switch (type) {
   case widgettype::cursor: {
     if (const auto cursor = _cursor; cursor) {

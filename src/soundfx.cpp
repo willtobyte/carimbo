@@ -85,8 +85,8 @@ namespace {
   }
 }
 
-soundfx::soundfx(const std::string& filename) {
-  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.c_str()), PHYSFS_close);
+soundfx::soundfx(std::string_view filename) {
+  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.data()), PHYSFS_close);
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(

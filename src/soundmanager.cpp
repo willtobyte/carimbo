@@ -5,8 +5,8 @@ using namespace audio;
 soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
     : _audiodevice(std::move(audiodevice)) {}
 
-std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) {
-  const auto [it, inserted] = _pool.try_emplace(filename);
+std::shared_ptr<soundfx> soundmanager::get(std::string_view filename) {
+  const auto [it, inserted] = _pool.try_emplace(std::string(filename));
   if (!inserted) [[unlikely]] {
     return it->second;
   }
@@ -16,13 +16,13 @@ std::shared_ptr<soundfx> soundmanager::get(const std::string& filename) {
   return it->second = std::make_shared<soundfx>(filename);
 }
 
-void soundmanager::play(const std::string& filename, bool loop) {
+void soundmanager::play(std::string_view filename, bool loop) {
   if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->play(loop);
   }
 }
 
-void soundmanager::stop(const std::string& filename) {
+void soundmanager::stop(std::string_view filename) {
   if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->stop();
   }

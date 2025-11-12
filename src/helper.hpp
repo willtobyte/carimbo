@@ -36,6 +36,23 @@ struct SDL_Deleter {
   }
 };
 
+struct string_hash {
+  using is_transparent = void;
+  using hash_type = std::hash<std::string_view>;
+  
+  size_t operator()(std::string_view str) const noexcept {
+    return hash_type{}(str);
+  }
+  
+  size_t operator()(const std::string& str) const noexcept {
+    return hash_type{}(str);
+  }
+  
+  size_t operator()(const char* str) const noexcept {
+    return hash_type{}(str);
+  }
+};
+
 template <typename... Ts>
 constexpr void UNUSED(const Ts&...) {}
 

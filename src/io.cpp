@@ -2,8 +2,8 @@
 
 using namespace storage;
 
-std::vector<uint8_t> io::read(const std::string& filename) {
-  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.c_str()), PHYSFS_close);
+std::vector<uint8_t> io::read(std::string_view filename) {
+  const auto ptr = std::unique_ptr<PHYSFS_File, decltype(&PHYSFS_close)>(PHYSFS_openRead(filename.data()), PHYSFS_close);
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(
@@ -37,8 +37,8 @@ std::vector<uint8_t> io::read(const std::string& filename) {
   return buffer;
 }
 
-std::vector<std::string> io::enumerate(const std::string& directory) {
-  const std::unique_ptr<char*[], void(*)(char**)> ptr(PHYSFS_enumerateFiles(directory.c_str()), [](char** list) { PHYSFS_freeList(list); });
+std::vector<std::string> io::enumerate(std::string_view directory) {
+  const std::unique_ptr<char*[], void(*)(char**)> ptr(PHYSFS_enumerateFiles(directory.data()), [](char** list) { PHYSFS_freeList(list); });
 
   if (!ptr) [[unlikely]] {
     throw std::runtime_error(

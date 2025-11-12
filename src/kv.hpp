@@ -19,10 +19,10 @@ private:
 class kv final {
 public:
   ~kv() = default;
-  std::shared_ptr<memory::observable> get(const std::string& key, const sol::object& default_value = sol::lua_nil);
-  void set(const std::string& key, const sol::object& value);
+  std::shared_ptr<memory::observable> get(std::string_view key, const sol::object& default_value = sol::lua_nil);
+  void set(std::string_view key, const sol::object& value);
 
 private:
-  std::unordered_map<std::string, std::shared_ptr<observable>> _values;
+  std::unordered_map<std::string, std::shared_ptr<observable>, string_hash, std::equal_to<>> _values;
 };
 }

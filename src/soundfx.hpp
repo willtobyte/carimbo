@@ -5,7 +5,7 @@
 namespace audio {
 class soundfx final {
 public:
-  explicit soundfx(const std::string& filename);
+  explicit soundfx(std::string_view filename);
   ~soundfx();
 
   void play(bool loop = false) const;

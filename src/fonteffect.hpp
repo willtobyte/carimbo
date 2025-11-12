@@ -11,7 +11,7 @@ class fonteffect {
 
     virtual ~fonteffect() = default;
 
-    virtual void set(const std::string& text, geometry::point position) = 0;
+    virtual void set(std::string_view text, geometry::point position) = 0;
 
     virtual void update(float delta) = 0;
 
@@ -28,7 +28,7 @@ class fadeineffect final : public fonteffect {
   public:
     virtual ~fadeineffect() = default;
 
-    virtual void set(const std::string& text, geometry::point position) override;
+    virtual void set(std::string_view text, geometry::point position) override;
 
     virtual void update(float delta) override;
 

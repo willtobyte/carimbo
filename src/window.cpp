@@ -2,11 +2,11 @@
 
 using namespace graphics;
 
-window::window(const std::string& title, int32_t width, int32_t height, bool fullscreen)
+window::window(std::string_view title, int32_t width, int32_t height, bool fullscreen)
     : _width(width), _height(height),
       _window(
         SDL_CreateWindow(
-          title.c_str(),
+          title.data(),
           width,
           height,
           fullscreen ? SDL_WINDOW_FULLSCREEN : 0

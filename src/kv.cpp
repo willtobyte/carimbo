@@ -22,8 +22,8 @@ void observable::unsubscribe() {
   _subscriber = nullptr;
 }
 
-std::shared_ptr<memory::observable> kv::get(const std::string& key, const sol::object& default_value) {
-  auto [it, inserted] = _values.try_emplace(key, std::make_shared<observable>());
+std::shared_ptr<memory::observable> kv::get(std::string_view key, const sol::object& default_value) {
+  auto [it, inserted] = _values.try_emplace(std::string(key), std::make_shared<observable>());
 
   if (inserted) {
     it->second->set(default_value);
@@ -32,8 +32,8 @@ std::shared_ptr<memory::observable> kv::get(const std::string& key, const sol::o
   return it->second;
 }
 
-void kv::set(const std::string& key, const sol::object& value) {
-  const auto it = _values.try_emplace(key, std::make_shared<observable>()).first;
+void kv::set(std::string_view key, const sol::object& value) {
+  const auto it = _values.try_emplace(std::string(key), std::make_shared<observable>()).first;
 
   it->second->set(value);
 }

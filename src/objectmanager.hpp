@@ -21,7 +21,7 @@ public:
 
   virtual ~objectmanager() = default;
 
-  std::shared_ptr<object> create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage = true);
+  std::shared_ptr<object> create(std::string_view kind, std::optional<std::string_view> scope, bool manage = true);
 
   std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
 

@@ -3,7 +3,7 @@
 using namespace graphics;
 
 font::font(
-  const std::string& glyphs,
+  std::string_view glyphs,
   const glyphmap& map,
   std::shared_ptr<pixmap> pixmap,
   int16_t spacing,
@@ -18,7 +18,7 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const {
+void font::draw(std::string_view text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const {
   if (text.empty()) {
     return;
   }

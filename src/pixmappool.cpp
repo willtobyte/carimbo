@@ -6,16 +6,15 @@ using namespace graphics;
 pixmappool::pixmappool(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {}
 
-std::shared_ptr<pixmap> pixmappool::get(const std::string& filename) {
-  const auto [it, inserted] = _pool.try_emplace(filename);
+std::shared_ptr<pixmap> pixmappool::get(std::string_view filename) {
+  const auto [it, inserted] = _pool.try_emplace(std::string(filename));
   if (!inserted) [[unlikely]] {
     return it->second;
   }
 
   std::println("[pixmappool] cache miss {}", filename);
 
-  it->second = std::make_shared<pixmap>(_renderer, filename);
-  return it->second;
+  return it->second = std::make_shared<pixmap>(_renderer, filename);
 }
 
 void pixmappool::flush() {

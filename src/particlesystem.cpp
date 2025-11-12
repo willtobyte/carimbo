@@ -6,7 +6,7 @@ particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> res
   : _resourcemanager(std::move(resourcemanager)) {
 }
 
-std::shared_ptr<particlebatch> particlefactory::create(const std::string& kind, float x, float y, bool emitting) const {
+std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool emitting) const {
   const auto& filename = std::format("particles/{}.json", kind);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);

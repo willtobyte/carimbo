@@ -23,7 +23,7 @@ class tilemap final {
     explicit tilemap(
       geometry::size size,
       std::shared_ptr<resourcemanager> resourcemanager,
-      const std::string& name
+      std::string_view name
     );
     ~tilemap() = default;
 

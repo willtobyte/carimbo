@@ -9,10 +9,10 @@ public:
   soundmanager(std::shared_ptr<audiodevice> audiodevice);
   ~soundmanager() = default;
 
-  std::shared_ptr<soundfx> get(const std::string& filename);
+  std::shared_ptr<soundfx> get(std::string_view filename);
 
-  void play(const std::string& filename, bool loop = false);
-  void stop(const std::string& filename);
+  void play(std::string_view filename, bool loop = false);
+  void stop(std::string_view filename);
 
   void flush();
 
@@ -25,11 +25,6 @@ public:
 private:
   std::shared_ptr<audiodevice> _audiodevice;
 
-  std::unordered_map<
-    std::string,
-    std::shared_ptr<soundfx>,
-    std::hash<std::string>,
-    std::equal_to<std::string>
-  > _pool;
+  std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, std::equal_to<>> _pool;
 };
 }

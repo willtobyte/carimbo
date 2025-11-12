@@ -242,7 +242,7 @@ void object::set_visible(bool value) {
   }
 }
 
-void object::set_action(const std::optional<std::string>& action) {
+void object::set_action(std::optional<std::string_view> action) {
   if (!action || action->empty()) {
     _action.clear();
     if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
@@ -298,13 +298,13 @@ void object::set_onunhover(sol::protected_function fn) {
   _onunhover = interop::wrap_fn<void(std::shared_ptr<object>)>(std::move(fn));
 }
 
-void object::set_oncollision(std::string kind, sol::protected_function fn) {
-  _collision_mapping.insert_or_assign(std::move(kind), interop::wrap_fn<void(std::shared_ptr<object>, std::shared_ptr<object>)>(std::move(fn)));
+void object::set_oncollision(std::string_view kind, sol::protected_function fn) {
+  _collision_mapping[std::string(kind)] = interop::wrap_fn<void(std::shared_ptr<object>, std::shared_ptr<object>)>(std::move(fn));
 }
 
-void object::on_email(const std::string& message) {
+void object::on_email(std::string_view message) {
   if (const auto& fn = _onmail; fn) {
-    fn(shared_from_this(), message);
+    fn(shared_from_this(), std::string(message));
   }
 }
 

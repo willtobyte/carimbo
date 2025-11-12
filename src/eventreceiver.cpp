@@ -11,7 +11,7 @@ void eventreceiver::on_key_press(const keyboard::key& event) {
 void eventreceiver::on_key_release(const keyboard::key& event) {
 }
 
-void eventreceiver::on_text(const std::string& text) {
+void eventreceiver::on_text(std::string_view text) {
 }
 
 void eventreceiver::on_mouse_press(const mouse::button& event) {

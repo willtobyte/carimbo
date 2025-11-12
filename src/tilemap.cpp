@@ -5,7 +5,7 @@ using namespace framework;
 tilemap::tilemap(
     geometry::size size,
     std::shared_ptr<resourcemanager> resourcemanager,
-    const std::string& name) {
+    std::string_view name) {
   _view = { 0.f, 0.f, size.width(), size.height() };
 
   _pixmap = resourcemanager->pixmappool()->get(std::format("blobs/tilemaps/{}.png", name));

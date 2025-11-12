@@ -32,7 +32,7 @@ struct animation final {
 
 class cursor final : public input::eventreceiver {
 public:
-  explicit cursor(const std::string& name, std::shared_ptr<framework::resourcemanager> resourcemanager);
+  explicit cursor(std::string_view name, std::shared_ptr<framework::resourcemanager> resourcemanager);
   virtual ~cursor() = default;
 
   virtual void on_mouse_release(const input::event::mouse::button& event) override;
@@ -41,7 +41,7 @@ public:
   void update(float delta);
   void draw() const;
 
-  void handle(const std::string& message);
+  void handle(std::string_view message);
 
 private:
   geometry::point _position{0, 0};

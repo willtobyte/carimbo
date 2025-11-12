@@ -2,6 +2,13 @@
 
 using namespace graphics;
 
+static constexpr uint8_t from_hex(char c) {
+  if (c >= '0' && c <= '9') return c - '0';
+  if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+  if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+  throw std::runtime_error("invalid hex digit");
+}
+
 color::color(const uint32_t pixel) noexcept
     : _r(static_cast<uint8_t>(pixel >> 24)),
       _g(static_cast<uint8_t>(pixel >> 16)),
@@ -14,7 +21,7 @@ color::color(const SDL_Color& scolor) noexcept
 color::color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a) noexcept
     : _r(r), _g(g), _b(b), _a(a) {}
 
-color::color(const std::string& hex)
+color::color(std::string_view hex)
   : _r(0), _g(0), _b(0), _a(255) {
   const auto n = hex.size();
   if (n != 7 && n != 9) [[unlikely]] {
@@ -26,12 +33,12 @@ color::color(const std::string& hex)
   }
 
   try {
-    _r = static_cast<uint8_t>(std::stoi(hex.substr(1, 2), nullptr, 16));
-    _g = static_cast<uint8_t>(std::stoi(hex.substr(3, 2), nullptr, 16));
-    _b = static_cast<uint8_t>(std::stoi(hex.substr(5, 2), nullptr, 16));
+    _r = (from_hex(hex[1]) << 4) | from_hex(hex[2]);
+    _g = (from_hex(hex[3]) << 4) | from_hex(hex[4]);
+    _b = (from_hex(hex[5]) << 4) | from_hex(hex[6]);
 
     if (n == 9) {
-      _a = static_cast<uint8_t>(std::stoi(hex.substr(7, 2), nullptr, 16));
+      _a = (from_hex(hex[7]) << 4) | from_hex(hex[8]);
     }
   } catch (...) {
     throw std::runtime_error(std::format("invalid hex digits in '{}'", hex));

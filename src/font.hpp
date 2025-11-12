@@ -15,7 +15,7 @@ public:
   font() = delete;
 
   explicit font(
-    const std::string& glyphs,
+    std::string_view glyphs,
     const glyphmap& map,
     std::shared_ptr<pixmap> pixmap,
     int16_t spacing,
@@ -25,7 +25,7 @@ public:
 
   ~font() = default;
 
-  void draw(const std::string& text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const;
+  void draw(std::string_view text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const;
 
   std::string glyphs() const;
 

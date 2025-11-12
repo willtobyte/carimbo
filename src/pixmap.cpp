@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, const std::string& filename)
+pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     : _renderer(std::move(renderer)) {
   const auto buffer = storage::io::read(filename);
 

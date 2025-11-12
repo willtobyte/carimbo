@@ -71,7 +71,7 @@ public:
   bool visible() const;
   void set_visible(bool value);
 
-  void set_action(const std::optional<std::string>& action);
+  void set_action(std::optional<std::string_view> action);
   std::string action() const;
 
   void set_onbegin(sol::protected_function fn);
@@ -80,9 +80,9 @@ public:
   void set_ontouch(sol::protected_function fn);
   void set_onhover(sol::protected_function fn);
   void set_onunhover(sol::protected_function fn);
-  void set_oncollision(std::string kind, sol::protected_function fn);
+  void set_oncollision(std::string_view kind, sol::protected_function fn);
 
-  void on_email(const std::string& message);
+  void on_email(std::string_view message);
 
   void on_touch(float x, float y);
   void on_hover();
@@ -118,7 +118,7 @@ private:
   std::string _scope;
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
-  std::unordered_map<std::string, animation> _animations;
+  std::unordered_map<std::string, animation, string_hash, std::equal_to<>> _animations;
 
   bool _need_update_physics{true};
 
@@ -129,6 +129,6 @@ private:
   std::function<void(std::shared_ptr<object>, const std::string& )> _onbegin;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onend;
   std::function<void(std::shared_ptr<object>, const std::string& )> _onmail;
-  std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, std::hash<std::string_view>, std::equal_to<>> _collision_mapping;
+  std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, std::equal_to<>> _collision_mapping;
 };
 }

@@ -5,7 +5,7 @@
 namespace network {
 class querybuilder final {
 public:
-  querybuilder& add(const std::string& key, const std::string& value);
+  querybuilder& add(std::string_view key, std::string_view value);
 
   [[nodiscard]] std::string build() const;
 

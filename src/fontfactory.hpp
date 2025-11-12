@@ -15,7 +15,7 @@ public:
   explicit fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool);
   ~fontfactory() = default;
 
-  std::shared_ptr<font> get(const std::string& family);
+  std::shared_ptr<font> get(std::string_view family);
 
   void flush();
 
@@ -24,7 +24,7 @@ public:
   #endif
 
 private:
-  std::unordered_map<std::string, std::shared_ptr<font>> _pool;
+  std::unordered_map<std::string, std::shared_ptr<font>, string_hash, std::equal_to<>> _pool;
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<pixmappool> _pixmappool;
   std::function<void()> _loop;

@@ -2,8 +2,8 @@
 
 using namespace storage;
 
-void filesystem::mount(const std::string& filename, const std::string& mountpoint) {
-  if (PHYSFS_mount(filename.c_str(), mountpoint.c_str(), true) == 0) [[unlikely]] {
+void filesystem::mount(std::string_view filename, std::string_view mountpoint) {
+  if (PHYSFS_mount(filename.data(), mountpoint.data(), true) == 0) [[unlikely]] {
     throw std::runtime_error(
       std::format("[PHYSFS_mount] failed to mount {} to {}. reason: {}",
         filename,

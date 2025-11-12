@@ -20,7 +20,7 @@ enum class scenetype : uint8_t {
 class scene final {
 public:
   scene(
-    const std::string& name,
+    std::string_view name,
     std::shared_ptr<framework::objectmanager> objectmanager,
     std::shared_ptr<graphics::particlesystem> particlesystem,
     std::shared_ptr<graphics::pixmap> background,
@@ -41,13 +41,13 @@ public:
     std::shared_ptr<object>,
     std::shared_ptr<audio::soundfx>,
     std::shared_ptr<graphics::particleprops>
-  > get(const std::string& name, scenetype type) const;
+  > get(std::string_view name, scenetype type) const;
 
   std::string name() const;
 
   void on_enter() const;
   void on_leave() const;
-  void on_text(const std::string& text) const;
+  void on_text(std::string_view text) const;
   void on_touch(float x, float y) const;
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;

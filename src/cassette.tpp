@@ -1,7 +1,7 @@
 #pragma once
 
 template<typename T>
-void cassette::set(const std::string& key, const T& value) {
+void cassette::set(std::string_view key, const T& value) {
   if (key.empty()) [[unlikely]] {
     return;
   }
@@ -11,7 +11,7 @@ void cassette::set(const std::string& key, const T& value) {
 }
 
 template<typename T>
-T cassette::get(const std::string& key, const T& default_value) const {
+T cassette::get(std::string_view key, const T& default_value) const {
   if (!_j.contains(key)) {
     return default_value;
   }

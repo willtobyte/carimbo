@@ -12,10 +12,9 @@ objectmanager::objectmanager() {
   _objects.get<by_id>().rehash(128);
 }
 
-std::shared_ptr<object> objectmanager::create(const std::string& kind, std::optional<std::reference_wrapper<const std::string>> scope, bool manage) {
-  static const std::string empty;
-  const auto& n = scope.value_or(std::cref(empty)).get();
-  const auto& qualifier = n.empty() ? kind : std::format("{}/{}", n, kind);
+std::shared_ptr<object> objectmanager::create(std::string_view kind, std::optional<std::string_view> scope, bool manage) {
+  const auto& n = scope.value_or(std::string_view{});
+  const auto& qualifier = n.empty() ? std::string(kind) : std::format("{}/{}", n, kind);
 
   const auto& filename = std::format("objects/{}.json", qualifier);
   const auto& buffer = storage::io::read(filename);
@@ -23,7 +22,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   const auto scale = j.value("scale", float{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
-  std::unordered_map<std::string, animation> animations;
+  std::unordered_map<std::string, animation, string_hash, std::equal_to<>> animations;
   animations.reserve(j["animations"].size());
   for (auto&& item : j["animations"].items()) {
     const std::string& key = item.key();
@@ -37,7 +36,7 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
       const std::string e = a.at("effect").get<std::string>();
       effect = _resourcemanager->soundmanager()->get(
         std::format("blobs/{}{}.ogg",
-          (scope ? std::format("{}/", scope->get()) : std::string()), e));
+          (scope ? std::format("{}/", *scope) : std::string()), e));
     }
 
     std::optional<std::string> next;
@@ -62,8 +61,8 @@ std::shared_ptr<object> objectmanager::create(const std::string& kind, std::opti
 
   auto o = std::make_shared<object>();
   o->_scale = scale;
-  o->_kind = kind;
-  o->_scope = n;
+  o->_kind = std::string(kind);
+  o->_scope = std::string(n);
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
 

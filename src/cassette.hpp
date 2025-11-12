@@ -14,12 +14,12 @@ public:
   cassette& operator=(cassette&&) noexcept = default;
 
   template <typename T>
-  void set(const std::string& key, const T& value);
+  void set(std::string_view key, const T& value);
 
   template <typename T>
-  T get(const std::string& key, const T& default_value) const;
+  T get(std::string_view key, const T& default_value) const;
 
-  void clear(const std::string& key) noexcept;
+  void clear(std::string_view key) noexcept;
 
 private:
   nlohmann::json _j;

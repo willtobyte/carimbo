@@ -23,11 +23,11 @@ public:
 
   void draw() const;
 
-  void set_cursor(const std::string& name);
+  void set_cursor(std::string_view name);
 
   void hide();
 
-  void dispatch(widgettype type, const std::string& message);
+  void dispatch(widgettype type, std::string_view message);
 
 private:
   std::shared_ptr<framework::resourcemanager> _resourcemanager;

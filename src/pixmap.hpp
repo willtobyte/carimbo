@@ -16,7 +16,7 @@ enum class blendmode : SDL_BlendMode {
 class pixmap final {
 public:
   pixmap() = delete;
-  pixmap(std::shared_ptr<renderer> renderer, const std::string& filename);
+  pixmap(std::shared_ptr<renderer> renderer, std::string_view filename);
   ~pixmap() = default;
 
   void draw(

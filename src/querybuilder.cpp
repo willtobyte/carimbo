@@ -2,7 +2,7 @@
 
 using namespace network;
 
-static std::string encode(const std::string& value) {
+static std::string encode(std::string_view value) {
   std::string encoded;
   encoded.reserve(value.size() * 3);
 
@@ -19,7 +19,7 @@ static std::string encode(const std::string& value) {
   return encoded;
 }
 
-querybuilder& querybuilder::add(const std::string& key, const std::string& value) {
+querybuilder& querybuilder::add(std::string_view key, std::string_view value) {
   _parameters.emplace(std::string(key), std::string(value));
   return *this;
 }

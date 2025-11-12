@@ -3,7 +3,7 @@
 using namespace framework;
 
 scene::scene(
-  const std::string& name,
+  std::string_view name,
   std::shared_ptr<objectmanager> objectmanager,
   std::shared_ptr<graphics::particlesystem> particlesystem,
   std::shared_ptr<graphics::pixmap> background,
@@ -63,7 +63,7 @@ std::variant<
   std::shared_ptr<object>,
   std::shared_ptr<audio::soundfx>,
   std::shared_ptr<graphics::particleprops>
-> scene::get(const std::string& id, scenetype type) const {
+> scene::get(std::string_view id, scenetype type) const {
   if (type == scenetype::object) {
     for (const auto& [key, object] : _objects) {
       if (key == id) return object;
@@ -137,9 +137,9 @@ void scene::on_key_release(int32_t code) const {
   }
 }
 
-void scene::on_text(const std::string& text) const {
+void scene::on_text(std::string_view text) const {
   if (const auto& fn = _ontext; fn) {
-    fn(text);
+    fn(std::string(text));
   }
 }
 

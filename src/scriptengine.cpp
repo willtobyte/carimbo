@@ -445,7 +445,7 @@ void framework::scriptengine::run() {
         return self.create(kind, std::nullopt, manage);
       }
 
-      return self.create(kind, std::cref(*scope_opt), manage);
+      return self.create(kind, *scope_opt, manage);
     },
     "clone", &framework::objectmanager::clone,
     "remove", &framework::objectmanager::remove

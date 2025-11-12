@@ -2,7 +2,7 @@
 
 using namespace graphics;
 
-void fadeineffect::set(const std::string& text, geometry::point position) {
+void fadeineffect::set(std::string_view text, geometry::point position) {
   const auto length = text.size();
   if (length != _last_length) {
     _last_length = length;

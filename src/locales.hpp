@@ -3,5 +3,5 @@
 #include "common.hpp"
 
 namespace localization {
-std::string text(const std::string& key);
+std::string text(std::string_view key);
 }

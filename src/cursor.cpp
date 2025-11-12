@@ -4,7 +4,7 @@ using namespace graphics;
 
 using namespace input::event;
 
-cursor::cursor(const std::string& name, std::shared_ptr<framework::resourcemanager> resourcemanager)
+cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
 
@@ -93,6 +93,6 @@ void cursor::draw() const {
   );
 }
 
-void cursor::handle(const std::string& message) {
+void cursor::handle(std::string_view message) {
   _queued_action = message;
 }

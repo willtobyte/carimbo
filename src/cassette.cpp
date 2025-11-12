@@ -59,7 +59,7 @@ void cassette::persist() const noexcept {
 #endif
 }
 
-void cassette::clear(const std::string& key) noexcept {
+void cassette::clear(std::string_view key) noexcept {
   if (key.empty()) [[unlikely]] {
     return;
   }

@@ -15,7 +15,7 @@ static std::string language() {
   return locale->language;
 }
 
-static nlohmann::json parse(const std::string& code) {
+static nlohmann::json parse(std::string_view code) {
   const auto& filename = std::format("locales/{}.json", code);
   const auto& buffer = storage::io::read(filename);
   return nlohmann::json::parse(buffer);
@@ -33,12 +33,12 @@ static const nlohmann::json& mapping() {
 }
 
 namespace localization {
-std::string text(const std::string& key) {
+std::string text(std::string_view key) {
   const auto& j = mapping();
   const auto it = j.find(key);
 
   if (it == j.end()) {
-    return key;
+    return std::string(key);
   }
 
   return it.value().get<std::string>();

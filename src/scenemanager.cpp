@@ -14,8 +14,8 @@ scenemanager::scenemanager(
     _timermanager(std::move(timermanager)) {
 }
 
-std::shared_ptr<scene> scenemanager::load(const std::string& name) {
-  const auto [it, inserted] = _scene_mapping.try_emplace(name, nullptr);
+std::shared_ptr<scene> scenemanager::load(std::string_view name) {
+  const auto [it, inserted] = _scene_mapping.try_emplace(std::string(name), nullptr);
   if (!inserted) {
     return nullptr;
   }
@@ -88,7 +88,7 @@ std::shared_ptr<scene> scenemanager::load(const std::string& name) {
 
   std::optional<std::shared_ptr<tilemap>> map;
   if (const auto it = j.find("tilemap"); it != j.end()) {
-    map.emplace(std::make_shared<tilemap>(size, _resourcemanager, *it));
+    map.emplace(std::make_shared<tilemap>(size, _resourcemanager, it->get<std::string>()));
   }
 
   return it->second = std::make_shared<scene>(
@@ -108,7 +108,7 @@ std::string scenemanager::current() const {
   return _current;
 }
 
-void scenemanager::set(const std::string& name) {
+void scenemanager::set(std::string_view name) {
   if (_current == name) [[unlikely]] {
     std::println("[scenemanager] already in {}", name);
     return;
@@ -135,7 +135,7 @@ std::shared_ptr<scene> scenemanager::get() const {
   return _scene.lock();
 }
 
-std::vector<std::string> scenemanager::query(const std::string& name) const {
+std::vector<std::string> scenemanager::query(std::string_view name) const {
   std::vector<std::string> result;
   result.reserve(8);
   if (name.size() == 1 && name.front() == '*') {
@@ -146,14 +146,14 @@ std::vector<std::string> scenemanager::query(const std::string& name) const {
     return result;
   }
 
-  if (_scene_mapping.contains(name)) {
+  if (_scene_mapping.find(name) != _scene_mapping.end()) {
     result.emplace_back(name);
   }
 
   return result;
 }
 
-std::vector<std::string> scenemanager::destroy(const std::string& name) {
+std::vector<std::string> scenemanager::destroy(std::string_view name) {
   const auto scenes = query(name);
 
   for (const auto& scene : scenes) {
@@ -199,7 +199,7 @@ void scenemanager::on_key_release(const input::event::keyboard::key& event) {
   ptr->on_key_release(static_cast<int32_t>(event));
 }
 
-void scenemanager::on_text(const std::string& text) {
+void scenemanager::on_text(std::string_view text) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->on_text(text);

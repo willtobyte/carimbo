@@ -13,7 +13,7 @@ public:
 
   void set_font(std::shared_ptr<font> font);
 
-  void set(const std::string& text, float x, float y);
+  void set(std::string_view text, float x, float y);
 
   void set(float x, float y);
 
