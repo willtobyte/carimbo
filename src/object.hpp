@@ -85,9 +85,9 @@ public:
   void on_hover();
   void on_unhover();
 
-  memory::kv& kv();
+  memory::kv& kv() const noexcept;
 
-  uint64_t id() const;
+  uint64_t id() const noexcept;
 
 protected:
   void suspend();
@@ -98,6 +98,7 @@ private:
   friend class scene;
   friend class world;
 
+  uint64_t _id;
   b2BodyId _body;
   b2ShapeId _collision_shape;
   std::weak_ptr<world> _world;

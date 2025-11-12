@@ -74,12 +74,12 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   }
 
   auto o = std::make_shared<object>();
+  o->_id = _counter++;
   o->_scale = scale;
   o->_kind = std::string(kind);
   o->_scope = std::string(n);
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
-
   o->_world = _world;
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
@@ -97,6 +97,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   }
 
   const auto o = std::make_shared<object>();
+  o->_id = _counter++;
   o->_angle = matrix->_angle;
   o->_kind = matrix->_kind;
   o->_scope = matrix->_scope;
@@ -112,7 +113,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
 
   _objects.emplace(o);
 
-  std::println("[objectmanager] clone {} ({}) to {}", matrix->kind(), matrix->id(), o->id());
+  std::println("[objectmanager] clone {} {} to {}", matrix->kind(), matrix->id(), o->id());
 
   return o;
 }

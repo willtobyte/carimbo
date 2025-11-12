@@ -343,12 +343,12 @@ void object::on_unhover() {
   }
 }
 
-memory::kv& object::kv() {
+memory::kv& object::kv() const noexcept {
   return _kv;
 }
 
-uint64_t object::id() const {
-  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(this));
+uint64_t object::id() const noexcept {
+  return _id;
 }
 
 void object::suspend() {

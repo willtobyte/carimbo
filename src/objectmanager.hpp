@@ -50,7 +50,7 @@ private:
   struct id_key {
     using result_type = uint64_t;
     result_type operator()(const node& n) const {
-      return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(n.object.get()));
+      return n.object->id();
     }
   };
 
@@ -69,6 +69,7 @@ private:
 
   container_t _objects;
 
+  std::atomic<uint64_t> _counter;
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<scenemanager> _scenemanager;
   std::shared_ptr<world> _world;
