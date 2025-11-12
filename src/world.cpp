@@ -5,7 +5,7 @@
 using namespace framework;
 
 template <class Map, class Key>
-static inline const typename Map::mapped_type* find_ptr(
+[[nodiscard]] static inline const typename Map::mapped_type* find_ptr(
   const Map& m,
   const Key& k
 ) {
@@ -27,10 +27,9 @@ world::~world() {
   }
 }
 
-void world::update(float delta) {
-  static std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> collisions;
-  collisions.clear();
-  collisions.reserve(16);
+void world::update(const float delta) {
+  _collisions.clear();
+  _collisions.reserve(16);
 
   _accumulator += std::min(delta, 0.1f);
 
@@ -51,8 +50,8 @@ void world::update(float delta) {
       const auto id_a = physics::userdata_to_id(user_data_a);
       const auto id_b = physics::userdata_to_id(user_data_b);
 
-      auto pair = std::minmax(id_a, id_b);
-      if (collisions.insert(pair).second) {
+      const auto pair = std::minmax(id_a, id_b);
+      if (_collisions.insert(pair).second) {
         notify(id_a, id_b);
       }
     }
@@ -62,11 +61,11 @@ void world::update(float delta) {
 }
 
 #ifdef DEBUG
-static bool _draw_callback(b2ShapeId shape, void* ctx) {
-  auto* renderer = static_cast<SDL_Renderer*>(ctx);
-  const b2AABB aabb = b2Shape_GetAABB(shape);
+[[nodiscard]] static bool _draw_callback(const b2ShapeId shape, void* const ctx) {
+  auto* const renderer = static_cast<SDL_Renderer*>(ctx);
+  const auto aabb = b2Shape_GetAABB(shape);
 
-  SDL_FRect r{
+  const auto r = SDL_FRect{
     aabb.lowerBound.x,
     aabb.lowerBound.y,
     aabb.upperBound.x - aabb.lowerBound.x,
@@ -91,29 +90,29 @@ void world::draw() const {
   const auto y1 = static_cast<float>(height);
 
   const auto aabb = to_aabb(x0, y0, x1, y1);
-  auto filter = b2DefaultQueryFilter();
+  const auto filter = b2DefaultQueryFilter();
 
   b2World_OverlapAABB(_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
 #endif
 }
 
-world::operator b2WorldId() const {
+world::operator b2WorldId() const noexcept {
   return _world;
 }
 
-void world::notify(uint64_t id_a, uint64_t id_b) const {
-  auto objectmanager = _objectmanager.lock();
+void world::notify(const uint64_t id_a, const uint64_t id_b) const {
+  const auto objectmanager = _objectmanager.lock();
   if (!objectmanager) [[unlikely]] return;
 
-  auto object_a = objectmanager->find(id_a);
-  auto object_b = objectmanager->find(id_b);
+  const auto object_a = objectmanager->find(id_a);
+  const auto object_b = objectmanager->find(id_b);
 
   if (!object_a || !object_b) [[unlikely]] return;
 
-  if (const auto* callback = find_ptr(object_a->_collision_mapping, object_b->kind())) (*callback)(object_a, object_b);
-  if (const auto* callback = find_ptr(object_b->_collision_mapping, object_a->kind())) (*callback)(object_b, object_a);
+  if (const auto* const callback = find_ptr(object_a->_collision_mapping, object_b->kind())) (*callback)(object_a, object_b);
+  if (const auto* const callback = find_ptr(object_b->_collision_mapping, object_a->kind())) (*callback)(object_b, object_a);
 
-  SDL_Event event{};
+  auto event = SDL_Event{};
   event.type = static_cast<uint32_t>(input::event::type::collision);
   event.user.data1 = _envelopepool->acquire(collisionenvelope(id_a, id_b)).release();
   SDL_PushEvent(&event);
