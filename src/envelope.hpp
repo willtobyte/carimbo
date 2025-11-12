@@ -7,7 +7,7 @@ struct collisionenvelope final {
   uint64_t a;
   uint64_t b;
 
-  constexpr collisionenvelope(const uint64_t a, const uint64_t b) noexcept;
+  collisionenvelope(const uint64_t a, const uint64_t b) noexcept;
 };
 
 struct mailenvelope final {
