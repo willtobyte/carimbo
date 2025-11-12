@@ -6,27 +6,32 @@ namespace graphics {
 class color final {
 public:
   color() = default;
-  explicit color(uint32_t pixel);
-  explicit color(const SDL_Color& scolor);
-  color(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+  explicit color(uint32_t pixel) noexcept;
+  explicit color(const SDL_Color& scolor) noexcept;
+  color(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
   explicit color(const std::string& hex);
   ~color() = default;
 
-  uint8_t r() const;
-  uint8_t g() const;
-  uint8_t b() const;
-  uint8_t a() const;
+  color(const color&) noexcept = default;
+  color& operator=(const color&) noexcept = default;
+  color(color&&) noexcept = default;
+  color& operator=(color&&) noexcept = default;
 
-  void set_r(uint8_t r);
-  void set_g(uint8_t g);
-  void set_b(uint8_t b);
-  void set_a(uint8_t a);
+  uint8_t r() const noexcept;
+  uint8_t g() const noexcept;
+  uint8_t b() const noexcept;
+  uint8_t a() const noexcept;
 
-  bool operator==(const color& other) const;
+  void set_r(uint8_t r) noexcept;
+  void set_g(uint8_t g) noexcept;
+  void set_b(uint8_t b) noexcept;
+  void set_a(uint8_t a) noexcept;
 
-  bool operator!=(const color& other) const;
+  bool operator==(const color& other) const noexcept;
 
-  explicit operator SDL_Color() const;
+  bool operator!=(const color& other) const noexcept;
+
+  explicit operator SDL_Color() const noexcept;
 
 private:
   uint8_t _r{0};

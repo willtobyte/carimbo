@@ -53,11 +53,11 @@ timermanager::timermanager()
 }
 
 uint32_t timermanager::set(uint32_t interval, sol::protected_function fn) {
-  return add_timer(interval, std::move(interop::wrap_fn(fn)), true);
+  return add_timer(interval, interop::wrap_fn(fn), true);
 }
 
 uint32_t timermanager::singleshot(uint32_t interval, sol::protected_function fn) {
-  return add_timer(interval, std::move(interop::wrap_fn(fn)), false);
+  return add_timer(interval, interop::wrap_fn(fn), false);
 }
 
 void timermanager::cancel(uint32_t id) {

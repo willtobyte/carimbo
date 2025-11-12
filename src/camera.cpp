@@ -11,7 +11,7 @@ void camera::update(float delta) {
 }
 
 void camera::set_onrequestposition(sol::protected_function fn) {
-  _on_request_position = interop::wrap_fn<std::tuple<float, float>(float)>(std::move(fn));
+  _on_request_position = interop::wrap_fn<std::tuple<float, float>(float)>(fn);
 }
 
 std::tuple<float, float> camera::viewport() const noexcept {

@@ -291,9 +291,10 @@ void eventmanager::update(float delta) {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
 
         if (const auto* payload = ptr->try_timer(); payload) {
-          auto release = !payload->repeat;
+          const auto release = !payload->repeat;
+          const auto fn = payload->fn;
 
-          if (const auto& fn = payload->fn; fn) {
+          if (fn) {
             fn();
           }
 
