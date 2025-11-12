@@ -15,7 +15,7 @@ struct mailenvelope final {
   std::string kind;
   std::string body;
 
-  mailenvelope(uint64_t to, const std::string& kind, const std::string& body)
+  mailenvelope(uint64_t to, std::string_view kind, std::string_view body)
     : to(to), kind(kind), body(body) {}
 };
 

@@ -22,10 +22,10 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
 
   const auto scale = j.value("scale", float{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
-  std::unordered_map<std::string, animation, string_hash, std::equal_to<>> animations;
+  animation_map animations;
   animations.reserve(j["animations"].size());
   for (auto&& item : j["animations"].items()) {
-    const std::string& key = item.key();
+    const auto& key = item.key();
     const auto& a = item.value();
 
     std::optional<framework::bounds> bounds;

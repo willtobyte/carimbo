@@ -33,7 +33,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   effects.reserve(es.size());
 
   for (const auto& e : es) {
-    const auto& basename = e.get_ref<const std::string&>();
+    const auto basename = e.get<std::string_view>();
     const auto f = std::format("blobs/{}/{}.ogg", name, basename);
     effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
   }
@@ -45,19 +45,20 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto factory = _particlesystem->factory();
 
   for (const auto& i : ps) {
-    const auto& name = i["name"].get_ref<const std::string&>();
-    const auto& kind = i["kind"].get_ref<const std::string&>();
+    const auto name = i["name"].get<std::string_view>();
+    const auto kind = i["kind"].get<std::string_view>();
     const auto x = i["x"].get<float>();
     const auto y = i["y"].get<float>();
     const auto emitting = i.value("emitting", true);
     std::println("Emitter: {}", emitting);
 
-    particles[name] = factory->create(kind, x, y, emitting);
+    particles[std::string{name}] = factory->create(kind, x, y, emitting);
   }
 
   const auto fs = j.value("fonts", nlohmann::json::array());
   for (const auto& i : fs) {
-    _resourcemanager->fontfactory()->get(i.get_ref<const std::string&>());
+    const auto fontname = i.get<std::string_view>();
+    _resourcemanager->fontfactory()->get(fontname);
   }
 
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;

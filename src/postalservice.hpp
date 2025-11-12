@@ -11,7 +11,7 @@ struct mail final {
   mail(
     std::shared_ptr<object> to,
     std::optional<std::shared_ptr<object>> from,
-    const std::string& body
+    std::string_view body
   )
     : to(to->id()),
       kind(from && *from ? (*from)->kind() : "unknown"),

@@ -42,7 +42,7 @@ inline constexpr auto debugger =
 #endif
 ;
 
-static sol::object searcher(sol::this_state state, const std::string& module) {
+static sol::object searcher(sol::this_state state, std::string_view module) {
   sol::state_view lua{state};
 
   const auto filename = std::format("scripts/{}.lua", module);
@@ -232,17 +232,17 @@ void framework::scriptengine::run() {
 
   lua["moment"] = &moment;
 
-  lua["openurl"] = [](const std::string& url) {
+  lua["openurl"] = [](std::string_view url) {
 #ifdef EMSCRIPTEN
     const auto script = std::format(R"javascript(window.open('{}', '_blank', 'noopener,noreferrer');)javascript", url);
     emscripten_run_script(script.c_str());
 #else
-    SDL_OpenURL(url.c_str());
+    SDL_OpenURL(url.data());
 #endif
   };
 
-  lua["queryparam"] = [](const std::string& key, const std::string& defval) {
-    auto out = defval;
+  lua["queryparam"] = [](std::string_view key, std::string_view defval) {
+    std::string out{defval};
 
 #ifdef EMSCRIPTEN
     const auto script = std::format(
@@ -257,7 +257,7 @@ void framework::scriptengine::run() {
       out.assign(result);
     }
 #else
-    auto uppercase_key = key;
+    std::string uppercase_key{key};
     std::ranges::transform(
       uppercase_key,
       uppercase_key.begin(),
@@ -303,7 +303,7 @@ void framework::scriptengine::run() {
   lua["operatingsystem"] = &operatingsystem;
 
   lua["JSON"] = lua.create_table_with(
-    "parse", [](const std::string& json, sol::this_state state) {
+    "parse", [](std::string_view json, sol::this_state state) {
       const auto& j = nlohmann::json::parse(json);
 
       sol::state_view lua(state);
@@ -338,7 +338,7 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "play", [](
       audio::soundmanager& self,
-      const std::string& name,
+      std::string_view name,
       std::optional<bool> loop_opt
     ) {
       auto loop = loop_opt.value_or(false);
@@ -436,7 +436,7 @@ void framework::scriptengine::run() {
     sol::no_constructor,
     "create", [](
       framework::objectmanager& self,
-      const std::string& kind,
+      std::string_view kind,
       sol::optional<std::string> scope_opt,
       sol::optional<bool> manage_opt
     ) {
@@ -533,7 +533,7 @@ void framework::scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "current", sol::property(&framework::scenemanager::current),
-    "set", [&lua](framework::scenemanager& self, const std::string& name) {
+    "set", [&lua](framework::scenemanager& self, std::string_view name) {
       try {
         self.set(name);
       } catch (const std::exception& e) {
@@ -543,7 +543,7 @@ void framework::scriptengine::run() {
     "get", &framework::scenemanager::get,
     "destroy", [&lua](
       framework::scenemanager& self,
-      const std::string& name
+      std::string_view name
     ) {
       const auto scenes = self.query(name);
 
@@ -559,7 +559,7 @@ void framework::scriptengine::run() {
     },
     "register", [&lua](
       framework::scenemanager& self,
-      const std::string& name
+      std::string_view name
     ) {
       const auto start = SDL_GetPerformanceCounter();
 
@@ -586,7 +586,7 @@ void framework::scriptengine::run() {
         loaded[std::format("scenes/{}", name)] = module;
         auto ptr = std::weak_ptr<framework::scene>(scene);
 
-        module["get"] = [ptr, name](sol::table, const std::string& id, framework::scenetype type) {
+        module["get"] = [ptr, name](sol::table, std::string_view id, framework::scenetype type) {
           if (auto scene = ptr.lock()) [[likely]] {
             return scene->get(id, type);
           }
@@ -653,7 +653,7 @@ void framework::scriptengine::run() {
   struct cursorproxy {
     graphics::overlay& o;
 
-    void set(const std::string& name) { o.set_cursor(name); }
+    void set(std::string_view name) { o.set_cursor(name); }
 
     void hide() { o.hide(); }
   };
@@ -769,7 +769,7 @@ void framework::scriptengine::run() {
     "clear", &storage::cassette::clear,
     "set", [](
       storage::cassette& self,
-      const std::string& key,
+      std::string_view key,
       sol::object value
     ) {
       switch (value.get_type()) {
@@ -800,7 +800,7 @@ void framework::scriptengine::run() {
     },
     "get", [](
       const storage::cassette& self,
-      const std::string& key,
+      std::string_view key,
       sol::object default_value,
       sol::this_state state
     ) {
@@ -829,7 +829,7 @@ void framework::scriptengine::run() {
 
   lua.new_usertype<graphics::color>(
     "Color",
-    "color", sol::constructors<graphics::color(const std::string& )>(),
+    "color", sol::constructors<graphics::color(std::string_view)>(),
 
     "r", sol::property(&graphics::color::r, &graphics::color::set_r),
     "g", sol::property(&graphics::color::g, &graphics::color::set_g),
@@ -984,7 +984,7 @@ void framework::scriptengine::run() {
     sol::constructors<framework::mail(
       std::shared_ptr<framework::object>,
       std::optional<std::shared_ptr<framework::object>>,
-      const std::string&
+      std::string_view
     )>()
   );
 
@@ -1018,7 +1018,7 @@ void framework::scriptengine::run() {
       },
       [](
         std::shared_ptr<graphics::label> self,
-        const std::string& text,
+        std::string_view text,
         float x,
         float y
       ) {

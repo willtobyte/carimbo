@@ -4,19 +4,19 @@
 using namespace framework;
 
 static const std::map<std::string, std::function<void(
-  const std::string&,
+  std::string_view,
   graphics::pixmappool&,
   audio::soundmanager&
 )>> handlers = {
   {
     ".png",
-    [](const std::string& filename, graphics::pixmappool& pixmappool, audio::soundmanager&) {
+    [](std::string_view filename, graphics::pixmappool& pixmappool, audio::soundmanager&) {
       pixmappool.get(filename);
     }
   },
   {
     ".ogg",
-    [](const std::string& filename, graphics::pixmappool&, audio::soundmanager& soundmanager) {
+    [](std::string_view filename, graphics::pixmappool&, audio::soundmanager& soundmanager) {
       soundmanager.get(filename);
     }
   }

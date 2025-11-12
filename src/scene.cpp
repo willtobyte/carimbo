@@ -139,7 +139,7 @@ void scene::on_key_release(int32_t code) const {
 
 void scene::on_text(std::string_view text) const {
   if (const auto& fn = _ontext; fn) {
-    fn(std::string(text));
+    fn(text);
   }
 }
 
@@ -174,7 +174,7 @@ void scene::set_onkeyrelease(sol::protected_function fn) {
 }
 
 void scene::set_ontext(sol::protected_function fn) {
-  _ontext = interop::wrap_fn<void(const std::string&)>(std::move(fn));
+  _ontext = interop::wrap_fn<void(std::string_view)>(std::move(fn));
 }
 
 void scene::set_onmotion(sol::protected_function fn) {

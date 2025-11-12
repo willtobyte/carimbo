@@ -80,7 +80,7 @@ private:
   std::function<void(float, float)> _ontouch;
   std::function<void(int32_t)> _onkeypress;
   std::function<void(int32_t)> _onkeyrelease;
-  std::function<void(const std::string& )> _ontext;
+  std::function<void(std::string_view)> _ontext;
   std::function<void(float, float)> _onmotion;
 };
 }

@@ -36,6 +36,8 @@ struct animation final {
   std::vector<keyframe> keyframes;
 };
 
+using animation_map = std::unordered_map<std::string, animation, string_hash, std::equal_to<>>;
+
 class object final : public std::enable_shared_from_this<object> {
 public:
   object();
@@ -118,7 +120,7 @@ private:
   std::string _scope;
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
-  std::unordered_map<std::string, animation, string_hash, std::equal_to<>> _animations;
+  animation_map _animations;
 
   bool _need_update_physics{true};
 

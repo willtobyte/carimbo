@@ -84,7 +84,7 @@ struct motion {
 }
 
 struct mail final {
-  mail(uint64_t to, const std::string& body)
+  mail(uint64_t to, std::string_view body)
       : to(to), body(body) {}
 
   mail(const mail& other) = default;
