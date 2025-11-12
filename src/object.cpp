@@ -46,7 +46,7 @@ float object::x() const {
 void object::set_x(float x) {
   if (_position.x() == x) return;
   _position.set_x(x);
-  _need_update_physics = true;
+  _dirty = true;
 }
 
 float object::y() const {
@@ -56,13 +56,13 @@ float object::y() const {
 void object::set_y(float y) {
   if (_position.y() == y) return;
   _position.set_y(y);
-  _need_update_physics = true;
+  _dirty = true;
 }
 
 void object::set_placement(float x, float y) {
   if (_position.x() == x && _position.y() == y) return;
   _position.set(x, y);
-  _need_update_physics = true;
+  _dirty = true;
 }
 
 geometry::point object::placement() const {
@@ -96,57 +96,64 @@ void object::update(float delta, uint64_t now) {
   }
 
   if (!animation.bounds || !_visible) [[unlikely]] {
-    if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) b2Body_Disable(_body);
+    if (b2Body_IsValid(_body) && b2Body_IsEnabled(_body)) {
+      b2Body_Disable(_body);
+    }
     return;
   }
 
-  if (b2Body_IsValid(_body) && !_need_update_physics) {
+  if (b2Body_IsValid(_body) && !_dirty) {
     if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
     return;
   }
 
-  const auto& rectangle = animation.bounds->rectangle;
-  const auto transform = physics::body_transform::compute(
-    _position.x() + rectangle.x(), _position.y() + rectangle.y(),
-    0, 0, rectangle.width(), rectangle.height(),
-    _scale, _angle
-  );
+  if (b2Body_IsValid(_body) || _dirty) {
+    const auto& rectangle = animation.bounds->rectangle;
+    const auto transform = physics::body_transform::compute(
+      _position.x() + rectangle.x(), _position.y() + rectangle.y(),
+      0, 0, rectangle.width(), rectangle.height(),
+      _scale, _angle
+    );
 
-  const auto box = b2MakeBox(transform.hx(), transform.hy());
-  const auto rotation = b2MakeRot(transform.radians());
-  const auto position = b2Vec2{transform.px(), transform.py()};
+    const auto box = b2MakeBox(transform.hx(), transform.hy());
+    const auto rotation = b2MakeRot(transform.radians());
+    const auto position = b2Vec2{transform.px(), transform.py()};
 
-  if (!b2Body_IsValid(_body)) {
-    const auto world = _world.lock();
+    if (!b2Body_IsValid(_body)) {
+      const auto world = _world.lock();
 
-    if (b2Shape_IsValid(_collision_shape)) {
-      std::println("[object] warning: orphaned shape for {} {}", kind(), id());
-      b2DestroyShape(_collision_shape, false);
+      if (b2Shape_IsValid(_collision_shape)) {
+        std::println("[object] warning: orphaned shape for {} {}", kind(), id());
+        b2DestroyShape(_collision_shape, false);
+      }
+
+      auto def = b2DefaultBodyDef();
+      def.type = b2_kinematicBody;
+      def.userData = physics::id_to_userdata(id());
+      def.position = position;
+      def.rotation = rotation;
+      _body = b2CreateBody(*world, &def);
+
+      auto sd = b2DefaultShapeDef();
+      sd.isSensor = true;
+      sd.enableSensorEvents = true;
+      sd.filter.categoryBits = physics::collisioncategory::Player;
+      sd.filter.maskBits = physics::collisioncategory::Player;
+      _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
+
+      _dirty = false;
+      return;
     }
 
-    auto def = b2DefaultBodyDef();
-    def.type = b2_kinematicBody;
-    def.userData = physics::id_to_userdata(id());
-    def.position = position;
-    def.rotation = rotation;
-    _body = b2CreateBody(*world, &def);
+    if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
 
-    auto sd = b2DefaultShapeDef();
-    sd.isSensor = true;
-    sd.enableSensorEvents = true;
-    sd.filter.categoryBits = physics::collisioncategory::Player;
-    sd.filter.maskBits = physics::collisioncategory::Player;
-    _collision_shape = b2CreatePolygonShape(_body, &sd, &box);
-    return;
+    b2Body_SetTransform(_body, position, rotation);
+
+    if (b2Shape_IsValid(_collision_shape))
+      b2Shape_SetPolygon(_collision_shape, &box);
+
+    _dirty = false;
   }
-
-  if (!b2Body_IsEnabled(_body)) b2Body_Enable(_body);
-
-  _need_update_physics = false;
-  b2Body_SetTransform(_body, position, rotation);
-
-  if (b2Shape_IsValid(_collision_shape))
-    b2Shape_SetPolygon(_collision_shape, &box);
 }
 
 void object::draw() const {
@@ -194,7 +201,7 @@ uint8_t object::alpha() const {
 void object::set_scale(float scale) {
   if (_scale == scale) return;
   _scale = scale;
-  _need_update_physics = true;
+  _dirty = true;
 }
 
 float object::scale() const {
@@ -204,7 +211,7 @@ float object::scale() const {
 void object::set_angle(double angle) {
   if (_angle == angle) return;
   _angle = angle;
-  _need_update_physics = true;
+  _dirty = true;
 }
 
 double object::angle() const {
@@ -258,6 +265,8 @@ void object::set_action(std::optional<std::string_view> action) {
   _current_animation = it->second;
   _frame = 0;
   _last_frame = SDL_GetTicks();
+
+  _dirty = true;
 
   if (const auto& e = _current_animation->get().effect; e) {
     e->play();

@@ -123,7 +123,7 @@ private:
   animation_map _animations;
   std::optional<std::reference_wrapper<animation>> _current_animation;
 
-  bool _need_update_physics{true};
+  bool _dirty{true};
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
