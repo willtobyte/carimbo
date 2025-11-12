@@ -2,11 +2,11 @@
 
 using namespace graphics;
 
-static constexpr uint8_t from_hex(char c) {
+static constexpr uint8_t from_hex(char c) noexcept {
   if (c >= '0' && c <= '9') return c - '0';
   if (c >= 'a' && c <= 'f') return c - 'a' + 10;
   if (c >= 'A' && c <= 'F') return c - 'A' + 10;
-  throw std::runtime_error("invalid hex digit");
+  return 0;
 }
 
 color::color(const uint32_t pixel) noexcept
@@ -21,27 +21,23 @@ color::color(const SDL_Color& scolor) noexcept
 color::color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a) noexcept
     : _r(r), _g(g), _b(b), _a(a) {}
 
-color::color(std::string_view hex)
-  : _r(0), _g(0), _b(0), _a(255) {
+color::color(std::string_view hex) noexcept
+    : _r(0), _g(0), _b(0), _a(255) {
   const auto n = hex.size();
   if (n != 7 && n != 9) [[unlikely]] {
-    throw std::runtime_error(std::format("invalid hex code: '{}'. Use #RRGGBB or #RRGGBBAA", hex));
+    return;
   }
 
   if (hex[0] != '#') [[unlikely]] {
-    throw std::runtime_error(std::format("hex code '{}' must start with '#'", hex));
+    return;
   }
 
-  try {
-    _r = (from_hex(hex[1]) << 4) | from_hex(hex[2]);
-    _g = (from_hex(hex[3]) << 4) | from_hex(hex[4]);
-    _b = (from_hex(hex[5]) << 4) | from_hex(hex[6]);
+  _r = (from_hex(hex[1]) << 4) | from_hex(hex[2]);
+  _g = (from_hex(hex[3]) << 4) | from_hex(hex[4]);
+  _b = (from_hex(hex[5]) << 4) | from_hex(hex[6]);
 
-    if (n == 9) {
-      _a = (from_hex(hex[7]) << 4) | from_hex(hex[8]);
-    }
-  } catch (...) {
-    throw std::runtime_error(std::format("invalid hex digits in '{}'", hex));
+  if (n == 9) {
+    _a = (from_hex(hex[7]) << 4) | from_hex(hex[8]);
   }
 }
 
