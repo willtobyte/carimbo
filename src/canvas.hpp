@@ -9,7 +9,7 @@ public:
   explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() = default;
 
-  void set_pixels(const char* pixels);
+  void set_pixels(std::string_view pixels);
 
   void clear();
 

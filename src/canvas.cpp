@@ -33,17 +33,13 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   std::fill(_transparent.get(), _transparent.get() + count, pixel);
 }
 
-void canvas::set_pixels(const char* pixels) {
-  if (!pixels) [[unlikely]] {
-    return;
-  }
-
+void canvas::set_pixels(std::string_view pixels) {
   auto* const ptr = _framebuffer.get();
   auto* buffer = static_cast<void*>(nullptr);
   auto pitch = int{};
 
   SDL_LockTexture(ptr, nullptr, &buffer, &pitch);
-  std::memcpy(buffer, pixels, static_cast<size_t>(pitch) * static_cast<size_t>(ptr->h));
+  std::memcpy(buffer, pixels.data(), std::min(pixels.size(), static_cast<size_t>(pitch) * static_cast<size_t>(ptr->h)));
   SDL_UnlockTexture(ptr);
 }
 

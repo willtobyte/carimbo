@@ -1044,14 +1044,7 @@ void framework::scriptengine::run() {
     "Canvas",
     sol::no_constructor,
     "clear", &graphics::canvas::clear,
-    "pixels", sol::property(
-      [](const graphics::canvas&) {
-        return nullptr;
-      },
-      [](graphics::canvas& self, const char* data) {
-        self.set_pixels(data);
-      }
-    )
+    "pixels", sol::property(&graphics::canvas::set_pixels)
   );
 
   std::println("Powered by Carimbo: https://carimbo.site");
