@@ -11,23 +11,21 @@ soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
 
 std::shared_ptr<soundfx> soundmanager::get(std::string_view filename) {
   const auto [it, inserted] = _pool.try_emplace(std::string(filename));
-  if (!inserted) [[unlikely]] {
-    return it->second;
+  if (inserted) [[likely]] {
+    std::println("[soundmanager] cache miss {}", filename);
+    it->second = std::make_shared<soundfx>(filename);
   }
-
-  std::println("[soundmanager] cache miss {}", filename);
-
-  return it->second = std::make_shared<soundfx>(filename);
+  return it->second;
 }
 
 void soundmanager::play(std::string_view filename, bool loop) {
-  if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
+  if (const auto sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->play(loop);
   }
 }
 
 void soundmanager::stop(std::string_view filename) {
-  if (const auto& sound = get(std::format("blobs/{}.ogg", filename)); sound) {
+  if (const auto sound = get(std::format("blobs/{}.ogg", filename)); sound) {
     sound->stop();
   }
 }

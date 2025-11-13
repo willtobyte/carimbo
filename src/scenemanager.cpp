@@ -24,12 +24,12 @@ scenemanager::scenemanager(
 }
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
-  const auto [it, inserted] = _scene_mapping.try_emplace(std::string(name), nullptr);
-  if (!inserted) {
+  const auto [it, inserted] = _scene_mapping.try_emplace(std::string(name));
+  if (!inserted) [[unlikely]] {
     return nullptr;
   }
 
-  const auto& filename = std::format("scenes/{}.json", name);
+  const auto filename = std::format("scenes/{}.json", name);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
@@ -60,7 +60,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     const auto y = i["y"].get<float>();
     const auto emitting = i.value("emitting", true);
 
-    particles[std::string{name}] = factory->create(kind, x, y, emitting);
+    particles.emplace(name, factory->create(kind, x, y, emitting));
   }
 
   const auto fs = j.value("fonts", nlohmann::json::array());

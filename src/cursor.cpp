@@ -17,7 +17,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
 
-  const auto& filename = std::format("cursors/{}.json", name);
+  const auto filename = std::format("cursors/{}.json", name);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 

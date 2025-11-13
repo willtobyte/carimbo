@@ -26,10 +26,10 @@ objectmanager::objectmanager() {
 }
 
 std::shared_ptr<object> objectmanager::create(std::string_view kind, std::optional<std::string_view> scope, bool manage) {
-  const auto& n = scope.value_or(std::string_view{});
-  const auto& qualifier = n.empty() ? std::string(kind) : std::format("{}/{}", n, kind);
+  const auto n = scope.value_or(std::string_view{});
+  const auto qualifier = n.empty() ? std::string(kind) : std::format("{}/{}", n, kind);
 
-  const auto& filename = std::format("objects/{}.json", qualifier);
+  const auto filename = std::format("objects/{}.json", qualifier);
   const auto& buffer = storage::io::read(filename);
   const auto& j = nlohmann::json::parse(buffer);
 
