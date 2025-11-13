@@ -8,21 +8,19 @@ collisionenvelope::collisionenvelope(const uint64_t a, const uint64_t b) noexcep
 collisionenvelope::collisionenvelope() noexcept
   : a(0), b(0) {}
 
+void collisionenvelope::clear() noexcept {
+  a = 0;
+  b = 0;
+}
+
 mailenvelope::mailenvelope(std::pmr::memory_resource* mr)
   : to(0), kind(mr), body(mr) {
   kind.reserve(32);
   body.reserve(256);
 }
 
-mailenvelope::mailenvelope(const uint64_t to, const std::string_view kind_view,
-                           const std::string_view body_view, std::pmr::memory_resource* mr)
-  : to(to), kind(kind_view, mr), body(body_view, mr) {}
-
-void mailenvelope::set(const uint64_t _to, const std::string_view _kind, const std::string_view _body) {
-  to = _to;
-  kind.assign(_kind);
-  body.assign(_body);
-}
+mailenvelope::mailenvelope(const uint64_t to, const std::string_view kind, const std::string_view body, std::pmr::memory_resource* mr)
+  : to(to), kind(kind, mr), body(body, mr) {}
 
 void mailenvelope::clear() noexcept {
   to = 0;
@@ -50,10 +48,11 @@ void envelope::reset(collisionenvelope&& envelope) noexcept {
 
 void envelope::reset(mailenvelope&& envelope) {
   if (auto* current = std::get_if<mailenvelope>(&payload)) {
-    current->set(envelope.to, envelope.kind, envelope.body);
+    current->to = envelope.to;
+    current->kind = std::move(envelope.kind);
+    current->body = std::move(envelope.body);
   } else {
-    payload.emplace<mailenvelope>(_mr);
-    std::get<mailenvelope>(payload).set(envelope.to, envelope.kind, envelope.body);
+    payload.emplace<mailenvelope>(envelope.to, envelope.kind, envelope.body, _mr);
   }
 }
 
@@ -62,11 +61,14 @@ void envelope::reset(timerenvelope&& envelope) noexcept {
 }
 
 void envelope::reset() noexcept {
-  if (auto* mail = std::get_if<mailenvelope>(&payload)) {
+  if (auto* collision = std::get_if<collisionenvelope>(&payload)) {
+    collision->clear();
+  } else if (auto* mail = std::get_if<mailenvelope>(&payload)) {
     mail->clear();
   } else if (auto* timer = std::get_if<timerenvelope>(&payload)) {
     timer->clear();
   }
+
   payload.emplace<std::monostate>();
 }
 

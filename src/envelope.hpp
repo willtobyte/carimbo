@@ -9,6 +9,8 @@ struct collisionenvelope final {
 
   collisionenvelope(const uint64_t a, const uint64_t b) noexcept;
   collisionenvelope() noexcept;
+
+  void clear() noexcept;
 };
 
 struct mailenvelope final {
@@ -17,10 +19,8 @@ struct mailenvelope final {
   std::pmr::string body;
 
   explicit mailenvelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
-  mailenvelope(const uint64_t to, const std::string_view kind_view, const std::string_view body_view,
-               std::pmr::memory_resource* mr = std::pmr::get_default_resource());
+  mailenvelope(const uint64_t to, const std::string_view kind_view, const std::string_view body_view, std::pmr::memory_resource* mr = std::pmr::get_default_resource());
 
-  void set(const uint64_t new_to, const std::string_view kind_view, const std::string_view body_view);
   void clear() noexcept;
 };
 
