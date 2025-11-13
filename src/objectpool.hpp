@@ -84,10 +84,6 @@ public:
     }
   }
 
-  void release(envelope_ptr&& ptr) noexcept {
-    ptr.reset();
-  }
-
   void reserve(size_t count) {
     if (count > _available.size()) {
       expand(count - _available.size());
