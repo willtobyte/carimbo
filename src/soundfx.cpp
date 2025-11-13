@@ -108,11 +108,12 @@ soundfx::soundfx(std::string_view filename) {
 
   const auto format = (props->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(props->rate);
+  const auto estimated = static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * props->channels * 2;
 
   std::vector<uint8_t> linear16;
-  linear16.reserve(8 * 1024 * 1024);
+  linear16.reserve(estimated);
 
-  std::array<char, 512 * 1024> buffer{};
+  std::array<char, 1024 * 1024> buffer{};
 
   for (;;) {
     auto got = ov_read(
@@ -141,9 +142,7 @@ soundfx::soundfx(std::string_view filename) {
       break;
     }
 
-    auto old = linear16.size();
-    linear16.resize(old + static_cast<size_t>(got));
-    std::memcpy(linear16.data() + old, buffer.data(), static_cast<size_t>(got));
+    linear16.insert(linear16.end(), buffer.data(), buffer.data() + got);
   }
 
   alGenBuffers(1, &_buffer);
