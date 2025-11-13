@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "singleton.hpp"
 #include "envelope.hpp"
 
@@ -24,14 +25,20 @@ private:
   std::pmr::unsynchronized_pool_resource _pool{{.max_blocks_per_chunk = ChunkSize, .largest_required_pool_block = sizeof(envelope)}};
   std::pmr::vector<envelope*> _available{&_pool};
 
-  void expand(size_t count) {
-    _available.reserve(_available.size() + count);
-    for (size_t i = 0; i < count; ++i) {
+  void expand(size_t minimum) {
+    size_t target = _available.capacity();
+    if (target == 0) target = 1;
+
+    target = std::bit_ceil(std::max(target, minimum)) << 1;
+
+    _available.reserve(target);
+
+    for (size_t i = _available.size(); i < target; ++i) {
       void* mem = _pool.allocate(sizeof(envelope), alignof(envelope));
       _available.push_back(std::construct_at(static_cast<envelope*>(mem), &_pool));
     }
 
-    std::println("[pool<envelope>] expanded to {} objects", _available.size());
+    std::println("[pool<envelope>] expanded to {} objects", target);
   }
 
   void recycle(envelope* ptr) noexcept {
@@ -58,8 +65,7 @@ public:
   template<typename... Args>
   [[nodiscard]] envelope_ptr acquire(Args&&... args) {
     if (_available.empty()) {
-      const auto capacity = _available.capacity();
-      expand(capacity > 0 ? capacity : InitialCapacity);
+      expand(_available.capacity());
     }
 
     envelope* ptr = _available.back();
