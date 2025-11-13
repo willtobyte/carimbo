@@ -26,12 +26,8 @@ private:
   std::pmr::vector<envelope*> _available{&_pool};
 
   void expand(size_t minimum) {
-    const size_t current_size = _available.size();
-    size_t target = std::max(current_size, size_t(1));
-
-    while (target < minimum) {
-      target <<= 1;
-    }
+    const auto current_size = _available.size();
+    const auto target = std::bit_ceil(std::max(minimum, std::max(current_size, size_t(1))));
 
     _available.reserve(target);
 
