@@ -33,7 +33,7 @@ private:
 
     _available.reserve(target);
 
-    for (size_t i = _available.size(); i < target; ++i) {
+    for (auto count = target - _available.size(); count-- > 0uz;) {
       void* mem = _pool.allocate(sizeof(envelope), alignof(envelope));
       _available.push_back(std::construct_at(static_cast<envelope*>(mem), &_pool));
     }
