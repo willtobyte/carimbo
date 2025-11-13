@@ -6,6 +6,8 @@
 
 namespace framework {
 
+const constexpr auto InitialCapacity = 512uz;
+const constexpr auto ChunkSize = 64uz;
 class envelopepool_impl final {
 private:
   struct pmr_deleter final {
@@ -19,7 +21,7 @@ public:
   using envelope_ptr = std::unique_ptr<envelope, pmr_deleter>;
 
 private:
-  std::pmr::unsynchronized_pool_resource _pool{{.max_blocks_per_chunk = 64, .largest_required_pool_block = sizeof(envelope)}};
+  std::pmr::unsynchronized_pool_resource _pool{{.max_blocks_per_chunk = ChunkSize, .largest_required_pool_block = sizeof(envelope)}};
   std::pmr::vector<envelope*> _available{&_pool};
 
   void expand(size_t count) {
@@ -28,6 +30,8 @@ private:
       void* mem = _pool.allocate(sizeof(envelope), alignof(envelope));
       _available.push_back(std::construct_at(static_cast<envelope*>(mem), &_pool));
     }
+
+    std::println("[pool<envelope>] expanded to {} objects", _available.size());
   }
 
   void recycle(envelope* ptr) noexcept {
@@ -39,7 +43,7 @@ private:
 
 public:
   envelopepool_impl() {
-    expand(32);
+    expand(InitialCapacity);
   }
 
   ~envelopepool_impl() {
@@ -52,7 +56,7 @@ public:
   }
 
   template<typename... Args>
-  envelope_ptr acquire(Args&&... args) {
+  [[nodiscard]] envelope_ptr acquire(Args&&... args) {
     if (_available.empty()) {
       expand(_available.capacity() ? _available.capacity() : 32);
     }
@@ -65,6 +69,12 @@ public:
     }
 
     return envelope_ptr(ptr, pmr_deleter{this});
+  }
+
+  void release(envelope* ptr) noexcept {
+    if (ptr) {
+      recycle(ptr);
+    }
   }
 
   void release(envelope_ptr&& ptr) noexcept {
@@ -83,5 +93,4 @@ public:
 };
 
 using envelopepool = singleton<envelopepool_impl>;
-
 }

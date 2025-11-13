@@ -6,8 +6,6 @@ static constexpr auto WORLD_SUBSTEPS = 4;
 
 static constexpr float FIXED_TIMESTEP = 1.0f / 60.0f;
 
-static constexpr auto FLUSH_INTERVAL = 10000u;
-
 static constexpr auto DEGREES_TO_RADIANS = std::numbers::pi_v<float> / 180.0f;
 
 static constexpr auto RADIANS_TO_DEGREES = 180.0f / std::numbers::pi_v<float>;

@@ -25,7 +25,7 @@ static bool filter(void* userdata, SDL_Event* e) {
     return true;
   }
 
-  ctx->pool->release(envelopepool_impl::envelope_ptr(ptr, {ctx->pool}));
+  ctx->pool->release(ptr);
 
   return false;
 }
@@ -73,7 +73,7 @@ void timermanager::cancel(uint32_t id) {
   if (ptr) {
     context ctx{_envelopepool.get(), ptr};
     SDL_FilterEvents(filter, &ctx);
-    _envelopepool->release(envelopepool_impl::envelope_ptr(ptr, {_envelopepool.get()}));
+    _envelopepool->release(ptr);
   }
 }
 
@@ -87,7 +87,7 @@ void timermanager::clear() {
 
   for (auto& [id, ptr] : _envelopemapping) {
     if (ptr) {
-      _envelopepool->release(envelopepool_impl::envelope_ptr(ptr, {_envelopepool.get()}));
+      _envelopepool->release(ptr);
     }
   }
 
@@ -103,6 +103,6 @@ uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, 
     return id;
   }
 
-  _envelopepool->release(envelopepool_impl::envelope_ptr(ptr, {_envelopepool.get()}));
+  _envelopepool->release(ptr);
   throw std::runtime_error(std::format("[SDL_AddTimer] {}", SDL_GetError()));
 }
