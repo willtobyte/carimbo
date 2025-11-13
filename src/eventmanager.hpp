@@ -33,6 +33,6 @@ private:
   std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
   std::vector<SDL_JoystickID> _joystickgorder;
   std::unordered_map<SDL_JoystickID, uint8_t> _joystickmapping;
-  std::shared_ptr<framework::uniquepool<framework::envelope, framework::envelope_pool_name>> _envelopepool = framework::envelopepool::instance();
+  std::shared_ptr<framework::envelopepool_impl> _envelopepool = framework::envelopepool::instance();
 };
 }

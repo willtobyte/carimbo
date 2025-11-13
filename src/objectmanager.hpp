@@ -75,6 +75,6 @@ private:
   std::shared_ptr<world> _world;
   std::unordered_set<uint64_t> _hovering;
 
-  std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
+  std::shared_ptr<envelopepool_impl> _envelopepool = envelopepool::instance();
 };
 }

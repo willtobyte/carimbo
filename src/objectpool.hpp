@@ -3,108 +3,107 @@
 #include "common.hpp"
 
 #include "singleton.hpp"
-
 #include "envelope.hpp"
-#include "object.hpp"
 
 namespace framework {
+class envelopepool_impl final {
+private:
+  struct pmr_deleter final {
+    envelopepool_impl* pool;
 
-template<typename T, typename PtrType, auto& Name>
-class poolbase {
-protected:
-  std::pmr::unsynchronized_pool_resource _pool{{.max_blocks_per_chunk = 64, .largest_required_pool_block = sizeof(T) * 2}};
-  std::pmr::vector<PtrType> _objects{&_pool};
-
-  void expand(size_t minimum) {
-    size_t target = _objects.capacity();
-    if (target == 0) target = 1;
-
-    while (target < minimum) target <<= 1;
-
-    _objects.reserve(target);
-
-    for (auto i = _objects.size(); i < target; ++i) {
-      if constexpr (std::is_same_v<PtrType, std::unique_ptr<T>>) {
-        void* mem = _pool.allocate(sizeof(T), alignof(T));
-        T* ptr = new (mem) T();
-        _objects.emplace_back(ptr);
-      }
-      if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) {
-        std::pmr::polymorphic_allocator<T> alloc(&_pool);
-        _objects.emplace_back(std::allocate_shared<T>(alloc));
+    void operator()(envelope* ptr) const noexcept {
+      if (pool && ptr) {
+        pool->release_internal(ptr);
       }
     }
-
-    assert(_objects.size() == target);
-
-    std::println("[pool<{}>] expanded to {} objects", Name, target);
-  }
+  };
 
 public:
-  poolbase() {
-    _objects.reserve(256);
-  }
+  using envelope_ptr = std::unique_ptr<envelope, pmr_deleter>;
 
-  template<typename... Args>
-  PtrType acquire(Args&&... args) {
-    if (_objects.empty()) {
-      const auto capacity = _objects.capacity();
-      const auto need = capacity ? (capacity << 1) : 1;
-      expand(need);
+private:
+  std::pmr::unsynchronized_pool_resource _pool{{.max_blocks_per_chunk = 256, .largest_required_pool_block = sizeof(envelope)}};
+  std::pmr::vector<envelope*> _available{&_pool};
+
+  void expand(size_t minimum) {
+    const size_t current_size = _available.size();
+    size_t target = std::max(current_size, size_t(1));
+
+    while (target < minimum) {
+      target <<= 1;
     }
 
-    PtrType object = std::move(_objects.back());
-    _objects.pop_back();
+    _available.reserve(target);
 
-    if constexpr (requires { object->reset(std::forward<Args>(args)...); }) {
-      object->reset(std::forward<Args>(args)...);
+    for (size_t i = current_size; i < target; ++i) {
+      void* mem = _pool.allocate(sizeof(envelope), alignof(envelope));
+      envelope* ptr = new (mem) envelope(&_pool);
+      _available.push_back(ptr);
     }
 
-    return object;
+    std::println("[pool<envelope>] expanded to {} objects", target);
   }
 
-  void release(PtrType&& object) {
-    if (!object) {
+  void release_internal(envelope* ptr) noexcept {
+    if (!ptr) {
       return;
     }
 
-    if constexpr (std::is_same_v<PtrType, std::shared_ptr<T>>) {
-      if (object.use_count() != MINIMAL_USE_COUNT) {
-        return;
+    ptr->reset();
+    _available.push_back(ptr);
+  }
+
+public:
+  envelopepool_impl() {
+    expand(256);
+  }
+
+  ~envelopepool_impl() {
+    for (envelope* ptr : _available) {
+      if (ptr) {
+        ptr->~envelope();
+        _pool.deallocate(ptr, sizeof(envelope), alignof(envelope));
       }
     }
+  }
 
-    object->reset();
+  template<typename... Args>
+  envelope_ptr acquire(Args&&... args) {
+    if (_available.empty()) {
+      const size_t current_capacity = _available.capacity();
+      const size_t need = current_capacity ? current_capacity : 256;
+      expand(need);
+    }
 
-    _objects.emplace_back(std::move(object));
+    envelope* ptr = _available.back();
+    _available.pop_back();
+
+    if constexpr (sizeof...(Args) > 0) {
+      ptr->reset(std::forward<Args>(args)...);
+    }
+
+    return envelope_ptr(ptr, pmr_deleter{this});
+  }
+
+  void release(envelope_ptr&& object) noexcept {
+    object.reset();
   }
 
   void reserve(size_t count) {
-    expand(count);
+    if (count > _available.size()) {
+      expand(count);
+    }
   }
 
-  size_t size() const {
-    return _objects.size();
+  size_t size() const noexcept {
+    return _available.size();
   }
 };
 
 template<typename T, auto& Name>
-class uniquepool : public poolbase<T, std::unique_ptr<T>, Name> {
-public:
-  using poolbase<T, std::unique_ptr<T>, Name>::acquire;
-  using poolbase<T, std::unique_ptr<T>, Name>::release;
-};
+using uniquepool = envelopepool_impl;
 
 inline constexpr char envelope_pool_name[] = "envelope";
-using envelopepool = singleton<uniquepool<envelope, envelope_pool_name>>;
 
-template<typename T, auto& Name>
-class sharedpool : public poolbase<T, std::shared_ptr<T>, Name> {
-public:
-  using poolbase<T, std::shared_ptr<T>, Name>::acquire;
-  using poolbase<T, std::shared_ptr<T>, Name>::release;
-};
-
-inline constexpr char object_pool_name[] = "object";
-using objectpool = singleton<sharedpool<object, object_pool_name>>;
+using envelopepool = singleton<envelopepool_impl>;
 }

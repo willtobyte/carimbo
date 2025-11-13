@@ -67,6 +67,6 @@ private:
   std::weak_ptr<objectmanager> _objectmanager;
   std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> _collisions;
 
-  std::shared_ptr<uniquepool<envelope, framework::envelope_pool_name>> _envelopepool = envelopepool::instance();
+  std::shared_ptr<envelopepool_impl> _envelopepool = envelopepool::instance();
 };
 }

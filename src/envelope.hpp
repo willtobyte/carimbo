@@ -8,14 +8,20 @@ struct collisionenvelope final {
   uint64_t b;
 
   collisionenvelope(const uint64_t a, const uint64_t b) noexcept;
+  collisionenvelope() noexcept;
 };
 
 struct mailenvelope final {
   uint64_t to;
-  std::string kind;
-  std::string body;
+  std::pmr::string kind;
+  std::pmr::string body;
 
-  mailenvelope(const uint64_t to, const std::string_view kind, const std::string_view body);
+  explicit mailenvelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
+  mailenvelope(const uint64_t to, const std::string_view kind_view, const std::string_view body_view,
+               std::pmr::memory_resource* mr = std::pmr::get_default_resource());
+
+  void set(const uint64_t new_to, const std::string_view kind_view, const std::string_view body_view);
+  void clear() noexcept;
 };
 
 struct timerenvelope final {
@@ -23,25 +29,33 @@ struct timerenvelope final {
   std::function<void()> fn;
 
   timerenvelope(const bool repeat, std::function<void()>&& fn) noexcept;
+  timerenvelope() noexcept;
+
+  void clear() noexcept;
 };
 
 using payload_t = std::variant<std::monostate, collisionenvelope, mailenvelope, timerenvelope>;
 
 class envelope final {
+private:
+  std::pmr::memory_resource* _mr;
+
 public:
   payload_t payload;
+
+  explicit envelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
+  ~envelope() = default;
 
   void reset(collisionenvelope&& envelope) noexcept;
   void reset(mailenvelope&& envelope);
   void reset(timerenvelope&& envelope) noexcept;
   void reset() noexcept;
 
-  constexpr envelope() noexcept = default;
-  constexpr ~envelope() = default;
-
   template<typename... Args>
-    requires (!std::same_as<std::decay_t<Args>, envelope> && ...)
-  constexpr explicit envelope(Args&&... args) {
+    requires (!std::same_as<std::decay_t<Args>, envelope> && ...) &&
+             (!std::is_pointer_v<std::remove_reference_t<Args>> && ...) &&
+             (sizeof...(Args) > 0)
+  explicit envelope(Args&&... args) : envelope() {
     reset(std::forward<Args>(args)...);
   }
 
