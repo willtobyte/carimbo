@@ -23,6 +23,6 @@ public:
   void set(std::string_view key, const sol::object& value);
 
 private:
-  std::unordered_map<std::string, std::shared_ptr<observable>, string_hash, std::equal_to<>> _values;
+  std::unordered_map<std::string, std::shared_ptr<observable>, string_hash, string_equal> _values;
 };
 }

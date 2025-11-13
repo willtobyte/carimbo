@@ -24,7 +24,7 @@ public:
   #endif
 
 private:
-  std::unordered_map<std::string, std::shared_ptr<font>, string_hash, std::equal_to<>> _pool;
+  std::unordered_map<std::string, std::shared_ptr<font>, string_hash, string_equal> _pool;
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<pixmappool> _pixmappool;
   std::function<void()> _loop;

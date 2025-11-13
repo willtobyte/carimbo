@@ -70,18 +70,17 @@ struct PHYSFS_Deleter final {
 
 struct string_hash final {
   using is_transparent = void;
-  using hash_type = std::hash<std::string_view>;
 
-  size_t operator()(std::string_view str) const noexcept {
-    return hash_type{}(str);
+  size_t operator()(std::string_view sv) const noexcept {
+    return std::hash<std::string_view>{}(sv);
   }
+};
 
-  size_t operator()(const std::string& str) const noexcept {
-    return hash_type{}(str);
-  }
+struct string_equal final {
+  using is_transparent = void;
 
-  size_t operator()(const char* str) const noexcept {
-    return hash_type{}(str);
+  bool operator()(std::string_view a, std::string_view b) const noexcept {
+    return a == b;
   }
 };
 

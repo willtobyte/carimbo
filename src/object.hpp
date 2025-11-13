@@ -31,7 +31,7 @@ struct animation final {
   std::vector<keyframe> keyframes;
 };
 
-using animation_map = std::unordered_map<std::string, animation, string_hash, std::equal_to<>>;
+using animation_map = std::unordered_map<std::string, animation, string_hash, string_equal>;
 
 class object final : public std::enable_shared_from_this<object> {
 public:
@@ -99,18 +99,19 @@ private:
   friend class world;
 
   uint64_t _id;
-  b2BodyId _body;
-  b2ShapeId _collision_shape;
-  std::weak_ptr<world> _world;
-
-  std::size_t _frame;
   uint64_t _last_frame;
   double _angle;
-  uint8_t _alpha;
-  float _scale;
-  graphics::reflection _reflection;
-  bool _visible{true};
 
+  b2BodyId _body;
+  b2ShapeId _collision_shape;
+  std::size_t _frame;
+  float _scale;
+
+  uint8_t _alpha;
+  bool _visible{true};
+  bool _dirty{true};
+
+  graphics::reflection _reflection;
   geometry::point _position;
   std::string _kind;
   std::string _scope;
@@ -119,8 +120,6 @@ private:
   animation_map _animations;
   std::optional<std::reference_wrapper<animation>> _current_animation;
 
-  bool _dirty{true};
-
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;
@@ -128,6 +127,7 @@ private:
   std::function<void(std::shared_ptr<object>, std::string_view)> _onbegin;
   std::function<void(std::shared_ptr<object>, std::string_view)> _onend;
   std::function<void(std::shared_ptr<object>, std::string_view)> _onmail;
-  std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, std::equal_to<>> _collision_mapping;
+  std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, string_equal> _collision_mapping;
+  std::weak_ptr<world> _world;
 };
 }

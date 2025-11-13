@@ -15,12 +15,13 @@ using namespace event;
 
 eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
     : _renderer(std::move(renderer)) {
+  _joystickmapping.reserve(8);
+  _joystickgorder.reserve(8);
+
+  _receivers.reserve(32);
+  _controllers.reserve(8);
+
   int32_t number;
-
-  constexpr auto rc = 8uz;
-  _joystickmapping.reserve(rc);
-  _joystickgorder.reserve(rc);
-
   std::unique_ptr<SDL_JoystickID[], SDL_Deleter> joysticks(SDL_GetGamepads(&number));
 
   if (joysticks) {
@@ -50,14 +51,10 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
 }
 
 void eventmanager::update(float delta) {
-  _receivers.erase(
-    std::remove_if(
-      _receivers.begin(),
-      _receivers.end(),
-      [](const auto& weak) {
-        return weak.expired();
-      }),
-    _receivers.end());
+  std::erase_if(
+    _receivers,
+    std::mem_fn(&std::weak_ptr<input::eventreceiver>::expired)
+  );
 
   SDL_Event event;
   while (SDL_PollEvent(&event)) {

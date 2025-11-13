@@ -24,6 +24,6 @@ public:
 private:
   std::shared_ptr<audiodevice> _audiodevice;
 
-  std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, std::equal_to<>> _pool;
+  std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _pool;
 };
 }

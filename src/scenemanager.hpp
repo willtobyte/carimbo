@@ -47,7 +47,7 @@ private:
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::shared_ptr<framework::timermanager> _timermanager;
-  std::unordered_map<std::string, std::shared_ptr<scene>, string_hash, std::equal_to<>> _scene_mapping;
+  std::unordered_map<std::string, std::shared_ptr<scene>, string_hash, string_equal> _scene_mapping;
   std::weak_ptr<scene> _scene;
   std::string _current;
 };

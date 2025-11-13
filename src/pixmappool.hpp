@@ -21,6 +21,6 @@ public:
 private:
   std::shared_ptr<renderer> _renderer;
 
-  std::unordered_map<std::string, pixmap_ptr, string_hash, std::equal_to<>> _pool;
+  std::unordered_map<std::string, pixmap_ptr, string_hash, string_equal> _pool;
 };
 }
