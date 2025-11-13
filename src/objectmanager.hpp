@@ -69,7 +69,7 @@ private:
 
   container_t _objects;
 
-  std::atomic<uint64_t> _counter;
+  std::atomic<uint64_t> _counter{0};
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<scenemanager> _scenemanager;
   std::shared_ptr<world> _world;
