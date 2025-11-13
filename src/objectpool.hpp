@@ -42,10 +42,8 @@ private:
   }
 
   void recycle(envelope* ptr) noexcept {
-    if (ptr) {
-      ptr->reset();
-      _available.push_back(ptr);
-    }
+    ptr->reset();
+    _available.push_back(ptr);
   }
 
 public:
