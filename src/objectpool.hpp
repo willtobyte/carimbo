@@ -58,7 +58,8 @@ public:
   template<typename... Args>
   [[nodiscard]] envelope_ptr acquire(Args&&... args) {
     if (_available.empty()) {
-      expand(_available.capacity() ? _available.capacity() : 32);
+      const auto capacity = _available.capacity();
+      expand(capacity > 0 ? capacity : InitialCapacity);
     }
 
     envelope* ptr = _available.back();
