@@ -127,4 +127,5 @@ void fontfactory::debug() const {
     std::println("  {} use_count={}", key, ptr.use_count());
   }
 }
+
 #endif
