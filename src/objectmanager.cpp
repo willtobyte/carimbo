@@ -21,7 +21,6 @@ using namespace framework;
 using namespace input::event;
 
 objectmanager::objectmanager() {
-  _envelopepool->reserve(64);
   _hovering.reserve(256);
   _objects.get<by_id>().rehash(128);
 }

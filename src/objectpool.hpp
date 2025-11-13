@@ -81,16 +81,6 @@ public:
       recycle(ptr);
     }
   }
-
-  void reserve(size_t count) {
-    if (count > _available.size()) {
-      expand(count - _available.size());
-    }
-  }
-
-  size_t available() const noexcept {
-    return _available.size();
-  }
 };
 
 using envelopepool = singleton<envelopepool_impl>;
