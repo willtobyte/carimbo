@@ -3,7 +3,7 @@
 using namespace audio;
 
 namespace {
-  std::array<char, 4 * 1024 * 1024> buffer;
+  static std::array<char, 4 * 1024 * 1024> buffer;
 
   static size_t cb_read(void* ptr, size_t size, size_t nmemb, void* source) {
     const auto file = reinterpret_cast<PHYSFS_file*> (source);
