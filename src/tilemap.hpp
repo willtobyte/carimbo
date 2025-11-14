@@ -1,51 +1,51 @@
-#pragma once
+// #pragma once
 
-#include "common.hpp"
+// #include "common.hpp"
 
-namespace framework {
-class object;
-class resourcemanager;
+// namespace framework {
 
-struct transaction final {
-  std::vector<std::string> path;
-  uint16_t delay;
+// struct transaction final {
+//   std::vector<std::string> path;
+//   uint16_t delay;
 
-  friend void from_json(const nlohmann::json& j, transaction& t) {
-    j.at("path").get_to(t.path);
-    j.at("delay").get_to(t.delay);
-  }
-};
+//   friend void from_json(const nlohmann::json& j, transaction& t) {
+//     j.at("path").get_to(t.path);
+//     j.at("delay").get_to(t.delay);
+//   }
+// };
 
-class tilemap final {
-  public:
-    tilemap() = delete;
-    explicit tilemap(
-      geometry::size size,
-      std::shared_ptr<resourcemanager> resourcemanager,
-      std::string_view name
-    );
-    ~tilemap() = default;
+// class tilemap final {
+//   public:
+//     tilemap() = delete;
+//     explicit tilemap(
+//       geometry::size size,
+//       std::shared_ptr<resourcemanager> resourcemanager,
+//       std::string_view name
+//     );
+//     ~tilemap() = default;
 
-    void update(float delta);
-    void draw() const;
-    void set_target(std::shared_ptr<object> object);
+//     void update(float delta);
+//     void draw() const;
+//     void set_target(std::shared_ptr<object> object);
+//     void set_camera(std::shared_ptr<graphics::camera> camera);
 
-    std::vector<std::string> under() const;
+//     std::vector<std::string> under() const;
 
-  private:
-    float _size;
-    float _height;
-    float _width;
-    std::shared_ptr<graphics::pixmap> _pixmap;
-    std::vector<geometry::rectangle> _sources;
-    std::vector<std::string> _labels;
-    std::vector<bool> _visibles;
-    std::vector<std::vector<uint8_t>> _layers;
-    std::vector<transaction> _transactions;
-    std::shared_ptr<object> _target;
-    geometry::rectangle _view;
+//   private:
+//     float _size;
+//     float _height;
+//     float _width;
+//     std::shared_ptr<graphics::pixmap> _pixmap;
+//     std::vector<geometry::rectangle> _sources;
+//     std::vector<std::string> _labels;
+//     std::vector<bool> _visibles;
+//     std::vector<std::vector<uint8_t>> _layers;
+//     std::vector<transaction> _transactions;
+//     std::shared_ptr<object> _target;
+//     std::shared_ptr<graphics::camera> _camera;
+//     geometry::rectangle _view;
 
-    uint64_t _last_tick{0};
-    size_t _current_transaction{0};
-};
-}
+//     uint64_t _last_tick{0};
+//     size_t _current_transaction{0};
+// };
+// }

@@ -2,40 +2,6 @@
 
 #include "common.hpp"
 
-namespace audio {
-  class audiodevice;
-  class soundmanager;
-}
-
-namespace framework {
-  class lifecycleobserver;
-  class loopable;
-  class objectmanager;
-  class resourcemanager;
-  class postalservice;
-  class scenemanager;
-  class statemanager;
-  class timermanager;
-  class world;
-}
-
-namespace graphics {
-  class canvas;
-  class fontfactory;
-  class overlay;
-  class renderer;
-  class particlesystem;
-  class window;
-}
-
-namespace input {
-  class eventmanager;
-}
-
-namespace storage {
-  class cassette;
-}
-
 namespace framework {
 class engine final : public input::eventreceiver {
 public:

@@ -115,7 +115,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto timermanager = std::make_shared<framework::timermanager>();
   const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager);
   const auto world = std::make_shared<framework::world>(renderer);
-  const auto camera = std::make_shared<graphics::camera>();
+  const auto camera = std::make_shared<graphics::camera>(renderer);
 
   engine->set_audiodevice(audiodevice);
   engine->set_objectmanager(objectmanager);

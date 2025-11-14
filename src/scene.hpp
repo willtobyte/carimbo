@@ -26,7 +26,7 @@ public:
     std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
     std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
     std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
-    std::optional<std::shared_ptr<tilemap>> tilemap,
+    // std::optional<std::shared_ptr<tilemap>> tilemap,
     geometry::size size
   );
 
@@ -69,7 +69,7 @@ private:
   std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
   std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> _particles;
-  std::optional<std::shared_ptr<tilemap>> _tilemap;
+  // std::optional<std::shared_ptr<tilemap>> _tilemap;
 
   geometry::size _size;
 

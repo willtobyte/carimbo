@@ -95,10 +95,10 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     objects.emplace_back(std::move(key), std::move(object));
   }
 
-  std::optional<std::shared_ptr<tilemap>> map;
-  if (const auto it = j.find("tilemap"); it != j.end()) {
-    map.emplace(std::make_shared<tilemap>(size, _resourcemanager, it->get<std::string>()));
-  }
+  // std::optional<std::shared_ptr<tilemap>> map;
+  // if (const auto it = j.find("tilemap"); it != j.end()) {
+  //   map.emplace(std::make_shared<tilemap>(size, _resourcemanager, it->get<std::string>()));
+  // }
 
   return it->second = std::make_shared<scene>(
     name,
@@ -108,7 +108,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     std::move(objects),
     std::move(effects),
     std::move(particles),
-    std::move(map),
+    // std::move(map),
     std::move(size)
   );
 }

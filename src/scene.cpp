@@ -20,7 +20,7 @@ scene::scene(
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
   std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
-  std::optional<std::shared_ptr<tilemap>> tilemap,
+  // std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
   : _name(name),
@@ -30,7 +30,7 @@ scene::scene(
     _objects(std::move(objects)),
     _effects(std::move(effects)),
     _particles(std::move(particles)),
-    _tilemap(std::move(tilemap)),
+    // _tilemap(std::move(tilemap)),
     _size(std::move(size)) {
 }
 
@@ -53,9 +53,9 @@ void scene::update(float delta) {
     fn(delta);
   }
 
-  if (const auto& tilemap = _tilemap.value_or(nullptr)) {
-    tilemap->update(delta);
-  }
+  // if (const auto& tilemap = _tilemap.value_or(nullptr)) {
+  //   tilemap->update(delta);
+  // }
 }
 
 void scene::draw() const {
