@@ -3,10 +3,6 @@
 using namespace audio;
 
 namespace {
-  constexpr auto KILOBYTE = 1024uz;
-  constexpr auto READ_BUFFER_SIZE = 1 * KILOBYTE * KILOBYTE;
-  constexpr auto PHYSFS_BUFFER_SIZE = 4 * READ_BUFFER_SIZE;
-
   static std::array<char, READ_BUFFER_SIZE> buffer;
 
   template<typename To, typename From>

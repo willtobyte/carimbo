@@ -12,7 +12,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
         PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
-  PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
+  PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
 
   const auto length = PHYSFS_fileLength(ptr.get());
   if (length <= 0) [[unlikely]] {
