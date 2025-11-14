@@ -111,9 +111,9 @@ soundfx::soundfx(std::string_view filename) {
     if (got < 0) [[unlikely]] {
       std::string_view reason;
       switch (got) {
-        case OV_HOLE:     reason = "OV_HOLE: Interruption or corruption in the stream"; break;
-        case OV_EBADLINK: reason = "OV_EBADLINK: Invalid or corrupt bitstream section"; break;
-        case OV_EINVAL:   reason = "OV_EINVAL: Invalid argument or corrupted stream"; break;
+        case OV_HOLE:     reason = "OV_HOLE"; break;
+        case OV_EBADLINK: reason = "OV_EBADLINK"; break;
+        case OV_EINVAL:   reason = "OV_EINVAL"; break;
         default:          reason = "Unknown error"; break;
       }
 
