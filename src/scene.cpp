@@ -4,7 +4,6 @@
 #include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "pixmap.hpp"
-#include "point.hpp"
 #include "rectangle.hpp"
 #include "size.hpp"
 #include "soundfx.hpp"
@@ -20,7 +19,6 @@ scene::scene(
   std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
   std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
-  // std::optional<std::shared_ptr<tilemap>> tilemap,
   geometry::size size
 )
   : _name(name),
@@ -30,7 +28,6 @@ scene::scene(
     _objects(std::move(objects)),
     _effects(std::move(effects)),
     _particles(std::move(particles)),
-    // _tilemap(std::move(tilemap)),
     _size(std::move(size)) {
 }
 
@@ -53,20 +50,19 @@ void scene::update(float delta) {
     fn(delta);
   }
 
-  // if (const auto& tilemap = _tilemap.value_or(nullptr)) {
-  //   tilemap->update(delta);
-  // }
+  if (const auto& fn = _oncamera; fn) [[likely]] {
+    _camera = fn(delta);
+  }
 }
 
 void scene::draw() const {
-  const auto r =
-    geometry::rectangle(
-      .0f, .0f,
-      static_cast<float>(_background->width()),
-      static_cast<float>(_background->height())
-    );
+  static const auto destination = geometry::rectangle(
+    .0f, .0f,
+    static_cast<float>(_background->width()),
+    static_cast<float>(_background->height())
+  );
 
-  _background->draw(r, r);
+  _background->draw(destination, destination);
 }
 
 std::variant<
@@ -165,6 +161,10 @@ void scene::set_onenter(sol::protected_function fn) {
 
 void scene::set_onloop(sol::protected_function fn) {
   _onloop = interop::wrap_fn<void(float)>(std::move(fn));
+}
+
+void scene::set_oncamera(sol::protected_function fn) {
+  _oncamera = interop::wrap_fn<geometry::rectangle(float)>(std::move(fn));
 }
 
 void scene::set_onleave(sol::protected_function fn) {

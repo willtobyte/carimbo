@@ -2,14 +2,7 @@
 
 #include "common.hpp"
 
-namespace audio {
-  class soundfx;
-}
-
 namespace framework {
-class objectmanager;
-class tilemap;
-
 enum class scenetype : uint8_t {
   object = 0,
   effect,
@@ -26,7 +19,6 @@ public:
     std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
     std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
     std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
-    // std::optional<std::shared_ptr<tilemap>> tilemap,
     geometry::size size
   );
 
@@ -54,6 +46,7 @@ public:
 
   void set_onenter(sol::protected_function fn);
   void set_onloop(sol::protected_function fn);
+  void set_oncamera(sol::protected_function fn);
   void set_onleave(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);
   void set_onkeypress(sol::protected_function fn);
@@ -63,18 +56,19 @@ public:
 
 private:
   std::string _name;
+  geometry::size _size;
+  geometry::rectangle _camera;
+
   std::shared_ptr<framework::objectmanager> _objectmanager;
   std::shared_ptr<graphics::particlesystem> _particlesystem;
   std::shared_ptr<graphics::pixmap> _background;
   std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
   std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
   std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> _particles;
-  // std::optional<std::shared_ptr<tilemap>> _tilemap;
-
-  geometry::size _size;
 
   std::function<void()> _onenter;
   std::function<void(float)> _onloop;
+  std::function<geometry::rectangle(float)> _oncamera;
   std::function<void()> _onleave;
   std::function<void(float, float)> _ontouch;
   std::function<void(int32_t)> _onkeypress;

@@ -103,7 +103,6 @@ namespace geometry {
 }
 
 namespace graphics {
-  class camera;
   class canvas;
   class color;
   class cursor;

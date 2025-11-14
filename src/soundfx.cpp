@@ -113,7 +113,7 @@ soundfx::soundfx(std::string_view filename) {
   std::vector<uint8_t> linear16;
   linear16.reserve(estimated);
 
-  std::array<char, 1024 * 1024> buffer{};
+  std::array<char, 4 * 1024 * 1024> buffer{};
 
   for (;;) {
     auto got = ov_read(

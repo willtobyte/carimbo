@@ -609,6 +609,10 @@ void framework::scriptengine::run() {
           scene->set_onloop(std::move(fn));
         }
 
+        if (auto fn = module["on_camera"].get<sol::protected_function>(); fn.valid()) {
+          scene->set_oncamera(std::move(fn));
+        }
+
         if (auto fn = module["on_text"].get<sol::protected_function>(); fn.valid()) {
           scene->set_ontext(std::move(fn));
         }
@@ -761,6 +765,15 @@ void framework::scriptengine::run() {
     sol::constructors<geometry::size(), geometry::size(float, float), geometry::size(const geometry::size&)>(),
     "width", sol::property(&geometry::size::width, &geometry::size::set_width),
     "height", sol::property(&geometry::size::height, &geometry::size::set_height)
+  );
+
+  lua.new_usertype<geometry::rectangle>(
+    "Rectangle",
+    sol::constructors<geometry::rectangle(), geometry::rectangle(float, float, float, float)>(),
+    "x", sol::property(&geometry::rectangle::x),
+    "y", sol::property(&geometry::rectangle::y),
+    "width", sol::property(&geometry::rectangle::width),
+    "height", sol::property(&geometry::rectangle::height)
   );
 
   lua.new_usertype<storage::cassette>(
@@ -972,12 +985,6 @@ void framework::scriptengine::run() {
 
   lua["keyboard"] = keyboard{};
 
-  lua.new_usertype<graphics::camera>(
-    "Camera",
-    sol::no_constructor,
-    "on_request_position", &graphics::camera::set_onrequestcalc
-  );
-
   lua.new_usertype<framework::mail>(
     "Mail",
     sol::constructors<framework::mail(
@@ -1084,7 +1091,6 @@ void framework::scriptengine::run() {
   lua["soundmanager"] = engine->soundmanager();
   lua["statemanager"] = engine->statemanager();
   lua["timermanager"] = engine->timermanager();
-  lua["camera"] = engine->camera();
 
   auto viewport = lua.create_table();
   viewport["width"] = engine->window()->width();
