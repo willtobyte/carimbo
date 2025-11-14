@@ -2,10 +2,6 @@
 
 using namespace audio;
 
-#include "soundfx.hpp"
-
-using namespace audio;
-
 namespace {
   constexpr auto KILOBYTE = 1024uz;
   constexpr auto READ_BUFFER_SIZE = 1 * KILOBYTE * KILOBYTE;
@@ -40,32 +36,31 @@ namespace {
     return positive ? (base > limit - offset) : (base < limit - offset);
   }
 
+  static PHYSFS_sint64 compute_seek_target(PHYSFS_File* file, ogg_int64_t offset, int whence) {
+    switch (whence) {
+      case SEEK_SET:
+        return (offset < 0) ? -1 : offset;
+
+      case SEEK_CUR: {
+        const auto pos = PHYSFS_tell(file);
+        if (pos < 0 || would_overflow(pos, offset)) [[unlikely]] return -1;
+        return pos + offset;
+      }
+
+      case SEEK_END: {
+        const auto end = PHYSFS_fileLength(file);
+        if (end < 0 || would_overflow(end, offset)) [[unlikely]] return -1;
+        return end + offset;
+      }
+
+      default:
+        return -1;
+    }
+  }
+
   static int physfs_seek(void* source, ogg_int64_t offset, int whence) {
     auto* file = static_cast<PHYSFS_File*>(source);
-
-    const auto compute_target = [file](ogg_int64_t offset, int whence) -> PHYSFS_sint64 {
-      switch (whence) {
-        case SEEK_SET:
-          return (offset < 0) ? -1 : offset;
-
-        case SEEK_CUR: {
-          const auto pos = PHYSFS_tell(file);
-          if (pos < 0 || would_overflow(pos, offset)) [[unlikely]] return -1;
-          return pos + offset;
-        }
-
-        case SEEK_END: {
-          const auto end = PHYSFS_fileLength(file);
-          if (end < 0 || would_overflow(end, offset)) [[unlikely]] return -1;
-          return end + offset;
-        }
-
-        default:
-          return -1;
-      }
-    };
-
-    return seek_file(file, compute_target(offset, whence));
+    return seek_file(file, compute_seek_target(file, offset, whence));
   }
 
   static int physfs_close(void* source) {
