@@ -24,8 +24,8 @@ namespace {
     return (result > 0) ? safe_cast<size_t>(result) / size : 0;
   }
 
-  static int seek_file(PHYSFS_File* file, PHYSFS_sint64 target) {
-    return (target < 0 || !PHYSFS_seek(file, safe_cast<PHYSFS_uint64>(target))) ? -1 : 0;
+  static int seek_file(PHYSFS_File* ptr, PHYSFS_sint64 target) {
+    return (target < 0 || !PHYSFS_seek(ptr, safe_cast<PHYSFS_uint64>(target))) ? -1 : 0;
   }
 
   static bool would_overflow(PHYSFS_sint64 base, ogg_int64_t offset) {
@@ -36,19 +36,19 @@ namespace {
     return positive ? (base > limit - offset) : (base < limit - offset);
   }
 
-  static PHYSFS_sint64 compute_seek_target(PHYSFS_File* file, ogg_int64_t offset, int whence) {
+  static PHYSFS_sint64 compute_seek_target(PHYSFS_File* ptr, ogg_int64_t offset, int whence) {
     switch (whence) {
       case SEEK_SET:
         return (offset < 0) ? -1 : offset;
 
       case SEEK_CUR: {
-        const auto pos = PHYSFS_tell(file);
+        const auto pos = PHYSFS_tell(ptr);
         if (pos < 0 || would_overflow(pos, offset)) [[unlikely]] return -1;
         return pos + offset;
       }
 
       case SEEK_END: {
-        const auto end = PHYSFS_fileLength(file);
+        const auto end = PHYSFS_fileLength(ptr);
         if (end < 0 || would_overflow(end, offset)) [[unlikely]] return -1;
         return end + offset;
       }
@@ -90,10 +90,6 @@ soundfx::soundfx(std::string_view filename) {
   ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 
   const auto* props = ov_info(vf.get(), -1);
-  if (!props) [[unlikely]] {
-    throw std::runtime_error(std::format("[ov_info] {}", filename));
-  }
-
   const auto format = (props->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(props->rate);
   const auto estimated = static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * props->channels * 2;
