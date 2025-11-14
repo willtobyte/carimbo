@@ -2,88 +2,79 @@
 
 using namespace audio;
 
+#include "soundfx.hpp"
+
+using namespace audio;
+
 namespace {
-  static std::array<char, 8 * 1024 * 1024> buffer;
+  constexpr auto KILOBYTE = 1024uz;
+  constexpr auto READ_BUFFER_SIZE = 1 * KILOBYTE * KILOBYTE;
+  constexpr auto PHYSFS_BUFFER_SIZE = 4 * READ_BUFFER_SIZE;
 
-  static size_t cb_read(void* ptr, size_t size, size_t nmemb, void* source) {
-    const auto file = reinterpret_cast<PHYSFS_file*> (source);
+  static std::array<char, READ_BUFFER_SIZE> buffer;
 
-    PHYSFS_sint64 result
-      = PHYSFS_readBytes(file, ptr, static_cast<PHYSFS_uint32>(size) * static_cast<PHYSFS_uint32>(nmemb));
-    if (result <= 0) [[unlikely]] {
-      return 0;
-    }
-
-    return static_cast<size_t> (result) / size;
+  template<typename To, typename From>
+  auto safe_cast(From value) {
+    return static_cast<To>(value);
   }
 
-  static int cb_seek(void* source, ogg_int64_t offset, int whence) {
-    auto* file = reinterpret_cast<PHYSFS_File*>(source);
+  static size_t physfs_read(void* ptr, size_t size, size_t nmemb, void* source) {
+    const auto result = PHYSFS_readBytes(
+      static_cast<PHYSFS_file*>(source),
+      ptr,
+      safe_cast<PHYSFS_uint32>(size * nmemb)
+    );
 
-    switch (whence) {
-      case SEEK_SET: {
-        if (offset < 0) [[unlikely]] {
-          return -1;
-        }
-
-        const auto ok = PHYSFS_seek(file, static_cast<PHYSFS_uint64>(offset));
-        return ok ? 0 : -1;
-      }
-
-      case SEEK_CUR: {
-        const PHYSFS_sint64 position = PHYSFS_tell(file);
-        if (position < 0) [[unlikely]] {
-          return -1;
-        }
-
-        if ((offset > 0 && position > (std::numeric_limits<PHYSFS_sint64>::max)() - offset) ||
-            (offset < 0 && position < (std::numeric_limits<PHYSFS_sint64>::min)() - offset)) [[unlikely]] {
-          return -1;
-        }
-
-        const PHYSFS_sint64 target = position + offset;
-        if (target < 0) [[unlikely]] {
-          return -1;
-        }
-
-        const auto ok = PHYSFS_seek(file, static_cast<PHYSFS_uint64>(target));
-        return ok ? 0 : -1;
-      }
-
-      case SEEK_END: {
-        const PHYSFS_sint64 end = PHYSFS_fileLength(file);
-        if (end < 0) [[unlikely]] {
-          return -1;
-        }
-
-        if ((offset > 0 && end > (std::numeric_limits<PHYSFS_sint64>::max)() - offset) ||
-            (offset < 0 && end < (std::numeric_limits<PHYSFS_sint64>::min)() - offset)) [[unlikely]] {
-          return -1;
-        }
-
-        const PHYSFS_sint64 target = end + offset;
-        if (target < 0) [[unlikely]] {
-          return -1;
-        }
-
-        const auto ok = PHYSFS_seek(file, static_cast<PHYSFS_uint64>(target));
-        return ok ? 0 : -1;
-      }
-    }
-
-    assert(false); [[unlikely]];
-    return -1;
+    return (result > 0) ? safe_cast<size_t>(result) / size : 0;
   }
 
-  static int cb_close(void* source) {
-    const auto file = reinterpret_cast<PHYSFS_file*> (source);
-    PHYSFS_close(file);
+  static int seek_file(PHYSFS_File* file, PHYSFS_sint64 target) {
+    return (target < 0 || !PHYSFS_seek(file, safe_cast<PHYSFS_uint64>(target))) ? -1 : 0;
+  }
+
+  static bool would_overflow(PHYSFS_sint64 base, ogg_int64_t offset) {
+    const auto positive = offset > 0;
+    const auto limit = positive
+      ? (std::numeric_limits<PHYSFS_sint64>::max)()
+      : (std::numeric_limits<PHYSFS_sint64>::min)();
+    return positive ? (base > limit - offset) : (base < limit - offset);
+  }
+
+  static int physfs_seek(void* source, ogg_int64_t offset, int whence) {
+    auto* file = static_cast<PHYSFS_File*>(source);
+
+    const auto compute_target = [file](ogg_int64_t offset, int whence) -> PHYSFS_sint64 {
+      switch (whence) {
+        case SEEK_SET:
+          return (offset < 0) ? -1 : offset;
+
+        case SEEK_CUR: {
+          const auto pos = PHYSFS_tell(file);
+          if (pos < 0 || would_overflow(pos, offset)) [[unlikely]] return -1;
+          return pos + offset;
+        }
+
+        case SEEK_END: {
+          const auto end = PHYSFS_fileLength(file);
+          if (end < 0 || would_overflow(end, offset)) [[unlikely]] return -1;
+          return end + offset;
+        }
+
+        default:
+          return -1;
+      }
+    };
+
+    return seek_file(file, compute_target(offset, whence));
+  }
+
+  static int physfs_close(void* source) {
+    PHYSFS_close(static_cast<PHYSFS_file*>(source));
     return 0;
   }
 
-  static long cb_tell(void* source) {
-    const auto file = reinterpret_cast<PHYSFS_file*> (source);
-    return static_cast<long>(PHYSFS_tell(file));
+  static long physfs_tell(void* source) {
+    return safe_cast<long>(PHYSFS_tell(static_cast<PHYSFS_file*>(source)));
   }
 }
 
@@ -97,10 +88,10 @@ soundfx::soundfx(std::string_view filename) {
         PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
   }
 
-  PHYSFS_setBuffer(ptr.get(), 4 * 1024 * 1024);
+  PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
 
   std::unique_ptr<OggVorbis_File, OggVorbis_Deleter> vf{new OggVorbis_File};
-  ov_callbacks callbacks = {cb_read, cb_seek, cb_close, cb_tell};
+  ov_callbacks callbacks = {physfs_read, physfs_seek, physfs_close, physfs_tell};
   ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
 
   const auto* props = ov_info(vf.get(), -1);
@@ -153,22 +144,17 @@ soundfx::soundfx(std::string_view filename) {
 }
 
 soundfx::~soundfx() {
-  if (_source == 0) {
-    goto freebuffer;
-  }
-
-  if (_source) {
+  if (_source != 0) {
     alSourceStop(_source);
     alSourcei(_source, AL_BUFFER, 0);
     alDeleteSources(1, &_source);
     _source = 0;
   }
 
-  freebuffer:
-    if (_buffer) {
-      alDeleteBuffers(1, &_buffer);
-      _buffer = 0;
-    }
+  if (_buffer != 0) {
+    alDeleteBuffers(1, &_buffer);
+    _buffer = 0;
+  }
 }
 
 void soundfx::play(bool loop) const {
