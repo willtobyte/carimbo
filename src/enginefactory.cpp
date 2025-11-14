@@ -9,7 +9,6 @@
 #include "postalservice.hpp"
 #include "scenemanager.hpp"
 #include "timermanager.hpp"
-#include "window.hpp"
 
 using namespace framework;
 
@@ -48,6 +47,7 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
     return *this;
   }
 
+#ifdef NDEBUG
 #ifdef EMSCRIPTEN
   static constexpr auto script = R"javascript(
     (function(){{
@@ -95,6 +95,7 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
   sentry_options_set_system_crash_reporter_enabled(options, true);
 
   sentry_init(options);
+#endif
 #endif
 
   return *this;
