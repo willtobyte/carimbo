@@ -57,12 +57,10 @@ endif()
 find_package(Boost CONFIG REQUIRED)
 find_package(box2d CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
-find_package(Ogg CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
-find_package(Vorbis CONFIG REQUIRED)
 
 if(NOT IS_EMSCRIPTEN)
   find_package(OpenAL CONFIG REQUIRED)
@@ -104,12 +102,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   boost::boost
   box2d::box2d
   nlohmann_json::nlohmann_json
-  Ogg::ogg
   physfs-static
   SDL3::SDL3-static
   sol2::sol2
   spng::spng_static
-  vorbis::vorbis
   $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
   $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>

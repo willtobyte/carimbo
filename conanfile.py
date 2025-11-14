@@ -29,12 +29,10 @@ class Carimbo(ConanFile):
         self.requires("box2d/3.1.1")
         self.requires("libspng/0.7.4")
         self.requires("nlohmann_json/3.12.0")
-        self.requires("ogg/1.3.5")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
         self.requires("sdl/3.2.20")
         self.requires("sol2/3.5.0")
-        self.requires("vorbis/1.3.7")
 
         if self._is_jit_capable():
             self.requires("luajit/2.1.0-beta3")

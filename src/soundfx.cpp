@@ -1,130 +1,36 @@
 #include "soundfx.hpp"
 
+#include "io.hpp"
+#include "stb_vorbis.c"
+
 using namespace audio;
 
-namespace {
-  static std::array<char, READ_BUFFER_SIZE> buffer;
-
-  template<typename To, typename From>
-  auto safe_cast(From value) {
-    return static_cast<To>(value);
-  }
-
-  static size_t physfs_read(void* ptr, size_t size, size_t nmemb, void* source) {
-    const auto result = PHYSFS_readBytes(
-      static_cast<PHYSFS_file*>(source),
-      ptr,
-      safe_cast<PHYSFS_uint32>(size * nmemb)
-    );
-
-    return (result > 0) ? safe_cast<size_t>(result) / size : 0;
-  }
-
-  static int seek_file(PHYSFS_File* ptr, PHYSFS_sint64 target) {
-    return (target < 0 || !PHYSFS_seek(ptr, safe_cast<PHYSFS_uint64>(target))) ? -1 : 0;
-  }
-
-  static bool would_overflow(PHYSFS_sint64 base, ogg_int64_t offset) {
-    const auto positive = offset > 0;
-    const auto limit = positive
-      ? (std::numeric_limits<PHYSFS_sint64>::max)()
-      : (std::numeric_limits<PHYSFS_sint64>::min)();
-    return positive ? (base > limit - offset) : (base < limit - offset);
-  }
-
-  static PHYSFS_sint64 compute_seek_target(PHYSFS_File* ptr, ogg_int64_t offset, int whence) {
-    switch (whence) {
-      case SEEK_SET:
-        return (offset < 0) ? -1 : offset;
-
-      case SEEK_CUR: {
-        const auto pos = PHYSFS_tell(ptr);
-        if (pos < 0 || would_overflow(pos, offset)) [[unlikely]] return -1;
-        return pos + offset;
-      }
-
-      case SEEK_END: {
-        const auto end = PHYSFS_fileLength(ptr);
-        if (end < 0 || would_overflow(end, offset)) [[unlikely]] return -1;
-        return end + offset;
-      }
-
-      default:
-        return -1;
-    }
-  }
-
-  static int physfs_seek(void* source, ogg_int64_t offset, int whence) {
-    auto* file = static_cast<PHYSFS_File*>(source);
-    return seek_file(file, compute_seek_target(file, offset, whence));
-  }
-
-  static int physfs_close(void* source) {
-    PHYSFS_close(static_cast<PHYSFS_file*>(source));
-    return 0;
-  }
-
-  static long physfs_tell(void* source) {
-    return safe_cast<long>(PHYSFS_tell(static_cast<PHYSFS_file*>(source)));
-  }
-}
-
 soundfx::soundfx(std::string_view filename) {
-  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data()));
+  const auto buffer = storage::io::read(filename);
 
-  if (!ptr) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[PHYSFS_openRead] error while opening file: {}, error: {}",
-        filename,
-        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+  int channels;
+  int sample_rate;
+  short* decoded;
+  const auto samples = stb_vorbis_decode_memory(
+    buffer.data(),
+    static_cast<int>(buffer.size()),
+    &channels,
+    &sample_rate,
+    &decoded
+  );
+
+  if (samples < 0 || !decoded) [[unlikely]] {
+    throw std::runtime_error(std::format("[stb_vorbis_decode_memory] failed to decode: {}", filename));
   }
 
-  PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
-
-  std::unique_ptr<OggVorbis_File, OggVorbis_Deleter> vf{new OggVorbis_File};
-  ov_callbacks callbacks = {physfs_read, physfs_seek, physfs_close, physfs_tell};
-  ov_open_callbacks(ptr.get(), vf.get(), nullptr, 0, callbacks);
-
-  const auto* props = ov_info(vf.get(), -1);
-  const auto format = (props->channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
-  const auto frequency = static_cast<ALsizei>(props->rate);
-  const auto estimated = static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * props->channels * 2;
-
-  std::vector<uint8_t> linear16;
-  linear16.reserve(estimated);
-
-  for (;;) {
-    auto got = ov_read(
-      vf.get(),
-      buffer.data(),
-      static_cast<int>(buffer.size()),
-      0, // little-endian
-      2, // 16-bit
-      1, // signed
-      nullptr
-    );
-
-    if (got < 0) [[unlikely]] {
-      std::string_view reason;
-      switch (got) {
-        case OV_HOLE:     reason = "OV_HOLE"; break;
-        case OV_EBADLINK: reason = "OV_EBADLINK"; break;
-        case OV_EINVAL:   reason = "OV_EINVAL"; break;
-        default:          reason = "Unknown error"; break;
-      }
-
-      throw std::runtime_error(std::format("[ov_read] {} ({})", filename, reason));
-    }
-
-    if (!got) {
-      break;
-    }
-
-    linear16.insert(linear16.end(), buffer.data(), buffer.data() + got);
-  }
+  const auto format = (channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+  const auto frequency = static_cast<ALsizei>(sample_rate);
+  const auto size = samples * channels * sizeof(short);
 
   alGenBuffers(1, &_buffer);
-  alBufferData(_buffer, format, linear16.data(), static_cast<ALsizei>(linear16.size()), frequency);
+  alBufferData(_buffer, format, decoded, static_cast<ALsizei>(size), frequency);
+
+  free(decoded);
 
   alGenSources(1, &_source);
   alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));
