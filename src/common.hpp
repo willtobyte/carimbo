@@ -6,20 +6,13 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <boost/functional/hash.hpp>
-#include <boost/unordered/unordered_flat_set.hpp>
-#include <boost/unordered_map.hpp>
-#include <boost/unordered_set.hpp>
 #include <box2d/box2d.h>
 #include <lua.hpp>
 #include <nlohmann/json.hpp>
-#include <ogg/ogg.h>
 #include <physfs.h>
 #include <SDL3/SDL.h>
 #include <sol/sol.hpp>
 #include <spng.h>
-#include <vorbis/codec.h>
-#include <vorbis/vorbisfile.h>
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
