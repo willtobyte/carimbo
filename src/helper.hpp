@@ -46,12 +46,12 @@ struct OggVorbis_Deleter final {
   }
 };
 
-struct SPNG_Deleter final {
+struct STBI_Deleter final {
   template <typename T>
   void operator()(T* ptr) const noexcept {
     if (!ptr) return;
 
-    if constexpr (requires { spng_ctx_free(ptr); }) spng_ctx_free(ptr);
+    if constexpr (requires { stbi_image_free(ptr); }) stbi_image_free(ptr);
   }
 };
 

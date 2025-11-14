@@ -1,47 +1,35 @@
 #include "pixmap.hpp"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 using namespace graphics;
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     : _renderer(std::move(renderer)) {
   const auto buffer = storage::io::read(filename);
 
-  const auto ctx = std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32));
+  int width, height, channels;
+  const auto pixels = std::unique_ptr<stbi_uc, STBI_Deleter>(
+    stbi_load_from_memory(
+      buffer.data(),
+      static_cast<int>(buffer.size()),
+      &width,
+      &height,
+      &channels,
+      STBI_rgb_alpha
+    )
+  );
 
-  if (const auto error = spng_set_png_buffer(ctx.get(), buffer.data(), buffer.size()); error != SPNG_OK) [[unlikely]] {
+  if (!pixels) [[unlikely]] {
     throw std::runtime_error(
-      std::format("[spng_set_png_buffer] error while parsing image: {}, error: {}",
+      std::format("[stbi_load_from_memory] error while loading image: {}, error: {}",
         filename,
-        spng_strerror(error)));
+        stbi_failure_reason()));
   }
 
-  spng_ihdr ihdr{};
-  if (const auto error = spng_get_ihdr(ctx.get(), &ihdr); error != SPNG_OK) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[spng_get_ihdr] error while getting image information: {}, error: {}",
-        filename,
-        spng_strerror(error)));
-  }
-
-  const int format{SPNG_FMT_RGBA8};
-  size_t length{0};
-  if (const auto error = spng_decoded_image_size(ctx.get(), format, &length); error != SPNG_OK) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[spng_decoded_image_size] error while getting image size: {}, error: {}",
-        filename,
-        spng_strerror(error)));
-  }
-
-  std::vector<uint8_t> output(length);
-  if (const auto error = spng_decode_image(ctx.get(), output.data(), length, format, SPNG_DECODE_TRNS); error != SPNG_OK) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[spng_decode_image] error while decoding image: {}, error: {}",
-        filename,
-        spng_strerror(error)));
-  }
-
-  _width = static_cast<int32_t>(ihdr.width);
-  _height = static_cast<int32_t>(ihdr.height);
+  _width = static_cast<int32_t>(width);
+  _height = static_cast<int32_t>(height);
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
         *_renderer,
@@ -56,8 +44,8 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
 
-  const auto pitch = static_cast<int32_t>(ihdr.width * 4);
-  if (!SDL_UpdateTexture(_texture.get(), nullptr, output.data(), pitch)) [[unlikely]] {
+  const auto pitch = static_cast<int32_t>(width * 4);
+  if (!SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch)) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_UpdateTexture] {}", SDL_GetError()));
   }
 

@@ -60,7 +60,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
-find_package(SPNG CONFIG REQUIRED)
 
 if(NOT IS_EMSCRIPTEN)
   find_package(OpenAL CONFIG REQUIRED)
@@ -105,7 +104,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   physfs-static
   SDL3::SDL3-static
   sol2::sol2
-  spng::spng_static
   $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
   $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>

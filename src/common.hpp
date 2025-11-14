@@ -12,7 +12,6 @@
 #include <physfs.h>
 #include <SDL3/SDL.h>
 #include <sol/sol.hpp>
-#include <spng.h>
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
