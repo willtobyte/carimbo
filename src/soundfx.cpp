@@ -110,10 +110,9 @@ soundfx::soundfx(std::string_view filename) {
   const auto frequency = static_cast<ALsizei>(props->rate);
   const auto estimated = static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * props->channels * 2;
 
+  std::array<char, 1024 * 1024> buffer;
   std::vector<uint8_t> linear16;
   linear16.reserve(estimated);
-
-  std::array<char, 4 * 1024 * 1024> buffer{};
 
   for (;;) {
     auto got = ov_read(
