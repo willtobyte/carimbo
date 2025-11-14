@@ -32,6 +32,7 @@ class Carimbo(ConanFile):
         self.requires("physfs/3.2.0")
         self.requires("sdl/3.2.20")
         self.requires("sol2/3.5.0")
+        self.requires("stb/cci.20240531")
 
         if self._is_jit_capable():
             self.requires("luajit/2.1.0-beta3")

@@ -1,7 +1,7 @@
 #include "soundfx.hpp"
 
 #include "io.hpp"
-#include "stb_vorbis.c"
+#include <stb_vorbis.c>
 
 using namespace audio;
 
