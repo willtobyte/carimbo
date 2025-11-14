@@ -3,6 +3,8 @@
 using namespace audio;
 
 namespace {
+  std::array<char, 4 * 1024 * 1024> buffer;
+
   static size_t cb_read(void* ptr, size_t size, size_t nmemb, void* source) {
     const auto file = reinterpret_cast<PHYSFS_file*> (source);
 
@@ -110,9 +112,9 @@ soundfx::soundfx(std::string_view filename) {
   const auto frequency = static_cast<ALsizei>(props->rate);
   const auto estimated = static_cast<size_t>(ov_pcm_total(vf.get(), -1)) * props->channels * 2;
 
-  std::array<char, 1024 * 1024> buffer;
   std::vector<uint8_t> linear16;
   linear16.reserve(estimated);
+  buffer.fill(0);
 
   for (;;) {
     auto got = ov_read(
