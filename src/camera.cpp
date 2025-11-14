@@ -2,9 +2,6 @@
 
 using namespace graphics;
 
-camera::camera() noexcept {
-}
-
 void camera::update(float delta) {
   if (const auto& fn = _on_request_calc; fn) {
     std::tie(_x, _y, _width, _height) = fn(delta);

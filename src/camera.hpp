@@ -5,8 +5,8 @@
 namespace graphics {
 class camera final {
   public:
-    camera() noexcept;
-    ~camera() = default;
+    camera() noexcept = default;
+    ~camera() noexcept = default;
 
     void update(float delta);
 
