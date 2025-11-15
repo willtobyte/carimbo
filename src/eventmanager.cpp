@@ -22,17 +22,17 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   _controllers.reserve(8);
 
   int number;
-  std::unique_ptr<SDL_JoystickID[], SDL_Deleter> joysticks(SDL_GetGamepads(&number));
+  std::unique_ptr<uint32_t[], SDL_Deleter> gamepads(SDL_GetGamepads(&number));
 
-  if (joysticks) {
+  if (gamepads) {
     for (auto index = 0; index < number; ++index) {
-      const auto gamepad_id = joysticks[static_cast<size_t>(index)];
-      if (!SDL_IsGamepad(gamepad_id)) {
+      const auto gid = gamepads[index];
+      if (!SDL_IsGamepad(gid)) {
         continue;
       }
 
-      if (const auto controller = SDL_OpenGamepad(gamepad_id)) {
-        const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
+      if (const auto controller = SDL_OpenGamepad(gid)) {
+        const uint32_t jid = static_cast<uint32_t>(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)));
 
         if (_controllers.contains(jid)) {
           SDL_CloseGamepad(controller);
@@ -190,8 +190,8 @@ void eventmanager::update(float delta) {
           }
 
           const auto index = it->second;
-          const SDL_JoystickID rid = event.cdevice.which;
-          const SDL_JoystickID lid = _joystickgorder.back();
+          const auto rid = event.cdevice.which;
+          const auto lid = _joystickgorder.back();
 
           _joystickgorder[index] = lid;
           _joystickmapping[lid] = index;

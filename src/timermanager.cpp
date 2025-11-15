@@ -30,7 +30,7 @@ static bool filter(void* userdata, SDL_Event* e) {
   return false;
 }
 
-static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interval, bool repeat) {
+static uint32_t generic_wrapper(void* userdata, uint32_t id, uint32_t interval, bool repeat) {
   SDL_Event event{};
   event.type = event_type;
   event.user.data1 = userdata;
@@ -39,11 +39,11 @@ static uint32_t generic_wrapper(void* userdata, SDL_TimerID id, uint32_t interva
   return repeat ? interval : 0;
 }
 
-uint32_t wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
+uint32_t wrapper(void* userdata, uint32_t id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, true);
 }
 
-uint32_t singleshot_wrapper(void* userdata, SDL_TimerID id, uint32_t interval) {
+uint32_t singleshot_wrapper(void* userdata, uint32_t id, uint32_t interval) {
   return generic_wrapper(userdata, id, interval, false);
 }
 

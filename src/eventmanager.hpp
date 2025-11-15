@@ -30,9 +30,9 @@ public:
 private:
   std::shared_ptr<graphics::renderer> _renderer;
   std::vector<std::weak_ptr<eventreceiver>> _receivers;
-  std::unordered_map<SDL_JoystickID, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
-  std::vector<SDL_JoystickID> _joystickgorder;
-  std::unordered_map<SDL_JoystickID, uint8_t> _joystickmapping;
+  std::unordered_map<uint32_t, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
+  std::vector<uint32_t> _joystickgorder;
+  std::unordered_map<uint32_t, uint8_t> _joystickmapping;
   std::shared_ptr<framework::envelopepool_impl> _envelopepool = framework::envelopepool::instance();
 };
 }

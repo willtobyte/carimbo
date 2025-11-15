@@ -6,7 +6,7 @@
 
 namespace graphics {
 
-enum class blendmode : SDL_BlendMode {
+enum class blendmode : int {
   None = SDL_BLENDMODE_NONE,
   Blend = SDL_BLENDMODE_BLEND,
   Add  = SDL_BLENDMODE_ADD

@@ -9,14 +9,14 @@ enum class player : uint8_t {
   two
 };
 
-enum class type : int {
+enum class type : uint32_t {
   collision = SDL_EVENT_USER + 1,
   mail,
   timer
 };
 
 namespace keyboard {
-enum class key : uint32_t {
+enum class key : int32_t {
   up = SDLK_UP,
   left = SDLK_LEFT,
   down = SDLK_DOWN,
