@@ -3,8 +3,6 @@
 #include "io.hpp"
 #include "pixmap.hpp"
 #include "pixmappool.hpp"
-#include "rectangle.hpp"
-#include "reflection.hpp"
 #include "resourcemanager.hpp"
 
 using namespace graphics;
@@ -153,24 +151,17 @@ void particlesystem::draw() const {
 
     const auto n = batch->size();
     const auto& pixmap = *props->pixmap;
-    const auto width = static_cast<float>(pixmap.width());
-    const auto height = static_cast<float>(pixmap.height());
-    static const geometry::point source{0, 0};
+    const auto w = static_cast<float>(pixmap.width());
+    const auto h = static_cast<float>(pixmap.height());
 
     const auto* particles = batch->particles.data();
 
     for (auto i = n; i-- > 0uz;) {
       const auto& p = particles[i];
 
-      const geometry::rectangle destination{
-        p.x, p.y,
-        width * p.scale,
-        height * p.scale
-      };
-
       pixmap.draw(
-        source,
-        destination,
+        0.f, 0.f, w, h,
+        p.x, p.y, w * p.scale, h * p.scale,
         p.angle,
         p.alpha
       );

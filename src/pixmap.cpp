@@ -80,6 +80,20 @@ int pixmap::height() const {
   return _height;
 }
 
+void pixmap::draw(
+    const float sx, const float sy, const float sw, const float sh,
+    const float dx, const float dy, const float dw, const float dh,
+    const double angle,
+    const uint8_t alpha,
+    reflection reflection
+) const {
+  const SDL_FRect source{ sx, sy, sw, sh };
+  const SDL_FRect destination{ dx, dy, dw, dh };
+
+  SDL_SetTextureAlphaMod(_texture.get(), alpha);
+  SDL_RenderTextureRotated(*_renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
+}
+
 void pixmap::set_blendmode(blendmode mode) {
   if (!SDL_SetTextureBlendMode(_texture.get(), static_cast<SDL_BlendMode>(mode))) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_SetTextureBlendMode] {}", SDL_GetError()));

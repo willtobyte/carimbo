@@ -26,6 +26,14 @@ public:
       reflection reflection = reflection::none
   ) const;
 
+  void draw(
+      float sx, float sy, float sw, float sh,
+      float dx, float dy, float dw, float dh,
+      double angle = 0.0,
+      uint8_t alpha = 255,
+      reflection reflection = reflection::none
+  ) const;
+
   operator SDL_Texture* () const;
 
   int width() const;
