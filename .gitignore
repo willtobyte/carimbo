@@ -37,4 +37,4 @@ stdout.txt
 stderr.txt
 
 # Sentry
-.sentry-native
+.sentry
