@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef HAVE_SENTRY
-#include <sentry.h>
-#endif
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <box2d/box2d.h>
@@ -12,6 +8,10 @@
 #include <physfs.h>
 #include <SDL3/SDL.h>
 #include <sol/sol.hpp>
+
+#ifdef HAVE_SENTRY
+#include <sentry.h>
+#endif
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -32,6 +32,7 @@
 #include <map>
 #include <memory>
 #include <memory_resource>
+#include <mutex>
 #include <numbers>
 #include <optional>
 #include <print>
