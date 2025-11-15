@@ -3,12 +3,12 @@
 using namespace framework;
 
 application::application(const int argc, char** const argv) {
-  std::atexit([] { SDL_Quit(); });
-  std::atexit([] { PHYSFS_deinit(); });
-
 #ifdef HAVE_SENTRY
   std::atexit([] { sentry_close(); });
 #endif
+
+  std::atexit([] { SDL_Quit(); });
+  std::atexit([] { PHYSFS_deinit(); });
 
 #ifdef HAVE_STEAM
   std::atexit([] { SteamAPI_Shutdown(); });
