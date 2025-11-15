@@ -38,7 +38,7 @@ class Carimbo(ConanFile):
             self.requires("luajit/2.1.0-beta3")
 
         if self._have_sentry():
-            self.requires("sentry-native/0.11.3")
+            self.requires("sentry-native/0.12.1")
 
     def configure(self):
         self.options["boost"].header_only = True

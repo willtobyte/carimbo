@@ -92,8 +92,6 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
   sentry_options_add_attachment(options, "stderr.txt");
   sentry_options_add_attachment(options, "VERSION");
 
-  sentry_options_set_system_crash_reporter_enabled(options, true);
-
   sentry_init(options);
 #endif
 #endif
