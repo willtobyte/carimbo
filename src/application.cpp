@@ -7,12 +7,12 @@ application::application(const int argc, char** const argv) {
   std::atexit([] { sentry_close(); });
 #endif
 
-  std::atexit([] { SDL_Quit(); });
-  std::atexit([] { PHYSFS_deinit(); });
-
 #ifdef HAVE_STEAM
   std::atexit([] { SteamAPI_Shutdown(); });
 #endif
+
+  std::atexit([] { PHYSFS_deinit(); });
+  std::atexit([] { SDL_Quit(); });
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
