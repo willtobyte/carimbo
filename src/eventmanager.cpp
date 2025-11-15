@@ -323,10 +323,21 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
     return;
   }
 
-  std::owner_less<void> cmp;
+  constexpr std::owner_less<> compare;
+
   for (auto i = _receivers.size(); i-- > 0; ) {
-    auto& weak = _receivers[i];
-    if (weak.expired() || (!cmp(weak, receiver) && !cmp(receiver, weak))) {
+    const auto& weak = _receivers[i];
+
+    auto should_remove = false;
+
+    if (weak.expired()) [[unlikely]] {
+      should_remove = true;
+    } else {
+      const auto locked = weak.lock();
+      should_remove = !compare(weak, receiver) && !compare(receiver, weak);
+    }
+
+    if (should_remove) {
       _receivers[i] = std::move(_receivers.back());
       _receivers.pop_back();
     }
