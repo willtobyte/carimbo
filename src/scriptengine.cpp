@@ -1,6 +1,7 @@
 #include "scriptengine.hpp"
 
 using namespace framework;
+using interop::verify;
 
 static int on_panic(lua_State* L) {
   const auto* message = lua_tostring(L, -1);
@@ -50,11 +51,7 @@ static sol::object searcher(sol::this_state state, std::string_view module) {
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
 
   const auto loader = lua.load(script, std::format("@{}", filename));
-  if (!loader.valid()) [[unlikely]] {
-    sol::error err = loader;
-    throw std::runtime_error(err.what());
-  }
-
+  verify(loader);
   return sol::make_object(lua, loader.get<sol::protected_function>());
 }
 
@@ -578,11 +575,7 @@ void framework::scriptengine::run() {
         const auto result = lua.load(script, std::format("@{}", filename));
         const auto pf = result.get<sol::protected_function>();
         const auto exec = pf();
-        if (!exec.valid()) [[unlikely]] {
-          sol::error err = exec;
-          throw std::runtime_error(err.what());
-        }
-
+        verify(exec);
         auto module = exec.get<sol::table>();
 
         auto loaded = lua["package"]["loaded"];
@@ -1076,11 +1069,7 @@ void framework::scriptengine::run() {
   const auto buffer = storage::io::read("scripts/main.lua");
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
   const auto source = lua.safe_script(script, "@main.lua");
-  if (!source.valid()) [[unlikely]] {
-    sol::error err = source;
-    throw std::runtime_error(err.what());
-  }
-
+  verify(source);
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
@@ -1103,11 +1092,7 @@ void framework::scriptengine::run() {
 
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
-  if (!result.valid()) [[unlikely]] {
-    sol::error err = result;
-    throw std::runtime_error(err.what());
-  }
-
+  verify(result);
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
 
   const auto end = SDL_GetPerformanceCounter();
