@@ -25,7 +25,7 @@ public:
 
   void remove_receiver(const std::shared_ptr<eventreceiver>& receiver);
 
-  void purge(uint32_t begin_event, uint32_t end_event = 0);
+  void flush(uint32_t begin_event, uint32_t end_event = 0);
 
 private:
   std::shared_ptr<graphics::renderer> _renderer;

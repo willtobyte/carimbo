@@ -344,7 +344,7 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
   }
 }
 
-void eventmanager::purge(uint32_t begin_event, uint32_t end_event) {
+void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {
   if (end_event == 0) [[unlikely]] {
     end_event = begin_event;
   }
