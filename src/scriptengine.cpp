@@ -552,6 +552,9 @@ void framework::scriptengine::run() {
         loaded[std::format("scenes/{}", scene)] = sol::lua_nil;
       }
 
+      lua.collect_garbage();
+      lua.collect_garbage();
+
       self.destroy(name);
 
       lua.collect_garbage();
