@@ -3,8 +3,6 @@
 #include "envelope.hpp"
 #include "event.hpp"
 #include "eventreceiver.hpp"
-#include "noncopyable.hpp"
-#include "objectpool.hpp"
 #include "renderer.hpp"
 
 #include <SDL3/SDL_gamepad.h>
