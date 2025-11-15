@@ -6,11 +6,10 @@ namespace interop {
 
 template<typename T>
   requires requires(const T& t) { { t.valid() } -> std::convertible_to<bool>; }
-inline void verify(const T& result,
-                   std::source_location loc = std::source_location::current()) noexcept(false) {
+inline void verify(const T& result) {
   if (!result.valid()) [[unlikely]] {
     sol::error err = result;
-    throw std::runtime_error(std::format("{}:{} - {}", loc.file_name(), loc.line(), err.what()));
+    throw std::runtime_error(err.what());
   }
 }
 
