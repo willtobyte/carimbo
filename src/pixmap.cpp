@@ -9,7 +9,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     : _renderer(std::move(renderer)) {
   const auto buffer = storage::io::read(filename);
 
-  int width, height, channels;
+  int32_t width, height, channels;
   const auto pixels = std::unique_ptr<stbi_uc, STBI_Deleter>(
     stbi_load_from_memory(
       buffer.data(),
@@ -28,8 +28,8 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
         stbi_failure_reason()));
   }
 
-  _width = static_cast<int32_t>(width);
-  _height = static_cast<int32_t>(height);
+  _width = width;
+  _height = height;
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
         *_renderer,
