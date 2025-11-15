@@ -19,14 +19,6 @@ public:
   ~pixmap() = default;
 
   void draw(
-      const geometry::point& source,
-      const geometry::rectangle& destination,
-      double angle = 0.0L,
-      uint8_t alpha = 255,
-      reflection reflection = reflection::none
-  ) const;
-
-  void draw(
       const geometry::rectangle& source,
       const geometry::rectangle& destination,
       double angle = 0.0L,

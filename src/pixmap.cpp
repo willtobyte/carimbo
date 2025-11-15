@@ -55,29 +55,6 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
 }
 
 void pixmap::draw(
-    const geometry::point& source,
-    const geometry::rectangle& destination,
-    const double angle,
-    const uint8_t alpha,
-    reflection reflection
-) const {
-  const geometry::rectangle _source{
-    source.x(),
-    source.y(),
-    static_cast<float>(width()),
-    static_cast<float>(height())
-  };
-
-  draw(
-    _source,
-    destination,
-    angle,
-    alpha,
-    reflection
-  );
-}
-
-void pixmap::draw(
     const geometry::rectangle& source,
     const geometry::rectangle& destination,
     const double angle,

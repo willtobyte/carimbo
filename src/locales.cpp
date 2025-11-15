@@ -2,12 +2,12 @@
 
 static std::string_view language() {
   auto count = 0;
-  const auto locales = SDL_GetPreferredLocales(&count);
+  std::unique_ptr<SDL_Locale[], SDL_Deleter> locales(SDL_GetPreferredLocales(&count));
   if (!locales || count == 0) {
     return "en";
   }
 
-  const SDL_Locale* locale = locales[0];
+  const SDL_Locale* locale = &locales[0];
   if (!locale || !locale->language) {
     return "en";
   }
