@@ -16,9 +16,9 @@ class operatingsystem final {
     constexpr operatingsystem() noexcept = default;
     constexpr ~operatingsystem() noexcept = default;
 
-    [[nodiscard]] int32_t compute() const noexcept;
+    [[nodiscard]] int compute() const noexcept;
 
-    [[nodiscard]] int32_t memory() const noexcept;
+    [[nodiscard]] int memory() const noexcept;
 
     [[nodiscard]] std::string_view name() const noexcept;
 };

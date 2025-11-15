@@ -9,14 +9,14 @@ enum class player : uint8_t {
   two
 };
 
-enum class type : uint32_t {
+enum class type : int {
   collision = SDL_EVENT_USER + 1,
   mail,
   timer
 };
 
 namespace keyboard {
-enum class key : int32_t {
+enum class key : uint32_t {
   up = SDLK_UP,
   left = SDLK_LEFT,
   down = SDLK_DOWN,
@@ -55,7 +55,7 @@ struct button {
 }
 
 namespace gamepad {
-enum class button : int32_t {
+enum class button : uint32_t {
   up = SDL_GAMEPAD_BUTTON_DPAD_UP,
   down = SDL_GAMEPAD_BUTTON_DPAD_DOWN,
   left = SDL_GAMEPAD_BUTTON_DPAD_LEFT,

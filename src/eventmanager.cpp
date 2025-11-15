@@ -21,7 +21,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   _receivers.reserve(32);
   _controllers.reserve(8);
 
-  int32_t number;
+  int number;
   std::unique_ptr<SDL_JoystickID[], SDL_Deleter> joysticks(SDL_GetGamepads(&number));
 
   if (joysticks) {

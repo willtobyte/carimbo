@@ -21,7 +21,7 @@ application::application(const int argc, char** const argv) {
 #endif
 }
 
-int32_t application::run() {
+int application::run() {
   static_assert(std::endian::native == std::endian::little);
 
   try {

@@ -9,7 +9,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     : _renderer(std::move(renderer)) {
   const auto buffer = storage::io::read(filename);
 
-  int32_t width, height, channels;
+  int width, height, channels;
   const auto pixels = std::unique_ptr<stbi_uc, STBI_Deleter>(
     stbi_load_from_memory(
       buffer.data(),
@@ -44,7 +44,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
   }
 
-  const auto pitch = static_cast<int32_t>(width * 4);
+  const auto pitch = width * 4;
   if (!SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch)) [[unlikely]] {
     throw std::runtime_error(std::format("[SDL_UpdateTexture] {}", SDL_GetError()));
   }
@@ -95,11 +95,11 @@ pixmap::operator SDL_Texture* () const {
   return _texture.get();
 }
 
-int32_t pixmap::width() const {
+int pixmap::width() const {
   return _width;
 }
 
-int32_t pixmap::height() const {
+int pixmap::height() const {
   return _height;
 }
 

@@ -11,11 +11,11 @@ std::optional<std::string_view> desktop::folder() const noexcept {
   return folder;
 }
 
-int32_t operatingsystem::compute() const noexcept {
+int operatingsystem::compute() const noexcept {
   return SDL_GetNumLogicalCPUCores();
 }
 
-int32_t operatingsystem::memory() const noexcept {
+int operatingsystem::memory() const noexcept {
   return SDL_GetSystemRAM();
 }
 

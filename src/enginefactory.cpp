@@ -17,12 +17,12 @@ enginefactory& enginefactory::with_title(const std::string_view title) noexcept 
   return *this;
 }
 
-enginefactory& enginefactory::with_width(const int32_t width) noexcept {
+enginefactory& enginefactory::with_width(const int width) noexcept {
   _width = width;
   return *this;
 }
 
-enginefactory& enginefactory::with_height(const int32_t height) noexcept {
+enginefactory& enginefactory::with_height(const int height) noexcept {
   _height = height;
   return *this;
 }

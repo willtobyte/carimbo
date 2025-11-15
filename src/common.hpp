@@ -109,7 +109,7 @@ namespace graphics {
   class renderer;
   class tilemap;
   class window;
-  enum class reflection : int32_t;
+  enum class reflection : int;
 }
 
 namespace input {

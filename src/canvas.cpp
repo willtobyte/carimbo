@@ -6,15 +6,15 @@ using namespace graphics;
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
-  int32_t lw, lh;
+  int lw, lh;
   SDL_RendererLogicalPresentation mode;
   SDL_GetRenderLogicalPresentation(*_renderer, &lw, &lh, &mode);
 
   float sx, sy;
   SDL_GetRenderScale(*_renderer, &sx, &sy);
 
-  const auto width = static_cast<int32_t>(std::lround(static_cast<float>(lw) / sx));
-  const auto height = static_cast<int32_t>(std::lround(static_cast<float>(lh) / sy));
+  const auto width = static_cast<int>(std::lround(static_cast<float>(lw) / sx));
+  const auto height = static_cast<int>(std::lround(static_cast<float>(lh) / sy));
 
   auto* const texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
   if (!texture) [[unlikely]] {

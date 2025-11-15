@@ -36,17 +36,17 @@ public:
 
   operator SDL_Texture* () const;
 
-  int32_t width() const;
+  int width() const;
 
-  int32_t height() const;
+  int height() const;
 
   void set_blendmode(blendmode mode);
 
 private:
+  int _width;
+  int _height;
+
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;
-
-  int32_t _width;
-  int32_t _height;
 };
 }

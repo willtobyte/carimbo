@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace graphics {
-enum class reflection : int32_t {
+enum class reflection {
   none = SDL_FLIP_NONE,
   horizontal = SDL_FLIP_HORIZONTAL,
   vertical = SDL_FLIP_VERTICAL,
