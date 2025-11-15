@@ -3,9 +3,9 @@
 using namespace framework;
 
 application::application(const int argc, char** const argv) {
-// #ifdef HAVE_SENTRY
-//   std::atexit([] { sentry_close(); });
-// #endif
+#ifdef HAVE_SENTRY
+  std::atexit([] { sentry_flush(3000); }); // sentry_close();
+#endif
 
 #ifdef HAVE_STEAM
   std::atexit([] { SteamAPI_Shutdown(); });
