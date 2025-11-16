@@ -569,7 +569,8 @@ void framework::scriptengine::run() {
         const auto filename = std::format("scenes/{}.lua", name);
         const auto buffer = storage::io::read(filename);
         std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
-        const auto result = lua.load(script, std::format("@{}", filename));
+        const auto result = lua.safe_script(script, std::format("@{}", filename));
+        verify(result);
         const auto pf = result.get<sol::protected_function>();
         const auto exec = pf();
         verify(exec);
