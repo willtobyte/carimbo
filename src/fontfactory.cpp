@@ -60,7 +60,6 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
   SDL_RenderClear(*_renderer);
   SDL_RenderTexture(*_renderer, *pixmap, nullptr, &destination);
-  SDL_RenderPresent(*_renderer);
 
   std::unique_ptr<SDL_Surface, SDL_Deleter> surface(SDL_RenderReadPixels(*_renderer, nullptr));
   if (!surface) [[unlikely]] {
