@@ -54,7 +54,10 @@ void world::update(const float delta) {
       const auto id_b = physics::userdata_to_id(user_data_b);
 
       const auto pair = std::minmax(id_a, id_b);
-      _collisions.insert(pair);
+      const auto [it, inserted] = _collisions.insert(pair);
+      if (inserted) {
+        notify(id_a, id_b);
+      }
     }
 
     for (auto i = events.endCount; i-- > 0; ) {
@@ -73,10 +76,6 @@ void world::update(const float delta) {
 
       const auto pair = std::minmax(id_a, id_b);
       _collisions.erase(pair);
-    }
-
-    for (const auto& [id_a, id_b] : _collisions) {
-      notify(id_a, id_b);
     }
 
     _accumulator -= FIXED_TIMESTEP;
@@ -123,6 +122,11 @@ world::operator b2WorldId() const noexcept {
   return _world;
 }
 
+bool world::collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const {
+  const auto pair = std::minmax(a->_id, b->_id);
+  return _collisions.contains(pair);
+}
+
 void world::notify(const uint64_t id_a, const uint64_t id_b) const {
   const auto objectmanager = _objectmanager.lock();
   if (!objectmanager) [[unlikely]] return;
@@ -134,11 +138,6 @@ void world::notify(const uint64_t id_a, const uint64_t id_b) const {
 
   if (const auto* const callback = find_ptr(object_a->_collision_mapping, object_b->kind())) (*callback)(object_a, object_b);
   if (const auto* const callback = find_ptr(object_b->_collision_mapping, object_a->kind())) (*callback)(object_b, object_a);
-
-  auto event = SDL_Event{};
-  event.type = static_cast<uint32_t>(input::event::type::collision);
-  event.user.data1 = _envelopepool->acquire(collisionenvelope(id_a, id_b)).release();
-  SDL_PushEvent(&event);
 }
 
 void world::set_objectmanager(std::weak_ptr<objectmanager> objectmanager) {

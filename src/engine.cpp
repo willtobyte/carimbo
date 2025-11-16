@@ -85,6 +85,10 @@ std::shared_ptr<framework::timermanager> engine::timermanager() const noexcept {
   return _timermanager;
 }
 
+std::shared_ptr<framework::world> engine::world() const noexcept {
+  return _world;
+}
+
 void engine::set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice) {
   _audiodevice = std::move(audiodevice);
 }

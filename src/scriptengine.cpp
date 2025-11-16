@@ -504,7 +504,6 @@ void framework::scriptengine::run() {
   lua.new_usertype<framework::statemanager>(
     "StateManager",
     sol::no_constructor,
-    "collides", &statemanager::collides,
     "players", sol::property(&statemanager::players),
     "player", [cache = std::make_shared<std::unordered_map<uint8_t, playerwrapper>>()](
       framework::statemanager& self,
@@ -721,7 +720,14 @@ void framework::scriptengine::run() {
     "scenemanager", &framework::engine::scenemanager,
     "timermanager", &framework::engine::timermanager,
     "particlesystem", &framework::engine::particlesystem,
+    "world", &framework::engine::world,
     "run", &framework::engine::run
+  );
+
+  lua.new_usertype<framework::world>(
+    "World",
+    sol::no_constructor,
+    "collides", &framework::world::collides
   );
 
   lua.new_enum(
@@ -1083,6 +1089,7 @@ void framework::scriptengine::run() {
   lua["soundmanager"] = engine->soundmanager();
   lua["statemanager"] = engine->statemanager();
   lua["timermanager"] = engine->timermanager();
+  lua["world"] = engine->world();
 
   auto viewport = lua.create_table();
   viewport["width"] = engine->window()->width();

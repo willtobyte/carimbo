@@ -24,6 +24,7 @@ public:
   std::shared_ptr<graphics::particlesystem> particlesystem() const noexcept;
   std::shared_ptr<storage::cassette> cassette() const noexcept;
   std::shared_ptr<framework::timermanager> timermanager() const noexcept;
+  std::shared_ptr<framework::world> world() const noexcept;
 
   void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
   void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);

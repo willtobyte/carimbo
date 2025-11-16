@@ -57,6 +57,8 @@ public:
 
   [[nodiscard]] operator b2WorldId() const noexcept;
 
+  [[nodiscard]] bool collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const;
+
 protected:
   void notify(uint64_t id_a, uint64_t id_b) const;
 
