@@ -35,49 +35,53 @@ void world::update(const float delta) {
 
   while (_accumulator >= FIXED_TIMESTEP) {
     b2World_Step(_world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
-    const auto events = b2World_GetSensorEvents(_world);
-
-    for (auto i = events.beginCount; i-- > 0; ) {
-      const auto& e = events.beginEvents[i];
-
-      const auto body_a = b2Shape_GetBody(e.sensorShapeId);
-      const auto body_b = b2Shape_GetBody(e.visitorShapeId);
-
-      const auto user_data_a = b2Body_GetUserData(body_a);
-      const auto user_data_b = b2Body_GetUserData(body_b);
-
-      if (!user_data_a || !user_data_b) [[unlikely]] continue;
-
-      const auto id_a = physics::userdata_to_id(user_data_a);
-      const auto id_b = physics::userdata_to_id(user_data_b);
-
-      const auto pair = std::minmax(id_a, id_b);
-      const auto [it, inserted] = _collisions.insert(pair);
-
-      if (inserted) {
-        notify(id_a, id_b);
-      }
-    }
-
-    for (auto i = events.endCount; i-- > 0; ) {
-      const auto& e = events.endEvents[i];
-
-      const auto body_a = b2Shape_GetBody(e.sensorShapeId);
-      const auto body_b = b2Shape_GetBody(e.visitorShapeId);
-
-      const auto user_data_a = b2Body_GetUserData(body_a);
-      const auto user_data_b = b2Body_GetUserData(body_b);
-
-      if (!user_data_a || !user_data_b) [[unlikely]] continue;
-
-      const auto id_a = physics::userdata_to_id(user_data_a);
-      const auto id_b = physics::userdata_to_id(user_data_b);
-
-      const auto pair = std::minmax(id_a, id_b);
-      _collisions.erase(pair);
-    }
-
     _accumulator -= FIXED_TIMESTEP;
+  }
+
+  const auto events = b2World_GetSensorEvents(_world);
+
+  for (auto i = events.beginCount; i-- > 0; ) {
+    const auto& e = events.beginEvents[i];
+
+    const auto body_a = b2Shape_GetBody(e.sensorShapeId);
+    const auto body_b = b2Shape_GetBody(e.visitorShapeId);
+
+    if (!b2Body_IsValid(body_a) || !b2Body_IsValid(body_b)) [[unlikely]] continue;
+
+    const auto user_data_a = b2Body_GetUserData(body_a);
+    const auto user_data_b = b2Body_GetUserData(body_b);
+
+    if (!user_data_a || !user_data_b) [[unlikely]] continue;
+
+    const auto id_a = physics::userdata_to_id(user_data_a);
+    const auto id_b = physics::userdata_to_id(user_data_b);
+
+    const auto pair = std::minmax(id_a, id_b);
+    const auto [it, inserted] = _collisions.insert(pair);
+
+    if (inserted) {
+      notify(id_a, id_b);
+    }
+  }
+
+  for (auto i = events.endCount; i-- > 0; ) {
+    const auto& e = events.endEvents[i];
+
+    const auto body_a = b2Shape_GetBody(e.sensorShapeId);
+    const auto body_b = b2Shape_GetBody(e.visitorShapeId);
+
+    if (!b2Body_IsValid(body_a) || !b2Body_IsValid(body_b)) [[unlikely]] continue;
+
+    const auto user_data_a = b2Body_GetUserData(body_a);
+    const auto user_data_b = b2Body_GetUserData(body_b);
+
+    if (!user_data_a || !user_data_b) [[unlikely]] continue;
+
+    const auto id_a = physics::userdata_to_id(user_data_a);
+    const auto id_b = physics::userdata_to_id(user_data_b);
+
+    const auto pair = std::minmax(id_a, id_b);
+    _collisions.erase(pair);
   }
 }
 
@@ -122,7 +126,9 @@ world::operator b2WorldId() const noexcept {
 }
 
 bool world::collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const {
-  const auto pair = std::minmax(a->_id, b->_id);
+  const auto id_a = a->id();
+  const auto id_b = b->id();
+  const auto pair = std::minmax(id_a, id_b);
   return _collisions.contains(pair);
 }
 
