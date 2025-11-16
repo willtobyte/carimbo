@@ -254,22 +254,6 @@ void eventmanager::update(float delta) {
         }
       } break;
 
-      case static_cast<uint32_t>(type::collision): {
-        auto* ptr = static_cast<framework::envelope*>(event.user.data1);
-        if (ptr) {
-          if (const auto* payload = ptr->try_collision(); payload) {
-            const auto o = collision(payload->a, payload->b);
-            for (const auto& weak : _receivers) {
-              if (auto receiver = weak.lock(); receiver) {
-                receiver->on_collision(o);
-              }
-            }
-          }
-
-          _envelopepool->release(ptr);
-        }
-      } break;
-
       case static_cast<uint32_t>(type::mail): {
         auto* ptr = static_cast<framework::envelope*>(event.user.data1);
 

@@ -20,7 +20,6 @@ public:
   virtual void on_gamepad_release(uint8_t who, const event::gamepad::button& event);
   virtual void on_gamepad_motion(uint8_t who, const event::gamepad::motion& event);
   virtual void on_mail(const event::mail& event);
-  virtual void on_collision(const event::collision& event);
 
 #ifndef NDEBUG
   virtual void on_debug();

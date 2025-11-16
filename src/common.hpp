@@ -76,7 +76,6 @@ namespace framework {
   class timermanager;
   class world;
   class querybuilder;
-  struct collisionenvelope;
   struct mailenvelope;
   struct timerenvelope;
   class envelope;

@@ -35,9 +35,6 @@ void eventreceiver::on_gamepad_motion(uint8_t who, const gamepad::motion& event)
 void eventreceiver::on_mail(const mail& event) {
 }
 
-void eventreceiver::on_collision(const collision& event) {
-}
-
 #ifndef NDEBUG
 void eventreceiver::on_debug() {
 }

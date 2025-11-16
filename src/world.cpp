@@ -1,8 +1,6 @@
 #include "world.hpp"
 
-#include "envelope.hpp"
 #include "objectmanager.hpp"
-#include "objectpool.hpp"
 #include "physics.hpp"
 #include "renderer.hpp"
 
@@ -55,6 +53,7 @@ void world::update(const float delta) {
 
       const auto pair = std::minmax(id_a, id_b);
       const auto [it, inserted] = _collisions.insert(pair);
+
       if (inserted) {
         notify(id_a, id_b);
       }

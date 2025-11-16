@@ -10,8 +10,7 @@ enum class player : uint8_t {
 };
 
 enum class type : uint32_t {
-  collision = SDL_EVENT_USER + 1,
-  mail,
+  mail = SDL_EVENT_USER + 1,
   timer
 };
 
@@ -91,16 +90,6 @@ struct mail final {
 
   uint64_t to;
   std::string body;
-};
-
-struct collision final {
-  collision(uint64_t a, uint64_t b)
-      : a(a), b(b) {}
-
-  collision(const collision& other) = default;
-
-  uint64_t a;
-  uint64_t b;
 };
 }
 }

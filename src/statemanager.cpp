@@ -9,11 +9,6 @@ using namespace framework;
 using namespace input::event;
 
 statemanager::statemanager() {
-  _collision_mapping.reserve(64);
-}
-
-bool statemanager::collides(const std::shared_ptr<object>& a, const std::shared_ptr<object>& b) const {
-  return _collision_mapping.contains(std::pair{a->id(), b->id()});
 }
 
 bool statemanager::on(uint8_t player, gamepad::button type) const {
@@ -107,10 +102,5 @@ void statemanager::on_gamepad_motion(uint8_t who, const gamepad::motion& event) 
   }
 }
 
-void statemanager::on_collision(const input::event::collision& event) {
-  _collision_mapping.emplace(event.a, event.b);
-}
-
 void statemanager::on_endupdate() {
-  _collision_mapping.clear();
 }

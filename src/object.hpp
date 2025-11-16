@@ -78,7 +78,6 @@ public:
   void set_onhover(sol::protected_function fn);
   void set_onunhover(sol::protected_function fn);
   void set_oncollision(std::string_view kind, sol::protected_function fn);
-
   void on_email(std::string_view message);
 
   void on_touch(float x, float y);

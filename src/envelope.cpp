@@ -2,17 +2,6 @@
 
 using namespace framework;
 
-collisionenvelope::collisionenvelope(const uint64_t a, const uint64_t b) noexcept
-  : a(a), b(b) {}
-
-collisionenvelope::collisionenvelope() noexcept
-  : a(0), b(0) {}
-
-void collisionenvelope::clear() noexcept {
-  a = 0;
-  b = 0;
-}
-
 mailenvelope::mailenvelope(std::pmr::memory_resource* mr)
   : to(0), kind(mr), body(mr) {
   kind.reserve(32);
@@ -42,10 +31,6 @@ void timerenvelope::clear() noexcept {
 envelope::envelope(std::pmr::memory_resource* mr)
   : _mr(mr), payload(std::monostate{}) {}
 
-void envelope::reset(collisionenvelope&& envelope) noexcept {
-  payload.emplace<collisionenvelope>(std::move(envelope));
-}
-
 void envelope::reset(mailenvelope&& envelope) {
   if (auto* current = std::get_if<mailenvelope>(&payload)) {
     current->to = envelope.to;
@@ -61,19 +46,13 @@ void envelope::reset(timerenvelope&& envelope) noexcept {
 }
 
 void envelope::reset() noexcept {
-  if (auto* collision = std::get_if<collisionenvelope>(&payload)) {
-    collision->clear();
-  } else if (auto* mail = std::get_if<mailenvelope>(&payload)) {
+  if (auto* mail = std::get_if<mailenvelope>(&payload)) {
     mail->clear();
   } else if (auto* timer = std::get_if<timerenvelope>(&payload)) {
     timer->clear();
   }
 
   payload.emplace<std::monostate>();
-}
-
-const collisionenvelope* envelope::try_collision() const noexcept {
-  return std::get_if<collisionenvelope>(&payload);
 }
 
 const mailenvelope* envelope::try_mail() const noexcept {

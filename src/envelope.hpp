@@ -3,16 +3,6 @@
 #include "common.hpp"
 
 namespace framework {
-struct collisionenvelope final {
-  uint64_t a;
-  uint64_t b;
-
-  collisionenvelope(const uint64_t a, const uint64_t b) noexcept;
-  collisionenvelope() noexcept;
-
-  void clear() noexcept;
-};
-
 struct mailenvelope final {
   uint64_t to;
   std::pmr::string kind;
@@ -34,7 +24,7 @@ struct timerenvelope final {
   void clear() noexcept;
 };
 
-using payload_t = std::variant<std::monostate, collisionenvelope, mailenvelope, timerenvelope>;
+using payload_t = std::variant<std::monostate, mailenvelope, timerenvelope>;
 
 class envelope final {
 private:
@@ -46,7 +36,6 @@ public:
   explicit envelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
   ~envelope() = default;
 
-  void reset(collisionenvelope&& envelope) noexcept;
   void reset(mailenvelope&& envelope);
   void reset(timerenvelope&& envelope) noexcept;
   void reset() noexcept;
@@ -59,7 +48,6 @@ public:
     reset(std::forward<Args>(args)...);
   }
 
-  [[nodiscard]] const collisionenvelope* try_collision() const noexcept;
   [[nodiscard]] const mailenvelope* try_mail() const noexcept;
   [[nodiscard]] const timerenvelope* try_timer() const noexcept;
 };

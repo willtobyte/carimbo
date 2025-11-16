@@ -318,7 +318,6 @@ void object::set_oncollision(std::string_view kind, sol::protected_function fn) 
   _collision_mapping.insert_or_assign(std::string(kind), interop::wrap_fn<collision_fn>(fn));
 }
 
-
 void object::on_email(std::string_view message) {
   if (const auto& fn = _onmail; fn) {
     fn(shared_from_this(), message);
