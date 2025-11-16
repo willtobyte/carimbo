@@ -3,7 +3,6 @@
 #include "common.hpp"
 
 namespace interop {
-
 template<typename T>
   requires requires(const T& t) { { t.valid() } -> std::convertible_to<bool>; }
 inline void verify(const T& result) {
