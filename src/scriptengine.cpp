@@ -1099,7 +1099,6 @@ void framework::scriptengine::run() {
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
   verify(result);
-  setup();
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
 
   const auto end = SDL_GetPerformanceCounter();
