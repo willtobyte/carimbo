@@ -49,6 +49,9 @@ public:
 protected:
   virtual void on_quit() noexcept override;
 
+private:
+  std::exception_ptr _exception;
+
 #ifndef NDEBUG
   virtual void on_debug() override;
 #endif

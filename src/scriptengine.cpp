@@ -8,17 +8,10 @@ static int on_panic(lua_State* L) {
   throw std::runtime_error(std::format("Lua panic: {}", message));
 }
 
-static int on_exception_handler(
-  lua_State* L,
-  sol::optional<const std::exception&> maybe_exception,
-  sol::string_view description
-) {
+static int on_exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description) {
   if (maybe_exception) {
-    std::println("[scriptengine] C++ exception: {}", maybe_exception->what());
     return luaL_error(L, "%s", maybe_exception->what());
   }
-
-  std::println("[scriptengine] unknown exception: {}", description.data());
   return luaL_error(L, "%s", description.data());
 }
 
@@ -208,6 +201,11 @@ void framework::scriptengine::run() {
   lua.open_libraries();
   lua.set_panic(&on_panic);
   lua.set_exception_handler(on_exception_handler);
+
+  lua.set_function("__error_handler", [](std::string msg) -> std::string {
+    throw std::runtime_error(msg);
+  });
+  sol::protected_function::set_default_handler(lua["__error_handler"]);
 
   lua["searcher"] = &searcher;
 
@@ -1076,6 +1074,7 @@ void framework::scriptengine::run() {
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
   const auto source = lua.safe_script(script, "@main.lua");
   verify(source);
+
   const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
   lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
@@ -1100,6 +1099,7 @@ void framework::scriptengine::run() {
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
   verify(result);
+  setup();
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
 
   const auto end = SDL_GetPerformanceCounter();
