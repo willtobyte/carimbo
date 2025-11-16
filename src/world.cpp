@@ -23,6 +23,7 @@ world::world(std::shared_ptr<graphics::renderer> renderer)
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
+  _collisions.reserve(64);
 }
 
 world::~world() {
@@ -32,14 +33,12 @@ world::~world() {
 }
 
 void world::update(const float delta) {
-  _collisions.clear();
-  _collisions.reserve(16);
-
   _accumulator += std::min(delta, 0.1f);
 
   while (_accumulator >= FIXED_TIMESTEP) {
     b2World_Step(_world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
     const auto events = b2World_GetSensorEvents(_world);
+
     for (auto i = events.beginCount; i-- > 0; ) {
       const auto& e = events.beginEvents[i];
 
@@ -55,9 +54,29 @@ void world::update(const float delta) {
       const auto id_b = physics::userdata_to_id(user_data_b);
 
       const auto pair = std::minmax(id_a, id_b);
-      if (_collisions.insert(pair).second) {
-        notify(id_a, id_b);
-      }
+      _collisions.insert(pair);
+    }
+
+    for (auto i = events.endCount; i-- > 0; ) {
+      const auto& e = events.endEvents[i];
+
+      const auto body_a = b2Shape_GetBody(e.sensorShapeId);
+      const auto body_b = b2Shape_GetBody(e.visitorShapeId);
+
+      const auto user_data_a = b2Body_GetUserData(body_a);
+      const auto user_data_b = b2Body_GetUserData(body_b);
+
+      if (!user_data_a || !user_data_b) [[unlikely]] continue;
+
+      const auto id_a = physics::userdata_to_id(user_data_a);
+      const auto id_b = physics::userdata_to_id(user_data_b);
+
+      const auto pair = std::minmax(id_a, id_b);
+      _collisions.erase(pair);
+    }
+
+    for (const auto& [id_a, id_b] : _collisions) {
+      notify(id_a, id_b);
     }
 
     _accumulator -= FIXED_TIMESTEP;
