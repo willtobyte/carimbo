@@ -587,9 +587,7 @@ void framework::scriptengine::run() {
           sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
             lua["pool"] = lua.create_table();
 
-            auto result = fn();
-
-            interop::verify(result);
+            fn();
           });
 
           scene->set_onenter(std::move(wrapper));
@@ -628,9 +626,7 @@ void framework::scriptengine::run() {
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
           sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
-            auto result = fn();
-
-            interop::verify(result);
+            fn();
 
             lua["pool"] = sol::lua_nil;
 
