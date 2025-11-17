@@ -527,13 +527,7 @@ void framework::scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "current", sol::property(&framework::scenemanager::current),
-    "set", [&lua](framework::scenemanager& self, std::string_view name) {
-      try {
-        self.set(name);
-      } catch (const std::exception& e) {
-        luaL_error(lua, e.what());
-      }
-    },
+    "set", &framework::scenemanager::set,
     "get", &framework::scenemanager::get,
     "destroy", [&lua](
       framework::scenemanager& self,
