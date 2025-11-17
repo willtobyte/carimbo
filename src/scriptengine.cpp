@@ -580,6 +580,8 @@ void framework::scriptengine::run() {
         loaded[std::format("scenes/{}", name)] = module;
         auto ptr = std::weak_ptr<framework::scene>(scene);
 
+
+
         module["get"] = [ptr, name](sol::table, std::string_view id, framework::scenetype type) {
           if (auto scene = ptr.lock()) [[likely]] {
             return scene->get(id, type);
@@ -593,7 +595,15 @@ void framework::scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onenter(std::move(fn));
+          sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
+            lua["pool"] = lua.create_table();
+
+            auto result = fn();
+
+            interop::verify(result);
+          });
+
+          scene->set_onenter(std::move(wrapper));
 
           lua.collect_garbage();
           lua.collect_garbage();
@@ -628,10 +638,27 @@ void framework::scriptengine::run() {
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          scene->set_onleave(std::move(fn));
+          sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
+            auto result = fn();
 
-          lua.collect_garbage();
-          lua.collect_garbage();
+            interop::verify(result);
+
+            lua["pool"] = sol::lua_nil;
+
+            lua.collect_garbage();
+            lua.collect_garbage();
+          });
+
+          scene->set_onleave(std::move(wrapper));
+        } else {
+          sol::protected_function wrapper = sol::make_object(lua, [&lua]() {
+            lua["pool"] = sol::lua_nil;
+
+            lua.collect_garbage();
+            lua.collect_garbage();
+          });
+
+          scene->set_onleave(std::move(wrapper));
         }
 
         const auto end = SDL_GetPerformanceCounter();
