@@ -81,7 +81,10 @@ void timermanager::cancel(uint32_t id) {
 }
 
 void timermanager::clear() {
-  for (const auto& [id, _] : _envelopemapping) {
+  while (!_envelopemapping.empty()) {
+    auto it = _envelopemapping.begin();
+    const auto id = it->first;
+
     cancel(id);
   }
 }

@@ -1,7 +1,6 @@
 #include "scenemanager.hpp"
 
 #include "event.hpp"
-#include "eventreceiver.hpp"
 #include "io.hpp"
 #include "objectmanager.hpp"
 #include "particlesystem.hpp"
@@ -128,6 +127,7 @@ void scenemanager::set(std::string_view name) {
 
   if (const auto active = _scene.lock()) [[ likely ]] {
     std::println("[scenemanager] left {}", active->name());
+    _timermanager->clear();
     active->on_leave();
   }
 
