@@ -3,7 +3,7 @@
 using namespace steam;
 
 void achievement::unlock(std::string_view id) noexcept {
-#ifndef HAVE_STEAM
+#ifndef HAS_STEAM
   return;
 #endif
 

@@ -3,11 +3,11 @@
 using namespace framework;
 
 application::application(const int argc, char** const argv) {
-#ifdef HAVE_SENTRY
+#ifdef HAS_SENTRY
   // std::atexit([] { sentry_close(); });
 #endif
 
-#ifdef HAVE_STEAM
+#ifdef HAS_STEAM
   std::atexit([] { SteamAPI_Shutdown(); });
 #endif
 
@@ -16,7 +16,7 @@ application::application(const int argc, char** const argv) {
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
-#ifdef HAVE_STEAM
+#ifdef HAS_STEAM
   SteamAPI_InitSafe();
 #endif
 }
@@ -38,7 +38,7 @@ int application::run() {
 
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Ink Spill Disaster", error, nullptr);
 
-#ifdef HAVE_SENTRY
+#ifdef HAS_SENTRY
     const auto event = sentry_value_new_event();
     const auto exc = sentry_value_new_exception("Exception", error);
     sentry_value_set_stacktrace(exc, nullptr, 0);

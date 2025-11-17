@@ -209,7 +209,7 @@ void engine::_loop() {
     observer->on_enddraw();
   }
 
-#ifdef HAVE_STEAM
+#ifdef HAS_STEAM
   SteamAPI_RunCallbacks();
 #endif
 }

@@ -88,20 +88,16 @@ class Carimbo(ConanFile):
 
         toolchain = CMakeToolchain(self)
 
-        if not self._is_webassembly():
-            toolchain.preprocessor_definitions["HAVE_BOOST"] = "ON"
-            toolchain.cache_variables["HAVE_BOOST"] = "ON"
-
         if self._is_jit_capable():
-            toolchain.preprocessor_definitions["HAVE_LUAJIT"] = "ON"
+            toolchain.preprocessor_definitions["HAS_LUAJIT"] = "ON"
 
         if self._have_steam():
-            toolchain.preprocessor_definitions["HAVE_STEAM"] = "ON"
-            toolchain.cache_variables["HAVE_STEAM"] = "ON"
+            toolchain.preprocessor_definitions["HAS_STEAM"] = "ON"
+            toolchain.cache_variables["HAS_STEAM"] = "ON"
 
         if self._have_sentry():
-            toolchain.preprocessor_definitions["HAVE_SENTRY"] = "ON"
-            toolchain.cache_variables["HAVE_SENTRY"] = "ON"
+            toolchain.preprocessor_definitions["HAS_SENTRY"] = "ON"
+            toolchain.cache_variables["HAS_SENTRY"] = "ON"
 
         toolchain.generate()
         CMakeDeps(self).generate()

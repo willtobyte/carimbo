@@ -200,7 +200,7 @@ void framework::scriptengine::run() {
 
   lua.open_libraries();
   lua.set_panic(&on_panic);
-  lua.set_exception_handler(on_exception_handler);
+  // lua.set_exception_handler(on_exception_handler);
 
   lua.set_function("__error_handler", [](std::string msg) -> std::string {
     throw std::runtime_error(msg);
@@ -600,7 +600,7 @@ void framework::scriptengine::run() {
 
             auto result = fn();
 
-            interop::verify(result);
+            // interop::verify(result);
           });
 
           scene->set_onenter(std::move(wrapper));
@@ -641,7 +641,7 @@ void framework::scriptengine::run() {
           sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
             auto result = fn();
 
-            interop::verify(result);
+            // interop::verify(result);
 
             lua["pool"] = sol::lua_nil;
 

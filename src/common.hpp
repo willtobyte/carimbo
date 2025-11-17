@@ -9,7 +9,7 @@
 #include <SDL3/SDL.h>
 #include <sol/sol.hpp>
 
-#ifdef HAVE_SENTRY
+#ifdef HAS_SENTRY
 #include <sentry.h>
 #endif
 

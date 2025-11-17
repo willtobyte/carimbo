@@ -69,7 +69,7 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
   emscripten_run_script(std::format(script, dsn).c_str());
 #endif
 
-#ifdef HAVE_SENTRY
+#ifdef HAS_SENTRY
   auto* options = sentry_options_new();
   sentry_options_set_debug(options, true);
   sentry_options_set_dsn(options, dsn.data());
