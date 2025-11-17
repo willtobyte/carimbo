@@ -25,8 +25,6 @@ static bool filter(void* userdata, SDL_Event* e) {
     return true;
   }
 
-  ctx->pool->release(ptr);
-
   return false;
 }
 
@@ -61,16 +59,21 @@ uint32_t timermanager::singleshot(uint32_t interval, sol::protected_function fn)
 }
 
 void timermanager::cancel(uint32_t id) {
-  SDL_RemoveTimer(id);
   const auto it = _envelopemapping.find(id);
   if (it == _envelopemapping.end()) [[unlikely]] {
     return;
   }
 
   auto* ptr = it->second;
+
+  SDL_RemoveTimer(id);
   _envelopemapping.erase(it);
 
   if (ptr) {
+    if (auto* timer_payload = std::get_if<timerenvelope>(&ptr->payload)) {
+      timer_payload->fn = nullptr;
+    }
+
     context ctx{_envelopepool.get(), ptr};
     SDL_FilterEvents(filter, &ctx);
     _envelopepool->release(ptr);
@@ -78,20 +81,9 @@ void timermanager::cancel(uint32_t id) {
 }
 
 void timermanager::clear() {
-  for (auto& [id, ptr] : _envelopemapping) {
-    SDL_RemoveTimer(id);
+  for (const auto& [id, _] : _envelopemapping) {
+    cancel(id);
   }
-
-  context ctx{_envelopepool.get(), nullptr};
-  SDL_FilterEvents(filter, &ctx);
-
-  for (auto& [id, ptr] : _envelopemapping) {
-    if (ptr) {
-      _envelopepool->release(ptr);
-    }
-  }
-
-  _envelopemapping.clear();
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
