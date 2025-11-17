@@ -38,11 +38,6 @@ execute_process(
 )
 add_compile_definitions(GIT_VERSION="${latest_tag}+${commit_short}")
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-  $<$<BOOL:${DEVELOPMENT}>:DEVELOPMENT>
-  $<$<CONFIG:Debug>:DEBUG>
-)
-
 if(WIN32)
   set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE $<NOT:$<CONFIG:Debug>>
@@ -70,6 +65,12 @@ if(NOT IS_EMSCRIPTEN)
     find_package(luajit CONFIG REQUIRED)
   endif()
 endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  $<$<BOOL:${DEVELOPMENT}>:DEVELOPMENT>
+  $<$<BOOL:${luajit_FOUND}>:SOL_EXCEPTIONS_SAFE_PROPAGATION>
+  $<$<CONFIG:Debug>:DEBUG>
+)
 
 target_link_options(${PROJECT_NAME} PRIVATE
   $<$<BOOL:${IS_EMSCRIPTEN}>:
