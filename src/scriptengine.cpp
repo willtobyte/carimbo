@@ -8,13 +8,6 @@ static int on_panic(lua_State* L) {
   throw std::runtime_error(std::format("Lua panic: {}", message));
 }
 
-static int on_exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description) {
-  if (maybe_exception) {
-    return luaL_error(L, "%s", maybe_exception->what());
-  }
-  return luaL_error(L, "%s", description.data());
-}
-
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
@@ -197,10 +190,8 @@ void framework::scriptengine::run() {
   const auto start = SDL_GetPerformanceCounter();
 
   sol::state lua;
-
   lua.open_libraries();
   lua.set_panic(&on_panic);
-  // lua.set_exception_handler(on_exception_handler);
 
   lua["searcher"] = &searcher;
 
@@ -586,7 +577,7 @@ void framework::scriptengine::run() {
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
           const auto wrapper = [fn, &lua]() mutable {
             lua["pool"] = lua.create_table();
-            auto result = fn();
+            const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
               return luaL_error(lua, "%s", err.what());
@@ -631,7 +622,7 @@ void framework::scriptengine::run() {
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
           const auto wrapper = [fn, &lua]() mutable {
-            auto result = fn();
+            const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
               return luaL_error(lua, "%s", err.what());

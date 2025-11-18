@@ -1,7 +1,5 @@
 #pragma once
 
-#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
-
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <box2d/box2d.h>
