@@ -68,7 +68,6 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   $<$<BOOL:${DEVELOPMENT}>:DEVELOPMENT>
-  $<$<BOOL:${luajit_FOUND}>:SOL_EXCEPTIONS_SAFE_PROPAGATION>
   $<$<CONFIG:Debug>:DEBUG>
 )
 
