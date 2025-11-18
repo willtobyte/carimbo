@@ -69,7 +69,7 @@ void pixmap::draw(
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &_source, &_destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 }
 
-pixmap::operator SDL_Texture* () const {
+pixmap::operator SDL_Texture*() const {
   return _texture.get();
 }
 
@@ -93,10 +93,4 @@ void pixmap::draw(
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
-}
-
-void pixmap::set_blendmode(blendmode mode) {
-  if (!SDL_SetTextureBlendMode(_texture.get(), static_cast<SDL_BlendMode>(mode))) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_SetTextureBlendMode] {}", SDL_GetError()));
-  }
 }

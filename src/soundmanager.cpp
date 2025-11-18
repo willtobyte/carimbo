@@ -15,6 +15,7 @@ std::shared_ptr<soundfx> soundmanager::get(std::string_view filename) {
     std::println("[soundmanager] cache miss {}", filename);
     it->second = std::make_shared<soundfx>(filename);
   }
+
   return it->second;
 }
 

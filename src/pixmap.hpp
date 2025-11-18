@@ -5,13 +5,6 @@
 #include "reflection.hpp"
 
 namespace graphics {
-
-enum class blendmode : int {
-  None = SDL_BLENDMODE_NONE,
-  Blend = SDL_BLENDMODE_BLEND,
-  Add  = SDL_BLENDMODE_ADD
-};
-
 class pixmap final {
 public:
   pixmap() = delete;
@@ -34,13 +27,11 @@ public:
       reflection reflection = reflection::none
   ) const;
 
-  operator SDL_Texture* () const;
+  operator SDL_Texture*() const;
 
   int width() const;
 
   int height() const;
-
-  void set_blendmode(blendmode mode);
 
 private:
   int _width;
