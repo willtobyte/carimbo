@@ -155,8 +155,8 @@ void scene::on_motion(float x, float y) const {
   }
 }
 
-void scene::set_onenter(sol::protected_function fn) {
-  _onenter = interop::wrap_fn(std::move(fn));
+void scene::set_onenter(std::function<void()>&& fn) {
+  _onenter = std::move(fn);
 }
 
 void scene::set_onloop(sol::protected_function fn) {
@@ -167,8 +167,8 @@ void scene::set_oncamera(sol::protected_function fn) {
   _oncamera = interop::wrap_fn<geometry::rectangle(float)>(std::move(fn));
 }
 
-void scene::set_onleave(sol::protected_function fn) {
-  _onleave = interop::wrap_fn(std::move(fn));
+void scene::set_onleave(std::function<void()>&& fn) {
+  _onleave = std::move(fn);
 }
 
 void scene::set_ontouch(sol::protected_function fn) {

@@ -1,7 +1,7 @@
 #include "scriptengine.hpp"
 
 using namespace framework;
-using interop::verify;
+using namespace interop;
 
 static int on_panic(lua_State* L) {
   const auto* message = lua_tostring(L, -1);
@@ -584,11 +584,16 @@ void framework::scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
+          const auto wrapper = [fn, &lua]() mutable {
             lua["pool"] = lua.create_table();
             auto result = fn();
-            verify(result);
-          });
+            if (!result.valid()) {
+              sol::error err = result;
+              return luaL_error(lua, "%s", err.what());
+            }
+
+            return 0;
+          };
 
           scene->set_onenter(std::move(wrapper));
 
@@ -625,14 +630,20 @@ void framework::scriptengine::run() {
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
-            fn();
+          const auto wrapper = [fn, &lua]() mutable {
+            auto result = fn();
+            if (!result.valid()) {
+              sol::error err = result;
+              return luaL_error(lua, "%s", err.what());
+            }
 
             lua["pool"] = sol::lua_nil;
 
             lua.collect_garbage();
             lua.collect_garbage();
-          });
+
+            return 0;
+          };
 
           scene->set_onleave(std::move(wrapper));
         } else {
