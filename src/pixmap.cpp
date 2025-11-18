@@ -46,13 +46,8 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
   }
 
   const auto pitch = width * 4;
-  if (!SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch)) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_UpdateTexture] {}", SDL_GetError()));
-  }
-
-  if (!SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST)) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_SetTextureScaleMode] {}", SDL_GetError()));
-  }
+  SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch);
+  SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST);
 }
 
 void pixmap::draw(
