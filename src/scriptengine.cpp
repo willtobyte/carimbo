@@ -586,8 +586,8 @@ void framework::scriptengine::run() {
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
           sol::protected_function wrapper = sol::make_object(lua, [fn, &lua]() mutable {
             lua["pool"] = lua.create_table();
-
-            fn();
+            auto result = fn();
+            verify(result);
           });
 
           scene->set_onenter(std::move(wrapper));
