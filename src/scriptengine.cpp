@@ -329,7 +329,7 @@ void framework::scriptengine::run() {
   );
 
   lua.new_enum(
-    "SceneType",
+    "SceneKind",
     "object", framework::scenekind::object,
     "effect", framework::scenekind::effect,
     "particle", framework::scenekind::particle

@@ -20,7 +20,7 @@ static std::string encode(std::string_view value) {
 }
 
 querybuilder& querybuilder::add(std::string_view key, std::string_view value) {
-  _parameters.emplace(std::string(key), std::string(value));
+  _parameters.emplace(std::string{key}, std::string{value});
   return *this;
 }
 

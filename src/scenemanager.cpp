@@ -12,7 +12,7 @@ using namespace framework;
 
 scenemanager::scenemanager(
   std::shared_ptr<framework::resourcemanager> resourcemanager,
-  std::shared_ptr<objectmanager> objectmanager,
+  std::shared_ptr<framework::objectmanager> objectmanager,
   std::shared_ptr<graphics::particlesystem> particlesystem,
   std::shared_ptr<framework::timermanager> timermanager
 )
@@ -23,93 +23,25 @@ scenemanager::scenemanager(
 }
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
-  const auto [it, inserted] = _scene_mapping.try_emplace(std::string(name));
-  if (!inserted) [[unlikely]] {
-    return nullptr;
-  }
+  const auto [it, inserted] = _scene_mapping.try_emplace(std::string{name});
+  if (inserted) [[unlikely]] {
+    const auto filename = std::format("scenes/{}.json", name);
+    const auto buffer = storage::io::read(filename);
+    const auto j = nlohmann::json::parse(buffer);
 
-  const auto filename = std::format("scenes/{}.json", name);
-  const auto buffer = storage::io::read(filename);
-  const auto j = nlohmann::json::parse(buffer);
+    const auto type = j.at("type").get<scenetype>();
 
-  auto background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
-
-  geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
-
-  std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects;
-  const auto es = j.value("effects", nlohmann::json::array());
-  effects.reserve(es.size());
-
-  for (const auto& e : es) {
-    const auto basename = e.get<std::string_view>();
-    const auto f = std::format("blobs/{}/{}.ogg", name, basename);
-    effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
-  }
-
-  const auto ps = j.value("particles", nlohmann::json::array());
-  std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles;
-  particles.reserve(ps.size());
-
-  const auto factory = _particlesystem->factory();
-
-  for (const auto& i : ps) {
-    const auto name = i["name"].get<std::string_view>();
-    const auto kind = i["kind"].get<std::string_view>();
-    const auto x = i["x"].get<float>();
-    const auto y = i["y"].get<float>();
-    const auto emitting = i.value("emitting", true);
-
-    particles.emplace(name, factory->create(kind, x, y, emitting));
-  }
-
-  const auto fs = j.value("fonts", nlohmann::json::array());
-  for (const auto& i : fs) {
-    const auto fontname = i.get<std::string_view>();
-    _resourcemanager->fontfactory()->get(fontname);
-  }
-
-  std::vector<std::pair<std::string, std::shared_ptr<object>>> objects;
-  const auto os = j.value("objects", nlohmann::json::array());
-  objects.reserve(os.size());
-
-  for (const auto& o : os) {
-    if (!o.is_object()) [[unlikely]] {
-      continue;
+    switch(type) {
+      case scenetype::backdrop:
+        return it->second = std::make_shared<scenebackdrop>(name, j, shared_from_this());
+      case scenetype::blank:
+        return it->second = std::make_shared<sceneblank>(name, j, shared_from_this());
+      // case scenetype::tilemap:
+      //   return it->second = std::make_shared<scenetilemap>(j);
     }
-
-    std::string key = o["name"].get<std::string>();
-    std::string kind = o["kind"].get<std::string>();
-
-    const float x = o.value("x", .0f);
-    const float y = o.value("y", .0f);
-
-    std::string action = o.value("action", std::string{});
-
-    auto object = _objectmanager->create(kind, name, false);
-    object->set_placement(x, y);
-    if (!action.empty()) {
-      object->set_action(action);
-    }
-
-    objects.emplace_back(std::move(key), std::move(object));
   }
 
-  // std::optional<std::shared_ptr<tilemap>> map;
-  // if (const auto it = j.find("tilemap"); it != j.end()) {
-  //   map.emplace(std::make_shared<tilemap>(size, _resourcemanager, it->get<std::string>()));
-  // }
-
-  return it->second = std::make_shared<scene>(
-    name,
-    _objectmanager,
-    _particlesystem,
-    std::move(background),
-    std::move(objects),
-    std::move(effects),
-    std::move(particles),
-    // std::move(map),
-    std::move(size)
-  );
+  return nullptr;
 }
 
 std::string_view scenemanager::current() const {
@@ -228,4 +160,16 @@ void scenemanager::on_mouse_motion(const input::event::mouse::motion& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->on_motion(event.x, event.y);
+}
+
+std::shared_ptr<objectmanager> scenemanager::objectmanager() const noexcept {
+  return _objectmanager;
+}
+
+std::shared_ptr<graphics::particlesystem> scenemanager::particlesystem() const noexcept {
+  return _particlesystem;
+}
+
+std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {
+  return _resourcemanager;
 }

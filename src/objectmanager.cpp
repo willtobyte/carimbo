@@ -27,7 +27,7 @@ objectmanager::objectmanager() {
 
 std::shared_ptr<object> objectmanager::create(std::string_view kind, std::optional<std::string_view> scope, bool manage) {
   const auto n = scope.value_or(std::string_view{});
-  const auto qualifier = n.empty() ? std::string(kind) : std::format("{}/{}", n, kind);
+  const auto qualifier = n.empty() ? std::string{kind} : std::format("{}/{}", n, kind);
 
   const auto filename = std::format("objects/{}.json", qualifier);
   const auto buffer = storage::io::read(filename);
@@ -49,7 +49,7 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
       const auto e = a.at("effect").get<std::string_view>();
       effect = _resourcemanager->soundmanager()->get(
         std::format("blobs/{}{}.ogg",
-          (scope ? std::format("{}/", *scope) : std::string()), e));
+          (scope ? std::format("{}/", *scope) : std::string{}), e));
     }
 
     std::optional<std::string> next;
@@ -75,8 +75,8 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_scale = scale;
-  o->_kind = std::string(kind);
-  o->_scope = std::string(n);
+  o->_kind = std::string{kind};
+  o->_scope = std::string{n};
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
   o->_world = _world;

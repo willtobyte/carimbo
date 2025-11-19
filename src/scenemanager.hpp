@@ -3,9 +3,19 @@
 #include "common.hpp"
 
 namespace framework {
-class objectmanager;
+enum class scenetype : std::uint8_t {
+  backdrop,
+  blank,
+  // tilemap
+};
 
-class scenemanager final  : public input::eventreceiver {
+NLOHMANN_JSON_SERIALIZE_ENUM(scenetype, {
+  {scenetype::backdrop, "backdrop"},
+  {scenetype::blank, "blank"},
+  // {scenetype::tilemap, "tilemap"},
+})
+
+class scenemanager final : public input::eventreceiver, public std::enable_shared_from_this<scenemanager> {
 public:
   scenemanager(
     std::shared_ptr<framework::resourcemanager> resourcemanager,
@@ -33,6 +43,10 @@ public:
   void draw() const;
 
   void on_touch(float x, float y) const;
+
+  std::shared_ptr<objectmanager> objectmanager() const noexcept;
+  std::shared_ptr<graphics::particlesystem> particlesystem() const noexcept;
+  std::shared_ptr<resourcemanager> resourcemanager() const noexcept;
 
 protected:
   virtual void on_key_press(const input::event::keyboard::key& event) override;

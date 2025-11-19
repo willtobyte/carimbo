@@ -315,7 +315,7 @@ void object::set_onunhover(sol::protected_function fn) {
 
 void object::set_oncollision(std::string_view kind, sol::protected_function fn) {
   using collision_fn = void(std::shared_ptr<object>, std::shared_ptr<object>);
-  _collision_mapping.insert_or_assign(std::string(kind), interop::wrap_fn<collision_fn>(fn));
+  _collision_mapping.insert_or_assign(std::string{kind}, interop::wrap_fn<collision_fn>(fn));
 }
 
 void object::on_email(std::string_view message) {

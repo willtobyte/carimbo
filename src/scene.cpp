@@ -5,33 +5,22 @@
 #include "particlesystem.hpp"
 #include "pixmap.hpp"
 #include "rectangle.hpp"
+#include "scenemanager.hpp"
 #include "size.hpp"
 #include "soundfx.hpp"
 #include "tilemap.hpp"
 
 using namespace framework;
 
-scene::scene(
-  std::string_view name,
-  std::shared_ptr<objectmanager> objectmanager,
-  std::shared_ptr<graphics::particlesystem> particlesystem,
-  std::shared_ptr<graphics::pixmap> background,
-  std::vector<std::pair<std::string, std::shared_ptr<object>>> objects,
-  std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> effects,
-  std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> particles,
-  geometry::size size
-)
-  : _name(name),
-    _objectmanager(std::move(objectmanager)),
-    _particlesystem(std::move(particlesystem)),
-    _background(std::move(background)),
-    _objects(std::move(objects)),
-    _effects(std::move(effects)),
-    _particles(std::move(particles)),
-    _size(std::move(size)) {
+scene::scene(std::string_view name, std::shared_ptr<scenemanager> scenemanager)
+    : _name(name),
+      _scenemanager(std::move(scenemanager)) {
+  _objectmanager = _scenemanager->objectmanager();
+  _particlesystem = _scenemanager->particlesystem();
+  _resourcemanager = _scenemanager->resourcemanager();
 }
 
-scene::~scene() {
+scene::~scene() noexcept {
   auto objects = std::exchange(_objects, {});
   for (const auto& [_, o] : objects) {
     _objectmanager->remove(o);
@@ -46,23 +35,13 @@ scene::~scene() {
 }
 
 void scene::update(float delta) {
-  if (const auto& fn = _onloop; fn) [[likely]] {
-    fn(delta);
-  }
-
-  if (const auto& fn = _oncamera; fn) [[likely]] {
-    _camera = fn(delta);
-  }
 }
 
 void scene::draw() const {
-  static const auto destination = geometry::rectangle(
-    .0f, .0f,
-    static_cast<float>(_background->width()),
-    static_cast<float>(_background->height())
-  );
+}
 
-  _background->draw(destination, destination);
+std::string_view scene::name() const noexcept {
+  return _name;
 }
 
 std::variant<
@@ -89,10 +68,6 @@ std::variant<
   }
 
   throw std::out_of_range(std::format("[scene] resource {} not found", id));
-}
-
-std::string_view scene::name() const {
-  return _name;
 }
 
 void scene::on_enter() const {
@@ -189,4 +164,146 @@ void scene::set_ontext(sol::protected_function fn) {
 
 void scene::set_onmotion(sol::protected_function fn) {
   _onmotion = interop::wrap_fn<void(float, float)>(std::move(fn));
+}
+
+scenebackdrop::scenebackdrop(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
+    : scene(name, std::move(scenemanager)) {
+  _background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
+
+  geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
+
+  const auto es = j.value("effects", nlohmann::json::array());
+  _effects.reserve(es.size());
+
+  for (const auto& e : es) {
+    const auto basename = e.get<std::string_view>();
+    const auto f = std::format("blobs/{}/{}.ogg", name, basename);
+    _effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
+  }
+
+  const auto ps = j.value("particles", nlohmann::json::array());
+  _particles.reserve(ps.size());
+
+  const auto factory = _particlesystem->factory();
+
+  for (const auto& i : ps) {
+    const auto name = i["name"].get<std::string_view>();
+    const auto kind = i["kind"].get<std::string_view>();
+    const auto x = i["x"].get<float>();
+    const auto y = i["y"].get<float>();
+    const auto emitting = i.value("emitting", true);
+
+    _particles.emplace(name, factory->create(kind, x, y, emitting));
+  }
+
+  const auto fs = j.value("fonts", nlohmann::json::array());
+  for (const auto& i : fs) {
+    const auto fontname = i.get<std::string_view>();
+    _resourcemanager->fontfactory()->get(fontname);
+  }
+
+  const auto os = j.value("objects", nlohmann::json::array());
+  _objects.reserve(os.size());
+
+  for (const auto& o : os) {
+    if (!o.is_object()) [[unlikely]] {
+      continue;
+    }
+
+    std::string key = o["name"].get<std::string>();
+    std::string kind = o["kind"].get<std::string>();
+
+    const float x = o.value("x", .0f);
+    const float y = o.value("y", .0f);
+
+    std::string action = o.value("action", std::string{});
+
+    auto object = _objectmanager->create(kind, name, false);
+    object->set_placement(x, y);
+    if (!action.empty()) {
+      object->set_action(action);
+    }
+
+    _objects.emplace_back(std::move(key), std::move(object));
+  }
+}
+
+void scenebackdrop::update(float delta) {
+  if (const auto& fn = _onloop; fn) [[likely]] {
+    fn(delta);
+  }
+
+  if (const auto& fn = _oncamera; fn) [[likely]] {
+    // _camera = fn(delta);
+  }
+}
+
+void scenebackdrop::draw() const noexcept {
+  static const auto destination = geometry::rectangle(
+    .0f, .0f,
+    static_cast<float>(_background->width()),
+    static_cast<float>(_background->height())
+  );
+
+  _background->draw(destination, destination);
+}
+
+sceneblank::sceneblank(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
+    : scene(name, std::move(scenemanager)) {
+  geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
+
+  const auto es = j.value("effects", nlohmann::json::array());
+  _effects.reserve(es.size());
+
+  for (const auto& e : es) {
+    const auto basename = e.get<std::string_view>();
+    const auto f = std::format("blobs/{}/{}.ogg", name, basename);
+    _effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
+  }
+
+  const auto ps = j.value("particles", nlohmann::json::array());
+  _particles.reserve(ps.size());
+
+  const auto factory = _particlesystem->factory();
+
+  for (const auto& i : ps) {
+    const auto name = i["name"].get<std::string_view>();
+    const auto kind = i["kind"].get<std::string_view>();
+    const auto x = i["x"].get<float>();
+    const auto y = i["y"].get<float>();
+    const auto emitting = i.value("emitting", true);
+
+    _particles.emplace(name, factory->create(kind, x, y, emitting));
+  }
+
+  const auto fs = j.value("fonts", nlohmann::json::array());
+  for (const auto& i : fs) {
+    const auto fontname = i.get<std::string_view>();
+    _resourcemanager->fontfactory()->get(fontname);
+  }
+
+  const auto os = j.value("objects", nlohmann::json::array());
+  _objects.reserve(os.size());
+
+  for (const auto& o : os) {
+    if (!o.is_object()) [[unlikely]] {
+      continue;
+    }
+
+    std::string key = o["name"].get<std::string>();
+    std::string kind = o["kind"].get<std::string>();
+
+    const float x = o.value("x", .0f);
+    const float y = o.value("y", .0f);
+
+    std::string action = o.value("action", std::string{});
+
+    auto object = _objectmanager->create(kind, name, false);
+    object->set_placement(x, y);
+    if (!action.empty()) {
+      object->set_action(action);
+    }
+
+    _objects.emplace_back(std::move(key), std::move(object));
+  }
 }

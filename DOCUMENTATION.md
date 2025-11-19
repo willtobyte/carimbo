@@ -391,11 +391,11 @@ function scene.on_enter()
   -- On scene enter.
 
   -- Retrieve a sound effect from the scenario.
-  pool.theme = scene:get("theme", SceneType.effect)
+  pool.theme = scene:get("theme", SceneKind.effect)
   pool.theme:play(true)
 
   -- Retrieve an object from the scenario, useful when you need to manipulate it.
-  pool.object = scene:get("object", SceneType.object)
+  pool.object = scene:get("object", SceneKind.object)
 end
 
 function scene.on_loop()

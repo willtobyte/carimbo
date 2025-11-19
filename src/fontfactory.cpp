@@ -18,7 +18,7 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
 std::shared_ptr<font> fontfactory::get(std::string_view family) {
   std::filesystem::path p(family);
   const std::string filename = p.has_extension()
-    ? std::string(family)
+    ? std::string{family}
     : std::format("fonts/{}.json", family);
 
   const auto [it, inserted] = _pool.try_emplace(filename);
