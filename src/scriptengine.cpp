@@ -628,6 +628,9 @@ void framework::scriptengine::run() {
               return luaL_error(lua, "%s", err.what());
             }
 
+            lua.collect_garbage();
+            lua.collect_garbage();
+
             lua["pool"] = sol::lua_nil;
 
             lua.collect_garbage();
@@ -635,15 +638,6 @@ void framework::scriptengine::run() {
 
             return 0;
           };
-
-          scene->set_onleave(std::move(wrapper));
-        } else {
-          sol::protected_function wrapper = sol::make_object(lua, [&lua]() {
-            lua["pool"] = sol::lua_nil;
-
-            lua.collect_garbage();
-            lua.collect_garbage();
-          });
 
           scene->set_onleave(std::move(wrapper));
         }
