@@ -69,20 +69,20 @@ std::variant<
   std::shared_ptr<object>,
   std::shared_ptr<audio::soundfx>,
   std::shared_ptr<graphics::particleprops>
-> scene::get(std::string_view id, scenetype type) const {
-  if (type == scenetype::object) {
+> scene::get(std::string_view id, scenekind kind) const {
+  if (kind == scenekind::object) {
     for (const auto& [key, object] : _objects) {
       if (key == id) return object;
     }
   }
 
-  if (type == scenetype::effect) {
+  if (kind == scenekind::effect) {
     for (const auto& [key, effect] : _effects) {
       if (key == id) return effect;
     }
   }
 
-  if (type == scenetype::particle) {
+  if (kind == scenekind::particle) {
     for (const auto& [key, batch] : _particles) {
       if (key == id) return batch->props;
     }

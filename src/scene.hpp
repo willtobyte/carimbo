@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace framework {
-enum class scenetype : uint8_t {
+enum class scenekind : uint8_t {
   object = 0,
   effect,
   particle
@@ -32,7 +32,7 @@ public:
     std::shared_ptr<object>,
     std::shared_ptr<audio::soundfx>,
     std::shared_ptr<graphics::particleprops>
-  > get(std::string_view name, scenetype type) const;
+  > get(std::string_view name, scenekind type) const;
 
   std::string_view name() const;
 

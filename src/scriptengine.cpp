@@ -330,9 +330,9 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "SceneType",
-    "object", framework::scenetype::object,
-    "effect", framework::scenetype::effect,
-    "particle", framework::scenetype::particle
+    "object", framework::scenekind::object,
+    "effect", framework::scenekind::effect,
+    "particle", framework::scenekind::particle
   );
 
   lua.new_enum(
@@ -562,9 +562,9 @@ void framework::scriptengine::run() {
 
 
 
-        module["get"] = [ptr, name](sol::table, std::string_view id, framework::scenetype type) {
+        module["get"] = [ptr, name](sol::table, std::string_view id, framework::scenekind kind) {
           if (auto scene = ptr.lock()) [[likely]] {
-            return scene->get(id, type);
+            return scene->get(id, kind);
           }
 
           throw std::runtime_error(std::format(
