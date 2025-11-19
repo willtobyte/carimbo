@@ -11,23 +11,19 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
   const auto buffer = storage::io::read(filename);
 
   int width, height, channels;
-  const auto pixels = std::unique_ptr<stbi_uc, STBI_Deleter>(
-    stbi_load_from_memory(
-      buffer.data(),
-      static_cast<int>(buffer.size()),
-      &width,
-      &height,
-      &channels,
-      STBI_rgb_alpha
-    )
+  const auto pixels = unwrap(
+    std::unique_ptr<stbi_uc, STBI_Deleter>(
+      stbi_load_from_memory(
+        buffer.data(),
+        static_cast<int>(buffer.size()),
+        &width,
+        &height,
+        &channels,
+        STBI_rgb_alpha
+      )
+    ),
+    std::format("error while loading image: {}", filename)
   );
-
-  if (!pixels) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[stbi_load_from_memory] error while loading image: {}, error: {}",
-        filename,
-        stbi_failure_reason()));
-  }
 
   _width = width;
   _height = height;
@@ -36,14 +32,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
         *_renderer,
         SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STATIC,
-        _width,
-        _height
-      ),
-      SDL_Deleter{}
-  );
-  if (!_texture) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
-  }
+        _width, _height));
 
   const auto pitch = width * 4;
   SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch);

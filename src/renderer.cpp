@@ -17,12 +17,7 @@ renderer::renderer(std::shared_ptr<window> window)
   SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, vsync);
   SDL_SetStringProperty(props, SDL_PROP_RENDERER_CREATE_NAME_STRING, nullptr);
 
-  auto* renderer = SDL_CreateRendererWithProperties(props);
-  if (!renderer) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_CreateRendererWithProperties] {}", SDL_GetError()));
-  }
-
-  _renderer.reset(renderer);
+  _renderer = std::unique_ptr<SDL_Renderer, SDL_Deleter>(SDL_CreateRendererWithProperties(props));
 }
 
 renderer::operator SDL_Renderer* () const {

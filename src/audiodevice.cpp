@@ -2,26 +2,16 @@
 
 using namespace audio;
 
-audiodevice::audiodevice() : _device(nullptr), _context(nullptr) {
-  _device.reset(alcOpenDevice(nullptr));
+audiodevice::audiodevice() {
+  _device = unwrap(
+    std::unique_ptr<ALCdevice, ALC_Deleter>(alcOpenDevice(nullptr)),
+    "failed to open audio device"
+  );
 
-  if (!_device) [[unlikely]] {
-    throw std::runtime_error("[alcOpenDevice] failed to open audio device");
-  }
-
-  if (const auto error = alcGetError(_device.get()); error != ALC_NO_ERROR) [[unlikely]] {
-    throw std::runtime_error("[alcOpenDevice] failed to open audio device");
-  }
-
-  _context.reset(alcCreateContext(_device.get(), nullptr));
-
-  if (!_context) [[unlikely]] {
-    throw std::runtime_error("[alcCreateContext] failed to create audio context");
-  }
-
-  if (const auto error = alcGetError(_device.get()); error != ALC_NO_ERROR) [[unlikely]] {
-    throw std::runtime_error("[alcCreateContext] failed to create audio context");
-  }
+  _context = unwrap(
+    std::unique_ptr<ALCcontext, ALC_Deleter>(alcCreateContext(_device.get(), nullptr)),
+    "failed to create audio context"
+  );
 
   if (const auto result = alcMakeContextCurrent(_context.get()); result == ALC_FALSE) [[unlikely]] {
     throw std::runtime_error("[alcMakeContextCurrent] failed to set current context");

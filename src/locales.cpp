@@ -1,29 +1,31 @@
 #include "locales.hpp"
 
+static constexpr std::string_view DEFAULT_LANGUAGE = "en";
+
 static std::string_view language() {
   auto count = 0;
-  std::unique_ptr<SDL_Locale*, SDL_Deleter> locales(SDL_GetPreferredLocales(&count));
+  const auto locales = std::unique_ptr<SDL_Locale*, SDL_Deleter>(SDL_GetPreferredLocales(&count));
 
-  if (!locales || count == 0 || !locales.get()[0]) {
-    return "en";
+  if (!locales || count == 0) [[unlikely]] {
+    return DEFAULT_LANGUAGE;
   }
 
-  const SDL_Locale* locale = locales.get()[0];
-  if (!locale || !locale->language) {
-    return "en";
+  const auto* const locale = locales.get()[0];
+  if (!locale || !locale->language) [[unlikely]] {
+    return DEFAULT_LANGUAGE;
   }
 
   return locale->language;
 }
 
-static nlohmann::json parse(std::string_view code) {
+[[nodiscard]] static nlohmann::json parse(std::string_view code) {
   const auto filename = std::format("locales/{}.json", code);
-  const auto& buffer = storage::io::read(filename);
+  const auto buffer = storage::io::read(filename);
   return nlohmann::json::parse(buffer);
 }
 
-static const nlohmann::json& mapping() {
-  static const nlohmann::json j = [] {
+[[nodiscard]] static const nlohmann::json& mapping() noexcept {
+  static const auto j = [] noexcept {
     try {
       return parse(language());
     } catch (...) {
@@ -34,14 +36,13 @@ static const nlohmann::json& mapping() {
 }
 
 namespace localization {
-std::string_view text(std::string_view key) {
+[[nodiscard]] std::string_view text(std::string_view key) {
   const auto& j = mapping();
-  const auto it = j.find(key);
 
-  if (it == j.end()) {
-    return key;
+  if (const auto it = j.find(key); it != j.end()) [[likely]] {
+    return it.value().get<std::string_view>();
   }
 
-  return it.value().get<std::string_view>();
+  return key;
 }
 }

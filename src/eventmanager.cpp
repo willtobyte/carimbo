@@ -19,18 +19,16 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   _receivers.reserve(32);
   _controllers.reserve(8);
 
-  int number;
-  std::unique_ptr<uint32_t[], SDL_Deleter> gamepads(SDL_GetGamepads(&number));
-
-  if (gamepads) {
+  auto number = 0;
+  if (const auto gamepads = std::unique_ptr<uint32_t[], SDL_Deleter>(SDL_GetGamepads(&number))) {
     for (auto index = 0; index < number; ++index) {
       const auto gid = gamepads[index];
       if (!SDL_IsGamepad(gid)) {
         continue;
       }
 
-      if (const auto controller = SDL_OpenGamepad(gid)) {
-        const uint32_t jid = static_cast<uint32_t>(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)));
+      if (auto* const controller = SDL_OpenGamepad(gid)) {
+        const auto jid = static_cast<uint32_t>(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)));
 
         if (_controllers.contains(jid)) {
           SDL_CloseGamepad(controller);
@@ -163,7 +161,7 @@ void eventmanager::update(float delta) {
           break;
         }
 
-        if (auto controller = SDL_OpenGamepad(event.cdevice.which)) {
+        if (auto* const controller = SDL_OpenGamepad(event.cdevice.which)) {
           const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
 
           if (_controllers.contains(jid)) {

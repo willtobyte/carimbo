@@ -10,14 +10,16 @@ soundfx::soundfx(std::string_view filename) {
 
   int channels;
   int sample_rate;
-  short* decoded;
+  short* output;
   const auto samples = stb_vorbis_decode_memory(
     buffer.data(),
     static_cast<int>(buffer.size()),
     &channels,
     &sample_rate,
-    &decoded
+    &output
   );
+
+  const std::unique_ptr<short, decltype(&free)> decoded(output, &free);
 
   if (samples < 0 || !decoded) [[unlikely]] {
     throw std::runtime_error(std::format("[stb_vorbis_decode_memory] failed to decode: {}", filename));
@@ -28,9 +30,7 @@ soundfx::soundfx(std::string_view filename) {
   const auto size = samples * channels * sizeof(short);
 
   alGenBuffers(1, &_buffer);
-  alBufferData(_buffer, format, decoded, static_cast<ALsizei>(size), frequency);
-
-  free(decoded);
+  alBufferData(_buffer, format, decoded.get(), static_cast<ALsizei>(size), frequency);
 
   alGenSources(1, &_source);
   alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));

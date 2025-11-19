@@ -16,14 +16,14 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   const auto width = static_cast<int>(std::lround(static_cast<float>(lw) / sx));
   const auto height = static_cast<int>(std::lround(static_cast<float>(lh) / sy));
 
-  auto* const texture = SDL_CreateTexture(*_renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STREAMING, width, height);
-  if (!texture) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
-  }
+  _framebuffer =
+    std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTexture(*_renderer,
+        SDL_PIXELFORMAT_RGBA32,
+        SDL_TEXTUREACCESS_STREAMING,
+        width, height));
 
-  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-
-  _framebuffer.reset(texture);
+  SDL_SetTextureBlendMode(_framebuffer.get(), SDL_BLENDMODE_BLEND);
 
   const auto pixel = SDL_MapRGBA(SDL_GetPixelFormatDetails(SDL_PIXELFORMAT_RGBA32), nullptr, 0, 0, 0, 0);
   const auto count = static_cast<size_t>(width) * static_cast<size_t>(height);

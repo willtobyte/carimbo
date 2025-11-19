@@ -4,19 +4,16 @@ using namespace graphics;
 
 window::window(std::string_view title, int width, int height, bool fullscreen)
     : _width(width), _height(height),
-      _window(
-        SDL_CreateWindow(
-          title.data(),
-          width,
-          height,
-          fullscreen ? SDL_WINDOW_FULLSCREEN : 0
+      _window(unwrap(
+        std::unique_ptr<SDL_Window, SDL_Deleter>(
+          SDL_CreateWindow(
+            title.data(),
+            width, height,
+            fullscreen ? SDL_WINDOW_FULLSCREEN : 0
+          )
         ),
-        SDL_Deleter{}
-      ) {
-  if (!_window) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_CreateWindow] {}", SDL_GetError()));
-  }
-
+        "error creating window"
+      )) {
   const SDL_Rect area = { 0, 0, width, height };
   const auto cursor = 0;
   SDL_SetTextInputArea(_window.get(), &area, cursor);

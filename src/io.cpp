@@ -3,14 +3,10 @@
 using namespace storage;
 
 std::vector<uint8_t> io::read(std::string_view filename) {
-  const auto ptr = std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data()));
-
-  if (!ptr) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[PHYSFS_openRead] error while opening file: {}, error: {}",
-        filename,
-        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
-  }
+  const auto ptr = unwrap(
+    std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data())),
+    std::format("error while opening file: {}", filename)
+  );
 
   PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
 
@@ -38,14 +34,10 @@ std::vector<uint8_t> io::read(std::string_view filename) {
 }
 
 std::vector<std::string> io::enumerate(std::string_view directory) {
-  const std::unique_ptr<char*[], PHYSFS_Deleter> ptr(PHYSFS_enumerateFiles(directory.data()));
-
-  if (!ptr) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[PHYSFS_enumerateFiles] error while enumerating directory: {}, error: {}",
-        directory,
-        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
-  }
+  const auto ptr = unwrap(
+    std::unique_ptr<char*[], PHYSFS_Deleter>(PHYSFS_enumerateFiles(directory.data())),
+    std::format("error while enumerating directory: {}", directory)
+  );
 
   auto* const *array = ptr.get();
 

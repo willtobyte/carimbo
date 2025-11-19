@@ -40,18 +40,12 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
   const auto width = pixmap->width();
   const auto height = pixmap->height();
 
-  std::unique_ptr<SDL_Texture, SDL_Deleter> target(
-    SDL_CreateTexture(
-      *_renderer,
-      SDL_PIXELFORMAT_RGBA32,
-      SDL_TEXTUREACCESS_TARGET,
-      width,
-      height
-    )
-  );
-  if (!target) [[unlikely]] {
-    throw std::runtime_error(std::format("[SDL_CreateTexture] {}", SDL_GetError()));
-  }
+  const auto target = std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTexture(
+        *_renderer,
+        SDL_PIXELFORMAT_RGBA32,
+        SDL_TEXTUREACCESS_TARGET,
+        width, height));
 
   auto* const origin = SDL_GetRenderTarget(*_renderer);
 
@@ -61,11 +55,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
   SDL_RenderClear(*_renderer);
   SDL_RenderTexture(*_renderer, *pixmap, nullptr, &destination);
 
-  std::unique_ptr<SDL_Surface, SDL_Deleter> surface(SDL_RenderReadPixels(*_renderer, nullptr));
-  if (!surface) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[SDL_RenderReadPixels] {}", SDL_GetError()));
-  }
+  const auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>(SDL_RenderReadPixels(*_renderer, nullptr));
 
   SDL_SetRenderTarget(*_renderer, origin);
 

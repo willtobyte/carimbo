@@ -39,6 +39,7 @@
 #include <random>
 #include <ranges>
 #include <stdexcept>
+#include <source_location>
 #include <string>
 #include <string_view>
 #include <type_traits>
