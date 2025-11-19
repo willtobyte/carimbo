@@ -11,7 +11,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
 
   const auto length = PHYSFS_fileLength(ptr.get());
-  if (length <= 0) [[unlikely]] {
+  if (length < 0) [[unlikely]] {
     throw std::runtime_error(
       std::format("[PHYSFS_fileLength] invalid file length, file: {}, error: {}",
         filename,
