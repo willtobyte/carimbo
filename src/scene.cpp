@@ -12,8 +12,9 @@
 
 using namespace framework;
 
-scene::scene(std::string_view name, std::shared_ptr<scenemanager> scenemanager)
+scene::scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
     : _name(name),
+      _j(j),
       _scenemanager(std::move(scenemanager)) {
   _objectmanager = _scenemanager->objectmanager();
   _particlesystem = _scenemanager->particlesystem();
@@ -35,6 +36,13 @@ scene::~scene() noexcept {
 }
 
 void scene::update(float delta) {
+  if (const auto& fn = _onloop; fn) [[likely]] {
+    fn(delta);
+  }
+
+  if (const auto& fn = _oncamera; fn) [[likely]] {
+    // _camera = fn(delta);
+  }
 }
 
 void scene::draw() const {
@@ -166,45 +174,35 @@ void scene::set_onmotion(sol::protected_function fn) {
   _onmotion = interop::wrap_fn<void(float, float)>(std::move(fn));
 }
 
-scenebackdrop::scenebackdrop(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
-    : scene(name, std::move(scenemanager)) {
-  _background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
-
-  geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
-
-  const auto es = j.value("effects", nlohmann::json::array());
+void scene::load() {
+  const auto es = _j.value("effects", nlohmann::json::array());
   _effects.reserve(es.size());
-
   for (const auto& e : es) {
     const auto basename = e.get<std::string_view>();
-    const auto f = std::format("blobs/{}/{}.ogg", name, basename);
+    const auto f = std::format("blobs/{}/{}.ogg", _name, basename);
     _effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
   }
 
-  const auto ps = j.value("particles", nlohmann::json::array());
+  const auto ps = _j.value("particles", nlohmann::json::array());
   _particles.reserve(ps.size());
-
   const auto factory = _particlesystem->factory();
-
   for (const auto& i : ps) {
     const auto name = i["name"].get<std::string_view>();
     const auto kind = i["kind"].get<std::string_view>();
     const auto x = i["x"].get<float>();
     const auto y = i["y"].get<float>();
     const auto emitting = i.value("emitting", true);
-
     _particles.emplace(name, factory->create(kind, x, y, emitting));
   }
 
-  const auto fs = j.value("fonts", nlohmann::json::array());
+  const auto fs = _j.value("fonts", nlohmann::json::array());
   for (const auto& i : fs) {
     const auto fontname = i.get<std::string_view>();
     _resourcemanager->fontfactory()->get(fontname);
   }
 
-  const auto os = j.value("objects", nlohmann::json::array());
+  const auto os = _j.value("objects", nlohmann::json::array());
   _objects.reserve(os.size());
-
   for (const auto& o : os) {
     if (!o.is_object()) [[unlikely]] {
       continue;
@@ -218,7 +216,7 @@ scenebackdrop::scenebackdrop(std::string_view name, const nlohmann::json& j, std
 
     std::string action = o.value("action", std::string{});
 
-    auto object = _objectmanager->create(kind, name, false);
+    auto object = _objectmanager->create(kind, _name, false);
     object->set_placement(x, y);
     if (!action.empty()) {
       object->set_action(action);
@@ -228,14 +226,11 @@ scenebackdrop::scenebackdrop(std::string_view name, const nlohmann::json& j, std
   }
 }
 
-void scenebackdrop::update(float delta) {
-  if (const auto& fn = _onloop; fn) [[likely]] {
-    fn(delta);
-  }
+scenebackdrop::scenebackdrop(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
+    : scene(name, j, std::move(scenemanager)) {
+  _background = _resourcemanager->pixmappool()->get(std::format("blobs/{}/background.png", name));
 
-  if (const auto& fn = _oncamera; fn) [[likely]] {
-    // _camera = fn(delta);
-  }
+  load();
 }
 
 void scenebackdrop::draw() const noexcept {
@@ -249,61 +244,6 @@ void scenebackdrop::draw() const noexcept {
 }
 
 sceneblank::sceneblank(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
-    : scene(name, std::move(scenemanager)) {
-  geometry::size size{j.at("width").get<float>(), j.at("height").get<float>()};
-
-  const auto es = j.value("effects", nlohmann::json::array());
-  _effects.reserve(es.size());
-
-  for (const auto& e : es) {
-    const auto basename = e.get<std::string_view>();
-    const auto f = std::format("blobs/{}/{}.ogg", name, basename);
-    _effects.emplace_back(basename, _resourcemanager->soundmanager()->get(f));
-  }
-
-  const auto ps = j.value("particles", nlohmann::json::array());
-  _particles.reserve(ps.size());
-
-  const auto factory = _particlesystem->factory();
-
-  for (const auto& i : ps) {
-    const auto name = i["name"].get<std::string_view>();
-    const auto kind = i["kind"].get<std::string_view>();
-    const auto x = i["x"].get<float>();
-    const auto y = i["y"].get<float>();
-    const auto emitting = i.value("emitting", true);
-
-    _particles.emplace(name, factory->create(kind, x, y, emitting));
-  }
-
-  const auto fs = j.value("fonts", nlohmann::json::array());
-  for (const auto& i : fs) {
-    const auto fontname = i.get<std::string_view>();
-    _resourcemanager->fontfactory()->get(fontname);
-  }
-
-  const auto os = j.value("objects", nlohmann::json::array());
-  _objects.reserve(os.size());
-
-  for (const auto& o : os) {
-    if (!o.is_object()) [[unlikely]] {
-      continue;
-    }
-
-    std::string key = o["name"].get<std::string>();
-    std::string kind = o["kind"].get<std::string>();
-
-    const float x = o.value("x", .0f);
-    const float y = o.value("y", .0f);
-
-    std::string action = o.value("action", std::string{});
-
-    auto object = _objectmanager->create(kind, name, false);
-    object->set_placement(x, y);
-    if (!action.empty()) {
-      object->set_action(action);
-    }
-
-    _objects.emplace_back(std::move(key), std::move(object));
-  }
+    : scene(name, j, std::move(scenemanager)) {
+  load();
 }

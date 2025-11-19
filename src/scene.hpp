@@ -11,7 +11,7 @@ enum class scenekind : uint8_t {
 
 class scene {
   public:
-    explicit scene(std::string_view name, std::shared_ptr<scenemanager> scenemanager);
+    explicit scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
 
     virtual ~scene() noexcept;
 
@@ -46,7 +46,10 @@ class scene {
     void set_onmotion(sol::protected_function fn);
 
   protected:
+    void load();
+
     std::string _name;
+    nlohmann::json _j;
 
     std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
     std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
@@ -74,8 +77,6 @@ class scenebackdrop : public scene {
     scenebackdrop(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
 
     virtual ~scenebackdrop() noexcept = default;
-
-    virtual void update(float delta) override;
 
     virtual void draw() const noexcept override;
 
