@@ -285,7 +285,7 @@ void framework::scriptengine::run() {
 
   lua["JSON"] = lua.create_table_with(
     "parse", [](std::string_view json, sol::this_state state) {
-      const auto& j = nlohmann::json::parse(json);
+      const auto j = nlohmann::json::parse(json);
 
       sol::state_view lua(state);
 
@@ -358,7 +358,7 @@ void framework::scriptengine::run() {
   struct metaobject {
     static sol::object index(framework::object& self, sol::stack_object key, sol::this_state state) {
       auto& store = self.kv();
-      const auto& ptr = store.get(key.as<std::string>());
+      const auto ptr = store.get(key.as<std::string>());
       return sol::make_object(state, std::ref(*ptr));
     }
 

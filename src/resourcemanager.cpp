@@ -68,8 +68,8 @@ void resourcemanager::prefetch() {
 
 void resourcemanager::prefetch(const std::vector<std::string>& filenames) {
   for (const auto& filename : filenames) {
-    if (const auto& position = filename.rfind('.'); position != std::string::npos) {
-      const auto& extension = filename.substr(position);
+    if (const auto position = filename.rfind('.'); position != std::string::npos) {
+      const auto extension = filename.substr(position);
       if (const auto it = handlers.find(extension); it != handlers.end()) {
         it->second(filename, *_pixmappool, *_soundmanager);
       }

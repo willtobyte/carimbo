@@ -37,7 +37,7 @@ static std::string_view language() {
 
 namespace localization {
 [[nodiscard]] std::string_view text(std::string_view key) {
-  const auto& j = mapping();
+  const auto j = mapping();
 
   if (const auto it = j.find(key); it != j.end()) [[likely]] {
     return it.value().get<std::string_view>();

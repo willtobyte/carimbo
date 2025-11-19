@@ -28,10 +28,10 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
 
   std::println("[fontfactory] cache miss {}", filename);
 
-  const auto& buffer = storage::io::read(filename);
-  const auto& j = nlohmann::json::parse(buffer);
+  const auto buffer = storage::io::read(filename);
+  const auto j = nlohmann::json::parse(buffer);
 
-  const auto& glyphs = j["glyphs"].get<std::string_view>();
+  const auto glyphs = j["glyphs"].get<std::string_view>();
   const auto spacing = j.value("spacing", int16_t{0});
   const auto leading = j.value("leading", int16_t{0});
   const auto scale   = j.value("scale",   float{1.f});

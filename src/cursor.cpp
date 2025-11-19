@@ -18,15 +18,15 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
   SDL_HideCursor();
 
   const auto filename = std::format("cursors/{}.json", name);
-  const auto& buffer = storage::io::read(filename);
-  const auto& j = nlohmann::json::parse(buffer);
+  const auto buffer = storage::io::read(filename);
+  const auto j = nlohmann::json::parse(buffer);
 
   _point = j["point"].template get<geometry::point>();
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
   _animations.reserve(j["animations"].size());
 
   for (const auto& item : j["animations"].items()) {
-    const auto& key = item.key();
+    const auto key = item.key();
     const auto& a = item.value();
     const auto& f = a["frames"];
     std::vector<graphics::keyframe> keyframes(f.size());

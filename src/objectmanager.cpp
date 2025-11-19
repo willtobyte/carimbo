@@ -30,15 +30,15 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   const auto qualifier = n.empty() ? std::string(kind) : std::format("{}/{}", n, kind);
 
   const auto filename = std::format("objects/{}.json", qualifier);
-  const auto& buffer = storage::io::read(filename);
-  const auto& j = nlohmann::json::parse(buffer);
+  const auto buffer = storage::io::read(filename);
+  const auto j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float{1.f});
   const auto spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/{}.png", qualifier));
   animation_map animations;
   animations.reserve(j["animations"].size());
   for (auto&& item : j["animations"].items()) {
-    const auto& key = item.key();
+    const auto key = item.key();
     const auto& a = item.value();
 
     std::optional<framework::bounds> bounds;
@@ -190,7 +190,7 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 
   for (auto id : hits) {
-    if (const auto& o = find(id)) [[likely]] {
+    if (const auto o = find(id)) [[likely]] {
       o->on_touch(x, y);
     }
   }
@@ -207,14 +207,14 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
 
   for (const auto id : _hovering) {
     if (hits.contains(id)) continue;
-    if (const auto& o = find(id)) [[likely]] {
+    if (const auto o = find(id)) [[likely]] {
       o->on_unhover();
     }
   }
 
   for (const auto id : hits) {
     if (_hovering.contains(id)) continue;
-    if (const auto& o = find(id)) [[likely]] {
+    if (const auto o = find(id)) [[likely]] {
       o->on_hover();
     }
   }
@@ -223,7 +223,7 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
 }
 
 void objectmanager::on_mail(const input::event::mail& event) {
-  if (const auto& o = find(event.to); o) {
+  if (const auto o = find(event.to); o) {
     o->on_email(event.body);
   }
 }
