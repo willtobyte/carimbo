@@ -19,11 +19,11 @@ soundfx::soundfx(std::string_view filename) {
     &output
   );
 
-  const std::unique_ptr<short, decltype(&free)> decoded(output, &free);
-
-  if (samples < 0 || !decoded) [[unlikely]] {
+  if (samples < 0 || !output) [[unlikely]] {
     throw std::runtime_error(std::format("[stb_vorbis_decode_memory] failed to decode: {}", filename));
   }
+
+  const std::unique_ptr<short, decltype(&free)> decoded(output, &free);
 
   const auto format = (channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(sample_rate);
