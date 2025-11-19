@@ -147,9 +147,11 @@ std::shared_ptr<object> objectmanager::find(uint64_t id) const {
 
 void objectmanager::update(float delta) {
   const auto now = SDL_GetTicks();
-  const auto& byseq = _objects.get<by_seq>();
-  for (const auto& e : byseq) {
-    e.object->update(delta, now);
+  auto& byseq = _objects.get<by_seq>();
+  for (auto it = byseq.begin(); it != byseq.end(); ) {
+    auto o = it->object;
+    ++it;
+    o->update(delta, now);
   }
 }
 
