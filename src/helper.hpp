@@ -83,7 +83,6 @@ template<typename T, typename D>
   std::string_view message,
   std::source_location location = std::source_location::current())
     -> std::unique_ptr<T, D> {
-
     if (!ptr) [[unlikely]] {
         throw std::runtime_error(
             std::format("{}:{} - {}",
@@ -102,7 +101,6 @@ template<typename T>
   std::string_view message,
   std::source_location location = std::source_location::current())
     -> std::unique_ptr<T, SDL_Deleter> {
-
     if (!ptr) [[unlikely]] {
         throw std::runtime_error(
             std::format("{}:{} - {} | SDL Error: {}",
@@ -122,7 +120,6 @@ template<typename T>
   std::string_view message,
   std::source_location location = std::source_location::current())
     -> std::unique_ptr<T, PHYSFS_Deleter> {
-
     if (!ptr) [[unlikely]] {
         throw std::runtime_error(
             std::format("{}:{} - {} | PHYSFS Error: {}",
@@ -142,7 +139,6 @@ template<typename T>
   std::string_view message,
   std::source_location location = std::source_location::current())
     -> std::unique_ptr<T, STBI_Deleter> {
-
     if (!ptr) [[unlikely]] {
         throw std::runtime_error(
             std::format("{}:{} - {} | STBI Error: {}",
@@ -163,7 +159,6 @@ template<typename T>
   ALCdevice* device = nullptr,
   std::source_location location = std::source_location::current())
     -> std::unique_ptr<T, ALC_Deleter> {
-
     if (!ptr) [[unlikely]] {
         const auto error = alcGetError(device);
         const char* error_str = "Unknown error";
@@ -189,6 +184,3 @@ template<typename T>
 
     return std::move(ptr);
 }
-
-template <typename... Ts>
-constexpr void UNUSED(const Ts&...) {}
