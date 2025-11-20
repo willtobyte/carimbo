@@ -16,10 +16,10 @@ public:
   constexpr rectangle() noexcept = default;
   constexpr rectangle(const rectangle&) noexcept = default;
   constexpr rectangle(rectangle&&) noexcept = default;
-  
+
   constexpr rectangle(float x, float y, float width, float height) noexcept
     : _position{ x, y }, _size{ width, height } {}
-  
+
   constexpr rectangle(const geometry::point& position, const geometry::size& size) noexcept
     : _position(position), _size(size) {}
 
@@ -47,11 +47,11 @@ public:
   constexpr void set_position(float x, float y) noexcept {
     _position = { x, y };
   }
-  
+
   constexpr void set_position(const geometry::point& position) noexcept {
     _position = position;
   }
-  
+
   [[nodiscard]] constexpr geometry::point position() const noexcept {
     return _position;
   }
@@ -77,17 +77,17 @@ public:
   [[nodiscard]] constexpr rectangle operator+(const geometry::point& offset) const noexcept {
     return rectangle(_position + offset, _size);
   }
-  
+
   [[nodiscard]] constexpr rectangle operator*(numeric auto factor) const noexcept {
     return rectangle(
-      _position, 
+      _position,
       geometry::size(
-        _size.width() * static_cast<float>(factor), 
+        _size.width() * static_cast<float>(factor),
         _size.height() * static_cast<float>(factor)
       )
     );
   }
-  
+
   constexpr rectangle& operator*=(numeric auto factor) noexcept {
     scale(factor);
     return *this;
@@ -115,7 +115,6 @@ private:
   point _position{};
   geometry::size _size{};
 };
-
 }
 
 template<>
@@ -128,10 +127,10 @@ struct std::tuple_element<I, geometry::rectangle> {
 
 template<>
 struct std::formatter<geometry::rectangle> : std::formatter<std::string> {
-  auto format(const geometry::rectangle& rect, std::format_context& ctx) const {
+  auto format(const geometry::rectangle& r, std::format_context& context) const {
     return std::formatter<std::string>::format(
-      std::format("rectangle({}, {}, {}x{})", rect.x(), rect.y(), rect.width(), rect.height()),
-      ctx
+      std::format("rectangle({}, {}, {}x{})", r.x(), r.y(), r.width(), r.height()),
+      context
     );
   }
 };

@@ -132,10 +132,10 @@ struct std::tuple_element<I, geometry::size> {
 
 template<>
 struct std::formatter<geometry::size> : std::formatter<std::string> {
-  auto format(const geometry::size& s, std::format_context& ctx) const {
+  auto format(const geometry::size& s, std::format_context& context) const {
     return std::formatter<std::string>::format(
       std::format("size({}x{})", s.width(), s.height()),
-      ctx
+      context
     );
   }
 };

@@ -49,7 +49,7 @@ public:
     : _r(0), _g(0), _b(0), _a(255) {
     const auto n = hex.size();
     const bool valid = (n == 7 || n == 9) && hex[0] == '#';
-    
+
     if (!valid) [[unlikely]] {
       return;
     }
@@ -161,10 +161,10 @@ struct std::tuple_element<I, graphics::color> {
 
 template<>
 struct std::formatter<graphics::color> : std::formatter<std::string> {
-  auto format(const graphics::color& c, std::format_context& ctx) const {
+  auto format(const graphics::color& c, std::format_context& context) const {
     return std::formatter<std::string>::format(
       std::format("color(#{:02x}{:02x}{:02x}{:02x})", c.r(), c.g(), c.b(), c.a()),
-      ctx
+      context
     );
   }
 };

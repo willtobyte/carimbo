@@ -150,10 +150,10 @@ struct std::tuple_element<I, geometry::point> {
 
 template<>
 struct std::formatter<geometry::point> : std::formatter<std::string> {
-  auto format(const geometry::point& p, std::format_context& ctx) const {
+  auto format(const geometry::point& p, std::format_context& context) const {
     return std::formatter<std::string>::format(
       std::format("point({}, {})", p.x(), p.y()),
-      ctx
+      context
     );
   }
 };
