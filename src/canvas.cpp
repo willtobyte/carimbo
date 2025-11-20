@@ -33,7 +33,7 @@ canvas::canvas(std::shared_ptr<renderer> renderer)
   std::fill(_transparent.get(), _transparent.get() + count, pixel);
 }
 
-void canvas::set_pixels(std::string_view pixels) {
+void canvas::set_pixels(std::string_view pixels) noexcept {
   auto* const ptr = _framebuffer.get();
   auto* buffer = static_cast<void*>(nullptr);
   auto pitch = int{};
@@ -43,7 +43,7 @@ void canvas::set_pixels(std::string_view pixels) {
   SDL_UnlockTexture(ptr);
 }
 
-void canvas::clear() {
+void canvas::clear() noexcept {
   set_pixels(reinterpret_cast<const char*>(_transparent.get()));
 }
 

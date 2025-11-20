@@ -8,6 +8,6 @@ public:
   application(int argc, char **argv);
   ~application() = default;
 
-  int run();
+  [[nodiscard]] int run();
 };
 }

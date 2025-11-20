@@ -9,9 +9,9 @@ public:
   explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() = default;
 
-  void set_pixels(std::string_view pixels);
+  void set_pixels(std::string_view pixels) noexcept;
 
-  void clear();
+  void clear() noexcept;
 
   void draw() const noexcept;
 
