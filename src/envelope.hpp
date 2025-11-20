@@ -41,9 +41,9 @@ public:
   void reset() noexcept;
 
   template<typename... Args>
-    requires (!std::same_as<std::decay_t<Args>, envelope> && ...) &&
-             (!std::is_pointer_v<std::remove_reference_t<Args>> && ...) &&
-             (sizeof...(Args) > 0)
+  requires (!std::same_as<std::decay_t<Args>, envelope> && ...) &&
+            (!std::is_pointer_v<std::remove_reference_t<Args>> && ...) &&
+            (sizeof...(Args) > 0)
   explicit envelope(Args&&... args) : envelope() {
     reset(std::forward<Args>(args)...);
   }
