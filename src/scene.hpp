@@ -51,6 +51,7 @@ class scene {
     std::string _name;
     nlohmann::json _j;
 
+    geometry::rectangle _camera;
     std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
     std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
     std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> _particles;

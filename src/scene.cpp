@@ -91,7 +91,7 @@ void scene::update(float delta) {
   }
 
   if (auto fn = _oncamera; fn) [[likely]] {
-    // _camera = fn(delta);
+    _camera = fn(delta);
   }
 }
 
