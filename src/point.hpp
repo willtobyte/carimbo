@@ -2,13 +2,15 @@
 
 #include "common.hpp"
 
+#include "size.hpp"
+
 namespace geometry {
 class point final {
 public:
   constexpr point() noexcept = default;
   constexpr point(const point&) noexcept = default;
   constexpr point(point&&) noexcept = default;
-  
+
   constexpr point(float x, float y) noexcept
     : _x(x), _y(y) {}
 
