@@ -83,20 +83,4 @@ class scenebackdrop : public scene {
   private:
     std::shared_ptr<graphics::pixmap> _background;
 };
-
-class sceneblank : public scene {
-  public:
-    sceneblank(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
-
-    virtual ~sceneblank() noexcept = default;
-};
-
-class scenetilemap : public scene {
-  public:
-    virtual ~scenetilemap() noexcept = default;
-
-    virtual void update(float delta) override;
-
-    virtual void draw() const override;
-};
 }

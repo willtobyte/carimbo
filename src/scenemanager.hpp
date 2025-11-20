@@ -5,13 +5,11 @@
 namespace framework {
 enum class scenetype : std::uint8_t {
   backdrop,
-  blank,
   // tilemap
 };
 
 NLOHMANN_JSON_SERIALIZE_ENUM(scenetype, {
   {scenetype::backdrop, "backdrop"},
-  {scenetype::blank, "blank"},
   // {scenetype::tilemap, "tilemap"},
 })
 
