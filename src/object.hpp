@@ -106,7 +106,7 @@ private:
     const geometry::rectangle* _source{nullptr};
     const geometry::point* _offset{nullptr};
 
-    explicit controller(animation& a, uint64_t now);
+    explicit controller(animation& a);
     void frooze();
     bool tick(uint64_t now);
     void reset(uint64_t now);

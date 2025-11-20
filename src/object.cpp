@@ -11,7 +11,7 @@
 
 using namespace framework;
 
-object::controller::controller(animation& a, uint64_t now) : _animation(a), _last_tick(now) {
+object::controller::controller(animation& a) : _animation(a), _last_tick(0) {
   frooze();
 }
 
@@ -34,6 +34,12 @@ void object::controller::frooze() {
 
 bool object::controller::tick(uint64_t now) {
   if (!_keyframe || _keyframe->duration == 0) [[unlikely]] return false;
+
+  if (_last_tick == 0) [[unlikely]] {
+    _last_tick = now;
+    return false;
+  }
+
   if (now - _last_tick < _keyframe->duration) [[likely]] return false;
 
   ++_frame;
@@ -44,7 +50,7 @@ bool object::controller::tick(uint64_t now) {
 
 void object::controller::reset(uint64_t now) {
   _frame = 0;
-  _last_tick = now;
+  _last_tick = 0;
   frooze();
 }
 
@@ -195,11 +201,12 @@ void object::update(float delta, uint64_t now) {
   }
 
   if (!_animation->_animation.oneshot) [[unlikely]] {
-    _animation->reset(now);
+    _animation->reset(0);
     return;
   }
 
-  const auto ended = std::exchange(_action, std::string{});
+  std::string ended = std::move(_action);
+  _action.clear();
   if (auto fn = _onend; fn) fn(shared_from_this(), ended);
   if (_animation->_animation.next) [[likely]] set_action(*_animation->_animation.next);
 }
@@ -213,8 +220,10 @@ void object::draw() const {
   geometry::rectangle destination{_position + offset, source.size()};
 
   if (_scale != 1.0f) [[unlikely]] {
-    const auto [ow, oh] = std::pair{destination.width(), destination.height()};
-    const auto [sw, sh] = std::pair{ow * _scale, oh * _scale};
+    const float ow = destination.width();
+    const float oh = destination.height();
+    const float sw = ow * _scale;
+    const float sh = oh * _scale;
     destination.set_position(destination.x() + (ow - sw) * .5f, destination.y() + (oh - sh) * .5f);
     destination.scale(_scale);
   }
@@ -269,9 +278,8 @@ void object::set_action(std::optional<std::string_view> action) {
   auto it = _animations.find(*action);
   if (it == _animations.end()) [[unlikely]] return;
 
-  const auto now = SDL_GetTicks();
   _action = it->first;
-  _animation.emplace(it->second, now);
+  _animation.emplace(it->second);
   _dirty = true;
 
   if (auto& effect = _animation->_animation.effect) [[likely]] effect->play();
