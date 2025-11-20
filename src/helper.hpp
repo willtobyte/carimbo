@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef _MSC_VER
+  #define CONSTEXPR_IF_NOT_MSVC
+#else
+  #define CONSTEXPR_IF_NOT_MSVC constexpr
+#endif
+
 extern "C" const char* stbi_failure_reason(void);
 
 struct ALC_Deleter final {
