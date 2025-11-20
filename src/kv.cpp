@@ -9,7 +9,7 @@ sol::object observable::value() const {
 void observable::set(const sol::object& value) {
   _value = value;
 
-  if (const auto& fn = _subscriber; fn) {
+  if (auto fn = _subscriber; fn) {
     fn(value);
   }
 }

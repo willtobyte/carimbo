@@ -91,7 +91,7 @@ void object::update(float delta, uint64_t now) {
       if (_frame >= keyframes.size()) {
         if (animation.oneshot) {
           const auto ended = std::exchange(_action, std::string{});
-          if (const auto& fn = _onend; fn) fn(shared_from_this(), ended);
+          if (auto fn = _onend; fn) fn(shared_from_this(), ended);
           if (!animation.next) return;
           set_action(*animation.next);
           return;
@@ -280,7 +280,7 @@ void object::set_action(std::optional<std::string_view> action) {
     e->play();
   }
 
-  if (const auto& fn = _onbegin; fn) {
+  if (auto fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
   }
 }
@@ -319,25 +319,25 @@ void object::set_oncollision(std::string_view kind, sol::protected_function fn) 
 }
 
 void object::on_email(std::string_view message) {
-  if (const auto& fn = _onmail; fn) {
+  if (auto fn = _onmail; fn) {
     fn(shared_from_this(), message);
   }
 }
 
 void object::on_touch(float x, float y) {
-  if (const auto& fn = _ontouch; fn) {
+  if (auto fn = _ontouch; fn) {
     fn(shared_from_this(), x, y);
   }
 }
 
 void object::on_hover() {
-  if (const auto& fn = _onhover; fn) {
+  if (auto fn = _onhover; fn) {
     fn(shared_from_this());
   }
 }
 
 void object::on_unhover() {
-  if (const auto& fn = _onunhover; fn) {
+  if (auto fn = _onunhover; fn) {
     fn(shared_from_this());
   }
 }

@@ -141,8 +141,15 @@ void world::notify(const uint64_t id_a, const uint64_t id_b) const {
 
   if (!object_a || !object_b) [[unlikely]] return;
 
-  if (const auto* const callback = find_ptr(object_a->_collision_mapping, object_b->kind())) (*callback)(object_a, object_b);
-  if (const auto* const callback = find_ptr(object_b->_collision_mapping, object_a->kind())) (*callback)(object_b, object_a);
+  if (const auto* const callback_ptr = find_ptr(object_a->_collision_mapping, object_b->kind())) {
+    auto callback = *callback_ptr;
+    callback(object_a, object_b);
+  }
+
+  if (const auto* const callback_ptr = find_ptr(object_b->_collision_mapping, object_a->kind())) {
+    auto callback = *callback_ptr;
+    callback(object_b, object_a);
+  }
 }
 
 void world::set_objectmanager(std::weak_ptr<objectmanager> objectmanager) {

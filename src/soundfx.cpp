@@ -55,7 +55,7 @@ void soundfx::play(bool loop) const {
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
 
-  if (const auto& fn = _onbegin; fn) {
+  if (auto fn = _onbegin; fn) {
     fn();
   }
 }
@@ -77,7 +77,7 @@ void soundfx::update(float delta) {
   }
 
   _notified.store(true, std::memory_order_relaxed);
-  if (const auto& fn = _onend; fn) {
+  if (auto fn = _onend; fn) {
     fn();
   }
 }

@@ -86,11 +86,11 @@ scene::~scene() noexcept {
 }
 
 void scene::update(float delta) {
-  if (const auto& fn = _onloop; fn) [[likely]] {
+  if (auto fn = _onloop; fn) [[likely]] {
     fn(delta);
   }
 
-  if (const auto& fn = _oncamera; fn) [[likely]] {
+  if (auto fn = _oncamera; fn) [[likely]] {
     // _camera = fn(delta);
   }
 }
@@ -137,13 +137,13 @@ void scene::on_enter() const {
     _particlesystem->add(batch);
   }
 
-  if (const auto& fn = _onenter; fn) {
+  if (auto fn = _onenter; fn) {
     fn();
   }
 }
 
 void scene::on_leave() const {
-  if (const auto& fn = _onleave; fn) {
+  if (auto fn = _onleave; fn) {
     fn();
   }
 
@@ -159,31 +159,31 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  if (const auto& fn = _ontouch; fn) {
+  if (auto fn = _ontouch; fn) {
     fn(x, y);
   }
 }
 
 void scene::on_key_press(int32_t code) const {
-  if (const auto& fn = _onkeypress; fn) {
+  if (auto fn = _onkeypress; fn) {
     fn(code);
   }
 }
 
 void scene::on_key_release(int32_t code) const {
-  if (const auto& fn = _onkeyrelease; fn) {
+  if (auto fn = _onkeyrelease; fn) {
     fn(code);
   }
 }
 
 void scene::on_text(std::string_view text) const {
-  if (const auto& fn = _ontext; fn) {
+  if (auto fn = _ontext; fn) {
     fn(text);
   }
 }
 
 void scene::on_motion(float x, float y) const {
-  if (const auto& fn = _onmotion; fn) {
+  if (auto fn = _onmotion; fn) {
     fn(x, y);
   }
 }
