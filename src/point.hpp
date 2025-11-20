@@ -79,14 +79,14 @@ public:
     return *this;
   }
 
-  [[nodiscard]] constexpr point operator*(numeric auto factor) const noexcept {
+  [[nodiscard]] point operator*(numeric auto factor) const noexcept {
     return point(
       std::round(_x * static_cast<float>(factor)),
       std::round(_y * static_cast<float>(factor))
     );
   }
 
-  constexpr point& operator*=(numeric auto factor) noexcept {
+  point& operator*=(numeric auto factor) noexcept {
     _x = std::round(_x * static_cast<float>(factor));
     _y = std::round(_y * static_cast<float>(factor));
     return *this;
@@ -102,7 +102,7 @@ public:
     return *this;
   }
 
-  [[nodiscard]] constexpr bool operator==(const point& other) const noexcept {
+  [[nodiscard]] bool operator==(const point& other) const noexcept {
     return std::abs(_x - other._x) <= epsilon * std::max(std::abs(_x), std::abs(other._x))
         && std::abs(_y - other._y) <= epsilon * std::max(std::abs(_y), std::abs(other._y));
   }
@@ -128,14 +128,14 @@ private:
   float _y{0};
 };
 
-[[nodiscard]] inline constexpr point operator*(const point& p, float factor) noexcept {
+[[nodiscard]] inline point operator*(const point& p, float factor) noexcept {
   return point(
     std::round(p.x() * factor),
     std::round(p.y() * factor)
   );
 }
 
-[[nodiscard]] inline constexpr point operator*(float factor, const point& p) noexcept {
+[[nodiscard]] inline point operator*(float factor, const point& p) noexcept {
   return p * factor;
 }
 }

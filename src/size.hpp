@@ -79,7 +79,7 @@ public:
     return *this;
   }
 
-  [[nodiscard]] constexpr bool operator==(const size& rhs) const noexcept {
+  [[nodiscard]] bool operator==(const size& rhs) const noexcept {
     return std::abs(_width - rhs._width) <= epsilon * std::max(std::abs(_width), std::abs(rhs._width))
         && std::abs(_height - rhs._height) <= epsilon * std::max(std::abs(_height), std::abs(rhs._height));
   }
