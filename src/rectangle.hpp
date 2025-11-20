@@ -5,10 +5,6 @@
 #include "point.hpp"
 #include "size.hpp"
 
-#include <tuple>
-
-#include "concepts.hpp"
-
 namespace geometry {
 
 class rectangle final {
