@@ -80,8 +80,8 @@ public:
   }
 
   [[nodiscard]] constexpr bool operator==(const size& rhs) const noexcept {
-    return std::fabs(_width - rhs._width) <= epsilon * std::max(std::fabs(_width), std::fabs(rhs._width))
-        && std::fabs(_height - rhs._height) <= epsilon * std::max(std::fabs(_height), std::fabs(rhs._height));
+    return std::abs(_width - rhs._width) <= epsilon * std::max(std::abs(_width), std::abs(rhs._width))
+        && std::abs(_height - rhs._height) <= epsilon * std::max(std::abs(_height), std::abs(rhs._height));
   }
 
   [[nodiscard]] constexpr float area() const noexcept {

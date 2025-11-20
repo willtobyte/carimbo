@@ -103,8 +103,8 @@ public:
   }
 
   [[nodiscard]] constexpr bool operator==(const point& other) const noexcept {
-    return std::fabs(_x - other._x) <= epsilon * std::max(std::fabs(_x), std::fabs(other._x))
-        && std::fabs(_y - other._y) <= epsilon * std::max(std::fabs(_y), std::fabs(other._y));
+    return std::abs(_x - other._x) <= epsilon * std::max(std::abs(_x), std::abs(other._x))
+        && std::abs(_y - other._y) <= epsilon * std::max(std::abs(_y), std::abs(other._y));
   }
 
   template<std::size_t I>
