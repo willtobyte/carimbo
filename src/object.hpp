@@ -97,15 +97,41 @@ private:
   friend class scene;
   friend class world;
 
+  struct controller {
+    animation& _animation;
+    std::size_t _frame{0};
+    uint64_t _last_tick{0};
+    const keyframe* _keyframe{nullptr};
+    const bounds* _bounds{nullptr};
+    const geometry::rectangle* _source{nullptr};
+    const geometry::point* _offset{nullptr};
+
+    explicit controller(animation& a, uint64_t now);
+    void frooze();
+    bool tick(uint64_t now);
+    void reset(uint64_t now);
+    bool finished() const;
+    bool valid() const;
+    const geometry::rectangle& bounds() const;
+  };
+
+  struct body {
+    b2BodyId _id{b2_nullBodyId};
+    b2ShapeId _shape{b2_nullShapeId};
+    bool _enabled{false};
+
+    ~body();
+    void enable();
+    void disable();
+    bool missing() const;
+    bool valid() const;
+    void sync(const geometry::rectangle& bounds, const geometry::point& position,
+              float scale, double angle, uint64_t id, std::weak_ptr<world> world);
+  };
+
   uint64_t _id;
-  uint64_t _last_frame;
   double _angle;
-
-  b2BodyId _body;
-  b2ShapeId _collision_shape;
-  std::size_t _frame;
   float _scale;
-
   uint8_t _alpha;
   bool _visible{true};
   bool _dirty{true};
@@ -117,7 +143,8 @@ private:
   std::string _action;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   animation_map _animations;
-  std::optional<std::reference_wrapper<animation>> _current_animation;
+  std::optional<controller> _animation;
+  body _body;
 
   memory::kv _kv;
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
