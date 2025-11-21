@@ -180,13 +180,33 @@ object::~object() {
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
-std::string_view object::kind() const noexcept { return _kind; }
-std::string_view object::scope() const noexcept { return _scope; }
-geometry::point object::position() const noexcept { return _position; }
-float object::x() const noexcept { return _position.x(); }
-float object::y() const noexcept { return _position.y(); }
-geometry::point object::placement() const noexcept { return _position; }
-uint8_t object::alpha() const noexcept { return _alpha; }
+std::string_view object::kind() const noexcept {
+  return _kind;
+}
+
+std::string_view object::scope() const noexcept {
+  return _scope;
+}
+
+geometry::point object::position() const noexcept {
+  return _position;
+}
+
+float object::x() const noexcept {
+  return _position.x();
+}
+
+float object::y() const noexcept {
+  return _position.y();
+}
+
+geometry::point object::placement() const noexcept {
+  return _position;
+}
+
+uint8_t object::alpha() const noexcept {
+  return _alpha;
+}
 
 void object::set_x(float x) noexcept {
   if (_position.x() == x) [[unlikely]] return;
