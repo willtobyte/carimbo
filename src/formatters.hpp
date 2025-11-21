@@ -80,8 +80,10 @@ struct std::formatter<framework::object> {
 
   auto format(const framework::object& o, std::format_context& context) const {
     auto out = context.out();
-    out = std::format_to(out, "object(placement:{}, angle:{}, alpha:{}, visible:{}, action:{})", 
-      o.placement(), o.angle(), o.alpha(), o.visible(), o.action());
+    out = std::format_to(out, "object(placement:");
+    out = std::formatter<geometry::point>{}.format(o.placement(), context);
+    out = std::format_to(out, ", angle:{}, alpha:{}, visible:{}, action:{})", 
+      o.angle(), o.alpha(), o.visible(), o.action());
     return out;
   }
 };
