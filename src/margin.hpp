@@ -160,12 +160,4 @@ struct std::tuple_element<I, geometry::margin> {
   using type = float;
 };
 
-template<>
-struct std::formatter<geometry::margin> : std::formatter<std::string> {
-  auto format(const geometry::margin& m, std::format_context& context) const {
-    return std::formatter<std::string>::format(
-      std::format("margin(t:{}, l:{}, b:{}, r:{})", m.top(), m.left(), m.bottom(), m.right()),
-      context
-    );
-  }
-};
+

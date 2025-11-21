@@ -159,12 +159,4 @@ struct std::tuple_element<I, graphics::color> {
   using type = uint8_t;
 };
 
-template<>
-struct std::formatter<graphics::color> : std::formatter<std::string> {
-  auto format(const graphics::color& c, std::format_context& context) const {
-    return std::formatter<std::string>::format(
-      std::format("color(#{:02x}{:02x}{:02x}{:02x})", c.r(), c.g(), c.b(), c.a()),
-      context
-    );
-  }
-};
+
