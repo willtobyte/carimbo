@@ -288,13 +288,13 @@ void object::draw() const {
     _destination = geometry::rectangle{_position + offset, source.size()};
 
     if (_scale != 1.0f) [[unlikely]] {
-      const float ow = _destination.width();
-      const float oh = _destination.height();
-      const float scale_factor = (1.0f - _scale) * .5f;
-      const float offset_x = ow * scale_factor;
-      const float offset_y = oh * scale_factor;
-      const float destination_x = _destination.x();
-      const float destination_y = _destination.y();
+      const auto ow = _destination.width();
+      const auto oh = _destination.height();
+      const auto scale_factor = (1.0f - _scale) * .5f;
+      const auto offset_x = ow * scale_factor;
+      const auto offset_y = oh * scale_factor;
+      const auto destination_x = _destination.x();
+      const auto destination_y = _destination.y();
       _destination.set_position(destination_x + offset_x, destination_y + offset_y);
       _destination.scale(_scale);
     }
