@@ -149,11 +149,12 @@ struct std::tuple_element<I, geometry::point> {
 };
 
 template<>
-struct std::formatter<geometry::point> : std::formatter<std::string> {
-  auto format(const geometry::point& p, std::format_context& context) const {
-    return std::formatter<std::string>::format(
-      std::format("point({}, {})", p.x(), p.y()),
-      context
-    );
+struct std::formatter<geometry::point> {
+  constexpr auto parse(std::format_parse_context& ctx) {
+    return ctx.begin();
+  }
+
+  auto format(const geometry::point& p, std::format_context& ctx) const {
+    return std::format_to(ctx.out(), "point({}, {})", p.x(), p.y());
   }
 };
