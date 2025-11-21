@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "point.hpp"
 
 #include "kv.hpp"
 
@@ -149,7 +150,7 @@ private:
   graphics::reflection _reflection;
   bool _visible{true};
   bool _dirty{true};
-  mutable bool _draw_dirty{true};
+  mutable bool _redraw{true};
   mutable geometry::rectangle _destination;
 
   std::string _action;

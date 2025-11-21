@@ -215,7 +215,7 @@ void object::set_x(float x) noexcept {
 
   _position.set_x(x);
   _dirty = true;
-  _draw_dirty = true;
+  _redraw = true;
 }
 
 void object::set_y(float y) noexcept {
@@ -223,7 +223,7 @@ void object::set_y(float y) noexcept {
 
   _position.set_y(y);
   _dirty = true;
-  _draw_dirty = true;
+  _redraw = true;
 }
 
 void object::set_placement(float x, float y) noexcept {
@@ -231,7 +231,7 @@ void object::set_placement(float x, float y) noexcept {
 
   _position.set(x, y);
   _dirty = true;
-  _draw_dirty = true;
+  _redraw = true;
 }
 
 void object::update(float delta, uint64_t now) {
@@ -245,20 +245,23 @@ void object::update(float delta, uint64_t now) {
         _body.enable();
         return;
       }
+
       _body.sync(_animation->bounds(), _position, _scale, _angle, _id);
       _dirty = false;
       return;
     }
+
     _body.disable();
     return;
   }
 
-  _draw_dirty = true;
+  _redraw = true;
 
   if (!_animation->finished()) [[likely]] {
     if (_animation->_has_bounds && _visible) [[likely]] {
       _body.sync(_animation->bounds(), _position, _scale, _angle, _id);
       _dirty = false;
+
       return;
     }
 
@@ -277,7 +280,9 @@ void object::update(float delta, uint64_t now) {
     fn(shared_from_this(), _action);
   }
 
-  if (_animation->_animation.next) [[likely]] set_action(*_animation->_animation.next);
+  if (_animation->_animation.next) [[likely]] {
+    set_action(*_animation->_animation.next);
+  }
 }
 
 void object::draw() const {
@@ -286,7 +291,7 @@ void object::draw() const {
   const auto& source = _animation->_source;
   const auto& offset = _animation->_offset;
 
-  if (_draw_dirty) [[unlikely]] {
+  if (_redraw) [[unlikely]] {
     _destination = geometry::rectangle{_position + offset, source.size()};
 
     if (_scale != 1.0f) [[unlikely]] {
@@ -301,7 +306,7 @@ void object::draw() const {
       _destination.scale(_scale);
     }
 
-    _draw_dirty = false;
+    _redraw = false;
   }
 
   _spritesheet->draw(source, _destination, _angle, _alpha, _reflection);
@@ -325,7 +330,7 @@ void object::set_scale(float scale) noexcept {
 
   _scale = scale;
   _dirty = true;
-  _draw_dirty = true;
+  _redraw = true;
 }
 
 float object::scale() const noexcept {
@@ -337,7 +342,7 @@ void object::set_angle(double angle) noexcept {
 
   _angle = angle;
   _dirty = true;
-  _draw_dirty = true;
+  _redraw = true;
 }
 
 double object::angle() const noexcept {
@@ -369,7 +374,7 @@ void object::set_action(std::optional<std::string_view> action) {
     _animation.reset();
     _body.disable();
     _dirty = true;
-    _draw_dirty = true;
+    _redraw = true;
     return;
   }
 
@@ -381,7 +386,7 @@ void object::set_action(std::optional<std::string_view> action) {
   _action = it->first;
   _animation.emplace(it->second);
   _dirty = true;
-  _draw_dirty = true;
+  _redraw = true;
 
   if (auto& effect = _animation->_animation.effect) [[likely]] effect->play();
   if (auto fn = _onbegin; fn) {
