@@ -388,8 +388,8 @@ void object::set_action(std::optional<std::string_view> action) {
   _dirty = true;
   _redraw = true;
 
-  if (auto& effect = _animation->_animation.effect) [[likely]] {
-    effect->play();
+  if (auto& fx = _animation->_animation.effect; fx) [[likely]] {
+    fx->play();
   }
 
   if (auto fn = _onbegin; fn) {
