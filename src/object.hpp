@@ -36,40 +36,40 @@ using animation_map = std::unordered_map<std::string, animation, string_hash, st
 class object final : public std::enable_shared_from_this<object> {
 public:
   object();
-  virtual ~object();
-  std::string_view kind() const;
-  std::string_view scope() const;
+  ~object();
+  std::string_view kind() const noexcept;
+  std::string_view scope() const noexcept;
 
   void update(float delta, uint64_t now);
 
   void draw() const;
 
-  geometry::point position() const;
-  float x() const;
-  void set_x(float x);
-  float y() const;
-  void set_y(float y);
+  geometry::point position() const noexcept;
+  float x() const noexcept;
+  void set_x(float x) noexcept;
+  float y() const noexcept;
+  void set_y(float y) noexcept;
 
-  void set_placement(float x, float y);
-  geometry::point placement() const;
+  void set_placement(float x, float y) noexcept;
+  geometry::point placement() const noexcept;
 
-  void set_alpha(uint8_t alpha);
-  uint8_t alpha() const;
+  void set_alpha(uint8_t alpha) noexcept;
+  uint8_t alpha() const noexcept;
 
-  void set_scale(float scale);
-  float scale() const;
+  void set_scale(float scale) noexcept;
+  float scale() const noexcept;
 
-  void set_angle(double angle);
-  double angle() const;
+  void set_angle(double angle) noexcept;
+  double angle() const noexcept;
 
-  void set_reflection(graphics::reflection reflection);
-  graphics::reflection reflection() const;
+  void set_reflection(graphics::reflection reflection) noexcept;
+  graphics::reflection reflection() const noexcept;
 
-  bool visible() const;
+  bool visible() const noexcept;
   void set_visible(bool value);
 
   void set_action(std::optional<std::string_view> action);
-  std::string_view action() const;
+  std::string_view action() const noexcept;
 
   void set_onbegin(sol::protected_function fn);
   void set_onend(sol::protected_function fn);
@@ -101,18 +101,20 @@ private:
     animation& _animation;
     std::size_t _frame{0};
     uint64_t _last_tick{0};
-    const keyframe* _keyframe{nullptr};
-    const bounds* _bounds{nullptr};
-    const geometry::rectangle* _source{nullptr};
-    const geometry::point* _offset{nullptr};
 
-    explicit controller(animation& a);
+    geometry::rectangle _source;
+    geometry::point _offset;
+    geometry::rectangle _bounds;
+    bool _has_keyframe{false};
+    bool _has_bounds{false};
+
+    explicit controller(animation& animation);
     void frooze();
     bool tick(uint64_t now);
-    void reset(uint64_t now);
-    bool finished() const;
-    bool valid() const;
-    const geometry::rectangle& bounds() const;
+    void reset();
+    bool finished() const noexcept;
+    bool valid() const noexcept;
+    const geometry::rectangle& bounds() const noexcept;
   };
 
   struct body {
@@ -120,33 +122,43 @@ private:
     b2ShapeId _shape{b2_nullShapeId};
     bool _enabled{false};
 
+    struct {
+      geometry::point position;
+      geometry::rectangle bounds;
+      float scale{0.0f};
+      double angle{0.0};
+      bool valid{false};
+    } _last_sync;
+
     ~body();
     void enable();
     void disable();
-    bool missing() const;
-    bool valid() const;
-    void sync(const geometry::rectangle& bounds, const geometry::point& position,
-              float scale, double angle, uint64_t id, std::weak_ptr<world> world);
+    bool missing() const noexcept;
+    bool valid() const noexcept;
+    void sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id, std::weak_ptr<world> world);
   };
 
-  uint64_t _id;
+  geometry::point _position;
   double _angle;
   float _scale;
   uint8_t _alpha;
+  graphics::reflection _reflection;
   bool _visible{true};
   bool _dirty{true};
+  mutable bool _draw_dirty{true};
 
-  graphics::reflection _reflection;
-  geometry::point _position;
-  std::string _kind;
-  std::string _scope;
+  mutable geometry::rectangle _cached_destination;
+
   std::string _action;
-  std::shared_ptr<graphics::pixmap> _spritesheet;
-  animation_map _animations;
   std::optional<controller> _animation;
   body _body;
 
-  memory::kv _kv;
+  uint64_t _id;
+  std::shared_ptr<graphics::pixmap> _spritesheet;
+  animation_map _animations;
+  std::string _kind;
+  std::string _scope;
+
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;
   std::function<void(std::shared_ptr<object>)> _onunhover;
@@ -155,6 +167,7 @@ private:
   std::function<void(std::shared_ptr<object>, std::string_view)> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, string_equal> _collision_mapping;
   std::weak_ptr<world> _world;
+  memory::kv _kv;
 };
 }
 

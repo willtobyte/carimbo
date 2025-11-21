@@ -11,7 +11,7 @@
 
 using namespace framework;
 
-object::controller::controller(animation& a) : _animation(a), _last_tick(0) {
+object::controller::controller(animation& animation) : _animation(animation), _last_tick(0) {
   frooze();
 }
 
@@ -19,28 +19,36 @@ void object::controller::frooze() {
   const auto& keyframes = _animation.keyframes;
 
   if (_frame >= keyframes.size()) [[unlikely]] {
-    _keyframe = nullptr;
-    _source = nullptr;
-    _offset = nullptr;
-    _bounds = nullptr;
+    _has_keyframe = false;
+    _has_bounds = false;
     return;
   }
 
-  _keyframe = &keyframes[_frame];
-  _source = &_keyframe->frame;
-  _offset = &_keyframe->offset;
-  _bounds = _animation.bounds ? &(*_animation.bounds) : nullptr;
+  const auto& keyframe = keyframes[_frame];
+  _source = keyframe.frame;
+  _offset = keyframe.offset;
+  _has_keyframe = true;
+
+  if (_animation.bounds) [[likely]] {
+    _bounds = _animation.bounds->rectangle;
+    _has_bounds = true;
+  } else {
+    _has_bounds = false;
+  }
 }
 
 bool object::controller::tick(uint64_t now) {
-  if (!_keyframe || _keyframe->duration == 0) [[unlikely]] return false;
+  if (!_has_keyframe) [[unlikely]] return false;
+
+  const auto& keyframes = _animation.keyframes;
+  if (_frame >= keyframes.size() || keyframes[_frame].duration <= 0) [[unlikely]] return false;
 
   if (_last_tick == 0) [[unlikely]] {
     _last_tick = now;
     return false;
   }
 
-  if (now - _last_tick < _keyframe->duration) [[likely]] return false;
+  if (now - _last_tick < keyframes[_frame].duration) [[likely]] return false;
 
   ++_frame;
   _last_tick = now;
@@ -48,22 +56,22 @@ bool object::controller::tick(uint64_t now) {
   return true;
 }
 
-void object::controller::reset(uint64_t now) {
+void object::controller::reset() {
   _frame = 0;
   _last_tick = 0;
   frooze();
 }
 
-bool object::controller::finished() const {
+bool object::controller::finished() const noexcept {
   return _frame >= _animation.keyframes.size();
 }
 
-bool object::controller::valid() const {
-  return _keyframe != nullptr;
+bool object::controller::valid() const noexcept {
+  return _has_keyframe;
 }
 
-const geometry::rectangle& object::controller::bounds() const {
-  return _bounds->rectangle;
+const geometry::rectangle& object::controller::bounds() const noexcept {
+  return _bounds;
 }
 
 object::body::~body() {
@@ -80,6 +88,14 @@ object::body::~body() {
   _enabled = false;
 }
 
+bool object::body::missing() const noexcept {
+  return !b2Body_IsValid(_id);
+}
+
+bool object::body::valid() const noexcept {
+  return b2Body_IsValid(_id);
+}
+
 void object::body::enable() {
   if (!b2Body_IsValid(_id) || _enabled) [[unlikely]] return;
 
@@ -94,16 +110,15 @@ void object::body::disable() {
   _enabled = false;
 }
 
-bool object::body::missing() const {
-  return !b2Body_IsValid(_id);
-}
+void object::body::sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id, std::weak_ptr<world> world) {
+  if (_last_sync.valid &&
+      _last_sync.position == position &&
+      _last_sync.bounds == bounds &&
+      _last_sync.scale == scale &&
+      _last_sync.angle == angle) [[likely]] {
+    return;
+  }
 
-bool object::body::valid() const {
-  return b2Body_IsValid(_id);
-}
-
-void object::body::sync(const geometry::rectangle& bounds, const geometry::point& position,
-                        float scale, double angle, uint64_t id, std::weak_ptr<world> world) {
   const auto transform = physics::body_transform::compute(
     position.x() + bounds.x(), position.y() + bounds.y(),
     0, 0, bounds.width(), bounds.height(), scale, angle
@@ -131,6 +146,12 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
     sd.filter.maskBits = physics::collisioncategory::Player;
     _shape = b2CreatePolygonShape(_id, &sd, &box);
     _enabled = true;
+
+    _last_sync.position = position;
+    _last_sync.bounds = bounds;
+    _last_sync.scale = scale;
+    _last_sync.angle = angle;
+    _last_sync.valid = true;
     return;
   }
 
@@ -139,6 +160,12 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
   if (b2Shape_IsValid(_shape)) [[likely]] {
     b2Shape_SetPolygon(_shape, &box);
   }
+
+  _last_sync.position = position;
+  _last_sync.bounds = bounds;
+  _last_sync.scale = scale;
+  _last_sync.angle = angle;
+  _last_sync.valid = true;
 }
 
 object::object()
@@ -153,112 +180,159 @@ object::~object() {
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
-std::string_view object::kind() const { return _kind; }
-std::string_view object::scope() const { return _scope; }
-geometry::point object::position() const { return _position; }
-float object::x() const { return _position.x(); }
-float object::y() const { return _position.y(); }
-geometry::point object::placement() const { return _position; }
+std::string_view object::kind() const noexcept { return _kind; }
+std::string_view object::scope() const noexcept { return _scope; }
+geometry::point object::position() const noexcept { return _position; }
+float object::x() const noexcept { return _position.x(); }
+float object::y() const noexcept { return _position.y(); }
+geometry::point object::placement() const noexcept { return _position; }
+uint8_t object::alpha() const noexcept { return _alpha; }
 
-void object::set_x(float x) {
+void object::set_x(float x) noexcept {
   if (_position.x() == x) [[unlikely]] return;
 
   _position.set_x(x);
   _dirty = true;
+  _draw_dirty = true;
 }
 
-void object::set_y(float y) {
+void object::set_y(float y) noexcept {
   if (_position.y() == y) [[unlikely]] return;
 
   _position.set_y(y);
   _dirty = true;
+  _draw_dirty = true;
 }
 
-void object::set_placement(float x, float y) {
+void object::set_placement(float x, float y) noexcept {
   if (_position.x() == x && _position.y() == y) [[unlikely]] return;
 
   _position.set(x, y);
   _dirty = true;
+  _draw_dirty = true;
 }
 
 void object::update(float delta, uint64_t now) {
   if (!_animation) [[unlikely]] return;
 
-  if (!_animation->tick(now) || !_animation->finished()) [[likely]] {
-    if (!_animation->_bounds || !_visible) [[unlikely]] {
-      _body.disable();
+  const auto changed = _animation->tick(now);
+
+  if (!changed) [[likely]] {
+    if (_animation->_has_bounds && _visible) [[likely]] {
+      if (_body.valid() && !_dirty) [[likely]] {
+        _body.enable();
+        return;
+      }
+      _body.sync(_animation->bounds(), _position, _scale, _angle, _id, _world);
+      _dirty = false;
+      return;
+    }
+    _body.disable();
+    return;
+  }
+
+  _draw_dirty = true;
+
+  if (!_animation->finished()) [[likely]] {
+    if (_animation->_has_bounds && _visible) [[likely]] {
+      _body.sync(_animation->bounds(), _position, _scale, _angle, _id, _world);
+      _dirty = false;
       return;
     }
 
-    if (_body.valid() && !_dirty) [[likely]] {
-      _body.enable();
-      return;
-    }
+    _body.disable();
 
-    _body.sync(_animation->bounds(), _position, _scale, _angle, _id, _world);
-    _dirty = false;
     return;
   }
 
   if (!_animation->_animation.oneshot) [[unlikely]] {
-    _animation->reset(0);
+    _animation->reset();
+
     return;
   }
 
-  std::string ended = std::move(_action);
-  _action.clear();
-  if (auto fn = _onend; fn) fn(shared_from_this(), ended);
+  if (auto fn = _onend; fn) {
+    fn(shared_from_this(), _action);
+  }
+
   if (_animation->_animation.next) [[likely]] set_action(*_animation->_animation.next);
 }
 
 void object::draw() const {
   if (!_visible || !_animation || !_animation->valid()) [[unlikely]] return;
 
-  const auto& source = *_animation->_source;
-  const auto& offset = *_animation->_offset;
+  const auto& source = _animation->_source;
+  const auto& offset = _animation->_offset;
 
-  geometry::rectangle destination{_position + offset, source.size()};
+  if (_draw_dirty) [[unlikely]] {
+    _cached_destination = geometry::rectangle{_position + offset, source.size()};
 
-  if (_scale != 1.0f) [[unlikely]] {
-    const float ow = destination.width();
-    const float oh = destination.height();
-    const float sw = ow * _scale;
-    const float sh = oh * _scale;
-    destination.set_position(destination.x() + (ow - sw) * .5f, destination.y() + (oh - sh) * .5f);
-    destination.scale(_scale);
+    if (_scale != 1.0f) [[unlikely]] {
+      const float ow = _cached_destination.width();
+      const float oh = _cached_destination.height();
+      const float scale_factor = (1.0f - _scale) * .5f;
+      const float offset_x = ow * scale_factor;
+      const float offset_y = oh * scale_factor;
+      const float dest_x = _cached_destination.x();
+      const float dest_y = _cached_destination.y();
+      _cached_destination.set_position(dest_x + offset_x, dest_y + offset_y);
+      _cached_destination.scale(_scale);
+    }
+
+    _draw_dirty = false;
   }
 
-  _spritesheet->draw(source, destination, _angle, _alpha, _reflection);
+  _spritesheet->draw(source, _cached_destination, _angle, _alpha, _reflection);
 }
 
-void object::set_alpha(uint8_t alpha) { _alpha = alpha; }
-uint8_t object::alpha() const { return _alpha; }
+void object::set_alpha(uint8_t alpha) noexcept {
+  if (_alpha == alpha) [[likely]] return;
 
-void object::set_scale(float scale) {
+  const auto was_visible = _alpha != 0;
+  const auto will_be_visible = alpha != 0;
+
+  _alpha = alpha;
+
+  if (was_visible != will_be_visible) {
+    will_be_visible ? _body.enable() : _body.disable();
+  }
+}
+
+void object::set_scale(float scale) noexcept {
   if (_scale == scale) [[likely]] return;
 
   _scale = scale;
   _dirty = true;
+  _draw_dirty = true;
 }
 
-float object::scale() const { return _scale; }
+float object::scale() const noexcept {
+  return _scale;
+}
 
-void object::set_angle(double angle) {
+void object::set_angle(double angle) noexcept {
   if (_angle == angle) [[likely]] return;
 
   _angle = angle;
   _dirty = true;
+  _draw_dirty = true;
 }
 
-double object::angle() const { return _angle; }
+double object::angle() const noexcept {
+  return _angle;
+}
 
-void object::set_reflection(graphics::reflection reflection) {
+void object::set_reflection(graphics::reflection reflection) noexcept {
   _reflection = reflection;
 }
 
-graphics::reflection object::reflection() const { return _reflection; }
+graphics::reflection object::reflection() const noexcept {
+  return _reflection;
+}
 
-bool object::visible() const { return _visible && !_action.empty() && _alpha != 0; }
+bool object::visible() const noexcept {
+  return _visible && !_action.empty() && _alpha != 0;
+}
 
 void object::set_visible(bool value) {
   if (value == _visible) [[likely]] return;
@@ -272,21 +346,30 @@ void object::set_action(std::optional<std::string_view> action) {
     _action.clear();
     _animation.reset();
     _body.disable();
+    _dirty = true;
+    _draw_dirty = true;
     return;
   }
 
-  auto it = _animations.find(*action);
+  if (_action == *action && _animation) [[likely]] return;
+
+  const auto it = _animations.find(*action);
   if (it == _animations.end()) [[unlikely]] return;
 
   _action = it->first;
   _animation.emplace(it->second);
   _dirty = true;
+  _draw_dirty = true;
 
   if (auto& effect = _animation->_animation.effect) [[likely]] effect->play();
-  if (auto fn = _onbegin; fn) fn(shared_from_this(), _action);
+  if (auto fn = _onbegin; fn) {
+    fn(shared_from_this(), _action);
+  }
 }
 
-std::string_view object::action() const { return _action; }
+std::string_view object::action() const noexcept {
+  return _action;
+}
 
 void object::set_onbegin(sol::protected_function fn) {
   _onbegin = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
@@ -320,23 +403,36 @@ void object::set_oncollision(std::string_view kind, sol::protected_function fn) 
 }
 
 void object::on_email(std::string_view message) {
-  if (auto fn = _onmail; fn) fn(shared_from_this(), message);
+  if (auto fn = _onmail; fn) {
+    fn(shared_from_this(), message);
+  }
 }
 
 void object::on_touch(float x, float y) {
-  if (auto fn = _ontouch; fn) fn(shared_from_this(), x, y);
+  if (auto fn = _ontouch; fn) {
+    fn(shared_from_this(), x, y);
+  }
 }
 
 void object::on_hover() {
-  if (auto fn = _onhover; fn) fn(shared_from_this());
+  if (auto fn = _onhover; fn) {
+    fn(shared_from_this());
+  }
 }
 
 void object::on_unhover() {
-  if (auto fn = _onunhover; fn) fn(shared_from_this());
+  if (auto fn = _onunhover; fn) {
+    fn(shared_from_this());
+  }
 }
 
-memory::kv& object::kv() noexcept { return _kv; }
-uint64_t object::id() const noexcept { return _id; }
+memory::kv& object::kv() noexcept {
+  return _kv;
+}
+
+uint64_t object::id() const noexcept {
+  return _id;
+}
 
 void object::suspend() {
   _body.disable();
