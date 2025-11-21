@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 
+#include "font.hpp"
 #include "widget.hpp"
 
 namespace graphics {
