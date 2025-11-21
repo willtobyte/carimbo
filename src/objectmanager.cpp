@@ -80,6 +80,7 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
   o->_world = _world;
+  o->_body = object::body(_world);
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
 
@@ -109,6 +110,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_alpha = matrix->_alpha;
 
   o->_world = _world;
+  o->_body = object::body(_world);
 
   _objects.emplace(o);
 

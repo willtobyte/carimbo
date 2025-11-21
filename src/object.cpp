@@ -88,6 +88,8 @@ object::body::~body() {
   _enabled = false;
 }
 
+object::body::body(std::weak_ptr<world> world) : _world(std::move(world)) {}
+
 bool object::body::missing() const noexcept {
   return !b2Body_IsValid(_id);
 }
@@ -110,7 +112,7 @@ void object::body::disable() {
   _enabled = false;
 }
 
-void object::body::sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id, std::weak_ptr<world> world) {
+void object::body::sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id) {
   if (_last_sync.valid &&
       _last_sync.position == position &&
       _last_sync.bounds == bounds &&
@@ -129,7 +131,7 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
   const auto b2_position = b2Vec2{transform.px(), transform.py()};
 
   if (missing()) [[unlikely]] {
-    auto w = world.lock();
+    auto w = _world.lock();
     if (!w) [[unlikely]] return;
 
     auto def = b2DefaultBodyDef();
@@ -243,7 +245,7 @@ void object::update(float delta, uint64_t now) {
         _body.enable();
         return;
       }
-      _body.sync(_animation->bounds(), _position, _scale, _angle, _id, _world);
+      _body.sync(_animation->bounds(), _position, _scale, _angle, _id);
       _dirty = false;
       return;
     }
@@ -255,7 +257,7 @@ void object::update(float delta, uint64_t now) {
 
   if (!_animation->finished()) [[likely]] {
     if (_animation->_has_bounds && _visible) [[likely]] {
-      _body.sync(_animation->bounds(), _position, _scale, _angle, _id, _world);
+      _body.sync(_animation->bounds(), _position, _scale, _angle, _id);
       _dirty = false;
       return;
     }

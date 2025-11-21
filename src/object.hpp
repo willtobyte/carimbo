@@ -130,12 +130,16 @@ private:
       bool valid{false};
     } _last_sync;
 
+    std::weak_ptr<world> _world;
+
+    body() = default;
+    body(std::weak_ptr<world> world);
     ~body();
     void enable();
     void disable();
     bool missing() const noexcept;
     bool valid() const noexcept;
-    void sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id, std::weak_ptr<world> world);
+    void sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id);
   };
 
   geometry::point _position;
