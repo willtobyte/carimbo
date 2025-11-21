@@ -98,7 +98,7 @@ private:
   friend class scene;
   friend class world;
 
-  struct controller {
+  struct controller final {
     animation& _animation;
     std::size_t _frame{0};
     uint64_t _last_tick{0};
@@ -118,7 +118,7 @@ private:
     const geometry::rectangle& bounds() const noexcept;
   };
 
-  struct body {
+  struct body final {
     b2BodyId _id{b2_nullBodyId};
     b2ShapeId _shape{b2_nullShapeId};
     bool _enabled{false};
@@ -174,5 +174,3 @@ private:
   memory::kv _kv;
 };
 }
-
-
