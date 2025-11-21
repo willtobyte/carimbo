@@ -19,9 +19,9 @@ public:
 
   void flush();
 
-  #ifndef NDEBUG
+#ifndef NDEBUG
   void debug() const;
-  #endif
+#endif
 
 private:
   std::unordered_map<std::string, std::shared_ptr<font>, string_hash, string_equal> _pool;

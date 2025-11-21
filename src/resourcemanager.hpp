@@ -21,9 +21,9 @@ public:
   void prefetch();
   void prefetch(const std::vector<std::string>& filenames);
 
-  #ifndef NDEBUG
+#ifndef NDEBUG
   void debug() const;
-  #endif
+#endif
 
   std::shared_ptr<graphics::renderer> renderer() const;
   std::shared_ptr<graphics::pixmappool> pixmappool() const;
