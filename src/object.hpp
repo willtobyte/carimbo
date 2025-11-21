@@ -176,12 +176,14 @@ private:
 }
 
 template<>
-struct std::formatter<framework::object> : std::formatter<std::string> {
-  auto format(const framework::object& o, std::format_context& context) const {
-    return std::formatter<std::string>::format(
-      std::format("object(placement:{}, angle:{}, alpha:{}, visible:{}, action:{})",
-        o.placement(), o.angle(), o.alpha(), o.visible(), o.action()),
-      context
-    );
+struct std::formatter<framework::object> {
+  constexpr auto parse(std::format_parse_context& ctx) {
+    return ctx.begin();
+  }
+
+  auto format(const framework::object& o, std::format_context& ctx) const {
+    return std::format_to(ctx.out(),
+      "object(placement:{}, angle:{}, alpha:{}, visible:{}, action:{})",
+      o.placement(), o.angle(), o.alpha(), o.visible(), o.action());
   }
 };
