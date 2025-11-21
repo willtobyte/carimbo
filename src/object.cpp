@@ -388,7 +388,10 @@ void object::set_action(std::optional<std::string_view> action) {
   _dirty = true;
   _redraw = true;
 
-  if (auto& effect = _animation->_animation.effect) [[likely]] effect->play();
+  if (auto& effect = _animation->_animation.effect) [[likely]] {
+    effect->play();
+  }
+
   if (auto fn = _onbegin; fn) {
     fn(shared_from_this(), _action);
   }
