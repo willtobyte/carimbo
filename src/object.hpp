@@ -146,8 +146,7 @@ private:
   bool _visible{true};
   bool _dirty{true};
   mutable bool _draw_dirty{true};
-
-  mutable geometry::rectangle _cached_destination;
+  mutable geometry::rectangle _destination;
 
   std::string _action;
   std::optional<controller> _animation;

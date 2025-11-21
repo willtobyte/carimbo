@@ -285,24 +285,24 @@ void object::draw() const {
   const auto& offset = _animation->_offset;
 
   if (_draw_dirty) [[unlikely]] {
-    _cached_destination = geometry::rectangle{_position + offset, source.size()};
+    _destination = geometry::rectangle{_position + offset, source.size()};
 
     if (_scale != 1.0f) [[unlikely]] {
-      const float ow = _cached_destination.width();
-      const float oh = _cached_destination.height();
+      const float ow = _destination.width();
+      const float oh = _destination.height();
       const float scale_factor = (1.0f - _scale) * .5f;
       const float offset_x = ow * scale_factor;
       const float offset_y = oh * scale_factor;
-      const float dest_x = _cached_destination.x();
-      const float dest_y = _cached_destination.y();
-      _cached_destination.set_position(dest_x + offset_x, dest_y + offset_y);
-      _cached_destination.scale(_scale);
+      const float destination_x = _destination.x();
+      const float destination_y = _destination.y();
+      _destination.set_position(destination_x + offset_x, destination_y + offset_y);
+      _destination.scale(_scale);
     }
 
     _draw_dirty = false;
   }
 
-  _spritesheet->draw(source, _cached_destination, _angle, _alpha, _reflection);
+  _spritesheet->draw(source, _destination, _angle, _alpha, _reflection);
 }
 
 void object::set_alpha(uint8_t alpha) noexcept {
