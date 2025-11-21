@@ -1,5 +1,4 @@
 #include "object.hpp"
-#include "formatters.hpp"
 
 #include "kv.hpp"
 #include "physics.hpp"
