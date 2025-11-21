@@ -131,15 +131,15 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
   const auto b2_position = b2Vec2{transform.px(), transform.py()};
 
   if (missing()) [[unlikely]] {
-    auto w = _world.lock();
-    if (!w) [[unlikely]] return;
+    auto world = _world.lock();
+    if (!world) [[unlikely]] return;
 
     auto def = b2DefaultBodyDef();
     def.type = b2_kinematicBody;
     def.userData = physics::id_to_userdata(id);
     def.position = b2_position;
     def.rotation = rotation;
-    _id = b2CreateBody(*w, &def);
+    _id = b2CreateBody(*world, &def);
 
     auto sd = b2DefaultShapeDef();
     sd.isSensor = true;
