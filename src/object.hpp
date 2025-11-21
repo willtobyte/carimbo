@@ -179,8 +179,8 @@ template<>
 struct std::formatter<framework::object> : std::formatter<std::string> {
   auto format(const framework::object& o, std::format_context& context) const {
     return std::formatter<std::string>::format(
-      std::format("object(placement:{}, angle:{}, alpha:{}, visible:{}, action:{})",
-        o.placement(), o.angle(), o.alpha(), o.visible(), o.action()),
+      std::format("object(placement:({}, {}), angle:{}, alpha:{}, visible:{}, action:{})",
+        o.placement().x(), o.placement().y(), o.angle(), o.alpha(), o.visible(), o.action()),
       context
     );
   }
