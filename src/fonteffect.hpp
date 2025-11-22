@@ -7,7 +7,7 @@
 namespace graphics {
 class fonteffect {
   public:
-    enum class type: uint8_t {
+    enum type: uint8_t {
       fadein
     };
 

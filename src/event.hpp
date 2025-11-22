@@ -4,7 +4,7 @@
 
 namespace input {
 namespace event {
-enum class player : uint8_t {
+enum player : uint8_t {
   one = 0,
   two
 };
@@ -15,7 +15,7 @@ enum class type : uint32_t {
 };
 
 namespace keyboard {
-enum class key : int32_t {
+enum key : int32_t {
   up = SDLK_UP,
   left = SDLK_LEFT,
   down = SDLK_DOWN,
@@ -35,12 +35,12 @@ struct motion {
 };
 
 struct button {
-  enum class type : uint32_t {
+  enum type : uint32_t {
     down = SDL_EVENT_MOUSE_BUTTON_DOWN,
     up = SDL_EVENT_MOUSE_BUTTON_UP,
   };
 
-  enum class which : uint8_t {
+  enum which : uint8_t {
     left = SDL_BUTTON_LEFT,
     middle = SDL_BUTTON_MIDDLE,
     right = SDL_BUTTON_RIGHT,
@@ -54,7 +54,7 @@ struct button {
 }
 
 namespace gamepad {
-enum class button : uint32_t {
+enum button : uint32_t {
   up = SDL_GAMEPAD_BUTTON_DPAD_UP,
   down = SDL_GAMEPAD_BUTTON_DPAD_DOWN,
   left = SDL_GAMEPAD_BUTTON_DPAD_LEFT,
@@ -66,7 +66,7 @@ enum class button : uint32_t {
 };
 
 struct motion {
-  enum class axis : int8_t {
+  enum axis : int8_t {
     invalid = SDL_GAMEPAD_AXIS_INVALID,
     leftx = SDL_GAMEPAD_AXIS_LEFTX,
     lefty = SDL_GAMEPAD_AXIS_LEFTY,

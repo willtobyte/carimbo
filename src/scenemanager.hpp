@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace framework {
-enum class scenetype : std::uint8_t {
+enum scenetype : std::uint8_t {
   backdrop,
   // tilemap
 };

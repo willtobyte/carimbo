@@ -28,7 +28,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
       }
 
       if (auto* const controller = SDL_OpenGamepad(gid)) {
-        const auto jid = static_cast<uint32_t>(SDL_GetJoystickID(SDL_GetGamepadJoystick(controller)));
+        const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
 
         if (_controllers.contains(jid)) {
           SDL_CloseGamepad(controller);

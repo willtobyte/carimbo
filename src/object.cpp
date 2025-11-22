@@ -151,8 +151,8 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
     auto sd = b2DefaultShapeDef();
     sd.isSensor = true;
     sd.enableSensorEvents = true;
-    sd.filter.categoryBits = physics::collisioncategory::Player;
-    sd.filter.maskBits = physics::collisioncategory::Player;
+    sd.filter.categoryBits = physics::collisioncategory::player;
+    sd.filter.maskBits = physics::collisioncategory::player;
     _shape = b2CreatePolygonShape(_id, &sd, &box);
     _enabled = true;
 
