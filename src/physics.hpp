@@ -11,41 +11,14 @@ inline void* id_to_userdata(uint64_t id) {
   return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
 }
 
-enum collisioncategory : uint32_t {
-  Player = 0x0001,
-  Enemy = 0x0002,
-  Projectile = 0x0004,
-  Terrain = 0x0008,
-  Trigger = 0x0010,
+enum collisioncategory : uint64_t {
+  player = B2_DEFAULT_CATEGORY_BITS << 0,      // 0x0001
+  enemy = B2_DEFAULT_CATEGORY_BITS << 1,       // 0x0002
+  projectile = B2_DEFAULT_CATEGORY_BITS << 2,  // 0x0004
+  terrain = B2_DEFAULT_CATEGORY_BITS << 3,     // 0x0008
+  trigger = B2_DEFAULT_CATEGORY_BITS << 4,     // 0x0010
+  collectible = B2_DEFAULT_CATEGORY_BITS << 4, // 0x0020
+  interface = B2_DEFAULT_CATEGORY_BITS << 8,   // 0x0040
+  all = B2_DEFAULT_MASK_BITS                   // All
 };
-
-class body_transform final {
-public:
-  body_transform() = default;
-
-  static body_transform compute(
-    float position_x,
-    float position_y,
-    float bounds_x,
-    float bounds_y,
-    float bounds_width,
-    float bounds_height,
-    float scale,
-    double angle_degrees
-  );
-
-  float px() const { return _px; }
-  float py() const { return _py; }
-  float hx() const { return _hx; }
-  float hy() const { return _hy; }
-  float radians() const { return _radians; }
-
-private:
-  float _px{.0f};
-  float _py{.0f};
-  float _hx{.0f};
-  float _hy{.0f};
-  float _radians{.0f};
-};
-
 }

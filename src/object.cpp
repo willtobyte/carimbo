@@ -1,5 +1,6 @@
 #include "object.hpp"
 
+#include "constant.hpp"
 #include "kv.hpp"
 #include "physics.hpp"
 #include "pixmap.hpp"
@@ -121,14 +122,20 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
     return;
   }
 
-  const auto transform = physics::body_transform::compute(
-    position.x() + bounds.x(), position.y() + bounds.y(),
-    0, 0, bounds.width(), bounds.height(), scale, angle
-  );
+  const auto sw = bounds.width() * scale;
+  const auto sh = bounds.height() * scale;
+  const auto hx = 0.5f * sw;
+  const auto hy = 0.5f * sh;
 
-  const auto box = b2MakeBox(transform.hx(), transform.hy());
-  const auto rotation = b2MakeRot(transform.radians());
-  const auto b2_position = b2Vec2{transform.px(), transform.py()};
+  const auto center_x = bounds.width() * 0.5f;
+  const auto center_y = bounds.height() * 0.5f;
+  const auto px = position.x() + bounds.x() + center_x;
+  const auto py = position.y() + bounds.y() + center_y;
+  const auto radians = static_cast<float>(angle * DEGREES_TO_RADIANS);
+
+  const auto box = b2MakeBox(hx, hy);
+  const auto rotation = b2MakeRot(radians);
+  const auto b2_position = b2Vec2{px, py};
 
   if (missing()) [[unlikely]] {
     auto world = _world.lock();
