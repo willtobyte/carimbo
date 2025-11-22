@@ -239,12 +239,9 @@ void framework::scriptengine::run() {
     }
 #else
     std::string uppercase_key{key};
-    std::ranges::transform(
-      uppercase_key,
-      uppercase_key.begin(),
-      [](unsigned char c) {
-        return static_cast<char>(std::toupper(c));
-      });
+    for (auto& c : uppercase_key) {
+      c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    }
 
     if (const auto* value = std::getenv(uppercase_key.c_str()); value && *value) {
       out.assign(value);

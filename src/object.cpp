@@ -21,14 +21,12 @@ void object::controller::frooze() {
 
   if (_frame >= keyframes.size()) [[unlikely]] {
     _has_keyframe = false;
-    _has_bounds = false;
-    return;
+  } else {
+    const auto& keyframe = keyframes[_frame];
+    _source = keyframe.frame;
+    _offset = keyframe.offset;
+    _has_keyframe = true;
   }
-
-  const auto& keyframe = keyframes[_frame];
-  _source = keyframe.frame;
-  _offset = keyframe.offset;
-  _has_keyframe = true;
 
   if (_animation.bounds) [[likely]] {
     _bounds = _animation.bounds->rectangle;
