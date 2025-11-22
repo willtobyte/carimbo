@@ -108,7 +108,6 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_reflection = matrix->_reflection;
   o->_alpha = matrix->_alpha;
 
-  o->_world = _world;
   o->_body = object::body(_world);
 
   _objects.emplace(o);
