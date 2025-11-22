@@ -19,20 +19,16 @@ object::controller::controller(animation& animation) : _animation(animation), _l
 void object::controller::frooze() {
   const auto& keyframes = _animation.keyframes;
 
-  if (_frame >= keyframes.size()) [[unlikely]] {
-    _has_keyframe = false;
-  } else {
+  _has_keyframe = _frame < keyframes.size();
+  if (_has_keyframe) [[likely]] {
     const auto& keyframe = keyframes[_frame];
     _source = keyframe.frame;
     _offset = keyframe.offset;
-    _has_keyframe = true;
   }
 
-  if (_animation.bounds) [[likely]] {
+  _has_bounds = _animation.bounds.has_value();
+  if (_has_bounds) [[likely]] {
     _bounds = _animation.bounds->rectangle;
-    _has_bounds = true;
-  } else {
-    _has_bounds = false;
   }
 }
 
