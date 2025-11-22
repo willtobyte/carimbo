@@ -193,10 +193,6 @@ std::string_view object::kind() const noexcept {
   return _kind;
 }
 
-std::string_view object::scope() const noexcept {
-  return _scope;
-}
-
 geometry::point object::position() const noexcept {
   return _position;
 }

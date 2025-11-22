@@ -38,8 +38,8 @@ class object final : public std::enable_shared_from_this<object> {
 public:
   object();
   ~object();
+
   std::string_view kind() const noexcept;
-  std::string_view scope() const noexcept;
 
   void update(float delta, uint64_t now);
 
@@ -161,7 +161,6 @@ private:
   std::shared_ptr<graphics::pixmap> _spritesheet;
   animation_map _animations;
   std::string _kind;
-  std::string _scope;
 
   std::function<void(std::shared_ptr<object>, float, float)> _ontouch;
   std::function<void(std::shared_ptr<object>)> _onhover;

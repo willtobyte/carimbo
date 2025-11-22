@@ -26,8 +26,9 @@ objectmanager::objectmanager() {
 }
 
 std::shared_ptr<object> objectmanager::create(std::string_view kind, std::optional<std::string_view> scope, bool manage) {
-  const auto n = scope.value_or(std::string_view{});
-  const auto qualifier = n.empty() ? std::string{kind} : std::format("{}/{}", n, kind);
+  const auto qualifier = scope
+      .transform([&](auto s) { return s.empty() ? std::string{kind} : std::format("{}/{}", s, kind); })
+      .value_or(std::string{kind});
 
   const auto filename = std::format("objects/{}.json", qualifier);
   const auto buffer = storage::io::read(filename);
@@ -76,7 +77,6 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   o->_id = _counter++;
   o->_scale = scale;
   o->_kind = kind;
-  o->_scope = n;
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
   o->_body = object::body(_world);
@@ -99,7 +99,6 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   o->_id = _counter++;
   o->_angle = matrix->_angle;
   o->_kind = matrix->_kind;
-  o->_scope = matrix->_scope;
   o->_action = matrix->_action;
   o->_spritesheet = matrix->_spritesheet;
   o->_animations = matrix->_animations;
