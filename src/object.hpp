@@ -170,7 +170,6 @@ private:
   std::function<void(std::shared_ptr<object>, std::string_view)> _onend;
   std::function<void(std::shared_ptr<object>, std::string_view)> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, string_equal> _collision_mapping;
-  std::weak_ptr<world> _world;
   memory::kv _kv;
 };
 }

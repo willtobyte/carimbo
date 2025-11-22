@@ -75,11 +75,10 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   auto o = std::make_shared<object>();
   o->_id = _counter++;
   o->_scale = scale;
-  o->_kind = std::string{kind};
-  o->_scope = std::string{n};
+  o->_kind = kind;
+  o->_scope = n;
   o->_animations = std::move(animations);
   o->_spritesheet = std::move(spritesheet);
-  o->_world = _world;
   o->_body = object::body(_world);
 
   std::println("[objectmanager] created {} {}", o->kind(), o->id());
