@@ -35,6 +35,10 @@
 //     float _size;
 //     float _height;
 //     float _width;
+//     uint64_t _last_tick{0};
+//     size_t _current_transaction{0};
+//     geometry::rectangle _camera;
+
 //     std::shared_ptr<graphics::pixmap> _pixmap;
 //     std::vector<geometry::rectangle> _sources;
 //     std::vector<std::string> _labels;
@@ -42,10 +46,6 @@
 //     std::vector<std::vector<uint8_t>> _layers;
 //     std::vector<transaction> _transactions;
 //     std::shared_ptr<object> _target;
-//     std::shared_ptr<graphics::camera> _camera;
-//     geometry::rectangle _view;
-
-//     uint64_t _last_tick{0};
-//     size_t _current_transaction{0};
+//     // std::shared_ptr<graphics::camera> _camera;
 // };
 // }

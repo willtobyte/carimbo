@@ -22,7 +22,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
   auto number = 0;
   if (const auto gamepads = std::unique_ptr<uint32_t[], SDL_Deleter>(SDL_GetGamepads(&number))) {
     for (auto index = 0; index < number; ++index) {
-      const auto gid = gamepads[index];
+      const auto gid = gamepads[static_cast<size_t>(index)];
       if (!SDL_IsGamepad(gid)) {
         continue;
       }
@@ -82,22 +82,21 @@ void eventmanager::update(float delta) {
             const auto fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
             SDL_SetWindowFullscreen(window, !fullscreen);
           } break;
+#ifndef NDEBUG
+          case SDLK_D: {
+            if (event.key.mod & SDL_KMOD_CTRL) {
+              for (const auto& weak : _receivers) {
+                if (auto receiver = weak.lock(); receiver) {
+                  receiver->on_debug();
+                }
+              }
+            }
+          } break;
+#endif
           default:
             break;
         }
-
-#ifndef NDEBUG
-        case SDLK_D: {
-          if (event.key.mod & SDL_KMOD_CTRL) {
-            for (const auto& weak : _receivers) {
-              if (auto receiver = weak.lock(); receiver) {
-                receiver->on_debug();
-              }
-            }
-            break;
-          }
-        }
-#endif
+        break;
 
         const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
 

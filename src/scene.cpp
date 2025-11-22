@@ -32,12 +32,12 @@ scene::scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<sce
   _particles.reserve(ps.size());
   const auto factory = _particlesystem->factory();
   for (const auto& i : ps) {
-    const auto name = i["name"].get<std::string_view>();
+    const auto particle = i["name"].get<std::string_view>();
     const auto kind = i["kind"].get<std::string_view>();
     const auto x = i["x"].get<float>();
     const auto y = i["y"].get<float>();
     const auto emitting = i.value("emitting", true);
-    _particles.emplace(name, factory->create(kind, x, y, emitting));
+    _particles.emplace(particle, factory->create(kind, x, y, emitting));
   }
 
   const auto fs = _j.value("fonts", nlohmann::json::array());

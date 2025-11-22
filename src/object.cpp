@@ -125,7 +125,7 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
   const auto center_y = bounds.height() * 0.5f;
   const auto px = position.x() + bounds.x() + center_x;
   const auto py = position.y() + bounds.y() + center_y;
-  const auto radians = static_cast<float>(angle * DEGREES_TO_RADIANS);
+  const auto radians = static_cast<float>(angle) * DEGREES_TO_RADIANS;
 
   const auto box = b2MakeBox(hx, hy);
   const auto rotation = b2MakeRot(radians);

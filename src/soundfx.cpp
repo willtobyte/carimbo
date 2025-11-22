@@ -27,7 +27,7 @@ soundfx::soundfx(std::string_view filename) {
 
   const auto format = (channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
   const auto frequency = static_cast<ALsizei>(sample_rate);
-  const auto size = samples * channels * sizeof(short);
+  const auto size = static_cast<size_t>(samples) * static_cast<size_t>(channels) * sizeof(short);
 
   alGenBuffers(1, &_buffer);
   alBufferData(_buffer, format, decoded.get(), static_cast<ALsizei>(size), frequency);
