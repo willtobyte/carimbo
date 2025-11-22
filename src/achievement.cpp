@@ -3,10 +3,7 @@
 using namespace steam;
 
 void achievement::unlock(std::string_view id) noexcept {
-#ifndef HAS_STEAM
-  return;
-#endif
-
+#ifdef HAS_STEAM
   if (!SteamUserStats()) [[unlikely]] {
     return;
   }
@@ -21,4 +18,5 @@ void achievement::unlock(std::string_view id) noexcept {
 
   SetAchievement(ptr);
   StoreStats();
+#endif
 }
