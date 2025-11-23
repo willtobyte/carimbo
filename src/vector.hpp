@@ -93,6 +93,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result[i] = lhs[i] + rhs[i];
   }
+
   return result;
 }
 
@@ -102,6 +103,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result[i] = lhs[i] - rhs[i];
   }
+
   return result;
 }
 
@@ -111,6 +113,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result[i] = lhs[i] * scalar;
   }
+
   return result;
 }
 
@@ -125,6 +128,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result[i] = lhs[i] / scalar;
   }
+
   return result;
 }
 
@@ -133,6 +137,7 @@ constexpr auto& operator+=(vector<N>& lhs, vector<N> const& rhs) noexcept {
   for (std::size_t i = 0; i < N; ++i) {
     lhs[i] += rhs[i];
   }
+
   return lhs;
 }
 
@@ -141,6 +146,7 @@ constexpr auto& operator-=(vector<N>& lhs, vector<N> const& rhs) noexcept {
   for (std::size_t i = 0; i < N; ++i) {
     lhs[i] -= rhs[i];
   }
+
   return lhs;
 }
 
@@ -149,6 +155,7 @@ constexpr auto& operator*=(vector<N>& lhs, float scalar) noexcept {
   for (std::size_t i = 0; i < N; ++i) {
     lhs[i] *= scalar;
   }
+
   return lhs;
 }
 
@@ -157,6 +164,7 @@ constexpr auto& operator/=(vector<N>& lhs, float scalar) noexcept {
   for (std::size_t i = 0; i < N; ++i) {
     lhs[i] /= scalar;
   }
+
   return lhs;
 }
 
@@ -165,6 +173,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     if (lhs[i] != rhs[i]) return false;
   }
+
   return true;
 }
 
@@ -174,6 +183,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result[i] = -vec[i];
   }
+
   return result;
 }
 
@@ -183,6 +193,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result[i] = lhs[i] * rhs[i];
   }
+
   return result;
 }
 
@@ -191,6 +202,7 @@ constexpr auto& operator*=(vector<N>& lhs, vector<N> const& rhs) noexcept {
   for (std::size_t i = 0; i < N; ++i) {
     lhs[i] *= rhs[i];
   }
+
   return lhs;
 }
 
@@ -200,6 +212,7 @@ template <std::size_t N>
   for (std::size_t i = 0; i < N; ++i) {
     result += lhs[i] * rhs[i];
   }
+
   return result;
 }
 
