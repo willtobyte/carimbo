@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace storage {
 class cassette final {
 public:
   cassette();
@@ -28,4 +27,3 @@ private:
 };
 
 #include "cassette.tpp"
-}

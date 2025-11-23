@@ -1,7 +1,5 @@
 #include "application.hpp"
 
-using namespace framework;
-
 application::application(const int argc, char** const argv) {
 #ifdef HAS_SENTRY
   // std::atexit([] { sentry_close(); });
@@ -27,7 +25,7 @@ int application::run() {
   try {
     const char* const p = std::getenv("CARTRIDGE");
 
-    storage::filesystem::mount(p ? p : "cartridge.rom", "/");
+    filesystem::mount(p ? p : "cartridge.rom", "/");
 
     auto se = scriptengine();
     se.run();

@@ -2,13 +2,10 @@
 
 #include "common.hpp"
 
-namespace graphics {
   class font;
   class pixmappool;
   class renderer;
-}
 
-namespace graphics {
 class fontfactory final {
 public:
   fontfactory() = delete;
@@ -29,4 +26,3 @@ private:
   std::shared_ptr<pixmappool> _pixmappool;
   std::function<void()> _loop;
 };
-}

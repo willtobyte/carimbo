@@ -3,8 +3,6 @@
 #include "fonteffect.hpp"
 #include "pixmap.hpp"
 
-using namespace graphics;
-
 font::font(
   std::string_view glyphs,
   const glyphmap& map,
@@ -21,18 +19,18 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(std::string_view text, const math::vec2& position, const std::weak_ptr<fonteffect>& effect) const {
+void font::draw(std::string_view text, const vec2& position, const std::weak_ptr<fonteffect>& effect) const {
   if (text.empty()) {
     return;
   }
 
-  math::vec2 cursor = position;
+  vec2 cursor = position;
 
   const auto height = _map.begin()->second.h * _scale;
 
   for (const auto ch : text) {
     if (ch == '\n') {
-      cursor = math::vec2(position.x, cursor.y + height + _leading);
+      cursor = vec2(position.x, cursor.y + height + _leading);
       continue;
     }
 
@@ -65,7 +63,7 @@ void font::draw(std::string_view text, const math::vec2& position, const std::we
       reflection
     );
 
-    cursor = math::vec2(cursor.x + glyph.w * s + _spacing, cursor.y);
+    cursor = vec2(cursor.x + glyph.w * s + _spacing, cursor.y);
   }
 }
 

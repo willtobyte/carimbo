@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 enum class scenekind : uint8_t {
   object = 0,
   effect,
@@ -23,8 +22,8 @@ class scene {
 
     std::variant<
       std::shared_ptr<object>,
-      std::shared_ptr<audio::soundfx>,
-      std::shared_ptr<graphics::particleprops>
+      std::shared_ptr<soundfx>,
+      std::shared_ptr<particleprops>
     > get(std::string_view name, scenekind type) const;
 
     void on_enter() const;
@@ -51,20 +50,20 @@ class scene {
     std::string _name;
     nlohmann::json _j;
 
-    math::vec4 _camera;
+    vec4 _camera;
     std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
-    std::vector<std::pair<std::string, std::shared_ptr<audio::soundfx>>> _effects;
-    std::unordered_map<std::string, std::shared_ptr<graphics::particlebatch>> _particles;
+    std::vector<std::pair<std::string, std::shared_ptr<soundfx>>> _effects;
+    std::unordered_map<std::string, std::shared_ptr<particlebatch>> _particles;
 
     std::shared_ptr<scenemanager> _scenemanager;
 
     std::shared_ptr<objectmanager> _objectmanager;
-    std::shared_ptr<graphics::particlesystem> _particlesystem;
+    std::shared_ptr<particlesystem> _particlesystem;
     std::shared_ptr<resourcemanager> _resourcemanager;
 
     std::function<void()> _onenter;
     std::function<void(float)> _onloop;
-    std::function<math::vec4(float)> _oncamera;
+    std::function<vec4(float)> _oncamera;
     std::function<void()> _onleave;
     std::function<void(float, float)> _ontouch;
     std::function<void(int32_t)> _onkeypress;
@@ -82,6 +81,5 @@ class scenebackdrop : public scene {
     virtual void draw() const noexcept override;
 
   private:
-    std::shared_ptr<graphics::pixmap> _background;
+    std::shared_ptr<pixmap> _background;
 };
-}

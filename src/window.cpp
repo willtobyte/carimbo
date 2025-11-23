@@ -1,7 +1,5 @@
 #include "window.hpp"
 
-using namespace graphics;
-
 window::window(std::string_view title, int width, int height, bool fullscreen)
     : _width(width), _height(height),
       _window(unwrap(

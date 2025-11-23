@@ -5,7 +5,6 @@
 #include "singleton.hpp"
 #include "envelope.hpp"
 
-namespace framework {
 
 const constexpr auto InitialCapacity = 512uz;
 const constexpr auto ChunkSize = 64uz;
@@ -84,4 +83,3 @@ public:
 };
 
 using envelopepool = singleton<envelopepool_impl>;
-}

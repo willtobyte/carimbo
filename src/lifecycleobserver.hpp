@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 class lifecycleobserver {
 public:
   lifecycleobserver() = default;
@@ -13,4 +12,3 @@ public:
   virtual void on_begindraw();
   virtual void on_enddraw();
 };
-}

@@ -1,7 +1,5 @@
 #include "kv.hpp"
 
-using namespace memory;
-
 sol::object observable::value() const {
   return _value;
 }
@@ -22,7 +20,7 @@ void observable::unsubscribe() {
   _subscriber = nullptr;
 }
 
-std::shared_ptr<memory::observable> kv::get(std::string_view key, const sol::object& default_value) {
+std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& default_value) {
   auto [it, inserted] = _values.try_emplace(std::string{key});
 
   if (inserted) [[likely]] {

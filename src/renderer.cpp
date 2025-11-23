@@ -3,8 +3,6 @@
 #include "defer.hpp"
 #include "window.hpp"
 
-using namespace graphics;
-
 renderer::renderer(std::shared_ptr<window> window)
     : _window(std::move(window)) {
   const auto vsync =

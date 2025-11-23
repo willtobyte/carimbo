@@ -1,7 +1,5 @@
 #include "cassette.hpp"
 
-using namespace storage;
-
 cassette::cassette() {
 #ifdef EMSCRIPTEN
   const auto* const raw = emscripten_run_script_string("document.cookie");

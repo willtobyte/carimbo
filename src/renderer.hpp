@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace graphics {
 class window;
 
 class renderer final {
@@ -21,4 +20,3 @@ private:
   std::unique_ptr<SDL_Renderer, SDL_Deleter> _renderer;
   std::shared_ptr<window> _window;
 };
-}

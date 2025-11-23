@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 class envelope;
 
 struct mail final {
@@ -29,4 +28,3 @@ public:
 private:
   std::shared_ptr<envelopepool_impl> _envelopepool;
 };
-}

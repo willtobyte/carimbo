@@ -4,13 +4,12 @@
 
 #include "kv.hpp"
 
-namespace framework {
 class world;
 
 struct keyframe final {
   uint64_t duration{0};
-  math::vec2 offset;
-  math::vec4 frame;
+  vec2 offset;
+  vec4 frame;
 
   friend void from_json(const nlohmann::json& j, keyframe& o);
 };
@@ -18,16 +17,16 @@ struct keyframe final {
 struct bounds final {
   std::optional<uint8_t> type;
   std::bitset<256> reagents;
-  math::vec4 rectangle;
+  vec4 rectangle;
 
-  friend void from_json(const nlohmann::json& j, framework::bounds& o);
+  friend void from_json(const nlohmann::json& j, bounds& o);
 };
 
 struct animation final {
   bool oneshot{false};
   std::optional<std::string> next;
-  std::optional<framework::bounds> bounds;
-  std::shared_ptr<audio::soundfx> effect;
+  std::optional<bounds> bounds;
+  std::shared_ptr<soundfx> effect;
   std::vector<keyframe> keyframes;
 };
 
@@ -44,14 +43,14 @@ public:
 
   void draw() const;
 
-  math::vec2 position() const noexcept;
+  vec2 position() const noexcept;
   float x() const noexcept;
   void set_x(float x) noexcept;
   float y() const noexcept;
   void set_y(float y) noexcept;
 
   void set_placement(float x, float y) noexcept;
-  math::vec2 placement() const noexcept;
+  vec2 placement() const noexcept;
 
   void set_alpha(uint8_t alpha) noexcept;
   uint8_t alpha() const noexcept;
@@ -62,8 +61,8 @@ public:
   void set_angle(double angle) noexcept;
   double angle() const noexcept;
 
-  void set_reflection(graphics::reflection reflection) noexcept;
-  graphics::reflection reflection() const noexcept;
+  void set_reflection(reflection reflection) noexcept;
+  reflection reflection() const noexcept;
 
   bool visible() const noexcept;
   void set_visible(bool value);
@@ -84,7 +83,7 @@ public:
   void on_hover();
   void on_unhover();
 
-  memory::kv& kv() noexcept;
+  kv& kv() noexcept;
 
   uint64_t id() const noexcept;
 
@@ -102,9 +101,9 @@ private:
     std::size_t _frame{0};
     uint64_t _last_tick{0};
 
-    math::vec2 _offset;
-    math::vec4 _source;
-    math::vec4 _bounds;
+    vec2 _offset;
+    vec4 _source;
+    vec4 _bounds;
     bool _has_keyframe{false};
     bool _has_bounds{false};
 
@@ -114,7 +113,7 @@ private:
     void reset();
     bool finished() const noexcept;
     bool valid() const noexcept;
-    const math::vec4& bounds() const noexcept;
+    const vec4& bounds() const noexcept;
   };
 
   struct body final {
@@ -123,8 +122,8 @@ private:
     bool _enabled{false};
 
     struct {
-      math::vec2 position;
-      math::vec4 bounds;
+      vec2 position;
+      vec4 bounds;
       float scale{0.0f};
       double angle{0.0};
       bool valid{false};
@@ -139,25 +138,25 @@ private:
     void disable();
     bool missing() const noexcept;
     bool valid() const noexcept;
-    void sync(const math::vec4& bounds, const math::vec2& position, float scale, double angle, uint64_t id);
+    void sync(const vec4& bounds, const vec2& position, float scale, double angle, uint64_t id);
   };
 
-  math::vec2 _position;
+  vec2 _position;
   double _angle;
   float _scale;
   uint8_t _alpha;
-  graphics::reflection _reflection;
+  ::reflection _reflection;
   bool _visible{true};
   bool _dirty{true};
   mutable bool _redraw{true};
-  mutable math::vec4 _destination;
+  mutable vec4 _destination;
 
   std::string _action;
   std::optional<controller> _animation;
   body _body;
 
   uint64_t _id;
-  std::shared_ptr<graphics::pixmap> _spritesheet;
+  std::shared_ptr<pixmap> _spritesheet;
   animation_map _animations;
   std::string _kind;
 
@@ -168,6 +167,5 @@ private:
   std::function<void(std::shared_ptr<object>, std::string_view)> _onend;
   std::function<void(std::shared_ptr<object>, std::string_view)> _onmail;
   std::unordered_map<std::string, std::function<void(std::shared_ptr<object>, std::shared_ptr<object>)>, string_hash, string_equal> _collision_mapping;
-  memory::kv _kv;
+  ::kv _kv;
 };
-}

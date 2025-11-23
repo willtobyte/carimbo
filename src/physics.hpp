@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-namespace framework::physics {
+namespace physics {
 inline uint64_t userdata_to_id(void* userdata) {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata));
 }

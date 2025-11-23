@@ -15,10 +15,6 @@
 #include "soundfx.hpp"
 #include "world.hpp"
 
-using namespace framework;
-
-using namespace input::event;
-
 objectmanager::objectmanager() {
   _hovering.reserve(256);
   _objects.get<by_id>().rehash(128);
@@ -30,7 +26,7 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
       .value_or(std::string{kind});
 
   const auto filename = std::format("objects/{}.json", qualifier);
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
   const auto j = nlohmann::json::parse(buffer);
 
   const auto scale = j.value("scale", float{1.f});
@@ -41,10 +37,10 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
     const auto key = item.key();
     const auto& a = item.value();
 
-    std::optional<framework::bounds> bounds;
-    if (a.contains("bounds")) bounds.emplace(a.at("bounds").get<framework::bounds>());
+    std::optional<bounds> bounds;
+    if (a.contains("bounds")) bounds.emplace(a.at("bounds").get<::bounds>());
 
-    std::shared_ptr<audio::soundfx> effect;
+    std::shared_ptr<soundfx> effect;
     if (a.contains("effect")) {
       const auto e = a.at("effect").get<std::string_view>();
       effect = _resourcemanager->soundmanager()->get(
@@ -57,7 +53,7 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
 
     const bool oneshot = next.has_value() || a.value("oneshot", false);
 
-    auto keyframes = a.value("frames", std::vector<framework::keyframe>{});
+    auto keyframes = a.value("frames", std::vector<keyframe>{});
 
 
     animations.try_emplace(
@@ -171,8 +167,8 @@ void objectmanager::set_world(std::shared_ptr<world> world) {
   _world = std::move(world);
 }
 
-void objectmanager::on_mouse_release(const mouse::button& event) {
-  if (event.button != mouse::button::which::left) return;
+void objectmanager::on_mouse_release(const event::mouse::button& event) {
+  if (event.button != event::mouse::button::which::left) return;
 
   const auto x = event.x;
   const auto y = event.y;
@@ -193,7 +189,7 @@ void objectmanager::on_mouse_release(const mouse::button& event) {
   }
 }
 
-void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
+void objectmanager::on_mouse_motion(const event::mouse::motion& event) {
   const auto x = event.x;
   const auto y = event.y;
 
@@ -219,7 +215,7 @@ void objectmanager::on_mouse_motion(const input::event::mouse::motion& event) {
   _hovering.swap(hits);
 }
 
-void objectmanager::on_mail(const input::event::mail& event) {
+void objectmanager::on_mail(const event::mail& event) {
   if (const auto o = find(event.to); o) {
     o->on_email(event.body);
   }

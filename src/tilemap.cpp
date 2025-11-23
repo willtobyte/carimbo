@@ -12,7 +12,7 @@
 // using namespace framework;
 
 // tilemap::tilemap(
-//     geometry::size size,
+//     size size,
 //     std::shared_ptr<resourcemanager> resourcemanager,
 //     std::string_view name) {
 //   _view = { 0.f, 0.f, size.width(), size.height() };
@@ -20,7 +20,7 @@
 //   _pixmap = resourcemanager->pixmappool()->get(std::format("blobs/tilemaps/{}.png", name));
 
 //   const auto filename = std::format("tilemaps/{}.json", name);
-//   const auto& buffer = storage::io::read(filename);
+//   const auto& buffer = io::read(filename);
 //   const auto& j = nlohmann::json::parse(buffer);
 
 //   _size = j["size"].get<float>();
@@ -128,7 +128,7 @@
 //   _target = std::move(object);
 // }
 
-// void tilemap::set_camera(std::shared_ptr<graphics::camera> camera) {
+// void tilemap::set_camera(std::shared_ptr<camera> camera) {
 //   if (!camera) [[unlikely]] return;
 //   _camera = std::move(camera);
 // }
@@ -155,7 +155,7 @@
 //   }
 
 //   auto bounds =
-//     geometry::rectangle(
+//     rectangle(
 //       _target->position() + animation.bounds->rectangle.position(),
 //       animation.bounds->rectangle.size()
 //     );

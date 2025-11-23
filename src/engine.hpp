@@ -2,45 +2,44 @@
 
 #include "common.hpp"
 
-namespace framework {
-class engine final : public input::eventreceiver {
+class engine final : public eventreceiver {
 public:
   engine() = default;
   virtual ~engine() = default;
 
-  std::shared_ptr<audio::audiodevice> audiodevice() const noexcept;
-  std::shared_ptr<framework::objectmanager> objectmanager() const noexcept;
-  std::shared_ptr<input::eventmanager> eventmanager() const noexcept;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const noexcept;
-  std::shared_ptr<graphics::overlay> overlay() const noexcept;
-  std::shared_ptr<framework::resourcemanager> resourcemanager() const noexcept;
-  std::shared_ptr<framework::postalservice> postalservice() const noexcept;
-  std::shared_ptr<framework::scenemanager> scenemanager() const noexcept;
-  std::shared_ptr<framework::statemanager> statemanager() const noexcept;
-  std::shared_ptr<audio::soundmanager> soundmanager() const noexcept;
-  std::shared_ptr<graphics::window> window() const noexcept;
-  std::shared_ptr<graphics::renderer> renderer() const noexcept;
-  std::shared_ptr<graphics::canvas> canvas() const noexcept;
-  std::shared_ptr<graphics::particlesystem> particlesystem() const noexcept;
-  std::shared_ptr<storage::cassette> cassette() const noexcept;
-  std::shared_ptr<framework::timermanager> timermanager() const noexcept;
-  std::shared_ptr<framework::world> world() const noexcept;
+  std::shared_ptr<::audiodevice> audiodevice() const noexcept;
+  std::shared_ptr<::objectmanager> objectmanager() const noexcept;
+  std::shared_ptr<::eventmanager> eventmanager() const noexcept;
+  std::shared_ptr<::fontfactory> fontfactory() const noexcept;
+  std::shared_ptr<::overlay> overlay() const noexcept;
+  std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
+  std::shared_ptr<::postalservice> postalservice() const noexcept;
+  std::shared_ptr<::scenemanager> scenemanager() const noexcept;
+  std::shared_ptr<::statemanager> statemanager() const noexcept;
+  std::shared_ptr<::soundmanager> soundmanager() const noexcept;
+  std::shared_ptr<::window> window() const noexcept;
+  std::shared_ptr<::renderer> renderer() const noexcept;
+  std::shared_ptr<::canvas> canvas() const noexcept;
+  std::shared_ptr<::particlesystem> particlesystem() const noexcept;
+  std::shared_ptr<::cassette> cassette() const noexcept;
+  std::shared_ptr<::timermanager> timermanager() const noexcept;
+  std::shared_ptr<::world> world() const noexcept;
 
-  void set_audiodevice(std::shared_ptr<audio::audiodevice> audiodevice);
-  void set_objectmanager(std::shared_ptr<framework::objectmanager> objectmanager);
-  void set_eventmanager(std::shared_ptr<input::eventmanager> eventmanager);
-  void set_overlay(std::shared_ptr<graphics::overlay> overlay);
-  void set_resourcemanager(std::shared_ptr<framework::resourcemanager> resourcemanager);
-  void set_scenemanager(std::shared_ptr<framework::scenemanager> scenemanager);
-  void set_particlesystem(std::shared_ptr<graphics::particlesystem> particlesystem);
-  void set_postalservice(std::shared_ptr<framework::postalservice> postalservice);
-  void set_statemanager(std::shared_ptr<framework::statemanager> statemanager);
-  void set_window(std::shared_ptr<graphics::window> window);
-  void set_world(std::shared_ptr<framework::world> world);
-  void set_renderer(std::shared_ptr<graphics::renderer> renderer);
-  void set_timermanager(std::shared_ptr<framework::timermanager> timermanager);
+  void set_audiodevice(std::shared_ptr<::audiodevice> ptr);
+  void set_objectmanager(std::shared_ptr<::objectmanager> ptr);
+  void set_eventmanager(std::shared_ptr<::eventmanager> ptr);
+  void set_overlay(std::shared_ptr<::overlay> ptr);
+  void set_resourcemanager(std::shared_ptr<::resourcemanager> ptr);
+  void set_scenemanager(std::shared_ptr<::scenemanager> ptr);
+  void set_particlesystem(std::shared_ptr<::particlesystem> ptr);
+  void set_postalservice(std::shared_ptr<::postalservice> ptr);
+  void set_statemanager(std::shared_ptr<::statemanager> ptr);
+  void set_window(std::shared_ptr<::window> ptr);
+  void set_world(std::shared_ptr<::world> ptr);
+  void set_renderer(std::shared_ptr<::renderer> ptr);
+  void set_timermanager(std::shared_ptr<::timermanager> ptr);
 
-  void add_loopable(std::shared_ptr<loopable> loopable);
+  void add_loopable(std::shared_ptr<::loopable> ptr);
 
   void run();
 
@@ -58,22 +57,21 @@ private:
 
 private:
   std::atomic<bool> _running{true};
-  std::shared_ptr<audio::audiodevice> _audiodevice;
-  std::shared_ptr<framework::objectmanager> _objectmanager;
-  std::shared_ptr<input::eventmanager> _eventmanager;
-  std::vector<std::shared_ptr<loopable>> _loopables;
-  std::shared_ptr<graphics::overlay> _overlay;
-  std::shared_ptr<framework::resourcemanager> _resourcemanager;
-  std::shared_ptr<framework::postalservice> _postalservice;
-  std::shared_ptr<framework::scenemanager> _scenemanager;
-  std::shared_ptr<framework::statemanager> _statemanager;
-  std::shared_ptr<graphics::renderer> _renderer;
-  std::shared_ptr<graphics::canvas> _canvas;
-  std::shared_ptr<graphics::particlesystem> _particlesystem;
-  std::shared_ptr<graphics::window> _window;
-  std::shared_ptr<framework::world> _world;
-  std::vector<std::shared_ptr<framework::lifecycleobserver>> _observers;
-  std::shared_ptr<framework::timermanager> _timermanager;
-  std::shared_ptr<storage::cassette> _cassette = std::make_shared<storage::cassette>();
+  std::shared_ptr<::audiodevice> _audiodevice;
+  std::shared_ptr<::objectmanager> _objectmanager;
+  std::shared_ptr<::eventmanager> _eventmanager;
+  std::vector<std::shared_ptr<::loopable>> _loopables;
+  std::shared_ptr<::overlay> _overlay;
+  std::shared_ptr<::resourcemanager> _resourcemanager;
+  std::shared_ptr<::postalservice> _postalservice;
+  std::shared_ptr<::scenemanager> _scenemanager;
+  std::shared_ptr<::statemanager> _statemanager;
+  std::shared_ptr<::renderer> _renderer;
+  std::shared_ptr<::canvas> _canvas;
+  std::shared_ptr<::particlesystem> _particlesystem;
+  std::shared_ptr<::window> _window;
+  std::shared_ptr<::world> _world;
+  std::vector<std::shared_ptr<::lifecycleobserver>> _observers;
+  std::shared_ptr<::timermanager> _timermanager;
+  std::shared_ptr<::cassette> _cassette = std::make_shared<::cassette>();
 };
-}

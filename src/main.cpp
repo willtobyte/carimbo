@@ -15,6 +15,6 @@ int main(int argc, char **argv) {
 #endif
 #endif
 
-  framework::application app(argc, argv);
+  application app(argc, argv);
   return app.run();
 }

@@ -1,7 +1,5 @@
 #include "scriptengine.hpp"
 
-using namespace framework;
-using namespace interop;
 
 static int on_panic(lua_State* L) {
   const auto* message = lua_tostring(L, -1);
@@ -33,15 +31,15 @@ static sol::object searcher(sol::this_state state, std::string_view module) {
   sol::state_view lua{state};
 
   const auto filename = std::format("scripts/{}.lua", module);
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
 
   const auto loader = lua.load(script, std::format("@{}", filename));
-  verify(loader);
+  interop::verify(loader);
   return sol::make_object(lua, loader.get<sol::protected_function>());
 }
 
-class lua_loopable final : public framework::loopable {
+class lua_loopable final : public loopable {
 public:
   explicit lua_loopable(const sol::state_view lua) : _L(lua) {}
 
@@ -186,7 +184,7 @@ struct sentinel final {
   }
 };
 
-void framework::scriptengine::run() {
+void scriptengine::run() {
   const auto start = SDL_GetPerformanceCounter();
 
   sol::state lua;
@@ -260,22 +258,22 @@ void framework::scriptengine::run() {
 
   lua["achievement"] = &achievement;
 
-  platform::desktop desktop;
+  desktop desktop;
 
-  lua.new_usertype<platform::desktop>(
+  lua.new_usertype<::desktop>(
     "Desktop",
-    "folder", &platform::desktop::folder
+    "folder", &desktop::folder
   );
 
   lua["desktop"] = &desktop;
 
-  platform::operatingsystem operatingsystem;
+  operatingsystem operatingsystem;
 
-  lua.new_usertype<platform::operatingsystem>(
+  lua.new_usertype<::operatingsystem>(
     "OperatingSystem",
-    "compute", &platform::operatingsystem::compute,
-    "memory", &platform::operatingsystem::memory,
-    "name", &platform::operatingsystem::name
+    "compute", &operatingsystem::compute,
+    "memory", &operatingsystem::memory,
+    "name", &operatingsystem::name
   );
 
   lua["operatingsystem"] = &operatingsystem;
@@ -298,107 +296,107 @@ void framework::scriptengine::run() {
     }
   );
 
-  lua.new_usertype<audio::soundfx>(
+  lua.new_usertype<soundfx>(
     "SoundFX",
     sol::no_constructor,
-     "play", [](audio::soundfx& self, std::optional<bool> loop_opt) {
+     "play", [](soundfx& self, std::optional<bool> loop_opt) {
        auto loop = loop_opt.value_or(false);
        self.play(loop);
      },
-     "stop", &audio::soundfx::stop,
-     "volume", sol::property(&audio::soundfx::volume, &audio::soundfx::set_volume),
-     "on_begin", &audio::soundfx::set_onbegin,
-     "on_end", &audio::soundfx::set_onend
+     "stop", &soundfx::stop,
+     "volume", sol::property(&soundfx::volume, &soundfx::set_volume),
+     "on_begin", &soundfx::set_onbegin,
+     "on_end", &soundfx::set_onend
   );
 
-  lua.new_usertype<audio::soundmanager>(
+  lua.new_usertype<soundmanager>(
     "SoundManager",
     sol::no_constructor,
     "play", [](
-      audio::soundmanager& self,
+      soundmanager& self,
       std::string_view name,
       std::optional<bool> loop_opt
     ) {
       auto loop = loop_opt.value_or(false);
       self.play(name, loop);
     },
-    "stop", &audio::soundmanager::stop
+    "stop", &soundmanager::stop
   );
 
   lua.new_enum(
     "SceneKind",
-    "object", framework::scenekind::object,
-    "effect", framework::scenekind::effect,
-    "particle", framework::scenekind::particle
+    "object", scenekind::object,
+    "effect", scenekind::effect,
+    "particle", scenekind::particle
   );
 
   lua.new_enum(
     "Controller",
-    "up", input::event::gamepad::button::up,
-    "down", input::event::gamepad::button::down,
-    "left", input::event::gamepad::button::left,
-    "right", input::event::gamepad::button::right,
-    "north", input::event::gamepad::button::north,
-    "east", input::event::gamepad::button::east,
-    "south", input::event::gamepad::button::south,
-    "west", input::event::gamepad::button::west
+    "up", event::gamepad::button::up,
+    "down", event::gamepad::button::down,
+    "left", event::gamepad::button::left,
+    "right", event::gamepad::button::right,
+    "north", event::gamepad::button::north,
+    "east", event::gamepad::button::east,
+    "south", event::gamepad::button::south,
+    "west", event::gamepad::button::west
   );
 
   lua.new_enum(
     "Reflection",
-    "none", graphics::reflection::none,
-    "horizontal", graphics::reflection::horizontal,
-    "vertical", graphics::reflection::vertical,
-    "both", graphics::reflection::both
+    "none", reflection::none,
+    "horizontal", reflection::horizontal,
+    "vertical", reflection::vertical,
+    "both", reflection::both
   );
 
   struct metaobject {
-    static sol::object index(framework::object& self, sol::stack_object key, sol::this_state state) {
+    static sol::object index(object& self, sol::stack_object key, sol::this_state state) {
       auto& store = self.kv();
       const auto ptr = store.get(key.as<std::string>());
       return sol::make_object(state, std::ref(*ptr));
     }
 
-    static void new_index(framework::object& self, sol::stack_object key, sol::stack_object value) {
+    static void new_index(object& self, sol::stack_object key, sol::stack_object value) {
       auto& store = self.kv();
       store.set(key.as<std::string>(), value);
     }
   };
 
-  lua.new_usertype<memory::observable>(
+  lua.new_usertype<observable>(
     "Observable",
     sol::no_constructor,
-    "value", sol::property(&memory::observable::value),
-    "set", &memory::observable::set,
-    "subscribe", &memory::observable::subscribe,
-    "unsubscribe", &memory::observable::unsubscribe
+    "value", sol::property(&observable::value),
+    "set", &observable::set,
+    "subscribe", &observable::subscribe,
+    "unsubscribe", &observable::unsubscribe
   );
 
-  lua.new_usertype<framework::object>(
+  lua.new_usertype<object>(
     "Object",
     sol::no_constructor,
-    "id", sol::property(&framework::object::id),
-    "kind", sol::property(&framework::object::kind),
-    "x", sol::property(&framework::object::x, &framework::object::set_x),
-    "y", sol::property(&framework::object::y, &framework::object::set_y),
-    "alpha", sol::property(&framework::object::alpha, &framework::object::set_alpha),
-    "scale", sol::property(&framework::object::scale, &framework::object::set_scale),
-    "angle", sol::property(&framework::object::angle, &framework::object::set_angle),
-    "reflection", sol::property(&framework::object::reflection, &framework::object::set_reflection),
-    "visible", sol::property(&framework::object::visible, &framework::object::set_visible),
-    "on_begin", &framework::object::set_onbegin,
-    "on_end", &framework::object::set_onend,
-    "on_mail", &framework::object::set_onmail,
-    "on_touch", &framework::object::set_ontouch,
-    "on_hover", &framework::object::set_onhover,
-    "on_unhover", &framework::object::set_onunhover,
-    "on_collision", &framework::object::set_oncollision,
-    "action", sol::property(&framework::object::action, &framework::object::set_action),
+    "id", sol::property(&object::id),
+    "kind", sol::property(&object::kind),
+    "x", sol::property(&object::x, &object::set_x),
+    "y", sol::property(&object::y, &object::set_y),
+    "alpha", sol::property(&object::alpha, &object::set_alpha),
+    "scale", sol::property(&object::scale, &object::set_scale),
+    "angle", sol::property(&object::angle, &object::set_angle),
+    "reflection", sol::property(&object::reflection, &object::set_reflection),
+    "visible", sol::property(&object::visible, &object::set_visible),
+    "on_begin", &object::set_onbegin,
+    "on_end", &object::set_onend,
+    "on_mail", &object::set_onmail,
+    "on_touch", &object::set_ontouch,
+    "on_hover", &object::set_onhover,
+    "on_unhover", &object::set_onunhover,
+    "on_collision", &object::set_oncollision,
+    "action", sol::property(&object::action, &object::set_action),
     "placement", sol::property(
-      [](framework::object& o) {
+      [](object& o) {
         return o.placement();
       },
-      [](framework::object& self, sol::table table) {
+      [](object& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
 
@@ -409,11 +407,11 @@ void framework::scriptengine::run() {
     sol::meta_function::new_index, metaobject::new_index
   );
 
-  lua.new_usertype<framework::objectmanager>(
+  lua.new_usertype<objectmanager>(
     "ObjectManager",
     sol::no_constructor,
     "create", [](
-      framework::objectmanager& self,
+      objectmanager& self,
       std::string_view kind,
       sol::optional<std::string> scope_opt,
       sol::optional<bool> manage_opt
@@ -425,23 +423,23 @@ void framework::scriptengine::run() {
 
       return self.create(kind, *scope_opt, manage);
     },
-    "clone", &framework::objectmanager::clone,
-    "remove", &framework::objectmanager::remove
+    "clone", &objectmanager::clone,
+    "remove", &objectmanager::remove
   );
 
-  lua.new_usertype<framework::resourcemanager>(
+  lua.new_usertype<resourcemanager>(
     "ResourceManager",
     sol::no_constructor,
-    "flush", [&lua](framework::resourcemanager& self) {
+    "flush", [&lua](resourcemanager& self) {
       lua.collect_garbage();
       self.flush();
     },
     "prefetch", sol::overload(
-        [](framework::resourcemanager& self) {
+        [](resourcemanager& self) {
           self.prefetch();
         },
 
-        [](framework::resourcemanager& self, sol::table table) {
+        [](resourcemanager& self, sol::table table) {
           std::vector<std::string> filenames;
           filenames.reserve(table.size());
           for (const auto& [key, value] : table) {
@@ -450,7 +448,7 @@ void framework::scriptengine::run() {
           self.prefetch(std::move(filenames));
         },
 
-        [](framework::resourcemanager& self, sol::variadic_args arguments) {
+        [](resourcemanager& self, sol::variadic_args arguments) {
           std::vector<std::string> filenames;
           filenames.reserve(arguments.size());
           for (const auto& value : arguments) {
@@ -463,9 +461,9 @@ void framework::scriptengine::run() {
 
   struct playerwrapper {
     uint8_t index;
-    const framework::statemanager* e;
+    const statemanager* e;
 
-    bool on(input::event::gamepad::button type) {
+    bool on(event::gamepad::button type) {
       return e->on(index, type);
     }
   };
@@ -478,17 +476,17 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "Player",
-    "one", input::event::player::one,
-    "two", input::event::player::two
+    "one", event::player::one,
+    "two", event::player::two
   );
 
-  lua.new_usertype<framework::statemanager>(
+  lua.new_usertype<statemanager>(
     "StateManager",
     sol::no_constructor,
     "players", sol::property(&statemanager::players),
     "player", [cache = std::make_shared<std::unordered_map<uint8_t, playerwrapper>>()](
-      framework::statemanager& self,
-      input::event::player player
+      statemanager& self,
+      event::player player
     ) mutable {
       auto index = static_cast<uint8_t>(player);
       auto it = cache->find(index);
@@ -500,20 +498,20 @@ void framework::scriptengine::run() {
     }
   );
 
-  lua.new_usertype<framework::scene>(
+  lua.new_usertype<scene>(
     "Scene",
     sol::no_constructor,
-    "name", sol::property(&framework::scene::name)
+    "name", sol::property(&scene::name)
   );
 
-  lua.new_usertype<framework::scenemanager>(
+  lua.new_usertype<scenemanager>(
     "SceneManager",
     sol::no_constructor,
-    "current", sol::property(&framework::scenemanager::current),
-    "set", &framework::scenemanager::set,
-    "get", &framework::scenemanager::get,
+    "current", sol::property(&scenemanager::current),
+    "set", &scenemanager::set,
+    "get", &scenemanager::get,
     "destroy", [&lua](
-      framework::scenemanager& self,
+      scenemanager& self,
       std::string_view name
     ) {
       const auto scenes = self.query(name);
@@ -532,7 +530,7 @@ void framework::scriptengine::run() {
       lua.collect_garbage();
     },
     "register", [&lua](
-      framework::scenemanager& self,
+      scenemanager& self,
       std::string_view name
     ) {
       const auto start = SDL_GetPerformanceCounter();
@@ -544,22 +542,22 @@ void framework::scriptengine::run() {
         }
 
         const auto filename = std::format("scenes/{}.lua", name);
-        const auto buffer = storage::io::read(filename);
+        const auto buffer = io::read(filename);
         std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
         const auto result = lua.load(script, std::format("@{}", filename));
-        verify(result);
+        interop::verify(result);
         const auto pf = result.get<sol::protected_function>();
         const auto exec = pf();
-        verify(exec);
+        interop::verify(exec);
         auto module = exec.get<sol::table>();
 
         auto loaded = lua["package"]["loaded"];
         loaded[std::format("scenes/{}", name)] = module;
-        auto ptr = std::weak_ptr<framework::scene>(scene);
+        auto ptr = std::weak_ptr<::scene>(scene);
 
 
 
-        module["get"] = [ptr, name](sol::table, std::string_view id, framework::scenekind kind) {
+        module["get"] = [ptr, name](sol::table, std::string_view id, ::scenekind kind) {
           if (auto scene = ptr.lock()) [[likely]] {
             return scene->get(id, kind);
           }
@@ -649,12 +647,12 @@ void framework::scriptengine::run() {
 
   lua.new_enum(
     "WidgetType",
-    "cursor", graphics::widgettype::cursor,
-    "label", graphics::widgettype::label
+    "cursor", ::widgettype::cursor,
+    "label", ::widgettype::label
   );
 
   struct cursorproxy {
-    graphics::overlay& o;
+    overlay& o;
 
     void set(std::string_view name) { o.set_cursor(name); }
 
@@ -668,25 +666,25 @@ void framework::scriptengine::run() {
     "hide", &cursorproxy::hide
   );
 
-  lua.new_usertype<graphics::overlay>(
+  lua.new_usertype<overlay>(
     "Overlay",
     sol::no_constructor,
-    "create", &graphics::overlay::create,
-    "destroy", &graphics::overlay::destroy,
-    "dispatch", &graphics::overlay::dispatch,
-    "cursor", sol::property([](graphics::overlay& o) { return cursorproxy{o}; })
+    "create", &overlay::create,
+    "destroy", &overlay::destroy,
+    "dispatch", &overlay::dispatch,
+    "cursor", sol::property([](overlay& o) { return cursorproxy{o}; })
   );
 
-  lua.new_usertype<graphics::particleprops>(
+  lua.new_usertype<particleprops>(
     "ParticleProps",
     sol::no_constructor,
-    "active", sol::property(&graphics::particleprops::active),
-    "emitting", sol::property(&graphics::particleprops::emitting),
+    "active", sol::property(&particleprops::active),
+    "emitting", sol::property(&particleprops::emitting),
     "placement", sol::property(
       []() {
         return nullptr;
       },
-      [](graphics::particleprops& self, sol::table table) {
+      [](particleprops& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
 
@@ -695,91 +693,91 @@ void framework::scriptengine::run() {
     )
   );
 
-  lua.new_usertype<graphics::particlefactory>(
+  lua.new_usertype<particlefactory>(
     "ParticleFactory",
     sol::no_constructor,
-    "create", &graphics::particlefactory::create
+    "create", &particlefactory::create
   );
 
-  lua.new_usertype<graphics::particlesystem>(
+  lua.new_usertype<particlesystem>(
     "ParticleSystem",
     sol::no_constructor,
-    "factory", sol::property(&graphics::particlesystem::factory),
-    "add", &graphics::particlesystem::add,
-    "clear", &graphics::particlesystem::clear,
-    "set", &graphics::particlesystem::set
+    "factory", sol::property(&particlesystem::factory),
+    "add", &particlesystem::add,
+    "clear", &particlesystem::clear,
+    "set", &particlesystem::set
   );
 
-  lua.new_usertype<framework::engine>(
+  lua.new_usertype<engine>(
     "Engine",
     sol::no_constructor,
-    "canvas", &framework::engine::canvas,
-    "cassette", &framework::engine::cassette,
-    "objectmanager", &framework::engine::objectmanager,
-    "fontfactory", &framework::engine::fontfactory,
-    "overlay", &framework::engine::overlay,
-    "resourcemanager", &framework::engine::resourcemanager,
-    "soundmanager", &framework::engine::soundmanager,
-    "statemanager", &framework::engine::statemanager,
-    "scenemanager", &framework::engine::scenemanager,
-    "timermanager", &framework::engine::timermanager,
-    "particlesystem", &framework::engine::particlesystem,
-    "world", &framework::engine::world,
-    "run", &framework::engine::run
+    "canvas", &engine::canvas,
+    "cassette", &engine::cassette,
+    "objectmanager", &engine::objectmanager,
+    "fontfactory", &engine::fontfactory,
+    "overlay", &engine::overlay,
+    "resourcemanager", &engine::resourcemanager,
+    "soundmanager", &engine::soundmanager,
+    "statemanager", &engine::statemanager,
+    "scenemanager", &engine::scenemanager,
+    "timermanager", &engine::timermanager,
+    "particlesystem", &engine::particlesystem,
+    "world", &engine::world,
+    "run", &engine::run
   );
 
-  lua.new_usertype<framework::world>(
+  lua.new_usertype<world>(
     "World",
     sol::no_constructor,
-    "collides", &framework::world::collides
+    "collides", &world::collides
   );
 
   lua.new_enum(
     "FontEffect",
-    "fadein", graphics::fonteffect::type::fadein
+    "fadein", fonteffect::type::fadein
   );
 
-  lua.new_usertype<graphics::font>(
+  lua.new_usertype<font>(
     "Font",
     sol::no_constructor,
-    "glyphs", sol::property(&graphics::font::glyphs)
+    "glyphs", sol::property(&font::glyphs)
   );
 
-  lua.new_usertype<framework::enginefactory>(
+  lua.new_usertype<enginefactory>(
     "EngineFactory",
-    sol::constructors<framework::enginefactory()>(),
-    "with_title", &framework::enginefactory::with_title,
-    "with_width", &framework::enginefactory::with_width,
-    "with_height", &framework::enginefactory::with_height,
-    "with_scale", &framework::enginefactory::with_scale,
-    "with_gravity", &framework::enginefactory::with_gravity,
-    "with_fullscreen", &framework::enginefactory::with_fullscreen,
-    "with_sentry", &framework::enginefactory::with_sentry,
-    "create", &framework::enginefactory::create
+    sol::constructors<enginefactory()>(),
+    "with_title", &enginefactory::with_title,
+    "with_width", &enginefactory::with_width,
+    "with_height", &enginefactory::with_height,
+    "with_scale", &enginefactory::with_scale,
+    "with_gravity", &enginefactory::with_gravity,
+    "with_fullscreen", &enginefactory::with_fullscreen,
+    "with_sentry", &enginefactory::with_sentry,
+    "create", &enginefactory::create
   );
 
-  lua.new_usertype<math::vec2>(
+  lua.new_usertype<vec2>(
     "Vec2",
-    sol::constructors<math::vec2(), math::vec2(float, float)>(),
-    "x", &math::vec2::x,
-    "y", &math::vec2::y
+    sol::constructors<vec2(), vec2(float, float)>(),
+    "x", &vec2::x,
+    "y", &vec2::y
   );
 
-  lua.new_usertype<math::vec4>(
+  lua.new_usertype<vec4>(
     "Vec4",
-    sol::constructors<math::vec4(), math::vec4(float, float, float, float)>(),
-    "x", &math::vec4::x,
-    "y", &math::vec4::y,
-    "width", &math::vec4::w,
-    "height", &math::vec4::h
+    sol::constructors<vec4(), vec4(float, float, float, float)>(),
+    "x", &vec4::x,
+    "y", &vec4::y,
+    "width", &vec4::w,
+    "height", &vec4::h
   );
 
-  lua.new_usertype<storage::cassette>(
+  lua.new_usertype<cassette>(
     "Cassette",
     sol::no_constructor,
-    "clear", &storage::cassette::clear,
+    "clear", &cassette::clear,
     "set", [](
-      storage::cassette& self,
+      cassette& self,
       std::string_view key,
       sol::object value
     ) {
@@ -810,7 +808,7 @@ void framework::scriptengine::run() {
       }
     },
     "get", [](
-      const storage::cassette& self,
+      const cassette& self,
       std::string_view key,
       sol::object default_value,
       sol::this_state state
@@ -838,29 +836,29 @@ void framework::scriptengine::run() {
     }
   );
 
-  lua.new_usertype<graphics::color>(
+  lua.new_usertype<color>(
     "Color",
-    "color", sol::constructors<graphics::color(std::string_view)>(),
+    "color", sol::constructors<color(std::string_view)>(),
 
-    "r", sol::property(&graphics::color::r, &graphics::color::set_r),
-    "g", sol::property(&graphics::color::g, &graphics::color::set_g),
-    "b", sol::property(&graphics::color::b, &graphics::color::set_b),
-    "a", sol::property(&graphics::color::a, &graphics::color::set_a),
+    "r", sol::property(&color::r, &color::set_r),
+    "g", sol::property(&color::g, &color::set_g),
+    "b", sol::property(&color::b, &color::set_b),
+    "a", sol::property(&color::a, &color::set_a),
 
-    sol::meta_function::equal_to, &graphics::color::operator==
+    sol::meta_function::equal_to, &color::operator==
   );
 
   lua.new_enum(
     "KeyEvent",
-    "up", input::event::keyboard::key::up,
-    "left", input::event::keyboard::key::left,
-    "down", input::event::keyboard::key::down,
-    "right", input::event::keyboard::key::right,
-    "space", input::event::keyboard::key::space,
+    "up", event::keyboard::key::up,
+    "left", event::keyboard::key::left,
+    "down", event::keyboard::key::down,
+    "right", event::keyboard::key::right,
+    "space", event::keyboard::key::space,
 
-    "backspace", input::event::keyboard::key::backspace,
-    "enter", input::event::keyboard::key::enter,
-    "escape", input::event::keyboard::key::escape
+    "backspace", event::keyboard::key::backspace,
+    "enter", event::keyboard::key::enter,
+    "escape", event::keyboard::key::escape
   );
 
   struct mouse final {
@@ -907,7 +905,7 @@ void framework::scriptengine::run() {
     "x", sol::property(&mouse::x),
     "y", sol::property(&mouse::y),
     "xy", &mouse::xy,
-    "button", sol::property(&mouse::button)
+    "button", sol::readonly_property(&mouse::button)
   );
 
   lua["mouse"] = mouse{};
@@ -983,45 +981,45 @@ void framework::scriptengine::run() {
 
   lua["keyboard"] = keyboard{};
 
-  lua.new_usertype<framework::mail>(
+  lua.new_usertype<mail>(
     "Mail",
-    sol::constructors<framework::mail(
-      std::shared_ptr<framework::object>,
-      std::optional<std::shared_ptr<framework::object>>,
+    sol::constructors<mail(
+      std::shared_ptr<object>,
+      std::optional<std::shared_ptr<object>>,
       std::string_view
     )>()
   );
 
-  lua.new_usertype<framework::postalservice>(
+  lua.new_usertype<postalservice>(
     "PostalService",
-    sol::constructors<framework::postalservice()>(),
-    "post", &framework::postalservice::post
+    sol::constructors<postalservice()>(),
+    "post", &postalservice::post
   );
 
-  lua.new_usertype<framework::timermanager>(
+  lua.new_usertype<timermanager>(
     "TimerManager",
     sol::no_constructor,
-    "cancel", &framework::timermanager::cancel,
-    "clear", &framework::timermanager::clear,
-    "set", &framework::timermanager::set,
-    "singleshot", &framework::timermanager::singleshot
+    "cancel", &timermanager::cancel,
+    "clear", &timermanager::clear,
+    "set", &timermanager::set,
+    "singleshot", &timermanager::singleshot
   );
 
-  lua.new_usertype<graphics::label>(
+  lua.new_usertype<label>(
     "Label",
     sol::no_constructor,
-    sol::base_classes, sol::bases<graphics::widget>(),
-    "font", sol::property(&graphics::label::set_font),
+    sol::base_classes, sol::bases<widget>(),
+    "font", sol::property(&label::set_font),
     "set", sol::overload(
       [](
-        std::shared_ptr<graphics::label> self,
+        std::shared_ptr<label> self,
         float x,
         float y
       ) {
         self->set(x, y);
       },
       [](
-        std::shared_ptr<graphics::label> self,
+        std::shared_ptr<label> self,
         std::string_view text,
         float x,
         float y
@@ -1029,26 +1027,26 @@ void framework::scriptengine::run() {
         self->set(text, x, y);
       }
     ),
-    "effect", sol::property(&graphics::label::set_effect),
-    "clear", &graphics::label::clear
+    "effect", sol::property(&label::set_effect),
+    "clear", &label::clear
   );
 
-  lua.new_usertype<graphics::widget>(
+  lua.new_usertype<widget>(
     "Widget",
     sol::no_constructor
   );
 
-  lua.new_usertype<graphics::fontfactory>(
+  lua.new_usertype<fontfactory>(
     "FontFactory",
     sol::no_constructor,
-    "get", &graphics::fontfactory::get
+    "get", &fontfactory::get
   );
 
-  lua.new_usertype<graphics::canvas>(
+  lua.new_usertype<canvas>(
     "Canvas",
     sol::no_constructor,
-    "clear", &graphics::canvas::clear,
-    "pixels", sol::property(&graphics::canvas::set_pixels)
+    "clear", &canvas::clear,
+    "pixels", sol::property(&canvas::set_pixels)
   );
 
   std::println("Powered by Carimbo: https://carimbo.site");
@@ -1068,12 +1066,12 @@ void framework::scriptengine::run() {
   lua.script(bootstrap, "@bootstrap");
   lua.script(debugger, "@debugger");
 
-  const auto buffer = storage::io::read("scripts/main.lua");
+  const auto buffer = io::read("scripts/main.lua");
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
   const auto source = lua.safe_script(script, "@main.lua");
-  verify(source);
+  interop::verify(source);
 
-  const auto engine = lua["engine"].get<std::shared_ptr<framework::engine>>();
+  const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
   lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
@@ -1096,7 +1094,7 @@ void framework::scriptengine::run() {
 
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
-  verify(result);
+  interop::verify(result);
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
 
   const auto end = SDL_GetPerformanceCounter();

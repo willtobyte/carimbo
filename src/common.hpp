@@ -50,18 +50,14 @@
 #include <variant>
 #include <vector>
 
-#include "concepts.hpp"
 #include "constant.hpp"
 #include "defer.hpp"
 #include "helper.hpp"
 
-namespace audio {
   class audiodevice;
   class soundfx;
   class soundmanager;
-}
 
-namespace framework {
   class application;
   class engine;
   class enginefactory;
@@ -81,11 +77,7 @@ namespace framework {
   struct mailenvelope;
   struct timerenvelope;
   class envelope;
-}
 
-
-
-namespace graphics {
   class canvas;
   class color;
   class cursor;
@@ -101,35 +93,22 @@ namespace graphics {
   class tilemap;
   class window;
   enum class reflection : int;
-}
 
-namespace input {
   class eventmanager;
   class eventreceiver;
-}
 
-namespace storage {
   class cassette;
   class filesystem;
-}
 
-namespace memory {
   class kv;
-}
 
-namespace platform {
   class desktop;
   class operatingsystem;
-}
 
 namespace steam {
   class achievement;
 }
 
-namespace i18n {
   class locales;
-}
 
-namespace widget {
   class widget;
-}

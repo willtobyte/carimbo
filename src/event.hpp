@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace input {
 namespace event {
 enum player : uint8_t {
   one = 0,
@@ -91,5 +90,4 @@ struct mail final {
   uint64_t to;
   std::string body;
 };
-}
 }

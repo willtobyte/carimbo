@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 class engine;
 
 class enginefactory final {
@@ -28,4 +27,3 @@ private:
   float _gravity{9.8f};
   bool _fullscreen{false};
 };
-}

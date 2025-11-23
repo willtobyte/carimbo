@@ -8,8 +8,6 @@
 #include "soundfx.hpp"
 #include "tilemap.hpp"
 
-using namespace framework;
-
 scene::scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
     : _name(name),
       _j(j),
@@ -102,8 +100,8 @@ std::string_view scene::name() const noexcept {
 
 std::variant<
   std::shared_ptr<object>,
-  std::shared_ptr<audio::soundfx>,
-  std::shared_ptr<graphics::particleprops>
+  std::shared_ptr<soundfx>,
+  std::shared_ptr<particleprops>
 > scene::get(std::string_view id, scenekind kind) const {
   if (kind == scenekind::object) {
     for (const auto& [key, object] : _objects) {
@@ -195,7 +193,7 @@ void scene::set_onloop(sol::protected_function fn) {
 }
 
 void scene::set_oncamera(sol::protected_function fn) {
-  _oncamera = interop::wrap_fn<math::vec4(float)>(std::move(fn));
+  _oncamera = interop::wrap_fn<vec4(float)>(std::move(fn));
 }
 
 void scene::set_onleave(std::function<void()>&& fn) {

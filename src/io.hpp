@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace storage {
 class io final {
 public:
   io() = delete;
@@ -12,4 +11,3 @@ public:
 
   static std::vector<std::string> enumerate(std::string_view directory);
 };
-}

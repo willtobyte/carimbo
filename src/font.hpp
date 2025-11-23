@@ -2,10 +2,9 @@
 
 #include "common.hpp"
 
-namespace graphics {
 class pixmap;
 
-using glyphmap = std::map<char, math::vec4>;
+using glyphmap = std::map<char, vec4>;
 
 class font final {
 public:
@@ -22,7 +21,7 @@ public:
 
   ~font() = default;
 
-  void draw(std::string_view text, const math::vec2& position, const std::weak_ptr<fonteffect>& effect) const;
+  void draw(std::string_view text, const vec2& position, const std::weak_ptr<fonteffect>& effect) const;
 
   std::string_view glyphs() const;
 
@@ -34,4 +33,3 @@ private:
   std::string _glyphs;
   std::shared_ptr<pixmap> _pixmap;
 };
-}

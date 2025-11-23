@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 class objectmanager;
 
 [[nodiscard]] constexpr b2AABB to_aabb(const float x0, const float y0, const float x1, const float y1) noexcept {
@@ -26,7 +25,7 @@ template <class OutIt>
 
 class world final {
 public:
-  explicit world(std::shared_ptr<graphics::renderer> renderer);
+  explicit world(std::shared_ptr<renderer> renderer);
   ~world();
 
   template <class OutIt>
@@ -65,10 +64,9 @@ protected:
 private:
   b2WorldId _world;
   float _accumulator{.0f};
-  std::shared_ptr<graphics::renderer> _renderer;
+  std::shared_ptr<renderer> _renderer;
   std::weak_ptr<objectmanager> _objectmanager;
   std::unordered_set<std::pair<uint64_t, uint64_t>, boost::hash<std::pair<uint64_t, uint64_t>>> _collisions;
 
   std::shared_ptr<envelopepool_impl> _envelopepool = envelopepool::instance();
 };
-}

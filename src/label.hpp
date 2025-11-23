@@ -5,7 +5,6 @@
 #include "font.hpp"
 #include "widget.hpp"
 
-namespace graphics {
 
 class label final : public widget {
 public:
@@ -29,7 +28,6 @@ public:
 private:
   std::shared_ptr<font> _font;
   std::string _text;
-  math::vec2 _position;
+  vec2 _position;
   std::shared_ptr<fonteffect> _effect;
 };
-}

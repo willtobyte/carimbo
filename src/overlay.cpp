@@ -7,9 +7,7 @@
 #include "resourcemanager.hpp"
 #include "widget.hpp"
 
-using namespace graphics;
-
-overlay::overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager)
+overlay::overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager)
     : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {

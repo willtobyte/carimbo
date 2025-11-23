@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace graphics {
 using pixmap_ptr = std::shared_ptr<pixmap>;
 
 class pixmappool final {
@@ -23,4 +22,3 @@ private:
 
   std::unordered_map<std::string, pixmap_ptr, string_hash, string_equal> _pool;
 };
-}

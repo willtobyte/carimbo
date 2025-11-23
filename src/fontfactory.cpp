@@ -5,8 +5,6 @@
 #include "pixmappool.hpp"
 #include "renderer.hpp"
 
-using namespace graphics;
-
 fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool)
   : _renderer(std::move(renderer))
   , _pixmappool(std::move(pixmappool))
@@ -25,7 +23,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
 
   std::println("[fontfactory] cache miss {}", filename);
 
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
   const auto j = nlohmann::json::parse(buffer);
 
   const auto glyphs = j["glyphs"].get<std::string_view>();

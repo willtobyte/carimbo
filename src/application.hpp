@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 class application final {
 public:
   application(int argc, char **argv);
@@ -10,4 +9,3 @@ public:
 
   [[nodiscard]] int run();
 };
-}

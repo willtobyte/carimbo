@@ -49,7 +49,6 @@ static auto wrap_fn(sol::protected_function pf) {
 }
 }
 
-namespace framework {
 class scriptengine final : private noncopyable {
 public:
   scriptengine() = default;
@@ -57,4 +56,3 @@ public:
 
   void run();
 };
-}

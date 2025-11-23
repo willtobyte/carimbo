@@ -5,19 +5,15 @@
 #include "resourcemanager.hpp"
 #include "vector.hpp"
 
-using namespace graphics;
-
-using namespace input::event;
-
-cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager> resourcemanager)
+cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
 
   const auto filename = std::format("cursors/{}.json", name);
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
   const auto j = nlohmann::json::parse(buffer);
 
-  _point = j["point"].template get<math::vec2>();
+  _point = j["point"].template get<vec2>();
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
   _animations.reserve(j["animations"].size());
 
@@ -25,18 +21,18 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
     const auto key = item.key();
     const auto& a = item.value();
     const auto& f = a["frames"];
-    std::vector<graphics::keyframe> keyframes(f.size());
+    std::vector<keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
-      return graphics::keyframe{
+      return keyframe{
         frame["duration"].template get<uint64_t>(),
-        frame["offset"].template get<math::vec2>(),
-        frame["rectangle"].template get<math::vec4>(),
+        frame["offset"].template get<vec2>(),
+        frame["rectangle"].template get<vec4>(),
       };
     });
 
     const auto oneshot = a.value("oneshot", false);
 
-    _animations.emplace(key, graphics::animation{oneshot, keyframes});
+    _animations.emplace(key, animation{oneshot, std::nullopt, std::nullopt, nullptr, keyframes});
   }
 
   if (const auto it = _animations.find(ACTION_DEFAULT); it != _animations.end()) {
@@ -44,10 +40,10 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
   }
 }
 
-void cursor::on_mouse_release(const mouse::button& event) {
-  constexpr auto left = mouse::button::which::left;
-  constexpr auto middle = mouse::button::which::middle;
-  constexpr auto right = mouse::button::which::right;
+void cursor::on_mouse_release(const event::mouse::button& event) {
+  constexpr auto left = event::mouse::button::which::left;
+  constexpr auto middle = event::mouse::button::which::middle;
+  constexpr auto right = event::mouse::button::which::right;
 
   switch (event.button) {
   case left:
@@ -68,8 +64,8 @@ void cursor::on_mouse_release(const mouse::button& event) {
   _last_frame = SDL_GetTicks();
 }
 
-void cursor::on_mouse_motion(const mouse::motion& event) {
-  _position = math::vec2(event.x, event.y);
+void cursor::on_mouse_motion(const event::mouse::motion& event) {
+  _position = vec2(event.x, event.y);
 }
 
 void cursor::update(float delta) {

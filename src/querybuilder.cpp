@@ -1,7 +1,5 @@
 #include "querybuilder.hpp"
 
-using namespace network;
-
 static std::string encode(std::string_view value) {
   std::string encoded;
   encoded.reserve(value.size() * 3);
@@ -19,12 +17,13 @@ static std::string encode(std::string_view value) {
   return encoded;
 }
 
-querybuilder& querybuilder::add(std::string_view key, std::string_view value) {
+network::querybuilder& network::querybuilder::add(std::string_view key, std::string_view value) {
   _parameters.emplace(std::string{key}, std::string{value});
   return *this;
 }
 
-std::string querybuilder::build() const {
+std::string
+network::querybuilder::build() const {
   if (_parameters.empty()) {
     return {};
   }
@@ -43,8 +42,9 @@ std::string querybuilder::build() const {
   return result;
 }
 
-std::string querybuilder::make(std::initializer_list<std::pair<std::string, std::string>> entries) {
-  querybuilder builder;
+std::string
+network::querybuilder::make(std::initializer_list<std::pair<std::string, std::string>> entries) {
+  network::querybuilder builder;
   for (const auto& [key, value] : entries) {
     builder.add(key, value);
   }

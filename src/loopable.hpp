@@ -1,6 +1,5 @@
 #pragma once
 
-namespace framework {
 class loopable {
 public:
   loopable() = default;
@@ -8,4 +7,3 @@ public:
 
   virtual void loop(float delta) = 0;
 };
-}

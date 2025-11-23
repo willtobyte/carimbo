@@ -1,8 +1,6 @@
 #include "timermanager.hpp"
 
-using namespace framework;
-
-constexpr auto event_type = static_cast<uint32_t>(input::event::type::timer);
+constexpr auto event_type = static_cast<uint32_t>(event::type::timer);
 
 struct context final {
   envelopepool_impl* pool;

@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace graphics {
 
 static constexpr uint8_t lookup[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -149,13 +148,12 @@ private:
   uint8_t _a{255};
 };
 
-}
 
 template<>
-struct std::tuple_size<graphics::color> : std::integral_constant<std::size_t, 4> {};
+struct std::tuple_size<color> : std::integral_constant<std::size_t, 4> {};
 
 template<std::size_t I>
-struct std::tuple_element<I, graphics::color> {
+struct std::tuple_element<I, color> {
   using type = uint8_t;
 };
 

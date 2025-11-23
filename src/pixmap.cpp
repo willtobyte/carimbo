@@ -4,11 +4,9 @@
 #define STBI_ONLY_PNG
 #include "stb_image.h"
 
-using namespace graphics;
-
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
     : _renderer(std::move(renderer)) {
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
 
   int width, height, channels;
   const auto pixels = unwrap(

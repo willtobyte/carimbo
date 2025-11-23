@@ -18,7 +18,7 @@
 //   public:
 //     tilemap() = delete;
 //     explicit tilemap(
-//       geometry::size size,
+//       size size,
 //       std::shared_ptr<resourcemanager> resourcemanager,
 //       std::string_view name
 //     );
@@ -27,7 +27,7 @@
 //     void update(float delta);
 //     void draw() const;
 //     void set_target(std::shared_ptr<object> object);
-//     void set_camera(std::shared_ptr<graphics::camera> camera);
+//     void set_camera(std::shared_ptr<camera> camera);
 
 //     std::vector<std::string> under() const;
 
@@ -37,15 +37,15 @@
 //     float _width;
 //     uint64_t _last_tick{0};
 //     size_t _current_transaction{0};
-//     geometry::rectangle _camera;
+//     rectangle _camera;
 
-//     std::shared_ptr<graphics::pixmap> _pixmap;
-//     std::vector<geometry::rectangle> _sources;
+//     std::shared_ptr<pixmap> _pixmap;
+//     std::vector<rectangle> _sources;
 //     std::vector<std::string> _labels;
 //     std::vector<bool> _visibles;
 //     std::vector<std::vector<uint8_t>> _layers;
 //     std::vector<transaction> _transactions;
 //     std::shared_ptr<object> _target;
-//     // std::shared_ptr<graphics::camera> _camera;
+//     // std::shared_ptr<camera> _camera;
 // };
 // }

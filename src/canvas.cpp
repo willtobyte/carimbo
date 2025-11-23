@@ -2,7 +2,7 @@
 
 #include "renderer.hpp"
 
-using namespace graphics;
+
 
 canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {

@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace math {
 template <std::size_t N>
 class vector {
 public:
@@ -255,5 +254,4 @@ inline void from_json(const nlohmann::json& j, vec4& v) {
   v.y = j.at("y").get<float>();
   v.w = j.at("width").get<float>();
   v.h = j.at("height").get<float>();
-}
 }

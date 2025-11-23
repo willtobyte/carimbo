@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 template <typename T>
 class singleton {
 public:
@@ -19,4 +18,3 @@ public:
     return _instance;
   }
 };
-}

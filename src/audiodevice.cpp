@@ -1,6 +1,6 @@
 #include "audiodevice.hpp"
 
-using namespace audio;
+
 
 audiodevice::audiodevice() {
   _device = unwrap(

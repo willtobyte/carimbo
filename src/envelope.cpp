@@ -1,7 +1,5 @@
 #include "envelope.hpp"
 
-using namespace framework;
-
 mailenvelope::mailenvelope(std::pmr::memory_resource* mr)
   : to(0), kind(mr), body(mr) {
   kind.reserve(32);

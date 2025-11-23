@@ -4,8 +4,6 @@
 #include "physics.hpp"
 #include "renderer.hpp"
 
-using namespace framework;
-
 template <class Map, class Key>
 [[nodiscard]] static inline const typename Map::mapped_type* find_ptr(
   const Map& m,
@@ -16,7 +14,7 @@ template <class Map, class Key>
   return std::addressof(it->second);
 }
 
-world::world(std::shared_ptr<graphics::renderer> renderer)
+world::world(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};

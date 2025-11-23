@@ -8,10 +8,7 @@
 #include <SDL3/SDL_gamepad.h>
 #include <SDL3/SDL_keycode.h>
 
-using namespace input;
-using namespace event;
-
-eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
+eventmanager::eventmanager(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
   _joystickmapping.reserve(8);
   _joystickgorder.reserve(8);
@@ -49,7 +46,7 @@ eventmanager::eventmanager(std::shared_ptr<graphics::renderer> renderer)
 void eventmanager::update(float delta) {
   std::erase_if(
     _receivers,
-    std::mem_fn(&std::weak_ptr<input::eventreceiver>::expired)
+    std::mem_fn(&std::weak_ptr<eventreceiver>::expired)
   );
 
   SDL_Event event;
@@ -66,7 +63,7 @@ void eventmanager::update(float delta) {
       } break;
 
       case SDL_EVENT_KEY_DOWN: {
-        const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
+        const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
@@ -98,7 +95,7 @@ void eventmanager::update(float delta) {
         }
         break;
 
-        const keyboard::key e{static_cast<keyboard::key>(event.key.key)};
+        const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
@@ -116,7 +113,7 @@ void eventmanager::update(float delta) {
       } break;
 
       case SDL_EVENT_MOUSE_MOTION: {
-        const mouse::motion e{event.motion.x, event.motion.y};
+        const event::mouse::motion e{event.motion.x, event.motion.y};
 
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
@@ -126,9 +123,9 @@ void eventmanager::update(float delta) {
       } break;
 
       case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-        const mouse::button e{
-          .type = mouse::button::type::down,
-          .button = static_cast<mouse::button::which>(event.button.button),
+        const event::mouse::button e{
+          .type = event::mouse::button::type::down,
+          .button = static_cast<event::mouse::button::which>(event.button.button),
           .x = event.button.x,
           .y = event.button.y
         };
@@ -141,9 +138,9 @@ void eventmanager::update(float delta) {
       } break;
 
       case SDL_EVENT_MOUSE_BUTTON_UP: {
-        const mouse::button e{
-          .type = mouse::button::type::up,
-          .button = static_cast<mouse::button::which>(event.button.button),
+        const event::mouse::button e{
+          .type = event::mouse::button::type::up,
+          .button = static_cast<event::mouse::button::which>(event.button.button),
           .x = event.button.x,
           .y = event.button.y
         };
@@ -206,7 +203,7 @@ void eventmanager::update(float delta) {
 
         const auto slot = it->second;
 
-        const gamepad::button e{event.gbutton.button};
+        const event::gamepad::button e{event.gbutton.button};
 
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
@@ -223,7 +220,7 @@ void eventmanager::update(float delta) {
 
         const auto slot = it->second;
 
-        const gamepad::button e{event.gbutton.button};
+        const event::gamepad::button e{event.gbutton.button};
 
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
@@ -240,9 +237,9 @@ void eventmanager::update(float delta) {
 
         const auto slot = it->second;
 
-        const auto axis = static_cast<gamepad::motion::axis>(event.gaxis.axis);
+        const auto axis = static_cast<event::gamepad::motion::axis>(event.gaxis.axis);
         const auto value = event.gaxis.value;
-        const gamepad::motion e{axis, value};
+        const event::gamepad::motion e{axis, value};
 
         for (const auto& weak : _receivers) {
           if (auto receiver = weak.lock(); receiver) {
@@ -251,12 +248,12 @@ void eventmanager::update(float delta) {
         }
       } break;
 
-      case static_cast<uint32_t>(type::mail): {
-        auto* ptr = static_cast<framework::envelope*>(event.user.data1);
+      case static_cast<uint32_t>(event::type::mail): {
+        auto* ptr = static_cast<envelope*>(event.user.data1);
 
         if (ptr) {
           if (const auto* payload = ptr->try_mail(); payload) {
-            const auto o = mail(payload->to, payload->body);
+            const auto o = event::mail(payload->to, payload->body);
             for (const auto& weak : _receivers) {
               if (auto receiver = weak.lock(); receiver) {
                 receiver->on_mail(o);
@@ -268,8 +265,8 @@ void eventmanager::update(float delta) {
         }
       } break;
 
-      case static_cast<uint32_t>(type::timer): {
-        auto* ptr = static_cast<framework::envelope*>(event.user.data1);
+      case static_cast<uint32_t>(event::type::timer): {
+        auto* ptr = static_cast<envelope*>(event.user.data1);
 
         if (const auto* payload = ptr->try_timer(); payload) {
           const auto fn = payload->fn;
@@ -331,7 +328,7 @@ void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {
       continue;
     }
 
-    auto* ptr = static_cast<framework::envelope*>(const_cast<void*>(event.user.data1));
+    auto* ptr = static_cast<envelope*>(const_cast<void*>(event.user.data1));
     _envelopepool->release(ptr);
   }
 }

@@ -4,8 +4,6 @@
 #include "fonteffect.hpp"
 #include "widget.hpp"
 
-using namespace graphics;
-
 void label::set_font(std::shared_ptr<font> font) {
   _font = std::move(font);
 }

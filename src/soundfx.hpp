@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace audio {
 class soundfx final {
 public:
   explicit soundfx(std::string_view filename);
@@ -15,7 +14,7 @@ public:
 
   void set_volume(float gain);
   float volume() const;
-    
+
   void set_onbegin(sol::protected_function callback);
   void set_onend(sol::protected_function callback);
 
@@ -27,4 +26,3 @@ private:
   std::function<void()> _onend{};
   mutable std::atomic<bool> _notified{false};
 };
-}

@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 class timermanager final {
 public:
   explicit timermanager();
@@ -21,4 +20,3 @@ private:
 
   std::unordered_map<uint32_t, envelope*> _envelopemapping;
 };
-}

@@ -1,7 +1,5 @@
 #include "environment.hpp"
 
-using namespace platform;
-
 std::optional<std::string_view> desktop::folder() const noexcept {
   const auto* const folder = SDL_GetUserFolder(SDL_FOLDER_DESKTOP);
   if (!folder) {

@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace framework {
 struct mailenvelope final {
   uint64_t to;
   std::pmr::string kind;
@@ -51,4 +50,3 @@ public:
   [[nodiscard]] const mailenvelope* try_mail() const noexcept;
   [[nodiscard]] const timerenvelope* try_timer() const noexcept;
 };
-}

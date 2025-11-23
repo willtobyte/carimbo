@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace audio {
 class soundmanager final {
 public:
   soundmanager(std::shared_ptr<audiodevice> audiodevice);
@@ -26,4 +25,3 @@ private:
 
   std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _pool;
 };
-}

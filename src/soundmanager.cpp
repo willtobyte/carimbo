@@ -4,8 +4,6 @@
 #include "io.hpp"
 #include "soundfx.hpp"
 
-using namespace audio;
-
 soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
     : _audiodevice(std::move(audiodevice)) {}
 

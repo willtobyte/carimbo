@@ -5,18 +5,13 @@
 #include "noncopyable.hpp"
 #include "objectpool.hpp"
 
-namespace graphics {
   class renderer;
-}
 
-namespace input {
   class eventreceiver;
-}
 
-namespace input {
-class eventmanager final : private framework::noncopyable {
+class eventmanager final : private noncopyable {
 public:
-  explicit eventmanager(std::shared_ptr<graphics::renderer> renderer);
+  explicit eventmanager(std::shared_ptr<renderer> renderer);
   virtual ~eventmanager() = default;
 
   void update(float delta);
@@ -28,11 +23,10 @@ public:
   void flush(uint32_t begin_event, uint32_t end_event = 0);
 
 private:
-  std::shared_ptr<graphics::renderer> _renderer;
+  std::shared_ptr<renderer> _renderer;
   std::vector<std::weak_ptr<eventreceiver>> _receivers;
   std::unordered_map<uint32_t, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
   std::vector<uint32_t> _joystickgorder;
   std::unordered_map<uint32_t, uint8_t> _joystickmapping;
-  std::shared_ptr<framework::envelopepool_impl> _envelopepool = framework::envelopepool::instance();
+  std::shared_ptr<envelopepool_impl> _envelopepool = envelopepool::instance();
 };
-}

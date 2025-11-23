@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace platform {
 class desktop final {
   public:
     constexpr desktop() noexcept = default;
@@ -22,4 +21,3 @@ class operatingsystem final {
 
     [[nodiscard]] std::string_view name() const noexcept;
 };
-}

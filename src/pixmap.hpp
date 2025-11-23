@@ -4,7 +4,6 @@
 
 #include "reflection.hpp"
 
-namespace graphics {
 class pixmap final {
 public:
   pixmap() = delete;
@@ -32,4 +31,3 @@ private:
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;
 };
-}

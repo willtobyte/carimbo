@@ -8,13 +8,11 @@
 #include "scene.hpp"
 #include "timermanager.hpp"
 
-using namespace framework;
-
 scenemanager::scenemanager(
-  std::shared_ptr<framework::resourcemanager> resourcemanager,
-  std::shared_ptr<framework::objectmanager> objectmanager,
-  std::shared_ptr<graphics::particlesystem> particlesystem,
-  std::shared_ptr<framework::timermanager> timermanager
+  std::shared_ptr<::resourcemanager> resourcemanager,
+  std::shared_ptr<::objectmanager> objectmanager,
+  std::shared_ptr<::particlesystem> particlesystem,
+  std::shared_ptr<::timermanager> timermanager
 )
   : _resourcemanager(std::move(resourcemanager)),
     _objectmanager(std::move(objectmanager)),
@@ -26,7 +24,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(std::string{name});
   if (inserted) [[unlikely]] {
     const auto filename = std::format("scenes/{}.json", name);
-    const auto buffer = storage::io::read(filename);
+    const auto buffer = io::read(filename);
     const auto j = nlohmann::json::parse(buffer);
 
     const auto type = j.at("type").get<scenetype>();
@@ -126,13 +124,13 @@ void scenemanager::on_touch(float x, float y) const {
   ptr->on_touch(x, y);
 }
 
-void scenemanager::on_key_press(const input::event::keyboard::key& event) {
+void scenemanager::on_key_press(const event::keyboard::key& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->on_key_press(static_cast<int32_t>(event));
 }
 
-void scenemanager::on_key_release(const input::event::keyboard::key& event) {
+void scenemanager::on_key_release(const event::keyboard::key& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->on_key_release(static_cast<int32_t>(event));
@@ -144,17 +142,17 @@ void scenemanager::on_text(std::string_view text) {
   ptr->on_text(text);
 }
 
-void scenemanager::on_mouse_press(const input::event::mouse::button& event) {
+void scenemanager::on_mouse_press(const event::mouse::button& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
 }
 
-void scenemanager::on_mouse_release(const input::event::mouse::button& event) {
+void scenemanager::on_mouse_release(const event::mouse::button& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
 }
 
-void scenemanager::on_mouse_motion(const input::event::mouse::motion& event) {
+void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->on_motion(event.x, event.y);
@@ -164,7 +162,7 @@ std::shared_ptr<objectmanager> scenemanager::objectmanager() const noexcept {
   return _objectmanager;
 }
 
-std::shared_ptr<graphics::particlesystem> scenemanager::particlesystem() const noexcept {
+std::shared_ptr<particlesystem> scenemanager::particlesystem() const noexcept {
   return _particlesystem;
 }
 

@@ -8,38 +8,36 @@
 #include "renderer.hpp"
 #include "soundmanager.hpp"
 
-using namespace framework;
-
 static const std::map<std::string, std::function<void(
   std::string_view,
-  graphics::pixmappool&,
-  audio::soundmanager&
+  pixmappool&,
+  soundmanager&
 )>> handlers = {
   {
     ".png",
-    [](std::string_view filename, graphics::pixmappool& pixmappool, audio::soundmanager&) {
+    [](std::string_view filename, pixmappool& pixmappool, soundmanager&) {
       pixmappool.get(filename);
     }
   },
   {
     ".ogg",
-    [](std::string_view filename, graphics::pixmappool&, audio::soundmanager& soundmanager) {
+    [](std::string_view filename, pixmappool&, soundmanager& soundmanager) {
       soundmanager.get(filename);
     }
   }
 };
 
 resourcemanager::resourcemanager(
-  std::shared_ptr<graphics::renderer> renderer,
-  std::shared_ptr<audio::audiodevice> audiodevice,
-  std::shared_ptr<framework::engine> engine
+  std::shared_ptr<::renderer> renderer,
+  std::shared_ptr<::audiodevice> audiodevice,
+  std::shared_ptr<::engine> engine
 )
     : _renderer(std::move(renderer)),
       _audiodevice(std::move(audiodevice)),
       _engine(std::move(engine)),
-      _pixmappool(std::make_shared<graphics::pixmappool>(_renderer)),
-      _soundmanager(std::make_shared<audio::soundmanager>(_audiodevice)),
-      _fontfactory(std::make_shared<graphics::fontfactory>(_renderer, _pixmappool)) {
+      _pixmappool(std::make_shared<::pixmappool>(_renderer)),
+      _soundmanager(std::make_shared<::soundmanager>(_audiodevice)),
+      _fontfactory(std::make_shared<::fontfactory>(_renderer, _pixmappool)) {
 
 
 }
@@ -56,7 +54,7 @@ void resourcemanager::update(float delta) {
 
 void resourcemanager::prefetch() {
   const auto directory = "blobs";
-  const auto filenames = storage::io::enumerate(directory);
+  const auto filenames = io::enumerate(directory);
   std::vector<std::string> f;
   f.reserve(filenames.size());
   for (const auto& filename : filenames) {
@@ -85,18 +83,18 @@ void resourcemanager::debug() const {
 }
 #endif
 
-std::shared_ptr<graphics::renderer> resourcemanager::renderer() const {
+std::shared_ptr<renderer> resourcemanager::renderer() const {
   return _renderer;
 }
 
-std::shared_ptr<graphics::pixmappool> resourcemanager::pixmappool() const {
+std::shared_ptr<pixmappool> resourcemanager::pixmappool() const {
   return _pixmappool;
 }
 
-std::shared_ptr<audio::soundmanager> resourcemanager::soundmanager() const {
+std::shared_ptr<soundmanager> resourcemanager::soundmanager() const {
   return _soundmanager;
 }
 
-std::shared_ptr<graphics::fontfactory> resourcemanager::fontfactory() const {
+std::shared_ptr<fontfactory> resourcemanager::fontfactory() const {
   return _fontfactory;
 }

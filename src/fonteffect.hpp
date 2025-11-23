@@ -4,7 +4,6 @@
 
 #include "reflection.hpp"
 
-namespace graphics {
 class fonteffect {
   public:
     enum type: uint8_t {
@@ -13,7 +12,7 @@ class fonteffect {
 
     virtual ~fonteffect() = default;
 
-    virtual void set(std::string_view text, math::vec2 position) = 0;
+    virtual void set(std::string_view text, vec2 position) = 0;
 
     virtual void update(float delta) = 0;
 
@@ -30,7 +29,7 @@ class fadeineffect final : public fonteffect {
   public:
     virtual ~fadeineffect() = default;
 
-    virtual void set(std::string_view text, math::vec2 position) override;
+    virtual void set(std::string_view text, vec2 position) override;
 
     virtual void update(float delta) override;
 
@@ -42,9 +41,8 @@ class fadeineffect final : public fonteffect {
     bool _animating{false};
     size_t _last_length{0};
     size_t _draw_calls{0};
-    math::vec2 _position;
+    vec2 _position;
     std::string _text;
 
     const float _fade_duration{.3f};
 };
-}

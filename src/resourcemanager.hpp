@@ -2,14 +2,13 @@
 
 #include "common.hpp"
 
-namespace framework {
 class resourcemanager final {
 public:
   resourcemanager() = delete;
   resourcemanager(
-    std::shared_ptr<graphics::renderer> renderer,
-    std::shared_ptr<audio::audiodevice> audiodevice,
-    std::shared_ptr<engine> engine
+    std::shared_ptr<::renderer> renderer,
+    std::shared_ptr<::audiodevice> audiodevice,
+    std::shared_ptr<::engine> engine
   );
 
   ~resourcemanager() = default;
@@ -25,17 +24,16 @@ public:
   void debug() const;
 #endif
 
-  std::shared_ptr<graphics::renderer> renderer() const;
-  std::shared_ptr<graphics::pixmappool> pixmappool() const;
-  std::shared_ptr<audio::soundmanager> soundmanager() const;
-  std::shared_ptr<graphics::fontfactory> fontfactory() const;
+  std::shared_ptr<::renderer> renderer() const;
+  std::shared_ptr<::pixmappool> pixmappool() const;
+  std::shared_ptr<::soundmanager> soundmanager() const;
+  std::shared_ptr<::fontfactory> fontfactory() const;
 
 private:
-  std::shared_ptr<graphics::renderer> _renderer;
-  std::shared_ptr<audio::audiodevice> _audiodevice;
-  std::shared_ptr<framework::engine> _engine;
-  std::shared_ptr<graphics::pixmappool> _pixmappool;
-  std::shared_ptr<audio::soundmanager> _soundmanager;
-  std::shared_ptr<graphics::fontfactory> _fontfactory;
+  std::shared_ptr<::renderer> _renderer;
+  std::shared_ptr<::audiodevice> _audiodevice;
+  std::shared_ptr<::engine> _engine;
+  std::shared_ptr<::pixmappool> _pixmappool;
+  std::shared_ptr<::soundmanager> _soundmanager;
+  std::shared_ptr<::fontfactory> _fontfactory;
 };
-}

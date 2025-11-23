@@ -4,10 +4,9 @@
 
 #include "widget.hpp"
 
-namespace graphics {
-class overlay final : public input::eventreceiver {
+class overlay final : public eventreceiver {
 public:
-  explicit overlay(std::shared_ptr<framework::resourcemanager> resourcemanager, std::shared_ptr<input::eventmanager> eventmanager);
+  explicit overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager);
   virtual ~overlay() = default;
 
   std::variant<std::shared_ptr<label>> create(widgettype type);
@@ -25,9 +24,8 @@ public:
   void dispatch(widgettype type, std::string_view message);
 
 private:
-  std::shared_ptr<framework::resourcemanager> _resourcemanager;
-  std::shared_ptr<input::eventmanager> _eventmanager;
-  std::vector<std::shared_ptr<graphics::widget>> _widgets;
-  std::shared_ptr<graphics::cursor> _cursor;
+  std::shared_ptr<resourcemanager> _resourcemanager;
+  std::shared_ptr<eventmanager> _eventmanager;
+  std::vector<std::shared_ptr<widget>> _widgets;
+  std::shared_ptr<cursor> _cursor;
 };
-}

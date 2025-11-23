@@ -9,42 +9,41 @@
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/member.hpp>
 
-namespace framework {
-class objectmanager final : public input::eventreceiver, public std::enable_shared_from_this<objectmanager> {
+class objectmanager final : public eventreceiver, public std::enable_shared_from_this<objectmanager> {
 public:
   objectmanager();
 
   virtual ~objectmanager() = default;
 
-  std::shared_ptr<object> create(std::string_view kind, std::optional<std::string_view> scope, bool manage = true);
+  std::shared_ptr<::object> create(std::string_view kind, std::optional<std::string_view> scope, bool manage = true);
 
-  std::shared_ptr<object> clone(std::shared_ptr<object> matrix);
+  std::shared_ptr<::object> clone(std::shared_ptr<::object> matrix);
 
-  void manage(std::shared_ptr<object> object);
+  void manage(std::shared_ptr<::object> object);
 
-  bool remove(std::shared_ptr<object> object);
+  bool remove(std::shared_ptr<::object> object);
 
-  std::shared_ptr<object> find(uint64_t id) const;
+  std::shared_ptr<::object> find(uint64_t id) const;
 
   void update(float delta);
 
   void draw() const;
 
-  void set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager);
-  void set_scenemanager(std::shared_ptr<scenemanager> scenemanager);
-  void set_world(std::shared_ptr<world> world);
+  void set_resourcemanager(std::shared_ptr<::resourcemanager> resourcemanager);
+  void set_scenemanager(std::shared_ptr<::scenemanager> scenemanager);
+  void set_world(std::shared_ptr<::world> world);
 
 protected:
-  virtual void on_mouse_release(const input::event::mouse::button& event) override;
-  virtual void on_mouse_motion(const input::event::mouse::motion& event) override;
-  virtual void on_mail(const input::event::mail& event) override;
+  virtual void on_mouse_release(const event::mouse::button& event) override;
+  virtual void on_mouse_motion(const event::mouse::motion& event) override;
+  virtual void on_mail(const event::mail& event) override;
 
 private:
   struct by_id;
   struct by_seq;
   struct node {
-    std::shared_ptr<framework::object> object;
-    explicit node(std::shared_ptr<framework::object> o) : object(std::move(o)) {}
+    std::shared_ptr<::object> object;
+    explicit node(std::shared_ptr<::object> o) : object(std::move(o)) {}
   };
 
   struct id_key {
@@ -70,11 +69,10 @@ private:
   container_t _objects;
 
   std::atomic<uint64_t> _counter{1};
-  std::shared_ptr<resourcemanager> _resourcemanager;
-  std::shared_ptr<scenemanager> _scenemanager;
-  std::shared_ptr<world> _world;
+  std::shared_ptr<::resourcemanager> _resourcemanager;
+  std::shared_ptr<::scenemanager> _scenemanager;
+  std::shared_ptr<::world> _world;
   std::unordered_set<uint64_t> _hovering;
 
   std::shared_ptr<envelopepool_impl> _envelopepool = envelopepool::instance();
 };
-}

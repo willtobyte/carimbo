@@ -1,6 +1,5 @@
 #pragma once
 
-namespace framework {
 class noncopyable {
 public:
   noncopyable() = default;
@@ -11,4 +10,3 @@ public:
   noncopyable(noncopyable&&) = default;
   noncopyable& operator=(noncopyable&&) = default;
 };
-}

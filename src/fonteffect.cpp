@@ -1,8 +1,6 @@
 #include "fonteffect.hpp"
 
-using namespace graphics;
-
-void fadeineffect::set(std::string_view text, math::vec2 position) {
+void fadeineffect::set(std::string_view text, vec2 position) {
   const auto length = text.size();
   if (length != _last_length) {
     _last_length = length;

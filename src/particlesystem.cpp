@@ -5,15 +5,13 @@
 #include "pixmappool.hpp"
 #include "resourcemanager.hpp"
 
-using namespace graphics;
-
-particlefactory::particlefactory(std::shared_ptr<framework::resourcemanager> resourcemanager)
+particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanager)
   : _resourcemanager(std::move(resourcemanager)) {
 }
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool emitting) const {
   const auto filename = std::format("particles/{}.json", kind);
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
   const auto j = nlohmann::json::parse(buffer);
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
@@ -66,12 +64,12 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return pb;
 }
 
-particlesystem::particlesystem(std::shared_ptr<framework::resourcemanager> resourcemanager)
+particlesystem::particlesystem(std::shared_ptr<resourcemanager> resourcemanager)
   : _factory(std::make_shared<particlefactory>(resourcemanager)) {
   _batches.reserve(16);
 }
 
-void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) {
+void particlesystem::add(const std::shared_ptr<particlebatch>& batch) {
   if (!batch) [[unlikely]] {
     return;
   }
@@ -79,7 +77,7 @@ void graphics::particlesystem::add(const std::shared_ptr<particlebatch>& batch) 
   _batches.emplace_back(batch);
 }
 
-void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) {
+void particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) {
   if (batches.empty()) {
     _batches.clear();
     return;
@@ -88,7 +86,7 @@ void graphics::particlesystem::set(const std::vector<std::shared_ptr<particlebat
   _batches = batches;
 }
 
-void graphics::particlesystem::clear() {
+void particlesystem::clear() {
   _batches.clear();
 }
 

@@ -4,8 +4,6 @@
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
-using namespace graphics;
-
 pixmappool::pixmappool(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {}
 

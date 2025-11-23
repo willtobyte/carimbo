@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace graphics {
 class renderer;
 class canvas final {
 public:
@@ -20,4 +19,3 @@ private:
   std::unique_ptr<SDL_Texture, SDL_Deleter> _framebuffer;
   std::unique_ptr<uint32_t[]> _transparent;
 };
-}

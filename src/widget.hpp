@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace graphics {
 enum class widgettype : uint8_t {
   cursor = 0,
   label,
@@ -17,4 +16,3 @@ public:
 
   virtual void draw() const = 0;
 };
-}

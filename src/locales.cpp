@@ -20,7 +20,7 @@ static std::string_view language() {
 
 [[nodiscard]] static nlohmann::json parse(std::string_view code) {
   const auto filename = std::format("locales/{}.json", code);
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
   return nlohmann::json::parse(buffer);
 }
 

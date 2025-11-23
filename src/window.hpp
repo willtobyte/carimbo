@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace graphics {
 class window final : public std::enable_shared_from_this<window> {
 public:
   window(std::string_view title, int width, int height, bool fullscreen);
@@ -21,4 +20,3 @@ private:
   int _height;
   std::unique_ptr<SDL_Window, SDL_Deleter> _window;
 };
-}

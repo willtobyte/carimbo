@@ -3,10 +3,8 @@
 #include "io.hpp"
 #include <stb_vorbis.c>
 
-using namespace audio;
-
 soundfx::soundfx(std::string_view filename) {
-  const auto buffer = storage::io::read(filename);
+  const auto buffer = io::read(filename);
 
   int channels;
   int sample_rate;

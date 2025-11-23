@@ -6,8 +6,6 @@
 #include "reflection.hpp"
 #include "world.hpp"
 
-using namespace framework;
-
 object::controller::controller(animation& animation) : _animation(animation), _last_tick(0) {
   frooze();
 }
@@ -61,7 +59,7 @@ bool object::controller::valid() const noexcept {
   return _has_keyframe;
 }
 
-const math::vec4& object::controller::bounds() const noexcept {
+const vec4& object::controller::bounds() const noexcept {
   return _bounds;
 }
 
@@ -103,7 +101,7 @@ void object::body::disable() {
   _enabled = false;
 }
 
-void object::body::sync(const math::vec4& bounds, const math::vec2& position, float scale, double angle, uint64_t id) {
+void object::body::sync(const vec4& bounds, const vec2& position, float scale, double angle, uint64_t id) {
   if (_last_sync.valid &&
       _last_sync.position == position &&
       _last_sync.bounds == bounds &&
@@ -171,7 +169,7 @@ object::object()
   : _angle(.0),
     _alpha(255),
     _scale(1.0f),
-    _reflection(graphics::reflection::none) {
+    _reflection(reflection::none) {
   _collision_mapping.reserve(8);
 }
 
@@ -183,7 +181,7 @@ std::string_view object::kind() const noexcept {
   return _kind;
 }
 
-math::vec2 object::position() const noexcept {
+vec2 object::position() const noexcept {
   return _position;
 }
 
@@ -195,7 +193,7 @@ float object::y() const noexcept {
   return _position.y;
 }
 
-math::vec2 object::placement() const noexcept {
+vec2 object::placement() const noexcept {
   return _position;
 }
 
@@ -222,7 +220,7 @@ void object::set_y(float y) noexcept {
 void object::set_placement(float x, float y) noexcept {
   if (_position.x == x && _position.y == y) [[unlikely]] return;
 
-  _position = math::vec2(x, y);
+  _position = vec2(x, y);
   _dirty = true;
   _redraw = true;
 }
@@ -285,7 +283,7 @@ void object::draw() const {
   const auto& offset = _animation->_offset;
 
   if (_redraw) [[unlikely]] {
-    _destination = math::vec4{_position + offset, {source.w, source.h}};
+    _destination = vec4{_position + offset, {source.w, source.h}};
 
     if (_scale != 1.0f) [[unlikely]] {
       const auto ow = _destination.w;
@@ -344,11 +342,11 @@ double object::angle() const noexcept {
   return _angle;
 }
 
-void object::set_reflection(graphics::reflection reflection) noexcept {
+void object::set_reflection(enum reflection reflection) noexcept {
   _reflection = reflection;
 }
 
-graphics::reflection object::reflection() const noexcept {
+reflection object::reflection() const noexcept {
   return _reflection;
 }
 
@@ -449,7 +447,7 @@ void object::on_unhover() {
   }
 }
 
-memory::kv& object::kv() noexcept {
+kv& object::kv() noexcept {
   return _kv;
 }
 

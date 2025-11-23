@@ -1,7 +1,5 @@
 #include "io.hpp"
 
-using namespace storage;
-
 std::vector<uint8_t> io::read(std::string_view filename) {
   const auto ptr = unwrap(
     std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data())),

@@ -10,8 +10,6 @@
 #include "scenemanager.hpp"
 #include "timermanager.hpp"
 
-using namespace framework;
-
 enginefactory& enginefactory::with_title(const std::string_view title) noexcept {
   _title = title;
   return *this;
@@ -100,20 +98,20 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
 }
 
 std::shared_ptr<engine> enginefactory::create() const {
-  const auto audiodevice = std::make_shared<audio::audiodevice>();
-  const auto engine = std::make_shared<framework::engine>();
-  const auto window = std::make_shared<graphics::window>(_title, _width, _height, _fullscreen);
+  const auto audiodevice = std::make_shared<::audiodevice>();
+  const auto engine = std::make_shared<::engine>();
+  const auto window = std::make_shared<::window>(_title, _width, _height, _fullscreen);
   const auto renderer = window->create_renderer(_scale);
-  const auto eventmanager = std::make_shared<input::eventmanager>(renderer);
-  const auto resourcemanager = std::make_shared<framework::resourcemanager>(renderer, audiodevice, engine);
-  const auto postalservice = std::make_shared<framework::postalservice>();
-  const auto overlay = std::make_shared<graphics::overlay>(resourcemanager, eventmanager);
-  const auto statemanager = std::make_shared<framework::statemanager>();
-  const auto objectmanager = std::make_shared<framework::objectmanager>();
-  const auto particlesystem = std::make_shared<graphics::particlesystem>(resourcemanager);
-  const auto timermanager = std::make_shared<framework::timermanager>();
-  const auto scenemanager = std::make_shared<framework::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager);
-  const auto world = std::make_shared<framework::world>(renderer);
+  const auto eventmanager = std::make_shared<::eventmanager>(renderer);
+  const auto resourcemanager = std::make_shared<::resourcemanager>(renderer, audiodevice, engine);
+  const auto postalservice = std::make_shared<::postalservice>();
+  const auto overlay = std::make_shared<::overlay>(resourcemanager, eventmanager);
+  const auto statemanager = std::make_shared<::statemanager>();
+  const auto objectmanager = std::make_shared<::objectmanager>();
+  const auto particlesystem = std::make_shared<::particlesystem>(resourcemanager);
+  const auto timermanager = std::make_shared<::timermanager>();
+  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager);
+  const auto world = std::make_shared<::world>(renderer);
 
   engine->set_audiodevice(audiodevice);
   engine->set_objectmanager(objectmanager);

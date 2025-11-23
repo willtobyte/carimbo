@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace audio {
 
 class audiodevice final {
 public:
@@ -13,4 +12,3 @@ private:
   std::unique_ptr<ALCdevice, ALC_Deleter> _device;
   std::unique_ptr<ALCcontext, ALC_Deleter> _context;
 };
-}

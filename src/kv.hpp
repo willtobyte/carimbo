@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace memory {
 class observable final {
 public:
   ~observable() = default;
@@ -19,10 +18,9 @@ private:
 class kv final {
 public:
   ~kv() = default;
-  std::shared_ptr<memory::observable> get(std::string_view key, const sol::object& default_value = sol::lua_nil);
+  std::shared_ptr<observable> get(std::string_view key, const sol::object& default_value = sol::lua_nil);
   void set(std::string_view key, const sol::object& value);
 
 private:
   std::unordered_map<std::string, std::shared_ptr<observable>, string_hash, string_equal> _values;
 };
-}
