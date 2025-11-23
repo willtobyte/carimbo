@@ -840,10 +840,10 @@ void scriptengine::run() {
     "Color",
     "color", sol::constructors<color(std::string_view)>(),
 
-    "r", sol::property(&color::r, &color::set_r),
-    "g", sol::property(&color::g, &color::set_g),
-    "b", sol::property(&color::b, &color::set_b),
-    "a", sol::property(&color::a, &color::set_a),
+    "r", sol::property(&color::r),
+    "g", sol::property(&color::g),
+    "b", sol::property(&color::b),
+    "a", sol::property(&color::a),
 
     sol::meta_function::equal_to, &color::operator==
   );
