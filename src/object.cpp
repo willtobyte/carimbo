@@ -220,7 +220,8 @@ void object::set_y(float y) noexcept {
 void object::set_placement(float x, float y) noexcept {
   if (_position.x == x && _position.y == y) [[unlikely]] return;
 
-  _position = vec2(x, y);
+  _position.x = x;
+  _position.y = y;
   _dirty = true;
   _redraw = true;
 }
