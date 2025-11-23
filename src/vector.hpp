@@ -69,6 +69,9 @@ public:
   constexpr explicit vector(std::array<float, 4> const& data) noexcept
       : _data(data) {}
 
+  constexpr vector(vector<2> const& position, vector<2> const& size) noexcept
+      : x(position.x), y(position.y), w(size.x), h(size.y) {}
+
   [[nodiscard]] constexpr float operator[](std::size_t i) const noexcept {
     return _data[i];
   }

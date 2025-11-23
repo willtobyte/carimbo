@@ -285,8 +285,7 @@ void object::draw() const {
   const auto& offset = _animation->_offset;
 
   if (_redraw) [[unlikely]] {
-    const auto pos = _position + offset;
-    _destination = math::vec4{pos.x, pos.y, source.w, source.h};
+    _destination = math::vec4{_position + offset, {source.w, source.h}};
 
     if (_scale != 1.0f) [[unlikely]] {
       const auto ow = _destination.w;
