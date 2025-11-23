@@ -81,12 +81,9 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sINITIAL_MEMORY=256MB
     -sALLOW_MEMORY_GROWTH=1
     -sSTACK_SIZE=8MB
-    -sMALLOC=emmalloc
 
     -sFILESYSTEM=1
     -sUSE_SDL=3
-    -sUSE_OGG=1
-    -sUSE_VORBIS=1
 
     -sWASM_BIGINT=1
 
