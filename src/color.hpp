@@ -74,13 +74,6 @@ public:
     return _data[i];
   }
 
-  [[nodiscard]] constexpr uint32_t to_uint32() const noexcept {
-    return (static_cast<uint32_t>(r) << 24) |
-           (static_cast<uint32_t>(g) << 16) |
-           (static_cast<uint32_t>(b) << 8) |
-           static_cast<uint32_t>(a);
-  }
-
   [[nodiscard]] constexpr color with_alpha(uint8_t alpha) const noexcept {
     return color(r, g, b, alpha);
   }
