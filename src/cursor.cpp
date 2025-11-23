@@ -1,13 +1,9 @@
 #include "cursor.hpp"
 
-#include "eventreceiver.hpp"
 #include "io.hpp"
-#include "pixmap.hpp"
-#include "pixmappool.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
 #include "reflection.hpp"
 #include "resourcemanager.hpp"
+#include "vector.hpp"
 
 using namespace graphics;
 
@@ -21,7 +17,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
   const auto buffer = storage::io::read(filename);
   const auto j = nlohmann::json::parse(buffer);
 
-  _point = j["point"].template get<geometry::point>();
+  _point = j["point"].template get<math::vec2>();
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
   _animations.reserve(j["animations"].size());
 
@@ -32,9 +28,9 @@ cursor::cursor(std::string_view name, std::shared_ptr<framework::resourcemanager
     std::vector<graphics::keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
       return graphics::keyframe{
-          frame["rectangle"].template get<geometry::rectangle>(),
-          frame["offset"].template get<geometry::point>(),
-          frame["duration"].template get<uint64_t>(),
+        frame["duration"].template get<uint64_t>(),
+        frame["offset"].template get<math::vec2>(),
+        frame["rectangle"].template get<math::vec4>(),
       };
     });
 
@@ -73,7 +69,7 @@ void cursor::on_mouse_release(const mouse::button& event) {
 }
 
 void cursor::on_mouse_motion(const mouse::motion& event) {
-  _position = geometry::point(event.x, event.y);
+  _position = math::vec2(event.x, event.y);
 }
 
 void cursor::update(float delta) {
@@ -113,12 +109,13 @@ void cursor::draw() const {
 
   const auto& keyframe = keyframes[_frame];
 
+  const auto position = _position - _point + keyframe.offset;
+
   _spritesheet->draw(
-      keyframe.frame,
-      geometry::rectangle(
-        _position - _point + keyframe.offset,
-        keyframe.frame.size()
-      ),
+      keyframe.frame.x, keyframe.frame.y,
+      keyframe.frame.w, keyframe.frame.h,
+      position.x, position.y,
+      keyframe.frame.w, keyframe.frame.h,
       0,
       255,
       reflection::none

@@ -40,17 +40,17 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
 }
 
 void pixmap::draw(
-    const geometry::rectangle& source,
-    const geometry::rectangle& destination,
+    const float sx, const float sy, const float sw, const float sh,
+    const float dx, const float dy, const float dw, const float dh,
     const double angle,
     const uint8_t alpha,
-    reflection reflection
+    const reflection reflection
 ) const {
-  const SDL_FRect& _source = source;
-  const SDL_FRect& _destination = destination;
+  const SDL_FRect source{ sx, sy, sw, sh };
+  const SDL_FRect destination{ dx, dy, dw, dh };
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
-  SDL_RenderTextureRotated(*_renderer, _texture.get(), &_source, &_destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
+  SDL_RenderTextureRotated(*_renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 }
 
 pixmap::operator SDL_Texture*() const {
@@ -63,18 +63,4 @@ int pixmap::width() const {
 
 int pixmap::height() const {
   return _height;
-}
-
-void pixmap::draw(
-    const float sx, const float sy, const float sw, const float sh,
-    const float dx, const float dy, const float dw, const float dh,
-    const double angle,
-    const uint8_t alpha,
-    reflection reflection
-) const {
-  const SDL_FRect source{ sx, sy, sw, sh };
-  const SDL_FRect destination{ dx, dy, dw, dh };
-
-  SDL_SetTextureAlphaMod(_texture.get(), alpha);
-  SDL_RenderTextureRotated(*_renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 }

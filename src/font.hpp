@@ -5,7 +5,7 @@
 namespace graphics {
 class pixmap;
 
-using glyphmap = std::map<char, geometry::rectangle>;
+using glyphmap = std::map<char, math::vec4>;
 
 class font final {
 public:
@@ -22,16 +22,16 @@ public:
 
   ~font() = default;
 
-  void draw(std::string_view text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const;
+  void draw(std::string_view text, const math::vec2& position, const std::weak_ptr<fonteffect>& effect) const;
 
   std::string_view glyphs() const;
 
 private:
-  std::string _glyphs;
-  glyphmap _map;
-  std::shared_ptr<pixmap> _pixmap;
   int16_t _spacing{0};
   int16_t _leading{0};
   float _scale{1.0f};
+  glyphmap _map;
+  std::string _glyphs;
+  std::shared_ptr<pixmap> _pixmap;
 };
 }

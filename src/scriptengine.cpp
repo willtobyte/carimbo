@@ -758,28 +758,20 @@ void framework::scriptengine::run() {
     "create", &framework::enginefactory::create
   );
 
-  lua.new_usertype<geometry::point>(
-    "Point",
-    sol::constructors<geometry::point(), geometry::point(float, float)>(),
-    "set", &geometry::point::set,
-    "x", sol::property(&geometry::point::x, &geometry::point::set_x),
-    "y", sol::property(&geometry::point::y, &geometry::point::set_y)
+  lua.new_usertype<math::vec2>(
+    "Vec2",
+    sol::constructors<math::vec2(), math::vec2(float, float)>(),
+    "x", &math::vec2::x,
+    "y", &math::vec2::y
   );
 
-  lua.new_usertype<geometry::size>(
-    "Size",
-    sol::constructors<geometry::size(), geometry::size(float, float), geometry::size(const geometry::size&)>(),
-    "width", sol::property(&geometry::size::width, &geometry::size::set_width),
-    "height", sol::property(&geometry::size::height, &geometry::size::set_height)
-  );
-
-  lua.new_usertype<geometry::rectangle>(
-    "Rectangle",
-    sol::constructors<geometry::rectangle(), geometry::rectangle(float, float, float, float)>(),
-    "x", sol::property(&geometry::rectangle::x),
-    "y", sol::property(&geometry::rectangle::y),
-    "width", sol::property(&geometry::rectangle::width),
-    "height", sol::property(&geometry::rectangle::height)
+  lua.new_usertype<math::vec4>(
+    "Vec4",
+    sol::constructors<math::vec4(), math::vec4(float, float, float, float)>(),
+    "x", &math::vec4::x,
+    "y", &math::vec4::y,
+    "width", &math::vec4::w,
+    "height", &math::vec4::h
   );
 
   lua.new_usertype<storage::cassette>(

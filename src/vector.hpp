@@ -2,8 +2,7 @@
 
 #include "common.hpp"
 
-namespace geometry {
-
+namespace math {
 template <std::size_t N>
 class vector {
 public:
@@ -32,19 +31,18 @@ private:
 template <>
 class vector<2> {
 public:
-  constexpr vector() noexcept = default;
+  union {
+    struct { float x, y; };
+    std::array<float, 2> _data;
+  };
+
+  constexpr vector() noexcept : x(0), y(0) {}
 
   constexpr vector(float x, float y) noexcept
-      : _data{x, y} {}
+      : x(x), y(y) {}
 
   constexpr explicit vector(std::array<float, 2> const& data) noexcept
       : _data(data) {}
-
-  [[nodiscard]] constexpr float x() const noexcept { return _data[0]; }
-  [[nodiscard]] constexpr float y() const noexcept { return _data[1]; }
-
-  [[nodiscard]] constexpr float& x() noexcept { return _data[0]; }
-  [[nodiscard]] constexpr float& y() noexcept { return _data[1]; }
 
   [[nodiscard]] constexpr float operator[](std::size_t i) const noexcept {
     return _data[i];
@@ -53,31 +51,23 @@ public:
   [[nodiscard]] constexpr float& operator[](std::size_t i) noexcept {
     return _data[i];
   }
-
-private:
-  std::array<float, 2> _data{};
 };
 
 template <>
 class vector<4> {
 public:
-  constexpr vector() noexcept = default;
+  union {
+    struct { float x, y, w, h; };
+    std::array<float, 4> _data;
+  };
+
+  constexpr vector() noexcept : x(0), y(0), w(0), h(0) {}
 
   constexpr vector(float x, float y, float w, float h) noexcept
-      : _data{x, y, w, h} {}
+      : x(x), y(y), w(w), h(h) {}
 
   constexpr explicit vector(std::array<float, 4> const& data) noexcept
       : _data(data) {}
-
-  [[nodiscard]] constexpr float x() const noexcept { return _data[0]; }
-  [[nodiscard]] constexpr float y() const noexcept { return _data[1]; }
-  [[nodiscard]] constexpr float w() const noexcept { return _data[2]; }
-  [[nodiscard]] constexpr float h() const noexcept { return _data[3]; }
-
-  [[nodiscard]] constexpr float& x() noexcept { return _data[0]; }
-  [[nodiscard]] constexpr float& y() noexcept { return _data[1]; }
-  [[nodiscard]] constexpr float& w() noexcept { return _data[2]; }
-  [[nodiscard]] constexpr float& h() noexcept { return _data[3]; }
 
   [[nodiscard]] constexpr float operator[](std::size_t i) const noexcept {
     return _data[i];
@@ -89,15 +79,12 @@ public:
 
   [[nodiscard]] operator SDL_FRect() const noexcept {
     return SDL_FRect{
-      .x = _data[0],
-      .y = _data[1],
-      .w = _data[2],
-      .h = _data[3]
+      .x = x,
+      .y = y,
+      .w = w,
+      .h = h
     };
   }
-
-private:
-  std::array<float, 4> _data{};
 };
 
 template <std::size_t N>
@@ -226,12 +213,31 @@ template <std::size_t N>
   return std::sqrt(length_squared(vec));
 }
 
+using vec2 = vector<2>;
+using vec4 = vector<4>;
+
 template <std::size_t N>
 [[nodiscard]] inline auto normalize(vector<N> const& vec) noexcept {
   return vec / length(vec);
 }
 
-using vec2 = vector<2>;
-using vec4 = vector<4>;
+inline void to_json(nlohmann::json& j, const vec2& v) {
+  j = nlohmann::json{{"x", v.x}, {"y", v.y}};
+}
+
+inline void from_json(const nlohmann::json& j, vec2& v) {
+  v.x = j.at("x").get<float>();
+  v.y = j.at("y").get<float>();
+}
+
+inline void to_json(nlohmann::json& j, const vec4& v) {
+  j = nlohmann::json{{"x", v.x}, {"y", v.y}, {"width", v.w}, {"height", v.h}};
+}
+
+inline void from_json(const nlohmann::json& j, vec4& v) {
+  v.x = j.at("x").get<float>();
+  v.y = j.at("y").get<float>();
+  v.w = j.at("width").get<float>();
+  v.h = j.at("height").get<float>();
 }
 }

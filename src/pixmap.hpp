@@ -12,19 +12,11 @@ public:
   ~pixmap() = default;
 
   void draw(
-      const geometry::rectangle& source,
-      const geometry::rectangle& destination,
-      double angle = 0.0L,
-      uint8_t alpha = 255,
-      reflection reflection = reflection::none
-  ) const;
-
-  void draw(
-      float sx, float sy, float sw, float sh,
-      float dx, float dy, float dw, float dh,
-      double angle = 0.0,
-      uint8_t alpha = 255,
-      reflection reflection = reflection::none
+    const float sx, const float sy, const float sw, const float sh,
+    const float dx, const float dy, const float dw, const float dh,
+    const double angle = .0,
+    const uint8_t alpha = 255,
+    const reflection reflection = reflection::none
   ) const;
 
   operator SDL_Texture*() const;

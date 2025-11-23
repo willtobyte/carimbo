@@ -29,7 +29,7 @@ public:
 private:
   std::shared_ptr<font> _font;
   std::string _text;
-  geometry::point _position;
+  math::vec2 _position;
   std::shared_ptr<fonteffect> _effect;
 };
 }

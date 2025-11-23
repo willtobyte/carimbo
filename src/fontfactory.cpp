@@ -2,10 +2,7 @@
 
 #include "font.hpp"
 #include "io.hpp"
-#include "pixmap.hpp"
 #include "pixmappool.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
 #include "renderer.hpp"
 
 using namespace graphics;
@@ -83,8 +80,8 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
     }
 
     map[glyph] = {
-      { static_cast<float>(x), static_cast<float>(y) },
-      { static_cast<float>(w), static_cast<float>(h) }
+      static_cast<float>(x), static_cast<float>(y),
+      static_cast<float>(w), static_cast<float>(h)
     };
 
     x += w;

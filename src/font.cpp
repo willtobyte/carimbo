@@ -2,10 +2,6 @@
 
 #include "fonteffect.hpp"
 #include "pixmap.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
-#include "reflection.hpp"
-#include "size.hpp"
 
 using namespace graphics;
 
@@ -25,18 +21,18 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(std::string_view text, const geometry::point& position, const std::weak_ptr<fonteffect>& effect) const {
+void font::draw(std::string_view text, const math::vec2& position, const std::weak_ptr<fonteffect>& effect) const {
   if (text.empty()) {
     return;
   }
 
-  geometry::point cursor = position;
+  math::vec2 cursor = position;
 
-  const auto height = _map.begin()->second.height() * _scale;
+  const auto height = _map.begin()->second.h * _scale;
 
   for (const auto ch : text) {
     if (ch == '\n') {
-      cursor = geometry::point(position.x(), cursor.y() + height + _leading);
+      cursor = math::vec2(position.x, cursor.y + height + _leading);
       continue;
     }
 
@@ -46,7 +42,6 @@ void font::draw(std::string_view text, const geometry::point& position, const st
     }
 
     const auto& glyph = it->second;
-    const auto size = glyph.size();
 
     double angle = .0L;
     reflection reflection = reflection::none;
@@ -60,15 +55,17 @@ void font::draw(std::string_view text, const geometry::point& position, const st
       scale = e->scale();
     }
 
+    const auto s = _scale * scale;
+
     _pixmap->draw(
-      glyph,
-      {cursor, size * _scale * scale},
+      glyph.x, glyph.y, glyph.w, glyph.h,
+      cursor.x, cursor.y, glyph.w * s, glyph.h * s,
       angle,
       alpha,
       reflection
     );
 
-    cursor += std::make_pair('x', size.width() + _spacing);
+    cursor = math::vec2(cursor.x + glyph.w * s + _spacing, cursor.y);
   }
 }
 

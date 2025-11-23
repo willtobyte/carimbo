@@ -4,9 +4,7 @@
 #include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "pixmap.hpp"
-#include "rectangle.hpp"
 #include "scenemanager.hpp"
-#include "size.hpp"
 #include "soundfx.hpp"
 #include "tilemap.hpp"
 
@@ -197,7 +195,7 @@ void scene::set_onloop(sol::protected_function fn) {
 }
 
 void scene::set_oncamera(sol::protected_function fn) {
-  _oncamera = interop::wrap_fn<geometry::rectangle(float)>(std::move(fn));
+  _oncamera = interop::wrap_fn<math::vec4(float)>(std::move(fn));
 }
 
 void scene::set_onleave(std::function<void()>&& fn) {
@@ -230,11 +228,8 @@ scenebackdrop::scenebackdrop(std::string_view name, const nlohmann::json& j, std
 }
 
 void scenebackdrop::draw() const noexcept {
-  static const auto destination = geometry::rectangle(
-    .0f, .0f,
-    static_cast<float>(_background->width()),
-    static_cast<float>(_background->height())
-  );
+  static const auto w = static_cast<float>(_background->width());
+  static const auto h = static_cast<float>(_background->height());
 
-  _background->draw(destination, destination);
+  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 }

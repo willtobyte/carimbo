@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include "point.hpp"
 
 #include "kv.hpp"
 
@@ -9,9 +8,9 @@ namespace framework {
 class world;
 
 struct keyframe final {
-  geometry::rectangle frame;
-  geometry::point offset;
   uint64_t duration{0};
+  math::vec2 offset;
+  math::vec4 frame;
 
   friend void from_json(const nlohmann::json& j, keyframe& o);
 };
@@ -19,7 +18,7 @@ struct keyframe final {
 struct bounds final {
   std::optional<uint8_t> type;
   std::bitset<256> reagents;
-  geometry::rectangle rectangle;
+  math::vec4 rectangle;
 
   friend void from_json(const nlohmann::json& j, framework::bounds& o);
 };
@@ -45,14 +44,14 @@ public:
 
   void draw() const;
 
-  geometry::point position() const noexcept;
+  math::vec2 position() const noexcept;
   float x() const noexcept;
   void set_x(float x) noexcept;
   float y() const noexcept;
   void set_y(float y) noexcept;
 
   void set_placement(float x, float y) noexcept;
-  geometry::point placement() const noexcept;
+  math::vec2 placement() const noexcept;
 
   void set_alpha(uint8_t alpha) noexcept;
   uint8_t alpha() const noexcept;
@@ -103,9 +102,9 @@ private:
     std::size_t _frame{0};
     uint64_t _last_tick{0};
 
-    geometry::rectangle _source;
-    geometry::point _offset;
-    geometry::rectangle _bounds;
+    math::vec2 _offset;
+    math::vec4 _source;
+    math::vec4 _bounds;
     bool _has_keyframe{false};
     bool _has_bounds{false};
 
@@ -115,7 +114,7 @@ private:
     void reset();
     bool finished() const noexcept;
     bool valid() const noexcept;
-    const geometry::rectangle& bounds() const noexcept;
+    const math::vec4& bounds() const noexcept;
   };
 
   struct body final {
@@ -124,8 +123,8 @@ private:
     bool _enabled{false};
 
     struct {
-      geometry::point position;
-      geometry::rectangle bounds;
+      math::vec2 position;
+      math::vec4 bounds;
       float scale{0.0f};
       double angle{0.0};
       bool valid{false};
@@ -140,10 +139,10 @@ private:
     void disable();
     bool missing() const noexcept;
     bool valid() const noexcept;
-    void sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id);
+    void sync(const math::vec4& bounds, const math::vec2& position, float scale, double angle, uint64_t id);
   };
 
-  geometry::point _position;
+  math::vec2 _position;
   double _angle;
   float _scale;
   uint8_t _alpha;
@@ -151,7 +150,7 @@ private:
   bool _visible{true};
   bool _dirty{true};
   mutable bool _redraw{true};
-  mutable geometry::rectangle _destination;
+  mutable math::vec4 _destination;
 
   std::string _action;
   std::optional<controller> _animation;

@@ -9,8 +9,7 @@
 #include "physics.hpp"
 #include "pixmap.hpp"
 #include "pixmappool.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
+
 #include "resourcemanager.hpp"
 #include "scenemanager.hpp"
 #include "soundfx.hpp"

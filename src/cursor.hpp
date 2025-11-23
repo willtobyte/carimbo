@@ -3,8 +3,7 @@
 #include "common.hpp"
 
 #include "eventreceiver.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
+#include "vector.hpp"
 
 namespace framework {
   class resourcemanager;
@@ -20,9 +19,9 @@ constexpr auto ACTION_LEFT = "left";
 constexpr auto ACTION_RIGHT = "right";
 
 struct keyframe final {
-  geometry::rectangle frame;
-  geometry::point offset;
   uint64_t duration{0};
+  math::vec2 offset;
+  math::vec4 frame;
 };
 
 struct animation final {
@@ -44,11 +43,11 @@ public:
   void handle(std::string_view message);
 
 private:
-  geometry::point _position{0, 0};
-  std::string _action{ACTION_DEFAULT};
   uint64_t _frame{0};
   uint64_t _last_frame{0};
-  geometry::point _point;
+  math::vec2 _position{0, 0};
+  math::vec2 _point;
+  std::string _action{ACTION_DEFAULT};
   std::shared_ptr<framework::resourcemanager> _resourcemanager;
   std::shared_ptr<graphics::pixmap> _spritesheet;
   std::unordered_map<std::string, animation> _animations;

@@ -1,10 +1,8 @@
 #include "fonteffect.hpp"
 
-#include "point.hpp"
-
 using namespace graphics;
 
-void fadeineffect::set(std::string_view text, geometry::point position) {
+void fadeineffect::set(std::string_view text, math::vec2 position) {
   const auto length = text.size();
   if (length != _last_length) {
     _last_length = length;

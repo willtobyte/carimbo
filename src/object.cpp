@@ -3,11 +3,7 @@
 #include "constant.hpp"
 #include "kv.hpp"
 #include "physics.hpp"
-#include "pixmap.hpp"
-#include "point.hpp"
-#include "rectangle.hpp"
 #include "reflection.hpp"
-#include "soundfx.hpp"
 #include "world.hpp"
 
 using namespace framework;
@@ -65,7 +61,7 @@ bool object::controller::valid() const noexcept {
   return _has_keyframe;
 }
 
-const geometry::rectangle& object::controller::bounds() const noexcept {
+const math::vec4& object::controller::bounds() const noexcept {
   return _bounds;
 }
 
@@ -107,7 +103,7 @@ void object::body::disable() {
   _enabled = false;
 }
 
-void object::body::sync(const geometry::rectangle& bounds, const geometry::point& position, float scale, double angle, uint64_t id) {
+void object::body::sync(const math::vec4& bounds, const math::vec2& position, float scale, double angle, uint64_t id) {
   if (_last_sync.valid &&
       _last_sync.position == position &&
       _last_sync.bounds == bounds &&
@@ -116,15 +112,15 @@ void object::body::sync(const geometry::rectangle& bounds, const geometry::point
     return;
   }
 
-  const auto sw = bounds.width() * scale;
-  const auto sh = bounds.height() * scale;
+  const auto sw = bounds.w * scale;
+  const auto sh = bounds.h * scale;
   const auto hx = 0.5f * sw;
   const auto hy = 0.5f * sh;
 
-  const auto center_x = bounds.width() * 0.5f;
-  const auto center_y = bounds.height() * 0.5f;
-  const auto px = position.x() + bounds.x() + center_x;
-  const auto py = position.y() + bounds.y() + center_y;
+  const auto center_x = bounds.w * 0.5f;
+  const auto center_y = bounds.h * 0.5f;
+  const auto px = position.x + bounds.x + center_x;
+  const auto py = position.y + bounds.y + center_y;
   const auto radians = static_cast<float>(angle) * DEGREES_TO_RADIANS;
 
   const auto box = b2MakeBox(hx, hy);
@@ -187,19 +183,19 @@ std::string_view object::kind() const noexcept {
   return _kind;
 }
 
-geometry::point object::position() const noexcept {
+math::vec2 object::position() const noexcept {
   return _position;
 }
 
 float object::x() const noexcept {
-  return _position.x();
+  return _position.x;
 }
 
 float object::y() const noexcept {
-  return _position.y();
+  return _position.y;
 }
 
-geometry::point object::placement() const noexcept {
+math::vec2 object::placement() const noexcept {
   return _position;
 }
 
@@ -208,25 +204,25 @@ uint8_t object::alpha() const noexcept {
 }
 
 void object::set_x(float x) noexcept {
-  if (_position.x() == x) [[unlikely]] return;
+  if (_position.x == x) [[unlikely]] return;
 
-  _position.set_x(x);
+  _position.x = x;
   _dirty = true;
   _redraw = true;
 }
 
 void object::set_y(float y) noexcept {
-  if (_position.y() == y) [[unlikely]] return;
+  if (_position.y == y) [[unlikely]] return;
 
-  _position.set_y(y);
+  _position.y = y;
   _dirty = true;
   _redraw = true;
 }
 
 void object::set_placement(float x, float y) noexcept {
-  if (_position.x() == x && _position.y() == y) [[unlikely]] return;
+  if (_position.x == x && _position.y == y) [[unlikely]] return;
 
-  _position.set(x, y);
+  _position = math::vec2(x, y);
   _dirty = true;
   _redraw = true;
 }
@@ -289,24 +285,27 @@ void object::draw() const {
   const auto& offset = _animation->_offset;
 
   if (_redraw) [[unlikely]] {
-    _destination = geometry::rectangle{_position + offset, source.size()};
+    const auto pos = _position + offset;
+    _destination = math::vec4{pos.x, pos.y, source.w, source.h};
 
     if (_scale != 1.0f) [[unlikely]] {
-      const auto ow = _destination.width();
-      const auto oh = _destination.height();
+      const auto ow = _destination.w;
+      const auto oh = _destination.h;
       const auto scale_factor = (1.0f - _scale) * .5f;
       const auto offset_x = ow * scale_factor;
       const auto offset_y = oh * scale_factor;
-      const auto destination_x = _destination.x();
-      const auto destination_y = _destination.y();
-      _destination.set_position(destination_x + offset_x, destination_y + offset_y);
-      _destination.scale(_scale);
+      const auto destination_x = _destination.x;
+      const auto destination_y = _destination.y;
+      _destination.x = destination_x + offset_x;
+      _destination.y = destination_y + offset_y;
+      _destination.w *= _scale;
+      _destination.h *= _scale;
     }
 
     _redraw = false;
   }
 
-  _spritesheet->draw(source, _destination, _angle, _alpha, _reflection);
+  _spritesheet->draw(source.x, source.y, source.w, source.h, _destination.x, _destination.y, _destination.w, _destination.h, _angle, _alpha, _reflection);
 }
 
 void object::set_alpha(uint8_t alpha) noexcept {

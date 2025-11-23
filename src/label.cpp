@@ -2,7 +2,6 @@
 
 #include "font.hpp"
 #include "fonteffect.hpp"
-#include "point.hpp"
 #include "widget.hpp"
 
 using namespace graphics;

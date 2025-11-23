@@ -83,12 +83,7 @@ namespace framework {
   class envelope;
 }
 
-namespace geometry {
-  class point;
-  class rectangle;
-  class size;
-  class margin;
-}
+
 
 namespace graphics {
   class canvas;

@@ -13,7 +13,7 @@ class fonteffect {
 
     virtual ~fonteffect() = default;
 
-    virtual void set(std::string_view text, geometry::point position) = 0;
+    virtual void set(std::string_view text, math::vec2 position) = 0;
 
     virtual void update(float delta) = 0;
 
@@ -30,20 +30,20 @@ class fadeineffect final : public fonteffect {
   public:
     virtual ~fadeineffect() = default;
 
-    virtual void set(std::string_view text, geometry::point position) override;
+    virtual void set(std::string_view text, math::vec2 position) override;
 
     virtual void update(float delta) override;
 
     virtual uint8_t alpha() override;
 
   private:
-    std::string _text;
-    geometry::point _position;
     uint8_t _alpha;
     float _fade_time{.0f};
     bool _animating{false};
     size_t _last_length{0};
     size_t _draw_calls{0};
+    math::vec2 _position;
+    std::string _text;
 
     const float _fade_duration{.3f};
 };
