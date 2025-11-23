@@ -55,12 +55,12 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
   SDL_SetRenderTarget(*_renderer, origin);
 
   const auto* pixels = static_cast<const uint32_t*>(surface->pixels);
-  const auto separator = color(pixels[0]);
+  const auto separator = pixels[0];
 
   glyphmap map;
   auto x = 0, y = 0;
   for (char glyph : glyphs) {
-    while (x < width && color(pixels[y * width + x]) == separator) {
+    while (x < width && pixels[y * width + x] == separator) {
       ++x;
     }
     if (x >= width) [[unlikely]] {
@@ -68,12 +68,12 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
     }
 
     auto w = 0;
-    while (x + w < width && color(pixels[y * width + x + w]) != separator) {
+    while (x + w < width && pixels[y * width + x + w] != separator) {
       ++w;
     }
 
     auto h = 0;
-    while (y + h < height && color(pixels[(y + h) * width + x]) != separator) {
+    while (y + h < height && pixels[(y + h) * width + x] != separator) {
       ++h;
     }
 
