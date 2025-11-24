@@ -10,11 +10,11 @@ class componentmanager {
     void enroll() noexcept {
       const auto* name = typeid(T).name();
 
-      assert(types.find(name) == types.end() && "Registering component type more than once.");
+      assert(_types.find(name) == _types.end() && "Registering component type more than once.");
 
-      types.emplace(name, next);
+      _types.emplace(name, _next);
 
-      ++next;
+      ++_next;
     }
 
    	template<typename T>
@@ -22,8 +22,8 @@ class componentmanager {
     {
       const auto* name = typeid(T).name();
 
-      auto it = types.find(name);
-      assert(it != types.end() && "Component not registered before use.");
+      auto it = _types.find(name);
+      assert(it != _types.end() && "Component not registered before use.");
 
       return it->second;
     }
@@ -41,7 +41,7 @@ class componentmanager {
   	}
 
   private:
-    uint64_t next{0};
+    uint64_t _next{0};
 
-    std::unordered_map<std::string, componenttype> types;
+    std::unordered_map<std::string, componenttype> _types;
 };
