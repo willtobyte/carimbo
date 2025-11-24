@@ -5,8 +5,8 @@
 using entity = uint64_t;
 
 struct entitystorage final {
-  static constexpr size_t size = 10000ULL;
-  static constexpr size_t alignment = 64;
+  static constexpr auto size = 10000uz;
+  static constexpr auto alignment = 64uz;
 
   alignas(alignment) entity data[size];
 
@@ -46,8 +46,8 @@ struct alignas(8) physics final {
 using componenttype = uint8_t;
 
 struct componentstorage final {
-  static constexpr size_t size = 256ULL;
-  static constexpr size_t alignment = 64;
+  static constexpr auto size = 256uz;
+  static constexpr auto alignment = 64uz;
 
   alignas(alignment) componenttype data[size];
 
@@ -63,11 +63,11 @@ struct componentstorage final {
 using signature = std::bitset<componentstorage::size>;
 
 namespace signature_ops {
-  [[nodiscard]] inline constexpr bool matches(const signature& signature, const signature& required) noexcept {
+  [[nodiscard]] inline constexpr bool matches(const ::signature& signature, const ::signature& required) noexcept {
     return (signature & required) == required;
   }
 
-  [[nodiscard]] inline constexpr signature combine(const signature& a, const signature& b) noexcept {
+  [[nodiscard]] inline constexpr ::signature combine(const ::signature& a, const ::signature& b) noexcept {
     return a | b;
   }
 }
