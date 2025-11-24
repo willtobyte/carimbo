@@ -3,6 +3,8 @@
 #include "common.hpp"
 
 struct alignas(8) vec2 {
+  using value_type = float;
+
   union {
     struct { float x, y; };
     std::array<float, 2> _data;
@@ -33,6 +35,7 @@ struct alignas(8) vec2 {
   [[nodiscard]] constexpr auto end() const noexcept { return _data.end(); }
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
+  [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
 };
 
 static_assert(sizeof(vec2) == 8);
@@ -41,6 +44,8 @@ static_assert(std::is_trivially_copyable_v<vec2>);
 static_assert(std::is_standard_layout_v<vec2>);
 
 struct alignas(16) vec4 {
+  using value_type = float;
+
   union {
     struct { float x, y, w, h; };
     std::array<float, 4> _data;
@@ -74,6 +79,7 @@ struct alignas(16) vec4 {
   [[nodiscard]] constexpr auto end() const noexcept { return _data.end(); }
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 4; }
+  [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 4; }
 
   [[nodiscard]] operator SDL_FRect() const noexcept {
     return SDL_FRect{
