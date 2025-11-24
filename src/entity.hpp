@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "common.hpp"
 
 using entity = uint64_t;
 
@@ -19,7 +19,7 @@ struct entitystorage final {
   [[nodiscard]] constexpr const entity& operator[](size_t index) const noexcept { return data[index]; }
 };
 
-struct alignas(16) transform final {
+struct alignas(8) transform final {
 	vec2 position;
 	float angle;
 	float scale;
@@ -27,6 +27,24 @@ struct alignas(16) transform final {
 	[[nodiscard]] constexpr bool operator==(const transform&) const noexcept = default;
 };
 
+struct alignas(4) alpha final {
+	uint8_t value{255};
+
+	[[nodiscard]] constexpr bool operator==(const alpha&) const noexcept = default;
+};
+
+struct alignas(8) physics final {
+	b2BodyId id;
+	b2BodyType type;
+	bool enabled;
+
+	[[nodiscard]] bool operator==(const physics& other) const noexcept {
+		return std::memcmp(this, &other, sizeof(physics)) == 0;
+	}
+};
+
+static_assert(sizeof(transform) == 16);
+static_assert(alignof(transform) == 8);
 static_assert(std::is_trivially_copyable_v<transform>);
 static_assert(std::is_standard_layout_v<transform>);
 

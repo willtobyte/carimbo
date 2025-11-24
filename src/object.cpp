@@ -131,7 +131,7 @@ void object::body::sync(const vec4& bounds, const vec2& position, float scale, d
 
     auto def = b2DefaultBodyDef();
     def.type = b2_kinematicBody;
-    def.userData = physics::id_to_userdata(id);
+    def.userData = id_to_userdata(id);
     def.position = b2_position;
     def.rotation = rotation;
     _id = b2CreateBody(*world, &def);
@@ -139,8 +139,8 @@ void object::body::sync(const vec4& bounds, const vec2& position, float scale, d
     auto sd = b2DefaultShapeDef();
     sd.isSensor = true;
     sd.enableSensorEvents = true;
-    sd.filter.categoryBits = physics::collisioncategory::player;
-    sd.filter.maskBits = physics::collisioncategory::player;
+    sd.filter.categoryBits = collisioncategory::player;
+    sd.filter.maskBits = collisioncategory::player;
     _shape = b2CreatePolygonShape(_id, &sd, &box);
     _enabled = true;
 
