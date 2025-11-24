@@ -763,13 +763,13 @@ void scriptengine::run() {
     "y", &vec2::y
   );
 
-  lua.new_usertype<vec4>(
-    "Vec4",
-    sol::constructors<vec4(), vec4(float, float, float, float)>(),
-    "x", &vec4::x,
-    "y", &vec4::y,
-    "width", &vec4::w,
-    "height", &vec4::h
+  lua.new_usertype<box2>(
+    "Box2",
+    sol::constructors<box2(), box2(float, float, float, float)>(),
+    "x", &box2::x,
+    "y", &box2::y,
+    "width", &box2::w,
+    "height", &box2::h
   );
 
   lua.new_usertype<cassette>(

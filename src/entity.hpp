@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "geometry.hpp"
+
 using entity = uint64_t;
 
 struct entitystorage final {

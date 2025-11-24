@@ -4,7 +4,7 @@
 
 class pixmap;
 
-using glyphmap = std::map<char, vec4>;
+using glyphmap = std::map<char, box2>;
 
 class font final {
 public:

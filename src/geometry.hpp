@@ -43,7 +43,7 @@ static_assert(alignof(vec2) == 8);
 static_assert(std::is_trivially_copyable_v<vec2>);
 static_assert(std::is_standard_layout_v<vec2>);
 
-struct alignas(16) vec4 {
+struct alignas(16) box2 {
   using value_type = float;
 
   union {
@@ -51,15 +51,15 @@ struct alignas(16) vec4 {
     std::array<float, 4> _data;
   };
 
-  constexpr vec4() noexcept : x(0), y(0), w(0), h(0) {}
+  constexpr box2() noexcept : x(0), y(0), w(0), h(0) {}
 
-  constexpr vec4(float x, float y, float w, float h) noexcept
+  constexpr box2(float x, float y, float w, float h) noexcept
       : x(x), y(y), w(w), h(h) {}
 
-  constexpr explicit vec4(std::array<float, 4> const& data) noexcept
+  constexpr explicit box2(std::array<float, 4> const& data) noexcept
       : _data(data) {}
 
-  constexpr vec4(vec2 const& position, vec2 const& size) noexcept
+  constexpr box2(vec2 const& position, vec2 const& size) noexcept
       : x(position.x), y(position.y), w(size.x), h(size.y) {}
 
   [[nodiscard]] constexpr float operator[](std::size_t i) const noexcept {
@@ -91,40 +91,40 @@ struct alignas(16) vec4 {
   }
 };
 
-static_assert(sizeof(vec4) == 16);
-static_assert(alignof(vec4) == 16);
-static_assert(std::is_trivially_copyable_v<vec4>);
-static_assert(std::is_standard_layout_v<vec4>);
+static_assert(sizeof(box2) == 16);
+static_assert(alignof(box2) == 16);
+static_assert(std::is_trivially_copyable_v<box2>);
+static_assert(std::is_standard_layout_v<box2>);
 
 [[nodiscard]] constexpr auto operator+(vec2 const& lhs, vec2 const& rhs) noexcept {
   return vec2{lhs.x + rhs.x, lhs.y + rhs.y};
 }
 
-[[nodiscard]] constexpr auto operator+(vec4 const& lhs, vec4 const& rhs) noexcept {
-  return vec4{lhs.x + rhs.x, lhs.y + rhs.y, lhs.w + rhs.w, lhs.h + rhs.h};
+[[nodiscard]] constexpr auto operator+(box2 const& lhs, box2 const& rhs) noexcept {
+  return box2{lhs.x + rhs.x, lhs.y + rhs.y, lhs.w + rhs.w, lhs.h + rhs.h};
 }
 
 [[nodiscard]] constexpr auto operator-(vec2 const& lhs, vec2 const& rhs) noexcept {
   return vec2{lhs.x - rhs.x, lhs.y - rhs.y};
 }
 
-[[nodiscard]] constexpr auto operator-(vec4 const& lhs, vec4 const& rhs) noexcept {
-  return vec4{lhs.x - rhs.x, lhs.y - rhs.y, lhs.w - rhs.w, lhs.h - rhs.h};
+[[nodiscard]] constexpr auto operator-(box2 const& lhs, box2 const& rhs) noexcept {
+  return box2{lhs.x - rhs.x, lhs.y - rhs.y, lhs.w - rhs.w, lhs.h - rhs.h};
 }
 
 [[nodiscard]] constexpr auto operator*(vec2 const& lhs, float scalar) noexcept {
   return vec2{lhs.x * scalar, lhs.y * scalar};
 }
 
-[[nodiscard]] constexpr auto operator*(vec4 const& lhs, float scalar) noexcept {
-  return vec4{lhs.x * scalar, lhs.y * scalar, lhs.w * scalar, lhs.h * scalar};
+[[nodiscard]] constexpr auto operator*(box2 const& lhs, float scalar) noexcept {
+  return box2{lhs.x * scalar, lhs.y * scalar, lhs.w * scalar, lhs.h * scalar};
 }
 
 [[nodiscard]] constexpr auto operator*(float scalar, vec2 const& rhs) noexcept {
   return rhs * scalar;
 }
 
-[[nodiscard]] constexpr auto operator*(float scalar, vec4 const& rhs) noexcept {
+[[nodiscard]] constexpr auto operator*(float scalar, box2 const& rhs) noexcept {
   return rhs * scalar;
 }
 
@@ -132,8 +132,8 @@ static_assert(std::is_standard_layout_v<vec4>);
   return vec2{lhs.x / scalar, lhs.y / scalar};
 }
 
-[[nodiscard]] constexpr auto operator/(vec4 const& lhs, float scalar) noexcept {
-  return vec4{lhs.x / scalar, lhs.y / scalar, lhs.w / scalar, lhs.h / scalar};
+[[nodiscard]] constexpr auto operator/(box2 const& lhs, float scalar) noexcept {
+  return box2{lhs.x / scalar, lhs.y / scalar, lhs.w / scalar, lhs.h / scalar};
 }
 
 constexpr auto& operator+=(vec2& lhs, vec2 const& rhs) noexcept {
@@ -142,7 +142,7 @@ constexpr auto& operator+=(vec2& lhs, vec2 const& rhs) noexcept {
   return lhs;
 }
 
-constexpr auto& operator+=(vec4& lhs, vec4 const& rhs) noexcept {
+constexpr auto& operator+=(box2& lhs, box2 const& rhs) noexcept {
   lhs.x += rhs.x;
   lhs.y += rhs.y;
   lhs.w += rhs.w;
@@ -156,7 +156,7 @@ constexpr auto& operator-=(vec2& lhs, vec2 const& rhs) noexcept {
   return lhs;
 }
 
-constexpr auto& operator-=(vec4& lhs, vec4 const& rhs) noexcept {
+constexpr auto& operator-=(box2& lhs, box2 const& rhs) noexcept {
   lhs.x -= rhs.x;
   lhs.y -= rhs.y;
   lhs.w -= rhs.w;
@@ -170,7 +170,7 @@ constexpr auto& operator*=(vec2& lhs, float scalar) noexcept {
   return lhs;
 }
 
-constexpr auto& operator*=(vec4& lhs, float scalar) noexcept {
+constexpr auto& operator*=(box2& lhs, float scalar) noexcept {
   lhs.x *= scalar;
   lhs.y *= scalar;
   lhs.w *= scalar;
@@ -184,7 +184,7 @@ constexpr auto& operator/=(vec2& lhs, float scalar) noexcept {
   return lhs;
 }
 
-constexpr auto& operator/=(vec4& lhs, float scalar) noexcept {
+constexpr auto& operator/=(box2& lhs, float scalar) noexcept {
   lhs.x /= scalar;
   lhs.y /= scalar;
   lhs.w /= scalar;
@@ -196,7 +196,7 @@ constexpr auto& operator/=(vec4& lhs, float scalar) noexcept {
   return lhs.x == rhs.x && lhs.y == rhs.y;
 }
 
-[[nodiscard]] constexpr bool operator==(vec4 const& lhs, vec4 const& rhs) noexcept {
+[[nodiscard]] constexpr bool operator==(box2 const& lhs, box2 const& rhs) noexcept {
   return lhs.x == rhs.x && lhs.y == rhs.y && lhs.w == rhs.w && lhs.h == rhs.h;
 }
 
@@ -204,16 +204,16 @@ constexpr auto& operator/=(vec4& lhs, float scalar) noexcept {
   return vec2{-vec.x, -vec.y};
 }
 
-[[nodiscard]] constexpr auto operator-(vec4 const& vec) noexcept {
-  return vec4{-vec.x, -vec.y, -vec.w, -vec.h};
+[[nodiscard]] constexpr auto operator-(box2 const& vec) noexcept {
+  return box2{-vec.x, -vec.y, -vec.w, -vec.h};
 }
 
 [[nodiscard]] constexpr auto operator*(vec2 const& lhs, vec2 const& rhs) noexcept {
   return vec2{lhs.x * rhs.x, lhs.y * rhs.y};
 }
 
-[[nodiscard]] constexpr auto operator*(vec4 const& lhs, vec4 const& rhs) noexcept {
-  return vec4{lhs.x * rhs.x, lhs.y * rhs.y, lhs.w * rhs.w, lhs.h * rhs.h};
+[[nodiscard]] constexpr auto operator*(box2 const& lhs, box2 const& rhs) noexcept {
+  return box2{lhs.x * rhs.x, lhs.y * rhs.y, lhs.w * rhs.w, lhs.h * rhs.h};
 }
 
 constexpr auto& operator*=(vec2& lhs, vec2 const& rhs) noexcept {
@@ -222,7 +222,7 @@ constexpr auto& operator*=(vec2& lhs, vec2 const& rhs) noexcept {
   return lhs;
 }
 
-constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
+constexpr auto& operator*=(box2& lhs, box2 const& rhs) noexcept {
   lhs.x *= rhs.x;
   lhs.y *= rhs.y;
   lhs.w *= rhs.w;
@@ -234,7 +234,7 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   return lhs.x * rhs.x + lhs.y * rhs.y;
 }
 
-[[nodiscard]] constexpr float dot(vec4 const& lhs, vec4 const& rhs) noexcept {
+[[nodiscard]] constexpr float dot(box2 const& lhs, box2 const& rhs) noexcept {
   return lhs.x * rhs.x + lhs.y * rhs.y + lhs.w * rhs.w + lhs.h * rhs.h;
 }
 
@@ -246,7 +246,7 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   return dot(vec, vec);
 }
 
-[[nodiscard]] constexpr float length_squared(vec4 const& vec) noexcept {
+[[nodiscard]] constexpr float length_squared(box2 const& vec) noexcept {
   return dot(vec, vec);
 }
 
@@ -254,7 +254,7 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   return std::sqrt(length_squared(vec));
 }
 
-[[nodiscard]] inline float length(vec4 const& vec) noexcept {
+[[nodiscard]] inline float length(box2 const& vec) noexcept {
   return std::sqrt(length_squared(vec));
 }
 
@@ -262,7 +262,7 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   return length(b - a);
 }
 
-[[nodiscard]] inline float distance(vec4 const& a, vec4 const& b) noexcept {
+[[nodiscard]] inline float distance(box2 const& a, box2 const& b) noexcept {
   return length(b - a);
 }
 
@@ -270,7 +270,7 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   return length_squared(b - a);
 }
 
-[[nodiscard]] inline float distance_squared(vec4 const& a, vec4 const& b) noexcept {
+[[nodiscard]] inline float distance_squared(box2 const& a, box2 const& b) noexcept {
   return length_squared(b - a);
 }
 
@@ -279,16 +279,16 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   return len > 0.0f ? vec / len : vec2{};
 }
 
-[[nodiscard]] inline auto normalize(vec4 const& vec) noexcept {
+[[nodiscard]] inline auto normalize(box2 const& vec) noexcept {
   const float len = length(vec);
-  return len > 0.0f ? vec / len : vec4{};
+  return len > 0.0f ? vec / len : box2{};
 }
 
 [[nodiscard]] constexpr auto lerp(vec2 const& a, vec2 const& b, float t) noexcept {
   return a + (b - a) * t;
 }
 
-[[nodiscard]] constexpr auto lerp(vec4 const& a, vec4 const& b, float t) noexcept {
+[[nodiscard]] constexpr auto lerp(box2 const& a, box2 const& b, float t) noexcept {
   return a + (b - a) * t;
 }
 
@@ -299,8 +299,8 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   };
 }
 
-[[nodiscard]] constexpr auto clamp(vec4 const& vec, vec4 const& min, vec4 const& max) noexcept {
-  return vec4{
+[[nodiscard]] constexpr auto clamp(box2 const& vec, box2 const& min, box2 const& max) noexcept {
+  return box2{
     std::clamp(vec.x, min.x, max.x),
     std::clamp(vec.y, min.y, max.y),
     std::clamp(vec.w, min.w, max.w),
@@ -315,8 +315,8 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   };
 }
 
-[[nodiscard]] constexpr auto min(vec4 const& a, vec4 const& b) noexcept {
-  return vec4{
+[[nodiscard]] constexpr auto min(box2 const& a, box2 const& b) noexcept {
+  return box2{
     std::min(a.x, b.x),
     std::min(a.y, b.y),
     std::min(a.w, b.w),
@@ -331,8 +331,8 @@ constexpr auto& operator*=(vec4& lhs, vec4 const& rhs) noexcept {
   };
 }
 
-[[nodiscard]] constexpr auto max(vec4 const& a, vec4 const& b) noexcept {
-  return vec4{
+[[nodiscard]] constexpr auto max(box2 const& a, box2 const& b) noexcept {
+  return box2{
     std::max(a.x, b.x),
     std::max(a.y, b.y),
     std::max(a.w, b.w),
@@ -381,11 +381,11 @@ inline void from_json(const nlohmann::json& j, vec2& v) {
   v.y = j.at("y").get<float>();
 }
 
-inline void to_json(nlohmann::json& j, const vec4& v) {
+inline void to_json(nlohmann::json& j, const box2& v) {
   j = nlohmann::json{{"x", v.x}, {"y", v.y}, {"width", v.w}, {"height", v.h}};
 }
 
-inline void from_json(const nlohmann::json& j, vec4& v) {
+inline void from_json(const nlohmann::json& j, box2& v) {
   v.x = j.at("x").get<float>();
   v.y = j.at("y").get<float>();
   v.w = j.at("width").get<float>();

@@ -3,7 +3,7 @@
 #include "io.hpp"
 #include "reflection.hpp"
 #include "resourcemanager.hpp"
-#include "vector.hpp"
+#include "geometry.hpp"
 
 cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
@@ -26,7 +26,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
       return keyframe{
         frame["duration"].template get<uint64_t>(),
         frame["offset"].template get<vec2>(),
-        frame["rectangle"].template get<vec4>(),
+        frame["rectangle"].template get<box2>(),
       };
     });
 

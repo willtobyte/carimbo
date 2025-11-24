@@ -9,7 +9,7 @@ class world;
 struct keyframe final {
   uint64_t duration{0};
   vec2 offset;
-  vec4 frame;
+  box2 frame;
 
   friend void from_json(const nlohmann::json& j, keyframe& o);
 };
@@ -17,7 +17,7 @@ struct keyframe final {
 struct bounds final {
   std::optional<uint8_t> type;
   std::bitset<256> reagents;
-  vec4 rectangle;
+  box2 rectangle;
 
   friend void from_json(const nlohmann::json& j, bounds& o);
 };
@@ -102,8 +102,8 @@ private:
     uint64_t _last_tick{0};
 
     vec2 _offset;
-    vec4 _source;
-    vec4 _bounds;
+    box2 _source;
+    box2 _bounds;
     bool _has_keyframe{false};
     bool _has_bounds{false};
 
@@ -113,7 +113,7 @@ private:
     void reset();
     bool finished() const noexcept;
     bool valid() const noexcept;
-    const vec4& bounds() const noexcept;
+    const box2& bounds() const noexcept;
   };
 
   struct body final {
@@ -123,7 +123,7 @@ private:
 
     struct {
       vec2 position;
-      vec4 bounds;
+      box2 bounds;
       float scale{0.0f};
       double angle{0.0};
       bool valid{false};
@@ -138,7 +138,7 @@ private:
     void disable();
     bool missing() const noexcept;
     bool valid() const noexcept;
-    void sync(const vec4& bounds, const vec2& position, float scale, double angle, uint64_t id);
+    void sync(const box2& bounds, const vec2& position, float scale, double angle, uint64_t id);
   };
 
   vec2 _position;
@@ -149,7 +149,7 @@ private:
   bool _visible{true};
   bool _dirty{true};
   mutable bool _redraw{true};
-  mutable vec4 _destination;
+  mutable box2 _destination;
 
   std::string _action;
   std::optional<controller> _animation;
