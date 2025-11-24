@@ -15,7 +15,7 @@ public:
 		auto [it, inserted] = entitymapping.emplace(e, entitymapping.size());
 		assert(inserted && "Component added to same entity more than once.");
 
-		size_t index = it->second;
+		const auto index = it->second;
 		entitymapping.emplace(index, e);
 		array[index] = std::move(component);
   }
