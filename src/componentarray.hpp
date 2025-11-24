@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "entity.hpp"
+
 template<typename T>
 class componentarray {
   static constexpr auto max_entities = entitystorage::size;
@@ -30,15 +32,15 @@ public:
 
     auto const removed_index = lookup[e];
     auto const last_index = components.size() - 1;
-    
+
     if (removed_index != last_index) {
       auto const last_entity = reverse[last_index];
-      
+
       components[removed_index] = std::move(components[last_index]);
       reverse[removed_index] = last_entity;
       lookup[last_entity] = removed_index;
     }
-    
+
     components.pop_back();
     reverse.pop_back();
     lookup[e] = invalid_index;
