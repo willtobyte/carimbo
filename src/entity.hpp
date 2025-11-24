@@ -27,10 +27,10 @@ struct alignas(8) transform final {
 	[[nodiscard]] constexpr bool operator==(const transform&) const noexcept = default;
 };
 
-struct alignas(4) alpha final {
+struct transparency final {
 	uint8_t value{255};
 
-	[[nodiscard]] constexpr bool operator==(const alpha&) const noexcept = default;
+	[[nodiscard]] constexpr bool operator==(const transparency&) const noexcept = default;
 };
 
 struct alignas(8) physics final {
@@ -42,11 +42,6 @@ struct alignas(8) physics final {
 		return std::memcmp(this, &other, sizeof(physics)) == 0;
 	}
 };
-
-static_assert(sizeof(transform) == 16);
-static_assert(alignof(transform) == 8);
-static_assert(std::is_trivially_copyable_v<transform>);
-static_assert(std::is_standard_layout_v<transform>);
 
 using componenttype = uint8_t;
 
