@@ -1,116 +1,132 @@
 #pragma once
 
 #include "common.hpp"
-
 #include "entity.hpp"
 
 template<typename T>
-class componentarray {
+class componentarray final {
   static constexpr auto max_entities = entitystorage::size;
   static constexpr auto invalid_index = std::numeric_limits<size_t>::max();
 
 public:
-  componentarray() noexcept {
-    _lookup.assign(max_entities, invalid_index);
-    _components.reserve(max_entities);
-    _entities.reserve(max_entities);
+  constexpr componentarray() noexcept : _size(0) {
+    for (size_t i = 0; i < max_entities; ++i) {
+      _lookup[i] = invalid_index;
+    }
   }
 
-  void insert(const entity e, T component) noexcept {
-    assert(e < max_entities && "Entity ID out of bounds.");
-    assert(_lookup[e] == invalid_index && "Component added to same entity more than once.");
+  void insert(entity e, T component) noexcept {
+    auto const index = e & 0xFFFFFFFF;
+    assert(index < max_entities && "Entity ID out of bounds.");
+    assert(_lookup[index] == invalid_index && "Component added to same entity more than once.");
+    assert(_size < max_entities && "Component array full.");
 
-    auto const index = _components.size();
-    _lookup[e] = index;
-    _entities.push_back(e);
-    _components.push_back(std::move(component));
+    _lookup[index] = _size;
+    _entities[_size] = e;
+    _components[_size] = component;
+    ++_size;
   }
 
-  void remove(const entity e) noexcept {
-    assert(e < max_entities && "Entity ID out of bounds.");
-    assert(_lookup[e] != invalid_index && "Removing non-existent component.");
+  void remove(entity e) noexcept {
+    auto const index = e & 0xFFFFFFFF;
+    assert(index < max_entities && "Entity ID out of bounds.");
+    assert(_lookup[index] != invalid_index && "Removing non-existent component.");
+    assert(_size > 0 && "Removing from empty array.");
 
-    auto const removed_index = _lookup[e];
-    auto const last_index = _components.size() - 1;
+    auto const removed_index = _lookup[index];
+    auto const last_index = _size - 1;
 
     if (removed_index != last_index) {
       auto const last_entity = _entities[last_index];
+      auto const last_entity_index = last_entity & 0xFFFFFFFF;
 
-      _components[removed_index] = std::move(_components[last_index]);
+      _components[removed_index] = _components[last_index];
       _entities[removed_index] = last_entity;
-      _lookup[last_entity] = removed_index;
+      _lookup[last_entity_index] = removed_index;
     }
 
-    _components.pop_back();
-    _entities.pop_back();
-    _lookup[e] = invalid_index;
+    _lookup[index] = invalid_index;
+    --_size;
   }
 
-  [[nodiscard]] T& get(const entity e) noexcept {
-    assert(_lookup[e] != invalid_index && "Getting non-existent component.");
-    return _components[_lookup[e]];
+  [[nodiscard]] T& get(entity e) noexcept {
+    auto const index = e & 0xFFFFFFFF;
+    assert(index < max_entities && "Entity ID out of bounds.");
+    assert(_lookup[index] != invalid_index && "Getting non-existent component.");
+    return _components[_lookup[index]];
   }
 
-  [[nodiscard]] const T& get(const entity e) const noexcept {
-    assert(_lookup[e] != invalid_index && "Getting non-existent component.");
-    return _components[_lookup[e]];
+  [[nodiscard]] const T& get(entity e) const noexcept {
+    auto const index = e & 0xFFFFFFFF;
+    assert(index < max_entities && "Entity ID out of bounds.");
+    assert(_lookup[index] != invalid_index && "Getting non-existent component.");
+    return _components[_lookup[index]];
   }
 
-  [[nodiscard]] bool has(const entity e) const noexcept {
-    return e < max_entities && _lookup[e] != invalid_index;
+  [[nodiscard]] bool has(entity e) const noexcept {
+    auto const index = e & 0xFFFFFFFF;
+    return index < max_entities && _lookup[index] != invalid_index;
   }
 
   [[nodiscard]] size_t size() const noexcept {
-    return _components.size();
+    return _size;
   }
 
   [[nodiscard]] bool empty() const noexcept {
-    return _components.empty();
+    return _size == 0;
   }
 
-  [[nodiscard]] size_t capacity() const noexcept {
-    return _components.capacity();
-  }
-
-  void reserve(size_t n) {
-    _components.reserve(n);
-    _entities.reserve(n);
+  [[nodiscard]] bool full() const noexcept {
+    return _size == max_entities;
   }
 
   void clear() noexcept {
-    _components.clear();
-    _entities.clear();
-    std::fill(_lookup.begin(), _lookup.end(), invalid_index);
+    for (size_t i = 0; i < _size; ++i) {
+      auto const index = _entities[i] & 0xFFFFFFFF;
+      _lookup[index] = invalid_index;
+    }
+    _size = 0;
   }
 
-  [[nodiscard]] auto begin() noexcept { return _components.begin(); }
-  [[nodiscard]] auto end() noexcept { return _components.end(); }
-  [[nodiscard]] auto begin() const noexcept { return _components.begin(); }
-  [[nodiscard]] auto end() const noexcept { return _components.end(); }
-  [[nodiscard]] auto cbegin() const noexcept { return _components.cbegin(); }
-  [[nodiscard]] auto cend() const noexcept { return _components.cend(); }
+  [[nodiscard]] T* begin() noexcept { return _components; }
+  [[nodiscard]] T* end() noexcept { return _components + _size; }
+  [[nodiscard]] const T* begin() const noexcept { return _components; }
+  [[nodiscard]] const T* end() const noexcept { return _components + _size; }
+  [[nodiscard]] const T* cbegin() const noexcept { return _components; }
+  [[nodiscard]] const T* cend() const noexcept { return _components + _size; }
 
-  [[nodiscard]] const std::vector<entity>& entities() const noexcept {
-    return _entities;
+  [[nodiscard]] T& at_index(size_t idx) noexcept {
+    assert(idx < _size && "Index out of bounds.");
+    return _components[idx];
   }
 
-  [[nodiscard]] T& at_index(size_t index) noexcept {
-    assert(index < _components.size() && "Index out of bounds.");
-    return _components[index];
+  [[nodiscard]] const T& at_index(size_t idx) const noexcept {
+    assert(idx < _size && "Index out of bounds.");
+    return _components[idx];
   }
 
-  [[nodiscard]] const T& at_index(size_t index) const noexcept {
-    assert(index < _components.size() && "Index out of bounds.");
-    return _components[index];
+  [[nodiscard]] entity entity_at_index(size_t idx) const noexcept {
+    assert(idx < _size && "Index out of bounds.");
+    return _entities[idx];
   }
 
-  [[nodiscard]] entity entity_at_index(size_t index) const noexcept {
-    assert(index < _entities.size() && "Index out of bounds.");
-    return _entities[index];
+  template<typename F>
+  void each(F&& fn) noexcept {
+    for (size_t i = 0; i < _size; ++i) {
+      fn(_entities[i], _components[i]);
+    }
+  }
+
+  template<typename F>
+  void each(F&& fn) const noexcept {
+    for (size_t i = 0; i < _size; ++i) {
+      fn(_entities[i], _components[i]);
+    }
   }
 
 private:
-  std::vector<T> _components;
-  std::vector<size_t> _lookup;
-  std::vector<entity> _entities;
+  alignas(64) T _components[max_entities];
+  alignas(64) entity _entities[max_entities];
+  alignas(64) size_t _lookup[max_entities];
+  size_t _size;
 };
