@@ -555,8 +555,6 @@ void scriptengine::run() {
         loaded[std::format("scenes/{}", name)] = module;
         auto ptr = std::weak_ptr<::scene>(scene);
 
-
-
         module["get"] = [ptr, name](sol::table, std::string_view id, ::scenekind kind) {
           if (auto scene = ptr.lock()) [[likely]] {
             return scene->get(id, kind);
