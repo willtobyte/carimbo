@@ -30,13 +30,17 @@ struct alignas(16) timeline final {
 
   std::array<quad, capacity> frames;
   std::array<uint16_t, capacity> durations;
-  uint16_t count = 0;
+  uint16_t count{0};
+  uint16_t current{0};
+  uint64_t tick{0};
+  bool loop{true};
 
   [[nodiscard]] constexpr bool operator==(const timeline&) const noexcept = default;
 };
 
 struct alignas(8) sprite final {
   uint64_t id;
+  reflection reflection;
 
   [[nodiscard]] constexpr bool operator==(const sprite&) const noexcept = default;
 };
