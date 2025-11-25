@@ -3,7 +3,6 @@
 #include "common.hpp"
 
 namespace steam {
-
 class achievement final {
 public:
   achievement() = default;

@@ -3,6 +3,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <box2d/box2d.h>
+#include <entt/entt.hpp>
 #include <lua.hpp>
 #include <nlohmann/json.hpp>
 #include <physfs.h>
@@ -54,61 +55,77 @@
 #include "defer.hpp"
 #include "helper.hpp"
 
-  class audiodevice;
-  class soundfx;
-  class soundmanager;
+class achievement;
+class application;
+class audiodevice;
+class canvas;
+class cassette;
+class color;
+class cursor;
+class desktop;
+class engine;
+class enginefactory;
+class envelope;
+class envelopepool_impl;
+class eventmanager;
+class eventreceiver;
+class fadeineffect;
+class filesystem;
+class font;
+class fonteffect;
+class fontfactory;
+class io;
+class kv;
+class label;
+class lifecycleobserver;
+class loopable;
+class noncopyable;
+class object;
+class objectmanager;
+class observable;
+class operatingsystem;
+class overlay;
+class particlefactory;
+class particlesystem;
+class pixmap;
+class pixmappool;
+class postalservice;
+class querybuilder;
+class renderer;
+class resourcemanager;
+class scene;
+class scenebackdrop;
+class scenemanager;
+class scriptengine;
+class soundfx;
+class soundmanager;
+class statemanager;
+class timermanager;
+class widget;
+class window;
+class world;
 
-  class application;
-  class engine;
-  class enginefactory;
-  class lifecycleobserver;
-  class loopable;
-  class object;
-  class objectmanager;
-  class resourcemanager;
-  class postalservice;
-  class scene;
-  class scenemanager;
-  class scriptengine;
-  class statemanager;
-  class timermanager;
-  class world;
-  class querybuilder;
-  struct mailenvelope;
-  struct timerenvelope;
-  class envelope;
+struct animation;
+struct bounds;
+struct keyframe;
+struct mailenvelope;
+struct particle;
+struct particlebatch;
+struct particleprops;
+struct quad;
+struct timerenvelope;
+struct transform;
+struct vec2;
+struct vec3;
 
-  class canvas;
-  class color;
-  class cursor;
-  class font;
-  class fonteffect;
-  class fontfactory;
-  class label;
-  class overlay;
-  class particlesystem;
-  class pixmap;
-  class pixmappool;
-  class renderer;
-  class tilemap;
-  class window;
-  enum class reflection : int;
-
-  class eventmanager;
-  class eventreceiver;
-
-  class cassette;
-  class filesystem;
-
-  class kv;
-
-  class desktop;
-  class operatingsystem;
+enum collisioncategory : std::uint64_t;
+enum class reflection : int;
+enum class scenekind : uint8_t;
+enum scenetype : std::uint8_t;
+enum class widgettype : uint8_t;
 
 namespace steam {
   class achievement;
 }
 
-  class locales;
-
-  class widget;
+#define ECS
