@@ -20,7 +20,7 @@ public:
   [[nodiscard]] bool has(const entity id) const noexcept;
 
 private:
-  static constexpr auto invalid_index = std::numeric_limits<std::size_t>::max();
+  static constexpr auto __invalid = std::numeric_limits<std::size_t>::max();
 
   std::size_t _size{0};
   std::array<T, entity_n> _components;
@@ -30,7 +30,7 @@ private:
 
 template<typename T>
 component_array<T>::component_array() noexcept {
-  _entity_to_index.fill(invalid_index);
+  _entity_to_index.fill(__invalid);
 }
 
 template<typename T>
@@ -55,7 +55,7 @@ void component_array<T>::remove(const entity id) noexcept {
   _components[remove_index] = _components[last_index];
   _index_to_entity[remove_index] = last_entity;
   _entity_to_index[last_entity] = remove_index;
-  _entity_to_index[id] = invalid_index;
+  _entity_to_index[id] = __invalid;
 
   --_size;
 }
@@ -81,5 +81,5 @@ void component_array<T>::entity_destroyed(const entity id) noexcept {
 template<typename T>
 bool component_array<T>::has(const entity id) const noexcept {
   if (id >= entity_n) [[unlikely]] return false;
-  return _entity_to_index[id] != invalid_index;
+  return _entity_to_index[id] != __invalid;
 }
