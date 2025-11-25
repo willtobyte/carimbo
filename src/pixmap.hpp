@@ -8,7 +8,7 @@ class pixmap final {
 public:
   pixmap() = delete;
   pixmap(std::shared_ptr<renderer> renderer, std::string_view filename);
-  ~pixmap() = default;
+  ~pixmap() noexcept = default;
 
   void draw(
     const float sx, const float sy, const float sw, const float sh,
@@ -16,17 +16,20 @@ public:
     const double angle = .0,
     const uint8_t alpha = 255,
     const reflection reflection = reflection::none
-  ) const;
+  ) const noexcept;
 
-  operator SDL_Texture*() const;
+  operator SDL_Texture*() const noexcept;
 
-  int width() const;
+  int width() const noexcept;
 
-  int height() const;
+  int height() const noexcept;
+
+  size_t hash() const noexcept;
 
 private:
   int _width;
   int _height;
+  size_t _hash;
 
   std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;

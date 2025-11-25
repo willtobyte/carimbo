@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "geometry.hpp"
+
 using componenttype = std::uint8_t;
 
 constexpr componenttype component_n = 32;
@@ -40,7 +42,7 @@ struct alignas(16) timeline final {
 };
 
 struct alignas(8) sprite final {
-  uint64_t id;
+  size_t hash;
   reflection reflection;
 
   [[nodiscard]] constexpr bool operator==(const sprite&) const noexcept = default;

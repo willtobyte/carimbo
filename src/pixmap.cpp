@@ -5,7 +5,8 @@
 #include "stb_image.h"
 
 pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
-    : _renderer(std::move(renderer)) {
+    : _renderer(std::move(renderer)),
+      _hash(std::hash<std::string_view>{}(filename)) {
   const auto buffer = io::read(filename);
 
   int width, height, channels;
@@ -43,7 +44,7 @@ void pixmap::draw(
     const double angle,
     const uint8_t alpha,
     const reflection reflection
-) const {
+) const noexcept {
   const SDL_FRect source{ sx, sy, sw, sh };
   const SDL_FRect destination{ dx, dy, dw, dh };
 
@@ -51,14 +52,18 @@ void pixmap::draw(
   SDL_RenderTextureRotated(*_renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(reflection));
 }
 
-pixmap::operator SDL_Texture*() const {
+pixmap::operator SDL_Texture*() const noexcept {
   return _texture.get();
 }
 
-int pixmap::width() const {
+size_t pixmap::hash() const noexcept {
+  return _hash;
+}
+
+int pixmap::width() const noexcept {
   return _width;
 }
 
-int pixmap::height() const {
+int pixmap::height() const noexcept {
   return _height;
 }
