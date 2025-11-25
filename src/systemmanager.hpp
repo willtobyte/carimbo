@@ -100,9 +100,10 @@ void systemmanager<systems...>::update_one(const entity id, const signature& sig
 
   if ((signature & _signatures[I]) == _signatures[I]) {
     system.entities.insert(id);
-  } else {
-    system.entities.erase(id);
+    return;
   }
+
+  system.entities.erase(id);
 }
 
 template<typename... systems>
