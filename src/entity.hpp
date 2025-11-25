@@ -35,6 +35,12 @@ struct alignas(16) timeline final {
   [[nodiscard]] constexpr bool operator==(const timeline&) const noexcept = default;
 };
 
+struct alignas(8) sprite final {
+  uint64_t id;
+
+  [[nodiscard]] constexpr bool operator==(const sprite&) const noexcept = default;
+};
+
 struct alignas(4) physics final {
 	b2BodyId id;
 	b2BodyType type;
