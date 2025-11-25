@@ -1,12 +1,12 @@
 #include "envelope.hpp"
 
-mailenvelope::mailenvelope(std::pmr::memory_resource* mr)
+mailenvelope::mailenvelope(std::pmr::memory_resource* mr) noexcept
   : to(0), kind(mr), body(mr) {
   kind.reserve(32);
   body.reserve(256);
 }
 
-mailenvelope::mailenvelope(const uint64_t to, const std::string_view kind, const std::string_view body, std::pmr::memory_resource* mr)
+mailenvelope::mailenvelope(const uint64_t to, const std::string_view kind, const std::string_view body, std::pmr::memory_resource* mr) noexcept
   : to(to), kind(kind, mr), body(body, mr) {}
 
 void mailenvelope::clear() noexcept {
@@ -26,10 +26,10 @@ void timerenvelope::clear() noexcept {
   fn = nullptr;
 }
 
-envelope::envelope(std::pmr::memory_resource* mr)
+envelope::envelope(std::pmr::memory_resource* mr) noexcept
   : _mr(mr), payload(std::monostate{}) {}
 
-void envelope::reset(mailenvelope&& envelope) {
+void envelope::reset(mailenvelope&& envelope) noexcept {
   if (auto* current = std::get_if<mailenvelope>(&payload)) {
     current->to = envelope.to;
     current->kind = std::move(envelope.kind);

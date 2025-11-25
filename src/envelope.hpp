@@ -7,8 +7,8 @@ struct mailenvelope final {
   std::pmr::string kind;
   std::pmr::string body;
 
-  explicit mailenvelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
-  mailenvelope(const uint64_t to, const std::string_view kind_view, const std::string_view body_view, std::pmr::memory_resource* mr = std::pmr::get_default_resource());
+  explicit mailenvelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource()) noexcept;
+  mailenvelope(const uint64_t to, const std::string_view kind_view, const std::string_view body_view, std::pmr::memory_resource* mr = std::pmr::get_default_resource()) noexcept;
 
   void clear() noexcept;
 };
@@ -32,10 +32,10 @@ private:
 public:
   payload_t payload;
 
-  explicit envelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
+  explicit envelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource()) noexcept;
   ~envelope() = default;
 
-  void reset(mailenvelope&& envelope);
+  void reset(mailenvelope&& envelope) noexcept;
   void reset(timerenvelope&& envelope) noexcept;
   void reset() noexcept;
 
@@ -43,7 +43,7 @@ public:
   requires (!std::same_as<std::decay_t<Args>, envelope> && ...) &&
             (!std::is_pointer_v<std::remove_reference_t<Args>> && ...) &&
             (sizeof...(Args) > 0)
-  explicit envelope(Args&&... args) : envelope() {
+  explicit envelope(Args&&... args) noexcept : envelope() {
     reset(std::forward<Args>(args)...);
   }
 

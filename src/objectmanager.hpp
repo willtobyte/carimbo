@@ -11,27 +11,27 @@
 
 class objectmanager final : public eventreceiver, public std::enable_shared_from_this<objectmanager> {
 public:
-  objectmanager();
+  objectmanager() noexcept;
 
   virtual ~objectmanager() = default;
 
   std::shared_ptr<::object> create(std::string_view kind, std::optional<std::string_view> scope, bool manage = true);
 
-  std::shared_ptr<::object> clone(std::shared_ptr<::object> matrix);
+  std::shared_ptr<::object> clone(std::shared_ptr<::object> matrix) noexcept;
 
-  void manage(std::shared_ptr<::object> object);
+  void manage(std::shared_ptr<::object> object) noexcept;
 
-  bool remove(std::shared_ptr<::object> object);
+  bool remove(std::shared_ptr<::object> object) noexcept;
 
-  std::shared_ptr<::object> find(uint64_t id) const;
+  std::shared_ptr<::object> find(uint64_t id) const noexcept;
 
   void update(float delta);
 
-  void draw() const;
+  void draw() const noexcept;
 
-  void set_resourcemanager(std::shared_ptr<::resourcemanager> resourcemanager);
-  void set_scenemanager(std::shared_ptr<::scenemanager> scenemanager);
-  void set_world(std::shared_ptr<::world> world);
+  void set_resourcemanager(std::shared_ptr<::resourcemanager> resourcemanager) noexcept;
+  void set_scenemanager(std::shared_ptr<::scenemanager> scenemanager) noexcept;
+  void set_world(std::shared_ptr<::world> world) noexcept;
 
 protected:
   virtual void on_mouse_release(const event::mouse::button& event) override;

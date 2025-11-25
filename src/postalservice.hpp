@@ -13,7 +13,7 @@ struct mail final {
     std::shared_ptr<object> to,
     std::optional<std::shared_ptr<object>> from,
     std::string_view body
-  )
+  ) noexcept
     : to(to->id()),
       kind(from && *from ? (*from)->kind() : "unknown"),
       body(body) {}
@@ -21,9 +21,9 @@ struct mail final {
 
 class postalservice final {
 public:
-  postalservice();
+  postalservice() noexcept;
 
-  void post(const mail& message);
+  void post(const mail& message) noexcept;
 
 private:
   std::shared_ptr<envelopepool_impl> _envelopepool;

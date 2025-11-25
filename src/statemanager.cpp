@@ -5,10 +5,10 @@
 #include "lifecycleobserver.hpp"
 #include "object.hpp"
 
-statemanager::statemanager() {
+statemanager::statemanager() noexcept {
 }
 
-bool statemanager::on(uint8_t player, event::gamepad::button type) const {
+bool statemanager::on(uint8_t player, event::gamepad::button type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -18,11 +18,11 @@ bool statemanager::on(uint8_t player, event::gamepad::button type) const {
   return false;
 }
 
-uint8_t statemanager::players() const {
+uint8_t statemanager::players() const noexcept {
   return static_cast<uint8_t>(_state.size());
 }
 
-static constexpr inline std::optional<event::gamepad::button> keytoctrl(const event::keyboard::key& event) {
+static constexpr inline std::optional<event::gamepad::button> keytoctrl(const event::keyboard::key& event) noexcept {
 
   switch (event) {
   case event::keyboard::key::up:
@@ -40,27 +40,27 @@ static constexpr inline std::optional<event::gamepad::button> keytoctrl(const ev
   }
 }
 
-void statemanager::on_key_press(const event::keyboard::key& event) {
+void statemanager::on_key_press(const event::keyboard::key& event) noexcept {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = true;
   }
 }
 
-void statemanager::on_key_release(const event::keyboard::key& event) {
+void statemanager::on_key_release(const event::keyboard::key& event) noexcept {
   if (auto ctrl = keytoctrl(event)) {
     _state[0][*ctrl] = false;
   }
 }
 
-void statemanager::on_gamepad_press(uint8_t who, const event::gamepad::button& event) {
+void statemanager::on_gamepad_press(uint8_t who, const event::gamepad::button& event) noexcept {
   _state[who][event] = true;
 }
 
-void statemanager::on_gamepad_release(uint8_t who, const event::gamepad::button& event) {
+void statemanager::on_gamepad_release(uint8_t who, const event::gamepad::button& event) noexcept {
   _state[who][event] = false;
 }
 
-void statemanager::on_gamepad_motion(uint8_t who, const event::gamepad::motion& event) {
+void statemanager::on_gamepad_motion(uint8_t who, const event::gamepad::motion& event) noexcept {
 
   static constexpr auto threshold = 8000;
   static constexpr auto deadzone = 4000;
@@ -97,5 +97,5 @@ void statemanager::on_gamepad_motion(uint8_t who, const event::gamepad::motion& 
   }
 }
 
-void statemanager::on_endupdate() {
+void statemanager::on_endupdate() noexcept {
 }

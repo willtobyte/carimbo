@@ -10,7 +10,7 @@ font::font(
   int16_t spacing,
   int16_t leading,
   float scale
-)
+) noexcept
   : _glyphs(glyphs),
     _map(map),
     _pixmap(pixmap),
@@ -19,7 +19,7 @@ font::font(
     _scale(scale)
 {}
 
-void font::draw(std::string_view text, const vec2& position, const std::weak_ptr<fonteffect>& effect) const {
+void font::draw(std::string_view text, const vec2& position, const std::weak_ptr<fonteffect>& effect) const noexcept {
   if (text.empty()) {
     return;
   }
@@ -67,6 +67,6 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
   }
 }
 
-std::string_view font::glyphs() const {
+std::string_view font::glyphs() const noexcept {
   return _glyphs;
 }

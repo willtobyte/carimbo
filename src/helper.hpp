@@ -23,7 +23,7 @@ struct ALC_Deleter final {
 
 struct SDL_Deleter final {
   template <typename T>
-  void operator()(T* ptr) const {
+  void operator()(T* ptr) const noexcept {
     if (!ptr) return;
 
     if constexpr (requires { SDL_DestroyCond(ptr); }) SDL_DestroyCond(ptr);

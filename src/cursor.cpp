@@ -40,7 +40,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
   }
 }
 
-void cursor::on_mouse_release(const event::mouse::button& event) {
+void cursor::on_mouse_release(const event::mouse::button& event) noexcept {
   constexpr auto left = event::mouse::button::which::left;
   constexpr auto middle = event::mouse::button::which::middle;
   constexpr auto right = event::mouse::button::which::right;
@@ -64,11 +64,11 @@ void cursor::on_mouse_release(const event::mouse::button& event) {
   _last_frame = SDL_GetTicks();
 }
 
-void cursor::on_mouse_motion(const event::mouse::motion& event) {
+void cursor::on_mouse_motion(const event::mouse::motion& event) noexcept {
   _position = vec2(event.x, event.y);
 }
 
-void cursor::update(float delta) {
+void cursor::update(float delta) noexcept {
   if (!_current_animation) [[unlikely]] return;
 
   const auto now = SDL_GetTicks();
@@ -97,7 +97,7 @@ void cursor::update(float delta) {
   _frame = (_frame + 1) % keyframes.size();
 }
 
-void cursor::draw() const {
+void cursor::draw() const noexcept {
   if (!_current_animation) [[unlikely]] return;
 
   const auto& keyframes = _current_animation->get().keyframes;
@@ -118,6 +118,6 @@ void cursor::draw() const {
   );
 }
 
-void cursor::handle(const std::string_view message) {
+void cursor::handle(const std::string_view message) noexcept {
   _queued_action = message;
 }

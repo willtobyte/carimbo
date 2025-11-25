@@ -15,7 +15,7 @@
 #include "soundfx.hpp"
 #include "world.hpp"
 
-objectmanager::objectmanager() {
+objectmanager::objectmanager() noexcept {
   _hovering.reserve(256);
   _objects.get<by_id>().rehash(128);
 }
@@ -85,7 +85,7 @@ std::shared_ptr<object> objectmanager::create(std::string_view kind, std::option
   return o;
 }
 
-std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
+std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) noexcept {
   if (!matrix) [[unlikely]] {
     return nullptr;
   }
@@ -110,7 +110,7 @@ std::shared_ptr<object> objectmanager::clone(std::shared_ptr<object> matrix) {
   return o;
 }
 
-void objectmanager::manage(std::shared_ptr<object> object) {
+void objectmanager::manage(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return;
   }
@@ -118,7 +118,7 @@ void objectmanager::manage(std::shared_ptr<object> object) {
   _objects.emplace(object);
 }
 
-bool objectmanager::remove(std::shared_ptr<object> object) {
+bool objectmanager::remove(std::shared_ptr<object> object) noexcept {
   if (!object) [[unlikely]] {
     return false;
   }
@@ -131,7 +131,7 @@ bool objectmanager::remove(std::shared_ptr<object> object) {
   return _objects.get<by_id>().erase(id) > 0;
 }
 
-std::shared_ptr<object> objectmanager::find(uint64_t id) const {
+std::shared_ptr<object> objectmanager::find(uint64_t id) const noexcept {
   const auto& byid = _objects.get<by_id>();
   auto it = byid.find(id);
   if (it == byid.end()) [[unlikely]] return nullptr;
@@ -148,22 +148,22 @@ void objectmanager::update(float delta) {
   }
 }
 
-void objectmanager::draw() const {
+void objectmanager::draw() const noexcept {
   const auto& byseq = _objects.get<by_seq>();
   for (const auto& e : byseq) {
     e.object->draw();
   }
 }
 
-void objectmanager::set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) {
+void objectmanager::set_resourcemanager(std::shared_ptr<resourcemanager> resourcemanager) noexcept {
   _resourcemanager = std::move(resourcemanager);
 }
 
-void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) {
+void objectmanager::set_scenemanager(std::shared_ptr<scenemanager> scenemanager) noexcept {
   _scenemanager = std::move(scenemanager);
 }
 
-void objectmanager::set_world(std::shared_ptr<world> world) {
+void objectmanager::set_world(std::shared_ptr<world> world) noexcept {
   _world = std::move(world);
 }
 

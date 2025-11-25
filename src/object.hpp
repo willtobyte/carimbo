@@ -34,14 +34,14 @@ using animation_map = std::unordered_map<std::string, animation, string_hash, st
 
 class object final : public std::enable_shared_from_this<object> {
 public:
-  object();
-  ~object();
+  object() noexcept;
+  ~object() noexcept;
 
   std::string_view kind() const noexcept;
 
   void update(float delta, uint64_t now);
 
-  void draw() const;
+  void draw() const noexcept;
 
   vec2 position() const noexcept;
   float x() const noexcept;
@@ -65,7 +65,7 @@ public:
   reflection reflection() const noexcept;
 
   bool visible() const noexcept;
-  void set_visible(bool value);
+  void set_visible(bool value) noexcept;
 
   void set_action(std::optional<std::string_view> action);
   std::string_view action() const noexcept;
@@ -88,7 +88,7 @@ public:
   uint64_t id() const noexcept;
 
 protected:
-  void suspend();
+  void suspend() noexcept;
 
 private:
   friend class objectmanager;
@@ -107,10 +107,10 @@ private:
     bool _has_keyframe{false};
     bool _has_bounds{false};
 
-    explicit controller(animation& animation);
-    void frooze();
-    bool tick(uint64_t now);
-    void reset();
+    explicit controller(animation& animation) noexcept;
+    void frooze() noexcept;
+    bool tick(uint64_t now) noexcept;
+    void reset() noexcept;
     bool finished() const noexcept;
     bool valid() const noexcept;
     const quad& bounds() const noexcept;
@@ -132,13 +132,13 @@ private:
     std::weak_ptr<world> _world;
 
     body() = default;
-    body(std::weak_ptr<world> world);
-    ~body();
-    void enable();
-    void disable();
+    body(std::weak_ptr<world> world) noexcept;
+    ~body() noexcept;
+    void enable() noexcept;
+    void disable() noexcept;
     bool missing() const noexcept;
     bool valid() const noexcept;
-    void sync(const quad& bounds, const vec2& position, float scale, double angle, uint64_t id);
+    void sync(const quad& bounds, const vec2& position, float scale, double angle, uint64_t id) noexcept;
   };
 
   vec2 _position;

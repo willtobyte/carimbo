@@ -25,21 +25,21 @@ public:
   std::shared_ptr<::timermanager> timermanager() const noexcept;
   std::shared_ptr<::world> world() const noexcept;
 
-  void set_audiodevice(std::shared_ptr<::audiodevice> ptr);
-  void set_objectmanager(std::shared_ptr<::objectmanager> ptr);
-  void set_eventmanager(std::shared_ptr<::eventmanager> ptr);
-  void set_overlay(std::shared_ptr<::overlay> ptr);
-  void set_resourcemanager(std::shared_ptr<::resourcemanager> ptr);
-  void set_scenemanager(std::shared_ptr<::scenemanager> ptr);
-  void set_particlesystem(std::shared_ptr<::particlesystem> ptr);
-  void set_postalservice(std::shared_ptr<::postalservice> ptr);
-  void set_statemanager(std::shared_ptr<::statemanager> ptr);
-  void set_window(std::shared_ptr<::window> ptr);
-  void set_world(std::shared_ptr<::world> ptr);
-  void set_renderer(std::shared_ptr<::renderer> ptr);
-  void set_timermanager(std::shared_ptr<::timermanager> ptr);
+  void set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept;
+  void set_objectmanager(std::shared_ptr<::objectmanager> ptr) noexcept;
+  void set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept;
+  void set_overlay(std::shared_ptr<::overlay> ptr) noexcept;
+  void set_resourcemanager(std::shared_ptr<::resourcemanager> ptr) noexcept;
+  void set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept;
+  void set_particlesystem(std::shared_ptr<::particlesystem> ptr) noexcept;
+  void set_postalservice(std::shared_ptr<::postalservice> ptr) noexcept;
+  void set_statemanager(std::shared_ptr<::statemanager> ptr) noexcept;
+  void set_window(std::shared_ptr<::window> ptr) noexcept;
+  void set_world(std::shared_ptr<::world> ptr) noexcept;
+  void set_renderer(std::shared_ptr<::renderer> ptr) noexcept;
+  void set_timermanager(std::shared_ptr<::timermanager> ptr) noexcept;
 
-  void add_loopable(std::shared_ptr<::loopable> ptr);
+  void add_loopable(std::shared_ptr<::loopable> ptr) noexcept;
 
   void run();
 

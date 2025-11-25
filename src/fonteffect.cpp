@@ -1,6 +1,6 @@
 #include "fonteffect.hpp"
 
-void fadeineffect::set(std::string_view text, vec2 position) {
+void fadeineffect::set(std::string_view text, vec2 position) noexcept {
   const auto length = text.size();
   if (length != _last_length) {
     _last_length = length;
@@ -14,7 +14,7 @@ void fadeineffect::set(std::string_view text, vec2 position) {
    _draw_calls = 0;
 }
 
-void fadeineffect::update(float delta) {
+void fadeineffect::update(float delta) noexcept {
   if (_text.empty()) {
     return;
   }
@@ -33,7 +33,7 @@ void fadeineffect::update(float delta) {
   _alpha = static_cast<uint8_t>(progress * 255);
 }
 
-uint8_t fadeineffect::alpha() {
+uint8_t fadeineffect::alpha() noexcept {
   ++_draw_calls;
 
   if (_draw_calls == _text.size()) {

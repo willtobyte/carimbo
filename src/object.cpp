@@ -6,11 +6,11 @@
 #include "reflection.hpp"
 #include "world.hpp"
 
-object::controller::controller(animation& animation) : _animation(animation), _last_tick(0) {
+object::controller::controller(animation& animation) noexcept : _animation(animation), _last_tick(0) {
   frooze();
 }
 
-void object::controller::frooze() {
+void object::controller::frooze() noexcept {
   const auto& keyframes = _animation.keyframes;
 
   _has_keyframe = _frame < keyframes.size();
@@ -26,7 +26,7 @@ void object::controller::frooze() {
   }
 }
 
-bool object::controller::tick(uint64_t now) {
+bool object::controller::tick(uint64_t now) noexcept {
   if (!_has_keyframe) [[unlikely]] return false;
 
   const auto& keyframes = _animation.keyframes;
@@ -45,7 +45,7 @@ bool object::controller::tick(uint64_t now) {
   return true;
 }
 
-void object::controller::reset() {
+void object::controller::reset() noexcept {
   _frame = 0;
   _last_tick = 0;
   frooze();
@@ -63,7 +63,7 @@ const quad& object::controller::bounds() const noexcept {
   return _bounds;
 }
 
-object::body::~body() {
+object::body::~body() noexcept {
   if (b2Shape_IsValid(_shape)) [[likely]] {
     b2DestroyShape(_shape, false);
     _shape = b2_nullShapeId;
@@ -77,7 +77,7 @@ object::body::~body() {
   _enabled = false;
 }
 
-object::body::body(std::weak_ptr<world> world) : _world(std::move(world)) {}
+object::body::body(std::weak_ptr<world> world) noexcept : _world(std::move(world)) {}
 
 bool object::body::missing() const noexcept {
   return !b2Body_IsValid(_id);
@@ -87,21 +87,21 @@ bool object::body::valid() const noexcept {
   return b2Body_IsValid(_id);
 }
 
-void object::body::enable() {
+void object::body::enable() noexcept {
   if (!b2Body_IsValid(_id) || _enabled) [[unlikely]] return;
 
   b2Body_Enable(_id);
   _enabled = true;
 }
 
-void object::body::disable() {
+void object::body::disable() noexcept {
   if (!b2Body_IsValid(_id) || !_enabled) [[unlikely]] return;
 
   b2Body_Disable(_id);
   _enabled = false;
 }
 
-void object::body::sync(const quad& bounds, const vec2& position, float scale, double angle, uint64_t id) {
+void object::body::sync(const quad& bounds, const vec2& position, float scale, double angle, uint64_t id) noexcept {
   if (_last_sync.valid &&
       _last_sync.position == position &&
       _last_sync.bounds == bounds &&
@@ -165,7 +165,7 @@ void object::body::sync(const quad& bounds, const vec2& position, float scale, d
   _last_sync.valid = true;
 }
 
-object::object()
+object::object() noexcept
   : _angle(.0),
     _alpha(255),
     _scale(1.0f),
@@ -173,7 +173,7 @@ object::object()
   _collision_mapping.reserve(8);
 }
 
-object::~object() {
+object::~object() noexcept {
   std::println("[object] destroyed {} {}", kind(), id());
 }
 
@@ -277,7 +277,7 @@ void object::update(float delta, uint64_t now) {
   }
 }
 
-void object::draw() const {
+void object::draw() const noexcept {
   if (!_visible || !_animation || !_animation->valid()) [[unlikely]] return;
 
   const auto& source = _animation->_source;
@@ -355,7 +355,7 @@ bool object::visible() const noexcept {
   return _visible && !_action.empty() && _alpha != 0;
 }
 
-void object::set_visible(bool value) {
+void object::set_visible(bool value) noexcept {
   if (value == _visible) [[likely]] return;
 
   _visible = value;
@@ -456,6 +456,6 @@ uint64_t object::id() const noexcept {
   return _id;
 }
 
-void object::suspend() {
+void object::suspend() noexcept {
   _body.disable();
 }

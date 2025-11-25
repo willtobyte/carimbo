@@ -19,13 +19,13 @@ public:
   explicit cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager);
   virtual ~cursor() = default;
 
-  virtual void on_mouse_release(const event::mouse::button& event) override;
-  virtual void on_mouse_motion(const event::mouse::motion& event) override;
+  virtual void on_mouse_release(const event::mouse::button& event) noexcept override;
+  virtual void on_mouse_motion(const event::mouse::motion& event) noexcept override;
 
-  void update(float delta);
-  void draw() const;
+  void update(float delta) noexcept;
+  void draw() const noexcept;
 
-  void handle(std::string_view message);
+  void handle(std::string_view message) noexcept;
 
 private:
   uint64_t _frame{0};

@@ -48,7 +48,7 @@ soundfx::~soundfx() noexcept {
   }
 }
 
-void soundfx::play(bool loop) const noexcept {
+void soundfx::play(bool loop) const {
   _notified.store(false, std::memory_order_relaxed);
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
@@ -90,10 +90,10 @@ float soundfx::volume() const noexcept {
   return gain;
 }
 
-void soundfx::set_onbegin(sol::protected_function callback) noexcept {
+void soundfx::set_onbegin(sol::protected_function callback) {
   _onbegin = interop::wrap_fn(std::move(callback));
 }
 
-void soundfx::set_onend(sol::protected_function callback) noexcept {
+void soundfx::set_onend(sol::protected_function callback) {
   _onend = interop::wrap_fn(std::move(callback));
 }

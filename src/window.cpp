@@ -18,11 +18,11 @@ window::window(std::string_view title, int width, int height, bool fullscreen)
   SDL_StartTextInput(_window.get());
 }
 
-window::operator SDL_Window* () const {
+window::operator SDL_Window* () const noexcept {
   return _window.get();
 }
 
-std::shared_ptr<renderer> window::create_renderer(float scale) {
+std::shared_ptr<renderer> window::create_renderer(float scale) noexcept {
   const auto ptr = std::make_shared<renderer>(shared_from_this());
 
   SDL_SetRenderLogicalPresentation(*ptr, _width, _height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
@@ -31,10 +31,10 @@ std::shared_ptr<renderer> window::create_renderer(float scale) {
   return ptr;
 }
 
-int window::width() const {
+int window::width() const noexcept {
   return _width;
 }
 
-int window::height() const {
+int window::height() const noexcept {
   return _height;
 }
