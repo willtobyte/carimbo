@@ -395,31 +395,31 @@ std::string_view object::action() const noexcept {
   return _action;
 }
 
-void object::set_onbegin(sol::protected_function fn) {
+void object::set_onbegin(sol::protected_function fn) noexcept {
   _onbegin = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
 }
 
-void object::set_onend(sol::protected_function fn) {
+void object::set_onend(sol::protected_function fn) noexcept {
   _onend = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
 }
 
-void object::set_onmail(sol::protected_function fn) {
+void object::set_onmail(sol::protected_function fn) noexcept {
   _onmail = interop::wrap_fn<void(std::shared_ptr<object>, std::string_view)>(std::move(fn));
 }
 
-void object::set_ontouch(sol::protected_function fn) {
+void object::set_ontouch(sol::protected_function fn) noexcept {
   _ontouch = interop::wrap_fn<void(std::shared_ptr<object>, float, float)>(std::move(fn));
 }
 
-void object::set_onhover(sol::protected_function fn) {
+void object::set_onhover(sol::protected_function fn) noexcept {
   _onhover = interop::wrap_fn<void(std::shared_ptr<object>)>(std::move(fn));
 }
 
-void object::set_onunhover(sol::protected_function fn) {
+void object::set_onunhover(sol::protected_function fn) noexcept {
   _onunhover = interop::wrap_fn<void(std::shared_ptr<object>)>(std::move(fn));
 }
 
-void object::set_oncollision(std::string_view kind, sol::protected_function fn) {
+void object::set_oncollision(std::string_view kind, sol::protected_function fn) noexcept {
   _collision_mapping.insert_or_assign(
     std::string{kind}, interop::wrap_fn<void(std::shared_ptr<object>, std::shared_ptr<object>)>(fn));
 }

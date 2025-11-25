@@ -70,15 +70,15 @@ public:
   void set_action(std::optional<std::string_view> action);
   std::string_view action() const noexcept;
 
-  void set_onbegin(sol::protected_function fn);
-  void set_onend(sol::protected_function fn);
-  void set_onmail(sol::protected_function fn);
-  void set_ontouch(sol::protected_function fn);
-  void set_onhover(sol::protected_function fn);
-  void set_onunhover(sol::protected_function fn);
-  void set_oncollision(std::string_view kind, sol::protected_function fn);
-  void on_email(std::string_view message);
+  void set_onbegin(sol::protected_function fn) noexcept;
+  void set_onend(sol::protected_function fn) noexcept;
+  void set_onmail(sol::protected_function fn) noexcept;
+  void set_ontouch(sol::protected_function fn) noexcept;
+  void set_onhover(sol::protected_function fn) noexcept;
+  void set_onunhover(sol::protected_function fn) noexcept;
+  void set_oncollision(std::string_view kind, sol::protected_function fn) noexcept;
 
+  void on_email(std::string_view message);
   void on_touch(float x, float y);
   void on_hover();
   void on_unhover();
