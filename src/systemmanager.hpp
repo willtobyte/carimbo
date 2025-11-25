@@ -6,6 +6,11 @@
 #include "componentmanager.hpp"
 #include "entity.hpp"
 
+class system {
+public:
+  std::unordered_set<entity> entities;
+};
+
 template<typename... systems>
 class systemmanager final {
 public:
