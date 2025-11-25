@@ -3,6 +3,7 @@
 #include "common.hpp"
 
 #include "eventreceiver.hpp"
+#include "geometry.hpp"
 #include "object.hpp"
 
   class resourcemanager;

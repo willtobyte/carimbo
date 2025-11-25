@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+#include "geometry.hpp"
+
 class pixmap;
 
 using glyphmap = std::map<char, box2>;
