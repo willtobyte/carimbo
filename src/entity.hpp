@@ -6,7 +6,7 @@
 
 using entity = std::uint64_t;
 
-constexpr entity capacity = 4096;
+constexpr entity entity_n = 4096;
 
 struct alignas(8) transform final {
 	vec2 position;
