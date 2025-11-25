@@ -12,7 +12,7 @@ public:
 
   void destroy(const entity id) noexcept;
 
-  void set_signature(const entity id, const ::signature sig) noexcept;
+  void set_signature(const entity id, const ::signature signature) noexcept;
 
   [[nodiscard]] signature signature(const entity id) const noexcept;
 

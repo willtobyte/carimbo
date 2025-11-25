@@ -28,7 +28,7 @@ struct alignas(4) tint final {
 struct alignas(16) timeline final {
   static constexpr auto capacity = 16;
 
-  std::array<box2, capacity> frames;
+  std::array<quad, capacity> frames;
   std::array<uint16_t, capacity> durations;
   uint16_t count = 0;
   

@@ -30,7 +30,7 @@ public:
   [[nodiscard]] T& enroll();
 
   template<typename T>
-  void set_system_signature(const signature sig);
+  void set_system_signature(const signature signature);
 
 private:
   ComponentManager _componentmanager{};
@@ -87,15 +87,15 @@ T& coordinator<ComponentManager, SystemManager>::enroll() {
 
 template<typename ComponentManager, typename SystemManager>
 template<typename T>
-void coordinator<ComponentManager, SystemManager>::set_system_signature(const signature sig) {
-  _systemmanager.template set_signature<T>(sig);
+void coordinator<ComponentManager, SystemManager>::set_system_signature(const signature signature) {
+  _systemmanager.template set_signature<T>(signature);
 }
 
 template<typename ComponentManager, typename SystemManager>
 template<typename T>
 void coordinator<ComponentManager, SystemManager>::update_signature_bit(const entity id, const bool value) {
-  auto sig = _entitymanager.signature(id);
-  sig.set(_componentmanager.template component_type<T>(), value);
-  _entitymanager.set_signature(id, sig);
-  _systemmanager.entity_signature_changed(id, sig);
+  auto signature = _entitymanager.signature(id);
+  signature.set(_componentmanager.template component_type<T>(), value);
+  _entitymanager.set_signature(id, signature);
+  _systemmanager.entity_signature_changed(id, signature);
 }

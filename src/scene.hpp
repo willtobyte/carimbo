@@ -50,7 +50,7 @@ class scene {
     std::string _name;
     nlohmann::json _j;
 
-    box2 _camera;
+    quad _camera;
     std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
     std::vector<std::pair<std::string, std::shared_ptr<soundfx>>> _effects;
     std::unordered_map<std::string, std::shared_ptr<particlebatch>> _particles;
@@ -63,7 +63,7 @@ class scene {
 
     std::function<void()> _onenter;
     std::function<void(float)> _onloop;
-    std::function<box2(float)> _oncamera;
+    std::function<quad(float)> _oncamera;
     std::function<void()> _onleave;
     std::function<void(float, float)> _ontouch;
     std::function<void(int32_t)> _onkeypress;

@@ -7,6 +7,10 @@ class componentarray final {
 public:
   componentarray() noexcept;
 
+  auto begin() noexcept;
+
+  auto end() noexcept;
+
   void insert(const entity id, const T& component) noexcept;
 
   void remove(const entity id) noexcept;
@@ -32,6 +36,12 @@ template<typename T>
 componentarray<T>::componentarray() noexcept {
   _entity_to_index.fill(__invalid);
 }
+
+template<typename T>
+auto componentarray<T>::begin() noexcept { return _components.begin(); }
+
+template<typename T>
+auto componentarray<T>::end() noexcept { return _components.begin() + _size; }
 
 template<typename T>
 void componentarray<T>::insert(const entity id, const T& component) noexcept {

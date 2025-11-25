@@ -1,7 +1,7 @@
 #include "common.hpp"
 
 void from_json(const nlohmann::json& j, keyframe& o) {
-  o.frame = j.at("rectangle").get<box2>();
+  o.frame = j.at("quad").get<quad>();
 
   if (j.contains("offset")) {
     o.offset = j.at("offset").get<vec2>();
@@ -21,5 +21,5 @@ void from_json(const nlohmann::json& j, bounds& o) {
     }
   }
 
-  o.rectangle = j.at("rectangle").get<box2>();
+  o.rectangle = j.at("quad").get<quad>();
 }

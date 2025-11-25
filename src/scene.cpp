@@ -193,7 +193,7 @@ void scene::set_onloop(sol::protected_function fn) {
 }
 
 void scene::set_oncamera(sol::protected_function fn) {
-  _oncamera = interop::wrap_fn<box2(float)>(std::move(fn));
+  _oncamera = interop::wrap_fn<quad(float)>(std::move(fn));
 }
 
 void scene::set_onleave(std::function<void()>&& fn) {
