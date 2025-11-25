@@ -27,6 +27,7 @@ class Carimbo(ConanFile):
     def requirements(self):
         self.requires("boost/1.89.0")
         self.requires("box2d/3.1.1")
+        self.requires("entt/3.15.0")
         self.requires("nlohmann_json/3.12.0")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
