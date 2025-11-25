@@ -55,7 +55,6 @@
 #include "defer.hpp"
 #include "helper.hpp"
 
-class achievement;
 class application;
 class audiodevice;
 class canvas;
