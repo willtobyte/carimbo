@@ -6,41 +6,17 @@
 
 class entitymanager final {
 public:
-  entitymanager() noexcept
-      : entities(entity_n) {
-    std::iota(entities.begin(), entities.end(), entity{0});
-  }
+  entitymanager() noexcept;
 
-  [[nodiscard]] entity create() noexcept {
-    assert(!entities.empty() && "too many entities in existence.");
+  [[nodiscard]] entity create() noexcept;
 
-    const auto id = entities.back();
-		entities.pop_back();
-		signatures[id].reset();
-		return id;
-  }
+  void destroy(const entity id) noexcept;
 
-  void destroy(const entity id) noexcept {
-    assert(id >= entity{0});
-    assert(static_cast<std::size_t>(id) < signatures.size() && "entity out of range.");
+  void set_signature(const entity id, const ::signature sig) noexcept;
 
-    signatures[id].reset();
-    entities.emplace_back(id);
-  }
-
-  void set_signature(const entity id, const signature sig) noexcept {
-    assert(id < signatures.size() && "entity out of range.");
-
-    signatures[static_cast<std::size_t>(id)] = sig;
-  }
-
-  [[nodiscard]] signature get_signature(const entity id) const noexcept {
-    assert(id < signatures.size() && "entity out of range.");
-
-    return signatures[static_cast<std::size_t>(id)];
-  }
+  [[nodiscard]] signature signature(const entity id) const noexcept;
 
 private:
-  std::array<signature, entity_n> signatures;
+  std::array<::signature, entity_n> signatures;
   std::vector<entity> entities;
 };
