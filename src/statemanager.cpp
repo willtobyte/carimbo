@@ -8,7 +8,7 @@
 statemanager::statemanager() {
 }
 
-bool statemanager::on(uint8_t player, event::gamepad::button type) const {
+bool statemanager::on(uint8_t player, event::gamepad::button type) const noexcept {
   if (const auto pit = _state.find(player); pit != _state.end()) {
     if (const auto tit = pit->second.find(type); tit != pit->second.end()) {
       return tit->second;
@@ -18,11 +18,11 @@ bool statemanager::on(uint8_t player, event::gamepad::button type) const {
   return false;
 }
 
-uint8_t statemanager::players() const {
+uint8_t statemanager::players() const noexcept {
   return static_cast<uint8_t>(_state.size());
 }
 
-static constexpr inline std::optional<event::gamepad::button> keytoctrl(const event::keyboard::key& event) {
+static constexpr inline std::optional<event::gamepad::button> keytoctrl(const event::keyboard::key& event) noexcept {
 
   switch (event) {
   case event::keyboard::key::up:
@@ -97,5 +97,5 @@ void statemanager::on_gamepad_motion(uint8_t who, const event::gamepad::motion& 
   }
 }
 
-void statemanager::on_endupdate() {
+void statemanager::on_endupdate() noexcept {
 }

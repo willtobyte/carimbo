@@ -67,6 +67,6 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
   }
 }
 
-std::string_view font::glyphs() const {
+std::string_view font::glyphs() const noexcept {
   return _glyphs;
 }

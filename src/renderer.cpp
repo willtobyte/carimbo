@@ -18,18 +18,18 @@ renderer::renderer(std::shared_ptr<window> window)
   _renderer = std::unique_ptr<SDL_Renderer, SDL_Deleter>(SDL_CreateRendererWithProperties(props));
 }
 
-renderer::operator SDL_Renderer* () const {
+renderer::operator SDL_Renderer* () const noexcept {
   return _renderer.get();
 }
 
-renderer::operator SDL_Window* () const {
+renderer::operator SDL_Window* () const noexcept {
   return *_window;
 }
 
-void renderer::begin() const {
+void renderer::begin() const noexcept {
   SDL_RenderClear(*this);
 }
 
-void renderer::end() const {
+void renderer::end() const noexcept {
   SDL_RenderPresent(*this);
 }

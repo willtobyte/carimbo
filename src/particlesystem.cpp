@@ -167,6 +167,6 @@ void particlesystem::draw() const {
   }
 }
 
-std::shared_ptr<particlefactory> particlesystem::factory() const {
+std::shared_ptr<particlefactory> particlesystem::factory() const noexcept {
   return _factory;
 }

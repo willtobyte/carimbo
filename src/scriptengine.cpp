@@ -176,10 +176,10 @@ static nlohmann::json _to_json(const sol::object& value) {
 struct sentinel final {
   std::string _name;
 
-  explicit sentinel(std::string name)
+  explicit sentinel(std::string name) noexcept
       : _name(std::move(name)) {}
 
-  ~sentinel() {
+  ~sentinel() noexcept {
     std::println("[garbagecollector] collected {}", _name);
   }
 };
@@ -463,7 +463,7 @@ void scriptengine::run() {
     uint8_t index;
     const statemanager* e;
 
-    bool on(event::gamepad::button type) {
+    bool on(event::gamepad::button type) noexcept {
       return e->on(index, type);
     }
   };
@@ -654,9 +654,9 @@ void scriptengine::run() {
   struct cursorproxy {
     overlay& o;
 
-    void set(std::string_view name) { o.set_cursor(name); }
+    void set(std::string_view name) noexcept { o.set_cursor(name); }
 
-    void hide() { o.hide(); }
+    void hide() noexcept { o.hide(); }
   };
 
   lua.new_usertype<cursorproxy>(
@@ -861,29 +861,29 @@ void scriptengine::run() {
 
   struct mouse final {
   private:
-    [[nodiscard]] static std::tuple<float, float, uint32_t> state() {
+    [[nodiscard]] static std::tuple<float, float, uint32_t> state() noexcept {
       float x, y;
       const auto b = SDL_GetMouseState(&x, &y);
       return {x, y, b};
     }
 
   public:
-    static float x() {
+    static float x() noexcept {
       const auto [x, y, b] = state();
       return x;
     }
 
-    static float y() {
+    static float y() noexcept {
       const auto [x, y, b] = state();
       return y;
     }
 
-    static std::tuple<float, float> xy() {
+    static std::tuple<float, float> xy() noexcept {
       const auto [x, y, b] = state();
       return {x, y};
     }
 
-    static int button() {
+    static int button() noexcept {
       const auto [x, y, b] = state();
       if (b & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
       if (b & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;

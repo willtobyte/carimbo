@@ -2,11 +2,11 @@
 
 #include "common.hpp"
 
-inline uint64_t userdata_to_id(void* userdata) {
+inline uint64_t userdata_to_id(void* userdata) noexcept {
   return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata));
 }
 
-inline void* id_to_userdata(uint64_t id) {
+inline void* id_to_userdata(uint64_t id) noexcept {
   return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
 }
 

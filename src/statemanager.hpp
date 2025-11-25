@@ -7,9 +7,9 @@ public:
   statemanager();
   virtual ~statemanager() = default;
 
-  bool on(uint8_t player, const event::gamepad::button type) const;
+  bool on(uint8_t player, const event::gamepad::button type) const noexcept;
 
-  uint8_t players() const;
+  uint8_t players() const noexcept;
 
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;
@@ -22,7 +22,7 @@ protected:
 
   virtual void on_gamepad_motion(uint8_t who, const event::gamepad::motion& event) override;
 
-  virtual void on_endupdate() override;
+  virtual void on_endupdate() noexcept override;
 
 private:
   std::unordered_map<uint8_t, std::unordered_map<event::gamepad::button, bool>> _state;

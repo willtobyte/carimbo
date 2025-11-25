@@ -22,21 +22,21 @@ struct particleprops final {
   std::uniform_real_distribution<double> rotforced;
   std::uniform_real_distribution<double> rotveld;
 
-  auto randradius() { return radiusd(rng); }
-  auto randangle() { return angled(rng); }
-  auto randxspawn() { return xspawnd(rng); }
-  auto randyspawn() { return yspawnd(rng); }
-  auto randxvel() { return xveld(rng); }
-  auto randyvel() { return yveld(rng); }
-  auto randgx() { return gxd(rng); }
-  auto randgy() { return gyd(rng); }
-  auto randscale() { return scaled(rng); }
-  auto randlife() { return lifed(rng); }
-  auto randalpha() { return static_cast<uint8_t>(alphad(rng)); }
-  auto randrotforce() { return rotforced(rng); }
-  auto randrotvel() { return rotveld(rng); }
+  auto randradius() noexcept { return radiusd(rng); }
+  auto randangle() noexcept { return angled(rng); }
+  auto randxspawn() noexcept { return xspawnd(rng); }
+  auto randyspawn() noexcept { return yspawnd(rng); }
+  auto randxvel() noexcept { return xveld(rng); }
+  auto randyvel() noexcept { return yveld(rng); }
+  auto randgx() noexcept { return gxd(rng); }
+  auto randgy() noexcept { return gyd(rng); }
+  auto randscale() noexcept { return scaled(rng); }
+  auto randlife() noexcept { return lifed(rng); }
+  auto randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
+  auto randrotforce() noexcept { return rotforced(rng); }
+  auto randrotvel() noexcept { return rotveld(rng); }
 
-  void set_placement(float xv, float yv) { x = xv; y = yv; }
+  void set_placement(float xv, float yv) noexcept { x = xv; y = yv; }
 };
 
 struct alignas(64) particle final {
@@ -55,7 +55,7 @@ struct particlebatch final {
   std::shared_ptr<particleprops> props;
   std::vector<particle> particles;
 
-  std::size_t size() const {
+  std::size_t size() const noexcept {
     return particles.size();
   }
 };
@@ -85,7 +85,7 @@ class particlesystem final {
 
     void draw() const;
 
-    std::shared_ptr<particlefactory> factory() const;
+    std::shared_ptr<particlefactory> factory() const noexcept;
 
   private:
     std::shared_ptr<particlefactory> _factory;

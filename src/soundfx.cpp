@@ -48,7 +48,7 @@ soundfx::~soundfx() {
   }
 }
 
-void soundfx::play(bool loop) const {
+void soundfx::play(bool loop) const noexcept {
   _notified.store(false, std::memory_order_relaxed);
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
@@ -58,7 +58,7 @@ void soundfx::play(bool loop) const {
   }
 }
 
-void soundfx::stop() const {
+void soundfx::stop() const noexcept {
   alSourceStop(_source);
 }
 
@@ -80,11 +80,11 @@ void soundfx::update(float delta) {
   }
 }
 
-void soundfx::set_volume(float gain) {
+void soundfx::set_volume(float gain) noexcept {
   alSourcef(_source, AL_GAIN, std::clamp(gain, .0f, 1.0f));
 }
 
-float soundfx::volume() const {
+float soundfx::volume() const noexcept {
   float gain;
   alGetSourcef(_source, AL_GAIN, &gain);
   return gain;

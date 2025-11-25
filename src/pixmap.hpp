@@ -16,13 +16,13 @@ public:
     const double angle = .0,
     const uint8_t alpha = 255,
     const reflection reflection = reflection::none
-  ) const;
+  ) const noexcept;
 
-  operator SDL_Texture*() const;
+  operator SDL_Texture*() const noexcept;
 
-  int width() const;
+  int width() const noexcept;
 
-  int height() const;
+  int height() const noexcept;
 
 private:
   int _width;

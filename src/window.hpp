@@ -7,13 +7,13 @@ public:
   window(std::string_view title, int width, int height, bool fullscreen);
   ~window() = default;
 
-  operator SDL_Window*() const;
+  operator SDL_Window*() const noexcept;
 
   std::shared_ptr<renderer> create_renderer(float scale);
 
-  int width() const;
+  int width() const noexcept;
 
-  int height() const;
+  int height() const noexcept;
 
 private:
   int _width;

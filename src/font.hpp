@@ -25,7 +25,7 @@ public:
 
   void draw(std::string_view text, const vec2& position, const std::weak_ptr<fonteffect>& effect) const;
 
-  std::string_view glyphs() const;
+  std::string_view glyphs() const noexcept;
 
 private:
   int16_t _spacing{0};

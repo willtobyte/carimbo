@@ -33,7 +33,7 @@ void fadeineffect::update(float delta) {
   _alpha = static_cast<uint8_t>(progress * 255);
 }
 
-uint8_t fadeineffect::alpha() {
+uint8_t fadeineffect::alpha() noexcept {
   ++_draw_calls;
 
   if (_draw_calls == _text.size()) {

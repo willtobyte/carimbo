@@ -7,13 +7,13 @@ public:
   explicit soundfx(std::string_view filename);
   ~soundfx();
 
-  void play(bool loop = false) const;
-  void stop() const;
+  void play(bool loop = false) const noexcept;
+  void stop() const noexcept;
 
   void update(float delta);
 
-  void set_volume(float gain);
-  float volume() const;
+  void set_volume(float gain) noexcept;
+  float volume() const noexcept;
 
   void set_onbegin(sol::protected_function callback);
   void set_onend(sol::protected_function callback);
