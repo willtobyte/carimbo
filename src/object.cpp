@@ -59,7 +59,7 @@ bool object::controller::valid() const noexcept {
   return _has_keyframe;
 }
 
-const box2& object::controller::bounds() const noexcept {
+const quad& object::controller::bounds() const noexcept {
   return _bounds;
 }
 
@@ -101,7 +101,7 @@ void object::body::disable() {
   _enabled = false;
 }
 
-void object::body::sync(const box2& bounds, const vec2& position, float scale, double angle, uint64_t id) {
+void object::body::sync(const quad& bounds, const vec2& position, float scale, double angle, uint64_t id) {
   if (_last_sync.valid &&
       _last_sync.position == position &&
       _last_sync.bounds == bounds &&
@@ -284,7 +284,7 @@ void object::draw() const {
   const auto& offset = _animation->_offset;
 
   if (_redraw) [[unlikely]] {
-    _destination = box2{_position + offset, {source.w, source.h}};
+    _destination = quad{_position + offset, {source.w, source.h}};
 
     if (_scale != 1.0f) [[unlikely]] {
       const auto ow = _destination.w;

@@ -26,7 +26,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
       return keyframe{
         frame["duration"].template get<uint64_t>(),
         frame["offset"].template get<vec2>(),
-        frame["rectangle"].template get<box2>(),
+        frame["quad"].template get<quad>(),
       };
     });
 
