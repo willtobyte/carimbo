@@ -2,7 +2,7 @@
 
 #include "entity.hpp"
 
-template class component_array<transform>;
-template class component_array<tint>;
-template class component_array<timeline>;
-template class component_array<physics>;
+template class componentarray<transform>;
+template class componentarray<tint>;
+template class componentarray<timeline>;
+template class componentarray<physics>;

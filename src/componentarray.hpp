@@ -3,9 +3,9 @@
 #include "entity.hpp"
 
 template<typename T>
-class component_array final {
+class componentarray final {
 public:
-  component_array() noexcept;
+  componentarray() noexcept;
 
   void insert(const entity id, const T& component) noexcept;
 
@@ -29,12 +29,12 @@ private:
 };
 
 template<typename T>
-component_array<T>::component_array() noexcept {
+componentarray<T>::componentarray() noexcept {
   _entity_to_index.fill(__invalid);
 }
 
 template<typename T>
-void component_array<T>::insert(const entity id, const T& component) noexcept {
+void componentarray<T>::insert(const entity id, const T& component) noexcept {
   assert(id < entity_n);
   assert(!has(id) && "component added to same entity more than once.");
 
@@ -45,7 +45,7 @@ void component_array<T>::insert(const entity id, const T& component) noexcept {
 }
 
 template<typename T>
-void component_array<T>::remove(const entity id) noexcept {
+void componentarray<T>::remove(const entity id) noexcept {
   assert(has(id) && "removing non-existent component.");
 
   const auto remove_index = _entity_to_index[id];
@@ -61,25 +61,25 @@ void component_array<T>::remove(const entity id) noexcept {
 }
 
 template<typename T>
-T& component_array<T>::get(const entity id) noexcept {
+T& componentarray<T>::get(const entity id) noexcept {
   assert(has(id) && "retrieving non-existent component.");
   return _components[_entity_to_index[id]];
 }
 
 template<typename T>
-const T& component_array<T>::get(const entity id) const noexcept {
+const T& componentarray<T>::get(const entity id) const noexcept {
   assert(has(id) && "retrieving non-existent component.");
   return _components[_entity_to_index[id]];
 }
 
 template<typename T>
-void component_array<T>::entity_destroyed(const entity id) noexcept {
+void componentarray<T>::entity_destroyed(const entity id) noexcept {
   if (!has(id)) [[unlikely]] return;
   remove(id);
 }
 
 template<typename T>
-bool component_array<T>::has(const entity id) const noexcept {
+bool componentarray<T>::has(const entity id) const noexcept {
   if (id >= entity_n) [[unlikely]] return false;
   return _entity_to_index[id] != __invalid;
 }
