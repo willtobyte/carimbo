@@ -42,6 +42,7 @@
 #include <source_location>
 #include <string>
 #include <string_view>
+#include <set>
 #include <type_traits>
 #include <typeinfo>
 #include <unordered_map>

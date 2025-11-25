@@ -15,7 +15,7 @@ public:
 
   [[nodiscard]] const T& get(const entity id) const noexcept;
 
-  void entity_destroyed(const entity id) noexcept;
+  void destroy_entity(const entity id) noexcept;
 
   [[nodiscard]] bool has(const entity id) const noexcept;
 
@@ -73,7 +73,7 @@ const T& componentarray<T>::get(const entity id) const noexcept {
 }
 
 template<typename T>
-void componentarray<T>::entity_destroyed(const entity id) noexcept {
+void componentarray<T>::destroy_entity(const entity id) noexcept {
   if (!has(id)) [[unlikely]] return;
   remove(id);
 }
