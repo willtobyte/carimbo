@@ -27,9 +27,9 @@ private:
   static constexpr auto __invalid = std::numeric_limits<std::size_t>::max();
 
   std::size_t _size{0};
-  std::array<T, entity_n> _components;
-  std::array<entity, entity_n> _index_to_entity;
-  std::array<std::size_t, entity_n> _entity_to_index;
+  std::array<T, kEntityCapacity> _components;
+  std::array<entity, kEntityCapacity> _index_to_entity;
+  std::array<std::size_t, kEntityCapacity> _entity_to_index;
 };
 
 template<typename T>
@@ -45,7 +45,7 @@ auto componentarray<T>::end() noexcept { return _components.begin() + _size; }
 
 template<typename T>
 void componentarray<T>::insert(const entity id, const T& component) noexcept {
-  assert(id < entity_n);
+  assert(id < kEntityCapacity);
   assert(!has(id) && "component added to same entity more than once.");
 
   _components[_size] = component;
@@ -90,6 +90,6 @@ void componentarray<T>::destroy_entity(const entity id) noexcept {
 
 template<typename T>
 bool componentarray<T>::has(const entity id) const noexcept {
-  if (id >= entity_n) [[unlikely]] return false;
+  if (id >= kEntityCapacity) [[unlikely]] return false;
   return _entity_to_index[id] != __invalid;
 }

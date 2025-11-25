@@ -17,6 +17,6 @@ public:
   [[nodiscard]] signature signature(const entity id) const noexcept;
 
 private:
-  std::array<::signature, entity_n> signatures;
+  std::array<::signature, kEntityCapacity> signatures;
   std::vector<entity> entities;
 };

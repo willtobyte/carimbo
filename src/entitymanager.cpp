@@ -1,7 +1,7 @@
 #include "entitymanager.hpp"
 
 entitymanager::entitymanager() noexcept
-    : entities(entity_n) {
+    : entities(kEntityCapacity) {
   std::iota(entities.begin(), entities.end(), entity{0});
 }
 
