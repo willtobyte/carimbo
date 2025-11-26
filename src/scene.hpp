@@ -2,6 +2,16 @@
 
 #include "common.hpp"
 
+#ifdef ECS
+class scene {
+public:
+
+
+private:
+  entt::registry registry;
+};
+#else
+
 enum class scenekind : uint8_t {
   object = 0,
   effect,
@@ -9,77 +19,79 @@ enum class scenekind : uint8_t {
 };
 
 class scene {
-  public:
-    explicit scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
+public:
+  explicit scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
 
-    virtual ~scene() noexcept;
+  virtual ~scene() noexcept;
 
-    virtual void update(float delta);
+  virtual void update(float delta);
 
-    virtual void draw() const;
+  virtual void draw() const;
 
-    std::string_view name() const noexcept;
+  std::string_view name() const noexcept;
 
-    std::variant<
-      std::shared_ptr<object>,
-      std::shared_ptr<soundfx>,
-      std::shared_ptr<particleprops>
-    > get(std::string_view name, scenekind type) const;
+  std::variant<
+    std::shared_ptr<object>,
+    std::shared_ptr<soundfx>,
+    std::shared_ptr<particleprops>
+  > get(std::string_view name, scenekind type) const;
 
-    void on_enter() const;
-    void on_leave() const;
-    void on_text(std::string_view text) const;
-    void on_touch(float x, float y) const;
-    void on_key_press(int32_t code) const;
-    void on_key_release(int32_t code) const;
-    void on_motion(float x, float y) const;
+  void on_enter() const;
+  void on_leave() const;
+  void on_text(std::string_view text) const;
+  void on_touch(float x, float y) const;
+  void on_key_press(int32_t code) const;
+  void on_key_release(int32_t code) const;
+  void on_motion(float x, float y) const;
 
-    void set_onenter(std::function<void()>&& fn);
-    void set_onloop(sol::protected_function fn);
-    void set_oncamera(sol::protected_function fn);
-    void set_onleave(std::function<void()>&& fn);
-    void set_ontouch(sol::protected_function fn);
-    void set_onkeypress(sol::protected_function fn);
-    void set_onkeyrelease(sol::protected_function fn);
-    void set_ontext(sol::protected_function fn);
-    void set_onmotion(sol::protected_function fn);
+  void set_onenter(std::function<void()>&& fn);
+  void set_onloop(sol::protected_function fn);
+  void set_oncamera(sol::protected_function fn);
+  void set_onleave(std::function<void()>&& fn);
+  void set_ontouch(sol::protected_function fn);
+  void set_onkeypress(sol::protected_function fn);
+  void set_onkeyrelease(sol::protected_function fn);
+  void set_ontext(sol::protected_function fn);
+  void set_onmotion(sol::protected_function fn);
 
-  protected:
-    void load();
+protected:
+  void load();
 
-    std::string _name;
-    nlohmann::json _j;
+  std::string _name;
+  nlohmann::json _j;
 
-    quad _camera;
-    std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
-    std::vector<std::pair<std::string, std::shared_ptr<soundfx>>> _effects;
-    std::unordered_map<std::string, std::shared_ptr<particlebatch>> _particles;
+  quad _camera;
+  std::vector<std::pair<std::string, std::shared_ptr<object>>> _objects;
+  std::vector<std::pair<std::string, std::shared_ptr<soundfx>>> _effects;
+  std::unordered_map<std::string, std::shared_ptr<particlebatch>> _particles;
 
-    std::shared_ptr<scenemanager> _scenemanager;
+  std::shared_ptr<scenemanager> _scenemanager;
 
-    std::shared_ptr<objectmanager> _objectmanager;
-    std::shared_ptr<particlesystem> _particlesystem;
-    std::shared_ptr<resourcemanager> _resourcemanager;
+  std::shared_ptr<objectmanager> _objectmanager;
+  std::shared_ptr<particlesystem> _particlesystem;
+  std::shared_ptr<resourcemanager> _resourcemanager;
 
-    std::function<void()> _onenter;
-    std::function<void(float)> _onloop;
-    std::function<quad(float)> _oncamera;
-    std::function<void()> _onleave;
-    std::function<void(float, float)> _ontouch;
-    std::function<void(int32_t)> _onkeypress;
-    std::function<void(int32_t)> _onkeyrelease;
-    std::function<void(std::string_view)> _ontext;
-    std::function<void(float, float)> _onmotion;
+  std::function<void()> _onenter;
+  std::function<void(float)> _onloop;
+  std::function<quad(float)> _oncamera;
+  std::function<void()> _onleave;
+  std::function<void(float, float)> _ontouch;
+  std::function<void(int32_t)> _onkeypress;
+  std::function<void(int32_t)> _onkeyrelease;
+  std::function<void(std::string_view)> _ontext;
+  std::function<void(float, float)> _onmotion;
 };
 
 class scenebackdrop : public scene {
-  public:
-    scenebackdrop(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
+public:
+  scenebackdrop(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager);
 
-    virtual ~scenebackdrop() noexcept = default;
+  virtual ~scenebackdrop() noexcept = default;
 
-    virtual void draw() const noexcept override;
+  virtual void draw() const noexcept override;
 
-  private:
-    std::shared_ptr<pixmap> _background;
+private:
+  std::shared_ptr<pixmap> _background;
 };
+
+#endif

@@ -61,33 +61,33 @@ struct particlebatch final {
 };
 
 class particlefactory final {
-  public:
-    explicit particlefactory(std::shared_ptr<resourcemanager> resourcemanager);
+public:
+  explicit particlefactory(std::shared_ptr<resourcemanager> resourcemanager);
 
-    std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool emitting = true) const;
+  std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool emitting = true) const;
 
-  private:
-    std::shared_ptr<resourcemanager> _resourcemanager;
+private:
+  std::shared_ptr<resourcemanager> _resourcemanager;
 };
 
 class particlesystem final {
-  public:
-    explicit particlesystem(std::shared_ptr<resourcemanager> resourcemanager);
-    ~particlesystem() = default;
+public:
+  explicit particlesystem(std::shared_ptr<resourcemanager> resourcemanager);
+  ~particlesystem() = default;
 
-    void add(const std::shared_ptr<particlebatch>& batch);
+  void add(const std::shared_ptr<particlebatch>& batch);
 
-    void set(const std::vector<std::shared_ptr<particlebatch>>& batches);
+  void set(const std::vector<std::shared_ptr<particlebatch>>& batches);
 
-    void clear();
+  void clear();
 
-    void update(float delta);
+  void update(float delta);
 
-    void draw() const;
+  void draw() const;
 
-    std::shared_ptr<particlefactory> factory() const noexcept;
+  std::shared_ptr<particlefactory> factory() const noexcept;
 
-  private:
-    std::shared_ptr<particlefactory> _factory;
-    std::vector<std::shared_ptr<particlebatch>> _batches;
+private:
+  std::shared_ptr<particlefactory> _factory;
+  std::vector<std::shared_ptr<particlebatch>> _batches;
 };
