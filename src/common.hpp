@@ -117,11 +117,7 @@ struct transform;
 struct vec2;
 struct vec3;
 
-enum collisioncategory : std::uint64_t;
 enum class reflection : int;
-enum class scenekind : uint8_t;
-enum scenetype : std::uint8_t;
-enum class widgettype : uint8_t;
 
 namespace steam {
   class achievement;
