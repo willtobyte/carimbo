@@ -113,14 +113,9 @@ struct particlebatch;
 struct particleprops;
 struct quad;
 struct timerenvelope;
-struct transform;
 struct vec2;
 struct vec3;
 
 enum class reflection : int;
 
-namespace steam {
-  class achievement;
-}
-
-#define ECS
+namespace steam { class achievement; }
