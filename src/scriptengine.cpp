@@ -1,6 +1,5 @@
 #include "scriptengine.hpp"
 
-
 static int on_panic(lua_State* L) {
   const auto* message = lua_tostring(L, -1);
   throw std::runtime_error(std::format("Lua panic: {}", message));
@@ -496,6 +495,14 @@ void scriptengine::run() {
 
       return it->second;
     }
+  );
+
+  lua.new_usertype<entityproxy>(
+    "Entity",
+    sol::no_constructor,
+    "action", sol::property(&entityproxy::action, &entityproxy::set_action),
+    "on_hover", &entityproxy::set_onhover,
+    "on_unhover", &entityproxy::set_onunhover
   );
 
   lua.new_usertype<scene>(

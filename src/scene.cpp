@@ -8,6 +8,7 @@
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
 #include "tilemap.hpp"
+#include <variant>
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(scenemanager->renderer()) {
@@ -67,6 +68,9 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     _registry.emplace<physics>(entity, std::move(ph));
 
     _proxies.emplace(std::move(name), std::make_shared<entityproxy>(entity, _registry));
+
+    callbacks cb;
+    _registry.emplace<callbacks>(entity, std::move(cb));
   }
 }
 
@@ -250,6 +254,17 @@ void scene::draw() const noexcept {
 #endif
 }
 
+std::variant<
+  std::shared_ptr<entityproxy>,
+  std::shared_ptr<soundfx>,
+  std::shared_ptr<particleprops>
+> scene::get(std::string_view name, scenekind kind) const {
+  //if (kind == scenekind::object) {
+    const auto it = _proxies.find(name);
+    assert(it != _proxies.end() && "entity proxy not found in scene");
+    return it->second;
+    //}
+}
 
 void scene::set_onenter(std::function<void()>&& fn) {
   _onenter = std::move(fn);

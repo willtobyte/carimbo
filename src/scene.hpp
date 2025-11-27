@@ -97,16 +97,27 @@ public:
   entityproxy(entt::entity entity, entt::registry& registry) noexcept : _entity(entity), _registry(registry) {};
   ~entityproxy() noexcept = default;
 
+  std::string_view action() const noexcept {
+    const auto& s = _registry.get<state>(_entity);
+    return s.action;
+  }
+
+  void set_action(std::string_view name) noexcept {
+    auto& s = _registry.get<state>(_entity);
+    s.action = name;
+    s.dirty = true;
+  }
+
   void set_onhover(sol::protected_function fn) {
     auto& callback = _registry.get<callbacks>(_entity);
 
-    // callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
+    callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
   };
 
   void set_onunhover(sol::protected_function fn) {
     auto& callback = _registry.get<callbacks>(_entity);
 
-    // callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
+    callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
   };
 
 private:
@@ -155,10 +166,10 @@ public:
   }
 
   std::variant<
-    std::shared_ptr<object>,
+    std::shared_ptr<entityproxy>,
     std::shared_ptr<soundfx>,
     std::shared_ptr<particleprops>
-  > get(std::string_view name, scenekind type) const {std::println(">>> {}", name);}
+  > get(std::string_view name, scenekind kind) const;
 
   void set_onenter(std::function<void()>&& fn);
   void set_onloop(sol::protected_function fn);
@@ -192,7 +203,7 @@ private:
 
   mutable std::unordered_set<uint64_t> _hovering;
 
-  std::unordered_map<std::string, std::shared_ptr<entityproxy>> _proxies;
+  std::unordered_map<std::string, std::shared_ptr<entityproxy>, string_hash, string_equal> _proxies;
 
   std::function<void()> _onenter;
 };
