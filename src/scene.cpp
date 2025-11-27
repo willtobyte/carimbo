@@ -26,7 +26,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   for (const auto& o : os) {
     const auto name = o["name"].get<std::string_view>();
     const auto kind = o["kind"].get<std::string_view>();
-    const auto action = o["action"].get<std::string_view>();
+    const auto action = o.value("action", std::string_view{});
 
     const auto x = o.value("x", .0f);
     const auto y = o.value("y", .0f);
