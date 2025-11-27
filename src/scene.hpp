@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include <entt/entity/fwd.hpp>
 
 enum class scenekind : uint8_t {
   object = 0,
@@ -101,13 +100,13 @@ public:
   void set_onhover(sol::protected_function fn) {
     auto& callback = _registry.get<callbacks>(_entity);
 
-    callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
+    // callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
   };
 
   void set_onunhover(sol::protected_function fn) {
     auto& callback = _registry.get<callbacks>(_entity);
 
-    callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
+    // callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
   };
 
 private:
@@ -192,6 +191,8 @@ private:
   std::shared_ptr<renderer> _renderer;
 
   mutable std::unordered_set<uint64_t> _hovering;
+
+  std::unordered_map<std::string, std::shared_ptr<entityproxy>> _proxies;
 
   std::function<void()> _onenter;
 };

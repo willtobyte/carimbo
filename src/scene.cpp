@@ -65,6 +65,8 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
     physics ph;
     _registry.emplace<physics>(entity, std::move(ph));
+
+    _proxies.emplace(std::move(name), std::make_shared<entityproxy>(entity, _registry));
   }
 }
 
@@ -91,13 +93,13 @@ void scene::update(float delta) noexcept {
 
   {
     auto view = _registry.view<animator, state>();
-    
+
     for (auto entity : view) {
       auto& an = view.get<animator>(entity);
       auto& st = view.get<state>(entity);
 
       auto& tl = an.timelines[st.action];
-      
+
       if (st.dirty) {
         st.current_frame = 0;
         st.tick = now;
@@ -106,7 +108,7 @@ void scene::update(float delta) noexcept {
       }
 
       if (tl.frames.empty()) continue;
-      
+
       const auto& frame = tl.frames[st.current_frame];
       if (frame.duration == 0 || now - st.tick < static_cast<uint64_t>(frame.duration)) {
         continue;
