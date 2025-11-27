@@ -68,9 +68,9 @@ void from_json(const nlohmann::json& j, timeline& o) {
     j["next"].get_to(o.next);
   }
 
-  if (j.contains("box")) {
+  if (j.contains("hitbox")) {
     b2AABB box;
-    j["box"].get_to(box);
+    j["hitbox"]["quad"].get_to(box);
     o.box = box;
   }
 

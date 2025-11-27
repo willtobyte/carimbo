@@ -110,7 +110,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto objectmanager = std::make_shared<::objectmanager>();
   const auto particlesystem = std::make_shared<::particlesystem>(resourcemanager);
   const auto timermanager = std::make_shared<::timermanager>();
-  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager);
+  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager, renderer);
   const auto world = std::make_shared<::world>(renderer);
 
   engine->set_audiodevice(audiodevice);

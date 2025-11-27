@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "physics.hpp"
 
 class objectmanager;
 
@@ -18,8 +19,9 @@ template <class OutIt>
   const auto data = b2Body_GetUserData(body);
   if (!data) return true;
 
-  const auto id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(data));
-  *(*it)++ = id;
+  const auto id = userdata_to_id(data);
+  **it = id;
+  ++(*it);
   return true;
 }
 

@@ -9,7 +9,8 @@
 #include "soundfx.hpp"
 #include "tilemap.hpp"
 
-scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager) {
+scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
+    : _renderer(scenemanager->renderer()) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
@@ -89,6 +90,7 @@ scene::~scene() noexcept {
 void scene::update(float delta) noexcept {
   {
     auto view = _registry.view<transform, animator, state, physics>();
+
     for (auto entity : view) {
       auto& tr = view.get<transform>(entity);
       auto& an = view.get<animator>(entity);
@@ -99,17 +101,21 @@ void scene::update(float delta) noexcept {
         continue;
       }
 
-      if (ph.is_valid() && ph.dirty) {
+      if (!ph.is_valid() && ph.dirty) {
         auto bodyDef = b2DefaultBodyDef();
         bodyDef.type = static_cast<b2BodyType>(ph.type);
         bodyDef.position = b2Vec2{tr.position.x, tr.position.y};
 
-        bodyDef.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(entity));
+        bodyDef.userData = id_to_userdata(static_cast<uint64_t>(entity));
 
         ph.body = b2CreateBody(_world, &bodyDef);
       }
 
-      if (ph.dirty) {
+      if (ph.is_valid()) {
+        b2Body_SetTransform(ph.body, b2Vec2{tr.position.x, tr.position.y}, b2Rot_identity);
+      }
+
+      if (ph.is_valid() && ph.dirty) {
         if (b2Shape_IsValid(ph.shape)) {
           b2DestroyShape(ph.shape, false);
         }
@@ -120,9 +126,17 @@ void scene::update(float delta) noexcept {
 
           auto def = b2DefaultShapeDef();
 
-          auto polygon = b2MakeBox(
-            (box.upperBound.x - box.lowerBound.x) * .5f,
-            (box.upperBound.y - box.lowerBound.y) * .5f);
+          const float w = box.upperBound.x - box.lowerBound.x;
+          const float h = box.upperBound.y - box.lowerBound.y;
+
+          const float cx = box.lowerBound.x + w * .5f;
+          const float cy = box.lowerBound.y + h * .5f;
+
+          auto polygon = b2MakeOffsetBox(
+            w * .5f,
+            h * .5f,
+            b2Vec2{cx, cy},
+            b2Rot_identity);
 
           ph.shape = b2CreatePolygonShape(ph.body, &def, &polygon);
         }
@@ -132,6 +146,23 @@ void scene::update(float delta) noexcept {
     }
   }
 }
+
+#ifdef DEBUG
+[[nodiscard]] static bool _draw_callback(const b2ShapeId shape, void* const ctx) {
+  auto* const renderer = static_cast<SDL_Renderer*>(ctx);
+  const auto aabb = b2Shape_GetAABB(shape);
+
+  const auto r = SDL_FRect{
+    aabb.lowerBound.x,
+    aabb.lowerBound.y,
+    aabb.upperBound.x - aabb.lowerBound.x,
+    aabb.upperBound.y - aabb.lowerBound.y
+  };
+
+  SDL_RenderRect(renderer, &r);
+  return true;
+};
+#endif
 
 void scene::draw() const noexcept {
   const auto view = _registry.view<transform, tint, sprite, animator, state>();
@@ -157,18 +188,24 @@ void scene::draw() const noexcept {
       frame.quad.x, frame.quad.y,
       frame.quad.w, frame.quad.h
     );
-    // const auto& frame = tl.frames[0];
-
-    // std::println("id {}", sp.id);
-    // const auto it = _spritesheets.find(sp.id);
-    // assert(it != _spritesheets.end() && "key not found in _spritesheets");
-
-    // it->second->draw(
-    //   frame.quad.x, frame.quad.y, frame.quad.w, frame.quad.h,
-    //   0, 0, frame.quad.w, frame.quad.h,
-    //   tr.angle
-    // );
   }
+
+#ifdef DEBUG
+  SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
+
+  int width, height;
+  SDL_GetRenderOutputSize(*_renderer, &width, &height);
+
+  const auto x0 = .0f;
+  const auto y0 = .0f;
+  const auto x1 = static_cast<float>(width);
+  const auto y1 = static_cast<float>(height);
+
+  const auto aabb = to_aabb(x0, y0, x1, y1);
+  const auto filter = b2DefaultQueryFilter();
+
+  b2World_OverlapAABB(_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
+#endif
 }
 
 
@@ -204,11 +241,12 @@ void scene::on_motion(float x, float y) const {
   query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
-    std::println(">>> hover");
     if (hits.contains(id)) continue;
     if (const auto entity = find(id)) {
-      if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
-        callback.on_unhover();
+      if (_registry.all_of<callbacks>(*entity)) {
+        if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
+          callback.on_unhover();
+        }
       }
     }
   }
@@ -216,8 +254,10 @@ void scene::on_motion(float x, float y) const {
   for (const auto id : hits) {
     if (_hovering.contains(id)) continue;
     if (const auto entity = find(id)) {
-      if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
-        callback.on_hover();
+      if (_registry.all_of<callbacks>(*entity)) {
+        if (auto& callback = _registry.get<callbacks>(*entity); callback.on_hover) {
+          callback.on_hover();
+        }
       }
     }
   }

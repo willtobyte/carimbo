@@ -55,9 +55,8 @@ struct physics final {
 };
 
 struct timeline final {
-  // std::string action;
-  std::optional<b2AABB> box;
   std::string next;
+  std::optional<b2AABB> box;
   std::vector<frame> frames;
   std::vector<uint16_t> durations;
   uint16_t current{0};
@@ -95,15 +94,22 @@ struct callbacks {
 };
 
 class scene {
+[[nodiscard]] static inline uint64_t userdata_to_id(void* userdata) noexcept {
+  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata)) - 1;
+}
+
+[[nodiscard]] static inline void* id_to_userdata(uint64_t id) noexcept {
+  return reinterpret_cast<void*>(static_cast<uintptr_t>(id) + 1);
+}
+
 template <class OutIt>
 [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
   auto* const it = static_cast<OutIt*>(context);
   const auto body = b2Shape_GetBody(shape);
   const auto data = b2Body_GetUserData(body);
-  if (!data) return true;
-
-  const auto id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(data));
-  *(*it)++ = id;
+  const auto id = userdata_to_id(data);
+  **it = id;
+  ++(*it);
   return true;
 }
 
@@ -124,7 +130,6 @@ public:
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
     aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
     const auto filter = b2DefaultQueryFilter();
-
     b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
   }
 

@@ -3,11 +3,13 @@
 #include "common.hpp"
 
 inline uint64_t userdata_to_id(void* userdata) noexcept {
-  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata));
+  // Subtract 1 because we add 1 in id_to_userdata to avoid NULL when id is 0
+  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata)) - 1;
 }
 
 inline void* id_to_userdata(uint64_t id) noexcept {
-  return reinterpret_cast<void*>(static_cast<uintptr_t>(id));
+  // Add 1 to avoid NULL when id is 0 (Box2D treats NULL userData as "no data")
+  return reinterpret_cast<void*>(static_cast<uintptr_t>(id) + 1);
 }
 
 enum collisioncategory : std::uint64_t {

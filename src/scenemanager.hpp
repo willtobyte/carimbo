@@ -18,7 +18,8 @@ public:
     std::shared_ptr<::resourcemanager> resourcemanager,
     std::shared_ptr<::objectmanager> objectmanager,
     std::shared_ptr<::particlesystem> particlesystem,
-    std::shared_ptr<::timermanager> timermanager
+    std::shared_ptr<::timermanager> timermanager,
+    std::shared_ptr<::renderer> renderer
   );
 
   ~scenemanager() = default;
@@ -44,6 +45,7 @@ public:
   std::shared_ptr<::objectmanager> objectmanager() const noexcept;
   std::shared_ptr<::particlesystem> particlesystem() const noexcept;
   std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
+  std::shared_ptr<::renderer> renderer() const noexcept;
 
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;
@@ -58,6 +60,7 @@ private:
   std::shared_ptr<::objectmanager> _objectmanager;
   std::shared_ptr<::particlesystem> _particlesystem;
   std::shared_ptr<::timermanager> _timermanager;
+  std::shared_ptr<::renderer> _renderer;
   std::unordered_map<std::string, std::shared_ptr<::scene>, string_hash, string_equal> _scene_mapping;
   std::weak_ptr<::scene> _scene;
   std::string _current;

@@ -12,12 +12,14 @@ scenemanager::scenemanager(
   std::shared_ptr<::resourcemanager> resourcemanager,
   std::shared_ptr<::objectmanager> objectmanager,
   std::shared_ptr<::particlesystem> particlesystem,
-  std::shared_ptr<::timermanager> timermanager
+  std::shared_ptr<::timermanager> timermanager,
+  std::shared_ptr<::renderer> renderer
 )
   : _resourcemanager(std::move(resourcemanager)),
     _objectmanager(std::move(objectmanager)),
     _particlesystem(std::move(particlesystem)),
-    _timermanager(std::move(timermanager)) {
+    _timermanager(std::move(timermanager)),
+    _renderer(std::move(renderer)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
@@ -168,4 +170,8 @@ std::shared_ptr<particlesystem> scenemanager::particlesystem() const noexcept {
 
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {
   return _resourcemanager;
+}
+
+std::shared_ptr<::renderer> scenemanager::renderer() const noexcept {
+  return _renderer;
 }
