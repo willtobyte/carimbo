@@ -17,6 +17,8 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   const auto pixmappool = scenemanager->resourcemanager()->pixmappool();
 
+  _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
+
   const auto os = json.value("objects", nlohmann::json::array());
 
   for (const auto& o : os) {
@@ -165,6 +167,11 @@ void scene::update(float delta) noexcept {
 #endif
 
 void scene::draw() const noexcept {
+  static const auto w = static_cast<float>(_background->width());
+  static const auto h = static_cast<float>(_background->height());
+
+  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+
   const auto view = _registry.view<transform, tint, sprite, animator, state>();
 
   for (auto entity : view) {
