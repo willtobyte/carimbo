@@ -11,14 +11,18 @@ overlay::overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_p
     : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
-  const auto widget = [&]() {
-    switch (type) {
-    case widgettype::cursor:
-      std::terminate();
-    case widgettype::label:
-      return std::make_shared<label>();
-    }
-  }();
+  std::shared_ptr<label> widget;
+  
+  switch (type) {
+  case widgettype::cursor:
+    std::terminate();
+  case widgettype::label:
+    widget = std::make_shared<label>();
+    break;
+  default:
+    widget = nullptr;
+    break;
+  }
 
   _widgets.emplace_back(widget);
 
