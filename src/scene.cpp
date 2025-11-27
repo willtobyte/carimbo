@@ -172,11 +172,10 @@ void scene::draw() const noexcept {
 
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  const auto view = _registry.view<transform, tint, sprite, animator, state>();
+  const auto view = _registry.view<transform, sprite, animator, state>();
 
   for (auto entity : view) {
     auto& tr = view.get<transform>(entity);
-    auto& tn = view.get<tint>(entity);
     auto& sp = view.get<sprite>(entity);
     auto& an = view.get<animator>(entity);
     auto& st = view.get<state>(entity);
