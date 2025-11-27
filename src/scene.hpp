@@ -56,7 +56,7 @@ struct physics final {
 
 struct timeline final {
   // std::string action;
-  b2AABB box;
+  std::optional<b2AABB> box;
   std::string next;
   std::vector<frame> frames;
   std::vector<uint16_t> durations;
@@ -95,17 +95,17 @@ struct callbacks {
 };
 
 class scene {
-  template <class OutIt>
-  [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
-    auto* const it = static_cast<OutIt*>(context);
-    const auto body = b2Shape_GetBody(shape);
-    const auto data = b2Body_GetUserData(body);
-    if (!data) return true;
+template <class OutIt>
+[[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
+  auto* const it = static_cast<OutIt*>(context);
+  const auto body = b2Shape_GetBody(shape);
+  const auto data = b2Body_GetUserData(body);
+  if (!data) return true;
 
-    const auto id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(data));
-    *(*it)++ = id;
-    return true;
-  }
+  const auto id = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(data));
+  *(*it)++ = id;
+  return true;
+}
 
 public:
   scene(std::string_view name, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager);
@@ -171,6 +171,8 @@ private:
   mutable std::unordered_set<uint64_t> _hovering;
 
   std::unordered_map<size_t, std::shared_ptr<pixmap>> _spritesheets;
+
+  std::function<void()> _onenter;
 };
 
 

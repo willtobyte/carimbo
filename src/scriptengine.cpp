@@ -500,8 +500,9 @@ void scriptengine::run() {
 
   lua.new_usertype<scene>(
     "Scene",
-    sol::no_constructor
-    // "name", sol::property(&scene::name)
+    sol::no_constructor,
+    "name", sol::property(&scene::name),
+    "get", &scene::get
   );
 
   lua.new_usertype<scenemanager>(
@@ -556,7 +557,9 @@ void scriptengine::run() {
         auto ptr = std::weak_ptr<::scene>(scene);
 
         module["get"] = [ptr, name](sol::table, std::string_view id, scenekind kind) {
+          std::println("[scriptengine] module.get called with id='{}' kind={}", id, static_cast<int>(kind));
           if (auto scene = ptr.lock()) [[likely]] {
+            std::println("[scriptengine] calling scene->get");
             return scene->get(id, kind);
           }
 

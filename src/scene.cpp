@@ -114,15 +114,18 @@ void scene::update(float delta) noexcept {
           b2DestroyShape(ph.shape, false);
         }
 
-        const auto& box = an[st.action].box;
-        auto sdef = b2DefaultShapeDef();
-        std::println("{} {}", (box.upperBound.x - box.lowerBound.x) * .5f, (box.upperBound.y - box.lowerBound.y) * .5f);
+        const auto& opt = an[st.action].box;
+        if (opt.has_value()) {
+          const auto& box = opt.value();
 
-        auto polygon = b2MakeBox(
-          (box.upperBound.x - box.lowerBound.x) * .5f,
-          (box.upperBound.y - box.lowerBound.y) * .5f);
+          auto def = b2DefaultShapeDef();
 
-        ph.shape = b2CreatePolygonShape(ph.body, &sdef, &polygon);
+          auto polygon = b2MakeBox(
+            (box.upperBound.x - box.lowerBound.x) * .5f,
+            (box.upperBound.y - box.lowerBound.y) * .5f);
+
+          ph.shape = b2CreatePolygonShape(ph.body, &def, &polygon);
+        }
 
         ph.dirty = false;
       }
@@ -169,7 +172,10 @@ void scene::draw() const noexcept {
 }
 
 
-void scene::set_onenter(std::function<void()>&& fn) {}
+void scene::set_onenter(std::function<void()>&& fn) {
+  _onenter = std::move(fn);
+}
+
 void scene::set_onloop(sol::protected_function fn) {}
 void scene::set_oncamera(sol::protected_function fn) {}
 void scene::set_onleave(std::function<void()>&& fn) {}
@@ -180,15 +186,15 @@ void scene::set_ontext(sol::protected_function fn) {}
 void scene::set_onmotion(sol::protected_function fn) {}
 
 void scene::on_enter() const {
-  std::println(">>>>> enter");
+  if (auto fn = _onenter; fn) {
+    fn();
+  }
 }
 
 void scene::on_leave() const {
-
 }
 
 void scene::on_text(std::string_view text) const {
-
 }
 
 void scene::on_motion(float x, float y) const {
