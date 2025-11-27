@@ -2,138 +2,17 @@
 
 #include "common.hpp"
 
+#include "entityproxy.hpp"
+#include "soundfx.hpp"
+#include "particlesystem.hpp"
+
 enum class scenekind : uint8_t {
   object = 0,
   effect,
   particle
 };
 
-struct transform final {
-	vec2 position;
-	double angle;
-	float scale;
-};
-
-struct tint final {
-  uint8_t r{0};
-  uint8_t g{0};
-  uint8_t b{0};
-  uint8_t a{255};
-};
-
-struct offset {
-  float x{.0f};
-  float y{.0f};
-
-  friend void from_json(const nlohmann::json& j, offset& o);
-};
-
-struct frame final {
-  int duration;
-  offset offset;
-  quad quad;
-
-  friend void from_json(const nlohmann::json& j, frame& o);
-};
-
-enum class bodytype : uint8_t {
-  static_body = 0,
-  kinematic,
-  dynamic
-};
-
-struct physics final {
-  b2BodyId body;
-  b2ShapeId shape;
-  bodytype type{bodytype::static_body};
-  bool dirty{true};
-  bool enabled{true};
-
-  bool is_valid() const noexcept {
-    return b2Body_IsValid(body);
-  }
-};
-
-struct timeline final {
-  std::string next;
-  std::optional<b2AABB> box;
-  std::vector<frame> frames;
-  std::vector<uint16_t> durations;
-  uint16_t current{0};
-  uint64_t tick{0};
-
-   friend void from_json(const nlohmann::json& j, timeline& o);
-};
-
-struct animator final {
-  std::unordered_map<std::string, timeline> timelines;
-
-  const timeline& operator[](const std::string& action) const {
-    auto it = timelines.find(action);
-    assert(it != timelines.end() && "timeline not found");
-    return it->second;
-  }
-};
-
-struct sprite final {
-  std::shared_ptr<pixmap> pixmap;
-};
-
-struct state final {
-  bool dirty;
-  bool redraw;
-  uint16_t current_frame{0};
-  uint64_t tick{0};
-  std::string action;
-};
-
-struct callbacks {
-  std::function<void()> on_hover;
-  std::function<void()> on_unhover;
-};
-
-class entityproxy {
-public:
-  entityproxy(entt::entity entity, entt::registry& registry) noexcept : _entity(entity), _registry(registry) {};
-  ~entityproxy() noexcept = default;
-
-  std::string_view action() const noexcept {
-    const auto& s = _registry.get<state>(_entity);
-    return s.action;
-  }
-
-  void set_action(std::string_view name) noexcept {
-    auto& s = _registry.get<state>(_entity);
-    s.action = name;
-    s.dirty = true;
-  }
-
-  void set_onhover(sol::protected_function fn) {
-    auto& callback = _registry.get<callbacks>(_entity);
-
-    callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
-  };
-
-  void set_onunhover(sol::protected_function fn) {
-    auto& callback = _registry.get<callbacks>(_entity);
-
-    callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
-  };
-
-private:
-  entt::entity _entity;
-  entt::registry& _registry;
-};
-
 class scene {
-[[nodiscard]] static inline uint64_t userdata_to_id(void* userdata) noexcept {
-  return static_cast<uint64_t>(reinterpret_cast<uintptr_t>(userdata)) - 1;
-}
-
-[[nodiscard]] static inline void* id_to_userdata(uint64_t id) noexcept {
-  return reinterpret_cast<void*>(static_cast<uintptr_t>(id) + 1);
-}
-
 template <class OutIt>
 [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
   auto* const it = static_cast<OutIt*>(context);
@@ -155,15 +34,6 @@ public:
   void draw() const noexcept;
 
   std::string_view name() const noexcept { return ""; }
-
-  template <class OutIt>
-  void query(const float x, const float y, OutIt out) const {
-    auto aabb = b2AABB{};
-    aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
-    aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
-    const auto filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
-  }
 
   std::variant<
     std::shared_ptr<entityproxy>,
@@ -190,6 +60,15 @@ public:
   void on_key_release(int32_t code) const;
 
 protected:
+template <class OutIt>
+  void query(const float x, const float y, OutIt out) const {
+    auto aabb = b2AABB{};
+    aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
+    aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
+    const auto filter = b2DefaultQueryFilter();
+    b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
+  }
+
   std::optional<entt::entity> find(uint64_t id) const;
 
 private:

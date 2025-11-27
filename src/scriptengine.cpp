@@ -564,17 +564,9 @@ void scriptengine::run() {
         auto ptr = std::weak_ptr<::scene>(scene);
 
         module["get"] = [ptr, name](sol::table, std::string_view id, scenekind kind) {
-          std::println("[scriptengine] module.get called with id='{}' kind={}", id, static_cast<int>(kind));
           if (auto scene = ptr.lock()) [[likely]] {
-            std::println("[scriptengine] calling scene->get");
             return scene->get(id, kind);
           }
-
-          throw std::runtime_error(std::format(
-            "[scriptengine] scene '{}' expired while accessing object '{}'",
-            name,
-            id
-          ));
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
