@@ -39,7 +39,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     _registry.emplace<tint>(entity, std::move(tn));
 
     sprite s;
-    s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind));
+    s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
     _registry.emplace<sprite>(entity, std::move(s));
 
     state st;
