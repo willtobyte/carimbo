@@ -57,7 +57,6 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     _registry.emplace<transform>(entity, std::move(t));
 
     animator an;
-
     for (auto& [key, value] : j["timelines"].items()) {
       timeline tl;
       from_json(value, tl);
