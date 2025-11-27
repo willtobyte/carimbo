@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include <entt/entity/fwd.hpp>
 
 enum class scenekind : uint8_t {
   object = 0,
@@ -65,11 +66,6 @@ struct timeline final {
    friend void from_json(const nlohmann::json& j, timeline& o);
 };
 
-struct sprite final {
-  uint64_t id;
-  reflection reflection;
-};
-
 struct animator final {
   std::unordered_map<std::string, timeline> timelines;
 
@@ -78,6 +74,10 @@ struct animator final {
     assert(it != timelines.end() && "timeline not found");
     return it->second;
   }
+};
+
+struct sprite final {
+  std::shared_ptr<pixmap> pixmap;
 };
 
 struct state final {
@@ -91,6 +91,28 @@ struct state final {
 struct callbacks {
   std::function<void()> on_hover;
   std::function<void()> on_unhover;
+};
+
+class entityproxy {
+public:
+  entityproxy(entt::entity entity, entt::registry& registry) noexcept : _entity(entity), _registry(registry) {};
+  ~entityproxy() noexcept = default;
+
+  void set_onhover(sol::protected_function fn) {
+    auto& callback = _registry.get<callbacks>(_entity);
+
+    callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
+  };
+
+  void set_onunhover(sol::protected_function fn) {
+    auto& callback = _registry.get<callbacks>(_entity);
+
+    callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
+  };
+
+private:
+  entt::entity _entity;
+  entt::registry& _registry;
 };
 
 class scene {
@@ -165,17 +187,11 @@ private:
 
   b2WorldId _world;
 
-  float _accumulator{.0f};
-
-  uint64_t _sprite_counter{0};
-
   std::shared_ptr<pixmap> _background;
 
   std::shared_ptr<renderer> _renderer;
 
   mutable std::unordered_set<uint64_t> _hovering;
-
-  std::unordered_map<uint64_t, std::shared_ptr<pixmap>> _spritesheets;
 
   std::function<void()> _onenter;
 };

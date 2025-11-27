@@ -33,15 +33,13 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     const auto buffer = io::read(filename);
     const auto j = nlohmann::json::parse(buffer);
 
-    _spritesheets.emplace(++_sprite_counter, pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
-
     auto entity = _registry.create();
 
     tint tn;
     _registry.emplace<tint>(entity, std::move(tn));
 
     sprite s;
-    s.id = _sprite_counter;
+    s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind));
     _registry.emplace<sprite>(entity, std::move(s));
 
     state st;
@@ -89,6 +87,46 @@ scene::~scene() noexcept {
 }
 
 void scene::update(float delta) noexcept {
+  const auto now = SDL_GetTicks();
+
+  {
+    auto view = _registry.view<animator, state>();
+    
+    for (auto entity : view) {
+      auto& an = view.get<animator>(entity);
+      auto& st = view.get<state>(entity);
+
+      auto& tl = an.timelines[st.action];
+      
+      if (st.dirty) {
+        st.current_frame = 0;
+        st.tick = now;
+        st.dirty = false;
+        continue;
+      }
+
+      if (tl.frames.empty()) continue;
+      
+      const auto& frame = tl.frames[st.current_frame];
+      if (frame.duration == 0 || now - st.tick < static_cast<uint64_t>(frame.duration)) {
+        continue;
+      }
+
+      st.tick = now;
+
+      if (st.current_frame + 1 >= tl.frames.size()) {
+        if (!tl.next.empty()) {
+          st.action = tl.next;
+          st.dirty = true;
+        } else {
+          st.current_frame = 0;
+        }
+      } else {
+        st.current_frame++;
+      }
+    }
+  }
+
   {
     auto view = _registry.view<transform, animator, state, physics>();
 
@@ -182,12 +220,9 @@ void scene::draw() const noexcept {
     const auto x = tr.position.x;
     const auto y = tr.position.y;
 
-    const auto it = _spritesheets.find(sp.id);
-    assert(it != _spritesheets.end() && "attempted to access non-existent spritesheet");
-
     const auto frame = an[st.action].frames[st.current_frame];
 
-    it->second->draw(
+    sp.pixmap->draw(
       frame.quad.x + x, frame.quad.y + y,
       frame.quad.w, frame.quad.h,
       frame.quad.x, frame.quad.y,
