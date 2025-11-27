@@ -204,6 +204,7 @@ void scene::on_motion(float x, float y) const {
   query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
+    std::println(">>> hover");
     if (hits.contains(id)) continue;
     if (const auto entity = find(id)) {
       if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {

@@ -170,7 +170,7 @@ private:
 
   mutable std::unordered_set<uint64_t> _hovering;
 
-  std::unordered_map<size_t, std::shared_ptr<pixmap>> _spritesheets;
+  std::unordered_map<uint64_t, std::shared_ptr<pixmap>> _spritesheets;
 
   std::function<void()> _onenter;
 };
