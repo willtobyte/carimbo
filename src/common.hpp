@@ -64,6 +64,7 @@ class cursor;
 class desktop;
 class engine;
 class enginefactory;
+class entityproxy;
 class envelope;
 class envelopepool_impl;
 class eventmanager;

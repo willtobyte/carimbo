@@ -2,9 +2,10 @@
 
 #include "common.hpp"
 
-#include "entityproxy.hpp"
 #include "soundfx.hpp"
 #include "particlesystem.hpp"
+
+class entityproxy;
 
 enum class scenekind : uint8_t {
   object = 0,

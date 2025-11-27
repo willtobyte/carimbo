@@ -1,5 +1,6 @@
 #include "scene.hpp"
 
+#include "entityproxy.hpp"
 #include "geometry.hpp"
 #include "object.hpp"
 #include "objectmanager.hpp"
