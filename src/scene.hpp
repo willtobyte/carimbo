@@ -89,6 +89,11 @@ struct state final {
   std::string action;
 };
 
+struct callbacks {
+  std::function<void()> on_hover;
+  std::function<void()> on_unhover;
+};
+
 class scene {
   template <class OutIt>
   [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
@@ -127,25 +132,28 @@ public:
     std::shared_ptr<object>,
     std::shared_ptr<soundfx>,
     std::shared_ptr<particleprops>
-  > get(std::string_view name, scenekind type) const {}
+  > get(std::string_view name, scenekind type) const {std::println(">>> {}", name);}
 
-  void set_onenter(std::function<void()>&& fn) {}
-  void set_onloop(sol::protected_function fn) {}
-  void set_oncamera(sol::protected_function fn) {}
-  void set_onleave(std::function<void()>&& fn) {}
-  void set_ontouch(sol::protected_function fn) {}
-  void set_onkeypress(sol::protected_function fn) {}
-  void set_onkeyrelease(sol::protected_function fn) {}
-  void set_ontext(sol::protected_function fn) {}
-  void set_onmotion(sol::protected_function fn) {}
+  void set_onenter(std::function<void()>&& fn);
+  void set_onloop(sol::protected_function fn);
+  void set_oncamera(sol::protected_function fn);
+  void set_onleave(std::function<void()>&& fn);
+  void set_ontouch(sol::protected_function fn);
+  void set_onkeypress(sol::protected_function fn);
+  void set_onkeyrelease(sol::protected_function fn);
+  void set_ontext(sol::protected_function fn);
+  void set_onmotion(sol::protected_function fn);
 
-  void on_enter() const {}
-  void on_leave() const {}
-  void on_text(std::string_view text) const {}
-  void on_touch(float x, float y) const {}
-  void on_key_press(int32_t code) const {}
-  void on_key_release(int32_t code) const {}
-  void on_motion(float x, float y) const {}
+  void on_enter() const;
+  void on_leave() const;
+  void on_text(std::string_view text) const;
+  void on_touch(float x, float y) const;
+  void on_motion(float x, float y) const;
+  void on_key_press(int32_t code) const;
+  void on_key_release(int32_t code) const;
+
+protected:
+  std::optional<entt::entity> find(uint64_t id) const;
 
 private:
   entt::registry _registry;
@@ -159,6 +167,8 @@ private:
   std::shared_ptr<pixmap> _background;
 
   std::shared_ptr<renderer> _renderer;
+
+  mutable std::unordered_set<uint64_t> _hovering;
 
   std::unordered_map<size_t, std::shared_ptr<pixmap>> _spritesheets;
 };

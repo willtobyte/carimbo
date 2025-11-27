@@ -95,23 +95,37 @@ void scene::update(float delta) noexcept {
       auto& st = view.get<state>(entity);
       auto& ph = view.get<physics>(entity);
 
-      if (!ph.enabled || !ph.dirty || !ph.is_valid()) {
+      if (!ph.enabled) {
         continue;
       }
 
-      if (b2Shape_IsValid(ph.shape)) {
-        b2DestroyShape(ph.shape, false);
+      if (ph.is_valid() && ph.dirty) {
+        auto bodyDef = b2DefaultBodyDef();
+        bodyDef.type = static_cast<b2BodyType>(ph.type);
+        bodyDef.position = b2Vec2{tr.position.x, tr.position.y};
+
+        bodyDef.userData = reinterpret_cast<void*>(static_cast<uintptr_t>(entity));
+
+        ph.body = b2CreateBody(_world, &bodyDef);
       }
 
-      const auto& box = an[st.action].box;
-      auto sdef = b2DefaultShapeDef();
-      auto polygon = b2MakeBox(
-        (box.upperBound.x - box.lowerBound.x) * .5f,
-        (box.upperBound.y - box.lowerBound.y) * .5f);
+      if (ph.dirty) {
+        if (b2Shape_IsValid(ph.shape)) {
+          b2DestroyShape(ph.shape, false);
+        }
 
-      ph.shape = b2CreatePolygonShape(ph.body, &sdef, &polygon);
+        const auto& box = an[st.action].box;
+        auto sdef = b2DefaultShapeDef();
+        std::println("{} {}", (box.upperBound.x - box.lowerBound.x) * .5f, (box.upperBound.y - box.lowerBound.y) * .5f);
 
-      ph.dirty = false;
+        auto polygon = b2MakeBox(
+          (box.upperBound.x - box.lowerBound.x) * .5f,
+          (box.upperBound.y - box.lowerBound.y) * .5f);
+
+        ph.shape = b2CreatePolygonShape(ph.body, &sdef, &polygon);
+
+        ph.dirty = false;
+      }
     }
   }
 }
@@ -153,6 +167,84 @@ void scene::draw() const noexcept {
     // );
   }
 }
+
+
+void scene::set_onenter(std::function<void()>&& fn) {}
+void scene::set_onloop(sol::protected_function fn) {}
+void scene::set_oncamera(sol::protected_function fn) {}
+void scene::set_onleave(std::function<void()>&& fn) {}
+void scene::set_ontouch(sol::protected_function fn) {}
+void scene::set_onkeypress(sol::protected_function fn) {}
+void scene::set_onkeyrelease(sol::protected_function fn) {}
+void scene::set_ontext(sol::protected_function fn) {}
+void scene::set_onmotion(sol::protected_function fn) {}
+
+void scene::on_enter() const {
+  std::println(">>>>> enter");
+}
+
+void scene::on_leave() const {
+
+}
+
+void scene::on_text(std::string_view text) const {
+
+}
+
+void scene::on_motion(float x, float y) const {
+  static std::unordered_set<uint64_t> hits;
+  hits.clear();
+  hits.reserve(32);
+  query(x, y, std::inserter(hits, hits.end()));
+
+  for (const auto id : _hovering) {
+    if (hits.contains(id)) continue;
+    if (const auto entity = find(id)) {
+      if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
+        callback.on_unhover();
+      }
+    }
+  }
+
+  for (const auto id : hits) {
+    if (_hovering.contains(id)) continue;
+    if (const auto entity = find(id)) {
+      if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
+        callback.on_hover();
+      }
+    }
+  }
+
+  _hovering.swap(hits);
+}
+
+void scene::on_touch(float x, float y) const {
+
+}
+
+void scene::on_key_press(int32_t code) const {
+
+}
+
+void scene::on_key_release(int32_t code) const {
+
+}
+
+std::optional<entt::entity> scene::find(uint64_t id) const {
+  const auto entity = static_cast<entt::entity>(id);
+
+  if (_registry.valid(entity)) {
+    return entity;
+  }
+
+  return std::nullopt;
+}
+
+
+
+
+
+
 
 
 // scene::scene(std::string_view name, const nlohmann::json& j, std::shared_ptr<scenemanager> scenemanager)
