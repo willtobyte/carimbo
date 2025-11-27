@@ -36,6 +36,8 @@ struct alignas(8) vec2 {
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
+
+   friend void from_json(const nlohmann::json& j, vec2& o);
 };
 
 static_assert(sizeof(vec2) == 8);
@@ -77,6 +79,8 @@ struct alignas(16) vec3 {
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 3; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 3; }
+
+  friend void from_json(const nlohmann::json& j, vec3& o);
 };
 
 static_assert(sizeof(vec3) == 16);
@@ -130,6 +134,8 @@ struct alignas(16) quad {
       .h = h
     };
   }
+
+  friend void from_json(const nlohmann::json& j, quad& o);
 };
 
 static_assert(sizeof(quad) == 16);
@@ -539,34 +545,4 @@ constexpr auto& operator*=(quad& lhs, quad const& rhs) noexcept {
 [[nodiscard]] inline auto project(vec2 const& vec, vec2 const& onto) noexcept {
   const float len_sq = length_squared(onto);
   return len_sq > 0.0f ? onto * (dot(vec, onto) / len_sq) : vec2{};
-}
-
-inline void to_json(nlohmann::json& j, const vec2& v) {
-  j = nlohmann::json{{"x", v.x}, {"y", v.y}};
-}
-
-inline void from_json(const nlohmann::json& j, vec2& v) {
-  v.x = j.at("x").get<float>();
-  v.y = j.at("y").get<float>();
-}
-
-inline void to_json(nlohmann::json& j, const vec3& v) {
-  j = nlohmann::json{{"x", v.x}, {"y", v.y}, {"z", v.z}};
-}
-
-inline void from_json(const nlohmann::json& j, vec3& v) {
-  v.x = j.at("x").get<float>();
-  v.y = j.at("y").get<float>();
-  v.z = j.at("z").get<float>();
-}
-
-inline void to_json(nlohmann::json& j, const quad& v) {
-  j = nlohmann::json{{"x", v.x}, {"y", v.y}, {"width", v.w}, {"height", v.h}};
-}
-
-inline void from_json(const nlohmann::json& j, quad& v) {
-  v.x = j.at("x").get<float>();
-  v.y = j.at("y").get<float>();
-  v.w = j.at("width").get<float>();
-  v.h = j.at("height").get<float>();
 }

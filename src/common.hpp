@@ -105,7 +105,7 @@ class window;
 class world;
 
 struct animation;
-struct bounds;
+// struct bounds;
 struct keyframe;
 struct mailenvelope;
 struct particle;

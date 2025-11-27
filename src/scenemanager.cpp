@@ -31,7 +31,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
 
     switch(type) {
       case scenetype::backdrop:
-        return it->second = std::make_shared<scenebackdrop>(name, j, shared_from_this());
+        return it->second = std::make_shared<scene>(name, j, shared_from_this());
       // case scenetype::tilemap:
       //   return it->second = std::make_shared<scenetilemap>(j);
     }

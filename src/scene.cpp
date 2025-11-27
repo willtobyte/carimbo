@@ -10,6 +10,10 @@
 #include "tilemap.hpp"
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager) {
+  auto def = b2DefaultWorldDef();
+  def.gravity = b2Vec2{.0f, .0f};
+  _world = b2CreateWorld(&def);
+
   const auto pixmappool = scenemanager->resourcemanager()->pixmappool();
 
   const auto os = json.value("objects", nlohmann::json::array());
@@ -17,56 +21,136 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   for (const auto& o : os) {
     const auto name = o["name"].get<std::string_view>();
     const auto kind = o["kind"].get<std::string_view>();
+    const auto action = o["action"].get<std::string_view>();
 
     const auto x = o.value("x", .0f);
     const auto y = o.value("y", .0f);
 
-    const auto filename = std::format("objects/{}.json", kind);
+    const auto filename = std::format("objects/{}/{}.json", scene, kind);
     const auto buffer = io::read(filename);
     const auto j = nlohmann::json::parse(buffer);
 
-    _spritesheets.emplace(++_sprite_counter, pixmappool->get(std::format("blobs/{}.png", kind)));
+    _spritesheets.emplace(++_sprite_counter, pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
+
+    auto entity = _registry.create();
+
+    tint tn;
+    _registry.emplace<tint>(entity, std::move(tn));
+
+    sprite s;
+    s.id = _sprite_counter;
+    _registry.emplace<sprite>(entity, std::move(s));
+
+    state st;
+    st.action = action;
+    st.dirty = true;
+    st.tick = SDL_GetTicks();
+    _registry.emplace<state>(entity, std::move(st));
+
+    transform t;
+    t.position = {x, y};
+    t.angle = .0;
+    t.scale = 1.0f;
+    _registry.emplace<transform>(entity, std::move(t));
+
+    animator an;
+
+    for (auto& [key, value] : j["timelines"].items()) {
+      timeline tl;
+      from_json(value, tl);
+      an.timelines.emplace(key, std::move(tl));
+    }
+
+    _registry.emplace<animator>(entity, std::move(an));
+
+    physics ph;
+    _registry.emplace<physics>(entity, std::move(ph));
+  }
+}
+
+scene::~scene() noexcept {
+  auto view = _registry.view<physics>();
+  for (auto entity : view) {
+    auto& ph = view.get<physics>(entity);
+    if (b2Shape_IsValid(ph.shape)) {
+      b2DestroyShape(ph.shape, false);
+    }
+
+    if (ph.is_valid()) {
+      b2DestroyBody(ph.body);
+    }
+  }
+
+  if (b2World_IsValid(_world)) {
+    b2DestroyWorld(_world);
   }
 }
 
 void scene::update(float delta) noexcept {
-  auto view = _registry.view<transform, tint, sprite, timeline>();
-  for (auto entity : view) {
-    auto& tr = view.get<transform>(entity);
-    auto& tn = view.get<tint>(entity);
-    auto& sp = view.get<sprite>(entity);
-    auto& tl = view.get<timeline>(entity);
+  {
+    auto view = _registry.view<transform, animator, state, physics>();
+    for (auto entity : view) {
+      auto& tr = view.get<transform>(entity);
+      auto& an = view.get<animator>(entity);
+      auto& st = view.get<state>(entity);
+      auto& ph = view.get<physics>(entity);
+
+      if (!ph.enabled || !ph.dirty || !ph.is_valid()) {
+        continue;
+      }
+
+      if (b2Shape_IsValid(ph.shape)) {
+        b2DestroyShape(ph.shape, false);
+      }
+
+      const auto& box = an[st.action].box;
+      auto sdef = b2DefaultShapeDef();
+      auto polygon = b2MakeBox(
+        (box.upperBound.x - box.lowerBound.x) * .5f,
+        (box.upperBound.y - box.lowerBound.y) * .5f);
+
+      ph.shape = b2CreatePolygonShape(ph.body, &sdef, &polygon);
+
+      ph.dirty = false;
+    }
   }
 }
 
 void scene::draw() const noexcept {
-  auto view = _registry.view<transform, tint, sprite, timeline>();
+  const auto view = _registry.view<transform, tint, sprite, animator, state>();
 
   for (auto entity : view) {
     auto& tr = view.get<transform>(entity);
     auto& tn = view.get<tint>(entity);
     auto& sp = view.get<sprite>(entity);
-    auto& tl = view.get<timeline>(entity);
+    auto& an = view.get<animator>(entity);
+    auto& st = view.get<state>(entity);
 
-    if (tl.count == 0U) {
-      continue;
-    }
-
-    auto index = tl.current;
-    if (index >= tl.frames.size()) {
-      continue;
-    }
-
-    const auto& quad = tl.frames[index];
+    const auto x = tr.position.x;
+    const auto y = tr.position.y;
 
     const auto it = _spritesheets.find(sp.id);
-    assert(it != _spritesheets.end() && "key not found in _spritesheets");
+    assert(it != _spritesheets.end() && "attempted to access non-existent spritesheet");
+
+    const auto frame = an[st.action].frames[st.current_frame];
 
     it->second->draw(
-      quad.x, quad.y, quad.w, quad.h,
-      0, 0, quad.w, quad.h,
-      tr.angle
+      frame.quad.x + x, frame.quad.y + y,
+      frame.quad.w, frame.quad.h,
+      frame.quad.x, frame.quad.y,
+      frame.quad.w, frame.quad.h
     );
+    // const auto& frame = tl.frames[0];
+
+    // std::println("id {}", sp.id);
+    // const auto it = _spritesheets.find(sp.id);
+    // assert(it != _spritesheets.end() && "key not found in _spritesheets");
+
+    // it->second->draw(
+    //   frame.quad.x, frame.quad.y, frame.quad.w, frame.quad.h,
+    //   0, 0, frame.quad.w, frame.quad.h,
+    //   tr.angle
+    // );
   }
 }
 
