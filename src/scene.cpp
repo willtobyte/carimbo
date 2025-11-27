@@ -67,10 +67,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     physics ph;
     _registry.emplace<physics>(entity, std::move(ph));
 
-    _proxies.emplace(std::move(name), std::make_shared<entityproxy>(entity, _registry));
-
     callbacks cb;
     _registry.emplace<callbacks>(entity, std::move(cb));
+
+    _proxies.emplace(std::move(name), std::make_shared<entityproxy>(entity, _registry));
   }
 }
 
