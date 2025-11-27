@@ -229,9 +229,9 @@ void scene::draw() const noexcept {
     const auto frame = an[st.action].frames[st.current_frame];
 
     sp.pixmap->draw(
-      frame.quad.x + x, frame.quad.y + y,
-      frame.quad.w, frame.quad.h,
       frame.quad.x, frame.quad.y,
+      frame.quad.w, frame.quad.h,
+      frame.offset.x + tr.position.x, frame.offset.y + tr.position.y,
       frame.quad.w, frame.quad.h
     );
   }
