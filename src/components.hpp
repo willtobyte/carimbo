@@ -80,7 +80,7 @@ struct state final {
   bool redraw;
   uint16_t current_frame{0};
   uint64_t tick{0};
-  std::string action;
+  std::optional<std::string> action;
 };
 
 struct callbacks {

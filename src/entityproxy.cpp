@@ -1,18 +1,25 @@
 #include "entityproxy.hpp"
 #include "helper.hpp"
 
-entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept 
+entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept
   : _entity(entity), _registry(registry) {
 }
 
-std::string_view entityproxy::action() const noexcept {
+std::optional<std::string> entityproxy::action() const noexcept {
   const auto& s = _registry.get<state>(_entity);
   return s.action;
 }
 
-void entityproxy::set_action(std::string_view name) noexcept {
+void entityproxy::set_action(std::optional<std::string_view> name) noexcept {
   auto& s = _registry.get<state>(_entity);
-  s.action = name;
+
+  if (!name) {
+    s.action = std::nullopt;
+    s.dirty = true;
+    return;
+  }
+
+  s.action = *name;
   s.dirty = true;
 }
 

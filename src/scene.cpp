@@ -26,7 +26,8 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   for (const auto& o : os) {
     const auto name = o["name"].get<std::string_view>();
     const auto kind = o["kind"].get<std::string_view>();
-    const auto action = o.value("action", std::string_view{});
+    const auto action_str = o.value("action", std::string{});
+    const auto action = action_str.empty() ? std::nullopt : std::optional<std::string>(action_str);
 
     const auto x = o.value("x", .0f);
     const auto y = o.value("y", .0f);
@@ -103,7 +104,9 @@ void scene::update(float delta) noexcept {
       auto& an = view.get<animator>(entity);
       auto& st = view.get<state>(entity);
 
-      auto& tl = an.timelines[st.action];
+      if (!st.action.has_value()) continue;
+
+      auto& tl = an.timelines[st.action.value()];
 
       if (st.dirty) {
         st.current_frame = 0;
@@ -166,7 +169,9 @@ void scene::update(float delta) noexcept {
           b2DestroyShape(ph.shape, false);
         }
 
-        const auto& opt = an[st.action].box;
+        if (!st.action.has_value()) continue;
+
+        const auto& opt = an[st.action.value()].box;
         if (opt.has_value()) {
           const auto& box = opt.value();
 
@@ -227,7 +232,9 @@ void scene::draw() const noexcept {
     const auto x = tr.position.x;
     const auto y = tr.position.y;
 
-    const auto frame = an[st.action].frames[st.current_frame];
+    if (!st.action.has_value()) continue;
+
+    const auto frame = an[st.action.value()].frames[st.current_frame];
 
     sp.pixmap->draw(
       frame.quad.x, frame.quad.y,
