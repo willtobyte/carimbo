@@ -4,7 +4,7 @@
 
 #include "kv.hpp"
 
-class entityproxy : std::enable_shared_from_this<entityproxy> {
+class entityproxy {
 public:
   entityproxy(entt::entity entity, entt::registry& registry) noexcept;
   ~entityproxy() noexcept = default;
