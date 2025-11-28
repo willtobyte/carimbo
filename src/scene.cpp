@@ -303,10 +303,10 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  static std::vector<entt::entity> hits;
+  static entt::dense_set<entt::entity> hits;
   hits.reserve(32);
   hits.clear();
-  query(x, y, std::back_inserter(hits));
+  query(x, y, hits);
   if (hits.empty()) {
     if (auto fn = _ontouch; fn) {
       fn(x, y);
@@ -327,10 +327,10 @@ void scene::on_touch(float x, float y) const {
 }
 
 void scene::on_motion(float x, float y) const {
-  static std::unordered_set<entt::entity> hits;
+  static entt::dense_set<entt::entity> hits;
   hits.reserve(32);
   hits.clear();
-  query(x, y, std::inserter(hits, hits.end()));
+  query(x, y, hits);
 
   for (const auto entity : _hovering) {
     if (hits.contains(entity)) continue;
@@ -378,5 +378,3 @@ void scene::on_text(std::string_view text) const {
     fn(text);
   }
 }
-
-

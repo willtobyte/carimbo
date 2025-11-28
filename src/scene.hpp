@@ -15,14 +15,12 @@ enum class scenekind : uint8_t {
 };
 
 class scene {
-template <class OutIt>
 [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
-  auto* const it = static_cast<OutIt*>(context);
+  auto* const container = static_cast<entt::dense_set<entt::entity>*>(context);
   const auto body = b2Shape_GetBody(shape);
   const auto data = b2Body_GetUserData(body);
   const auto entity = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(data));
-  **it = entity;
-  ++(*it);
+  container->insert(entity);
   return true;
 }
 
@@ -62,13 +60,12 @@ public:
   void on_key_release(int32_t code) const;
 
 protected:
-template <class OutIt>
-  void query(const float x, const float y, OutIt out) const {
+  void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
     auto aabb = b2AABB{};
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
     aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
     const auto filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
+    b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
 private:
@@ -77,7 +74,7 @@ private:
   animationsystem _animationsystem;
   physicssystem _physicssystem;
 
-  mutable std::unordered_set<entt::entity> _hovering;
+  mutable entt::dense_set<entt::entity> _hovering;
 
   std::shared_ptr<pixmap> _background;
   std::shared_ptr<renderer> _renderer;
