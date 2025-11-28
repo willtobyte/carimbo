@@ -66,7 +66,7 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
       bdef.type = static_cast<b2BodyType>(p.type);
       bdef.position = b2Vec2{t.position.x, t.position.y};
       bdef.rotation = b2MakeRot(static_cast<float>(t.angle));
-      bdef.userData = id_to_userdata(static_cast<uint64_t>(entity));
+      bdef.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
 
       p.body = b2CreateBody(world, &bdef);
     }

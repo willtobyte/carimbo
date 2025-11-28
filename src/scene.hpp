@@ -20,8 +20,8 @@ template <class OutIt>
   auto* const it = static_cast<OutIt*>(context);
   const auto body = b2Shape_GetBody(shape);
   const auto data = b2Body_GetUserData(body);
-  const auto id = userdata_to_id(data);
-  **it = id;
+  const auto entity = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(data));
+  **it = entity;
   ++(*it);
   return true;
 }
@@ -71,15 +71,13 @@ template <class OutIt>
     b2World_OverlapAABB(_world, aabb, filter, &collect<OutIt>, &out);
   }
 
-  std::optional<entt::entity> find(uint64_t id) const;
-
 private:
   entt::registry _registry;
   b2WorldId _world;
   animationsystem _animationsystem;
   physicssystem _physicssystem;
 
-  mutable std::unordered_set<uint64_t> _hovering;
+  mutable std::unordered_set<entt::entity> _hovering;
 
   std::shared_ptr<pixmap> _background;
   std::shared_ptr<renderer> _renderer;

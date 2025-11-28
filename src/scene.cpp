@@ -303,7 +303,7 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  static std::vector<uint64_t> hits;
+  static std::vector<entt::entity> hits;
   hits.reserve(32);
   hits.clear();
   query(x, y, std::back_inserter(hits));
@@ -315,10 +315,10 @@ void scene::on_touch(float x, float y) const {
     return;
   }
 
-  for (auto id : hits) {
-    if (const auto entity = find(id)) [[likely]] {
-      if (_registry.all_of<callbacks>(*entity)) {
-        if (auto callback = _registry.get<callbacks>(*entity); callback.on_touch) {
+  for (auto entity : hits) {
+    if (_registry.valid(entity)) [[likely]] {
+      if (_registry.all_of<callbacks>(entity)) {
+        if (auto callback = _registry.get<callbacks>(entity); callback.on_touch) {
           callback.on_touch(callback.self, x, y);
         }
       }
@@ -327,27 +327,27 @@ void scene::on_touch(float x, float y) const {
 }
 
 void scene::on_motion(float x, float y) const {
-  static std::unordered_set<uint64_t> hits;
+  static std::unordered_set<entt::entity> hits;
   hits.reserve(32);
   hits.clear();
   query(x, y, std::inserter(hits, hits.end()));
 
-  for (const auto id : _hovering) {
-    if (hits.contains(id)) continue;
-    if (const auto entity = find(id)) [[likely]] {
-      if (_registry.all_of<callbacks>(*entity)) {
-        if (auto callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
+  for (const auto entity : _hovering) {
+    if (hits.contains(entity)) continue;
+    if (_registry.valid(entity)) [[likely]] {
+      if (_registry.all_of<callbacks>(entity)) {
+        if (auto callback = _registry.get<callbacks>(entity); callback.on_unhover) {
           callback.on_unhover(callback.self);
         }
       }
     }
   }
 
-  for (const auto id : hits) {
-    if (_hovering.contains(id)) continue;
-    if (const auto entity = find(id)) [[likely]] {
-      if (_registry.all_of<callbacks>(*entity)) {
-        if (auto callback = _registry.get<callbacks>(*entity); callback.on_hover) {
+  for (const auto entity : hits) {
+    if (_hovering.contains(entity)) continue;
+    if (_registry.valid(entity)) [[likely]] {
+      if (_registry.all_of<callbacks>(entity)) {
+        if (auto callback = _registry.get<callbacks>(entity); callback.on_hover) {
           callback.on_hover(callback.self);
         }
       }
@@ -379,12 +379,4 @@ void scene::on_text(std::string_view text) const {
   }
 }
 
-std::optional<entt::entity> scene::find(uint64_t id) const {
-  const auto entity = static_cast<entt::entity>(id);
 
-  if (_registry.valid(entity)) {
-    return entity;
-  }
-
-  return std::nullopt;
-}
