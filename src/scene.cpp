@@ -229,12 +229,6 @@ std::variant<
     return it->second;
   }
 
-  if (kind == scenekind::effect) {
-    const auto it = _effects.find(name);
-    assert(it != _effects.end() && "effect not found in scene");
-    return it->second;
-  }
-
   if (kind == scenekind::particle) {
     const auto it = _particles.find(name);
     assert(it != _particles.end() && "particles not found in scene");
@@ -306,10 +300,10 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  std::vector<uint64_t> hits;
+  static std::vector<uint64_t> hits;
   hits.reserve(32);
   query(x, y, std::back_inserter(hits));
-  if (hits.empty()) [[likely]] {
+  if (hits.empty()) {
     if (auto fn = _ontouch; fn) {
       fn(x, y);
     }
@@ -329,13 +323,13 @@ void scene::on_touch(float x, float y) const {
 }
 
 void scene::on_motion(float x, float y) const {
-  std::unordered_set<uint64_t> hits;
+  static std::unordered_set<uint64_t> hits;
   hits.reserve(32);
   query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
     if (hits.contains(id)) continue;
-    if (const auto entity = find(id)) {
+    if (const auto entity = find(id)) [[likely]] {
       if (_registry.all_of<callbacks>(*entity)) {
         if (auto callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
           callback.on_unhover(callback.self);
