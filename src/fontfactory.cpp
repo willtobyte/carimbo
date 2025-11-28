@@ -43,7 +43,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
         width, height));
 
   auto* const origin = SDL_GetRenderTarget(*_renderer);
-  
+
   // Flush any pending render commands before changing render targets
   // to prevent use-after-free when Metal recreates pipeline state
   SDL_FlushRenderer(*_renderer);
@@ -67,9 +67,8 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
     while (x < width && pixels[y * width + x] == separator) {
       ++x;
     }
-    if (x >= width) [[unlikely]] {
-      throw std::runtime_error(std::format("missing glyph for '{}'", glyph));
-    }
+
+    assert(x < width && std::format("missing glyph for '{}'", glyph).c_str());
 
     auto w = 0;
     while (x + w < width && pixels[y * width + x + w] != separator) {
