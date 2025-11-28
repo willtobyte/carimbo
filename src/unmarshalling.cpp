@@ -79,5 +79,7 @@ void from_json(const nlohmann::json& j, timeline& o) {
     o.box = box;
   }
 
-  j["frames"].get_to(o.frames);
+  if (j.contains("frames")) {
+    j["frames"].get_to(o.frames);
+  }
 }
