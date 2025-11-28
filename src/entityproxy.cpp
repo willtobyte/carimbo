@@ -25,12 +25,12 @@ void entityproxy::set_action(std::optional<std::string_view> name) noexcept {
 
 void entityproxy::set_onhover(sol::protected_function fn) {
   auto& callback = _registry.get<callbacks>(_entity);
-  callback.on_hover = interop::wrap_fn<void()>(std::move(fn));
+  callback.on_hover = interop::wrap_fn<void(std::shared_ptr<entityproxy>)>(std::move(fn));
 }
 
 void entityproxy::set_onunhover(sol::protected_function fn) {
   auto& callback = _registry.get<callbacks>(_entity);
-  callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
+  callback.on_unhover = interop::wrap_fn<void(std::shared_ptr<entityproxy>)>(std::move(fn));
 }
 
 void entityproxy::set_ontouch(sol::protected_function fn) {

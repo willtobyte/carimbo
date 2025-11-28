@@ -4,6 +4,7 @@
 
 #include "soundfx.hpp"
 #include "particlesystem.hpp"
+#include <entt/entity/fwd.hpp>
 
 class entityproxy;
 

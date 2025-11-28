@@ -84,7 +84,9 @@ struct state final {
 };
 
 struct callbacks {
-  std::function<void()> on_hover;
-  std::function<void()> on_unhover;
+  std::function<void(std::shared_ptr<entityproxy>)> on_hover;
+  std::function<void(std::shared_ptr<entityproxy>)> on_unhover;
   std::function<void(float, float)> on_touch;
+
+  std::shared_ptr<entityproxy> self;
 };

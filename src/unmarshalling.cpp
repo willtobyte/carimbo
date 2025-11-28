@@ -52,7 +52,9 @@ void from_json(const nlohmann::json& j, offset& o) {
 
 void from_json(const nlohmann::json& j, frame& o) {
   j["duration"].get_to(o.duration);
-  j["offset"].get_to(o.offset);
+  if (j.contains("offset")) {
+    j["offset"].get_to(o.offset);
+  }
   j["quad"].get_to(o.quad);
 }
 

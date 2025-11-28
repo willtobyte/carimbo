@@ -75,10 +75,12 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     physics ph;
     _registry.emplace<physics>(entity, std::move(ph));
 
-    callbacks cb;
-    _registry.emplace<callbacks>(entity, std::move(cb));
+    const auto e = std::make_shared<entityproxy>(entity, _registry);
+    _proxies.emplace(std::move(name), e);
 
-    _proxies.emplace(std::move(name), std::make_shared<entityproxy>(entity, _registry));
+    callbacks cb;
+    cb.self = e;
+    _registry.emplace<callbacks>(entity, std::move(cb));
   }
 }
 
@@ -202,6 +204,14 @@ void scene::update(float delta) noexcept {
       }
     }
   }
+
+  if (auto fn = _onloop; fn) [[likely]] {
+    fn(delta);
+  }
+
+  // if (auto fn = _oncamera; fn) [[likely]] {
+  //   _camera = fn(delta);
+  // }
 }
 
 #ifdef DEBUG
@@ -353,7 +363,7 @@ void scene::on_touch(float x, float y) const {
   for (auto id : hits) {
     if (const auto entity = find(id)) [[likely]] {
       if (_registry.all_of<callbacks>(*entity)) {
-        if (auto& callback = _registry.get<callbacks>(*entity); callback.on_touch) {
+        if (auto callback = _registry.get<callbacks>(*entity); callback.on_touch) {
           callback.on_touch(x, y);
         }
       }
@@ -371,8 +381,8 @@ void scene::on_motion(float x, float y) const {
     if (hits.contains(id)) continue;
     if (const auto entity = find(id)) {
       if (_registry.all_of<callbacks>(*entity)) {
-        if (auto& callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
-          callback.on_unhover();
+        if (auto callback = _registry.get<callbacks>(*entity); callback.on_unhover) {
+          callback.on_unhover(callback.self);
         }
       }
     }
@@ -382,8 +392,8 @@ void scene::on_motion(float x, float y) const {
     if (_hovering.contains(id)) continue;
     if (const auto entity = find(id)) {
       if (_registry.all_of<callbacks>(*entity)) {
-        if (auto& callback = _registry.get<callbacks>(*entity); callback.on_hover) {
-          callback.on_hover();
+        if (auto callback = _registry.get<callbacks>(*entity); callback.on_hover) {
+          callback.on_hover(callback.self);
         }
       }
     }
