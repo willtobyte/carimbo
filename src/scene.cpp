@@ -300,7 +300,7 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  static std::vector<uint64_t> hits;
+  std::vector<uint64_t> hits;
   hits.reserve(32);
   query(x, y, std::back_inserter(hits));
   if (hits.empty()) {
@@ -323,7 +323,7 @@ void scene::on_touch(float x, float y) const {
 }
 
 void scene::on_motion(float x, float y) const {
-  static std::unordered_set<uint64_t> hits;
+  std::unordered_set<uint64_t> hits;
   hits.reserve(32);
   query(x, y, std::inserter(hits, hits.end()));
 

@@ -77,30 +77,30 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
         b2DestroyShape(ph.shape, false);
       }
 
-      if (!st.action.has_value()) continue;
+      if (!st.action) continue;
 
-      const auto& opt = an[st.action.value()].box;
-      if (opt.has_value()) {
-        const auto& box = opt.value();
-
-        auto def = b2DefaultShapeDef();
+      const auto& opt = an[*st.action].box;
+      if (opt) {
+        const auto& box = *opt;
 
         const auto w = box.upperBound.x - box.lowerBound.x;
         const auto h = box.upperBound.y - box.lowerBound.y;
         const auto cx = box.lowerBound.x + w * .5f;
         const auto cy = box.lowerBound.y + h * .5f;
 
-        const auto sw = w * tr.scale;
-        const auto sh = h * tr.scale;
+        // const auto sw = w * tr.scale;
+        // const auto sh = h * tr.scale;
 
-        const auto dx = w * (tr.scale - 1.0f) * .5f;
-        const auto dy = h * (tr.scale - 1.0f) * .5f;
+        // const auto dx = w * (tr.scale - 1.0f) * .5f;
+        // const auto dy = h * (tr.scale - 1.0f) * .5f;
 
         auto polygon = b2MakeOffsetBox(
-          sw * .5f,
-          sh * .5f,
-          b2Vec2{cx + dx, cy + dy},
+          w * .5f,
+          h * .5f,
+          b2Vec2{cx, cy},
           b2Rot_identity);
+
+        auto def = b2DefaultShapeDef();
 
         ph.shape = b2CreatePolygonShape(ph.body, &def, &polygon);
       }
