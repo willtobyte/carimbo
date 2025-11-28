@@ -15,6 +15,8 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   const auto soundmanager = _scenemanager->resourcemanager()->soundmanager();
   const auto pixmappool = _scenemanager->resourcemanager()->pixmappool();
+  const auto fontfactory = _scenemanager->resourcemanager()->fontfactory();
+  const auto particlesystem = _scenemanager->particlesystem();
 
   const auto es = json.value("effects", nlohmann::json::array());
   _effects.reserve(es.size());
@@ -90,6 +92,24 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
     return lhs.z < rhs.z;
   });
+
+  const auto ps = json.value("particles", nlohmann::json::array());
+  _particles.reserve(ps.size());
+  const auto factory = particlesystem->factory();
+  for (const auto& i : ps) {
+    const auto particle = i["name"].get<std::string_view>();
+    const auto kind = i["kind"].get<std::string_view>();
+    const auto x = i["x"].get<float>();
+    const auto y = i["y"].get<float>();
+    const auto emitting = i.value("emitting", true);
+    _particles.emplace(particle, factory->create(kind, x, y, emitting));
+  }
+
+  const auto fs = json.value("fonts", nlohmann::json::array());
+  for (const auto& i : fs) {
+    const auto fontname = i.get<std::string_view>();
+    fontfactory->get(fontname);
+  }
 }
 
 scene::~scene() noexcept {
@@ -203,9 +223,25 @@ std::variant<
     return it->second;
   }
 
-  const auto it = _effects.find(name);
-  assert(it != _effects.end() && "effect not found in scene");
-  return it->second;
+  if (kind == scenekind::effect) {
+    const auto it = _effects.find(name);
+    assert(it != _effects.end() && "effect not found in scene");
+    return it->second;
+  }
+
+  if (kind == scenekind::effect) {
+    const auto it = _effects.find(name);
+    assert(it != _effects.end() && "effect not found in scene");
+    return it->second;
+  }
+
+  if (kind == scenekind::particle) {
+    const auto it = _particles.find(name);
+    assert(it != _particles.end() && "particles not found in scene");
+    return it->second->props;
+  }
+
+  std::terminate();
 }
 
 void scene::set_onenter(std::function<void()>&& fn) {
@@ -245,6 +281,12 @@ void scene::set_onmotion(sol::protected_function fn) {
 }
 
 void scene::on_enter() const {
+  const auto particlesystem = _scenemanager->particlesystem();
+
+  for (const auto& [key, batch] : _particles) {
+    particlesystem->add(batch);
+  }
+
   if (auto fn = _onenter; fn) {
     fn();
   }
@@ -255,11 +297,12 @@ void scene::on_leave() const {
       fn();
     }
 
-    // _particlesystem->clear();
-
     for (const auto& [_, e] : _effects) {
       e->stop();
     }
+
+    const auto particlesystem = _scenemanager->particlesystem();
+    particlesystem->clear();
 }
 
 void scene::on_touch(float x, float y) const {
