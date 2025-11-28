@@ -47,9 +47,8 @@ double entityproxy::angle() const noexcept {
 void entityproxy::set_angle(double angle) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.angle = angle;
-
+  
   auto& s = _registry.get<state>(_e);
-  s.dirty = true;
   s.redraw = true;
 }
 

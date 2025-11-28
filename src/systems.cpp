@@ -85,16 +85,21 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
 
         auto def = b2DefaultShapeDef();
 
-        const auto w = (box.upperBound.x - box.lowerBound.x) * tr.scale;
-        const auto h = (box.upperBound.y - box.lowerBound.y) * tr.scale;
+        const auto w = box.upperBound.x - box.lowerBound.x;
+        const auto h = box.upperBound.y - box.lowerBound.y;
+        const auto cx = box.lowerBound.x + w * .5f;
+        const auto cy = box.lowerBound.y + h * .5f;
 
-        const auto cx = (box.lowerBound.x + (box.upperBound.x - box.lowerBound.x) * .5f) * tr.scale;
-        const auto cy = (box.lowerBound.y + (box.upperBound.y - box.lowerBound.y) * .5f) * tr.scale;
+        const auto sw = w * tr.scale;
+        const auto sh = h * tr.scale;
+
+        const auto dx = w * (tr.scale - 1.0f) * .5f;
+        const auto dy = h * (tr.scale - 1.0f) * .5f;
 
         auto polygon = b2MakeOffsetBox(
-          w * .5f,
-          h * .5f,
-          b2Vec2{cx, cy},
+          sw * .5f,
+          sh * .5f,
+          b2Vec2{cx + dx, cy + dy},
           b2Rot_identity);
 
         ph.shape = b2CreatePolygonShape(ph.body, &def, &polygon);

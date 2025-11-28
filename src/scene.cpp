@@ -151,7 +151,10 @@ void scene::draw() const noexcept {
 
     if (!st.action.has_value()) continue;
 
-    const auto frame = an[st.action.value()].frames[st.current_frame];
+    const auto& timeline = an[st.action.value()];
+    if (timeline.frames.empty()) [[unlikely]] continue;
+
+    const auto& frame = timeline.frames[st.current_frame];
 
     const auto sw = frame.quad.w * tr.scale;
     const auto sh = frame.quad.h * tr.scale;
