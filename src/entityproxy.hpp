@@ -19,7 +19,7 @@ public:
   double angle() const noexcept;
   void set_angle(double angle) noexcept;
   float scale() const noexcept;
-  void set_scale(float scale) const noexcept;
+  void set_scale(float scale) noexcept;
 
   std::optional<std::string> action() const noexcept;
   void set_action(std::optional<std::string_view> name) noexcept;

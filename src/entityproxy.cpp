@@ -57,7 +57,7 @@ float entityproxy::scale() const noexcept {
   return t.scale;
 }
 
-void entityproxy::set_scale(float scale) const noexcept {
+void entityproxy::set_scale(float scale) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.scale = scale;
 
