@@ -1,10 +1,5 @@
 #include "scriptengine.hpp"
 
-static int on_panic(lua_State* L) {
-  const auto* message = lua_tostring(L, -1);
-  throw std::runtime_error(std::format("Lua panic: {}", message));
-}
-
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
@@ -188,7 +183,6 @@ void scriptengine::run() {
 
   sol::state lua;
   lua.open_libraries();
-  lua.set_panic(&on_panic);
 
   lua["searcher"] = &searcher;
 
