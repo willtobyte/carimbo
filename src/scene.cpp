@@ -340,7 +340,7 @@ void scene::on_motion(float x, float y) const {
 
   for (const auto id : hits) {
     if (_hovering.contains(id)) continue;
-    if (const auto entity = find(id)) {
+    if (const auto entity = find(id)) [[likely]] {
       if (_registry.all_of<callbacks>(*entity)) {
         if (auto callback = _registry.get<callbacks>(*entity); callback.on_hover) {
           callback.on_hover(callback.self);
