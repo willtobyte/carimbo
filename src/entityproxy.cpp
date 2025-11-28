@@ -34,6 +34,9 @@ uint8_t entityproxy::alpha() const noexcept {
 void entityproxy::set_alpha(uint8_t alpha) noexcept {
   auto& t = _registry.get<tint>(_e);
   t.a = alpha;
+
+  auto& s = _registry.get<state>(_e);
+  s.redraw = true;
 }
 
 double entityproxy::angle() const noexcept {
@@ -44,6 +47,10 @@ double entityproxy::angle() const noexcept {
 void entityproxy::set_angle(double angle) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.angle = angle;
+
+  auto& s = _registry.get<state>(_e);
+  s.dirty = true;
+  s.redraw = true;
 }
 
 float entityproxy::scale() const noexcept {
@@ -54,6 +61,10 @@ float entityproxy::scale() const noexcept {
 void entityproxy::set_scale(float scale) const noexcept {
   auto& t = _registry.get<transform>(_e);
   t.scale = scale;
+
+  auto& s = _registry.get<state>(_e);
+  s.dirty = true;
+  s.redraw = true;
 }
 
 std::optional<std::string> entityproxy::action() const noexcept {

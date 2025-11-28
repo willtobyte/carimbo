@@ -144,20 +144,31 @@ void scene::draw() const noexcept {
 
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  auto view = _registry.view<renderable, transform, sprite, animator, state>();
+  auto view = _registry.view<renderable, transform, tint, sprite, animator, state>();
 
   for (auto entity : view) {
-    auto [rn, tr, sp, an, st] = view.get<renderable, transform, sprite, animator, state>(entity);
+    auto [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
 
     if (!st.action.has_value()) continue;
 
     const auto frame = an[st.action.value()].frames[st.current_frame];
 
+    const auto sw = frame.quad.w * tr.scale;
+    const auto sh = frame.quad.h * tr.scale;
+
+    const auto cx = frame.offset.x + tr.position.x + frame.quad.w * 0.5f;
+    const auto cy = frame.offset.y + tr.position.y + frame.quad.h * 0.5f;
+
+    const auto fx = cx - sw * 0.5f;
+    const auto fy = cy - sh * 0.5f;
+
     sp.pixmap->draw(
       frame.quad.x, frame.quad.y,
       frame.quad.w, frame.quad.h,
-      frame.offset.x + tr.position.x, frame.offset.y + tr.position.y,
-      frame.quad.w, frame.quad.h
+      fx, fy,
+      sw, sh,
+      tr.angle,
+      tn.a
     );
   }
 
