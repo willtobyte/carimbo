@@ -85,9 +85,19 @@ private:
 
   std::shared_ptr<scenemanager> _scenemanager;
 
+  std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _effects;
   std::unordered_map<std::string, std::shared_ptr<entityproxy>, string_hash, string_equal> _proxies;
+  std::unordered_map<std::string, std::shared_ptr<particlebatch>, string_hash, string_equal> _particles;
 
   std::function<void()> _onenter;
+  std::function<void()> _onleave;
+  std::function<void(float)> _onloop;
+  std::function<quad(float)> _oncamera;
+  std::function<void(float, float)> _ontouch;
+  std::function<void(int32_t)> _onkeypress;
+  std::function<void(int32_t)> _onkeyrelease;
+  std::function<void(std::string_view)> _ontext;
+  std::function<void(float, float)> _onmotion;
 };
 
 

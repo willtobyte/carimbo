@@ -117,12 +117,6 @@ void scenemanager::draw() const {
   ptr->draw();
 }
 
-void scenemanager::on_touch(float x, float y) const {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->on_touch(x, y);
-}
-
 void scenemanager::on_key_press(const event::keyboard::key& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
@@ -149,6 +143,7 @@ void scenemanager::on_mouse_press(const event::mouse::button& event) {
 void scenemanager::on_mouse_release(const event::mouse::button& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
+  ptr->on_touch(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const event::mouse::motion& event) {

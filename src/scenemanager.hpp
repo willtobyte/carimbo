@@ -39,8 +39,6 @@ public:
 
   void draw() const;
 
-  void on_touch(float x, float y) const;
-
   std::shared_ptr<::objectmanager> objectmanager() const noexcept;
   std::shared_ptr<::particlesystem> particlesystem() const noexcept;
   std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
