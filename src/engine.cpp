@@ -8,23 +8,16 @@
 #include "eventreceiver.hpp"
 #include "lifecycleobserver.hpp"
 #include "loopable.hpp"
-#include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
-#include "postalservice.hpp"
 #include "scenemanager.hpp"
 #include "statemanager.hpp"
 #include "timermanager.hpp"
 #include "window.hpp"
-#include "world.hpp"
 
 std::shared_ptr<audiodevice> engine::audiodevice() const noexcept {
   return _audiodevice;
-}
-
-std::shared_ptr<objectmanager> engine::objectmanager() const noexcept {
-  return _objectmanager;
 }
 
 std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
@@ -41,10 +34,6 @@ std::shared_ptr<overlay> engine::overlay() const noexcept {
 
 std::shared_ptr<resourcemanager> engine::resourcemanager() const noexcept {
   return _resourcemanager;
-}
-
-std::shared_ptr<postalservice> engine::postalservice() const noexcept {
-  return _postalservice;
 }
 
 std::shared_ptr<scenemanager> engine::scenemanager() const noexcept {
@@ -83,16 +72,8 @@ std::shared_ptr<timermanager> engine::timermanager() const noexcept {
   return _timermanager;
 }
 
-std::shared_ptr<world> engine::world() const noexcept {
-  return _world;
-}
-
 void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) {
   _audiodevice = std::move(ptr);
-}
-
-void engine::set_objectmanager(std::shared_ptr<::objectmanager> ptr) {
-  _objectmanager = std::move(ptr);
 }
 
 void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) {
@@ -115,10 +96,6 @@ void engine::set_particlesystem(std::shared_ptr<::particlesystem> ptr) {
   _particlesystem = std::move(ptr);
 }
 
-void engine::set_postalservice(std::shared_ptr<::postalservice> ptr) {
-  _postalservice = std::move(ptr);
-}
-
 void engine::set_statemanager(std::shared_ptr<::statemanager> ptr) {
   _statemanager = std::move(ptr);
 
@@ -127,10 +104,6 @@ void engine::set_statemanager(std::shared_ptr<::statemanager> ptr) {
 
 void engine::set_window(std::shared_ptr<::window> ptr) {
   _window = std::move(ptr);
-}
-
-void engine::set_world(std::shared_ptr<::world> ptr) {
-  _world = std::move(ptr);
 }
 
 void engine::set_renderer(std::shared_ptr<::renderer> ptr) {
@@ -178,8 +151,6 @@ void engine::_loop() {
   _resourcemanager->update(delta);
   _overlay->update(delta);
   _scenemanager->update(delta);
-  _world->update(delta);
-  _objectmanager->update(delta);
   _particlesystem->update(delta);
 
   for (const auto& loopable : _loopables) {
@@ -196,8 +167,6 @@ void engine::_loop() {
 
   _renderer->begin();
   _scenemanager->draw();
-  _objectmanager->draw();
-  _world->draw();
   _particlesystem->draw();
   _overlay->draw();
   _canvas->draw();

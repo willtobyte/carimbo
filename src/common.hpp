@@ -89,7 +89,6 @@ class particlefactory;
 class particlesystem;
 class pixmap;
 class pixmappool;
-class postalservice;
 class querybuilder;
 class renderer;
 class resourcemanager;
@@ -103,11 +102,12 @@ class statemanager;
 class timermanager;
 class widget;
 class window;
-class world;
 
-struct animation;
 // struct bounds;
+
 struct keyframe;
+struct bounds;
+struct animation;
 struct mailenvelope;
 struct particle;
 struct particlebatch;

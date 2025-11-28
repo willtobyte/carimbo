@@ -2,7 +2,6 @@
 
 #include "event.hpp"
 #include "io.hpp"
-#include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "resourcemanager.hpp"
 #include "scene.hpp"
@@ -10,13 +9,11 @@
 
 scenemanager::scenemanager(
   std::shared_ptr<::resourcemanager> resourcemanager,
-  std::shared_ptr<::objectmanager> objectmanager,
   std::shared_ptr<::particlesystem> particlesystem,
   std::shared_ptr<::timermanager> timermanager,
   std::shared_ptr<::renderer> renderer
 )
   : _resourcemanager(std::move(resourcemanager)),
-    _objectmanager(std::move(objectmanager)),
     _particlesystem(std::move(particlesystem)),
     _timermanager(std::move(timermanager)),
     _renderer(std::move(renderer)) {

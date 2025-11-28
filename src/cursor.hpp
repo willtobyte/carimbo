@@ -4,7 +4,6 @@
 
 #include "eventreceiver.hpp"
 #include "geometry.hpp"
-#include "object.hpp"
 
   class resourcemanager;
 
@@ -13,6 +12,30 @@
 constexpr auto ACTION_DEFAULT = "default";
 constexpr auto ACTION_LEFT = "left";
 constexpr auto ACTION_RIGHT = "right";
+
+struct keyframe final {
+  uint64_t duration{0};
+  vec2 offset;
+  quad frame;
+
+  friend void from_json(const nlohmann::json& j, keyframe& o);
+};
+
+struct bounds final {
+  std::optional<uint8_t> type;
+  std::bitset<256> reagents;
+  quad rectangle;
+
+  friend void from_json(const nlohmann::json& j, bounds& o);
+};
+
+struct animation final {
+  bool oneshot{false};
+  std::optional<std::string> next;
+  std::optional<bounds> bounds;
+  std::shared_ptr<soundfx> effect;
+  std::vector<keyframe> keyframes;
+};
 
 class cursor final : public eventreceiver {
 public:

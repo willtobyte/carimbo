@@ -83,6 +83,8 @@ private:
 
   mutable std::unordered_set<uint64_t> _hovering;
 
+  std::shared_ptr<scenemanager> _scenemanager;
+
   std::unordered_map<std::string, std::shared_ptr<entityproxy>, string_hash, string_equal> _proxies;
 
   std::function<void()> _onenter;

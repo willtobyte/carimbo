@@ -1,5 +1,8 @@
 #include "common.hpp"
 
+#include "cursor.hpp"
+#include "geometry.hpp"
+
 void from_json(const nlohmann::json& j, keyframe& o) {
   o.frame = j["quad"].get<quad>();
 

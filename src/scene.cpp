@@ -2,22 +2,19 @@
 
 #include "entityproxy.hpp"
 #include "geometry.hpp"
-#include "object.hpp"
-#include "objectmanager.hpp"
 #include "particlesystem.hpp"
-#include "pixmap.hpp"
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
 #include "tilemap.hpp"
 #include <variant>
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
-    : _renderer(scenemanager->renderer()) {
+    : _renderer(scenemanager->renderer()), _scenemanager(std::move(scenemanager)) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 
-  const auto pixmappool = scenemanager->resourcemanager()->pixmappool();
+  const auto pixmappool = _scenemanager->resourcemanager()->pixmappool();
 
   _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
 
@@ -255,9 +252,8 @@ void scene::draw() const noexcept {
   const auto x1 = static_cast<float>(width);
   const auto y1 = static_cast<float>(height);
 
-  const auto aabb = to_aabb(x0, y0, x1, y1);
+  b2AABB aabb{{x0 - epsilon, y0 - epsilon}, {x1 + epsilon, y1 + epsilon}};
   const auto filter = b2DefaultQueryFilter();
-
   b2World_OverlapAABB(_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
 #endif
 }
@@ -331,7 +327,24 @@ void scene::on_motion(float x, float y) const {
 }
 
 void scene::on_touch(float x, float y) const {
+  static std::vector<uint64_t> hits;
+  hits.clear();
+  hits.reserve(32);
+  query(x, y, std::back_inserter(hits));
+  if (hits.empty()) [[likely]] {
+    _scenemanager->on_touch(x, y);
+    return;
+  }
 
+  for (auto id : hits) {
+    if (const auto entity = find(id)) [[likely]] {
+      if (_registry.all_of<callbacks>(*entity)) {
+        if (auto& callback = _registry.get<callbacks>(*entity); callback.on_touch) {
+          callback.on_touch(x, y);
+        }
+      }
+    }
+  }
 }
 
 void scene::on_key_press(int32_t code) const {

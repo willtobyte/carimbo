@@ -86,4 +86,5 @@ struct state final {
 struct callbacks {
   std::function<void()> on_hover;
   std::function<void()> on_unhover;
+  std::function<void(float, float)> on_touch;
 };

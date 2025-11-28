@@ -349,19 +349,6 @@ void scriptengine::run() {
     "both", reflection::both
   );
 
-  struct metaobject {
-    static sol::object index(object& self, sol::stack_object key, sol::this_state state) {
-      auto& store = self.kv();
-      const auto ptr = store.get(key.as<std::string>());
-      return sol::make_object(state, std::ref(*ptr));
-    }
-
-    static void new_index(object& self, sol::stack_object key, sol::stack_object value) {
-      auto& store = self.kv();
-      store.set(key.as<std::string>(), value);
-    }
-  };
-
   lua.new_usertype<observable>(
     "Observable",
     sol::no_constructor,
@@ -369,61 +356,6 @@ void scriptengine::run() {
     "set", &observable::set,
     "subscribe", &observable::subscribe,
     "unsubscribe", &observable::unsubscribe
-  );
-
-  lua.new_usertype<object>(
-    "Object",
-    sol::no_constructor,
-    "id", sol::property(&object::id),
-    "kind", sol::property(&object::kind),
-    "x", sol::property(&object::x, &object::set_x),
-    "y", sol::property(&object::y, &object::set_y),
-    "alpha", sol::property(&object::alpha, &object::set_alpha),
-    "scale", sol::property(&object::scale, &object::set_scale),
-    "angle", sol::property(&object::angle, &object::set_angle),
-    "reflection", sol::property(&object::reflection, &object::set_reflection),
-    "visible", sol::property(&object::visible, &object::set_visible),
-    "on_begin", &object::set_onbegin,
-    "on_end", &object::set_onend,
-    "on_mail", &object::set_onmail,
-    "on_touch", &object::set_ontouch,
-    "on_hover", &object::set_onhover,
-    "on_unhover", &object::set_onunhover,
-    "on_collision", &object::set_oncollision,
-    "action", sol::property(&object::action, &object::set_action),
-    "placement", sol::property(
-      [](object& o) {
-        return o.placement();
-      },
-      [](object& self, sol::table table) {
-        const auto x = table.get_or("x", table.get_or(1, .0f));
-        const auto y = table.get_or("y", table.get_or(2, .0f));
-
-        self.set_placement(x, y);
-      }
-    ),
-    sol::meta_function::index, metaobject::index,
-    sol::meta_function::new_index, metaobject::new_index
-  );
-
-  lua.new_usertype<objectmanager>(
-    "ObjectManager",
-    sol::no_constructor,
-    "create", [](
-      objectmanager& self,
-      std::string_view kind,
-      sol::optional<std::string> scope_opt,
-      sol::optional<bool> manage_opt
-    ) {
-      const auto manage = manage_opt.value_or(true);
-      if (!scope_opt) {
-        return self.create(kind, std::nullopt, manage);
-      }
-
-      return self.create(kind, *scope_opt, manage);
-    },
-    "clone", &objectmanager::clone,
-    "remove", &objectmanager::remove
   );
 
   lua.new_usertype<resourcemanager>(
@@ -497,12 +429,27 @@ void scriptengine::run() {
     }
   );
 
+  struct metaentity {
+    static sol::object index(entityproxy& self, sol::stack_object key, sol::this_state state) {
+      const auto ptr = self.kv.get(key.as<std::string>());
+      return sol::make_object(state, std::ref(*ptr));
+    }
+
+    static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
+      self.kv.set(key.as<std::string>(), value);
+    }
+  };
+
   lua.new_usertype<entityproxy>(
     "Entity",
     sol::no_constructor,
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
     "on_hover", &entityproxy::set_onhover,
-    "on_unhover", &entityproxy::set_onunhover
+    "on_unhover", &entityproxy::set_onunhover,
+    "on_touch", &entityproxy::set_ontouch,
+
+    sol::meta_function::index, metaentity::index,
+    sol::meta_function::new_index, metaentity::new_index
   );
 
   lua.new_usertype<scene>(
@@ -711,7 +658,6 @@ void scriptengine::run() {
     sol::no_constructor,
     "canvas", &engine::canvas,
     "cassette", &engine::cassette,
-    "objectmanager", &engine::objectmanager,
     "fontfactory", &engine::fontfactory,
     "overlay", &engine::overlay,
     "resourcemanager", &engine::resourcemanager,
@@ -720,14 +666,7 @@ void scriptengine::run() {
     "scenemanager", &engine::scenemanager,
     "timermanager", &engine::timermanager,
     "particlesystem", &engine::particlesystem,
-    "world", &engine::world,
     "run", &engine::run
-  );
-
-  lua.new_usertype<world>(
-    "World",
-    sol::no_constructor,
-    "collides", &world::collides
   );
 
   lua.new_enum(
@@ -977,20 +916,20 @@ void scriptengine::run() {
 
   lua["keyboard"] = keyboard{};
 
-  lua.new_usertype<mail>(
-    "Mail",
-    sol::constructors<mail(
-      std::shared_ptr<object>,
-      std::optional<std::shared_ptr<object>>,
-      std::string_view
-    )>()
-  );
+  // lua.new_usertype<mail>(
+  //   "Mail",
+  //   sol::constructors<mail(
+  //     std::shared_ptr<object>,
+  //     std::optional<std::shared_ptr<object>>,
+  //     std::string_view
+  //   )>()
+  // );
 
-  lua.new_usertype<postalservice>(
-    "PostalService",
-    sol::constructors<postalservice()>(),
-    "post", &postalservice::post
-  );
+  // lua.new_usertype<postalservice>(
+  //   "PostalService",
+  //   sol::constructors<postalservice()>(),
+  //   "post", &postalservice::post
+  // );
 
   lua.new_usertype<timermanager>(
     "TimerManager",
@@ -1071,16 +1010,16 @@ void scriptengine::run() {
   lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
-  lua["objectmanager"] = engine->objectmanager();
+  // lua["objectmanager"] = engine->objectmanager();
   lua["overlay"] = engine->overlay();
   lua["particlesystem"] = engine->particlesystem();
   lua["resourcemanager"] = engine->resourcemanager();
-  lua["postalservice"] = engine->postalservice();
+  // lua["postalservice"] = engine->postalservice();
   lua["scenemanager"] = engine->scenemanager();
   lua["soundmanager"] = engine->soundmanager();
   lua["statemanager"] = engine->statemanager();
   lua["timermanager"] = engine->timermanager();
-  lua["world"] = engine->world();
+  //lua["world"] = engine->world();
 
   auto viewport = lua.create_table();
   viewport["width"] = engine->window()->width();

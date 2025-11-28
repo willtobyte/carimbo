@@ -32,3 +32,8 @@ void entityproxy::set_onunhover(sol::protected_function fn) {
   auto& callback = _registry.get<callbacks>(_entity);
   callback.on_unhover = interop::wrap_fn<void()>(std::move(fn));
 }
+
+void entityproxy::set_ontouch(sol::protected_function fn) {
+  auto& callback = _registry.get<callbacks>(_entity);
+  callback.on_touch = interop::wrap_fn<void(float, float)>(std::move(fn));
+}

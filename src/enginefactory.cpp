@@ -3,10 +3,8 @@
 #include "audiodevice.hpp"
 #include "engine.hpp"
 #include "eventmanager.hpp"
-#include "objectmanager.hpp"
 #include "particlesystem.hpp"
 #include "resourcemanager.hpp"
-#include "postalservice.hpp"
 #include "scenemanager.hpp"
 #include "timermanager.hpp"
 
@@ -104,17 +102,13 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto renderer = window->create_renderer(_scale);
   const auto eventmanager = std::make_shared<::eventmanager>(renderer);
   const auto resourcemanager = std::make_shared<::resourcemanager>(renderer, audiodevice, engine);
-  const auto postalservice = std::make_shared<::postalservice>();
   const auto overlay = std::make_shared<::overlay>(resourcemanager, eventmanager);
   const auto statemanager = std::make_shared<::statemanager>();
-  const auto objectmanager = std::make_shared<::objectmanager>();
   const auto particlesystem = std::make_shared<::particlesystem>(resourcemanager);
   const auto timermanager = std::make_shared<::timermanager>();
-  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, objectmanager, particlesystem, timermanager, renderer);
-  const auto world = std::make_shared<::world>(renderer);
+  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, particlesystem, timermanager, renderer);
 
   engine->set_audiodevice(audiodevice);
-  engine->set_objectmanager(objectmanager);
   engine->set_eventmanager(eventmanager);
   engine->set_overlay(overlay);
   engine->set_renderer(renderer);
@@ -122,22 +116,13 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->set_scenemanager(scenemanager);
   engine->set_statemanager(statemanager);
   engine->set_particlesystem(particlesystem);
-  engine->set_postalservice(postalservice);
   engine->set_timermanager(timermanager);
   engine->set_window(window);
-  engine->set_world(world);
 
-  eventmanager->add_receiver(engine->objectmanager());
   eventmanager->add_receiver(engine);
   eventmanager->add_receiver(engine->statemanager());
   eventmanager->add_receiver(overlay);
   eventmanager->add_receiver(scenemanager);
-
-  objectmanager->set_resourcemanager(resourcemanager);
-  objectmanager->set_scenemanager(scenemanager);
-  objectmanager->set_world(world);
-
-  world->set_objectmanager(objectmanager);
 
   return engine;
 }

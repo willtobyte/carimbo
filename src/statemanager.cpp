@@ -3,7 +3,6 @@
 #include "event.hpp"
 #include "eventreceiver.hpp"
 #include "lifecycleobserver.hpp"
-#include "object.hpp"
 
 statemanager::statemanager() {
 }

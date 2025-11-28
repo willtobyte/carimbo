@@ -16,7 +16,6 @@ class scenemanager final : public eventreceiver, public std::enable_shared_from_
 public:
   scenemanager(
     std::shared_ptr<::resourcemanager> resourcemanager,
-    std::shared_ptr<::objectmanager> objectmanager,
     std::shared_ptr<::particlesystem> particlesystem,
     std::shared_ptr<::timermanager> timermanager,
     std::shared_ptr<::renderer> renderer
