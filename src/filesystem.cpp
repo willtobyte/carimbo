@@ -1,6 +1,6 @@
 #include "filesystem.hpp"
 
-void filesystem::mount(const std::string_view filename, const std::string_view mountpoint) {
+void filesystem::mount(const std::string_view filename, const std::string_view mountpoint) noexcept {
   [[maybe_unused]] const auto result = PHYSFS_mount(filename.data(), mountpoint.data(), true);
   [[maybe_unused]] const auto* const message = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
   

@@ -12,7 +12,7 @@ public:
   explicit fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool);
   ~fontfactory() = default;
 
-  std::shared_ptr<font> get(std::string_view family);
+  std::shared_ptr<font> get(std::string_view family) noexcept;
 
   void flush();
 

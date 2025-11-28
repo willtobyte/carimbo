@@ -1,6 +1,6 @@
 #include "io.hpp"
 
-std::vector<uint8_t> io::read(std::string_view filename) {
+std::vector<uint8_t> io::read(std::string_view filename) noexcept {
   const auto ptr = unwrap(
     std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data())),
     std::format("error while opening file: {}", filename)
@@ -9,33 +9,30 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
 
   const auto length = PHYSFS_fileLength(ptr.get());
-  if (length < 0) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[PHYSFS_fileLength] invalid file length, file: {}, error: {}",
-        filename,
-        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
-  }
+  [[maybe_unused]] const auto* const error_msg = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+  assert(length >= 0 &&
+    std::format("[PHYSFS_fileLength] invalid file length, file: {}, error: {}",
+      filename,
+      error_msg).c_str());
 
   const auto amount = static_cast<std::size_t>(length);
   std::vector<uint8_t> buffer(amount);
   const auto result = PHYSFS_readBytes(ptr.get(), buffer.data(), amount);
-  if (result != length) [[unlikely]] {
-    throw std::runtime_error(
-      std::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes however read {}, error: {}",
-        filename,
-        amount,
-        result,
-        PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
-  }
+  [[maybe_unused]] const auto* const read_error = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+  assert(result == length &&
+    std::format("[PHYSFS_readBytes] error reading file: {}, expected {} bytes however read {}, error: {}",
+      filename,
+      amount,
+      result,
+      read_error).c_str());
 
   return buffer;
 }
 
-std::vector<std::string> io::enumerate(std::string_view directory) {
-  const auto ptr = unwrap(
-    std::unique_ptr<char*[], PHYSFS_Deleter>(PHYSFS_enumerateFiles(directory.data())),
-    std::format("error while enumerating directory: {}", directory)
-  );
+std::vector<std::string> io::enumerate(std::string_view directory) noexcept {
+  std::unique_ptr<char*[], PHYSFS_Deleter> ptr(PHYSFS_enumerateFiles(directory.data()));
+  assert(ptr != nullptr &&
+    std::format("error while enumerating directory: {}", directory).c_str());
 
   auto* const *array = ptr.get();
 

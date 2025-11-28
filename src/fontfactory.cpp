@@ -10,7 +10,7 @@ fontfactory::fontfactory(std::shared_ptr<renderer> renderer, std::shared_ptr<pix
   , _pixmappool(std::move(pixmappool))
 {}
 
-std::shared_ptr<font> fontfactory::get(std::string_view family) {
+std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
   std::filesystem::path p(family);
   const std::string filename = p.has_extension()
     ? std::string{family}
@@ -44,8 +44,6 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
 
   auto* const origin = SDL_GetRenderTarget(*_renderer);
 
-  // Flush any pending render commands before changing render targets
-  // to prevent use-after-free when Metal recreates pipeline state
   SDL_FlushRenderer(*_renderer);
 
   SDL_FRect destination{0, 0, static_cast<float>(width), static_cast<float>(height)};

@@ -1,6 +1,6 @@
 #include "audiodevice.hpp"
 
-audiodevice::audiodevice() {
+audiodevice::audiodevice() noexcept {
   _device = unwrap(
     std::unique_ptr<ALCdevice, ALC_Deleter>(alcOpenDevice(nullptr)),
     "failed to open audio device"
