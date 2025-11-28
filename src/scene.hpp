@@ -4,7 +4,7 @@
 
 #include "soundfx.hpp"
 #include "particlesystem.hpp"
-#include <entt/entity/fwd.hpp>
+#include "systems.hpp"
 
 class entityproxy;
 
@@ -75,15 +75,14 @@ template <class OutIt>
 
 private:
   entt::registry _registry;
-
   b2WorldId _world;
-
-  std::shared_ptr<pixmap> _background;
-
-  std::shared_ptr<renderer> _renderer;
+  animationsystem _animationsystem;
+  physicssystem _physicssystem;
 
   mutable std::unordered_set<uint64_t> _hovering;
 
+  std::shared_ptr<pixmap> _background;
+  std::shared_ptr<renderer> _renderer;
   std::shared_ptr<scenemanager> _scenemanager;
 
   std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _effects;

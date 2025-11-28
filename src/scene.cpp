@@ -6,7 +6,6 @@
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
 #include "tilemap.hpp"
-#include <variant>
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(scenemanager->renderer()), _scenemanager(std::move(scenemanager)) {
@@ -114,106 +113,8 @@ scene::~scene() noexcept {
 void scene::update(float delta) noexcept {
   const auto now = SDL_GetTicks();
 
-  {
-    auto view = _registry.view<animator, state>();
-
-    for (auto entity : view) {
-      auto& an = view.get<animator>(entity);
-      auto& st = view.get<state>(entity);
-
-      if (!st.action.has_value()) continue;
-
-      auto& tl = an.timelines[st.action.value()];
-
-      if (st.dirty) {
-        st.current_frame = 0;
-        st.tick = now;
-        st.dirty = false;
-        continue;
-      }
-
-      if (tl.frames.empty()) continue;
-
-      const auto& frame = tl.frames[st.current_frame];
-      if (frame.duration == 0 || now - st.tick < static_cast<uint64_t>(frame.duration)) {
-        continue;
-      }
-
-      st.tick = now;
-
-      if (st.current_frame + 1 >= tl.frames.size()) {
-        if (!tl.next.empty()) {
-          st.action = tl.next;
-          st.current_frame = 0;
-          st.dirty = true;
-        } else {
-          st.current_frame = 0;
-        }
-      } else {
-        st.current_frame++;
-      }
-    }
-  }
-
-  {
-    auto view = _registry.view<transform, animator, state, physics>();
-
-    for (auto entity : view) {
-      auto& tr = view.get<transform>(entity);
-      auto& an = view.get<animator>(entity);
-      auto& st = view.get<state>(entity);
-      auto& ph = view.get<physics>(entity);
-
-      if (!ph.enabled) {
-        continue;
-      }
-
-      if (!ph.is_valid() && ph.dirty) {
-        auto bodyDef = b2DefaultBodyDef();
-        bodyDef.type = static_cast<b2BodyType>(ph.type);
-        bodyDef.position = b2Vec2{tr.position.x, tr.position.y};
-
-        bodyDef.userData = id_to_userdata(static_cast<uint64_t>(entity));
-
-        ph.body = b2CreateBody(_world, &bodyDef);
-      }
-
-      if (ph.is_valid()) {
-        b2Body_SetTransform(ph.body, b2Vec2{tr.position.x, tr.position.y}, b2Rot_identity);
-      }
-
-      if (ph.is_valid() && ph.dirty) {
-        if (b2Shape_IsValid(ph.shape)) {
-          b2DestroyShape(ph.shape, false);
-        }
-
-        if (!st.action.has_value()) continue;
-
-        const auto& opt = an[st.action.value()].box;
-        if (opt.has_value()) {
-          const auto& box = opt.value();
-
-          auto def = b2DefaultShapeDef();
-
-          const float w = box.upperBound.x - box.lowerBound.x;
-          const float h = box.upperBound.y - box.lowerBound.y;
-
-          const float cx = box.lowerBound.x + w * .5f;
-          const float cy = box.lowerBound.y + h * .5f;
-
-          auto polygon = b2MakeOffsetBox(
-            w * .5f,
-            h * .5f,
-            b2Vec2{cx, cy},
-            b2Rot_identity);
-
-          ph.shape = b2CreatePolygonShape(ph.body, &def, &polygon);
-        }
-
-        ph.dirty = false;
-      }
-    }
-  }
+  _animationsystem.update(_registry, now);
+  _physicssystem.update(_registry, _world, delta);
 
   if (auto fn = _onloop; fn) [[likely]] {
     fn(delta);
@@ -238,21 +139,15 @@ void scene::update(float delta) noexcept {
 #endif
 
 void scene::draw() const noexcept {
-  static const auto w = static_cast<float>(_background->width());
-  static const auto h = static_cast<float>(_background->height());
+  const auto w = static_cast<float>(_background->width());
+  const auto h = static_cast<float>(_background->height());
 
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  auto view = _registry.view<renderable>();
+  auto view = _registry.view<renderable, transform, sprite, animator, state>();
 
   for (auto entity : view) {
-    auto& tr = _registry.get<transform>(entity);
-    auto& sp = _registry.get<sprite>(entity);
-    auto& an = _registry.get<animator>(entity);
-    auto& st = _registry.get<state>(entity);
-
-    const auto x = tr.position.x;
-    const auto y = tr.position.y;
+    auto [rn, tr, sp, an, st] = view.get<renderable, transform, sprite, animator, state>(entity);
 
     if (!st.action.has_value()) continue;
 
@@ -354,8 +249,7 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  static std::vector<uint64_t> hits;
-  hits.clear();
+  std::vector<uint64_t> hits;
   hits.reserve(32);
   query(x, y, std::back_inserter(hits));
   if (hits.empty()) [[likely]] {
@@ -378,8 +272,7 @@ void scene::on_touch(float x, float y) const {
 }
 
 void scene::on_motion(float x, float y) const {
-  static std::unordered_set<uint64_t> hits;
-  hits.clear();
+  std::unordered_set<uint64_t> hits;
   hits.reserve(32);
   query(x, y, std::inserter(hits, hits.end()));
 
@@ -406,6 +299,10 @@ void scene::on_motion(float x, float y) const {
   }
 
   _hovering.swap(hits);
+
+  if (auto fn = _onmotion; fn) {
+    fn(x, y);
+  }
 }
 
 void scene::on_key_press(int32_t code) const {

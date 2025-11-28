@@ -449,6 +449,17 @@ void scriptengine::run() {
     "angle", sol::property(&entityproxy::angle, &entityproxy::set_angle),
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
+    "placement", sol::property(
+      []() {
+        return nullptr;
+      },
+      [](entityproxy& self, sol::table table) {
+        const auto x = table.get_or("x", table.get_or(1, .0f));
+        const auto y = table.get_or("y", table.get_or(2, .0f));
+
+        self.set_placement(x, y);
+      }
+    ),
     "on_hover", &entityproxy::set_onhover,
     "on_unhover", &entityproxy::set_onunhover,
     "on_touch", &entityproxy::set_ontouch,

@@ -23,7 +23,7 @@ float entityproxy::y() const noexcept {
 
 void entityproxy::set_y(float y) noexcept {
   auto& t = _registry.get<transform>(_e);
-  t.position.x = y;
+  t.position.y = y;
 }
 
 uint8_t entityproxy::alpha() const noexcept {
@@ -87,4 +87,10 @@ void entityproxy::set_onunhover(sol::protected_function fn) {
 void entityproxy::set_ontouch(sol::protected_function fn) {
   auto& callback = _registry.get<callbacks>(_e);
   callback.on_touch = interop::wrap_fn<void(std::shared_ptr<entityproxy>, float, float)>(std::move(fn));
+}
+
+void entityproxy::set_placement(float x, float y) noexcept {
+  auto& t = _registry.get<transform>(_e);
+  t.position.x = x;
+  t.position.y = y;
 }
