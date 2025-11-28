@@ -21,7 +21,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   const auto es = json.value("effects", nlohmann::json::array());
   _effects.reserve(es.size());
   for (const auto& e : es) {
-    const auto name = e.get<std::string>();
+    const auto& name = e.get_ref<const std::string&>();
     const auto f = std::format("blobs/{}/{}.ogg", scene, name);
     _effects.emplace(name, soundmanager->get(f));
   }
@@ -167,9 +167,8 @@ void scene::draw() const noexcept {
   auto view = _registry.view<renderable, transform, tint, sprite, animator, state>();
 
   for (auto entity : view) {
-    auto [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
-
-    if (!st.action.has_value()) continue;
+    const auto& [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
+    if (!st.action.has_value()) [[unlikely]] continue;
 
     const auto& timeline = an[st.action.value()];
     if (timeline.frames.empty()) [[unlikely]] continue;
@@ -300,8 +299,9 @@ void scene::on_leave() const {
 }
 
 void scene::on_touch(float x, float y) const {
-  std::vector<uint64_t> hits;
+  static std::vector<uint64_t> hits;
   hits.reserve(32);
+  hits.clear();
   query(x, y, std::back_inserter(hits));
   if (hits.empty()) {
     if (auto fn = _ontouch; fn) {
@@ -323,8 +323,9 @@ void scene::on_touch(float x, float y) const {
 }
 
 void scene::on_motion(float x, float y) const {
-  std::unordered_set<uint64_t> hits;
+  static std::unordered_set<uint64_t> hits;
   hits.reserve(32);
+  hits.clear();
   query(x, y, std::inserter(hits, hits.end()));
 
   for (const auto id : _hovering) {
