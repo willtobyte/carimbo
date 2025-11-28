@@ -19,8 +19,8 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
 
   for (const auto& item : j["animations"].items()) {
     const auto key = item.key();
-    const auto& a = item.value();
-    const auto& f = a["frames"];
+    const auto a = item.value();
+    const auto f = a["frames"];
     std::vector<keyframe> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
       return keyframe{

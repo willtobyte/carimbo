@@ -43,6 +43,10 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) {
         width, height));
 
   auto* const origin = SDL_GetRenderTarget(*_renderer);
+  
+  // Flush any pending render commands before changing render targets
+  // to prevent use-after-free when Metal recreates pipeline state
+  SDL_FlushRenderer(*_renderer);
 
   SDL_FRect destination{0, 0, static_cast<float>(width), static_cast<float>(height)};
   SDL_SetRenderTarget(*_renderer, target.get());
