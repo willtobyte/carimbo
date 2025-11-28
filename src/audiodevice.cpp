@@ -1,7 +1,5 @@
 #include "audiodevice.hpp"
 
-
-
 audiodevice::audiodevice() {
   _device = unwrap(
     std::unique_ptr<ALCdevice, ALC_Deleter>(alcOpenDevice(nullptr)),
@@ -13,7 +11,6 @@ audiodevice::audiodevice() {
     "failed to create audio context"
   );
 
-  if (const auto result = alcMakeContextCurrent(_context.get()); result == ALC_FALSE) [[unlikely]] {
-    throw std::runtime_error("[alcMakeContextCurrent] failed to set current context");
-  }
+  [[maybe_unused]] const auto result = alcMakeContextCurrent(_context.get());
+  assert(result != ALC_FALSE && "[alcMakeContextCurrent] failed to set current context");
 }
