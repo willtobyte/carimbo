@@ -83,6 +83,10 @@ struct state final {
   std::optional<std::string> action;
 };
 
+struct renderable final {
+  int z;
+};
+
 struct callbacks {
   std::function<void(std::shared_ptr<entityproxy>)> on_hover;
   std::function<void(std::shared_ptr<entityproxy>)> on_unhover;

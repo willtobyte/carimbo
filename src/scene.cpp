@@ -29,6 +29,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   const auto os = json.value("objects", nlohmann::json::array());
 
+  int zindex = 0;
   for (const auto& o : os) {
     const auto name = o["name"].get<std::string_view>();
     const auto kind = o["kind"].get<std::string_view>();
@@ -75,6 +76,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     physics ph;
     _registry.emplace<physics>(entity, std::move(ph));
 
+    renderable rn;
+    rn.z = zindex++;
+    _registry.emplace<renderable>(entity, std::move(rn));
+
     const auto e = std::make_shared<entityproxy>(entity, _registry);
     _proxies.emplace(std::move(name), e);
 
@@ -82,6 +87,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     cb.self = e;
     _registry.emplace<callbacks>(entity, std::move(cb));
   }
+
+  _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
+    return lhs.z < rhs.z;
+  });
 }
 
 scene::~scene() noexcept {
@@ -237,13 +246,13 @@ void scene::draw() const noexcept {
 
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  const auto view = _registry.view<transform, sprite, animator, state>();
+  auto view = _registry.view<renderable>();
 
   for (auto entity : view) {
-    auto& tr = view.get<transform>(entity);
-    auto& sp = view.get<sprite>(entity);
-    auto& an = view.get<animator>(entity);
-    auto& st = view.get<state>(entity);
+    auto& tr = _registry.get<transform>(entity);
+    auto& sp = _registry.get<sprite>(entity);
+    auto& an = _registry.get<animator>(entity);
+    auto& st = _registry.get<state>(entity);
 
     const auto x = tr.position.x;
     const auto y = tr.position.y;
