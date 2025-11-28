@@ -1027,7 +1027,6 @@ void scriptengine::run() {
   lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
-  // lua["objectmanager"] = engine->objectmanager();
   lua["overlay"] = engine->overlay();
   lua["particlesystem"] = engine->particlesystem();
   lua["resourcemanager"] = engine->resourcemanager();
