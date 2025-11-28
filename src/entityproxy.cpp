@@ -47,7 +47,7 @@ double entityproxy::angle() const noexcept {
 void entityproxy::set_angle(double angle) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.angle = angle;
-  
+
   auto& s = _registry.get<state>(_e);
   s.redraw = true;
 }
@@ -103,4 +103,14 @@ void entityproxy::set_placement(float x, float y) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.position.x = x;
   t.position.y = y;
+}
+
+std::string_view entityproxy::kind() const noexcept {
+  const auto& m = _registry.get<metadata>(_e);
+  return m.kind;
+}
+
+void entityproxy::set_kind(std::string_view kind) noexcept {
+  auto& m = _registry.get<metadata>(_e);
+  m.kind = kind;
 }

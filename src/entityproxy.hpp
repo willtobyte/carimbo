@@ -27,6 +27,9 @@ public:
   void set_onunhover(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);
 
+  std::string_view kind() const noexcept;
+  void set_kind(std::string_view kind) noexcept;
+
   void set_placement(float x, float y) noexcept;
 
   kv kv;

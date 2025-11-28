@@ -46,6 +46,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
     auto entity = _registry.create();
 
+    metadata m;
+    m.kind = kind;
+    _registry.emplace<metadata>(entity, std::move(m));
+
     tint tn;
     _registry.emplace<tint>(entity, std::move(tn));
 

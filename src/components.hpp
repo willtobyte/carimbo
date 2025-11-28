@@ -87,6 +87,10 @@ struct renderable final {
   int z;
 };
 
+struct metadata final {
+  std::string kind;
+};
+
 struct callbacks {
   std::function<void(std::shared_ptr<entityproxy>)> on_hover;
   std::function<void(std::shared_ptr<entityproxy>)> on_unhover;

@@ -449,6 +449,7 @@ void scriptengine::run() {
     "angle", sol::property(&entityproxy::angle, &entityproxy::set_angle),
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
+    "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),
     "placement", sol::property(
       []() {
         return nullptr;
