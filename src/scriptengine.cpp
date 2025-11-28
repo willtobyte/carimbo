@@ -443,6 +443,8 @@ void scriptengine::run() {
   lua.new_usertype<entityproxy>(
     "Entity",
     sol::no_constructor,
+    "x", sol::property(&entityproxy::x, &entityproxy::set_x),
+    "y", sol::property(&entityproxy::y, &entityproxy::set_y),
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
     "on_hover", &entityproxy::set_onhover,
     "on_unhover", &entityproxy::set_onunhover,

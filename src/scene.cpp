@@ -31,10 +31,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   int zindex = 0;
   for (const auto& o : os) {
-    const auto name = o["name"].get<std::string_view>();
-    const auto kind = o["kind"].get<std::string_view>();
-    const auto action_str = o.value("action", std::string{});
-    const auto action = action_str.empty() ? std::nullopt : std::optional<std::string>(action_str);
+    const auto name = o["name"].get<std::string>();
+    const auto kind = o["kind"].get<std::string>();
+    const auto q = o.value("action", std::string{});
+    const auto action = q.empty() ? std::nullopt : std::optional<std::string>(q);
 
     const auto x = o.value("x", .0f);
     const auto y = o.value("y", .0f);

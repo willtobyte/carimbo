@@ -1,8 +1,29 @@
 #include "entityproxy.hpp"
+#include "components.hpp"
 #include "helper.hpp"
 
 entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept
   : _entity(entity), _registry(registry) {
+}
+
+float entityproxy::x() const noexcept {
+  const auto& t = _registry.get<transform>(_entity);
+  return t.position.x;
+}
+
+void entityproxy::set_x(float x) noexcept {
+  auto& t = _registry.get<transform>(_entity);
+  t.position.x = x;
+}
+
+float entityproxy::y() const noexcept {
+  const auto& t = _registry.get<transform>(_entity);
+  return t.position.y;
+}
+
+void entityproxy::set_y(float y) noexcept {
+  auto& t = _registry.get<transform>(_entity);
+  t.position.x = y;
 }
 
 std::optional<std::string> entityproxy::action() const noexcept {

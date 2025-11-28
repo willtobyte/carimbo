@@ -9,6 +9,10 @@ public:
   entityproxy(entt::entity entity, entt::registry& registry) noexcept;
   ~entityproxy() noexcept = default;
 
+  float x() const noexcept;
+  void set_x(float x) noexcept;
+  float y() const noexcept;
+  void set_y(float y) noexcept;
   std::optional<std::string> action() const noexcept;
   void set_action(std::optional<std::string_view> name) noexcept;
   void set_onhover(sol::protected_function fn);
