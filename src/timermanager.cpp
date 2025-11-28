@@ -87,15 +87,12 @@ void timermanager::clear() {
   }
 }
 
-uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) {
+uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) noexcept {
   const auto ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
-  if (id) [[likely]] {
-    _envelopemapping.emplace(id, ptr);
-    return id;
-  }
+  assert(id != 0 && std::format("[SDL_AddTimer] {}", SDL_GetError()).c_str());
 
-  _envelopepool->release(ptr);
-  throw std::runtime_error(std::format("[SDL_AddTimer] {}", SDL_GetError()));
+  _envelopemapping.emplace(id, ptr);
+  return id;
 }

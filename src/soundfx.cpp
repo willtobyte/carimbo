@@ -1,9 +1,10 @@
 #include "soundfx.hpp"
 
 #include "io.hpp"
+
 #include <stb_vorbis.c>
 
-soundfx::soundfx(std::string_view filename) {
+soundfx::soundfx(std::string_view filename) noexcept {
   const auto buffer = io::read(filename);
 
   int channels;
@@ -17,9 +18,8 @@ soundfx::soundfx(std::string_view filename) {
     &output
   );
 
-  if (samples < 0 || !output) [[unlikely]] {
-    throw std::runtime_error(std::format("[stb_vorbis_decode_memory] failed to decode: {}", filename));
-  }
+  assert(samples >= 0 && output &&
+    std::format("[stb_vorbis_decode_memory] failed to decode: {}", filename).c_str());
 
   const std::unique_ptr<short, decltype(&free)> decoded(output, &free);
 
