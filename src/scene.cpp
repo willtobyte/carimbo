@@ -13,10 +13,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 
-  const auto soundmanager = _scenemanager->resourcemanager()->soundmanager();
-  const auto pixmappool = _scenemanager->resourcemanager()->pixmappool();
-  const auto fontfactory = _scenemanager->resourcemanager()->fontfactory();
-  const auto particlesystem = _scenemanager->particlesystem();
+  const auto& soundmanager = _scenemanager->resourcemanager()->soundmanager();
+  const auto& pixmappool = _scenemanager->resourcemanager()->pixmappool();
+  const auto& fontfactory = _scenemanager->resourcemanager()->fontfactory();
+  const auto& particlesystem = _scenemanager->particlesystem();
 
   const auto es = json.value("effects", nlohmann::json::array());
   _effects.reserve(es.size());
@@ -281,7 +281,7 @@ void scene::set_onmotion(sol::protected_function fn) {
 }
 
 void scene::on_enter() const {
-  const auto particlesystem = _scenemanager->particlesystem();
+  const auto& particlesystem = _scenemanager->particlesystem();
 
   for (const auto& [key, batch] : _particles) {
     particlesystem->add(batch);
@@ -301,7 +301,7 @@ void scene::on_leave() const {
       e->stop();
     }
 
-    const auto particlesystem = _scenemanager->particlesystem();
+    const auto& particlesystem = _scenemanager->particlesystem();
     particlesystem->clear();
 }
 
