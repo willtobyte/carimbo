@@ -218,10 +218,6 @@ void scene::update(float delta) noexcept {
   if (auto fn = _onloop; fn) [[likely]] {
     fn(delta);
   }
-
-  // if (auto fn = _oncamera; fn) [[likely]] {
-  //   _camera = fn(delta);
-  // }
 }
 
 #ifdef DEBUG
