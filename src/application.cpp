@@ -2,7 +2,7 @@
 
 application::application(const int argc, char** const argv) {
 #ifdef HAS_SENTRY
-  // std::atexit([] { sentry_close(); });
+  std::atexit([] { sentry_close(); });
 #endif
 
 #ifdef HAS_STEAM
