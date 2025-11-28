@@ -374,7 +374,7 @@ void scene::on_touch(float x, float y) const {
     if (const auto entity = find(id)) [[likely]] {
       if (_registry.all_of<callbacks>(*entity)) {
         if (auto callback = _registry.get<callbacks>(*entity); callback.on_touch) {
-          callback.on_touch(x, y);
+          callback.on_touch(callback.self, x, y);
         }
       }
     }
