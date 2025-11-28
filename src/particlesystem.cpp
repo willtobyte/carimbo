@@ -9,7 +9,7 @@ particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanage
   : _resourcemanager(std::move(resourcemanager)) {
 }
 
-std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool emitting) const {
+std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   const auto filename = std::format("particles/{}.json", kind);
   const auto buffer = io::read(filename);
   const auto j = nlohmann::json::parse(buffer);
@@ -39,7 +39,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
 
   const auto ps = std::make_shared<particleprops>();
   ps->active = true;
-  ps->emitting = emitting;
+  ps->spawning = spawning;
   ps->x = x;
   ps->y = y;
   ps->pixmap = pixmap;
@@ -120,7 +120,7 @@ void particlesystem::update(float delta) {
         continue;
       }
 
-      if (!props->emitting) [[unlikely]] {
+      if (!props->spawning) [[unlikely]] {
         continue;
       }
 

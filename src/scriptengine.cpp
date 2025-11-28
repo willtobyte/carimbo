@@ -640,7 +640,7 @@ void scriptengine::run() {
     "ParticleProps",
     sol::no_constructor,
     "active", sol::property(&particleprops::active),
-    "emitting", sol::property(&particleprops::emitting),
+    "spawning", sol::property(&particleprops::spawning),
     "placement", sol::property(
       []() {
         return nullptr;

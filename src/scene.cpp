@@ -101,8 +101,8 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     const auto kind = i["kind"].get<std::string_view>();
     const auto x = i["x"].get<float>();
     const auto y = i["y"].get<float>();
-    const auto emitting = i.value("emitting", true);
-    _particles.emplace(particle, factory->create(kind, x, y, emitting));
+    const auto active = i.value("active", true);
+    _particles.emplace(particle, factory->create(kind, x, y, active));
   }
 
   const auto fs = json.value("fonts", nlohmann::json::array());

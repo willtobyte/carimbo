@@ -5,7 +5,7 @@
 struct particleprops final {
   float x, y;
   bool active;
-  bool emitting;
+  bool spawning;
   std::shared_ptr<pixmap> pixmap;
   std::minstd_rand rng{std::random_device{}()};
   std::uniform_real_distribution<float> xspawnd;
@@ -64,7 +64,7 @@ class particlefactory final {
 public:
   explicit particlefactory(std::shared_ptr<resourcemanager> resourcemanager);
 
-  std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool emitting = true) const;
+  std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool spawning = true) const;
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
