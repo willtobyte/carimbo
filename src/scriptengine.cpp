@@ -682,15 +682,16 @@ void scriptengine::run() {
   lua.new_usertype<engine>(
     "Engine",
     sol::no_constructor,
-    "cassette", &engine::cassette,
     "fontfactory", &engine::fontfactory,
     "overlay", &engine::overlay,
-    "resourcemanager", &engine::resourcemanager,
-    "soundmanager", &engine::soundmanager,
-    "statemanager", &engine::statemanager,
+    // "resourcemanager", &engine::resourcemanager,
+    // "soundmanager", &engine::soundmanager,
+    // "statemanager", &engine::statemanager,
     "scenemanager", &engine::scenemanager,
     "run", &engine::run
   );
+
+  lua["cassette"] = cassette();
 
   lua.new_enum(
     "FontEffect",
@@ -1030,13 +1031,12 @@ void scriptengine::run() {
   interop::verify(source);
 
   const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
-  lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
   lua["overlay"] = engine->overlay();
-  lua["resourcemanager"] = engine->resourcemanager();
+  // lua["resourcemanager"] = engine->resourcemanager();
   lua["scenemanager"] = engine->scenemanager();
-  lua["soundmanager"] = engine->soundmanager();
-  lua["statemanager"] = engine->statemanager();
+  // lua["soundmanager"] = engine->soundmanager();
+  // lua["statemanager"] = engine->statemanager();
   //lua["world"] = engine->world();
 
   auto viewport = lua.create_table();

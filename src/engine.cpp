@@ -1,7 +1,6 @@
 #include "engine.hpp"
 
 #include "audiodevice.hpp"
-#include "cassette.hpp"
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "renderer.hpp"
@@ -48,10 +47,6 @@ std::shared_ptr<window> engine::window() const noexcept {
 
 std::shared_ptr<renderer> engine::renderer() const noexcept {
   return _renderer;
-}
-
-std::shared_ptr<cassette> engine::cassette() const noexcept {
-  return _cassette;
 }
 
 void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) {

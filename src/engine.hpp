@@ -17,7 +17,6 @@ public:
   std::shared_ptr<::soundmanager> soundmanager() const noexcept;
   std::shared_ptr<::window> window() const noexcept;
   std::shared_ptr<::renderer> renderer() const noexcept;
-  std::shared_ptr<::cassette> cassette() const noexcept;
 
   void set_audiodevice(std::shared_ptr<::audiodevice> ptr);
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr);
@@ -56,5 +55,4 @@ private:
   std::shared_ptr<::renderer> _renderer;
   std::shared_ptr<::window> _window;
   std::vector<std::shared_ptr<::lifecycleobserver>> _observers;
-  std::shared_ptr<::cassette> _cassette = std::make_shared<::cassette>();
 };
