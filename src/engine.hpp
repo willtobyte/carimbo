@@ -4,8 +4,8 @@
 
 class engine final : public eventreceiver {
 public:
-  engine() = default;
-  virtual ~engine() = default;
+  engine() noexcept = default;
+  ~engine() noexcept = default;
 
   std::shared_ptr<::audiodevice> audiodevice() const noexcept;
   std::shared_ptr<::eventmanager> eventmanager() const noexcept;
@@ -35,9 +35,6 @@ public:
 
 protected:
   virtual void on_quit() noexcept override;
-
-private:
-  std::exception_ptr _exception;
 
 #ifndef NDEBUG
   virtual void on_debug() override;

@@ -93,7 +93,6 @@ void eventmanager::update(float delta) {
           default:
             break;
         }
-        break;
 
         const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
