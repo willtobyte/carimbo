@@ -1,6 +1,7 @@
 #include "systems.hpp"
 
 #include "components.hpp"
+#include "constant.hpp"
 #include "geometry.hpp"
 
 void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
@@ -74,20 +75,50 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
       return;
     }
 
+    if (!s.action) [[unlikely]] {
+      return;
+    }
+
+    const auto it = an.timelines.find(*s.action);
+    if (it == an.timelines.end()) [[unlikely]] {
+      return;
+    }
+
+    const auto& timeline = it->second;
+    const auto& opt = timeline.box;
+    if (!opt) [[unlikely]] {
+      return;
+    }
+
+    const auto& box = *opt;
+
+    const auto bw = box.upperBound.x - box.lowerBound.x;
+    const auto bh = box.upperBound.y - box.lowerBound.y;
+
+    const auto hx = bw * t.scale * 0.5f;
+    const auto hy = bh * t.scale * 0.5f;
+
+    const auto cx = bw * 0.5f;
+    const auto cy = bh * 0.5f;
+    const auto px = t.position.x + box.lowerBound.x + cx;
+    const auto py = t.position.y + box.lowerBound.y + cy;
+
+    const auto position = b2Vec2{px, py};
+    const auto radians = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
+    const auto rotation = b2MakeRot(radians);
+
     if (!p.is_valid()) [[unlikely]] {
       auto bdef = b2DefaultBodyDef();
       bdef.type = static_cast<b2BodyType>(p.type);
-      bdef.position = b2Vec2{t.position.x, t.position.y};
-      bdef.rotation = b2MakeRot(static_cast<float>(t.angle));
+      bdef.position = position;
+      bdef.rotation = rotation;
       bdef.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
 
       p.body = b2CreateBody(world, &bdef);
     }
 
     if (p.is_valid()) [[likely]] {
-      b2Body_SetTransform(p.body,
-                         b2Vec2{t.position.x, t.position.y},
-                         b2MakeRot(static_cast<float>(t.angle)));
+      b2Body_SetTransform(p.body, position, rotation);
     }
 
     if (p.is_valid() && p.dirty) [[unlikely]] {
@@ -95,34 +126,10 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
         b2DestroyShape(p.shape, false);
       }
 
-      if (!s.action) [[unlikely]] {
-        return;
-      }
-
-      const auto it = an.timelines.find(*s.action);
-      if (it == an.timelines.end()) [[unlikely]] {
-        return;
-      }
-
-      const auto& opt = it->second.box;
-      if (!opt) [[unlikely]] {
-        return;
-      }
-
-      const auto& box = *opt;
-
-      const auto w = box.upperBound.x - box.lowerBound.x;
-      const auto h = box.upperBound.y - box.lowerBound.y;
-      const auto hw = w * 0.5f;
-      const auto hh = h * 0.5f;
-      const auto cx = box.lowerBound.x + hw;
-      const auto cy = box.lowerBound.y + hh;
-
-      auto poly = b2MakeOffsetBox(hw, hh, b2Vec2{cx, cy}, b2Rot_identity);
+      const auto poly = b2MakeBox(hx, hy);
 
       auto sdef = b2DefaultShapeDef();
       p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
-
       p.dirty = false;
     }
   });

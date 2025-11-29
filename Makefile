@@ -1,6 +1,8 @@
 SHELL := /usr/bin/env bash
 PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(buildtype),$(buildtype),Debug)
+SCENE := $(if $(SCENE),$(SCENE),prelude)
+CARTRIDGE := $(if $(CARTRIDGE),$(CARTRIDGE),../reprobate)
 NCPUS := 10
 
 .SHELLFLAGS := -eu -o pipefail -c
@@ -29,6 +31,11 @@ build: ## Builds the project
 	$(EXTRA_FLAGS)
 
 	cmake --build build --parallel $(NCPUS) --config $(BUILDTYPE) --verbose
+
+.PHONY: run
+run: build ## Builds and runs the project
+	rm -f cassette.tape
+	NOVSYNC=1 SCENE=$(SCENE) CARTRIDGE=$(CARTRIDGE) lldb -o run -- ./build/carimbo
 
 .PHONY: help
 help:
