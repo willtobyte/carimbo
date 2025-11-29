@@ -535,7 +535,7 @@ void scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          const auto wrapper = [fn, &lua, ptr]() mutable {
+          const auto wrapper = [fn, ptr, &lua]() mutable {
             lua["pool"] = lua.create_table();
             auto scene = ptr.lock();
             assert(scene && "scene should be valid");

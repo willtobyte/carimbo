@@ -134,3 +134,36 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
     }
   });
 }
+
+void renderablesystem::draw(const entt::registry& registry) const noexcept {
+  auto view = registry.view<renderable, transform, tint, sprite, animator, state>();
+
+  for (auto entity : view) {
+    const auto& [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
+    if (!rn.visible) [[unlikely]] continue;
+    if (!st.action.has_value()) [[unlikely]] continue;
+
+    const auto& timeline = an[st.action.value()];
+    if (timeline.frames.empty()) [[unlikely]] continue;
+
+    const auto& frame = timeline.frames[st.current_frame];
+
+    const auto sw = frame.quad.w * tr.scale;
+    const auto sh = frame.quad.h * tr.scale;
+
+    const auto cx = frame.offset.x + tr.position.x + frame.quad.w * 0.5f;
+    const auto cy = frame.offset.y + tr.position.y + frame.quad.h * 0.5f;
+
+    const auto fx = cx - sw * 0.5f;
+    const auto fy = cy - sh * 0.5f;
+
+    sp.pixmap->draw(
+      frame.quad.x, frame.quad.y,
+      frame.quad.w, frame.quad.h,
+      fx, fy,
+      sw, sh,
+      tr.angle,
+      tn.a
+    );
+  }
+}

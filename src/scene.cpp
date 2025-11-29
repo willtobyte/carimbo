@@ -121,7 +121,6 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 }
 
 scene::~scene() noexcept {
-  std::println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> destroyd");
   auto view = _registry.view<physics>();
   for (auto entity : view) {
     auto& ph = view.get<physics>(entity);
@@ -144,6 +143,7 @@ void scene::update(float delta) noexcept {
 
   _animationsystem.update(_registry, now);
   _physicssystem.update(_registry, _world, delta);
+  _particlesystem->update(delta);
 
   if (auto fn = _onloop; fn) [[likely]] {
     fn(delta);
@@ -173,36 +173,8 @@ void scene::draw() const noexcept {
 
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  auto view = _registry.view<renderable, transform, tint, sprite, animator, state>();
-
-  for (auto entity : view) {
-    const auto& [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
-    if (!rn.visible) [[unlikely]] continue;
-    if (!st.action.has_value()) [[unlikely]] continue;
-
-    const auto& timeline = an[st.action.value()];
-    if (timeline.frames.empty()) [[unlikely]] continue;
-
-    const auto& frame = timeline.frames[st.current_frame];
-
-    const auto sw = frame.quad.w * tr.scale;
-    const auto sh = frame.quad.h * tr.scale;
-
-    const auto cx = frame.offset.x + tr.position.x + frame.quad.w * 0.5f;
-    const auto cy = frame.offset.y + tr.position.y + frame.quad.h * 0.5f;
-
-    const auto fx = cx - sw * 0.5f;
-    const auto fy = cy - sh * 0.5f;
-
-    sp.pixmap->draw(
-      frame.quad.x, frame.quad.y,
-      frame.quad.w, frame.quad.h,
-      fx, fy,
-      sw, sh,
-      tr.angle,
-      tn.a
-    );
-  }
+  _renderablesystem.draw(_registry);
+  _particlesystem->draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
