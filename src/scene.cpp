@@ -9,7 +9,7 @@
 #include "tilemap.hpp"
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
-    : _renderer(scenemanager->renderer()),
+    : _renderer(std::move(scenemanager->renderer())),
       _scenemanager(std::move(scenemanager)),
       _particlesystem(std::make_shared<particlesystem>(scenemanager->resourcemanager())),
       _canvas(std::make_shared<::canvas>(scenemanager->renderer())),

@@ -17,14 +17,6 @@ std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
 }
 
-std::shared_ptr<fontfactory> engine::fontfactory() const noexcept {
-  return _resourcemanager->fontfactory();
-}
-
-std::shared_ptr<overlay> engine::overlay() const noexcept {
-  return _overlay;
-}
-
 std::shared_ptr<resourcemanager> engine::resourcemanager() const noexcept {
   return _resourcemanager;
 }
@@ -49,41 +41,45 @@ std::shared_ptr<renderer> engine::renderer() const noexcept {
   return _renderer;
 }
 
-void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) {
+std::shared_ptr<::overlay> engine::overlay() const noexcept {
+  return _overlay;
+}
+
+void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept {
   _audiodevice = std::move(ptr);
 }
 
-void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) {
+void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {
   _eventmanager = std::move(ptr);
 }
 
-void engine::set_overlay(std::shared_ptr<::overlay> ptr) {
-  _overlay = std::move(ptr);
-}
-
-void engine::set_resourcemanager(std::shared_ptr<::resourcemanager> ptr) {
+void engine::set_resourcemanager(std::shared_ptr<::resourcemanager> ptr) noexcept {
   _resourcemanager = std::move(ptr);
 }
 
-void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) {
+void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept {
   _scenemanager = std::move(ptr);
 }
 
-void engine::set_statemanager(std::shared_ptr<::statemanager> ptr) {
+void engine::set_statemanager(std::shared_ptr<::statemanager> ptr) noexcept {
   _statemanager = std::move(ptr);
 
   _observers.emplace_back(_statemanager);
 }
 
-void engine::set_window(std::shared_ptr<::window> ptr) {
+void engine::set_window(std::shared_ptr<::window> ptr) noexcept {
   _window = std::move(ptr);
 }
 
-void engine::set_renderer(std::shared_ptr<::renderer> ptr) {
+void engine::set_renderer(std::shared_ptr<::renderer> ptr) noexcept {
   _renderer = std::move(ptr);
 }
 
-void engine::add_loopable(std::shared_ptr<::loopable> ptr) {
+void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {
+  _overlay = std::move(ptr);
+}
+
+void engine::add_loopable(std::shared_ptr<::loopable> ptr) noexcept {
   _loopables.emplace_back(std::move(ptr));
 }
 
@@ -116,8 +112,8 @@ void engine::_loop() {
 
   _eventmanager->update(delta);
   _resourcemanager->update(delta);
-  _overlay->update(delta);
   _scenemanager->update(delta);
+  _overlay->update(delta);
 
   for (const auto& loopable : _loopables) {
     loopable->loop(delta);

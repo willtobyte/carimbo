@@ -6,22 +6,22 @@
 
 class overlay final : public eventreceiver {
 public:
-  explicit overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager);
-  virtual ~overlay() = default;
+  overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager);
+  virtual ~overlay() noexcept = default;
 
-  std::variant<std::shared_ptr<label>> create(widgettype type);
+  std::variant<std::shared_ptr<label>> create(widgettype type) noexcept;
 
-  void destroy(const std::variant<std::shared_ptr<label>>& widget);
+  void destroy(const std::variant<std::shared_ptr<label>>& widget) noexcept;
 
-  void update(float delta);
+  void update(float delta) noexcept;
 
-  void draw() const;
+  void draw() const noexcept;
 
-  void set_cursor(std::string_view name);
+  void set_cursor(std::string_view name) noexcept;
 
-  void hide();
+  void hide() noexcept;
 
-  void dispatch(widgettype type, std::string_view message);
+  void dispatch(widgettype type, std::string_view message) noexcept;
 
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;

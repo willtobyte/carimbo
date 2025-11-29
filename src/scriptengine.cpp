@@ -679,18 +679,6 @@ void scriptengine::run() {
     "set", &particlesystem::set
   );
 
-  // lua.new_usertype<engine>(
-  //   "Engine",
-  //   sol::no_constructor
-  //   // "fontfactory", &engine::fontfactory,
-  //   // "overlay", &engine::overlay,
-  //   // "resourcemanager", &engine::resourcemanager,
-  //   // "soundmanager", &engine::soundmanager,
-  //   // "statemanager", &engine::statemanager,
-  //   // "scenemanager", &engine::scenemanager,
-  //   // "run", &engine::run
-  // );
-
   lua["cassette"] = cassette();
 
   lua.new_enum(
@@ -1031,13 +1019,10 @@ void scriptengine::run() {
   interop::verify(source);
 
   const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
-  lua["fontfactory"] = engine->fontfactory();
-  lua["overlay"] = engine->overlay();
+
   lua["scenemanager"] = engine->scenemanager();
-  // lua["resourcemanager"] = engine->resourcemanager();
-  // lua["soundmanager"] = engine->soundmanager();
-  // lua["statemanager"] = engine->statemanager();
-  //lua["world"] = engine->world();
+  lua["fontfactory"] = engine->resourcemanager()->fontfactory();
+  lua["overlay"] = engine->overlay();
 
   auto viewport = lua.create_table();
   viewport["width"] = engine->window()->width();

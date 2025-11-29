@@ -10,7 +10,7 @@
 overlay::overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager)
     : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
 
-std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
+std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
   std::shared_ptr<label> widget;
   
   switch (type) {
@@ -29,7 +29,7 @@ std::variant<std::shared_ptr<label>> overlay::create(widgettype type) {
   return widget;
 }
 
-void overlay::destroy(const std::variant<std::shared_ptr<label>>& widget) {
+void overlay::destroy(const std::variant<std::shared_ptr<label>>& widget) noexcept {
   std::erase_if(_widgets, [&widget](const auto& existing) {
     if (const auto ptr = std::get_if<std::shared_ptr<label>>(&widget)) {
       return existing == *ptr;
@@ -39,7 +39,7 @@ void overlay::destroy(const std::variant<std::shared_ptr<label>>& widget) {
   });
 }
 
-void overlay::update(float delta) {
+void overlay::update(float delta) noexcept {
   for (const auto& widget : _widgets) {
     widget->update(delta);
   }
@@ -49,7 +49,7 @@ void overlay::update(float delta) {
   }
 }
 
-void overlay::draw() const {
+void overlay::draw() const noexcept {
   for (const auto& widget : _widgets) {
     widget->draw();
   }
@@ -59,16 +59,16 @@ void overlay::draw() const {
   }
 }
 
-void overlay::set_cursor(std::string_view name) {
+void overlay::set_cursor(std::string_view name) noexcept {
   _cursor = std::make_shared<cursor>(name, _resourcemanager);
   _eventmanager->add_receiver(_cursor);
 }
 
-void overlay::hide() {
+void overlay::hide() noexcept {
   SDL_HideCursor();
 }
 
-void overlay::dispatch(widgettype type, std::string_view message) {
+void overlay::dispatch(widgettype type, std::string_view message) noexcept {
   switch (type) {
   case widgettype::cursor: {
     if (const auto cursor = _cursor; cursor) {
