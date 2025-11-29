@@ -1,7 +1,6 @@
 #include "engine.hpp"
 
 #include "audiodevice.hpp"
-#include "canvas.hpp"
 #include "cassette.hpp"
 #include "eventmanager.hpp"
 #include "loopable.hpp"
@@ -51,10 +50,6 @@ std::shared_ptr<renderer> engine::renderer() const noexcept {
   return _renderer;
 }
 
-std::shared_ptr<canvas> engine::canvas() const noexcept {
-  return _canvas;
-}
-
 std::shared_ptr<cassette> engine::cassette() const noexcept {
   return _cassette;
 }
@@ -91,8 +86,6 @@ void engine::set_window(std::shared_ptr<::window> ptr) {
 
 void engine::set_renderer(std::shared_ptr<::renderer> ptr) {
   _renderer = std::move(ptr);
-
-  _canvas = std::make_shared<::canvas>(_renderer);
 }
 
 void engine::add_loopable(std::shared_ptr<::loopable> ptr) {
@@ -146,7 +139,6 @@ void engine::_loop() {
   _renderer->begin();
   _scenemanager->draw();
   _overlay->draw();
-  _canvas->draw();
   _renderer->end();
 
   for (const auto& observer : _observers) {

@@ -539,6 +539,7 @@ void scriptengine::run() {
             lua["pool"] = lua.create_table();
             auto scene = ptr.lock();
             assert(scene && "scene should be valid");
+            lua["canvas"] = scene->canvas();
             lua["timermanager"] = scene->timermanager();
             const auto result = fn();
             if (!result.valid()) {
@@ -595,6 +596,7 @@ void scriptengine::run() {
             lua.collect_garbage();
 
             lua["timermanager"] = sol::lua_nil;
+            lua["canvas"] = sol::lua_nil;
             lua["pool"] = sol::lua_nil;
 
             lua.collect_garbage();
@@ -680,7 +682,6 @@ void scriptengine::run() {
   lua.new_usertype<engine>(
     "Engine",
     sol::no_constructor,
-    "canvas", &engine::canvas,
     "cassette", &engine::cassette,
     "fontfactory", &engine::fontfactory,
     "overlay", &engine::overlay,
@@ -1029,7 +1030,6 @@ void scriptengine::run() {
   interop::verify(source);
 
   const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
-  lua["canvas"] = engine->canvas();
   lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
   lua["overlay"] = engine->overlay();

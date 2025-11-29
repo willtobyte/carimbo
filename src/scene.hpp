@@ -56,6 +56,8 @@ public:
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;
 
+  std::shared_ptr<::canvas> canvas() const noexcept;
+
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 
 protected:
@@ -79,6 +81,7 @@ private:
   std::shared_ptr<particlesystem> _particlesystem;
   std::shared_ptr<::timermanager> _timermanager;
 
+  std::shared_ptr<::canvas> _canvas;
   std::shared_ptr<scenemanager> _scenemanager;
 
   std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _effects;
