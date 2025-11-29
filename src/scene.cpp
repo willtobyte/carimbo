@@ -5,14 +5,12 @@
 #include "particlesystem.hpp"
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
-#include "canvas.hpp"
 #include "tilemap.hpp"
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(std::move(scenemanager->renderer())),
       _scenemanager(std::move(scenemanager)),
       _particlesystem(std::make_shared<particlesystem>(scenemanager->resourcemanager())),
-      _canvas(std::make_shared<::canvas>(scenemanager->renderer())),
       _timermanager(std::make_shared<::timermanager>()) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
@@ -176,8 +174,8 @@ void scene::draw() const noexcept {
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
   _rendersystem.draw(_registry);
+
   _particlesystem->draw();
-  _canvas->draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
@@ -356,10 +354,6 @@ void scene::on_text(std::string_view text) const {
   if (auto fn = _ontext; fn) {
     fn(text);
   }
-}
-
-std::shared_ptr<::canvas> scene::canvas() const noexcept {
-  return _canvas;
 }
 
 std::shared_ptr<timermanager> scene::timermanager() const noexcept {

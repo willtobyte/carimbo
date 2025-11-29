@@ -45,6 +45,10 @@ std::shared_ptr<::overlay> engine::overlay() const noexcept {
   return _overlay;
 }
 
+std::shared_ptr<::canvas> engine::canvas() const noexcept {
+  return _canvas;
+}
+
 void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept {
   _audiodevice = std::move(ptr);
 }
@@ -73,6 +77,8 @@ void engine::set_window(std::shared_ptr<::window> ptr) noexcept {
 
 void engine::set_renderer(std::shared_ptr<::renderer> ptr) noexcept {
   _renderer = std::move(ptr);
+
+  _canvas = std::make_shared<::canvas>(_renderer);
 }
 
 void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {

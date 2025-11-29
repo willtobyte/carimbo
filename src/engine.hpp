@@ -17,6 +17,7 @@ public:
   std::shared_ptr<::window> window() const noexcept;
   std::shared_ptr<::renderer> renderer() const noexcept;
   std::shared_ptr<::overlay> overlay() const noexcept;
+  std::shared_ptr<::canvas> canvas() const noexcept;
 
   void set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept;
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept;
@@ -51,5 +52,6 @@ private:
   std::shared_ptr<::renderer> _renderer;
   std::shared_ptr<::window> _window;
   std::shared_ptr<::overlay> _overlay;
+  std::shared_ptr<::canvas> _canvas;
   std::vector<std::shared_ptr<::lifecycleobserver>> _observers;
 };

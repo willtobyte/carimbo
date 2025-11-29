@@ -539,8 +539,9 @@ void scriptengine::run() {
             lua["pool"] = lua.create_table();
             auto scene = ptr.lock();
             assert(scene && "scene should be valid");
-            lua["canvas"] = scene->canvas();
+
             lua["timermanager"] = scene->timermanager();
+
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
@@ -596,7 +597,7 @@ void scriptengine::run() {
             lua.collect_garbage();
 
             lua["timermanager"] = sol::lua_nil;
-            lua["canvas"] = sol::lua_nil;
+
             lua["pool"] = sol::lua_nil;
 
             lua.collect_garbage();
@@ -1023,6 +1024,7 @@ void scriptengine::run() {
   lua["scenemanager"] = engine->scenemanager();
   lua["fontfactory"] = engine->resourcemanager()->fontfactory();
   lua["overlay"] = engine->overlay();
+  lua["canvas"] = engine->canvas();
 
   auto viewport = lua.create_table();
   viewport["width"] = engine->window()->width();

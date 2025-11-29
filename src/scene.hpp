@@ -56,9 +56,7 @@ public:
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;
 
-  std::shared_ptr<::canvas> canvas() const noexcept;
   std::shared_ptr<::timermanager> timermanager() const noexcept;
-  std::shared_ptr<::overlay> overlay() const noexcept;
 
 protected:
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
@@ -80,9 +78,7 @@ private:
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<particlesystem> _particlesystem;
   std::shared_ptr<::timermanager> _timermanager;
-  std::shared_ptr<::overlay> _overlay;
 
-  std::shared_ptr<::canvas> _canvas;
   std::shared_ptr<scenemanager> _scenemanager;
 
   std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _effects;
