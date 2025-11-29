@@ -12,7 +12,7 @@ overlay::overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_p
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
   std::shared_ptr<label> widget;
-  
+
   switch (type) {
   case widgettype::cursor:
     std::terminate();
@@ -44,7 +44,7 @@ void overlay::update(float delta) noexcept {
     widget->update(delta);
   }
 
-  if (auto cursor = _cursor; cursor) {
+  if (const auto& cursor = _cursor; cursor) {
     cursor->update(delta);
   }
 }
@@ -54,7 +54,7 @@ void overlay::draw() const noexcept {
     widget->draw();
   }
 
-  if (const auto cursor = _cursor; cursor) {
+  if (const auto& cursor = _cursor; cursor) {
     cursor->draw();
   }
 }
@@ -64,14 +64,14 @@ void overlay::set_cursor(std::string_view name) noexcept {
   _eventmanager->add_receiver(_cursor);
 }
 
-void overlay::hide() noexcept {
-  SDL_HideCursor();
+void overlay::hide(bool hidden) noexcept {
+  hidden ? SDL_HideCursor() : SDL_ShowCursor();
 }
 
 void overlay::dispatch(widgettype type, std::string_view message) noexcept {
   switch (type) {
   case widgettype::cursor: {
-    if (const auto cursor = _cursor; cursor) {
+    if (const auto& cursor = _cursor; cursor) {
       cursor->handle(message);
     }
   } break;

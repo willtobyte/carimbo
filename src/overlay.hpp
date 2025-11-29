@@ -19,7 +19,7 @@ public:
 
   void set_cursor(std::string_view name) noexcept;
 
-  void hide() noexcept;
+  void hide(bool hidden = true) noexcept;
 
   void dispatch(widgettype type, std::string_view message) noexcept;
 
