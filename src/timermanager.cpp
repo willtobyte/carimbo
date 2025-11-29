@@ -48,6 +48,10 @@ timermanager::timermanager()
   _envelopemapping.reserve(16);
 }
 
+timermanager::~timermanager() noexcept {
+  clear();
+}
+
 uint32_t timermanager::set(uint32_t interval, sol::protected_function fn) {
   return add_timer(interval, interop::wrap_fn(fn), true);
 }
@@ -56,7 +60,7 @@ uint32_t timermanager::singleshot(uint32_t interval, sol::protected_function fn)
   return add_timer(interval, interop::wrap_fn(fn), false);
 }
 
-void timermanager::cancel(uint32_t id) {
+void timermanager::cancel(uint32_t id) noexcept {
   const auto it = _envelopemapping.find(id);
   if (it == _envelopemapping.end()) [[unlikely]] {
     return;
@@ -78,7 +82,7 @@ void timermanager::cancel(uint32_t id) {
   }
 }
 
-void timermanager::clear() {
+void timermanager::clear() noexcept {
   while (!_envelopemapping.empty()) {
     auto it = _envelopemapping.begin();
     const auto id = it->first;

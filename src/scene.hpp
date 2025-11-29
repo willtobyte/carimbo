@@ -1,9 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-
-#include "soundfx.hpp"
-#include "particlesystem.hpp"
 #include "systems.hpp"
 
 class entityproxy;
@@ -59,6 +56,8 @@ public:
   void on_key_press(int32_t code) const;
   void on_key_release(int32_t code) const;
 
+  std::shared_ptr<::timermanager> timermanager() const noexcept;
+
 protected:
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
     auto aabb = b2AABB{};
@@ -74,10 +73,11 @@ private:
   animationsystem _animationsystem;
   physicssystem _physicssystem;
 
-  mutable entt::dense_set<entt::entity> _hovering;
-
   std::shared_ptr<pixmap> _background;
   std::shared_ptr<renderer> _renderer;
+  std::shared_ptr<particlesystem> _particlesystem;
+  std::shared_ptr<::timermanager> _timermanager;
+
   std::shared_ptr<scenemanager> _scenemanager;
 
   std::unordered_map<std::string, std::shared_ptr<soundfx>, string_hash, string_equal> _effects;
@@ -93,4 +93,6 @@ private:
   std::function<void(int32_t)> _onkeyrelease;
   std::function<void(std::string_view)> _ontext;
   std::function<void(float, float)> _onmotion;
+
+  mutable entt::dense_set<entt::entity> _hovering;
 };

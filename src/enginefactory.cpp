@@ -104,9 +104,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto resourcemanager = std::make_shared<::resourcemanager>(renderer, audiodevice, engine);
   const auto overlay = std::make_shared<::overlay>(resourcemanager, eventmanager);
   const auto statemanager = std::make_shared<::statemanager>();
-  const auto particlesystem = std::make_shared<::particlesystem>(resourcemanager);
-  const auto timermanager = std::make_shared<::timermanager>();
-  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, particlesystem, timermanager, renderer);
+  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, renderer);
 
   engine->set_audiodevice(audiodevice);
   engine->set_eventmanager(eventmanager);
@@ -115,8 +113,6 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->set_resourcemanager(resourcemanager);
   engine->set_scenemanager(scenemanager);
   engine->set_statemanager(statemanager);
-  engine->set_particlesystem(particlesystem);
-  engine->set_timermanager(timermanager);
   engine->set_window(window);
 
   eventmanager->add_receiver(engine);

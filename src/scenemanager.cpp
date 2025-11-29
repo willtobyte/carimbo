@@ -2,21 +2,11 @@
 
 #include "event.hpp"
 #include "io.hpp"
-#include "particlesystem.hpp"
 #include "resourcemanager.hpp"
 #include "scene.hpp"
-#include "timermanager.hpp"
 
-scenemanager::scenemanager(
-  std::shared_ptr<::resourcemanager> resourcemanager,
-  std::shared_ptr<::particlesystem> particlesystem,
-  std::shared_ptr<::timermanager> timermanager,
-  std::shared_ptr<::renderer> renderer
-)
-  : _resourcemanager(std::move(resourcemanager)),
-    _particlesystem(std::move(particlesystem)),
-    _timermanager(std::move(timermanager)),
-    _renderer(std::move(renderer)) {
+scenemanager::scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer)
+  : _resourcemanager(std::move(resourcemanager)), _renderer(std::move(renderer)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
@@ -54,7 +44,6 @@ void scenemanager::set(std::string_view name) {
 
   if (const auto active = _scene.lock()) [[ likely ]] {
     std::println("[scenemanager] left {}", active->name());
-    _timermanager->clear();
     active->on_leave();
   }
 
@@ -150,14 +139,6 @@ void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
   const auto ptr = _scene.lock();
   if (!ptr) [[unlikely]] return;
   ptr->on_motion(event.x, event.y);
-}
-
-std::shared_ptr<objectmanager> scenemanager::objectmanager() const noexcept {
-  return _objectmanager;
-}
-
-std::shared_ptr<particlesystem> scenemanager::particlesystem() const noexcept {
-  return _particlesystem;
 }
 
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {

@@ -3,17 +3,12 @@
 #include "audiodevice.hpp"
 #include "canvas.hpp"
 #include "cassette.hpp"
-#include "constant.hpp"
 #include "eventmanager.hpp"
-#include "eventreceiver.hpp"
-#include "lifecycleobserver.hpp"
 #include "loopable.hpp"
-#include "particlesystem.hpp"
 #include "renderer.hpp"
 #include "resourcemanager.hpp"
 #include "scenemanager.hpp"
 #include "statemanager.hpp"
-#include "timermanager.hpp"
 #include "window.hpp"
 
 std::shared_ptr<audiodevice> engine::audiodevice() const noexcept {
@@ -56,20 +51,12 @@ std::shared_ptr<renderer> engine::renderer() const noexcept {
   return _renderer;
 }
 
-std::shared_ptr<particlesystem> engine::particlesystem() const noexcept {
-  return _particlesystem;
-}
-
 std::shared_ptr<canvas> engine::canvas() const noexcept {
   return _canvas;
 }
 
 std::shared_ptr<cassette> engine::cassette() const noexcept {
   return _cassette;
-}
-
-std::shared_ptr<timermanager> engine::timermanager() const noexcept {
-  return _timermanager;
 }
 
 void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) {
@@ -92,10 +79,6 @@ void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) {
   _scenemanager = std::move(ptr);
 }
 
-void engine::set_particlesystem(std::shared_ptr<::particlesystem> ptr) {
-  _particlesystem = std::move(ptr);
-}
-
 void engine::set_statemanager(std::shared_ptr<::statemanager> ptr) {
   _statemanager = std::move(ptr);
 
@@ -110,10 +93,6 @@ void engine::set_renderer(std::shared_ptr<::renderer> ptr) {
   _renderer = std::move(ptr);
 
   _canvas = std::make_shared<::canvas>(_renderer);
-}
-
-void engine::set_timermanager(std::shared_ptr<::timermanager> ptr) {
-  _timermanager = std::move(ptr);
 }
 
 void engine::add_loopable(std::shared_ptr<::loopable> ptr) {
@@ -151,7 +130,6 @@ void engine::_loop() {
   _resourcemanager->update(delta);
   _overlay->update(delta);
   _scenemanager->update(delta);
-  _particlesystem->update(delta);
 
   for (const auto& loopable : _loopables) {
     loopable->loop(delta);
@@ -167,7 +145,6 @@ void engine::_loop() {
 
   _renderer->begin();
   _scenemanager->draw();
-  _particlesystem->draw();
   _overlay->draw();
   _canvas->draw();
   _renderer->end();

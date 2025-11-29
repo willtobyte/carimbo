@@ -529,12 +529,17 @@ void scriptengine::run() {
         auto ptr = std::weak_ptr<::scene>(scene);
 
         module["get"] = [ptr, name](sol::table, std::string_view id, scenekind kind) {
-          return ptr.lock()->get(id, kind);
+          auto scene = ptr.lock();
+          assert(scene && "scene should be valid");
+          return scene->get(id, kind);
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          const auto wrapper = [fn, &lua]() mutable {
+          const auto wrapper = [fn, &lua, ptr]() mutable {
             lua["pool"] = lua.create_table();
+            auto scene = ptr.lock();
+            assert(scene && "scene should be valid");
+            lua["timermanager"] = scene->timermanager();
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
@@ -589,6 +594,7 @@ void scriptengine::run() {
             lua.collect_garbage();
             lua.collect_garbage();
 
+            lua["timermanager"] = sol::lua_nil;
             lua["pool"] = sol::lua_nil;
 
             lua.collect_garbage();
@@ -682,8 +688,6 @@ void scriptengine::run() {
     "soundmanager", &engine::soundmanager,
     "statemanager", &engine::statemanager,
     "scenemanager", &engine::scenemanager,
-    "timermanager", &engine::timermanager,
-    "particlesystem", &engine::particlesystem,
     "run", &engine::run
   );
 
@@ -1029,13 +1033,10 @@ void scriptengine::run() {
   lua["cassette"] = engine->cassette();
   lua["fontfactory"] = engine->fontfactory();
   lua["overlay"] = engine->overlay();
-  lua["particlesystem"] = engine->particlesystem();
   lua["resourcemanager"] = engine->resourcemanager();
-  // lua["postalservice"] = engine->postalservice();
   lua["scenemanager"] = engine->scenemanager();
   lua["soundmanager"] = engine->soundmanager();
   lua["statemanager"] = engine->statemanager();
-  lua["timermanager"] = engine->timermanager();
   //lua["world"] = engine->world();
 
   auto viewport = lua.create_table();

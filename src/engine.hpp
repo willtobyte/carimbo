@@ -18,20 +18,16 @@ public:
   std::shared_ptr<::window> window() const noexcept;
   std::shared_ptr<::renderer> renderer() const noexcept;
   std::shared_ptr<::canvas> canvas() const noexcept;
-  std::shared_ptr<::particlesystem> particlesystem() const noexcept;
   std::shared_ptr<::cassette> cassette() const noexcept;
-  std::shared_ptr<::timermanager> timermanager() const noexcept;
 
   void set_audiodevice(std::shared_ptr<::audiodevice> ptr);
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr);
   void set_overlay(std::shared_ptr<::overlay> ptr);
   void set_resourcemanager(std::shared_ptr<::resourcemanager> ptr);
   void set_scenemanager(std::shared_ptr<::scenemanager> ptr);
-  void set_particlesystem(std::shared_ptr<::particlesystem> ptr);
   void set_statemanager(std::shared_ptr<::statemanager> ptr);
   void set_window(std::shared_ptr<::window> ptr);
   void set_renderer(std::shared_ptr<::renderer> ptr);
-  void set_timermanager(std::shared_ptr<::timermanager> ptr);
 
   void add_loopable(std::shared_ptr<::loopable> ptr);
 
@@ -60,9 +56,7 @@ private:
   std::shared_ptr<::statemanager> _statemanager;
   std::shared_ptr<::renderer> _renderer;
   std::shared_ptr<::canvas> _canvas;
-  std::shared_ptr<::particlesystem> _particlesystem;
   std::shared_ptr<::window> _window;
   std::vector<std::shared_ptr<::lifecycleobserver>> _observers;
-  std::shared_ptr<::timermanager> _timermanager;
   std::shared_ptr<::cassette> _cassette = std::make_shared<::cassette>();
 };

@@ -8,7 +8,10 @@
 #include "tilemap.hpp"
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
-    : _renderer(scenemanager->renderer()), _scenemanager(std::move(scenemanager)) {
+    : _renderer(scenemanager->renderer()),
+      _scenemanager(std::move(scenemanager)),
+      _particlesystem(std::make_shared<particlesystem>(scenemanager->resourcemanager())),
+      _timermanager(std::make_shared<::timermanager>()) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
@@ -16,7 +19,6 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   const auto& soundmanager = _scenemanager->resourcemanager()->soundmanager();
   const auto& pixmappool = _scenemanager->resourcemanager()->pixmappool();
   const auto& fontfactory = _scenemanager->resourcemanager()->fontfactory();
-  const auto& particlesystem = _scenemanager->particlesystem();
 
   const auto es = json.value("effects", nlohmann::json::array());
   _effects.reserve(es.size());
@@ -99,14 +101,16 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   const auto ps = json.value("particles", nlohmann::json::array());
   _particles.reserve(ps.size());
-  const auto factory = particlesystem->factory();
+  const auto factory = _particlesystem->factory();
   for (const auto& i : ps) {
     const auto particle = i["name"].get<std::string_view>();
     const auto kind = i["kind"].get<std::string_view>();
     const auto x = i["x"].get<float>();
     const auto y = i["y"].get<float>();
     const auto active = i.value("active", true);
-    _particles.emplace(particle, factory->create(kind, x, y, active));
+    const auto batch = factory->create(kind, x, y, active);
+    _particles.emplace(particle, batch);
+    _particlesystem->add(batch);
   }
 
   const auto fs = json.value("fonts", nlohmann::json::array());
@@ -117,6 +121,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 }
 
 scene::~scene() noexcept {
+  std::println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> destroyd");
   auto view = _registry.view<physics>();
   for (auto entity : view) {
     auto& ph = view.get<physics>(entity);
@@ -279,11 +284,9 @@ void scene::set_onmotion(sol::protected_function fn) {
 }
 
 void scene::on_enter() const {
-  const auto& particlesystem = _scenemanager->particlesystem();
-
-  for (const auto& [key, batch] : _particles) {
-    particlesystem->add(batch);
-  }
+  // for (const auto& [key, batch] : _particles) {
+  //   _particlesystem->add(batch);
+  // }
 
   if (auto fn = _onenter; fn) {
     fn();
@@ -291,6 +294,9 @@ void scene::on_enter() const {
 }
 
 void scene::on_leave() const {
+    _timermanager->clear();
+    // _particlesystem->clear();
+
     if (auto fn = _onleave; fn) {
       fn();
     }
@@ -298,9 +304,6 @@ void scene::on_leave() const {
     for (const auto& [_, e] : _effects) {
       e->stop();
     }
-
-    const auto& particlesystem = _scenemanager->particlesystem();
-    particlesystem->clear();
 }
 
 void scene::on_touch(float x, float y) const {
@@ -378,4 +381,8 @@ void scene::on_text(std::string_view text) const {
   if (auto fn = _ontext; fn) {
     fn(text);
   }
+}
+
+std::shared_ptr<timermanager> scene::timermanager() const noexcept {
+  return _timermanager;
 }

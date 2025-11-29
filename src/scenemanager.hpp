@@ -14,12 +14,7 @@ NLOHMANN_JSON_SERIALIZE_ENUM(scenetype, {
 
 class scenemanager final : public eventreceiver, public std::enable_shared_from_this<scenemanager> {
 public:
-  scenemanager(
-    std::shared_ptr<::resourcemanager> resourcemanager,
-    std::shared_ptr<::particlesystem> particlesystem,
-    std::shared_ptr<::timermanager> timermanager,
-    std::shared_ptr<::renderer> renderer
-  );
+  scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer);
 
   ~scenemanager() = default;
 
@@ -39,9 +34,8 @@ public:
 
   void draw() const;
 
-  std::shared_ptr<::objectmanager> objectmanager() const noexcept;
-  std::shared_ptr<::particlesystem> particlesystem() const noexcept;
   std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
+
   std::shared_ptr<::renderer> renderer() const noexcept;
 
 protected:
@@ -54,9 +48,6 @@ protected:
 
 private:
   std::shared_ptr<::resourcemanager> _resourcemanager;
-  std::shared_ptr<::objectmanager> _objectmanager;
-  std::shared_ptr<::particlesystem> _particlesystem;
-  std::shared_ptr<::timermanager> _timermanager;
   std::shared_ptr<::renderer> _renderer;
   std::unordered_map<std::string, std::shared_ptr<::scene>, string_hash, string_equal> _scene_mapping;
   std::weak_ptr<::scene> _scene;
