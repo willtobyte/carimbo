@@ -88,9 +88,7 @@ std::vector<std::string> scenemanager::destroy(std::string_view name) {
     }
   }
 
-  if (!scenes.empty()) {
-    _resourcemanager->flush();
-  }
+  _resourcemanager->flush();
 
   return scenes;
 }
