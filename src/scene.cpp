@@ -257,10 +257,6 @@ void scene::set_onmotion(sol::protected_function fn) {
 }
 
 void scene::on_enter() const {
-  // for (const auto& [key, batch] : _particles) {
-  //   _particlesystem->add(batch);
-  // }
-
   if (auto fn = _onenter; fn) {
     fn();
   }
@@ -268,7 +264,6 @@ void scene::on_enter() const {
 
 void scene::on_leave() const {
     _timermanager->clear();
-    // _particlesystem->clear();
 
     if (auto fn = _onleave; fn) {
       fn();
