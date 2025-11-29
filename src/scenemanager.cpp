@@ -5,9 +5,8 @@
 #include "resourcemanager.hpp"
 #include "scene.hpp"
 
-scenemanager::scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::eventmanager> eventmanager, std::shared_ptr<::renderer> renderer)
+scenemanager::scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer)
     : _resourcemanager(std::move(resourcemanager)),
-      _eventmanager(std::move(eventmanager)),
       _renderer(std::move(renderer)) {
 }
 
@@ -145,10 +144,6 @@ void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
 
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {
   return _resourcemanager;
-}
-
-std::shared_ptr<::eventmanager> scenemanager::eventmanager() const noexcept {
-  return _eventmanager;
 }
 
 std::shared_ptr<::renderer> scenemanager::renderer() const noexcept {
