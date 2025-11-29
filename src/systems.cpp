@@ -135,7 +135,7 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
   });
 }
 
-void renderablesystem::draw(const entt::registry& registry) const noexcept {
+void rendersystem::draw(const entt::registry& registry) const noexcept {
   auto view = registry.view<renderable, transform, tint, sprite, animator, state>();
 
   for (auto entity : view) {

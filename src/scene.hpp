@@ -72,7 +72,7 @@ private:
   b2WorldId _world;
   animationsystem _animationsystem;
   physicssystem _physicssystem;
-  renderablesystem _renderablesystem;
+  rendersystem _rendersystem;
 
   std::shared_ptr<pixmap> _background;
   std::shared_ptr<renderer> _renderer;
