@@ -679,17 +679,17 @@ void scriptengine::run() {
     "set", &particlesystem::set
   );
 
-  lua.new_usertype<engine>(
-    "Engine",
-    sol::no_constructor
-    // "fontfactory", &engine::fontfactory,
-    // "overlay", &engine::overlay,
-    // "resourcemanager", &engine::resourcemanager,
-    // "soundmanager", &engine::soundmanager,
-    // "statemanager", &engine::statemanager,
-    // "scenemanager", &engine::scenemanager,
-    // "run", &engine::run
-  );
+  // lua.new_usertype<engine>(
+  //   "Engine",
+  //   sol::no_constructor
+  //   // "fontfactory", &engine::fontfactory,
+  //   // "overlay", &engine::overlay,
+  //   // "resourcemanager", &engine::resourcemanager,
+  //   // "soundmanager", &engine::soundmanager,
+  //   // "statemanager", &engine::statemanager,
+  //   // "scenemanager", &engine::scenemanager,
+  //   // "run", &engine::run
+  // );
 
   lua["cassette"] = cassette();
 
