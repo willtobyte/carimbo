@@ -85,6 +85,7 @@ struct state final {
 
 struct renderable final {
   int z;
+  bool visible{true};
 };
 
 struct metadata final {

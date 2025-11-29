@@ -172,6 +172,7 @@ void scene::draw() const noexcept {
 
   for (auto entity : view) {
     const auto& [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
+    if (!rn.visible) [[unlikely]] continue;
     if (!st.action.has_value()) [[unlikely]] continue;
 
     const auto& timeline = an[st.action.value()];

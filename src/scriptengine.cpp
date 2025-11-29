@@ -448,6 +448,7 @@ void scriptengine::run() {
     "alpha", sol::property(&entityproxy::alpha, &entityproxy::set_alpha),
     "angle", sol::property(&entityproxy::angle, &entityproxy::set_angle),
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
+    "visible", sol::property(&entityproxy::visible, &entityproxy::set_visible),
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
     "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),
     "placement", sol::property(

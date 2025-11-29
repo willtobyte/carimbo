@@ -54,14 +54,27 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
 }
 
 void physicssystem::update(entt::registry& registry, b2WorldId world, float delta) noexcept {
-  auto view = registry.view<transform, animator, state, physics>();
+  auto view = registry.view<transform, animator, state, physics, renderable>();
 
-  view.each([world](const auto entity, const transform& t, const animator& an, const state& s, physics& p) {
+  view.each([world](const auto entity, const transform& t, const animator& an, const state& s, physics& p, const renderable& rn) {
     if (!p.enabled) [[unlikely]] {
       return;
     }
 
-    if (!p.is_valid() && p.dirty) [[unlikely]] {
+    if (!rn.visible) [[unlikely]] {
+      if (p.is_valid()) {
+        if (b2Shape_IsValid(p.shape)) {
+          b2DestroyShape(p.shape, false);
+          p.shape = b2ShapeId{};
+        }
+        b2DestroyBody(p.body);
+        p.body = b2BodyId{};
+        p.dirty = true;
+      }
+      return;
+    }
+
+    if (!p.is_valid()) [[unlikely]] {
       auto bdef = b2DefaultBodyDef();
       bdef.type = static_cast<b2BodyType>(p.type);
       bdef.position = b2Vec2{t.position.x, t.position.y};

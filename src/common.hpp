@@ -103,8 +103,6 @@ class timermanager;
 class widget;
 class window;
 
-// struct bounds;
-
 struct keyframe;
 struct bounds;
 struct animation;

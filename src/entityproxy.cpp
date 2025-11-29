@@ -66,6 +66,19 @@ void entityproxy::set_scale(float scale) noexcept {
   s.redraw = true;
 }
 
+bool entityproxy::visible() const noexcept {
+  const auto& r = _registry.get<renderable>(_e);
+  return r.visible;
+}
+
+void entityproxy::set_visible(bool visible) noexcept {
+  auto& r = _registry.get<renderable>(_e);
+  r.visible = visible;
+
+  auto& p = _registry.get<physics>(_e);
+  p.dirty = true;
+}
+
 std::optional<std::string> entityproxy::action() const noexcept {
   const auto& s = _registry.get<state>(_e);
   return s.action;

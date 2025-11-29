@@ -21,6 +21,9 @@ public:
   float scale() const noexcept;
   void set_scale(float scale) noexcept;
 
+  bool visible() const noexcept;
+  void set_visible(bool visible) noexcept;
+
   std::optional<std::string> action() const noexcept;
   void set_action(std::optional<std::string_view> name) noexcept;
   void set_onhover(sol::protected_function fn);
