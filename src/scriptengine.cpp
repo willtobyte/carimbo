@@ -21,6 +21,11 @@ inline constexpr auto debugger =
 #endif
 ;
 
+static int on_panic(lua_State* L) {
+  const auto* message = lua_tostring(L, -1);
+  throw std::runtime_error(std::format("Lua panic: {}", message));
+}
+
 static sol::object searcher(sol::this_state state, std::string_view module) {
   sol::state_view lua{state};
 
@@ -183,6 +188,7 @@ void scriptengine::run() {
 
   sol::state lua;
   lua.open_libraries();
+  lua.set_panic(&on_panic);
 
   lua["searcher"] = &searcher;
 
