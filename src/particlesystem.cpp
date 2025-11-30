@@ -171,7 +171,7 @@ void particlesystem::draw() const {
     }
 
     const auto* particles = batch->particles.data();
-    auto vi = 0;
+    auto offset = 0;
 
     for (auto i = 0uz; i < n; ++i) {
       const auto& p = particles[i];
@@ -194,7 +194,7 @@ void particlesystem::draw() const {
 
       const SDL_FColor color = {1.f, 1.f, 1.f, p.alpha / 255.f};
 
-      const auto base = vi;
+      const auto base = offset;
 
       for (auto j = 0uz; j < 4; ++j) {
         const auto rx = lx[j] * cos_a - ly[j] * sin_a;
@@ -217,7 +217,7 @@ void particlesystem::draw() const {
       _indices.emplace_back(base + 2);
       _indices.emplace_back(base + 3);
 
-      vi += 4;
+      offset += 4;
     }
 
     SDL_RenderGeometry(
