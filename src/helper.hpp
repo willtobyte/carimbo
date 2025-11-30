@@ -73,6 +73,10 @@ struct string_hash final {
   size_t operator()(std::string_view sv) const noexcept {
     return std::hash<std::string_view>{}(sv);
   }
+
+  size_t operator()(std::string const& s) const noexcept {
+    return std::hash<std::string_view>{}(s);
+  }
 };
 
 struct string_equal final {
@@ -80,6 +84,14 @@ struct string_equal final {
 
   bool operator()(std::string_view a, std::string_view b) const noexcept {
     return a == b;
+  }
+
+  bool operator()(std::string const& a, std::string_view b) const noexcept {
+    return std::string_view(a) == b;
+  }
+
+  bool operator()(std::string_view a, std::string const& b) const noexcept {
+    return a == std::string_view(b);
   }
 };
 
