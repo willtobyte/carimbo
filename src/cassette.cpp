@@ -2,9 +2,9 @@
 
 cassette::cassette() {
 #ifdef EMSCRIPTEN
-  const auto* const result = emscripten_run_script_string(std::format("localStorage.getItem('{}')", _storagekey).c_str());
-  const std::string_view value{result ? result : ""};
+  const auto* const result = emscripten_run_script_string(std::format("localStorage.getItem('{}')", _storagekey).c_str());\
 
+  const std::string_view value{result ? result : ""};
   if (value.empty() || value == "null") {
     _j = nlohmann::json::object();
     return;
