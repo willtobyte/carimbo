@@ -186,19 +186,19 @@ void particlesystem::draw() const {
       const auto cos_a = static_cast<float>(std::cos(p.angle));
       const auto sin_a = static_cast<float>(std::sin(p.angle));
 
-      const float lx[4] = {-shw, shw, shw, -shw};
-      const float ly[4] = {-shh, -shh, shh, shh};
+      const auto lx = std::array{-shw, shw, shw, -shw};
+      const auto ly = std::array{-shh, -shh, shh, shh};
 
-      const float u[4] = {0.f, 1.f, 1.f, 0.f};
-      const float v[4] = {0.f, 0.f, 1.f, 1.f};
+      const auto u = std::array{.0f, 1.f, 1.f, .0f};
+      const auto v = std::array{.0f, .0f, 1.f, 1.f};
 
       const SDL_FColor color = {1.f, 1.f, 1.f, p.alpha / 255.f};
 
       const auto base = vi;
 
-      for (int j = 0; j < 4; ++j) {
-        const float rx = lx[j] * cos_a - ly[j] * sin_a;
-        const float ry = lx[j] * sin_a + ly[j] * cos_a;
+      for (auto j = 0uz; j < 4; ++j) {
+        const auto rx = lx[j] * cos_a - ly[j] * sin_a;
+        const auto ry = lx[j] * sin_a + ly[j] * cos_a;
 
         SDL_Vertex vertex;
         vertex.position.x = p.x + rx;
