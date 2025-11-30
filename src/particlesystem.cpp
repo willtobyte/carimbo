@@ -176,10 +176,6 @@ void particlesystem::draw() const {
     for (auto i = 0uz; i < n; ++i) {
       const auto& p = particles[i];
 
-      if (p.life <= 0.f) [[unlikely]] {
-        continue;
-      }
-
       const auto shw = hw * p.scale;
       const auto shh = hh * p.scale;
 
