@@ -243,13 +243,21 @@ struct wrap_fn_impl<ReturnType(Args...)> {
 
 template<typename Signature>
 static auto wrap_fn(sol::protected_function pf) -> std::function<Signature> {
+  if (!pf.valid()) {
+    return nullptr;
+  }
+
   return wrap_fn_impl<Signature>::wrap(std::move(pf));
 }
 
 static auto wrap_fn(sol::protected_function pf) {
-  return [pf = std::move(pf)](auto&&... args) mutable {
-    auto result = pf(std::forward<decltype(args)>(args)...);
+  if (!pf.valid()) {
+    return std::function<void()>{nullptr};
+  }
+
+  return std::function<void()>{[pf = std::move(pf)]() mutable {
+    auto result = pf();
     verify(result);
-  };
+  }};
 }
 }
