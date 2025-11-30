@@ -47,6 +47,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
   SDL_FlushRenderer(*_renderer);
 
   SDL_FRect destination{0, 0, static_cast<float>(width), static_cast<float>(height)};
+
   SDL_SetRenderTarget(*_renderer, target.get());
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
   SDL_RenderClear(*_renderer);
