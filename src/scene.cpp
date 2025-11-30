@@ -10,7 +10,7 @@
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(std::move(scenemanager->renderer())),
       _scenemanager(std::move(scenemanager)),
-      _particlesystem(std::make_unique<particlesystem>(scenemanager->resourcemanager())),
+      _particlesystem(scenemanager->resourcemanager()),
       _timermanager(std::make_shared<::timermanager>()) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
@@ -101,7 +101,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   const auto ps = json.value("particles", nlohmann::json::array());
   _particles.reserve(ps.size());
-  const auto factory = _particlesystem->factory();
+  const auto factory = _particlesystem.factory();
   for (const auto& i : ps) {
     const auto particle = i["name"].get<std::string_view>();
     const auto kind = i["kind"].get<std::string_view>();
@@ -110,7 +110,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     const auto active = i.value("active", true);
     const auto batch = factory->create(kind, x, y, active);
     _particles.emplace(particle, batch);
-    _particlesystem->add(batch);
+    _particlesystem.add(batch);
   }
 
   const auto fs = json.value("fonts", nlohmann::json::array());
@@ -143,7 +143,7 @@ void scene::update(float delta) noexcept {
 
   _animationsystem.update(_registry, now);
   _physicssystem.update(_registry, _world, delta);
-  _particlesystem->update(delta);
+  _particlesystem.update(delta);
 
   if (auto fn = _onloop; fn) [[likely]] {
     fn(delta);
@@ -175,7 +175,7 @@ void scene::draw() const noexcept {
 
   _rendersystem.draw(_registry);
 
-  _particlesystem->draw();
+  _particlesystem.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
