@@ -86,6 +86,10 @@ struct string_equal final {
     return a == b;
   }
 
+  bool operator()(std::string const& a, std::string const& b) const noexcept {
+    return a == b;
+  }
+
   bool operator()(std::string const& a, std::string_view b) const noexcept {
     return std::string_view(a) == b;
   }
