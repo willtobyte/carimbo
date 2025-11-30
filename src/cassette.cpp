@@ -2,18 +2,13 @@
 
 cassette::cassette() {
 #ifdef EMSCRIPTEN
-  const auto* const raw = emscripten_run_script_string("document.cookie");
-  const auto cookie = std::string_view(raw ? raw : "");
-  const auto position = cookie.find(_cookiekey);
-  if (position == std::string_view::npos) {
+  const auto* const result = emscripten_run_script_string(std::format("localStorage.getItem('{}')", _storagekey).c_str());
+  const auto value{result ? result : ""};
+
+  if (value.empty() || value == "null") {
     _j = nlohmann::json::object();
     return;
   }
-
-  const auto length = std::char_traits<char>::length(_cookiekey);
-  const auto start = position + length;
-  const auto end = cookie.find(';', start);
-  const auto value = cookie.substr(start, (end == std::string_view::npos ? cookie.size() - start : end - start));
 
   if (nlohmann::json::accept(value)) {
     _j = nlohmann::json::parse(value);
@@ -21,7 +16,7 @@ cassette::cassette() {
   }
 
   _j = nlohmann::json::object();
-  const auto script = std::format("document.cookie = '{}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'", _cookiekey);
+  const auto script = std::format("localStorage.removeItem('{}')", _storagekey);
   emscripten_run_script(script.c_str());
 #else
   if (!std::filesystem::exists(_filename)) {
@@ -43,9 +38,7 @@ cassette::cassette() {
 
 void cassette::persist() const noexcept {
 #ifdef EMSCRIPTEN
-  constexpr auto path = "; path=/";
-  const auto value = std::format("{}{}{}", _cookiekey, _j.dump(), path);
-  const auto script = std::format("document.cookie = '{}';", value);
+  const auto script = std::format("localStorage.setItem('{}', '{}')", _storagekey, _j.dump());
   emscripten_run_script(script.c_str());
 #else
   std::ofstream file(_filename);

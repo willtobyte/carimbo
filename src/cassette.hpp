@@ -20,7 +20,7 @@ private:
 #ifndef EMSCRIPTEN
   static constexpr const char* _filename = "cassette.tape";
 #else
-  static constexpr const char* _cookiekey = "cassette=";
+  static constexpr const char* _storagekey = "cassette";
 #endif
 
   void persist() const noexcept;
