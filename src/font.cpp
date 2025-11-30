@@ -63,7 +63,7 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
       reflection
     );
 
-    cursor = vec2(cursor.x + glyph.w + _spacing, cursor.y);
+    cursor.x += glyph.w + _spacing;
   }
 }
 
