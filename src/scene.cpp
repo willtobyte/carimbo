@@ -10,7 +10,7 @@
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(std::move(scenemanager->renderer())),
       _scenemanager(std::move(scenemanager)),
-      _particlesystem(std::make_shared<particlesystem>(scenemanager->resourcemanager())),
+      _particlesystem(std::make_unique<particlesystem>(scenemanager->resourcemanager())),
       _timermanager(std::make_shared<::timermanager>()) {
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};

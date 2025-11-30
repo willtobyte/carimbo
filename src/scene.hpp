@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "systems.hpp"
 
 class entityproxy;
@@ -76,7 +77,7 @@ private:
 
   std::shared_ptr<pixmap> _background;
   std::shared_ptr<renderer> _renderer;
-  std::shared_ptr<particlesystem> _particlesystem;
+  std::unique_ptr<particlesystem> _particlesystem;
   std::shared_ptr<::timermanager> _timermanager;
 
   std::shared_ptr<scenemanager> _scenemanager;
