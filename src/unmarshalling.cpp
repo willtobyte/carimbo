@@ -69,6 +69,10 @@ void from_json(const nlohmann::json& j, b2AABB& o) {
 }
 
 void from_json(const nlohmann::json& j, timeline& o) {
+  if (j.contains("oneshot")) {
+    j["oneshot"].get_to(o.oneshot);
+  }
+
   if (j.contains("next")) {
     j["next"].get_to(o.next);
   }

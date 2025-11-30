@@ -51,6 +51,7 @@ struct physics final {
 };
 
 struct timeline final {
+  bool oneshot{false};
   std::string next;
   std::optional<b2AABB> box;
   std::vector<frame> frames;

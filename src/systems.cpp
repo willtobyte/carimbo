@@ -43,10 +43,14 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
     const auto next = !timeline.next.empty();
 
     if (last) [[unlikely]] {
-      s.current_frame = 0;
       if (next) {
         s.action = timeline.next;
+        s.current_frame = 0;
         s.dirty = true;
+      } else if (timeline.oneshot) {
+        s.action = std::nullopt;
+      } else {
+        s.current_frame = 0;
       }
     } else [[likely]] {
       ++s.current_frame;
