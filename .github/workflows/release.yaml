@@ -88,7 +88,7 @@ jobs:
           path: artifacts/*
 
   iOS:
-    runs-on: macos-latest
+    runs-on: macos-latest-xlarge
     if: false
     steps:
       - name: Checkout repository
@@ -200,7 +200,7 @@ jobs:
 
 
   WebAssembly:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-xlarge
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -283,7 +283,7 @@ jobs:
           path: artifacts/*
 
   Windows:
-    runs-on: windows-latest
+    runs-on: windows-latest-xlarge
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
