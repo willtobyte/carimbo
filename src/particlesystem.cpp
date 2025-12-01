@@ -59,6 +59,19 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   auto pb = std::make_shared<particlebatch>();
   pb->props = std::move(ps);
   pb->particles.resize(count);
+  pb->vertices.resize(count * 4);
+
+  pb->indices.resize(count * 6);
+  for (auto i = 0uz; i < count; ++i) {
+    const auto base = static_cast<int>(i * 4);
+    const auto index = i * 6;
+    pb->indices[index] = base;
+    pb->indices[index + 1] = base + 1;
+    pb->indices[index + 2] = base + 2;
+    pb->indices[index + 3] = base;
+    pb->indices[index + 4] = base + 2;
+    pb->indices[index + 5] = base + 3;
+  }
 
   return pb;
 }
@@ -67,8 +80,6 @@ particlesystem::particlesystem(std::shared_ptr<resourcemanager> resourcemanager)
     : _renderer(resourcemanager->renderer()),
       _factory(std::make_shared<particlefactory>(resourcemanager)) {
   _batches.reserve(16);
-  _vertices.reserve(8096);
-  _indices.reserve(10240);
 }
 
 void particlesystem::add(const std::shared_ptr<particlebatch>& batch) {
@@ -143,6 +154,9 @@ void particlesystem::update(float delta) {
 }
 
 void particlesystem::draw() const {
+  static constexpr auto u = std::array{.0f, 1.f, 1.f, .0f};
+  static constexpr auto v = std::array{.0f, .0f, 1.f, 1.f};
+
   for (const auto& batch : _batches) {
     const auto& props = batch->props;
     if (!props->active) [[unlikely]] {
@@ -150,28 +164,12 @@ void particlesystem::draw() const {
     }
 
     const auto& pixmap = *props->pixmap;
-    const auto tw = static_cast<float>(pixmap.width());
-    const auto th = static_cast<float>(pixmap.height());
-    const auto hw = tw * 0.5f;
-    const auto hh = th * 0.5f;
+    const auto hw = static_cast<float>(pixmap.width()) * 0.5f;
+    const auto hh = static_cast<float>(pixmap.height()) * 0.5f;
     const auto n = batch->size();
 
-    _vertices.clear();
-    _indices.clear();
-
-    const auto required_vertices = n * 4;
-    const auto required_indices = n * 6;
-
-    if (_vertices.capacity() < required_vertices) {
-      _vertices.reserve(required_vertices);
-    }
-
-    if (_indices.capacity() < required_indices) {
-      _indices.reserve(required_indices);
-    }
-
     const auto* particles = batch->particles.data();
-    auto offset = 0;
+    auto* vertices = batch->vertices.data();
 
     for (auto i = 0uz; i < n; ++i) {
       const auto& p = particles[i];
@@ -179,50 +177,35 @@ void particlesystem::draw() const {
       const auto shw = hw * p.scale;
       const auto shh = hh * p.scale;
 
-      const auto cos_a = static_cast<float>(std::cos(p.angle));
-      const auto sin_a = static_cast<float>(std::sin(p.angle));
+      const auto ca = static_cast<float>(std::cos(p.angle));
+      const auto sa = static_cast<float>(std::sin(p.angle));
 
       const auto lx = std::array{-shw, shw, shw, -shw};
       const auto ly = std::array{-shh, -shh, shh, shh};
 
-      const auto u = std::array{.0f, 1.f, 1.f, .0f};
-      const auto v = std::array{.0f, .0f, 1.f, 1.f};
-
       const SDL_FColor color = {1.f, 1.f, 1.f, p.alpha / 255.f};
 
-      const auto base = offset;
+      auto* vx = vertices + i * 4;
 
       for (auto j = 0uz; j < 4; ++j) {
-        const auto rx = lx[j] * cos_a - ly[j] * sin_a;
-        const auto ry = lx[j] * sin_a + ly[j] * cos_a;
+        const auto rx = lx[j] * ca - ly[j] * sa;
+        const auto ry = lx[j] * sa + ly[j] * ca;
 
-        SDL_Vertex vertex;
-        vertex.position.x = p.x + rx;
-        vertex.position.y = p.y + ry;
-        vertex.tex_coord.x = u[j];
-        vertex.tex_coord.y = v[j];
-        vertex.color = color;
-
-        _vertices.emplace_back(vertex);
+        vx[j].position.x = p.x + rx;
+        vx[j].position.y = p.y + ry;
+        vx[j].tex_coord.x = u[j];
+        vx[j].tex_coord.y = v[j];
+        vx[j].color = color;
       }
-
-      _indices.emplace_back(base);
-      _indices.emplace_back(base + 1);
-      _indices.emplace_back(base + 2);
-      _indices.emplace_back(base);
-      _indices.emplace_back(base + 2);
-      _indices.emplace_back(base + 3);
-
-      offset += 4;
     }
 
     SDL_RenderGeometry(
         *_renderer,
         static_cast<SDL_Texture*>(pixmap),
-        _vertices.data(),
-        static_cast<int>(_vertices.size()),
-        _indices.data(),
-        static_cast<int>(_indices.size())
+        batch->vertices.data(),
+        static_cast<int>(batch->vertices.size()),
+        batch->indices.data(),
+        static_cast<int>(batch->indices.size())
     );
   }
 }

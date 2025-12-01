@@ -54,6 +54,8 @@ struct alignas(64) particle final {
 struct particlebatch final {
   std::shared_ptr<particleprops> props;
   std::vector<particle> particles;
+  std::vector<int> indices;
+  std::vector<SDL_Vertex> vertices;
 
   std::size_t size() const noexcept {
     return particles.size();
@@ -91,7 +93,4 @@ private:
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<particlefactory> _factory;
   std::vector<std::shared_ptr<particlebatch>> _batches;
-
-  mutable std::vector<SDL_Vertex> _vertices;
-  mutable std::vector<int> _indices;
 };

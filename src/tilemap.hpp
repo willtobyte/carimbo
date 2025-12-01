@@ -1,6 +1,15 @@
-// #pragma once
+#pragma once
 
-// #include "common.hpp"
+#include "common.hpp"
+
+struct tile final {
+  float x, y;
+  uint64_t pixmap;
+};
+
+struct tileset final {
+  float w, h;
+};
 
 // namespace framework {
 
