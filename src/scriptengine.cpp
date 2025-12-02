@@ -431,16 +431,16 @@ void scriptengine::run() {
 
   struct metaentity {
     static sol::object index(entityproxy& self, sol::stack_object key, sol::this_state state) {
-      const auto ptr = self.kv.get(key.as<std::string>());
+      const auto ptr = self.kv.get(key.as<std::string_view>());
       return sol::make_object(state, std::ref(*ptr));
     }
 
     static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
-      self.kv.set(key.as<std::string>(), value);
+      self.kv.set(key.as<std::string_view>(), value);
     }
   };
 
-  lua.new_usertype<entityproxy>(
+  lua.new_usertype<entityprgioxy>(
     "Entity",
     sol::no_constructor,
     "x", sol::property(&entityproxy::x, &entityproxy::set_x),
