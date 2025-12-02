@@ -5,7 +5,6 @@
 #include "particlesystem.hpp"
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
-#include "tilemap.hpp"
 
 scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(std::move(scenemanager->renderer())),
@@ -63,6 +62,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     pb.action = action;
     pb.dirty = true;
     pb.tick = SDL_GetTicks();
+    pb.cache = nullptr;
     _registry.emplace<playback>(entity, std::move(pb));
 
     transform tf;
@@ -291,12 +291,10 @@ void scene::on_touch(float x, float y) const {
   }
 
   for (auto entity : hits) {
-    if (_registry.valid(entity)) [[likely]] {
-      if (_registry.all_of<callbacks>(entity)) {
-        if (auto callback = _registry.get<callbacks>(entity); callback.on_touch) {
-          callback.on_touch(callback.self, x, y);
-        }
-      }
+    if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_touch) {
+      auto fn = callback->on_touch;
+      auto self = callback->self;
+      fn(self, x, y);
     }
   }
 }
@@ -309,23 +307,19 @@ void scene::on_motion(float x, float y) const {
 
   for (const auto entity : _hovering) {
     if (hits.contains(entity)) continue;
-    if (_registry.valid(entity)) [[likely]] {
-      if (_registry.all_of<callbacks>(entity)) {
-        if (auto callback = _registry.get<callbacks>(entity); callback.on_unhover) {
-          callback.on_unhover(callback.self);
-        }
-      }
+    if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_unhover) {
+      auto fn = callback->on_unhover;
+      auto self = callback->self;
+      fn(self);
     }
   }
 
   for (const auto entity : hits) {
     if (_hovering.contains(entity)) continue;
-    if (_registry.valid(entity)) [[likely]] {
-      if (_registry.all_of<callbacks>(entity)) {
-        if (auto callback = _registry.get<callbacks>(entity); callback.on_hover) {
-          callback.on_hover(callback.self);
-        }
-      }
+    if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_hover) {
+      auto fn = callback->on_hover;
+      auto self = callback->self;
+      fn(self);
     }
   }
 

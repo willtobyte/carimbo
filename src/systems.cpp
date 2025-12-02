@@ -7,24 +7,27 @@
 void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
   auto view = registry.view<atlas, playback>();
 
-  view.each([now](const auto entity, const atlas& at, playback& s) {
+  view.each([now](const atlas& at, playback& s) {
     if (!s.action.has_value()) [[unlikely]] {
+      s.cache = nullptr;
       return;
     }
 
-    const auto& it = at.timelines.find(*s.action);
-    if (it == at.timelines.end()) [[unlikely]] {
-      return;
-    }
+    if (s.dirty || !s.cache) [[unlikely]] {
+      const auto it = at.timelines.find(*s.action);
+      if (it == at.timelines.end()) [[unlikely]] {
+        s.cache = nullptr;
+        return;
+      }
 
-    const auto& timeline = it->second;
-
-    if (s.dirty) [[unlikely]] {
+      s.cache = &it->second;
       s.current_frame = 0;
       s.tick = now;
       s.dirty = false;
       return;
     }
+
+    const auto& timeline = *s.cache;
 
     if (timeline.frames.empty()) [[unlikely]] {
       return;
@@ -63,37 +66,37 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
 }
 
 void physicssystem::update(entt::registry& registry, b2WorldId world, float delta) noexcept {
-  auto view = registry.view<transform, atlas, playback, physics, renderable>();
+  auto view = registry.view<transform, playback, physics, renderable>();
 
-  view.each([world](entt::entity entity, const transform& t, const atlas& at, const playback& s, physics& p, const renderable& rn) {
+  view.each([world](entt::entity entity, const transform& t, const playback& s, physics& p, const renderable& rn) {
     if (!p.enabled) [[unlikely]] {
       return;
     }
 
+    const bool valid = p.is_valid();
+
     if (!rn.visible) [[unlikely]] {
-      if (p.is_valid()) {
-        if (b2Shape_IsValid(p.shape)) {
-          b2DestroyShape(p.shape, false);
-          p.shape = b2ShapeId{};
-        }
-        b2DestroyBody(p.body);
-        p.body = b2BodyId{};
-        p.dirty = true;
+      if (!valid) {
+        return;
       }
+
+      if (b2Shape_IsValid(p.shape)) {
+        b2DestroyShape(p.shape, false);
+        p.shape = b2ShapeId{};
+      }
+      b2DestroyBody(p.body);
+      p.body = b2BodyId{};
+      p.dirty = true;
       return;
     }
 
-    if (!s.action) [[unlikely]] {
+    if (!s.cache) [[unlikely]] {
       return;
     }
 
-    const auto it = at.timelines.find(*s.action);
-    if (it == at.timelines.end()) [[unlikely]] {
-      return;
-    }
-
-    const auto& timeline = it->second;
+    const auto& timeline = *s.cache;
     const auto& opt = timeline.hitbox;
+
     if (!opt) [[unlikely]] {
       return;
     }
@@ -115,7 +118,7 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
     const auto radians = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
     const auto rotation = b2MakeRot(radians);
 
-    if (!p.is_valid()) [[unlikely]] {
+    if (!valid) [[unlikely]] {
       auto bdef = b2DefaultBodyDef();
       bdef.type = static_cast<b2BodyType>(p.type);
       bdef.position = position;
@@ -123,46 +126,63 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
       bdef.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
 
       p.body = b2CreateBody(world, &bdef);
-    }
-
-    if (p.is_valid()) [[likely]] {
-      b2Body_SetTransform(p.body, position, rotation);
-    }
-
-    if (p.is_valid() && p.dirty) [[unlikely]] {
-      if (b2Shape_IsValid(p.shape)) {
-        b2DestroyShape(p.shape, false);
-      }
 
       const auto poly = b2MakeBox(hx, hy);
-
       auto sdef = b2DefaultShapeDef();
       p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
       p.dirty = false;
+      return;
     }
+
+    b2Body_SetTransform(p.body, position, rotation);
+
+    if (!p.dirty) [[likely]] {
+      return;
+    }
+
+    if (b2Shape_IsValid(p.shape)) {
+      b2DestroyShape(p.shape, false);
+    }
+
+    const auto poly = b2MakeBox(hx, hy);
+    auto sdef = b2DefaultShapeDef();
+    p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
+    p.dirty = false;
   });
 }
 
 void rendersystem::draw(const entt::registry& registry) const noexcept {
-  auto view = registry.view<renderable, transform, tint, sprite, atlas, playback, orientation>();
+  auto view = registry.view<renderable, transform, tint, sprite, playback, orientation>();
 
-  for (auto entity : view) {
-    const auto& [rn, tr, tn, sp, at, st, fl] = view.get<renderable, transform, tint, sprite, atlas, playback, orientation>(entity);
-    if (!rn.visible) [[unlikely]] continue;
-    if (!st.action.has_value()) [[unlikely]] continue;
+  view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
+    if (!rn.visible) [[unlikely]] {
+      return;
+    }
 
-    const auto& timeline = at[st.action.value()];
-    if (timeline.frames.empty()) [[unlikely]] continue;
-    assert(st.current_frame < timeline.frames.size() && "current_frame out of bounds");
-    if (st.current_frame >= timeline.frames.size()) [[unlikely]] continue;
+    if (!st.cache) [[unlikely]] {
+      return;
+    }
+
+    const auto& timeline = *st.cache;
+
+    if (timeline.frames.empty()) [[unlikely]] {
+      return;
+    }
+
+    if (st.current_frame >= timeline.frames.size()) [[unlikely]] {
+      return;
+    }
 
     const auto& frame = timeline.frames[st.current_frame];
+
+    const auto hw = frame.quad.w * 0.5f;
+    const auto hh = frame.quad.h * 0.5f;
 
     const auto sw = frame.quad.w * tr.scale;
     const auto sh = frame.quad.h * tr.scale;
 
-    const auto cx = frame.offset.x + tr.position.x + frame.quad.w * 0.5f;
-    const auto cy = frame.offset.y + tr.position.y + frame.quad.h * 0.5f;
+    const auto cx = frame.offset.x + tr.position.x + hw;
+    const auto cy = frame.offset.y + tr.position.y + hh;
 
     const auto fx = cx - sw * 0.5f;
     const auto fy = cy - sh * 0.5f;
@@ -176,5 +196,5 @@ void rendersystem::draw(const entt::registry& registry) const noexcept {
       tn.a,
       fl.flip
     );
-  }
+  });
 }
