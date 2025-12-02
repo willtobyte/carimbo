@@ -1,9 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include "io.hpp"
-#include "pixmap.hpp"
-#include "pixmappool.hpp"
 
 struct alignas(16) tile final {
   float x;
@@ -32,10 +29,9 @@ struct alignas(64) layer final {
 class tilemap final {
 public:
   tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool) {
-
     const auto buffer = io::read(std::format("tilemaps/{}.json", name));
     const auto j = nlohmann::json::parse(buffer);
-    from_json(j, *this);
+    j.get_to(*this);
 
     atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
   }

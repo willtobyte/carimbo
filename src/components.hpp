@@ -21,7 +21,10 @@ struct offset {
   float x{.0f};
   float y{.0f};
 
-  friend void from_json(const nlohmann::json& j, offset& o);
+  friend void from_json(const nlohmann::json& j, offset& o) {
+    j["x"].get_to(o.x);
+    j["y"].get_to(o.y);
+  }
 };
 
 struct frame final {
@@ -29,7 +32,13 @@ struct frame final {
   offset offset;
   quad quad;
 
-  friend void from_json(const nlohmann::json& j, frame& o);
+  friend void from_json(const nlohmann::json& j, frame& o) {
+    j["duration"].get_to(o.duration);
+    if (j.contains("offset")) {
+      j["offset"].get_to(o.offset);
+    }
+    j["quad"].get_to(o.quad);
+  }
 };
 
 enum class bodytype : uint8_t {
@@ -50,16 +59,44 @@ struct physics final {
   }
 };
 
+inline void from_json(const nlohmann::json& j, b2AABB& o) {
+  const auto x = j["x"].get<float>();
+  const auto y = j["y"].get<float>();
+  const auto w = j["w"].get<float>();
+  const auto h = j["h"].get<float>();
+
+  o.lowerBound = b2Vec2(x - epsilon, y - epsilon);
+  o.upperBound = b2Vec2(x + w + epsilon, y + h + epsilon);
+}
+
 struct timeline final {
   bool oneshot{false};
   std::string next;
-  std::optional<b2AABB> box;
+  std::optional<b2AABB> hitbox;
   std::vector<frame> frames;
   std::vector<uint16_t> durations;
   uint16_t current{0};
   uint64_t tick{0};
 
-   friend void from_json(const nlohmann::json& j, timeline& o);
+  friend void from_json(const nlohmann::json& j, timeline& o) {
+    if (j.contains("oneshot")) {
+      j["oneshot"].get_to(o.oneshot);
+    }
+
+    if (j.contains("next")) {
+      j["next"].get_to(o.next);
+    }
+
+    if (j.contains("hitbox")) {
+      b2AABB hb;
+      j["hitbox"]["quad"].get_to(hb);
+      o.hitbox = hb;
+    }
+
+    if (j.contains("frames")) {
+      j["frames"].get_to(o.frames);
+    }
+  }
 };
 
 struct animator final {

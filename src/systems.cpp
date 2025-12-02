@@ -61,7 +61,7 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
 void physicssystem::update(entt::registry& registry, b2WorldId world, float delta) noexcept {
   auto view = registry.view<transform, animator, state, physics, renderable>();
 
-  view.each([world](const auto entity, const transform& t, const animator& an, const state& s, physics& p, const renderable& rn) {
+  view.each([world](entt::entity entity, const transform& t, const animator& an, const state& s, physics& p, const renderable& rn) {
     if (!p.enabled) [[unlikely]] {
       return;
     }
@@ -89,23 +89,23 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
     }
 
     const auto& timeline = it->second;
-    const auto& opt = timeline.box;
+    const auto& opt = timeline.hitbox;
     if (!opt) [[unlikely]] {
       return;
     }
 
-    const auto& box = *opt;
+    const auto& hitbox = *opt;
 
-    const auto bw = box.upperBound.x - box.lowerBound.x;
-    const auto bh = box.upperBound.y - box.lowerBound.y;
+    const auto bw = hitbox.upperBound.x - hitbox.lowerBound.x;
+    const auto bh = hitbox.upperBound.y - hitbox.lowerBound.y;
 
     const auto hx = bw * t.scale * 0.5f;
     const auto hy = bh * t.scale * 0.5f;
 
     const auto cx = bw * 0.5f;
     const auto cy = bh * 0.5f;
-    const auto px = t.position.x + box.lowerBound.x + cx;
-    const auto py = t.position.y + box.lowerBound.y + cy;
+    const auto px = t.position.x + hitbox.lowerBound.x + cx;
+    const auto py = t.position.y + hitbox.lowerBound.y + cy;
 
     const auto position = b2Vec2{px, py};
     const auto radians = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;

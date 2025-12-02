@@ -18,7 +18,15 @@ struct keyframe final {
   vec2 offset;
   quad frame;
 
-  friend void from_json(const nlohmann::json& j, keyframe& o);
+  friend void from_json(const nlohmann::json& j, keyframe& o) {
+    o.frame = j["quad"].get<quad>();
+
+    if (j.contains("offset")) {
+      o.offset = j["offset"].get<vec2>();
+    }
+
+    o.duration = j["duration"].get<uint64_t>();
+  }
 };
 
 struct bounds final {
@@ -26,7 +34,13 @@ struct bounds final {
   std::bitset<256> reagents;
   quad rectangle;
 
-  friend void from_json(const nlohmann::json& j, bounds& o);
+  friend void from_json(const nlohmann::json& j, bounds& o) {
+    if (j.contains("type")) {
+      o.type = j["type"].get<uint16_t>();
+    }
+
+    o.rectangle = j["quad"].get<quad>();
+  }
 };
 
 struct animation final {
