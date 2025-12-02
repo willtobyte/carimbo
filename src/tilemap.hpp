@@ -2,13 +2,34 @@
 
 #include "common.hpp"
 
-struct tile final {
-  float x, y;
-  uint64_t pixmap;
+struct alignas(16) uv final {
+  float u0, v0;
+  float u1, v1;
 };
 
-struct tileset final {
-  float w, h;
+struct alignas(16) tileset final {
+  vec2 size;
+  vec2 atlas_size_inv;
+  uint32_t tiles_per_row;
+};
+
+struct alignas(16) tile final {
+  vec2 position;
+  uint32_t uv_index;
+};
+
+struct alignas(64) layer final {
+  std::vector<tile> tiles;
+  std::string name;
+  bool collider{false};
+};
+
+struct alignas(64) tilemap final {
+  std::vector<SDL_Vertex> vertices;
+  std::vector<int32_t> indices;
+  std::vector<uv> table;
+  std::vector<layer> layers;
+  tileset atlas;
 };
 
 // namespace framework {
