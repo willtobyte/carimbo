@@ -88,9 +88,9 @@ struct timeline final {
     }
 
     if (j.contains("hitbox")) {
-      b2AABB hb;
-      j["hitbox"]["quad"].get_to(hb);
-      o.hitbox = hb;
+      b2AABB b;
+      j["hitbox"]["quad"].get_to(b);
+      o.hitbox = b;
     }
 
     if (j.contains("frames")) {
