@@ -416,17 +416,15 @@ void scriptengine::run() {
     "StateManager",
     sol::no_constructor,
     "players", sol::property(&statemanager::players),
-    "player", [cache = std::make_shared<std::unordered_map<uint8_t, playerwrapper>>()](
-      statemanager& self,
-      event::player player
-    ) mutable {
-      auto index = static_cast<uint8_t>(player);
-      auto it = cache->find(index);
-      if (it == cache->end()) [[unlikely]] {
-        it = cache->emplace(index, playerwrapper{static_cast<uint8_t>(player), &self}).first;
-      }
+    "player", [](statemanager& self, event::player player) {
+      static std::array<playerwrapper, 4> cache{
+        playerwrapper{0, &self},
+        playerwrapper{1, &self},
+        playerwrapper{2, &self},
+        playerwrapper{3, &self}
+      };
 
-      return it->second;
+      return cache[static_cast<uint8_t>(player)];
     }
   );
 
@@ -1028,6 +1026,7 @@ void scriptengine::run() {
   lua["fontfactory"] = engine->resourcemanager()->fontfactory();
   lua["overlay"] = engine->overlay();
   lua["canvas"] = engine->canvas();
+  lua["statemanager"] = engine->statemanager();
 
   auto viewport = lua.create_table();
   viewport["width"] = engine->window()->width();
