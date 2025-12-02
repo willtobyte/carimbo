@@ -9,6 +9,8 @@ public:
   entityproxy(entt::entity entity, entt::registry& registry) noexcept;
   ~entityproxy() noexcept = default;
 
+  uint64_t id() const noexcept;
+
   float x() const noexcept;
   void set_x(float x) noexcept;
   float y() const noexcept;

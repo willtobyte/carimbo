@@ -6,6 +6,10 @@ entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept
   : _e(entity), _registry(registry) {
 }
 
+uint64_t entityproxy::id() const noexcept {
+  return static_cast<uint64_t>(_e);
+}
+
 float entityproxy::x() const noexcept {
   const auto& t = _registry.get<transform>(_e);
   return t.position.x;

@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include "entityproxy.hpp"
 
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
@@ -443,6 +444,7 @@ void scriptengine::run() {
   lua.new_usertype<entityproxy>(
     "Entity",
     sol::no_constructor,
+    "id", sol::property(&entityproxy::id),
     "x", sol::property(&entityproxy::x, &entityproxy::set_x),
     "y", sol::property(&entityproxy::y, &entityproxy::set_y),
     "alpha", sol::property(&entityproxy::alpha, &entityproxy::set_alpha),
@@ -929,20 +931,22 @@ void scriptengine::run() {
 
   lua["keyboard"] = keyboard{};
 
-  // lua.new_usertype<mail>(
-  //   "Mail",
-  //   sol::constructors<mail(
-  //     std::shared_ptr<object>,
-  //     std::optional<std::shared_ptr<object>>,
-  //     std::string_view
-  //   )>()
-  // );
+  lua.new_usertype<mail>(
+    "Mail",
+    sol::constructors<mail(
+      std::shared_ptr<entityproxy>,
+      std::optional<std::shared_ptr<entityproxy>>,
+      std::string_view
+    )>()
+  );
 
-  // lua.new_usertype<postalservice>(
-  //   "PostalService",
-  //   sol::constructors<postalservice()>(),
-  //   "post", &postalservice::post
-  // );
+  lua.new_usertype<postalservice>(
+    "PostalService",
+    sol::constructors<postalservice()>(),
+    "post", &postalservice::post
+  );
+
+  lua["postalservice"] = postalservice{};
 
   lua.new_usertype<timermanager>(
     "TimerManager",
