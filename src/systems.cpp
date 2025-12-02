@@ -30,6 +30,10 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
       return;
     }
 
+    if (s.current_frame >= timeline.frames.size()) [[unlikely]] {
+      s.current_frame = 0;
+    }
+
     const auto& frame = timeline.frames[s.current_frame];
     const auto elapsed = now - s.tick;
 
@@ -149,6 +153,8 @@ void rendersystem::draw(const entt::registry& registry) const noexcept {
 
     const auto& timeline = at[st.action.value()];
     if (timeline.frames.empty()) [[unlikely]] continue;
+    assert(st.current_frame < timeline.frames.size() && "current_frame out of bounds");
+    if (st.current_frame >= timeline.frames.size()) [[unlikely]] continue;
 
     const auto& frame = timeline.frames[st.current_frame];
 

@@ -103,11 +103,13 @@ void entityproxy::set_action(std::optional<std::string_view> name) noexcept {
 
   if (!name) {
     s.action = std::nullopt;
+    s.current_frame = 0;
     s.dirty = true;
     return;
   }
 
   s.action = *name;
+  s.current_frame = 0;
   s.dirty = true;
 }
 
