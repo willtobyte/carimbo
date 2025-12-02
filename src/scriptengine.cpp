@@ -452,7 +452,14 @@ void scriptengine::run() {
     "visible", sol::property(&entityproxy::visible, &entityproxy::set_visible),
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
     "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),
-    "position", sol::property(&entityproxy::position, &entityproxy::set_position),
+    "position", sol::property(
+      &entityproxy::position,
+      [](entityproxy& self, sol::table table) {
+        const auto x = table.get_or("x", table.get_or(1, .0f));
+        const auto y = table.get_or("y", table.get_or(2, .0f));
+        self.set_position({x, y});
+      }
+    ),
     "set_onmail", &entityproxy::set_onmail,
     "on_hover", &entityproxy::set_onhover,
     "on_unhover", &entityproxy::set_onunhover,
