@@ -440,7 +440,7 @@ void scriptengine::run() {
     }
   };
 
-  lua.new_usertype<entityprgioxy>(
+  lua.new_usertype<entityproxy>(
     "Entity",
     sol::no_constructor,
     "x", sol::property(&entityproxy::x, &entityproxy::set_x),
