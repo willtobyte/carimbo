@@ -751,7 +751,7 @@ void scriptengine::run() {
           self.set(key, value.as<bool>());
           break;
         case sol::type::string:
-          self.set(key, value.as<std::string>());
+          self.set(key, value.as<std::string_view>());
           break;
         default:
           self.set(key, nullptr);
