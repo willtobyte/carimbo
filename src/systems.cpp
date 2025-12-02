@@ -4,197 +4,173 @@
 #include "constant.hpp"
 #include "geometry.hpp"
 
+namespace {
+[[nodiscard]] inline const timeline* resolve_timeline(const atlas& at, const std::optional<std::string>& action) noexcept {
+  if (!action.has_value()) [[unlikely]] {
+    return nullptr;
+  }
+
+  const auto it = at.timelines.find(*action);
+  return it != at.timelines.end() ? &it->second : nullptr;
+}
+
+inline void destroy_body(physics& p) noexcept {
+  if (b2Shape_IsValid(p.shape)) {
+    b2DestroyShape(p.shape, false);
+    p.shape = b2ShapeId{};
+  }
+
+  b2DestroyBody(p.body);
+  p.body = b2BodyId{};
+  p.dirty = true;
+}
+
+inline void patch_shape(physics& p, float hx, float hy) noexcept {
+  if (b2Shape_IsValid(p.shape)) {
+    b2DestroyShape(p.shape, false);
+  }
+
+  const auto poly = b2MakeBox(hx, hy);
+  auto sdef = b2DefaultShapeDef();
+  p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
+  p.dirty = false;
+}
+
+struct parameters {
+  b2Vec2 position;
+  b2Rot rotation;
+  float hx;
+  float hy;
+};
+
+[[nodiscard]] inline parameters compute_hitbox(const b2AABB& hitbox, const transform& t) noexcept {
+  const auto bw = hitbox.upperBound.x - hitbox.lowerBound.x;
+  const auto bh = hitbox.upperBound.y - hitbox.lowerBound.y;
+
+  return {
+    .position = {
+      t.position.x + hitbox.lowerBound.x + bw * 0.5f,
+      t.position.y + hitbox.lowerBound.y + bh * 0.5f
+    },
+    .rotation = b2MakeRot(static_cast<float>(t.angle) * DEGREES_TO_RADIANS),
+    .hx = bw * t.scale * 0.5f,
+    .hy = bh * t.scale * 0.5f
+  };
+}
+}
+
 void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
-  auto view = registry.view<atlas, playback>();
+  registry.view<atlas, playback>().each([now](const atlas& at, playback& s) {
+    const bool refresh = s.dirty | !s.timeline;
 
-  view.each([now](const atlas& at, playback& s) {
-    if (!s.action.has_value()) [[unlikely]] {
-      s.cache = nullptr;
-      return;
-    }
-
-    if (s.dirty || !s.cache) [[unlikely]] {
-      const auto it = at.timelines.find(*s.action);
-      if (it == at.timelines.end()) [[unlikely]] {
-        s.cache = nullptr;
-        return;
-      }
-
-      s.cache = &it->second;
+    if (refresh) [[unlikely]] {
+      s.timeline = resolve_timeline(at, s.action);
       s.current_frame = 0;
       s.tick = now;
       s.dirty = false;
+    }
+
+    if (!s.timeline) [[unlikely]] {
       return;
     }
 
-    const auto& timeline = *s.cache;
+    const auto& tl = *s.timeline;
 
-    if (timeline.frames.empty()) [[unlikely]] {
-      return;
-    }
+    assert(!tl.frames.empty() && "timeline must have frames");
+    assert(s.current_frame < tl.frames.size() && "frame index out of bounds");
 
-    if (s.current_frame >= timeline.frames.size()) [[unlikely]] {
-      s.current_frame = 0;
-    }
-
-    const auto& frame = timeline.frames[s.current_frame];
+    const auto& frame = tl.frames[s.current_frame];
     const auto elapsed = now - s.tick;
+    const auto ready = frame.duration > 0 && elapsed >= static_cast<uint64_t>(frame.duration);
 
-    if (frame.duration == 0 || elapsed < static_cast<uint64_t>(frame.duration)) [[likely]] {
+    if (!ready) [[likely]] {
       return;
     }
 
     s.tick = now;
 
-    const auto last = s.current_frame + 1 >= timeline.frames.size();
-    const auto next = !timeline.next.empty();
+    const auto is_last = s.current_frame + 1 >= tl.frames.size();
+    const auto has_next = !tl.next.empty();
 
-    if (last) [[unlikely]] {
-      if (next) {
-        s.action = timeline.next;
-        s.current_frame = 0;
-        s.dirty = true;
-      } else if (timeline.oneshot) {
-        s.action = std::nullopt;
-      } else {
-        s.current_frame = 0;
-      }
-    } else [[likely]] {
-      ++s.current_frame;
+    s.current_frame = is_last ? 0 : s.current_frame + 1;
+
+    if (is_last & has_next) {
+      s.action = tl.next;
+      s.dirty = true;
+    } else if (is_last & tl.oneshot) {
+      s.action = std::nullopt;
+      s.timeline = nullptr;
     }
   });
 }
 
-void physicssystem::update(entt::registry& registry, b2WorldId world, float delta) noexcept {
-  auto view = registry.view<transform, playback, physics, renderable>();
-
-  view.each([world](entt::entity entity, const transform& t, const playback& s, physics& p, const renderable& rn) {
-    if (!p.enabled) [[unlikely]] {
-      return;
-    }
-
-    const bool valid = p.is_valid();
-
-    if (!rn.visible) [[unlikely]] {
-      if (!valid) {
+void physicssystem::update(entt::registry& registry, b2WorldId world, [[maybe_unused]] float delta) noexcept {
+  registry.view<transform, playback, physics, renderable>().each(
+    [world](entt::entity entity, const transform& t, const playback& s, physics& p, const renderable& rn) {
+      if (!p.enabled) [[unlikely]] {
         return;
       }
 
-      if (b2Shape_IsValid(p.shape)) {
-        b2DestroyShape(p.shape, false);
-        p.shape = b2ShapeId{};
+      const auto valid = p.is_valid();
+      const auto destroy = !rn.visible & valid;
+      if (destroy) [[unlikely]] {
+        destroy_body(p);
+        return;
       }
-      b2DestroyBody(p.body);
-      p.body = b2BodyId{};
-      p.dirty = true;
-      return;
-    }
 
-    if (!s.cache) [[unlikely]] {
-      return;
-    }
+      const auto collidable = rn.visible & (s.timeline != nullptr) && s.timeline->hitbox.has_value();
 
-    const auto& timeline = *s.cache;
-    const auto& opt = timeline.hitbox;
+      if (!collidable) [[unlikely]] {
+        return;
+      }
 
-    if (!opt) [[unlikely]] {
-      return;
-    }
+      const auto params = compute_hitbox(*s.timeline->hitbox, t);
 
-    const auto& hitbox = *opt;
+      if (!valid) [[unlikely]] {
+        auto def = b2DefaultBodyDef();
+        def.type = static_cast<b2BodyType>(p.type);
+        def.position = params.position;
+        def.rotation = params.rotation;
+        def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
+        p.body = b2CreateBody(world, &def);
 
-    const auto bw = hitbox.upperBound.x - hitbox.lowerBound.x;
-    const auto bh = hitbox.upperBound.y - hitbox.lowerBound.y;
+        patch_shape(p, params.hx, params.hy);
 
-    const auto hx = bw * t.scale * 0.5f;
-    const auto hy = bh * t.scale * 0.5f;
+        return;
+      }
 
-    const auto cx = bw * 0.5f;
-    const auto cy = bh * 0.5f;
-    const auto px = t.position.x + hitbox.lowerBound.x + cx;
-    const auto py = t.position.y + hitbox.lowerBound.y + cy;
+      b2Body_SetTransform(p.body, params.position, params.rotation);
 
-    const auto position = b2Vec2{px, py};
-    const auto radians = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
-    const auto rotation = b2MakeRot(radians);
-
-    if (!valid) [[unlikely]] {
-      auto bdef = b2DefaultBodyDef();
-      bdef.type = static_cast<b2BodyType>(p.type);
-      bdef.position = position;
-      bdef.rotation = rotation;
-      bdef.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
-
-      p.body = b2CreateBody(world, &bdef);
-
-      const auto poly = b2MakeBox(hx, hy);
-      auto sdef = b2DefaultShapeDef();
-      p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
-      p.dirty = false;
-      return;
-    }
-
-    b2Body_SetTransform(p.body, position, rotation);
-
-    if (!p.dirty) [[likely]] {
-      return;
-    }
-
-    if (b2Shape_IsValid(p.shape)) {
-      b2DestroyShape(p.shape, false);
-    }
-
-    const auto poly = b2MakeBox(hx, hy);
-    auto sdef = b2DefaultShapeDef();
-    p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
-    p.dirty = false;
-  });
+      if (p.dirty) [[unlikely]] {
+        patch_shape(p, params.hx, params.hy);
+      }
+    });
 }
 
 void rendersystem::draw(const entt::registry& registry) const noexcept {
-  auto view = registry.view<renderable, transform, tint, sprite, playback, orientation>();
+  registry.view<renderable, transform, tint, sprite, playback, orientation>().each(
+    [](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
+      const auto drawable = rn.visible & (st.timeline != nullptr);
 
-  view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
-    if (!rn.visible) [[unlikely]] {
-      return;
-    }
+      if (!drawable) [[unlikely]] {
+        return;
+      }
 
-    if (!st.cache) [[unlikely]] {
-      return;
-    }
+      const auto& tl = *st.timeline;
 
-    const auto& timeline = *st.cache;
+      assert(!tl.frames.empty() && "timeline must have frames");
+      assert(st.current_frame < tl.frames.size() && "frame index out of bounds");
 
-    if (timeline.frames.empty()) [[unlikely]] {
-      return;
-    }
+      const auto& frame = tl.frames[st.current_frame];
+      const auto& q = frame.quad;
 
-    if (st.current_frame >= timeline.frames.size()) [[unlikely]] {
-      return;
-    }
+      const auto hw = q.w * 0.5f;
+      const auto hh = q.h * 0.5f;
+      const auto sw = q.w * tr.scale;
+      const auto sh = q.h * tr.scale;
+      const auto fx = frame.offset.x + tr.position.x + hw - sw * 0.5f;
+      const auto fy = frame.offset.y + tr.position.y + hh - sh * 0.5f;
 
-    const auto& frame = timeline.frames[st.current_frame];
-
-    const auto hw = frame.quad.w * 0.5f;
-    const auto hh = frame.quad.h * 0.5f;
-
-    const auto sw = frame.quad.w * tr.scale;
-    const auto sh = frame.quad.h * tr.scale;
-
-    const auto cx = frame.offset.x + tr.position.x + hw;
-    const auto cy = frame.offset.y + tr.position.y + hh;
-
-    const auto fx = cx - sw * 0.5f;
-    const auto fy = cy - sh * 0.5f;
-
-    sp.pixmap->draw(
-      frame.quad.x, frame.quad.y,
-      frame.quad.w, frame.quad.h,
-      fx, fy,
-      sw, sh,
-      tr.angle,
-      tn.a,
-      fl.flip
-    );
-  });
+      sp.pixmap->draw(q.x, q.y, q.w, q.h, fx, fy, sw, sh, tr.angle, tn.a, fl.flip);
+    });
 }

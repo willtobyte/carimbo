@@ -62,7 +62,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     pb.action = action;
     pb.dirty = true;
     pb.tick = SDL_GetTicks();
-    pb.cache = nullptr;
+    pb.timeline = nullptr;
     _registry.emplace<playback>(entity, std::move(pb));
 
     transform tf;

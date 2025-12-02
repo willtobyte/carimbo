@@ -105,14 +105,14 @@ void entityproxy::set_action(std::optional<std::string_view> name) noexcept {
     s.action = std::nullopt;
     s.current_frame = 0;
     s.dirty = true;
-    s.cache = nullptr;
+    s.timeline = nullptr;
     return;
   }
 
   s.action = *name;
   s.current_frame = 0;
   s.dirty = true;
-  s.cache = nullptr;
+  s.timeline = nullptr;
 }
 
 void entityproxy::set_onmail(sol::protected_function fn) {

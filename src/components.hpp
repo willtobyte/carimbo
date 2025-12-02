@@ -120,7 +120,7 @@ struct playback final {
   uint16_t current_frame{0};
   uint64_t tick{0};
   std::optional<std::string> action;
-  const timeline* cache{nullptr};
+  const timeline* timeline{nullptr};
 };
 
 struct renderable final {
