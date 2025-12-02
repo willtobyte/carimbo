@@ -131,6 +131,8 @@ struct metadata final {
 };
 
 struct callbacks {
+  std::function<void(std::shared_ptr<entityproxy>, std::string_view)> on_mail;
+
   std::function<void(std::shared_ptr<entityproxy>)> on_hover;
   std::function<void(std::shared_ptr<entityproxy>)> on_unhover;
   std::function<void(std::shared_ptr<entityproxy>, float, float)> on_touch;

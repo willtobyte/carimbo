@@ -15,6 +15,8 @@ public:
   void set_x(float x) noexcept;
   float y() const noexcept;
   void set_y(float y) noexcept;
+  vec2 position() const noexcept;
+  void set_position(const vec2& position) noexcept;
 
   uint8_t alpha() const noexcept;
   void set_alpha(uint8_t alpha) noexcept;
@@ -28,14 +30,14 @@ public:
 
   std::optional<std::string> action() const noexcept;
   void set_action(std::optional<std::string_view> name) noexcept;
+
+  void set_onmail(sol::protected_function fn);
   void set_onhover(sol::protected_function fn);
   void set_onunhover(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);
 
   std::string_view kind() const noexcept;
   void set_kind(std::string_view kind) noexcept;
-
-  void set_placement(float x, float y) noexcept;
 
   kv kv;
 private:
