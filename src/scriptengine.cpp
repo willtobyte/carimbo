@@ -343,11 +343,11 @@ void scriptengine::run() {
   );
 
   lua.new_enum(
-    "Reflection",
-    "none", reflection::none,
-    "horizontal", reflection::horizontal,
-    "vertical", reflection::vertical,
-    "both", reflection::both
+    "Flip",
+    "none", flip::none,
+    "horizontal", flip::horizontal,
+    "vertical", flip::vertical,
+    "both", flip::both
   );
 
   lua.new_usertype<observable>(
@@ -448,6 +448,7 @@ void scriptengine::run() {
     "alpha", sol::property(&entityproxy::alpha, &entityproxy::set_alpha),
     "angle", sol::property(&entityproxy::angle, &entityproxy::set_angle),
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
+    "flip", sol::property(&entityproxy::flip, &entityproxy::set_flip),
     "visible", sol::property(&entityproxy::visible, &entityproxy::set_visible),
     "action", sol::property(&entityproxy::action, &entityproxy::set_action),
     "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),

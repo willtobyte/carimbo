@@ -34,8 +34,8 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
 
   int zindex = 0;
   for (const auto& o : os) {
-    const auto name = o["name"].get<std::string>();
-    const auto kind = o["kind"].get<std::string>();
+    const auto name = o.at("name").get<std::string>();
+    const auto kind = o.at("kind").get<std::string>();
     const auto q = o.value("action", std::string{});
     const auto action = q.empty() ? std::nullopt : std::optional<std::string>(q);
 
@@ -59,26 +59,29 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
     _registry.emplace<sprite>(entity, std::move(s));
 
-    state st;
-    st.action = action;
-    st.dirty = true;
-    st.tick = SDL_GetTicks();
-    _registry.emplace<state>(entity, std::move(st));
+    playback pb;
+    pb.action = action;
+    pb.dirty = true;
+    pb.tick = SDL_GetTicks();
+    _registry.emplace<playback>(entity, std::move(pb));
 
-    transform t;
-    t.position = {x, y};
-    t.angle = .0;
-    t.scale = 1.0f;
-    _registry.emplace<transform>(entity, std::move(t));
+    transform tf;
+    tf.position = {x, y};
+    tf.angle = .0;
+    tf.scale = j.value("scale", 1.0f);
+    _registry.emplace<transform>(entity, std::move(tf));
 
-    animator an;
-    for (auto& [key, value] : j["timelines"].items()) {
+    atlas at;
+    for (auto& [key, value] : j.at("timelines").items()) {
       timeline tl;
       from_json(value, tl);
-      an.timelines.emplace(key, std::move(tl));
+      at.timelines.emplace(key, std::move(tl));
     }
 
-    _registry.emplace<animator>(entity, std::move(an));
+    _registry.emplace<atlas>(entity, std::move(at));
+
+    orientation ori;
+    _registry.emplace<orientation>(entity, std::move(ori));
 
     physics ph;
     _registry.emplace<physics>(entity, std::move(ph));
@@ -103,10 +106,10 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   _particles.reserve(ps.size());
   const auto factory = _particlesystem.factory();
   for (const auto& i : ps) {
-    const auto particle = i["name"].get<std::string_view>();
-    const auto kind = i["kind"].get<std::string_view>();
-    const auto x = i["x"].get<float>();
-    const auto y = i["y"].get<float>();
+    const auto particle = i.at("name").get<std::string_view>();
+    const auto kind = i.at("kind").get<std::string_view>();
+    const auto x = i.at("x").get<float>();
+    const auto y = i.at("y").get<float>();
     const auto active = i.value("active", true);
     const auto batch = factory->create(kind, x, y, active);
     _particles.emplace(particle, batch);

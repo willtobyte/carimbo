@@ -5,15 +5,15 @@
 #include "geometry.hpp"
 
 void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
-  auto view = registry.view<animator, state>();
+  auto view = registry.view<atlas, playback>();
 
-  view.each([now](const auto entity, const animator& an, state& s) {
+  view.each([now](const auto entity, const atlas& at, playback& s) {
     if (!s.action.has_value()) [[unlikely]] {
       return;
     }
 
-    const auto& it = an.timelines.find(*s.action);
-    if (it == an.timelines.end()) [[unlikely]] {
+    const auto& it = at.timelines.find(*s.action);
+    if (it == at.timelines.end()) [[unlikely]] {
       return;
     }
 
@@ -59,9 +59,9 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
 }
 
 void physicssystem::update(entt::registry& registry, b2WorldId world, float delta) noexcept {
-  auto view = registry.view<transform, animator, state, physics, renderable>();
+  auto view = registry.view<transform, atlas, playback, physics, renderable>();
 
-  view.each([world](entt::entity entity, const transform& t, const animator& an, const state& s, physics& p, const renderable& rn) {
+  view.each([world](entt::entity entity, const transform& t, const atlas& at, const playback& s, physics& p, const renderable& rn) {
     if (!p.enabled) [[unlikely]] {
       return;
     }
@@ -83,8 +83,8 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
       return;
     }
 
-    const auto it = an.timelines.find(*s.action);
-    if (it == an.timelines.end()) [[unlikely]] {
+    const auto it = at.timelines.find(*s.action);
+    if (it == at.timelines.end()) [[unlikely]] {
       return;
     }
 
@@ -140,14 +140,14 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, float delt
 }
 
 void rendersystem::draw(const entt::registry& registry) const noexcept {
-  auto view = registry.view<renderable, transform, tint, sprite, animator, state>();
+  auto view = registry.view<renderable, transform, tint, sprite, atlas, playback, orientation>();
 
   for (auto entity : view) {
-    const auto& [rn, tr, tn, sp, an, st] = view.get<renderable, transform, tint, sprite, animator, state>(entity);
+    const auto& [rn, tr, tn, sp, at, st, fl] = view.get<renderable, transform, tint, sprite, atlas, playback, orientation>(entity);
     if (!rn.visible) [[unlikely]] continue;
     if (!st.action.has_value()) [[unlikely]] continue;
 
-    const auto& timeline = an[st.action.value()];
+    const auto& timeline = at[st.action.value()];
     if (timeline.frames.empty()) [[unlikely]] continue;
 
     const auto& frame = timeline.frames[st.current_frame];
@@ -167,7 +167,8 @@ void rendersystem::draw(const entt::registry& registry) const noexcept {
       fx, fy,
       sw, sh,
       tr.angle,
-      tn.a
+      tn.a,
+      fl.flip
     );
   }
 }

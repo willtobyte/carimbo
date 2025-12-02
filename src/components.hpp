@@ -3,6 +3,7 @@
 #include "common.hpp"
 
 #include "geometry.hpp"
+#include "flip.hpp"
 
 struct transform final {
 	vec2 position;
@@ -99,7 +100,7 @@ struct timeline final {
   }
 };
 
-struct animator final {
+struct atlas final {
   std::unordered_map<std::string, timeline> timelines;
 
   const timeline& operator[](const std::string& action) const {
@@ -113,7 +114,7 @@ struct sprite final {
   std::shared_ptr<pixmap> pixmap;
 };
 
-struct state final {
+struct playback final {
   bool dirty;
   bool redraw;
   uint16_t current_frame{0};
@@ -128,6 +129,10 @@ struct renderable final {
 
 struct metadata final {
   std::string kind;
+};
+
+struct orientation final {
+  flip flip{flip::none};
 };
 
 struct callbacks {

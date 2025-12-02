@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 
+#include "flip.hpp"
 #include "kv.hpp"
 
 class entityproxy {
@@ -24,6 +25,9 @@ public:
   void set_angle(double angle) noexcept;
   float scale() const noexcept;
   void set_scale(float scale) noexcept;
+
+  ::flip flip() const noexcept;
+  void set_flip(::flip flip) noexcept;
 
   bool visible() const noexcept;
   void set_visible(bool visible) noexcept;

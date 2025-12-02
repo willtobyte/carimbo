@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-#include "reflection.hpp"
+#include "flip.hpp"
 
 class fonteffect {
 public:
@@ -20,7 +20,7 @@ public:
 
   virtual double angle() noexcept { return .0L; };
 
-  virtual reflection reflection() noexcept { return reflection::none; };
+  virtual flip flip() noexcept { return flip::none; };
 
   virtual uint8_t alpha() noexcept { return 255; };
 };

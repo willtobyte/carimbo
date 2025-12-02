@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-enum class reflection : int {
+enum class flip : int {
   none = SDL_FLIP_NONE,
   horizontal = SDL_FLIP_HORIZONTAL,
   vertical = SDL_FLIP_VERTICAL,

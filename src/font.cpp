@@ -42,13 +42,13 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
     const auto& glyph = it->second;
 
     double angle = .0L;
-    reflection reflection = reflection::none;
+    flip flip = flip::none;
     uint8_t alpha = 255;
     float scale = 1.f;
 
     if (const auto e = effect.lock(); e) {
       angle = e->angle();
-      reflection = e->reflection();
+      flip = e->flip();
       alpha = e->alpha();
       scale = e->scale();
     }
@@ -60,7 +60,7 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
       cursor.x, cursor.y, glyph.w * s, glyph.h * s,
       angle,
       alpha,
-      reflection
+      flip
     );
 
     cursor.x += glyph.w + _spacing;

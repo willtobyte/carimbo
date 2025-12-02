@@ -49,7 +49,7 @@ void entityproxy::set_alpha(uint8_t alpha) noexcept {
   auto& t = _registry.get<tint>(_e);
   t.a = alpha;
 
-  auto& s = _registry.get<state>(_e);
+  auto& s = _registry.get<playback>(_e);
   s.redraw = true;
 }
 
@@ -62,7 +62,7 @@ void entityproxy::set_angle(double angle) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.angle = angle;
 
-  auto& s = _registry.get<state>(_e);
+  auto& s = _registry.get<playback>(_e);
   s.redraw = true;
 }
 
@@ -75,7 +75,7 @@ void entityproxy::set_scale(float scale) noexcept {
   auto& t = _registry.get<transform>(_e);
   t.scale = scale;
 
-  auto& s = _registry.get<state>(_e);
+  auto& s = _registry.get<playback>(_e);
   s.dirty = true;
   s.redraw = true;
 }
@@ -94,12 +94,12 @@ void entityproxy::set_visible(bool visible) noexcept {
 }
 
 std::optional<std::string> entityproxy::action() const noexcept {
-  const auto& s = _registry.get<state>(_e);
+  const auto& s = _registry.get<playback>(_e);
   return s.action;
 }
 
 void entityproxy::set_action(std::optional<std::string_view> name) noexcept {
-  auto& s = _registry.get<state>(_e);
+  auto& s = _registry.get<playback>(_e);
 
   if (!name) {
     s.action = std::nullopt;
@@ -139,4 +139,17 @@ std::string_view entityproxy::kind() const noexcept {
 void entityproxy::set_kind(std::string_view kind) noexcept {
   auto& m = _registry.get<metadata>(_e);
   m.kind = kind;
+}
+
+flip entityproxy::flip() const noexcept {
+  const auto& o = _registry.get<::orientation>(_e);
+  return o.flip;
+}
+
+void entityproxy::set_flip(::flip flip) noexcept {
+  auto& o = _registry.get<::orientation>(_e);
+  o.flip = flip;
+
+  auto& s = _registry.get<playback>(_e);
+  s.redraw = true;
 }

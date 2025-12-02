@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-#include "reflection.hpp"
+#include "flip.hpp"
 
 class pixmap final {
 public:
@@ -15,7 +15,7 @@ public:
     const float dx, const float dy, const float dw, const float dh,
     const double angle = .0,
     const uint8_t alpha = 255,
-    const reflection reflection = reflection::none
+    const flip flip = flip::none
   ) const noexcept;
 
   operator SDL_Texture*() const noexcept;

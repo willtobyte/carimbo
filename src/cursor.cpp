@@ -1,7 +1,7 @@
 #include "cursor.hpp"
 
 #include "io.hpp"
-#include "reflection.hpp"
+#include "flip.hpp"
 #include "resourcemanager.hpp"
 #include "geometry.hpp"
 
@@ -114,7 +114,7 @@ void cursor::draw() const {
       keyframe.frame.w, keyframe.frame.h,
       0,
       255,
-      reflection::none
+      flip::none
   );
 }
 

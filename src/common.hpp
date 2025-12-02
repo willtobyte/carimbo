@@ -115,6 +115,6 @@ struct timerenvelope;
 struct vec2;
 struct vec3;
 
-enum class reflection : int;
+enum class flip : int;
 
 namespace steam { class achievement; }
