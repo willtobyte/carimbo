@@ -706,6 +706,14 @@ void scriptengine::run() {
     "y", &vec2::y
   );
 
+  lua.new_usertype<vec3>(
+    "Vec3",
+    sol::constructors<vec3(), vec3(float, float, float)>(),
+    "x", &vec3::x,
+    "y", &vec3::y,
+    "z", &vec3::z
+  );
+
   lua.new_usertype<quad>(
     "quad",
     sol::constructors<quad(), quad(float, float, float, float)>(),
