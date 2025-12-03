@@ -22,7 +22,7 @@ void observable::unsubscribe() {
 std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& default_value) {
   auto [it, inserted] = _values.try_emplace(std::string{key});
 
-  if (inserted) [[likely]] {
+  if (inserted) {
     it->second = std::make_shared<observable>();
     it->second->set(default_value);
   }
@@ -33,7 +33,7 @@ std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& def
 void kv::set(std::string_view key, const sol::object& value) {
   const auto [it, inserted] = _values.try_emplace(std::string{key});
 
-  if (inserted) [[likely]] {
+  if (inserted) {
     it->second = std::make_shared<observable>();
   }
 
