@@ -5,7 +5,7 @@
 #include "geometry.hpp"
 
 namespace {
-[[nodiscard]] inline const timeline* resolve_timeline(const atlas& at, const std::optional<std::string>& action) noexcept {
+[[nodiscard]] static const timeline* resolve_timeline(const atlas& at, const std::optional<std::string>& action) noexcept {
   if (!action.has_value()) [[unlikely]] {
     return nullptr;
   }
@@ -14,7 +14,7 @@ namespace {
   return it != at.timelines.end() ? &it->second : nullptr;
 }
 
-inline void destroy_body(physics& p) noexcept {
+static void destroy_body(physics& p) noexcept {
   if (b2Shape_IsValid(p.shape)) {
     b2DestroyShape(p.shape, false);
     p.shape = b2ShapeId{};
@@ -25,7 +25,7 @@ inline void destroy_body(physics& p) noexcept {
   p.dirty = true;
 }
 
-inline void patch_shape(physics& p, float hx, float hy) noexcept {
+static void patch_shape(physics& p, float hx, float hy) noexcept {
   if (b2Shape_IsValid(p.shape)) {
     b2DestroyShape(p.shape, false);
   }
@@ -36,14 +36,14 @@ inline void patch_shape(physics& p, float hx, float hy) noexcept {
   p.dirty = false;
 }
 
-struct parameters {
+struct result final {
   b2Vec2 position;
   b2Rot rotation;
   float hx;
   float hy;
 };
 
-[[nodiscard]] inline parameters compute_hitbox(const b2AABB& hitbox, const transform& t) noexcept {
+[[nodiscard]] static result compute_hitbox(const b2AABB& hitbox, const transform& t) noexcept {
   const auto bw = hitbox.upperBound.x - hitbox.lowerBound.x;
   const auto bh = hitbox.upperBound.y - hitbox.lowerBound.y;
 
@@ -70,7 +70,7 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
       s.dirty = false;
     }
 
-    if (!s.timeline) [[unlikely]] {
+    if (!s.timeline || s.timeline->frames.empty()) [[unlikely]] {
       return;
     }
 
@@ -150,9 +150,7 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, [[maybe_un
 void rendersystem::draw(const entt::registry& registry) const noexcept {
   registry.view<renderable, transform, tint, sprite, playback, orientation>().each(
     [](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
-      const auto drawable = rn.visible & (st.timeline != nullptr);
-
-      if (!drawable) [[unlikely]] {
+      if (!rn.visible || !st.timeline || st.timeline->frames.empty()) [[unlikely]] {
         return;
       }
 
