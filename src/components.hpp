@@ -82,7 +82,7 @@ struct physics final {
   }
 };
 
-static void from_json(const nlohmann::json& j, b2AABB& o) {
+inline void from_json(const nlohmann::json& j, b2AABB& o) {
   const auto x = j["x"].get<float>();
   const auto y = j["y"].get<float>();
   const auto w = j["w"].get<float>();
