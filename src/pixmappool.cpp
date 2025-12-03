@@ -9,7 +9,7 @@ pixmappool::pixmappool(std::shared_ptr<renderer> renderer)
 
 std::shared_ptr<pixmap> pixmappool::get(std::string_view filename) {
   const auto [it, inserted] = _pool.try_emplace(std::string{filename});
-  if (inserted) [[likely]] {
+  if (inserted) {
     std::println("[pixmappool] cache miss {}", filename);
     it->second = std::make_shared<pixmap>(_renderer, filename);
   }

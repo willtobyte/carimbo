@@ -9,7 +9,7 @@ soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
 
 std::shared_ptr<soundfx> soundmanager::get(std::string_view filename) {
   const auto [it, inserted] = _pool.try_emplace(std::string{filename});
-  if (inserted) [[likely]] {
+  if (inserted) {
     std::println("[soundmanager] cache miss {}", filename);
     it->second = std::make_shared<soundfx>(filename);
   }
