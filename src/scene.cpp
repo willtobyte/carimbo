@@ -259,20 +259,20 @@ void scene::set_onmotion(sol::protected_function fn) {
 }
 
 void scene::on_enter() const {
-  if (_onenter) {
-    _onenter();
+  if (auto fn = _onenter; fn) {
+    fn();
   }
 }
 
 void scene::on_leave() const {
   _timermanager->clear();
 
-  if (_onleave) {
-    _onleave();
-  }
-
   for (const auto& [_, e] : _effects) {
     e->stop();
+  }
+
+  if (auto fn = _onleave; fn) {
+    fn();
   }
 }
 
