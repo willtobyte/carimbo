@@ -12,7 +12,7 @@ scenemanager::scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, s
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(std::string{name});
-  if (inserted) [[unlikely]] {
+  if (inserted) {
     const auto filename = std::format("scenes/{}.json", name);
     const auto buffer = io::read(filename);
     const auto j = nlohmann::json::parse(buffer);
