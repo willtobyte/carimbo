@@ -233,8 +233,7 @@ struct functor final {
     if (!fn.valid() || !fn.lua_state()) [[unlikely]] return;
     auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
-      sol::error err = result;
-      throw std::runtime_error(err.what());
+      throw std::runtime_error(sol::stack::get<std::string>(result.lua_state(), result.stack_index()));
     }
   }
 
@@ -243,8 +242,7 @@ struct functor final {
     if (!fn.valid() || !fn.lua_state()) [[unlikely]] return R{};
     auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
-      sol::error err = result;
-      throw std::runtime_error(err.what());
+      throw std::runtime_error(sol::stack::get<std::string>(result.lua_state(), result.stack_index()));
     }
 
     return result.template get<R>();
@@ -255,7 +253,6 @@ template<typename T>
   requires requires(const T& t) { { t.valid() } -> std::convertible_to<bool>; }
 inline void verify(const T& result) {
   if (!result.valid()) [[unlikely]] {
-    sol::error err = result;
-    throw std::runtime_error(err.what());
+    throw std::runtime_error(sol::stack::get<std::string>(result.lua_state(), result.stack_index()));
   }
 }
