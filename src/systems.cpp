@@ -5,13 +5,12 @@
 #include "geometry.hpp"
 
 namespace {
-[[nodiscard]] static const timeline* resolve_timeline(const atlas& at, const std::optional<std::string>& action) noexcept {
-  if (!action.has_value()) [[unlikely]] {
+[[nodiscard]] static const timeline* resolve_timeline(const atlas& at, action_id action) noexcept {
+  if (action == no_action) [[unlikely]] {
     return nullptr;
   }
 
-  const auto it = at.timelines.find(*action);
-  return it != at.timelines.end() ? &it->second : nullptr;
+  return at.find(action);
 }
 
 static void destroy_body(physics& p) noexcept {
@@ -90,7 +89,7 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
     s.tick = now;
 
     const auto is_last = s.current_frame + 1 >= tl.frames.size();
-    const auto has_next = !tl.next.empty();
+    const auto has_next = tl.next != no_action;
 
     s.current_frame = is_last ? 0 : s.current_frame + 1;
 
@@ -98,7 +97,7 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
       s.action = tl.next;
       s.dirty = true;
     } else if (is_last & tl.oneshot) {
-      s.action = std::nullopt;
+      s.action = no_action;
       s.timeline = nullptr;
     }
   });

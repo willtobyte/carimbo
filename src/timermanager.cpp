@@ -53,11 +53,11 @@ timermanager::~timermanager() noexcept {
 }
 
 uint32_t timermanager::set(uint32_t interval, sol::protected_function fn) {
-  return add_timer(interval, interop::wrap_fn(fn), true);
+  return add_timer(interval, functor{std::move(fn)}, true);
 }
 
 uint32_t timermanager::singleshot(uint32_t interval, sol::protected_function fn) {
-  return add_timer(interval, interop::wrap_fn(fn), false);
+  return add_timer(interval, functor{std::move(fn)}, false);
 }
 
 void timermanager::cancel(uint32_t id) noexcept {
@@ -72,8 +72,8 @@ void timermanager::cancel(uint32_t id) noexcept {
   _envelopemapping.erase(it);
 
   if (ptr) {
-    if (auto* timer_payload = std::get_if<timerenvelope>(&ptr->payload)) {
-      timer_payload->fn = nullptr;
+    if (auto* payload = std::get_if<timerenvelope>(&ptr->payload)) {
+      payload->fn = nullptr;
     }
 
     context ctx{_envelopepool.get(), ptr};
@@ -91,7 +91,7 @@ void timermanager::clear() noexcept {
   }
 }
 
-uint32_t timermanager::add_timer(uint32_t interval, std::function<void()>&& fn, bool repeat) noexcept {
+uint32_t timermanager::add_timer(uint32_t interval, functor&& fn, bool repeat) noexcept {
   const auto ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);

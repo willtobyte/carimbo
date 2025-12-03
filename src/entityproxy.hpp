@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 
+#include "components.hpp"
 #include "flip.hpp"
 #include "kv.hpp"
 
@@ -32,16 +33,16 @@ public:
   bool visible() const noexcept;
   void set_visible(bool visible) noexcept;
 
-  std::optional<std::string> action() const noexcept;
-  void set_action(std::optional<std::string_view> name) noexcept;
+  action_id action() const noexcept;
+  void set_action(action_id id) noexcept;
 
   void set_onmail(sol::protected_function fn);
   void set_onhover(sol::protected_function fn);
   void set_onunhover(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);
 
-  std::string_view kind() const noexcept;
-  void set_kind(std::string_view kind) noexcept;
+  action_id kind() const noexcept;
+  void set_kind(action_id id) noexcept;
 
   kv kv;
 private:

@@ -15,11 +15,11 @@ void mailenvelope::clear() noexcept {
   body.clear();
 }
 
-timerenvelope::timerenvelope(const bool repeat, std::function<void()>&& fn) noexcept
+timerenvelope::timerenvelope(const bool repeat, functor&& fn) noexcept
   : repeat(repeat), fn(std::move(fn)) {}
 
 timerenvelope::timerenvelope() noexcept
-  : repeat(false), fn(nullptr) {}
+  : repeat(false), fn() {}
 
 void timerenvelope::clear() noexcept {
   repeat = false;

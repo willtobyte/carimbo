@@ -52,8 +52,7 @@ void soundfx::play(bool loop) const noexcept {
   _notified.store(false, std::memory_order_relaxed);
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
-
-  if (auto fn = _onbegin; fn) {
+  if (const auto fn = _onbegin; fn) {
     fn();
   }
 }
@@ -75,7 +74,7 @@ void soundfx::update(float delta) {
   }
 
   _notified.store(true, std::memory_order_relaxed);
-  if (auto fn = _onend; fn) {
+  if (const auto fn = _onend; fn) {
     fn();
   }
 }
@@ -91,9 +90,9 @@ float soundfx::volume() const noexcept {
 }
 
 void soundfx::set_onbegin(sol::protected_function callback) {
-  _onbegin = interop::wrap_fn(std::move(callback));
+  _onbegin = std::move(callback);
 }
 
 void soundfx::set_onend(sol::protected_function callback) {
-  _onend = interop::wrap_fn(std::move(callback));
+  _onend = std::move(callback);
 }

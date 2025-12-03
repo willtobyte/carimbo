@@ -5,6 +5,28 @@
 #include "geometry.hpp"
 #include "flip.hpp"
 
+using action_id = entt::id_type;
+inline constexpr action_id no_action = 0;
+
+[[nodiscard]] inline std::unordered_map<action_id, std::string>& action_registry() noexcept {
+  static std::unordered_map<action_id, std::string> registry;
+  return registry;
+}
+
+[[nodiscard]] inline action_id make_action(std::string_view action) noexcept {
+  if (action.empty()) return no_action;
+  const auto id = entt::hashed_string{action.data(), action.size()}.value();
+  action_registry().try_emplace(id, action);
+  return id;
+}
+
+[[nodiscard]] inline std::optional<std::string_view> action_name(action_id id) noexcept {
+  if (id == no_action) return std::nullopt;
+  auto& reg = action_registry();
+  auto it = reg.find(id);
+  return it != reg.end() ? std::optional<std::string_view>{it->second} : std::nullopt;
+}
+
 struct transform final {
 	vec2 position;
 	double angle;
@@ -60,7 +82,7 @@ struct physics final {
   }
 };
 
-inline void from_json(const nlohmann::json& j, b2AABB& o) {
+static void from_json(const nlohmann::json& j, b2AABB& o) {
   const auto x = j["x"].get<float>();
   const auto y = j["y"].get<float>();
   const auto w = j["w"].get<float>();
@@ -72,12 +94,9 @@ inline void from_json(const nlohmann::json& j, b2AABB& o) {
 
 struct timeline final {
   bool oneshot{false};
-  std::string next;
+  action_id next{no_action};
   std::optional<b2AABB> hitbox;
   std::vector<frame> frames;
-  std::vector<uint16_t> durations;
-  uint16_t current{0};
-  uint64_t tick{0};
 
   friend void from_json(const nlohmann::json& j, timeline& o) {
     if (j.contains("oneshot")) {
@@ -85,7 +104,7 @@ struct timeline final {
     }
 
     if (j.contains("next")) {
-      j["next"].get_to(o.next);
+      o.next = make_action(j["next"].get<std::string_view>());
     }
 
     if (j.contains("hitbox")) {
@@ -101,12 +120,11 @@ struct timeline final {
 };
 
 struct atlas final {
-  std::unordered_map<std::string, timeline> timelines;
+  entt::dense_map<action_id, timeline> timelines;
 
-  const timeline& operator[](const std::string& action) const {
-    auto it = timelines.find(action);
-    assert(it != timelines.end() && "timeline not found");
-    return it->second;
+  const timeline* find(action_id id) const noexcept {
+    auto it = timelines.find(id);
+    return it != timelines.end() ? &it->second : nullptr;
   }
 };
 
@@ -119,7 +137,7 @@ struct playback final {
   bool redraw;
   uint16_t current_frame{0};
   uint64_t tick{0};
-  std::optional<std::string> action;
+  action_id action{no_action};
   const timeline* timeline{nullptr};
 };
 
@@ -129,7 +147,7 @@ struct renderable final {
 };
 
 struct metadata final {
-  std::string kind;
+  action_id kind{no_action};
 };
 
 struct orientation final {
@@ -137,11 +155,10 @@ struct orientation final {
 };
 
 struct callbacks {
-  std::function<void(std::shared_ptr<entityproxy>, std::string_view)> on_mail;
-
-  std::function<void(std::shared_ptr<entityproxy>)> on_hover;
-  std::function<void(std::shared_ptr<entityproxy>)> on_unhover;
-  std::function<void(std::shared_ptr<entityproxy>, float, float)> on_touch;
+  functor on_mail;
+  functor on_hover;
+  functor on_unhover;
+  functor on_touch;
 
   std::shared_ptr<entityproxy> self;
 };

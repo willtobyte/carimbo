@@ -207,7 +207,50 @@ template<typename T>
     return std::move(ptr);
 }
 
-namespace interop {
+struct functor final {
+  sol::protected_function fn;
+
+  functor() noexcept = default;
+  functor(sol::protected_function f) noexcept : fn(std::move(f)) {}
+  functor(std::nullptr_t) noexcept : fn() {}
+
+  functor& operator=(sol::protected_function f) noexcept {
+    fn = std::move(f);
+    return *this;
+  }
+
+  functor& operator=(std::nullptr_t) noexcept {
+    fn = sol::protected_function();
+    return *this;
+  }
+
+  [[nodiscard]] explicit operator bool() const noexcept {
+    return fn.valid() && fn.lua_state() != nullptr;
+  }
+
+  template<typename... Args>
+  void operator()(Args&&... args) const {
+    if (!fn.valid() || !fn.lua_state()) [[unlikely]] return;
+    auto result = fn(std::forward<Args>(args)...);
+    if (!result.valid()) [[unlikely]] {
+      sol::error err = result;
+      throw std::runtime_error(err.what());
+    }
+  }
+
+  template<typename R, typename... Args>
+  [[nodiscard]] R call(Args&&... args) const {
+    if (!fn.valid() || !fn.lua_state()) [[unlikely]] return R{};
+    auto result = fn(std::forward<Args>(args)...);
+    if (!result.valid()) [[unlikely]] {
+      sol::error err = result;
+      throw std::runtime_error(err.what());
+    }
+
+    return result.template get<R>();
+  }
+};
+
 template<typename T>
   requires requires(const T& t) { { t.valid() } -> std::convertible_to<bool>; }
 inline void verify(const T& result) {
@@ -215,49 +258,4 @@ inline void verify(const T& result) {
     sol::error err = result;
     throw std::runtime_error(err.what());
   }
-}
-
-template<typename Signature>
-struct wrap_fn_impl;
-
-template<typename... Args>
-struct wrap_fn_impl<void(Args...)> {
-  static auto wrap(sol::protected_function pf) -> std::function<void(Args...)> {
-    return [pf = std::move(pf)](Args... args) mutable {
-      auto result = pf(std::forward<Args>(args)...);
-      verify(result);
-    };
-  }
-};
-
-template<typename ReturnType, typename... Args>
-struct wrap_fn_impl<ReturnType(Args...)> {
-  static auto wrap(sol::protected_function pf) -> std::function<ReturnType(Args...)> {
-    return [pf = std::move(pf)](Args... args) mutable -> ReturnType {
-      auto result = pf(std::forward<Args>(args)...);
-      verify(result);
-      return result.template get<ReturnType>();
-    };
-  }
-};
-
-template<typename Signature>
-static auto wrap_fn(sol::protected_function pf) -> std::function<Signature> {
-  if (!pf.valid()) {
-    return nullptr;
-  }
-
-  return wrap_fn_impl<Signature>::wrap(std::move(pf));
-}
-
-static auto wrap_fn(sol::protected_function pf) {
-  if (!pf.valid()) {
-    return std::function<void()>{nullptr};
-  }
-
-  return std::function<void()>{[pf = std::move(pf)]() mutable {
-    auto result = pf();
-    verify(result);
-  }};
-}
 }

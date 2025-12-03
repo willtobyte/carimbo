@@ -15,7 +15,7 @@ struct mail final {
     std::string_view body
   )
     : to(to->id()),
-      kind(from && *from ? (*from)->kind() : "unknown"),
+      kind(from && *from ? action_name((*from)->kind()).value_or("unknown") : "unknown"),
       body(body) {}
 };
 

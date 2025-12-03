@@ -35,8 +35,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   for (const auto& o : os) {
     const auto name = o.at("name").get<std::string>();
     const auto kind = o.at("kind").get<std::string>();
-    const auto q = o.value("action", std::string{});
-    const auto action = q.empty() ? std::nullopt : std::optional<std::string>(q);
+    const auto action = make_action(o.value("action", std::string{}));
 
     const auto x = o.value("x", .0f);
     const auto y = o.value("y", .0f);
@@ -48,7 +47,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     auto entity = _registry.create();
 
     metadata m;
-    m.kind = kind;
+    m.kind = make_action(kind);
     _registry.emplace<metadata>(entity, std::move(m));
 
     tint tn;
@@ -75,7 +74,7 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     for (auto& [key, value] : j.at("timelines").items()) {
       timeline tl;
       from_json(value, tl);
-      at.timelines.emplace(key, std::move(tl));
+      at.timelines.emplace(make_action(key), std::move(tl));
     }
 
     _registry.emplace<atlas>(entity, std::move(at));
@@ -148,7 +147,7 @@ void scene::update(float delta) noexcept {
   _physicssystem.update(_registry, _world, delta);
   _particlesystem.update(delta);
 
-  if (auto fn = _onloop; fn) [[likely]] {
+  if (const auto fn = _onloop; fn) {
     fn(delta);
   }
 }
@@ -228,11 +227,11 @@ void scene::set_onenter(std::function<void()>&& fn) {
 }
 
 void scene::set_onloop(sol::protected_function fn) {
-  _onloop = interop::wrap_fn<void(float)>(std::move(fn));
+  _onloop = std::move(fn);
 }
 
 void scene::set_oncamera(sol::protected_function fn) {
-  _oncamera = interop::wrap_fn<quad(float)>(std::move(fn));
+  _oncamera = std::move(fn);
 }
 
 void scene::set_onleave(std::function<void()>&& fn) {
@@ -240,41 +239,41 @@ void scene::set_onleave(std::function<void()>&& fn) {
 }
 
 void scene::set_ontouch(sol::protected_function fn) {
-  _ontouch = interop::wrap_fn<void(float, float)>(std::move(fn));
+  _ontouch = std::move(fn);
 }
 
 void scene::set_onkeypress(sol::protected_function fn) {
-  _onkeypress = interop::wrap_fn<void(int32_t)>(std::move(fn));
+  _onkeypress = std::move(fn);
 }
 
 void scene::set_onkeyrelease(sol::protected_function fn) {
-  _onkeyrelease = interop::wrap_fn<void(int32_t)>(std::move(fn));
+  _onkeyrelease = std::move(fn);
 }
 
 void scene::set_ontext(sol::protected_function fn) {
-  _ontext = interop::wrap_fn<void(std::string_view)>(std::move(fn));
+  _ontext = std::move(fn);
 }
 
 void scene::set_onmotion(sol::protected_function fn) {
-  _onmotion = interop::wrap_fn<void(float, float)>(std::move(fn));
+  _onmotion = std::move(fn);
 }
 
 void scene::on_enter() const {
-  if (auto fn = _onenter; fn) {
-    fn();
+  if (_onenter) {
+    _onenter();
   }
 }
 
 void scene::on_leave() const {
-    _timermanager->clear();
+  _timermanager->clear();
 
-    if (auto fn = _onleave; fn) {
-      fn();
-    }
+  if (_onleave) {
+    _onleave();
+  }
 
-    for (const auto& [_, e] : _effects) {
-      e->stop();
-    }
+  for (const auto& [_, e] : _effects) {
+    e->stop();
+  }
 }
 
 void scene::on_touch(float x, float y) const {
@@ -282,19 +281,19 @@ void scene::on_touch(float x, float y) const {
   hits.reserve(32);
   hits.clear();
   query(x, y, hits);
+
   if (hits.empty()) {
-    if (auto fn = _ontouch; fn) {
+    if (const auto fn = _ontouch; fn) {
       fn(x, y);
     }
-
     return;
   }
 
   for (auto entity : hits) {
     if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_touch) {
-      auto fn = callback->on_touch;
-      auto self = callback->self;
-      fn(self, x, y);
+      if (const auto fn = callback->on_touch; fn) {
+        fn(callback->self, x, y);
+      }
     }
   }
 }
@@ -308,42 +307,42 @@ void scene::on_motion(float x, float y) const {
   for (const auto entity : _hovering) {
     if (hits.contains(entity)) continue;
     if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_unhover) {
-      auto fn = callback->on_unhover;
-      auto self = callback->self;
-      fn(self);
+      if (const auto fn = callback->on_unhover; fn) {
+        fn(callback->self);
+      }
     }
   }
 
   for (const auto entity : hits) {
     if (_hovering.contains(entity)) continue;
     if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_hover) {
-      auto fn = callback->on_hover;
-      auto self = callback->self;
-      fn(self);
+      if (const auto fn = callback->on_hover; fn) {
+        fn(callback->self);
+      }
     }
   }
 
   _hovering.swap(hits);
 
-  if (auto fn = _onmotion; fn) {
+  if (const auto fn = _onmotion; fn) {
     fn(x, y);
   }
 }
 
 void scene::on_key_press(int32_t code) const {
-  if (auto fn = _onkeypress; fn) {
+  if (const auto fn = _onkeypress; fn) {
     fn(code);
   }
 }
 
 void scene::on_key_release(int32_t code) const {
-  if (auto fn = _onkeyrelease; fn) {
+  if (const auto fn = _onkeyrelease; fn) {
     fn(code);
   }
 }
 
 void scene::on_text(std::string_view text) const {
-  if (auto fn = _ontext; fn) {
+  if (const auto fn = _ontext; fn) {
     fn(text);
   }
 }

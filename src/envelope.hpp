@@ -15,9 +15,9 @@ struct mailenvelope final {
 
 struct timerenvelope final {
   bool repeat;
-  std::function<void()> fn;
+  functor fn;
 
-  timerenvelope(const bool repeat, std::function<void()>&& fn) noexcept;
+  timerenvelope(const bool repeat, functor&& fn) noexcept;
   timerenvelope() noexcept;
 
   void clear() noexcept;

@@ -267,11 +267,13 @@ void eventmanager::update(float delta) {
       case static_cast<uint32_t>(event::type::timer): {
         auto* ptr = static_cast<envelope*>(event.user.data1);
 
-        if (const auto* payload = ptr->try_timer(); payload) {
-          const auto fn = payload->fn;
+        if (ptr) {
+          if (const auto* payload = ptr->try_timer(); payload) {
+            const auto fn = payload->fn;
 
-          if (fn) {
-            fn();
+            if (fn) {
+              fn();
+            }
           }
         }
       } break;

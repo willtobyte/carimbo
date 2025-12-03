@@ -35,7 +35,7 @@ static sol::object searcher(sol::this_state state, std::string_view module) {
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
 
   const auto loader = lua.load(script, std::format("@{}", filename));
-  interop::verify(loader);
+  verify(loader);
   return sol::make_object(lua, loader.get<sol::protected_function>());
 }
 
@@ -450,8 +450,18 @@ void scriptengine::run() {
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
     "flip", sol::property(&entityproxy::flip, &entityproxy::set_flip),
     "visible", sol::property(&entityproxy::visible, &entityproxy::set_visible),
-    "action", sol::property(&entityproxy::action, &entityproxy::set_action),
-    "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),
+    "action", sol::property(
+      [](const entityproxy& self) { return action_name(self.action()); },
+      [](entityproxy& self, std::optional<std::string_view> name) {
+        self.set_action(name ? make_action(*name) : no_action);
+      }
+    ),
+    "kind", sol::property(
+      [](const entityproxy& self) { return action_name(self.kind()); },
+      [](entityproxy& self, std::string_view name) {
+        self.set_kind(make_action(name));
+      }
+    ),
     "position", sol::property(
       &entityproxy::position,
       [](entityproxy& self, sol::table table) {
@@ -517,10 +527,10 @@ void scriptengine::run() {
         const auto buffer = io::read(filename);
         std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
         const auto result = lua.load(script, std::format("@{}", filename));
-        interop::verify(result);
+        verify(result);
         const auto pf = result.get<sol::protected_function>();
         const auto exec = pf();
-        interop::verify(exec);
+        verify(exec);
         auto module = exec.get<sol::table>();
 
         auto loaded = lua["package"]["loaded"];
@@ -1026,7 +1036,7 @@ void scriptengine::run() {
   const auto buffer = io::read("scripts/main.lua");
   std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
   const auto source = lua.safe_script(script, "@main.lua");
-  interop::verify(source);
+  verify(source);
 
   const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
 
@@ -1044,7 +1054,7 @@ void scriptengine::run() {
 
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
-  interop::verify(result);
+  verify(result);
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
 
   const auto end = SDL_GetPerformanceCounter();

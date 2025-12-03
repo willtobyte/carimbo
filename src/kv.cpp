@@ -6,14 +6,13 @@ sol::object observable::value() const {
 
 void observable::set(const sol::object& value) {
   _value = value;
-
-  if (auto fn = _subscriber; fn) {
+  if (const auto fn = _subscriber; fn) {
     fn(value);
   }
 }
 
 void observable::subscribe(sol::protected_function callback) {
-  _subscriber = interop::wrap_fn<void(const sol::object&)>(std::move(callback));
+  _subscriber = std::move(callback);
 }
 
 void observable::unsubscribe() {

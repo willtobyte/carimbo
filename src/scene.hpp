@@ -88,13 +88,13 @@ private:
 
   std::function<void()> _onenter;
   std::function<void()> _onleave;
-  std::function<void(float)> _onloop;
-  std::function<quad(float)> _oncamera;
-  std::function<void(float, float)> _ontouch;
-  std::function<void(int32_t)> _onkeypress;
-  std::function<void(int32_t)> _onkeyrelease;
-  std::function<void(std::string_view)> _ontext;
-  std::function<void(float, float)> _onmotion;
+  functor _onloop;
+  functor _oncamera;
+  functor _ontouch;
+  functor _onkeypress;
+  functor _onkeyrelease;
+  functor _ontext;
+  functor _onmotion;
 
   mutable entt::dense_set<entt::entity> _hovering;
 };

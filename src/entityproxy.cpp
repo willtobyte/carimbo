@@ -93,56 +93,47 @@ void entityproxy::set_visible(bool visible) noexcept {
   p.dirty = true;
 }
 
-std::optional<std::string> entityproxy::action() const noexcept {
+action_id entityproxy::action() const noexcept {
   const auto& s = _registry.get<playback>(_e);
   return s.action;
 }
 
-void entityproxy::set_action(std::optional<std::string_view> name) noexcept {
+void entityproxy::set_action(action_id id) noexcept {
   auto& s = _registry.get<playback>(_e);
-
-  if (!name) {
-    s.action = std::nullopt;
-    s.current_frame = 0;
-    s.dirty = true;
-    s.timeline = nullptr;
-    return;
-  }
-
-  s.action = *name;
+  s.action = id;
   s.current_frame = 0;
   s.dirty = true;
   s.timeline = nullptr;
 }
 
 void entityproxy::set_onmail(sol::protected_function fn) {
-  auto& callback = _registry.get<callbacks>(_e);
-  callback.on_mail = interop::wrap_fn<void(std::shared_ptr<entityproxy>, std::string_view)>(std::move(fn));
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_mail = std::move(fn);
 }
 
 void entityproxy::set_onhover(sol::protected_function fn) {
-  auto& callback = _registry.get<callbacks>(_e);
-  callback.on_hover = interop::wrap_fn<void(std::shared_ptr<entityproxy>)>(std::move(fn));
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_hover = std::move(fn);
 }
 
 void entityproxy::set_onunhover(sol::protected_function fn) {
-  auto& callback = _registry.get<callbacks>(_e);
-  callback.on_unhover = interop::wrap_fn<void(std::shared_ptr<entityproxy>)>(std::move(fn));
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_unhover = std::move(fn);
 }
 
 void entityproxy::set_ontouch(sol::protected_function fn) {
-  auto& callback = _registry.get<callbacks>(_e);
-  callback.on_touch = interop::wrap_fn<void(std::shared_ptr<entityproxy>, float, float)>(std::move(fn));
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_touch = std::move(fn);
 }
 
-std::string_view entityproxy::kind() const noexcept {
+action_id entityproxy::kind() const noexcept {
   const auto& m = _registry.get<metadata>(_e);
   return m.kind;
 }
 
-void entityproxy::set_kind(std::string_view kind) noexcept {
+void entityproxy::set_kind(action_id id) noexcept {
   auto& m = _registry.get<metadata>(_e);
-  m.kind = kind;
+  m.kind = id;
 }
 
 flip entityproxy::flip() const noexcept {

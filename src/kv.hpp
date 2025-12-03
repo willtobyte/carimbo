@@ -11,7 +11,7 @@ public:
   void unsubscribe();
 
 private:
-  std::function<void(const sol::object&)> _subscriber;
+  functor _subscriber;
   sol::object _value;
 };
 

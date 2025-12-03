@@ -22,7 +22,7 @@ private:
   ALuint _source{0};
   ALuint _buffer{0};
 
-  std::function<void()> _onbegin{};
-  std::function<void()> _onend{};
+  functor _onbegin;
+  functor _onend;
   mutable std::atomic<bool> _notified{false};
 };
