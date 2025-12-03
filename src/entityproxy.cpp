@@ -106,26 +106,6 @@ void entityproxy::set_action(action_id id) noexcept {
   s.timeline = nullptr;
 }
 
-void entityproxy::set_onmail(sol::protected_function fn) {
-  auto& c = _registry.get<callbacks>(_e);
-  c.on_mail = std::move(fn);
-}
-
-void entityproxy::set_onhover(sol::protected_function fn) {
-  auto& c = _registry.get<callbacks>(_e);
-  c.on_hover = std::move(fn);
-}
-
-void entityproxy::set_onunhover(sol::protected_function fn) {
-  auto& c = _registry.get<callbacks>(_e);
-  c.on_unhover = std::move(fn);
-}
-
-void entityproxy::set_ontouch(sol::protected_function fn) {
-  auto& c = _registry.get<callbacks>(_e);
-  c.on_touch = std::move(fn);
-}
-
 action_id entityproxy::kind() const noexcept {
   const auto& m = _registry.get<metadata>(_e);
   return m.kind;
@@ -148,3 +128,24 @@ void entityproxy::set_flip(::flip flip) noexcept {
   auto& s = _registry.get<playback>(_e);
   s.redraw = true;
 }
+
+void entityproxy::set_onmail(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_mail = std::move(fn);
+}
+
+void entityproxy::set_onhover(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_hover = std::move(fn);
+}
+
+void entityproxy::set_onunhover(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_unhover = std::move(fn);
+}
+
+void entityproxy::set_ontouch(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_touch = std::move(fn);
+}
+

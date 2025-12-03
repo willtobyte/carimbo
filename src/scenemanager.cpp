@@ -85,10 +85,9 @@ std::vector<std::string> scenemanager::destroy(std::string_view name) {
   for (const auto& scene : scenes) {
     if (_scene_mapping.erase(scene) > 0) {
       std::println("[scenemanager] destroyed {}", scene);
+      _resourcemanager->flush();
     }
   }
-
-  _resourcemanager->flush();
 
   return scenes;
 }
