@@ -222,39 +222,39 @@ std::variant<
   std::terminate();
 }
 
-void scene::set_onenter(sol::protected_function&& fn) {
+void scene::set_onenter(std::function<void()>&& fn) {
   _onenter = std::move(fn);
 }
 
-void scene::set_onloop(sol::protected_function fn) {
+void scene::set_onloop(sol::protected_function&& fn) {
   _onloop = std::move(fn);
 }
 
-void scene::set_oncamera(sol::protected_function fn) {
+void scene::set_oncamera(sol::protected_function&& fn) {
   _oncamera = std::move(fn);
 }
 
-void scene::set_onleave(sol::protected_function&& fn) {
+void scene::set_onleave(std::function<void()>&& fn) {
   _onleave = std::move(fn);
 }
 
-void scene::set_ontouch(sol::protected_function fn) {
+void scene::set_ontouch(sol::protected_function&& fn) {
   _ontouch = std::move(fn);
 }
 
-void scene::set_onkeypress(sol::protected_function fn) {
+void scene::set_onkeypress(sol::protected_function&& fn) {
   _onkeypress = std::move(fn);
 }
 
-void scene::set_onkeyrelease(sol::protected_function fn) {
+void scene::set_onkeyrelease(sol::protected_function&& fn) {
   _onkeyrelease = std::move(fn);
 }
 
-void scene::set_ontext(sol::protected_function fn) {
+void scene::set_ontext(sol::protected_function&& fn) {
   _ontext = std::move(fn);
 }
 
-void scene::set_onmotion(sol::protected_function fn) {
+void scene::set_onmotion(sol::protected_function&& fn) {
   _onmotion = std::move(fn);
 }
 

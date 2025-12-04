@@ -270,6 +270,11 @@ void eventmanager::update(float delta) {
         if (ptr) {
           if (const auto* payload = ptr->try_timer(); payload) {
             const auto fn = payload->fn;
+            const auto repeat = payload->repeat;
+
+            if (!repeat) {
+              _envelopepool->release(ptr);
+            }
 
             if (fn) {
               fn();

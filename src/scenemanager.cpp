@@ -54,7 +54,12 @@ void scenemanager::set(std::string_view name) {
 
   std::println("[scenemanager] entered {}", name);
 
-  ptr->on_enter();
+  try {
+    ptr->on_enter();
+  } catch (const std::exception& e) {
+    std::println(stderr, "[scenemanager] error in on_enter for {}: {}", name, e.what());
+    throw;
+  }
 }
 
 std::shared_ptr<scene> scenemanager::get() const {

@@ -490,8 +490,14 @@ void scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "current", sol::property(&scenemanager::current),
-    "set", &scenemanager::set,
     "get", &scenemanager::get,
+    "set", [&lua](scenemanager& self, std::string_view name) {
+      try {
+        self.set(name);
+      } catch (const std::exception& e) {
+        luaL_error(lua, "%s", e.what());
+      }
+    },
     "destroy", [&lua](
       scenemanager& self,
       std::string_view name
@@ -544,7 +550,7 @@ void scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          lua.set_function("__onenter_impl", [fn, ptr, &lua]() mutable {
+          const auto wrapper = [fn, ptr, &lua]() mutable {
             lua["pool"] = lua.create_table();
 
             auto scene = ptr.lock();
@@ -554,17 +560,18 @@ void scriptengine::run() {
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
-              luaL_error(lua, "%s", err.what());
+              return luaL_error(lua, "%s", err.what());
             }
-          });
 
-          scene->set_onenter(lua["__onenter_impl"]);
-          lua["__onenter_impl"] = sol::lua_nil;
+            return 0;
+          };
+
+          scene->set_onenter(std::move(wrapper));
 
           lua.collect_garbage();
           lua.collect_garbage();
         }
-
+        
         if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
           scene->set_onloop(std::move(fn));
         }
@@ -594,11 +601,11 @@ void scriptengine::run() {
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          lua.set_function("__onleave_impl", [fn, &lua]() mutable {
+          const auto wrapper = [fn, &lua]() mutable {
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
-              luaL_error(lua, "%s", err.what());
+              return luaL_error(lua, "%s", err.what());
             }
 
             lua.collect_garbage();
@@ -610,10 +617,11 @@ void scriptengine::run() {
 
             lua.collect_garbage();
             lua.collect_garbage();
-          });
 
-          scene->set_onleave(lua["__onleave_impl"]);
-          lua["__onleave_impl"] = sol::lua_nil;
+            return 0;
+          };
+
+          scene->set_onleave(std::move(wrapper));
         }
 
         const auto end = SDL_GetPerformanceCounter();
