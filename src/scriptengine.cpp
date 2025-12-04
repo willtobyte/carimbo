@@ -550,7 +550,7 @@ void scriptengine::run() {
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
-          const auto wrapper = [fn, ptr, &lua]() mutable {
+          const auto wrapper = [fn, ptr, &lua]() {
             lua["pool"] = lua.create_table();
 
             auto scene = ptr.lock();
@@ -560,10 +560,8 @@ void scriptengine::run() {
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
-              return luaL_error(lua, "%s", err.what());
+              throw std::runtime_error(err.what());
             }
-
-            return 0;
           };
 
           scene->set_onenter(std::move(wrapper));
@@ -601,11 +599,11 @@ void scriptengine::run() {
         }
 
         if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          const auto wrapper = [fn, &lua]() mutable {
+          const auto wrapper = [fn, &lua]() {
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
-              return luaL_error(lua, "%s", err.what());
+              throw std::runtime_error(err.what());
             }
 
             lua.collect_garbage();
@@ -617,8 +615,6 @@ void scriptengine::run() {
 
             lua.collect_garbage();
             lua.collect_garbage();
-
-            return 0;
           };
 
           scene->set_onleave(std::move(wrapper));
