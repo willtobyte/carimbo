@@ -39,10 +39,10 @@ public:
     std::shared_ptr<particleprops>
   > get(std::string_view name, scenekind kind) const;
 
-  void set_onenter(std::function<void()>&& fn);
+  void set_onenter(sol::protected_function && fn);
   void set_onloop(sol::protected_function fn);
   void set_oncamera(sol::protected_function fn);
-  void set_onleave(std::function<void()>&& fn);
+  void set_onleave(sol::protected_function&& fn);
   void set_ontouch(sol::protected_function fn);
   void set_onkeypress(sol::protected_function fn);
   void set_onkeyrelease(sol::protected_function fn);
@@ -86,8 +86,8 @@ private:
   std::unordered_map<std::string, std::shared_ptr<entityproxy>, string_hash, string_equal> _proxies;
   std::unordered_map<std::string, std::shared_ptr<particlebatch>, string_hash, string_equal> _particles;
 
-  std::function<void()> _onenter;
-  std::function<void()> _onleave;
+  functor _onenter;
+  functor _onleave;
   functor _onloop;
   functor _oncamera;
   functor _ontouch;

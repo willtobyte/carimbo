@@ -76,7 +76,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
         ++h;
       }
 
-      map[glyph] = {
+      map[static_cast<uint8_t>(glyph)] ={
         static_cast<float>(x), static_cast<float>(y),
         static_cast<float>(w), static_cast<float>(h)
       };

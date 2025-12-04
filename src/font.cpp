@@ -26,7 +26,9 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
 
   vec2 cursor = position;
 
-  const auto height = _map.begin()->second.h * _scale;
+  const auto& first = _map[static_cast<uint8_t>(_glyphs[0])];
+  assert(first && "first glyph must be valid");
+  const float height = first->h * _scale;
 
   for (const auto ch : text) {
     if (ch == '\n') {
@@ -34,12 +36,11 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
       continue;
     }
 
-    const auto it = _map.find(ch);
-    if (it == _map.end()) {
+    const auto index = static_cast<uint8_t>(ch);
+    const auto& glyph = _map[index];
+    if (!glyph) {
       continue;
     }
-
-    const auto& glyph = it->second;
 
     double angle = .0L;
     flip flip = flip::none;
@@ -56,14 +57,14 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
     const auto s = _scale * scale;
 
     _pixmap->draw(
-      glyph.x, glyph.y, glyph.w, glyph.h,
-      cursor.x, cursor.y, glyph.w * s, glyph.h * s,
+      glyph->x, glyph->y, glyph->w, glyph->h,
+      cursor.x, cursor.y, glyph->w * s, glyph->h * s,
       angle,
       alpha,
       flip
     );
 
-    cursor.x += glyph.w + _spacing;
+    cursor.x += glyph->w + _spacing;
   }
 }
 

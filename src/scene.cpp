@@ -222,7 +222,7 @@ std::variant<
   std::terminate();
 }
 
-void scene::set_onenter(std::function<void()>&& fn) {
+void scene::set_onenter(sol::protected_function&& fn) {
   _onenter = std::move(fn);
 }
 
@@ -234,7 +234,7 @@ void scene::set_oncamera(sol::protected_function fn) {
   _oncamera = std::move(fn);
 }
 
-void scene::set_onleave(std::function<void()>&& fn) {
+void scene::set_onleave(sol::protected_function&& fn) {
   _onleave = std::move(fn);
 }
 

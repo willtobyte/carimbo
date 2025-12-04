@@ -6,7 +6,7 @@
 
 class pixmap;
 
-using glyphmap = std::map<char, quad>;
+using glyphmap = std::array<std::optional<quad>, 256>;
 
 class font final {
 public:

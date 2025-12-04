@@ -8,24 +8,7 @@
 #include "renderer.hpp"
 #include "soundmanager.hpp"
 
-static const std::map<std::string, std::function<void(
-  std::string_view,
-  pixmappool&,
-  soundmanager&
-)>> handlers = {
-  {
-    ".png",
-    [](std::string_view filename, pixmappool& pixmappool, soundmanager&) {
-      pixmappool.get(filename);
-    }
-  },
-  {
-    ".ogg",
-    [](std::string_view filename, pixmappool&, soundmanager& soundmanager) {
-      soundmanager.get(filename);
-    }
-  }
-};
+
 
 resourcemanager::resourcemanager(
   std::shared_ptr<::renderer> renderer,
@@ -68,8 +51,10 @@ void resourcemanager::prefetch(const std::vector<std::string>& filenames) {
   for (const auto& filename : filenames) {
     if (const auto position = filename.rfind('.'); position != std::string::npos) {
       const auto extension = filename.substr(position);
-      if (const auto it = handlers.find(extension); it != handlers.end()) {
-        it->second(filename, *_pixmappool, *_soundmanager);
+      if (extension == ".png") {
+        _pixmappool->get(filename);
+      } else if (extension == ".ogg") {
+        _soundmanager->get(filename);
       }
     }
   }
