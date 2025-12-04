@@ -149,3 +149,55 @@ void entityproxy::set_ontouch(sol::protected_function fn) {
   c.on_touch = std::move(fn);
 }
 
+std::shared_ptr<entityproxy> entityproxy::clone() {
+  auto e = _registry.create();
+
+  if (const auto* m = _registry.try_get<metadata>(_e)) {
+    _registry.emplace<metadata>(e, *m);
+  }
+
+  if (const auto* tn = _registry.try_get<tint>(_e)) {
+    _registry.emplace<tint>(e, *tn);
+  }
+
+  if (const auto* sp = _registry.try_get<sprite>(_e)) {
+    _registry.emplace<sprite>(e, *sp);
+  }
+
+  if (const auto* pb = _registry.try_get<playback>(_e)) {
+    playback cpb = *pb;
+    cpb.dirty = true;
+    cpb.redraw = true;
+    _registry.emplace<playback>(e, std::move(cpb));
+  }
+
+  if (const auto* tf = _registry.try_get<transform>(_e)) {
+    _registry.emplace<transform>(e, *tf);
+  }
+
+  if (const auto* at = _registry.try_get<atlas>(_e)) {
+    _registry.emplace<atlas>(e, *at);
+  }
+
+  if (const auto* ori = _registry.try_get<orientation>(_e)) {
+    _registry.emplace<orientation>(e, *ori);
+  }
+
+  physics ph;
+  ph.dirty = true;
+  _registry.emplace<physics>(e, std::move(ph));
+
+  if (const auto* rn = _registry.try_get<renderable>(_e)) {
+    renderable crn = *rn;
+    crn.z = rn->z + 1;
+    _registry.emplace<renderable>(e, std::move(crn));
+  }
+
+  auto proxy = std::make_shared<entityproxy>(e, _registry);
+
+  callbacks c;
+  c.self = proxy;
+  _registry.emplace<callbacks>(e, std::move(c));
+
+  return proxy;
+}

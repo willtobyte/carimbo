@@ -44,6 +44,8 @@ public:
   void set_onunhover(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);
 
+  std::shared_ptr<entityproxy> clone();
+
   kv kv;
 private:
   entt::entity _e;
