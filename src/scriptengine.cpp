@@ -474,6 +474,8 @@ void scriptengine::run() {
     "on_hover", &entityproxy::set_onhover,
     "on_unhover", &entityproxy::set_onunhover,
     "on_touch", &entityproxy::set_ontouch,
+    "on_begin", &entityproxy::set_onbegin,
+    "on_end", &entityproxy::set_onend,
     "clone", &entityproxy::clone,
 
     sol::meta_function::index, metaentity::index,

@@ -59,7 +59,7 @@ struct result final {
 }
 
 void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
-  registry.view<atlas, playback>().each([now](const atlas& at, playback& s) {
+  registry.view<atlas, playback, callbacks>().each([now](const atlas& at, playback& s, callbacks& c) {
     const bool refresh = s.dirty | !s.timeline;
 
     if (refresh) [[unlikely]] {
@@ -67,6 +67,9 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
       s.current_frame = 0;
       s.tick = now;
       s.dirty = false;
+      if (s.timeline && c.on_begin) {
+        c.on_begin(c.self);
+      }
     }
 
     if (!s.timeline || s.timeline->frames.empty()) [[unlikely]] {
@@ -99,6 +102,9 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
     } else if (is_last & tl.oneshot) {
       s.action = no_action;
       s.timeline = nullptr;
+      if (c.on_end) {
+        c.on_end(c.self);
+      }
     }
   });
 }

@@ -129,24 +129,34 @@ void entityproxy::set_flip(::flip flip) noexcept {
   s.redraw = true;
 }
 
-void entityproxy::set_onmail(sol::protected_function fn) {
+void entityproxy::set_onmail(sol::protected_function&& fn) {
   auto& c = _registry.get<callbacks>(_e);
   c.on_mail = std::move(fn);
 }
 
-void entityproxy::set_onhover(sol::protected_function fn) {
+void entityproxy::set_onhover(sol::protected_function&& fn) {
   auto& c = _registry.get<callbacks>(_e);
   c.on_hover = std::move(fn);
 }
 
-void entityproxy::set_onunhover(sol::protected_function fn) {
+void entityproxy::set_onunhover(sol::protected_function&& fn) {
   auto& c = _registry.get<callbacks>(_e);
   c.on_unhover = std::move(fn);
 }
 
-void entityproxy::set_ontouch(sol::protected_function fn) {
+void entityproxy::set_ontouch(sol::protected_function&& fn) {
   auto& c = _registry.get<callbacks>(_e);
   c.on_touch = std::move(fn);
+}
+
+void entityproxy::set_onbegin(sol::protected_function&& fn) {
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_begin = std::move(fn);
+}
+
+void entityproxy::set_onend(sol::protected_function&& fn) {
+  auto& c = _registry.get<callbacks>(_e);
+  c.on_end = std::move(fn);
 }
 
 std::shared_ptr<entityproxy> entityproxy::clone() {
@@ -196,7 +206,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   auto proxy = std::make_shared<entityproxy>(e, _registry);
 
   callbacks c;
-  c.self = std::move(proxy);
+  c.self = proxy;
   _registry.emplace<callbacks>(e, std::move(c));
 
   return proxy;

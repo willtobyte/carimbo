@@ -39,10 +39,12 @@ public:
   action_id kind() const noexcept;
   void set_kind(action_id id) noexcept;
 
-  void set_onmail(sol::protected_function fn);
-  void set_onhover(sol::protected_function fn);
-  void set_onunhover(sol::protected_function fn);
-  void set_ontouch(sol::protected_function fn);
+  void set_onmail(sol::protected_function&& fn);
+  void set_onhover(sol::protected_function&& fn);
+  void set_onunhover(sol::protected_function&& fn);
+  void set_ontouch(sol::protected_function&& fn);
+  void set_onbegin(sol::protected_function&& fn);
+  void set_onend(sol::protected_function&& fn);
 
   std::shared_ptr<entityproxy> clone();
 

@@ -159,6 +159,8 @@ struct callbacks {
   functor on_hover;
   functor on_unhover;
   functor on_touch;
+  functor on_begin;
+  functor on_end;
 
   std::shared_ptr<entityproxy> self;
 };
