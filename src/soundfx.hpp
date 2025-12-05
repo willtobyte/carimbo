@@ -7,7 +7,7 @@ public:
   explicit soundfx(std::string_view filename) noexcept;
   ~soundfx();
 
-  void play(bool loop = false) const noexcept;
+  void play(bool loop) const noexcept;
   void stop() const noexcept;
 
   void update(float delta);
