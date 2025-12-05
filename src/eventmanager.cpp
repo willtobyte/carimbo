@@ -44,31 +44,22 @@ eventmanager::eventmanager(std::shared_ptr<renderer> renderer)
 }
 
 void eventmanager::update(float delta) {
-  std::erase_if(
-    _receivers,
-    std::mem_fn(&std::weak_ptr<eventreceiver>::expired)
-  );
-
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
     SDL_ConvertEventToRenderCoordinates(*_renderer, &event);
 
     switch (event.type) {
       case SDL_EVENT_QUIT: {
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_quit();
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_quit();
         }
       } break;
 
       case SDL_EVENT_KEY_DOWN: {
         const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_key_press(e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_key_press(e);
         }
       } break;
 
@@ -82,10 +73,8 @@ void eventmanager::update(float delta) {
 #ifndef NDEBUG
           case SDLK_D: {
             if (event.key.mod & SDL_KMOD_CTRL) {
-              for (const auto& weak : _receivers) {
-                if (auto receiver = weak.lock(); receiver) {
-                  receiver->on_debug();
-                }
+              for (const auto& receiver : _receivers) {
+                receiver->on_debug();
               }
             }
           } break;
@@ -96,28 +85,22 @@ void eventmanager::update(float delta) {
 
         const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_key_release(e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_key_release(e);
         }
       } break;
 
       case SDL_EVENT_TEXT_INPUT: {
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_text(event.text.text);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_text(event.text.text);
         }
       } break;
 
       case SDL_EVENT_MOUSE_MOTION: {
         const event::mouse::motion e{event.motion.x, event.motion.y};
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_mouse_motion(e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_mouse_motion(e);
         }
       } break;
 
@@ -129,10 +112,8 @@ void eventmanager::update(float delta) {
           .y = event.button.y
         };
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_mouse_press(e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_mouse_press(e);
         }
       } break;
 
@@ -144,10 +125,8 @@ void eventmanager::update(float delta) {
           .y = event.button.y
         };
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_mouse_release(e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_mouse_release(e);
         }
       } break;
 
@@ -204,10 +183,8 @@ void eventmanager::update(float delta) {
 
         const event::gamepad::button e{event.gbutton.button};
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_gamepad_press(slot, e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_gamepad_press(slot, e);
         }
       } break;
 
@@ -221,10 +198,8 @@ void eventmanager::update(float delta) {
 
         const event::gamepad::button e{event.gbutton.button};
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_gamepad_release(slot, e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_gamepad_release(slot, e);
         }
       } break;
 
@@ -240,10 +215,8 @@ void eventmanager::update(float delta) {
         const auto value = event.gaxis.value;
         const event::gamepad::motion e{axis, value};
 
-        for (const auto& weak : _receivers) {
-          if (auto receiver = weak.lock(); receiver) {
-            receiver->on_gamepad_motion(slot, e);
-          }
+        for (const auto& receiver : _receivers) {
+          receiver->on_gamepad_motion(slot, e);
         }
       } break;
 
@@ -253,10 +226,8 @@ void eventmanager::update(float delta) {
         if (ptr) {
           if (const auto* payload = ptr->try_mail(); payload) {
             const auto o = event::mail(payload->to, payload->body);
-            for (const auto& weak : _receivers) {
-              if (auto receiver = weak.lock(); receiver) {
-                receiver->on_mail(o);
-              }
+            for (const auto& receiver : _receivers) {
+              receiver->on_mail(o);
             }
           }
 
@@ -302,25 +273,7 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
     return;
   }
 
-  constexpr std::owner_less<> compare;
-
-  for (auto i = _receivers.size(); i-- > 0; ) {
-    const auto& weak = _receivers[i];
-
-    auto should_remove = false;
-
-    if (weak.expired()) [[unlikely]] {
-      should_remove = true;
-    } else {
-      const auto locked = weak.lock();
-      should_remove = !compare(weak, receiver) && !compare(receiver, weak);
-    }
-
-    if (should_remove) {
-      _receivers[i] = std::move(_receivers.back());
-      _receivers.pop_back();
-    }
-  }
+  std::erase(_receivers, receiver);
 }
 
 void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {

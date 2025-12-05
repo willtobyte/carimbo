@@ -49,13 +49,13 @@ public:
   void set_ontext(sol::protected_function&& fn);
   void set_onmotion(sol::protected_function&& fn);
 
-  void on_enter() const;
-  void on_leave() const;
-  void on_text(std::string_view text) const;
-  void on_touch(float x, float y) const;
-  void on_motion(float x, float y) const;
-  void on_key_press(int32_t code) const;
-  void on_key_release(int32_t code) const;
+  void on_enter();
+  void on_leave();
+  void on_text(std::string_view text);
+  void on_touch(float x, float y);
+  void on_motion(float x, float y);
+  void on_key_press(int32_t code);
+  void on_key_release(int32_t code);
 
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 
@@ -96,5 +96,6 @@ private:
   functor _ontext;
   functor _onmotion;
 
-  mutable entt::dense_set<entt::entity> _hovering;
+  entt::dense_set<entt::entity> _hits;
+  entt::dense_set<entt::entity> _hovering;
 };

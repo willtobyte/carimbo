@@ -115,7 +115,7 @@ void particlesystem::update(float delta) {
     auto* particles = batch->particles.data();
     const auto n = batch->size();
 
-    for (auto i = n; i-- > 0uz;) {
+    for (auto i = 0uz; i < n; ++i) {
       auto& p = particles[i];
 
       p.life -= delta;

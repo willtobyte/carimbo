@@ -24,7 +24,7 @@ public:
 
 private:
   std::shared_ptr<renderer> _renderer;
-  std::vector<std::weak_ptr<eventreceiver>> _receivers;
+  std::vector<std::shared_ptr<eventreceiver>> _receivers;
   std::unordered_map<uint32_t, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
   std::vector<uint32_t> _joystickgorder;
   std::unordered_map<uint32_t, uint8_t> _joystickmapping;
