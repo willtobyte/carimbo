@@ -210,7 +210,7 @@ struct functor final {
     auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
       auto error_msg = sol::stack::get<std::string>(result.lua_state(), result.stack_index());
-      std::println(stderr, "[lua error] {}", error_msg);
+      std::println(stderr, "{}", error_msg);
       throw std::runtime_error(error_msg);
     }
   }
