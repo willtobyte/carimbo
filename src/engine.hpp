@@ -42,7 +42,7 @@ protected:
 #endif
 
 private:
-  std::atomic<bool> _running{true};
+  bool _running{true};
   std::shared_ptr<::audiodevice> _audiodevice;
   std::shared_ptr<::eventmanager> _eventmanager;
   std::vector<std::shared_ptr<::loopable>> _loopables;
