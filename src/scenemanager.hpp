@@ -49,7 +49,7 @@ protected:
 private:
   std::shared_ptr<::resourcemanager> _resourcemanager;
   std::shared_ptr<::renderer> _renderer;
-  std::unordered_map<std::string, std::shared_ptr<::scene>, string_hash, string_equal> _scene_mapping;
+  boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::weak_ptr<::scene> _scene;
   std::string _current;
 };

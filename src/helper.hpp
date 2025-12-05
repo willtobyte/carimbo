@@ -1,5 +1,13 @@
 #pragma once
 
+struct transparent_string_hash final {
+  using is_transparent = void;
+
+  size_t operator()(std::string_view sv) const noexcept {
+    return std::hash<std::string_view>{}(sv);
+  }
+};
+
 #ifdef _MSC_VER
   #define CONSTEXPR_IF_NOT_MSVC
 #else
@@ -64,38 +72,6 @@ struct PHYSFS_Deleter final {
     } else if constexpr (std::is_same_v<T, char*>) {
       PHYSFS_freeList(ptr);
     }
-  }
-};
-
-struct string_hash final {
-  using is_transparent = void;
-
-  size_t operator()(std::string_view sv) const noexcept {
-    return std::hash<std::string_view>{}(sv);
-  }
-
-  size_t operator()(std::string const& s) const noexcept {
-    return std::hash<std::string_view>{}(s);
-  }
-};
-
-struct string_equal final {
-  using is_transparent = void;
-
-  bool operator()(std::string_view a, std::string_view b) const noexcept {
-    return a == b;
-  }
-
-  bool operator()(std::string const& a, std::string const& b) const noexcept {
-    return a == b;
-  }
-
-  bool operator()(std::string const& a, std::string_view b) const noexcept {
-    return std::string_view(a) == b;
-  }
-
-  bool operator()(std::string_view a, std::string const& b) const noexcept {
-    return a == std::string_view(b);
   }
 };
 

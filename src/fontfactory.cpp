@@ -100,7 +100,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
 void fontfactory::flush() {
   std::println("[fontfactory] actual size {}", _pool.size());
 
-  const auto count = std::erase_if(_pool, [](auto const& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
+  const auto count = boost::unordered::erase_if(_pool, [](auto const& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
 
   std::println("[fontfactory] {} objects have been flushed", count);
 }

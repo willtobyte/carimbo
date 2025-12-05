@@ -20,5 +20,5 @@ public:
 private:
   std::shared_ptr<renderer> _renderer;
 
-  std::unordered_map<std::string, pixmap_ptr, string_hash, string_equal> _pool;
+  boost::unordered_flat_map<std::string, pixmap_ptr, transparent_string_hash, std::equal_to<>> _pool;
 };

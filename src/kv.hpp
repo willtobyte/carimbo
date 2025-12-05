@@ -22,5 +22,5 @@ public:
   void set(std::string_view key, const sol::object& value);
 
 private:
-  std::unordered_map<std::string, std::shared_ptr<observable>, string_hash, string_equal> _values;
+  boost::unordered_flat_map<std::string, std::shared_ptr<observable>, transparent_string_hash, std::equal_to<>> _values;
 };

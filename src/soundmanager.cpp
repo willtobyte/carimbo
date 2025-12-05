@@ -8,7 +8,7 @@ soundmanager::soundmanager(std::shared_ptr<audiodevice> audiodevice)
     : _audiodevice(std::move(audiodevice)) {}
 
 std::shared_ptr<soundfx> soundmanager::get(std::string_view filename) {
-  const auto [it, inserted] = _pool.try_emplace(std::string{filename});
+  const auto [it, inserted] = _pool.try_emplace(filename);
   if (inserted) {
     std::println("[soundmanager] cache miss {}", filename);
     it->second = std::make_shared<soundfx>(filename);
@@ -32,7 +32,7 @@ void soundmanager::stop(std::string_view filename) {
 void soundmanager::flush() {
   std::println("[soundmanager] actual size {}", _pool.size());
 
-  const auto count = std::erase_if(_pool, [](const auto& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
+  const auto count = boost::unordered::erase_if(_pool, [](const auto& pair) { return pair.second.use_count() == MINIMAL_USE_COUNT; });
   std::println("[soundmanager] {} objects have been flushed", count);
 }
 
