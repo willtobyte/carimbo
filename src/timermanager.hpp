@@ -18,5 +18,5 @@ protected:
 private:
   std::shared_ptr<envelopepool_impl> _envelopepool;
 
-  std::unordered_map<uint32_t, envelope*> _envelopemapping;
+  boost::unordered_flat_map<uint32_t, envelope*> _envelopemapping;
 };

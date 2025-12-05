@@ -21,7 +21,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
     const auto key = item.key();
     const auto a = item.value();
     const auto f = a["frames"];
-    std::vector<keyframe> keyframes(f.size());
+    boost::container::small_vector<keyframe, 16> keyframes(f.size());
     std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
       return keyframe{
         frame["duration"].template get<uint64_t>(),

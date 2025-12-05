@@ -48,7 +48,7 @@ struct animation final {
   std::optional<std::string> next;
   std::optional<bounds> bounds;
   std::shared_ptr<soundfx> effect;
-  std::vector<keyframe> keyframes;
+  boost::container::small_vector<keyframe, 16> keyframes;
 };
 
 class cursor final : public eventreceiver {
@@ -72,7 +72,7 @@ private:
   std::string _action{ACTION_DEFAULT};
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<pixmap> _spritesheet;
-  std::unordered_map<std::string, animation> _animations;
+  boost::unordered_flat_map<std::string, animation, transparent_string_hash, std::equal_to<>> _animations;
   std::optional<std::reference_wrapper<animation>> _current_animation;
   std::optional<std::string> _queued_action;
 };

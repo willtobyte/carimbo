@@ -12,6 +12,6 @@ public:
   static std::string make(std::initializer_list<std::pair<std::string, std::string>> entries);
 
 private:
-  std::unordered_map<std::string, std::string> _parameters;
+  boost::unordered_flat_map<std::string, std::string, transparent_string_hash, std::equal_to<>> _parameters;
 };
 }

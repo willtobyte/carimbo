@@ -25,5 +25,5 @@ protected:
   virtual void on_endupdate() noexcept override;
 
 private:
-  std::unordered_map<uint8_t, std::unordered_map<event::gamepad::button, bool>> _state;
+  boost::unordered_flat_map<uint8_t, boost::unordered_flat_map<event::gamepad::button, bool>> _state;
 };

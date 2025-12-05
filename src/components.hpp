@@ -8,8 +8,8 @@
 using action_id = entt::id_type;
 inline constexpr action_id no_action = 0;
 
-[[nodiscard]] inline std::unordered_map<action_id, std::string>& action_registry() noexcept {
-  static std::unordered_map<action_id, std::string> registry;
+[[nodiscard]] inline boost::unordered_flat_map<action_id, std::string>& action_registry() noexcept {
+  static boost::unordered_flat_map<action_id, std::string> registry;
   return registry;
 }
 
@@ -96,7 +96,7 @@ struct timeline final {
   bool oneshot{false};
   action_id next{no_action};
   std::optional<b2AABB> hitbox;
-  std::vector<frame> frames;
+  boost::container::small_vector<frame, 16> frames;
 
   friend void from_json(const nlohmann::json& j, timeline& o) {
     if (j.contains("oneshot")) {

@@ -45,7 +45,7 @@ private:
   bool _running{true};
   std::shared_ptr<::audiodevice> _audiodevice;
   std::shared_ptr<::eventmanager> _eventmanager;
-  std::vector<std::shared_ptr<::loopable>> _loopables;
+  boost::container::small_vector<std::shared_ptr<::loopable>, 8> _loopables;
   std::shared_ptr<::resourcemanager> _resourcemanager;
   std::shared_ptr<::scenemanager> _scenemanager;
   std::shared_ptr<::statemanager> _statemanager;
@@ -53,5 +53,5 @@ private:
   std::shared_ptr<::window> _window;
   std::shared_ptr<::overlay> _overlay;
   std::shared_ptr<::canvas> _canvas;
-  std::vector<std::shared_ptr<::lifecycleobserver>> _observers;
+  boost::container::small_vector<std::shared_ptr<::lifecycleobserver>, 8> _observers;
 };

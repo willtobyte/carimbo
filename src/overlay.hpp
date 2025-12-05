@@ -26,6 +26,6 @@ public:
 private:
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<eventmanager> _eventmanager;
-  std::vector<std::shared_ptr<widget>> _widgets;
+  boost::container::small_vector<std::shared_ptr<widget>, 16> _widgets;
   std::shared_ptr<cursor> _cursor;
 };

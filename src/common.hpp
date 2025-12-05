@@ -11,6 +11,7 @@
 #include <SDL3/SDL.h>
 #include <sol/sol.hpp>
 
+#include <boost/container/small_vector.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 
 #ifdef HAS_SENTRY

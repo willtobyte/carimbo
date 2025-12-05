@@ -882,7 +882,7 @@ void scriptengine::run() {
 
   struct keyboard final {
     static auto index(const keyboard&, sol::stack_object key, sol::this_state state) -> sol::object {
-      static const std::unordered_map<std::string, SDL_Scancode> map{
+      static const boost::unordered_flat_map<std::string, SDL_Scancode, transparent_string_hash, std::equal_to<>> map{
         {"a", SDL_SCANCODE_A}, {"b", SDL_SCANCODE_B}, {"c", SDL_SCANCODE_C}, {"d", SDL_SCANCODE_D},
         {"e", SDL_SCANCODE_E}, {"f", SDL_SCANCODE_F}, {"g", SDL_SCANCODE_G}, {"h", SDL_SCANCODE_H},
         {"i", SDL_SCANCODE_I}, {"j", SDL_SCANCODE_J}, {"k", SDL_SCANCODE_K}, {"l", SDL_SCANCODE_L},

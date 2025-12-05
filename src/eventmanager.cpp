@@ -273,7 +273,7 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
     return;
   }
 
-  std::erase(_receivers, receiver);
+  _receivers.erase(std::remove(_receivers.begin(), _receivers.end(), receiver), _receivers.end());
 }
 
 void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {
