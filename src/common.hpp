@@ -2,6 +2,7 @@
 
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/alext.h>
 #include <box2d/box2d.h>
 #include <entt/entt.hpp>
 #include <lua.hpp>

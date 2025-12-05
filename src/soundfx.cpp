@@ -7,28 +7,44 @@
 soundfx::soundfx(std::string_view filename) noexcept {
   const auto buffer = io::read(filename);
 
-  int channels;
-  int sample_rate;
-  short* output;
-  const auto samples = stb_vorbis_decode_memory(
-    buffer.data(),
-    static_cast<int>(buffer.size()),
-    &channels,
-    &sample_rate,
-    &output
+  auto error = 0;
+  const std::unique_ptr<stb_vorbis, decltype(&stb_vorbis_close)> vorbis(
+    stb_vorbis_open_memory(
+      buffer.data(),
+      static_cast<int>(buffer.size()),
+      &error,
+      nullptr
+    ),
+    &stb_vorbis_close
   );
 
-  assert(samples >= 0 && output &&
-    std::format("[stb_vorbis_decode_memory] failed to decode: {}", filename).c_str());
+  assert((error == VORBIS__no_error)
+    && std::format("[stb_vorbis_open_memory] failed to decode: {}", filename).c_str());
 
-  const std::unique_ptr<short, decltype(&free)> decoded(output, &free);
+  const auto info = stb_vorbis_get_info(vorbis.get());
+  const auto total_samples = stb_vorbis_stream_length_in_samples(vorbis.get());
+  const auto channels = info.channels;
+  const auto sample_rate = info.sample_rate;
+  const auto total_floats = static_cast<size_t>(total_samples) * static_cast<size_t>(channels);
 
-  const auto format = (channels == 1) ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+  auto samples = std::vector<float>(total_floats);
+
+  const auto decoded = stb_vorbis_get_samples_float_interleaved(
+    vorbis.get(),
+    channels,
+    samples.data(),
+    static_cast<int>(total_floats)
+  );
+
+  assert((decoded > 0)
+    && std::format("[stb_vorbis_get_samples_float_interleaved] failed to decode: {}", filename).c_str());
+
+  const auto format = (channels == 1) ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
   const auto frequency = static_cast<ALsizei>(sample_rate);
-  const auto size = static_cast<size_t>(samples) * static_cast<size_t>(channels) * sizeof(short);
+  const auto size = static_cast<size_t>(decoded) * static_cast<size_t>(channels) * sizeof(float);
 
   alGenBuffers(1, &_buffer);
-  alBufferData(_buffer, format, decoded.get(), static_cast<ALsizei>(size), frequency);
+  alBufferData(_buffer, format, samples.data(), static_cast<ALsizei>(size), frequency);
 
   alGenSources(1, &_source);
   alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));

@@ -30,9 +30,9 @@ static void patch_shape(physics& p, float hx, float hy) noexcept {
   }
 
   const auto poly = b2MakeBox(hx, hy);
-  auto sdef = b2DefaultShapeDef();
-  sdef.enableContactEvents = true;
-  p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
+  auto def = b2DefaultShapeDef();
+  def.enableContactEvents = true;
+  p.shape = b2CreatePolygonShape(p.body, &def, &poly);
   p.dirty = false;
 }
 
