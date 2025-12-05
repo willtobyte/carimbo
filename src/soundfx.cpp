@@ -65,7 +65,7 @@ soundfx::~soundfx() {
 }
 
 void soundfx::play(bool loop) const noexcept {
-  _notified.store(false, std::memory_order_relaxed);
+  _notified = false;
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
   if (const auto fn = _onbegin; fn) {
@@ -78,7 +78,7 @@ void soundfx::stop() const noexcept {
 }
 
 void soundfx::update(float delta) {
-  if (_notified.load(std::memory_order_relaxed)) {
+  if (_notified) {
     return;
   }
 
@@ -89,7 +89,7 @@ void soundfx::update(float delta) {
     return;
   }
 
-  _notified.store(true, std::memory_order_relaxed);
+  _notified = true;
   if (const auto fn = _onend; fn) {
     fn();
   }

@@ -24,5 +24,5 @@ private:
 
   functor _onbegin;
   functor _onend;
-  mutable std::atomic<bool> _notified{false};
+  mutable bool _notified{false};
 };
