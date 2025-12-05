@@ -96,7 +96,7 @@ struct timeline final {
   bool oneshot{false};
   action_id next{no_action};
   std::optional<b2AABB> hitbox;
-  boost::container::small_vector<frame, 16> frames;
+  boost::container::small_vector<frame, 24> frames;
 
   friend void from_json(const nlohmann::json& j, timeline& o) {
     if (j.contains("oneshot")) {
