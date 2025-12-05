@@ -593,35 +593,34 @@ void scriptengine::run() {
             if (auto onkeyrelease = module["on_keyrelease"].get<sol::protected_function>(); onkeyrelease.valid()) {
               scene->set_onkeyrelease(std::move(onkeyrelease));
             }
+
+            if (auto onleave = module["on_leave"].get<sol::protected_function>(); onleave.valid()) {
+              const auto wrapper = [onleave, &lua]() {
+                const auto result = onleave();
+                if (!result.valid()) {
+                  sol::error err = result;
+                  throw std::runtime_error(err.what());
+                }
+
+                lua.collect_garbage();
+                lua.collect_garbage();
+
+                lua["timermanager"] = sol::lua_nil;
+
+                lua["pool"] = sol::lua_nil;
+
+                lua.collect_garbage();
+                lua.collect_garbage();
+              };
+
+              scene->set_onleave(std::move(wrapper));
+            }
           };
 
           scene->set_onenter(std::move(wrapper));
 
           lua.collect_garbage();
           lua.collect_garbage();
-        }
-
-
-        if (auto fn = module["on_leave"].get<sol::protected_function>(); fn.valid()) {
-          const auto wrapper = [fn, &lua]() {
-            const auto result = fn();
-            if (!result.valid()) {
-              sol::error err = result;
-              throw std::runtime_error(err.what());
-            }
-
-            lua.collect_garbage();
-            lua.collect_garbage();
-
-            lua["timermanager"] = sol::lua_nil;
-
-            lua["pool"] = sol::lua_nil;
-
-            lua.collect_garbage();
-            lua.collect_garbage();
-          };
-
-          scene->set_onleave(std::move(wrapper));
         }
 
         const auto end = SDL_GetPerformanceCounter();
