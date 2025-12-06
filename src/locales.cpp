@@ -21,31 +21,28 @@ static std::string_view language() {
 [[nodiscard]] static const boost::unordered_flat_map<std::string, std::string, transparent_string_hash, std::equal_to<>>& mapping() noexcept {
   static struct {
     boost::unordered_flat_map<std::string, std::string, transparent_string_hash, std::equal_to<>> data;
-    std::once_flag flag;
 
-    decltype(data)& operator()() noexcept {
-      std::call_once(flag, [this] {
-        try {
-          const auto filename = std::format("locales/{}.json", language());
-          auto document = unmarshal::parse(io::read(filename));
+    decltype(data)& operator*() noexcept {
+      try {
+        const auto filename = std::format("locales/{}.json", language());
+        auto document = unmarshal::parse(io::read(filename));
 
-          for (auto field : document.object()) {
-            data.emplace(unmarshal::key(field), unmarshal::string(field.value()));
-          }
-        } catch (...) {
+        for (auto field : document.object()) {
+          data.emplace(unmarshal::key(field), unmarshal::string(field.value()));
         }
-      });
+      } catch (...) {
+      }
 
       return data;
     }
   } map;
 
-  return map();
+  return *map;
 }
 
 namespace localization {
 [[nodiscard]] std::string_view text(std::string_view key) {
-  const auto& m = mapping();
+  static const auto& m = mapping();
 
   if (const auto it = m.find(key); it != m.end()) [[likely]] {
     return it->second;
