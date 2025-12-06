@@ -32,48 +32,48 @@ T cassette::get(std::string_view key, const T& default_value) const {
     return default_value;
   }
 
-  const auto& stored = it->second;
+  const auto& storage = it->second;
 
   if constexpr (std::is_same_v<T, bool>) {
-    if (const auto* v = std::get_if<bool>(&stored)) {
+    if (const auto* v = std::get_if<bool>(&storage)) {
       return *v;
     }
   } else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) {
-    if (const auto* v = std::get_if<int64_t>(&stored)) {
+    if (const auto* v = std::get_if<int64_t>(&storage)) {
       return static_cast<T>(*v);
     }
-    if (const auto* v = std::get_if<uint64_t>(&stored)) {
+    if (const auto* v = std::get_if<uint64_t>(&storage)) {
       return static_cast<T>(*v);
     }
-    if (const auto* v = std::get_if<double>(&stored)) {
+    if (const auto* v = std::get_if<double>(&storage)) {
       return static_cast<T>(*v);
     }
   } else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) {
-    if (const auto* v = std::get_if<uint64_t>(&stored)) {
+    if (const auto* v = std::get_if<uint64_t>(&storage)) {
       return static_cast<T>(*v);
     }
-    if (const auto* v = std::get_if<int64_t>(&stored)) {
+    if (const auto* v = std::get_if<int64_t>(&storage)) {
       return static_cast<T>(*v);
     }
-    if (const auto* v = std::get_if<double>(&stored)) {
+    if (const auto* v = std::get_if<double>(&storage)) {
       return static_cast<T>(*v);
     }
   } else if constexpr (std::is_floating_point_v<T>) {
-    if (const auto* v = std::get_if<double>(&stored)) {
+    if (const auto* v = std::get_if<double>(&storage)) {
       return static_cast<T>(*v);
     }
-    if (const auto* v = std::get_if<int64_t>(&stored)) {
+    if (const auto* v = std::get_if<int64_t>(&storage)) {
       return static_cast<T>(*v);
     }
-    if (const auto* v = std::get_if<uint64_t>(&stored)) {
+    if (const auto* v = std::get_if<uint64_t>(&storage)) {
       return static_cast<T>(*v);
     }
   } else if constexpr (std::is_same_v<T, std::string>) {
-    if (const auto* v = std::get_if<std::string>(&stored)) {
+    if (const auto* v = std::get_if<std::string>(&storage)) {
       return *v;
     }
   } else if constexpr (std::is_same_v<T, std::string_view>) {
-    if (const auto* v = std::get_if<std::string>(&stored)) {
+    if (const auto* v = std::get_if<std::string>(&storage)) {
       return std::string_view(*v);
     }
   }

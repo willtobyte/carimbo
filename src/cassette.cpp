@@ -1,164 +1,208 @@
 #include "cassette.hpp"
 
+#include <charconv>
+#include <fstream>
+
+namespace {
+constexpr std::string_view TYPE_NULL   = "null";
+constexpr std::string_view TYPE_BOOL   = "bool";
+constexpr std::string_view TYPE_INT64  = "int64";
+constexpr std::string_view TYPE_UINT64 = "uint64";
+constexpr std::string_view TYPE_DOUBLE = "double";
+constexpr std::string_view TYPE_STRING = "string";
+
+std::string encode_string(std::string_view str) {
+  std::string result;
+  result.reserve(str.size());
+  for (const char c : str) {
+    switch (c) {
+      case '\n': result.append("\\n");  break;
+      case '\r': result.append("\\r");  break;
+      case '\\': result.append("\\\\"); break;
+      default:   result += c;           break;
+    }
+  }
+
+  return result;
+}
+
+std::string decode_string(std::string_view str) {
+  std::string result;
+  result.reserve(str.size());
+  for (std::size_t i = 0; i < str.size(); ++i) {
+    if (str[i] == '\\' && i + 1 < str.size()) {
+      switch (str[i + 1]) {
+        case 'n':  result += '\n'; ++i; break;
+        case 'r':  result += '\r'; ++i; break;
+        case '\\': result += '\\'; ++i; break;
+        default:   result += str[i];    break;
+      }
+    } else {
+      result += str[i];
+    }
+  }
+
+  return result;
+}
+
+bool parse_line(std::string_view line, std::string_view& type, std::string_view& key, std::string_view& value) {
+  if (line.empty()) {
+    return false;
+  }
+
+  const auto colon_pos = line.find(':');
+  if (colon_pos == std::string_view::npos) {
+    return false;
+  }
+
+  type = line.substr(0, colon_pos);
+
+  const auto eq_pos = line.find('=', colon_pos + 1);
+  if (eq_pos == std::string_view::npos) {
+    return false;
+  }
+
+  key = line.substr(colon_pos + 1, eq_pos - colon_pos - 1);
+  value = line.substr(eq_pos + 1);
+  return !key.empty();
+}
+}
+
 cassette::cassette() {
 #ifdef EMSCRIPTEN
   const auto* const result = emscripten_run_script_string(std::format("localStorage.getItem('{}')", _storagekey).c_str());
-  const std::string_view value{result ? result : ""};
+  const std::string_view content{result ? result : ""};
 
-  if (value.empty() || value == "null") {
+  if (content.empty() || content == "null") {
     return;
-  }
-
-  try {
-    auto buffer = simdjson::padded_string(value);
-    auto document = unmarshal::parse(buffer);
-
-    for (auto field : document.object()) {
-      auto key = field.unescaped_key().value();
-      auto val = field.value();
-
-      switch (val.type()) {
-        case simdjson::ondemand::json_type::null:
-          _data.emplace(std::string(key), nullptr);
-          break;
-        case simdjson::ondemand::json_type::boolean:
-          _data.emplace(std::string(key), val.get_bool().value());
-          break;
-        case simdjson::ondemand::json_type::number: {
-          auto num = val.get_number().value();
-          if (num.is_int64()) {
-            _data.emplace(std::string(key), num.get_int64());
-          } else if (num.is_uint64()) {
-            _data.emplace(std::string(key), num.get_uint64());
-          } else {
-            _data.emplace(std::string(key), num.get_double());
-          }
-          break;
-        }
-        case simdjson::ondemand::json_type::string:
-          _data.emplace(std::string(key), std::string(val.get_string().value()));
-          break;
-        default:
-          break;
-      }
-    }
-  } catch (...) {
-    _data.clear();
-    const auto script = std::format("localStorage.removeItem('{}')", _storagekey);
-    emscripten_run_script(script.c_str());
   }
 #else
   if (!std::filesystem::exists(_filename)) {
     return;
   }
 
-  try {
-    auto document = unmarshal::parse(simdjson::padded_string::load(_filename));
-
-    for (auto field : document.object()) {
-      auto key = field.unescaped_key().value();
-      auto val = field.value();
-
-      switch (val.type()) {
-        case simdjson::ondemand::json_type::null:
-          _data.emplace(std::string(key), nullptr);
-          break;
-        case simdjson::ondemand::json_type::boolean:
-          _data.emplace(std::string(key), val.get_bool().value());
-          break;
-        case simdjson::ondemand::json_type::number: {
-          auto num = val.get_number().value();
-          if (num.is_int64()) {
-            _data.emplace(std::string(key), num.get_int64());
-          } else if (num.is_uint64()) {
-            _data.emplace(std::string(key), num.get_uint64());
-          } else {
-            _data.emplace(std::string(key), num.get_double());
-          }
-          break;
-        }
-        case simdjson::ondemand::json_type::string:
-          _data.emplace(std::string(key), std::string(val.get_string().value()));
-          break;
-        default:
-          break;
-      }
-    }
-  } catch (...) {
-    _data.clear();
-    std::filesystem::remove(_filename);
+  std::ifstream file(_filename, std::ios::binary | std::ios::ate);
+  if (!file) {
+    return;
   }
+
+  const auto size = file.tellg();
+  file.seekg(0);
+  std::string content(static_cast<std::size_t>(size), '\0');
+  file.read(content.data(), size);
 #endif
+
+  std::string_view remaining{content};
+  while (!remaining.empty()) {
+    auto newline_pos = remaining.find('\n');
+    auto line = remaining.substr(0, newline_pos);
+    remaining = (newline_pos == std::string_view::npos) ? std::string_view{} : remaining.substr(newline_pos + 1);
+
+    if (line.empty()) {
+      continue;
+    }
+
+    std::string_view type;
+    std::string_view key, value;
+    if (!parse_line(line, type, key, value)) {
+      continue;
+    }
+
+    std::string key_str{key};
+
+    if (type == TYPE_NULL) {
+      _data.emplace(std::move(key_str), nullptr);
+    } else if (type == TYPE_BOOL) {
+      _data.emplace(std::move(key_str), value == "1");
+    } else if (type == TYPE_INT64) {
+      int64_t v{};
+      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
+      if (ec == std::errc{}) {
+        _data.emplace(std::move(key_str), v);
+      }
+    } else if (type == TYPE_UINT64) {
+      uint64_t v{};
+      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
+      if (ec == std::errc{}) {
+        _data.emplace(std::move(key_str), v);
+      }
+    } else if (type == TYPE_DOUBLE) {
+      double v{};
+      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
+      if (ec == std::errc{}) {
+        _data.emplace(std::move(key_str), v);
+      }
+    } else if (type == TYPE_STRING) {
+      _data.emplace(std::move(key_str), decode_string(value));
+    }
+  }
 }
 
 void cassette::persist() const noexcept {
   thread_local std::string buffer;
   buffer.clear();
-  buffer.reserve(_data.size() * 48);
-  buffer += '{';
+  buffer.reserve(_data.size() * 64);
 
-  auto first = true;
   for (const auto& [key, value] : _data) {
-    if (!first) {
-      buffer += ',';
-    }
-    first = false;
-
-    buffer += '"';
-    for (const char c : key) {
-      switch (c) {
-        case '"':  buffer.append("\\\"", 2); break;
-        case '\\': buffer.append("\\\\", 2); break;
-        default:   buffer += c;              break;
-      }
-    }
-    buffer.append("\":", 2);
-
-    std::visit([](const auto& v) {
+    std::visit([&key](const auto& v) {
       using T = std::decay_t<decltype(v)>;
+
       if constexpr (std::is_same_v<T, std::nullptr_t>) {
-        buffer.append("null", 4);
+        buffer += TYPE_NULL;
+        buffer += ':';
+        buffer += key;
+        buffer += "=\n";
       } else if constexpr (std::is_same_v<T, bool>) {
-        if (v) {
-          buffer.append("true", 4);
-        } else {
-          buffer.append("false", 5);
-        }
-      } else if constexpr (std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t>) {
+        buffer += TYPE_BOOL;
+        buffer += ':';
+        buffer += key;
+        buffer += '=';
+        buffer += v ? '1' : '0';
+        buffer += '\n';
+      } else if constexpr (std::is_same_v<T, int64_t>) {
+        buffer += TYPE_INT64;
+        buffer += ':';
+        buffer += key;
+        buffer += '=';
         std::array<char, 24> num;
-        const auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
+        auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
         buffer.append(num.data(), static_cast<std::size_t>(ptr - num.data()));
+        buffer += '\n';
+      } else if constexpr (std::is_same_v<T, uint64_t>) {
+        buffer += TYPE_UINT64;
+        buffer += ':';
+        buffer += key;
+        buffer += '=';
+        std::array<char, 24> num;
+        auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
+        buffer.append(num.data(), static_cast<std::size_t>(ptr - num.data()));
+        buffer += '\n';
       } else if constexpr (std::is_same_v<T, double>) {
+        buffer += TYPE_DOUBLE;
+        buffer += ':';
+        buffer += key;
+        buffer += '=';
         std::array<char, 32> num;
-        const auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
+        auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
         buffer.append(num.data(), static_cast<std::size_t>(ptr - num.data()));
+        buffer += '\n';
       } else if constexpr (std::is_same_v<T, std::string>) {
-        buffer += '"';
-        for (const char c : v) {
-          switch (c) {
-            case '"':  buffer.append("\\\"", 2); break;
-            case '\\': buffer.append("\\\\", 2); break;
-            case '\b': buffer.append("\\b", 2);  break;
-            case '\f': buffer.append("\\f", 2);  break;
-            case '\n': buffer.append("\\n", 2);  break;
-            case '\r': buffer.append("\\r", 2);  break;
-            case '\t': buffer.append("\\t", 2);  break;
-            default:   buffer += c;              break;
-          }
-        }
-        buffer += '"';
+        buffer += TYPE_STRING;
+        buffer += ':';
+        buffer += key;
+        buffer += '=';
+        buffer += encode_string(v);
+        buffer += '\n';
       }
     }, value);
   }
 
-  buffer += '}';
-
 #ifdef EMSCRIPTEN
-  const auto script = std::format("localStorage.setItem('{}', '{}')", _storagekey, buffer);
+  const auto script = std::format("localStorage.setItem('{}', '{}')", _storagekey, encode_string(buffer));
   emscripten_run_script(script.c_str());
 #else
-  auto file = std::ofstream(_filename);
-  file << buffer;
+  std::ofstream file(_filename, std::ios::binary | std::ios::trunc);
+  file.write(buffer.data(), static_cast<std::streamsize>(buffer.size()));
 #endif
 }
 
@@ -169,4 +213,13 @@ void cassette::clear(std::string_view key) noexcept {
 
   _data.erase(std::string(key));
   persist();
+}
+
+const cassette::value_type* cassette::find(std::string_view key) const noexcept {
+  const auto it = _data.find(key);
+  if (it == _data.end()) {
+    return nullptr;
+  }
+
+  return &it->second;
 }

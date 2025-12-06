@@ -675,6 +675,7 @@ void scriptengine::run() {
           const auto v = self.get<bool>(key, default_value.as<bool>());
           return sol::make_object(lua, v);
         }
+
         case sol::type::number: {
           const double x = default_value.as<double>();
           double i{};
@@ -692,12 +693,27 @@ void scriptengine::run() {
           const auto v = self.get<double>(key, x);
           return sol::make_object(lua, v);
         }
+
         case sol::type::string: {
           const auto v = self.get<std::string>(key, default_value.as<std::string>());
           return sol::make_object(lua, v);
         }
-        default:
-          return sol::make_object(lua, nullptr);
+
+        default: {
+          const auto* value = self.find(key);
+          if (!value) {
+            return sol::make_object(lua, sol::lua_nil);
+          }
+
+          return std::visit([&lua](const auto& v) {
+            using T = std::decay_t<decltype(v)>;
+            if constexpr (std::is_same_v<T, std::nullptr_t>) {
+              return sol::make_object(lua, sol::lua_nil);
+            } else {
+              return sol::make_object(lua, v);
+            }
+          }, *value);
+        }
       }
     }
   );

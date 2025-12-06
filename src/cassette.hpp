@@ -26,6 +26,8 @@ public:
 
   void clear(std::string_view key) noexcept;
 
+  const value_type* find(std::string_view key) const noexcept;
+
 private:
   boost::unordered_flat_map<std::string, value_type, transparent_string_hash, std::equal_to<>> _data;
 
