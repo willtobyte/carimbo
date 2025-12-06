@@ -21,7 +21,7 @@ struct alignas(64) layer final {
 
   friend void from_json(unmarshal::value json, layer& out) {
     out.collider = unmarshal::get<bool>(json, "collider");
-    out.name = std::string(unmarshal::get<std::string_view>(json, "name"));
+    out.name = unmarshal::get<std::string_view>(json, "name");
 
     out.tiles.clear();
     for (auto element : json["tiles"].get_array()) {

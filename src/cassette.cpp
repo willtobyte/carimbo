@@ -211,7 +211,7 @@ void cassette::clear(std::string_view key) noexcept {
     return;
   }
 
-  _data.erase(std::string(key));
+  _data.erase(key);
   persist();
 }
 

@@ -7,17 +7,17 @@ void cassette::set(std::string_view key, const T& value) {
   }
 
   if constexpr (std::is_same_v<T, std::nullptr_t>) {
-    _data.insert_or_assign(std::string(key), nullptr);
+    _data.insert_or_assign(key, nullptr);
   } else if constexpr (std::is_same_v<T, bool>) {
-    _data.insert_or_assign(std::string(key), value);
+    _data.insert_or_assign(key, value);
   } else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) {
-    _data.insert_or_assign(std::string(key), static_cast<int64_t>(value));
+    _data.insert_or_assign(key, static_cast<int64_t>(value));
   } else if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) {
-    _data.insert_or_assign(std::string(key), static_cast<uint64_t>(value));
+    _data.insert_or_assign(key, static_cast<uint64_t>(value));
   } else if constexpr (std::is_floating_point_v<T>) {
-    _data.insert_or_assign(std::string(key), static_cast<double>(value));
+    _data.insert_or_assign(key, static_cast<double>(value));
   } else if constexpr (std::is_convertible_v<T, std::string> || std::is_convertible_v<T, std::string_view>) {
-    _data.insert_or_assign(std::string(key), std::string(value));
+    _data.insert_or_assign(key, value);
   } else {
     static_assert(sizeof(T) == 0, "unsupported type for cassette::set");
   }

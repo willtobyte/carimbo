@@ -25,7 +25,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
     for (auto element : *effects) {
       auto name = unmarshal::string(element);
       const auto path = std::format("blobs/{}/{}.ogg", scene, name);
-      _effects.emplace(std::string(name), soundmanager->get(path));
+      _effects.emplace(name, soundmanager->get(path));
     }
   }
 
@@ -35,8 +35,8 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   if (auto objects = unmarshal::find_array(document, "objects")) {
     for (auto element : *objects) {
       auto object = unmarshal::object_of(element);
-      const auto name = std::string(unmarshal::get<std::string_view>(object, "name"));
-      const auto kind = std::string(unmarshal::get<std::string_view>(object, "kind"));
+      const auto name = unmarshal::get<std::string_view>(object, "name");
+      const auto kind = unmarshal::get<std::string_view>(object, "kind");
       const auto action = make_action(unmarshal::value_or(object, "action", std::string_view{}));
 
       const auto x = unmarshal::value_or(object, "x", .0f);
@@ -77,7 +77,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
         auto tl = timeline{};
         auto value = unmarshal::value_of(field.value());
         from_json(value, tl);
-        at.timelines.emplace(make_action(std::string(key)), std::move(tl));
+        at.timelines.emplace(make_action(key), std::move(tl));
       }
 
       _registry.emplace<atlas>(entity, std::move(at));
@@ -109,13 +109,13 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   if (auto particles = unmarshal::find_array(document, "particles")) {
     for (auto element : *particles) {
       auto particle_object = unmarshal::object_of(element);
-      const auto particle_name = std::string(unmarshal::get<std::string_view>(particle_object, "name"));
+      const auto name = unmarshal::get<std::string_view>(particle_object, "name");
       const auto kind = unmarshal::get<std::string_view>(particle_object, "kind");
       const auto px = unmarshal::get<float>(particle_object, "x");
       const auto py = unmarshal::get<float>(particle_object, "y");
       const auto active = unmarshal::value_or(particle_object, "active", true);
       const auto batch = factory->create(kind, px, py, active);
-      _particles.emplace(particle_name, batch);
+      _particles.emplace(name, batch);
       _particlesystem.add(batch);
     }
   }
