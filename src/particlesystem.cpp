@@ -4,36 +4,121 @@
 #include "pixmap.hpp"
 #include "resourcemanager.hpp"
 
+namespace {
+
+template <typename T>
+std::pair<T, T> read_range(unmarshal::object &obj, T default_start, T default_end) noexcept {
+  return {
+    unmarshal::value_or(obj, "start", default_start),
+    unmarshal::value_or(obj, "end", default_end)
+  };
+}
+
+struct particleconfig final {
+  size_t count{0};
+
+  std::pair<float, float> xspawn{.0f, .0f};
+  std::pair<float, float> yspawn{.0f, .0f};
+  std::pair<float, float> radius{.0f, .0f};
+  std::pair<double, double> angle{.0, .0};
+  std::pair<float, float> scale{1.0f, 1.0f};
+  std::pair<float, float> life{1.0f, 1.0f};
+  std::pair<unsigned, unsigned> alpha{255u, 255u};
+
+  std::pair<float, float> xvel{.0f, .0f};
+  std::pair<float, float> yvel{.0f, .0f};
+
+  std::pair<float, float> gx{.0f, .0f};
+  std::pair<float, float> gy{.0f, .0f};
+
+  std::pair<double, double> rforce{.0, .0};
+  std::pair<double, double> rvel{.0, .0};
+
+  friend void from_json(unmarshal::document &document, particleconfig &out) {
+    for (auto field : document.get_object()) {
+      auto key = unmarshal::key(field);
+
+      if (key == "count") {
+        uint64_t value;
+        if (!field.value().get_uint64().get(value)) {
+          out.count = static_cast<size_t>(value);
+        }
+      } else if (key == "spawn") {
+        auto object = unmarshal::object_of(field.value());
+        for (auto spawn_field : object) {
+          auto spawn_key = unmarshal::key(spawn_field);
+          auto spawn_object = unmarshal::object_of(spawn_field.value());
+
+          if (spawn_key == "x") {
+            out.xspawn = read_range(spawn_object, .0f, .0f);
+          } else if (spawn_key == "y") {
+            out.yspawn = read_range(spawn_object, .0f, .0f);
+          } else if (spawn_key == "radius") {
+            out.radius = read_range(spawn_object, .0f, .0f);
+          } else if (spawn_key == "angle") {
+            out.angle = read_range(spawn_object, .0, .0);
+          } else if (spawn_key == "scale") {
+            out.scale = read_range(spawn_object, 1.0f, 1.0f);
+          } else if (spawn_key == "life") {
+            out.life = read_range(spawn_object, 1.0f, 1.0f);
+          } else if (spawn_key == "alpha") {
+            out.alpha = read_range(spawn_object, 255u, 255u);
+          }
+        }
+      } else if (key == "velocity") {
+        auto object = unmarshal::object_of(field.value());
+        for (auto vel_field : object) {
+          auto vel_key = unmarshal::key(vel_field);
+          auto vel_object = unmarshal::object_of(vel_field.value());
+
+          if (vel_key == "x") {
+            out.xvel = read_range(vel_object, .0f, .0f);
+          } else if (vel_key == "y") {
+            out.yvel = read_range(vel_object, .0f, .0f);
+          }
+        }
+      } else if (key == "gravity") {
+        auto object = unmarshal::object_of(field.value());
+        for (auto grav_field : object) {
+          auto grav_key = unmarshal::key(grav_field);
+          auto grav_object = unmarshal::object_of(grav_field.value());
+
+          if (grav_key == "x") {
+            out.gx = read_range(grav_object, .0f, .0f);
+          } else if (grav_key == "y") {
+            out.gy = read_range(grav_object, .0f, .0f);
+          }
+        }
+      } else if (key == "rotation") {
+        auto object = unmarshal::object_of(field.value());
+        for (auto rot_field : object) {
+          auto rot_key = unmarshal::key(rot_field);
+          auto rot_object = unmarshal::object_of(rot_field.value());
+
+          if (rot_key == "force") {
+            out.rforce = read_range(rot_object, .0, .0);
+          } else if (rot_key == "velocity") {
+            out.rvel = read_range(rot_object, .0, .0);
+          }
+        }
+      }
+    }
+  }
+};
+}
+
 particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
 }
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   const auto filename = std::format("particles/{}.json", kind);
-  auto document = unmarshal::dom::parse(io::read(filename));
+  auto document = unmarshal::parse(io::read(filename));
+
+  particleconfig conf;
+  from_json(document, conf);
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
-
-  const auto spawn = document["spawn"];
-  const auto velocity = document["velocity"];
-  const auto gravity = document["gravity"];
-  const auto rotation = document["rotation"];
-
-  const auto count = unmarshal::dom::value_or(document["count"], 0uz);
-
-  const auto [xspawn_start, xspawn_end] = unmarshal::dom::range(spawn, "x", .0f, .0f);
-  const auto [yspawn_start, yspawn_end] = unmarshal::dom::range(spawn, "y", .0f, .0f);
-  const auto [radius_start, radius_end] = unmarshal::dom::range(spawn, "radius", .0f, .0f);
-  const auto [angle_start, angle_end] = unmarshal::dom::range(spawn, "angle", .0, .0);
-  const auto [scale_start, scale_end] = unmarshal::dom::range(spawn, "scale", 1.0f, 1.0f);
-  const auto [life_start, life_end] = unmarshal::dom::range(spawn, "life", 1.0f, 1.0f);
-  const auto [alpha_start, alpha_end] = unmarshal::dom::range(spawn, "alpha", 255u, 255u);
-  const auto [xvel_start, xvel_end] = unmarshal::dom::range(velocity, "x", .0f, .0f);
-  const auto [yvel_start, yvel_end] = unmarshal::dom::range(velocity, "y", .0f, .0f);
-  const auto [gx_start, gx_end] = unmarshal::dom::range(gravity, "x", .0f, .0f);
-  const auto [gy_start, gy_end] = unmarshal::dom::range(gravity, "y", .0f, .0f);
-  const auto [rforce_start, rforce_end] = unmarshal::dom::range(rotation, "force", .0, .0);
-  const auto [rvel_start, rvel_end] = unmarshal::dom::range(rotation, "velocity", .0, .0);
 
   const auto props = std::make_shared<particleprops>();
   props->active = true;
@@ -41,27 +126,27 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->x = x;
   props->y = y;
   props->pixmap = pixmap;
-  props->xspawnd = std::uniform_real_distribution<float>(xspawn_start, xspawn_end);
-  props->yspawnd = std::uniform_real_distribution<float>(yspawn_start, yspawn_end);
-  props->radiusd = std::uniform_real_distribution<float>(radius_start, radius_end);
-  props->angled = std::uniform_real_distribution<double>(angle_start, angle_end);
-  props->xveld = std::uniform_real_distribution<float>(xvel_start, xvel_end);
-  props->yveld = std::uniform_real_distribution<float>(yvel_start, yvel_end);
-  props->gxd = std::uniform_real_distribution<float>(gx_start, gx_end);
-  props->gyd = std::uniform_real_distribution<float>(gy_start, gy_end);
-  props->lifed = std::uniform_real_distribution<float>(life_start, life_end);
-  props->alphad = std::uniform_int_distribution<unsigned int>(alpha_start, alpha_end);
-  props->scaled = std::uniform_real_distribution<float>(scale_start, scale_end);
-  props->rotforced = std::uniform_real_distribution<double>(rforce_start, rforce_end);
-  props->rotveld = std::uniform_real_distribution<double>(rvel_start, rvel_end);
+  props->xspawnd = std::uniform_real_distribution<float>(conf.xspawn.first, conf.xspawn.second);
+  props->yspawnd = std::uniform_real_distribution<float>(conf.yspawn.first, conf.yspawn.second);
+  props->radiusd = std::uniform_real_distribution<float>(conf.radius.first, conf.radius.second);
+  props->angled = std::uniform_real_distribution<double>(conf.angle.first, conf.angle.second);
+  props->xveld = std::uniform_real_distribution<float>(conf.xvel.first, conf.xvel.second);
+  props->yveld = std::uniform_real_distribution<float>(conf.yvel.first, conf.yvel.second);
+  props->gxd = std::uniform_real_distribution<float>(conf.gx.first, conf.gx.second);
+  props->gyd = std::uniform_real_distribution<float>(conf.gy.first, conf.gy.second);
+  props->lifed = std::uniform_real_distribution<float>(conf.life.first, conf.life.second);
+  props->alphad = std::uniform_int_distribution<unsigned int>(conf.alpha.first, conf.alpha.second);
+  props->scaled = std::uniform_real_distribution<float>(conf.scale.first, conf.scale.second);
+  props->rotforced = std::uniform_real_distribution<double>(conf.rforce.first, conf.rforce.second);
+  props->rotveld = std::uniform_real_distribution<double>(conf.rvel.first, conf.rvel.second);
 
   auto batch = std::make_shared<particlebatch>();
   batch->props = std::move(props);
-  batch->particles.resize(count);
-  batch->vertices.resize(count * 4);
+  batch->particles.resize(conf.count);
+  batch->vertices.resize(conf.count * 4);
 
-  batch->indices.resize(count * 6);
-  for (auto i = 0uz; i < count; ++i) {
+  batch->indices.resize(conf.count * 6);
+  for (auto i = 0uz; i < conf.count; ++i) {
     const auto base = static_cast<int>(i * 4);
     const auto index = i * 6;
     batch->indices[index] = base;
