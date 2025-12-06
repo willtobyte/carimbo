@@ -32,7 +32,9 @@ struct json final {
 
 template <typename T>
 [[nodiscard]] inline T get(auto &&source, std::string_view key) {
-  return source[key].template get<T>().value();
+  T out;
+  source[key].template get<T>().get(out);
+  return out;
 }
 
 template <typename T>
@@ -41,11 +43,11 @@ template <typename T>
   if (result.error()) [[unlikely]]
     return fallback;
 
-  auto typed = result.template get<T>();
-  if (typed.error()) [[unlikely]]
+  T out;
+  if (result.template get<T>().get(out)) [[unlikely]]
     return fallback;
 
-  return typed.value();
+  return out;
 }
 
 [[nodiscard]] inline bool contains(auto &&source, std::string_view key) noexcept {
