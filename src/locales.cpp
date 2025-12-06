@@ -24,7 +24,7 @@ static std::string_view language() {
 
     decltype(data)& operator*() noexcept {
       try {
-        const auto filename = std::format("locales/{}.json", language());
+        auto filename = std::format("locales/{}.json", language());
         auto document = unmarshal::parse(io::read(filename));
 
         for (auto field : document.object()) {
