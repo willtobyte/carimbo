@@ -34,7 +34,6 @@ build: ## Builds the project
 
 .PHONY: run
 run: build ## Builds and runs the project
-	rm -f cassette.tape
 	NOVSYNC=1 SCENE=$(SCENE) CARTRIDGE=$(CARTRIDGE) lldb -o run -- ./build/carimbo
 
 .PHONY: help
