@@ -17,7 +17,7 @@ public:
 
   void draw() const noexcept;
 
-  void set_cursor(std::string_view name) noexcept;
+  void set_cursor(std::string_view name);
 
   void hide(bool hidden = true) noexcept;
 

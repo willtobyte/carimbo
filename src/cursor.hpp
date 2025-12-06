@@ -18,14 +18,14 @@ struct keyframe final {
   vec2 offset;
   quad frame;
 
-  friend void from_json(const nlohmann::json& j, keyframe& o) {
-    o.frame = j["quad"].get<quad>();
+  friend void from_json(unmarshal::value json, keyframe& out) {
+    from_json(json["quad"].value(), out.frame);
 
-    if (j.contains("offset")) {
-      o.offset = j["offset"].get<vec2>();
+    if (unmarshal::contains(json, "offset")) {
+      from_json(json["offset"].value(), out.offset);
     }
 
-    o.duration = j["duration"].get<uint64_t>();
+    out.duration = unmarshal::get<uint64_t>(json, "duration");
   }
 };
 
@@ -34,12 +34,12 @@ struct bounds final {
   std::bitset<256> reagents;
   quad rectangle;
 
-  friend void from_json(const nlohmann::json& j, bounds& o) {
-    if (j.contains("type")) {
-      o.type = j["type"].get<uint16_t>();
+  friend void from_json(unmarshal::value json, bounds& out) {
+    if (unmarshal::contains(json, "type")) {
+      out.type = unmarshal::get<uint16_t>(json, "type");
     }
 
-    o.rectangle = j["quad"].get<quad>();
+    from_json(json["quad"].value(), out.rectangle);
   }
 };
 

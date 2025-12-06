@@ -2,8 +2,19 @@
 
 #include "common.hpp"
 
+#include <variant>
+
 class cassette final {
 public:
+  using value_type = std::variant<
+    std::nullptr_t,
+    bool,
+    int64_t,
+    uint64_t,
+    double,
+    std::string
+  >;
+
   cassette();
   ~cassette() = default;
 
@@ -16,7 +27,8 @@ public:
   void clear(std::string_view key) noexcept;
 
 private:
-  nlohmann::json _j;
+  boost::unordered_flat_map<std::string, value_type, transparent_string_hash, std::equal_to<>> _data;
+
 #ifndef EMSCRIPTEN
   static constexpr const char* _filename = "cassette.tape";
 #else

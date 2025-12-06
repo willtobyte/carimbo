@@ -14,14 +14,13 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name);
   if (inserted) {
     const auto filename = std::format("scenes/{}.json", name);
-    const auto buffer = io::read(filename);
-    const auto j = nlohmann::json::parse(buffer);
+    auto document = unmarshal::parse(io::read(filename));
 
-    const auto type = j.at("type").get<scenetype>();
+    const auto type = parse_scenetype(unmarshal::get<std::string_view>(document, "type"));
 
     switch(type) {
       case scenetype::backdrop:
-        return it->second = std::make_shared<scene>(name, j, shared_from_this());
+        return it->second = std::make_shared<scene>(name, document, shared_from_this());
       // case scenetype::tilemap:
       //   return it->second = std::make_shared<scenetilemap>(j);
     }

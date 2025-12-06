@@ -52,9 +52,9 @@ endif()
 find_package(Boost CONFIG REQUIRED)
 find_package(box2d CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
+find_package(simdjson CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(stb CONFIG REQUIRED)
 
@@ -100,9 +100,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   boost::boost
   box2d::box2d
   EnTT::EnTT
-  nlohmann_json::nlohmann_json
   physfs-static
   SDL3::SDL3-static
+  simdjson::simdjson
   sol2::sol2
   stb::stb
   $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>

@@ -18,29 +18,32 @@ static std::string_view language() {
   return locale->language;
 }
 
-[[nodiscard]] static nlohmann::json parse(std::string_view code) {
-  const auto filename = std::format("locales/{}.json", code);
-  const auto buffer = io::read(filename);
-  return nlohmann::json::parse(buffer);
-}
-
-[[nodiscard]] static const nlohmann::json& mapping() noexcept {
-  static const auto j = [] noexcept {
+[[nodiscard]] static const boost::unordered_flat_map<std::string, std::string, transparent_string_hash, std::equal_to<>>& mapping() noexcept {
+  static const auto m = [] noexcept {
+    boost::unordered_flat_map<std::string, std::string, transparent_string_hash, std::equal_to<>> result;
     try {
-      return parse(language());
+      const auto filename = std::format("locales/{}.json", language());
+      auto document = unmarshal::parse(io::read(filename));
+
+      for (auto field : document.object()) {
+        result.emplace(
+          std::string(field.unescaped_key().value()),
+          std::string(field.value().get_string().value())
+        );
+      }
     } catch (...) {
-      return nlohmann::json{};
     }
+    return result;
   }();
-  return j;
+  return m;
 }
 
 namespace localization {
 [[nodiscard]] std::string_view text(std::string_view key) {
-  const auto j = mapping();
+  const auto& m = mapping();
 
-  if (const auto it = j.find(key); it != j.end()) [[likely]] {
-    return it.value().get<std::string_view>();
+  if (const auto it = m.find(key); it != m.end()) [[likely]] {
+    return it->second;
   }
 
   return key;

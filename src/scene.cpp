@@ -6,7 +6,7 @@
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager)
+scene::scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<scenemanager> scenemanager)
     : _renderer(std::move(scenemanager->renderer())),
       _scenemanager(std::move(scenemanager)),
       _particlesystem(scenemanager->resourcemanager()),
@@ -21,30 +21,29 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
   const auto& pixmappool = _scenemanager->resourcemanager()->pixmappool();
   const auto& fontfactory = _scenemanager->resourcemanager()->fontfactory();
 
-  const auto es = json.value("effects", nlohmann::json::array());
-  _effects.reserve(es.size());
-  for (const auto& e : es) {
-    const auto& name = e.get_ref<const std::string&>();
-    const auto f = std::format("blobs/{}/{}.ogg", scene, name);
-    _effects.emplace(name, soundmanager->get(f));
+  if (auto effects = unmarshal::find_array(document, "effects")) {
+    for (auto element : *effects) {
+      const auto name = std::string(element.get_string().value());
+      const auto path = std::format("blobs/{}/{}.ogg", scene, name);
+      _effects.emplace(name, soundmanager->get(path));
+    }
   }
 
   _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
 
-  const auto os = json.value("objects", nlohmann::json::array());
+  auto zindex = 0;
+  if (auto objects = unmarshal::find_array(document, "objects")) {
+    for (auto element : *objects) {
+      auto object = element.get_object().value();
+      const auto name = std::string(unmarshal::get<std::string_view>(object, "name"));
+      const auto kind = std::string(unmarshal::get<std::string_view>(object, "kind"));
+      const auto action = make_action(unmarshal::value_or(object, "action", std::string_view{}));
 
-  int zindex = 0;
-  for (const auto& o : os) {
-    const auto name = o.at("name").get<std::string>();
-    const auto kind = o.at("kind").get<std::string>();
-    const auto action = make_action(o.value("action", std::string{}));
+      const auto x = unmarshal::value_or(object, "x", .0f);
+      const auto y = unmarshal::value_or(object, "y", .0f);
 
-    const auto x = o.value("x", .0f);
-    const auto y = o.value("y", .0f);
-
-    const auto filename = std::format("objects/{}/{}.json", scene, kind);
-    const auto buffer = io::read(filename);
-    const auto j = nlohmann::json::parse(buffer);
+      const auto filename = std::format("objects/{}/{}.json", scene, kind);
+      auto object_document = unmarshal::parse(io::read(filename));
 
     auto entity = _registry.create();
 
@@ -66,61 +65,65 @@ scene::scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr
     pb.timeline = nullptr;
     _registry.emplace<playback>(entity, std::move(pb));
 
-    transform tf;
+    auto tf = transform{};
     tf.position = {x, y};
     tf.angle = .0;
-    tf.scale = j.value("scale", 1.0f);
+    tf.scale = unmarshal::value_or(object_document, "scale", 1.0f);
     _registry.emplace<transform>(entity, std::move(tf));
 
-    atlas at;
-    for (auto& [key, value] : j.at("timelines").items()) {
-      timeline tl;
-      from_json(value, tl);
+    auto at = atlas{};
+    for (auto field : object_document["timelines"].get_object()) {
+      auto key = std::string(field.unescaped_key().value());
+      auto tl = timeline{};
+      from_json(field.value(), tl);
       at.timelines.emplace(make_action(key), std::move(tl));
     }
 
     _registry.emplace<atlas>(entity, std::move(at));
 
-    orientation ori;
+    auto ori = orientation{};
     _registry.emplace<orientation>(entity, std::move(ori));
 
-    physics ph;
+    auto ph = physics{};
     _registry.emplace<physics>(entity, std::move(ph));
 
-    renderable rn;
+    auto rn = renderable{};
     rn.z = zindex++;
     _registry.emplace<renderable>(entity, std::move(rn));
 
-    const auto e = std::make_shared<entityproxy>(entity, _registry);
-    _proxies.emplace(std::move(name), e);
+    const auto entity_proxy = std::make_shared<entityproxy>(entity, _registry);
+    _proxies.emplace(std::move(name), entity_proxy);
 
-    callbacks cb;
-    cb.self = e;
+    auto cb = callbacks{};
+    cb.self = entity_proxy;
     _registry.emplace<callbacks>(entity, std::move(cb));
   }
 
-  _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
-    return lhs.z < rhs.z;
-  });
-
-  const auto ps = json.value("particles", nlohmann::json::array());
-  _particles.reserve(ps.size());
-  const auto factory = _particlesystem.factory();
-  for (const auto& i : ps) {
-    const auto particle = i.at("name").get<std::string_view>();
-    const auto kind = i.at("kind").get<std::string_view>();
-    const auto x = i.at("x").get<float>();
-    const auto y = i.at("y").get<float>();
-    const auto active = i.value("active", true);
-    const auto batch = factory->create(kind, x, y, active);
-    _particles.emplace(particle, batch);
-    _particlesystem.add(batch);
+    _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
+      return lhs.z < rhs.z;
+    });
   }
 
-  const auto fs = json.value("fonts", nlohmann::json::array());
-  for (const auto& i : fs) {
-    const auto fontname = i.get<std::string_view>();
-    fontfactory->get(fontname);
+  const auto factory = _particlesystem.factory();
+  if (auto particles = unmarshal::find_array(document, "particles")) {
+    for (auto element : *particles) {
+      auto particle_object = element.get_object().value();
+      const auto particle_name = std::string(unmarshal::get<std::string_view>(particle_object, "name"));
+      const auto kind = unmarshal::get<std::string_view>(particle_object, "kind");
+      const auto px = unmarshal::get<float>(particle_object, "x");
+      const auto py = unmarshal::get<float>(particle_object, "y");
+      const auto active = unmarshal::value_or(particle_object, "active", true);
+      const auto batch = factory->create(kind, px, py, active);
+      _particles.emplace(particle_name, batch);
+      _particlesystem.add(batch);
+    }
+  }
+
+  if (auto fonts = unmarshal::find_array(document, "fonts")) {
+    for (auto element : *fonts) {
+      const auto fontname = element.get_string().value();
+      fontfactory->get(fontname);
+    }
   }
 }
 

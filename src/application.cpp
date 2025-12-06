@@ -20,7 +20,7 @@ application::application(const int argc, char** const argv) {
 }
 
 int application::run() {
-  static_assert(std::endian::native == std::endian::little);
+  static_assert(boost::core::endian::native == boost::core::endian::little);
 
   try {
     const char* const p = std::getenv("CARTRIDGE");

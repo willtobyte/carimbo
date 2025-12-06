@@ -37,9 +37,9 @@ struct alignas(8) vec2 {
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
 
-  friend void from_json(const nlohmann::json& j, vec2& o) {
-    j["x"].get_to(o.x);
-    j["y"].get_to(o.y);
+  friend void from_json(unmarshal::value json, vec2& out) {
+    out.x = unmarshal::get<float>(json, "x");
+    out.y = unmarshal::get<float>(json, "y");
   }
 };
 
@@ -83,10 +83,10 @@ struct alignas(16) vec3 {
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 3; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 3; }
 
-  friend void from_json(const nlohmann::json& j, vec3& o) {
-    j["x"].get_to(o.x);
-    j["y"].get_to(o.y);
-    j["z"].get_to(o.z);
+  friend void from_json(unmarshal::value json, vec3& out) {
+    out.x = unmarshal::get<float>(json, "x");
+    out.y = unmarshal::get<float>(json, "y");
+    out.z = unmarshal::get<float>(json, "z");
   }
 };
 
@@ -142,11 +142,11 @@ struct alignas(16) quad {
     };
   }
 
-  friend void from_json(const nlohmann::json& j, quad& o) {
-    j["x"].get_to(o.x);
-    j["y"].get_to(o.y);
-    j["w"].get_to(o.w);
-    j["h"].get_to(o.h);
+  friend void from_json(unmarshal::value json, quad& out) {
+    out.x = unmarshal::get<float>(json, "x");
+    out.y = unmarshal::get<float>(json, "y");
+    out.w = unmarshal::get<float>(json, "w");
+    out.h = unmarshal::get<float>(json, "h");
   }
 };
 

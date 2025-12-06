@@ -61,7 +61,7 @@ void overlay::draw() const noexcept {
   }
 }
 
-void overlay::set_cursor(std::string_view name) noexcept {
+void overlay::set_cursor(std::string_view name) {
   _cursor = std::make_shared<cursor>(name, _resourcemanager);
   _eventmanager->add_receiver(_cursor);
 }

@@ -10,27 +10,26 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
   SDL_HideCursor();
 
   const auto filename = std::format("cursors/{}.json", name);
-  const auto buffer = io::read(filename);
-  const auto j = nlohmann::json::parse(buffer);
+  auto document = unmarshal::parse(io::read(filename));
 
-  _point = j["point"].template get<vec2>();
+  from_json(document["point"].value(), _point);
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
-  _animations.reserve(j["animations"].size());
 
-  for (const auto& item : j["animations"].items()) {
-    const auto key = item.key();
-    const auto a = item.value();
-    const auto f = a["frames"];
-    boost::container::small_vector<keyframe, 16> keyframes(f.size());
-    std::ranges::transform(f, keyframes.begin(), [](const auto& frame) {
-      return keyframe{
-        frame["duration"].template get<uint64_t>(),
-        frame["offset"].template get<vec2>(),
-        frame["quad"].template get<quad>(),
-      };
-    });
+  for (auto field : document["animations"].get_object()) {
+    auto key = std::string(field.unescaped_key().value());
+    auto animation_object = field.value().get_object().value();
 
-    const auto oneshot = a.value("oneshot", false);
+    auto keyframes = boost::container::small_vector<keyframe, 16>{};
+    for (auto element : animation_object["frames"].get_array()) {
+      auto frame_value = element.value();
+      auto kf = keyframe{};
+      kf.duration = unmarshal::get<uint64_t>(frame_value, "duration");
+      from_json(frame_value["offset"].value(), kf.offset);
+      from_json(frame_value["quad"].value(), kf.frame);
+      keyframes.emplace_back(std::move(kf));
+    }
+
+    const auto oneshot = unmarshal::value_or(animation_object, "oneshot", false);
 
     _animations.emplace(key, animation{oneshot, std::nullopt, std::nullopt, nullptr, keyframes});
   }

@@ -28,7 +28,7 @@ private:
     size_t target = _available.capacity();
     if (target == 0) target = 1;
 
-    target = std::bit_ceil(std::max(target, minimum)) << 1;
+    target = boost::core::bit_ceil(std::max(target, minimum)) << 1;
 
     _available.reserve(target);
 

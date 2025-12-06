@@ -23,7 +23,7 @@ class scene {
 }
 
 public:
-  scene(std::string_view scene, const nlohmann::json& json, std::shared_ptr<scenemanager> scenemanager);
+  scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<scenemanager> scenemanager);
 
   ~scene() noexcept;
 

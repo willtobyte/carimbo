@@ -44,9 +44,9 @@ struct offset {
   float x{.0f};
   float y{.0f};
 
-  friend void from_json(const nlohmann::json& j, offset& o) {
-    j["x"].get_to(o.x);
-    j["y"].get_to(o.y);
+  friend void from_json(unmarshal::value json, offset& out) {
+    out.x = unmarshal::get<float>(json, "x");
+    out.y = unmarshal::get<float>(json, "y");
   }
 };
 
@@ -55,12 +55,12 @@ struct frame final {
   offset offset;
   quad quad;
 
-  friend void from_json(const nlohmann::json& j, frame& o) {
-    j["duration"].get_to(o.duration);
-    if (j.contains("offset")) {
-      j["offset"].get_to(o.offset);
+  friend void from_json(unmarshal::value json, frame& out) {
+    out.duration = unmarshal::get<int64_t>(json, "duration");
+    if (unmarshal::contains(json, "offset")) {
+      from_json(json["offset"].value(), out.offset);
     }
-    j["quad"].get_to(o.quad);
+    from_json(json["quad"].value(), out.quad);
   }
 };
 
@@ -82,14 +82,14 @@ struct physics final {
   }
 };
 
-inline void from_json(const nlohmann::json& j, b2AABB& o) {
-  const auto x = j["x"].get<float>();
-  const auto y = j["y"].get<float>();
-  const auto w = j["w"].get<float>();
-  const auto h = j["h"].get<float>();
+inline void from_json(unmarshal::value json, b2AABB& out) {
+  const auto x = unmarshal::get<float>(json, "x");
+  const auto y = unmarshal::get<float>(json, "y");
+  const auto w = unmarshal::get<float>(json, "w");
+  const auto h = unmarshal::get<float>(json, "h");
 
-  o.lowerBound = b2Vec2(x - epsilon, y - epsilon);
-  o.upperBound = b2Vec2(x + w + epsilon, y + h + epsilon);
+  out.lowerBound = b2Vec2(x - epsilon, y - epsilon);
+  out.upperBound = b2Vec2(x + w + epsilon, y + h + epsilon);
 }
 
 struct timeline final {
@@ -98,23 +98,25 @@ struct timeline final {
   std::optional<b2AABB> hitbox;
   boost::container::small_vector<frame, 24> frames;
 
-  friend void from_json(const nlohmann::json& j, timeline& o) {
-    if (j.contains("oneshot")) {
-      j["oneshot"].get_to(o.oneshot);
+  friend void from_json(unmarshal::value json, timeline& out) {
+    out.oneshot = unmarshal::value_or(json, "oneshot", false);
+
+    if (unmarshal::contains(json, "next")) {
+      out.next = make_action(unmarshal::get<std::string_view>(json, "next"));
     }
 
-    if (j.contains("next")) {
-      o.next = make_action(j["next"].get<std::string_view>());
+    if (auto hitbox_object = unmarshal::find_object(json, "hitbox")) {
+      auto aabb = b2AABB{};
+      from_json((*hitbox_object)["quad"].value(), aabb);
+      out.hitbox = aabb;
     }
 
-    if (j.contains("hitbox")) {
-      b2AABB b;
-      j["hitbox"]["quad"].get_to(b);
-      o.hitbox = b;
-    }
-
-    if (j.contains("frames")) {
-      j["frames"].get_to(o.frames);
+    if (auto frames_array = unmarshal::find_array(json, "frames")) {
+      for (auto element : *frames_array) {
+        auto fr = frame{};
+        from_json(element.value(), fr);
+        out.frames.emplace_back(std::move(fr));
+      }
     }
   }
 };

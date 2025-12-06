@@ -28,7 +28,7 @@ class Carimbo(ConanFile):
         self.requires("boost/1.89.0")
         self.requires("box2d/3.1.1")
         self.requires("entt/3.15.0")
-        self.requires("nlohmann_json/3.12.0")
+        self.requires("simdjson/4.2.2")
         self.requires("openal-soft/1.23.1")
         self.requires("physfs/3.2.0")
         self.requires("sdl/3.2.20")

@@ -6,10 +6,12 @@
 #include <box2d/box2d.h>
 #include <entt/entt.hpp>
 #include <lua.hpp>
-#include <nlohmann/json.hpp>
 #include <physfs.h>
 #include <SDL3/SDL.h>
+#include <simdjson.h>
 #include <sol/sol.hpp>
+
+#include "unmarshal.hpp"
 
 #include <boost/container/small_vector.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>

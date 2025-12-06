@@ -7,10 +7,10 @@ struct alignas(16) tile final {
   float y;
   uint32_t id;
 
-  friend void from_json(const nlohmann::json& j, tile& t) {
-    j.at("x").get_to(t.x);
-    j.at("y").get_to(t.y);
-    t.id = static_cast<uint32_t>(std::stoul(j.at("id").get<std::string>()));
+  friend void from_json(unmarshal::value json, tile& out) {
+    out.x = unmarshal::get<float>(json, "x");
+    out.y = unmarshal::get<float>(json, "y");
+    out.id = static_cast<uint32_t>(std::stoul(std::string(unmarshal::get<std::string_view>(json, "id"))));
   }
 };
 
@@ -19,28 +19,39 @@ struct alignas(64) layer final {
   std::string name;
   std::vector<tile> tiles;
 
-  friend void from_json(const nlohmann::json& j, layer& l) {
-    j.at("collider").get_to(l.collider);
-    j.at("name").get_to(l.name);
-    j.at("tiles").get_to(l.tiles);
+  friend void from_json(unmarshal::value json, layer& out) {
+    out.collider = unmarshal::get<bool>(json, "collider");
+    out.name = std::string(unmarshal::get<std::string_view>(json, "name"));
+
+    out.tiles.clear();
+    for (auto element : json["tiles"].get_array()) {
+      auto t = tile{};
+      from_json(element.value(), t);
+      out.tiles.emplace_back(std::move(t));
+    }
   }
 };
 
 class tilemap final {
 public:
   tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool) {
-    const auto buffer = io::read(std::format("tilemaps/{}.json", name));
-    const auto j = nlohmann::json::parse(buffer);
-    j.get_to(*this);
+    auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
+    from_json(document, *this);
 
     atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
   }
 
-  friend void from_json(const nlohmann::json& j, tilemap& t) {
-    j.at("tileSize").get_to(t.tile_size);
-    j.at("mapWidth").get_to(t.map_width);
-    j.at("mapHeight").get_to(t.map_height);
-    j.at("layers").get_to(t.layers);
+  friend void from_json(unmarshal::document& document, tilemap& out) {
+    out.tile_size = unmarshal::get<int32_t>(document, "tileSize");
+    out.map_width = unmarshal::get<int32_t>(document, "mapWidth");
+    out.map_height = unmarshal::get<int32_t>(document, "mapHeight");
+
+    out.layers.clear();
+    for (auto element : document["layers"].get_array()) {
+      auto l = layer{};
+      from_json(element.value(), l);
+      out.layers.emplace_back(std::move(l));
+    }
   }
 
 private:

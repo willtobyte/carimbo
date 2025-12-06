@@ -7,10 +7,11 @@ enum scenetype : std::uint8_t {
   // tilemap
 };
 
-NLOHMANN_JSON_SERIALIZE_ENUM(scenetype, {
-  {scenetype::backdrop, "backdrop"},
-  // {scenetype::tilemap, "tilemap"},
-})
+[[nodiscard]] inline scenetype parse_scenetype(std::string_view str) noexcept {
+  if (str == "backdrop") return scenetype::backdrop;
+  // if (str == "tilemap") return scenetype::tilemap;
+  return scenetype::backdrop;
+}
 
 class scenemanager final : public eventreceiver, public std::enable_shared_from_this<scenemanager> {
 public:

@@ -20,13 +20,12 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
   if (inserted) {
     std::println("[fontfactory] cache miss {}", filename);
 
-    const auto buffer = io::read(filename);
-    const auto j = nlohmann::json::parse(buffer);
+    auto document = unmarshal::parse(io::read(filename));
 
-    const auto glyphs = j["glyphs"].get<std::string_view>();
-    const auto spacing = j.value("spacing", int16_t{0});
-    const auto leading = j.value("leading", int16_t{0});
-    const auto scale   = j.value("scale",   float{1.f});
+    const auto glyphs = unmarshal::get<std::string_view>(document, "glyphs");
+    const auto spacing = unmarshal::value_or(document, "spacing", int16_t{0});
+    const auto leading = unmarshal::value_or(document, "leading", int16_t{0});
+    const auto scale = unmarshal::value_or(document, "scale", float{1.f});
 
     const auto pixmap = _pixmappool->get(std::format("blobs/overlay/{}.png", family));
     const auto width = pixmap->width();
