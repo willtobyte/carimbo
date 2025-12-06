@@ -17,7 +17,7 @@ void cassette::set(std::string_view key, const T& value) {
   } else if constexpr (std::is_floating_point_v<T>) {
     _data.insert_or_assign(key, static_cast<double>(value));
   } else if constexpr (std::is_convertible_v<T, std::string> || std::is_convertible_v<T, std::string_view>) {
-    _data.insert_or_assign(key, value);
+    _data.insert_or_assign(key, std::string(value));
   } else {
     static_assert(sizeof(T) == 0, "unsupported type for cassette::set");
   }
