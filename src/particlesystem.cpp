@@ -10,30 +10,30 @@ particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanage
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   const auto filename = std::format("particles/{}.json", kind);
-  auto document = unmarshal::parse(io::read(filename));
+  auto document = unmarshal::dom::parse(io::read(filename));
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
 
-  const auto count = unmarshal::value_or(document, "count", 0uz);
+  const auto spawn = document["spawn"];
+  const auto velocity = document["velocity"];
+  const auto gravity = document["gravity"];
+  const auto rotation = document["rotation"];
 
-  const auto spawn = unmarshal::find_object(document, "spawn");
-  const auto velocity = unmarshal::find_object(document, "velocity");
-  const auto gravity = unmarshal::find_object(document, "gravity");
-  const auto rotation = unmarshal::find_object(document, "rotation");
+  const auto count = unmarshal::dom::value_or(document["count"], 0uz);
 
-  const auto [xspawn_start, xspawn_end] = unmarshal::range<float>(spawn, "x", .0f, .0f);
-  const auto [yspawn_start, yspawn_end] = unmarshal::range<float>(spawn, "y", .0f, .0f);
-  const auto [radius_start, radius_end] = unmarshal::range<float>(spawn, "radius", .0f, .0f);
-  const auto [angle_start, angle_end] = unmarshal::range<double>(spawn, "angle", .0, .0);
-  const auto [scale_start, scale_end] = unmarshal::range<float>(spawn, "scale", 1.0f, 1.0f);
-  const auto [life_start, life_end] = unmarshal::range<float>(spawn, "life", 1.0f, 1.0f);
-  const auto [alpha_start, alpha_end] = unmarshal::range<unsigned int>(spawn, "alpha", 255u, 255u);
-  const auto [xvel_start, xvel_end] = unmarshal::range<float>(velocity, "x", .0f, .0f);
-  const auto [yvel_start, yvel_end] = unmarshal::range<float>(velocity, "y", .0f, .0f);
-  const auto [gx_start, gx_end] = unmarshal::range<float>(gravity, "x", .0f, .0f);
-  const auto [gy_start, gy_end] = unmarshal::range<float>(gravity, "y", .0f, .0f);
-  const auto [rforce_start, rforce_end] = unmarshal::range<double>(rotation, "force", .0, .0);
-  const auto [rvel_start, rvel_end] = unmarshal::range<double>(rotation, "velocity", .0, .0);
+  const auto [xspawn_start, xspawn_end] = unmarshal::dom::range(spawn, "x", .0f, .0f);
+  const auto [yspawn_start, yspawn_end] = unmarshal::dom::range(spawn, "y", .0f, .0f);
+  const auto [radius_start, radius_end] = unmarshal::dom::range(spawn, "radius", .0f, .0f);
+  const auto [angle_start, angle_end] = unmarshal::dom::range(spawn, "angle", .0, .0);
+  const auto [scale_start, scale_end] = unmarshal::dom::range(spawn, "scale", 1.0f, 1.0f);
+  const auto [life_start, life_end] = unmarshal::dom::range(spawn, "life", 1.0f, 1.0f);
+  const auto [alpha_start, alpha_end] = unmarshal::dom::range(spawn, "alpha", 255u, 255u);
+  const auto [xvel_start, xvel_end] = unmarshal::dom::range(velocity, "x", .0f, .0f);
+  const auto [yvel_start, yvel_end] = unmarshal::dom::range(velocity, "y", .0f, .0f);
+  const auto [gx_start, gx_end] = unmarshal::dom::range(gravity, "x", .0f, .0f);
+  const auto [gy_start, gy_end] = unmarshal::dom::range(gravity, "y", .0f, .0f);
+  const auto [rforce_start, rforce_end] = unmarshal::dom::range(rotation, "force", .0, .0);
+  const auto [rvel_start, rvel_end] = unmarshal::dom::range(rotation, "velocity", .0, .0);
 
   const auto props = std::make_shared<particleprops>();
   props->active = true;
