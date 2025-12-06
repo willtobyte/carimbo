@@ -92,11 +92,14 @@ void timermanager::clear() noexcept {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, functor&& fn, bool repeat) noexcept {
-  const auto ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
+  auto* ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   assert(id != 0 && std::format("[SDL_AddTimer] {}", SDL_GetError()).c_str());
 
-  _envelopemapping.emplace(id, ptr);
+  if (repeat) {
+    _envelopemapping.emplace(id, ptr);
+  }
+
   return id;
 }

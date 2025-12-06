@@ -243,12 +243,12 @@ void eventmanager::update(float delta) {
             const auto fn = payload->fn;
             const auto repeat = payload->repeat;
 
-            if (!repeat) {
-              _envelopepool->release(ptr);
-            }
-
             if (fn) {
               fn();
+            }
+
+            if (!repeat) {
+              _envelopepool->release(ptr);
             }
           }
         }
