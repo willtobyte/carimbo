@@ -19,10 +19,14 @@ struct keyframe final {
   quad frame;
 
   friend void from_json(unmarshal::value json, keyframe& out) {
-    from_json(json["quad"].value(), out.frame);
+    unmarshal::value value;
+    json["quad"].get(value);
+    from_json(value, out.frame);
 
     if (unmarshal::contains(json, "offset")) {
-      from_json(json["offset"].value(), out.offset);
+      unmarshal::value value;
+      json["offset"].get(value);
+      from_json(value, out.offset);
     }
 
     out.duration = unmarshal::get<uint64_t>(json, "duration");
@@ -39,7 +43,9 @@ struct bounds final {
       out.type = unmarshal::get<uint16_t>(json, "type");
     }
 
-    from_json(json["quad"].value(), out.rectangle);
+    unmarshal::value value;
+    json["quad"].get(value);
+    from_json(value, out.rectangle);
   }
 };
 

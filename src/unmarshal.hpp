@@ -12,7 +12,10 @@ struct parsed final {
   document _document;
 
   parsed(simdjson::padded_string&& buffer)
-      : _buffer(std::move(buffer)), _parser{}, _document(_parser.iterate(_buffer)) {}
+      : _buffer(std::move(buffer)), _parser{} {
+    auto result = _parser.iterate(_buffer);
+    std::move(result).get(_document);
+  }
 
   operator document&() noexcept { return _document; }
   document* operator->() noexcept { return &_document; }
@@ -60,7 +63,9 @@ template <typename T>
     return fallback;
   }
 
-  return typed.value();
+  T out;
+  std::move(typed).get(out);
+  return out;
 }
 
 template <typename T>
@@ -75,7 +80,9 @@ template <typename T>
     return fallback;
   }
 
-  return typed.value();
+  T out;
+  std::move(typed).get(out);
+  return out;
 }
 
 template <typename T>
@@ -90,7 +97,9 @@ template <typename T>
     return fallback;
   }
 
-  return typed.value();
+  T out;
+  std::move(typed).get(out);
+  return out;
 }
 
 [[nodiscard]] inline bool contains(value json, std::string_view key) noexcept {
@@ -108,11 +117,13 @@ template <typename T>
     return std::nullopt;
   }
 
-  return typed.value();
+  object out;
+  std::move(typed).get(out);
+  return out;
 }
 
-[[nodiscard]] inline std::optional<object> find_object(object object, std::string_view key) noexcept {
-  auto result = object[key];
+[[nodiscard]] inline std::optional<object> find_object(object o, std::string_view key) noexcept {
+  auto result = o[key];
   if (result.error()) [[unlikely]] {
     return std::nullopt;
   }
@@ -122,7 +133,9 @@ template <typename T>
     return std::nullopt;
   }
 
-  return typed.value();
+  object out;
+  std::move(typed).get(out);
+  return out;
 }
 
 [[nodiscard]] inline std::optional<object> find_object(parsed& p, std::string_view key) noexcept {
@@ -136,7 +149,9 @@ template <typename T>
     return std::nullopt;
   }
 
-  return typed.value();
+  object out;
+  std::move(typed).get(out);
+  return out;
 }
 
 [[nodiscard]] inline std::optional<array> find_array(value json, std::string_view key) noexcept {
@@ -150,7 +165,9 @@ template <typename T>
     return std::nullopt;
   }
 
-  return typed.value();
+  array out;
+  std::move(typed).get(out);
+  return out;
 }
 
 [[nodiscard]] inline std::optional<array> find_array(document& document, std::string_view key) noexcept {
@@ -164,6 +181,8 @@ template <typename T>
     return std::nullopt;
   }
 
-  return typed.value();
+  array out;
+  std::move(typed).get(out);
+  return out;
 }
 }
