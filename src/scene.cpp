@@ -149,8 +149,8 @@ scene::~scene() noexcept {
 void scene::update(float delta) noexcept {
   const auto now = SDL_GetTicks();
 
-  _animationsystem.update(_registry, now);
-  _physicssystem.update(_registry, _world, delta);
+  _animationsystem.update(now);
+  _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
 
   if (const auto fn = _onloop; fn) {
@@ -181,7 +181,7 @@ void scene::draw() const noexcept {
 
   _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  _rendersystem.draw(_registry);
+  _rendersystem.draw();
 
   _particlesystem.draw();
 

@@ -59,8 +59,8 @@ struct result final {
 }
 }
 
-void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
-  registry.view<atlas, playback, callbacks>().each([now](const atlas& at, playback& s, callbacks& c) {
+void animationsystem::update(uint64_t now) noexcept {
+  _group.each([now](const atlas& at, playback& s, callbacks& c) {
     const bool refresh = s.dirty | !s.timeline;
 
     if (refresh) [[unlikely]] {
@@ -110,8 +110,8 @@ void animationsystem::update(entt::registry& registry, uint64_t now) noexcept {
   });
 }
 
-void physicssystem::update(entt::registry& registry, b2WorldId world, [[maybe_unused]] float delta) noexcept {
-  registry.view<transform, playback, physics, renderable>().each(
+void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexcept {
+  _group.each(
     [world](entt::entity entity, const transform& t, const playback& s, physics& p, const renderable& rn) {
       if (!p.enabled) [[unlikely]] {
         return;
@@ -153,8 +153,8 @@ void physicssystem::update(entt::registry& registry, b2WorldId world, [[maybe_un
     });
 }
 
-void rendersystem::draw(const entt::registry& registry) const noexcept {
-  registry.view<renderable, transform, tint, sprite, playback, orientation>().each(
+void rendersystem::draw() const noexcept {
+  _group.each(
     [](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
       if (!rn.visible || !st.timeline || st.timeline->frames.empty()) [[unlikely]] {
         return;

@@ -70,16 +70,18 @@ protected:
 
 private:
   entt::registry _registry;
+
   b2WorldId _world;
-  animationsystem _animationsystem;
-  physicssystem _physicssystem;
-  rendersystem _rendersystem;
+
+  animationsystem _animationsystem{_registry};
+  physicssystem _physicssystem{_registry};
+  rendersystem _rendersystem{_registry};
+
   particlesystem _particlesystem;
 
   std::shared_ptr<pixmap> _background;
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<::timermanager> _timermanager;
-
   std::shared_ptr<scenemanager> _scenemanager;
 
   boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
