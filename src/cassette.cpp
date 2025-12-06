@@ -128,7 +128,7 @@ cassette::cassette() {
       }
     } else if (type == TYPE_DOUBLE) {
       try {
-        double v = std::stod(std::string(value));
+        double v = std::stod(std::string{value});
         _data.emplace(std::move(key_str), v);
       } catch (...) {
       }
