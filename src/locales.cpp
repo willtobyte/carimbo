@@ -26,10 +26,9 @@ static std::string_view language() {
       auto document = unmarshal::parse(io::read(filename));
 
       for (auto field : document.object()) {
-        result.emplace(
-          std::string(field.unescaped_key().value()),
-          std::string(field.value().get_string().value())
-        );
+        auto key = unmarshal::key(field);
+        auto value = unmarshal::string(field.value());
+        result.emplace(key, value);
       }
     } catch (...) {
     }

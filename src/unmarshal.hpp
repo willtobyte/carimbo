@@ -91,4 +91,28 @@ template <typename T>
       value_or(*nested, "start", default_start),
       value_or(*nested, "end", default_end)};
 }
+
+[[nodiscard]] inline std::string_view key(auto &&field) noexcept {
+  std::string_view out;
+  field.unescaped_key().get(out);
+  return out;
+}
+
+[[nodiscard]] inline std::string_view string(auto &&element) noexcept {
+  std::string_view out;
+  element.get_string().get(out);
+  return out;
+}
+
+[[nodiscard]] inline value value_of(auto &&element) noexcept {
+  value out;
+  element.get(out);
+  return out;
+}
+
+[[nodiscard]] inline object object_of(auto &&element) noexcept {
+  object out;
+  element.get_object().get(out);
+  return out;
+}
 }

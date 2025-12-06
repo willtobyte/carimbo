@@ -12,24 +12,35 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
   const auto filename = std::format("cursors/{}.json", name);
   auto document = unmarshal::parse(io::read(filename));
 
-  from_json(document["point"].value(), _point);
+  unmarshal::value p;
+  document["point"].get(p);
+  from_json(p, _point);
+
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
 
   for (auto field : document["animations"].get_object()) {
-    auto key = std::string(field.unescaped_key().value());
-    auto animation_object = field.value().get_object().value();
+    auto key = unmarshal::key(field);
+    auto aobject = unmarshal::object_of(field.value());
 
     auto keyframes = boost::container::small_vector<keyframe, 16>{};
-    for (auto element : animation_object["frames"].get_array()) {
-      auto frame_value = element.value();
+    for (auto element : aobject["frames"].get_array()) {
+      auto value = unmarshal::value_of(element);
+
       auto kf = keyframe{};
-      kf.duration = unmarshal::get<uint64_t>(frame_value, "duration");
-      from_json(frame_value["offset"].value(), kf.offset);
-      from_json(frame_value["quad"].value(), kf.frame);
+      kf.duration = unmarshal::get<uint64_t>(value, "duration");
+
+      unmarshal::value offset;
+      value["offset"].get(offset);
+      from_json(offset, kf.offset);
+
+      unmarshal::value quad;
+      value["quad"].get(quad);
+      from_json(quad, kf.frame);
+
       keyframes.emplace_back(std::move(kf));
     }
 
-    const auto oneshot = unmarshal::value_or(animation_object, "oneshot", false);
+    auto oneshot = unmarshal::value_or(aobject, "oneshot", false);
 
     _animations.emplace(key, animation{oneshot, std::nullopt, std::nullopt, nullptr, keyframes});
   }

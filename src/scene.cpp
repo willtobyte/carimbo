@@ -23,9 +23,9 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
   if (auto effects = unmarshal::find_array(document, "effects")) {
     for (auto element : *effects) {
-      const auto name = std::string(element.get_string().value());
+      auto name = unmarshal::string(element);
       const auto path = std::format("blobs/{}/{}.ogg", scene, name);
-      _effects.emplace(name, soundmanager->get(path));
+      _effects.emplace(std::string(name), soundmanager->get(path));
     }
   }
 
@@ -34,7 +34,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   auto zindex = 0;
   if (auto objects = unmarshal::find_array(document, "objects")) {
     for (auto element : *objects) {
-      auto object = element.get_object().value();
+      auto object = unmarshal::object_of(element);
       const auto name = std::string(unmarshal::get<std::string_view>(object, "name"));
       const auto kind = std::string(unmarshal::get<std::string_view>(object, "kind"));
       const auto action = make_action(unmarshal::value_or(object, "action", std::string_view{}));
@@ -73,10 +73,11 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       auto at = atlas{};
       for (auto field : dobject["timelines"].get_object()) {
-        auto key = std::string(field.unescaped_key().value());
+        auto key = unmarshal::key(field);
         auto tl = timeline{};
-        from_json(field.value(), tl);
-        at.timelines.emplace(make_action(key), std::move(tl));
+        auto value = unmarshal::value_of(field.value());
+        from_json(value, tl);
+        at.timelines.emplace(make_action(std::string(key)), std::move(tl));
       }
 
       _registry.emplace<atlas>(entity, std::move(at));
@@ -107,7 +108,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   const auto factory = _particlesystem.factory();
   if (auto particles = unmarshal::find_array(document, "particles")) {
     for (auto element : *particles) {
-      auto particle_object = element.get_object().value();
+      auto particle_object = unmarshal::object_of(element);
       const auto particle_name = std::string(unmarshal::get<std::string_view>(particle_object, "name"));
       const auto kind = unmarshal::get<std::string_view>(particle_object, "kind");
       const auto px = unmarshal::get<float>(particle_object, "x");
@@ -121,7 +122,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
   if (auto fonts = unmarshal::find_array(document, "fonts")) {
     for (auto element : *fonts) {
-      const auto fontname = element.get_string().value();
+      auto fontname = unmarshal::string(element);
       fontfactory->get(fontname);
     }
   }
