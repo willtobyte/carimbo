@@ -7,10 +7,10 @@
 namespace {
 
 template <typename T>
-std::pair<T, T> read_range(unmarshal::object &obj, T default_start, T default_end) noexcept {
+std::pair<T, T> read_range(unmarshal::object &object, T default_start, T default_end) noexcept {
   return {
-    unmarshal::value_or(obj, "start", default_start),
-    unmarshal::value_or(obj, "end", default_end)
+    unmarshal::value_or(object, "start", default_start),
+    unmarshal::value_or(object, "end", default_end)
   };
 }
 
@@ -23,7 +23,7 @@ struct particleconfig final {
   std::pair<double, double> angle{.0, .0};
   std::pair<float, float> scale{1.0f, 1.0f};
   std::pair<float, float> life{1.0f, 1.0f};
-  std::pair<unsigned, unsigned> alpha{255u, 255u};
+  std::pair<uint8_t, uint8_t> alpha{255u, 255u};
 
   std::pair<float, float> xvel{.0f, .0f};
   std::pair<float, float> yvel{.0f, .0f};
