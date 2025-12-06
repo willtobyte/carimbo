@@ -43,61 +43,61 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       const auto y = unmarshal::value_or(object, "y", .0f);
 
       const auto filename = std::format("objects/{}/{}.json", scene, kind);
-      auto object_document = unmarshal::parse(io::read(filename));
+      auto dobject = unmarshal::parse(io::read(filename));
 
-    auto entity = _registry.create();
+      auto entity = _registry.create();
 
-    metadata m;
-    m.kind = make_action(kind);
-    _registry.emplace<metadata>(entity, std::move(m));
+      metadata m;
+      m.kind = make_action(kind);
+      _registry.emplace<metadata>(entity, std::move(m));
 
-    tint tn;
-    _registry.emplace<tint>(entity, std::move(tn));
+      tint tn;
+      _registry.emplace<tint>(entity, std::move(tn));
 
-    sprite s;
-    s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
-    _registry.emplace<sprite>(entity, std::move(s));
+      sprite s;
+      s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
+      _registry.emplace<sprite>(entity, std::move(s));
 
-    playback pb;
-    pb.action = action;
-    pb.dirty = true;
-    pb.tick = SDL_GetTicks();
-    pb.timeline = nullptr;
-    _registry.emplace<playback>(entity, std::move(pb));
+      playback pb;
+      pb.action = action;
+      pb.dirty = true;
+      pb.tick = SDL_GetTicks();
+      pb.timeline = nullptr;
+      _registry.emplace<playback>(entity, std::move(pb));
 
-    auto tf = transform{};
-    tf.position = {x, y};
-    tf.angle = .0;
-    tf.scale = unmarshal::value_or(object_document, "scale", 1.0f);
-    _registry.emplace<transform>(entity, std::move(tf));
+      auto tf = transform{};
+      tf.position = {x, y};
+      tf.angle = .0;
+      tf.scale = unmarshal::value_or(dobject, "scale", 1.0f);
+      _registry.emplace<transform>(entity, std::move(tf));
 
-    auto at = atlas{};
-    for (auto field : object_document["timelines"].get_object()) {
-      auto key = std::string(field.unescaped_key().value());
-      auto tl = timeline{};
-      from_json(field.value(), tl);
-      at.timelines.emplace(make_action(key), std::move(tl));
+      auto at = atlas{};
+      for (auto field : dobject["timelines"].get_object()) {
+        auto key = std::string(field.unescaped_key().value());
+        auto tl = timeline{};
+        from_json(field.value(), tl);
+        at.timelines.emplace(make_action(key), std::move(tl));
+      }
+
+      _registry.emplace<atlas>(entity, std::move(at));
+
+      auto ori = orientation{};
+      _registry.emplace<orientation>(entity, std::move(ori));
+
+      auto ph = physics{};
+      _registry.emplace<physics>(entity, std::move(ph));
+
+      auto rn = renderable{};
+      rn.z = zindex++;
+      _registry.emplace<renderable>(entity, std::move(rn));
+
+      const auto entity_proxy = std::make_shared<entityproxy>(entity, _registry);
+      _proxies.emplace(std::move(name), entity_proxy);
+
+      auto cb = callbacks{};
+      cb.self = entity_proxy;
+      _registry.emplace<callbacks>(entity, std::move(cb));
     }
-
-    _registry.emplace<atlas>(entity, std::move(at));
-
-    auto ori = orientation{};
-    _registry.emplace<orientation>(entity, std::move(ori));
-
-    auto ph = physics{};
-    _registry.emplace<physics>(entity, std::move(ph));
-
-    auto rn = renderable{};
-    rn.z = zindex++;
-    _registry.emplace<renderable>(entity, std::move(rn));
-
-    const auto entity_proxy = std::make_shared<entityproxy>(entity, _registry);
-    _proxies.emplace(std::move(name), entity_proxy);
-
-    auto cb = callbacks{};
-    cb.self = entity_proxy;
-    _registry.emplace<callbacks>(entity, std::move(cb));
-  }
 
     _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
       return lhs.z < rhs.z;

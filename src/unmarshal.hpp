@@ -1,6 +1,7 @@
 #pragma once
 
 namespace unmarshal {
+
 using document = simdjson::ondemand::document;
 using value = simdjson::ondemand::value;
 using object = simdjson::ondemand::object;
@@ -11,195 +12,83 @@ struct parsed final {
   simdjson::ondemand::parser _parser;
   document _document;
 
-  parsed(simdjson::padded_string&& buffer)
+  explicit parsed(simdjson::padded_string &&buffer)
       : _buffer(std::move(buffer)), _parser{} {
-    auto result = _parser.iterate(_buffer);
-    std::move(result).get(_document);
+    _parser.iterate(_buffer).get(_document);
   }
 
-  operator document&() noexcept { return _document; }
-  document* operator->() noexcept { return &_document; }
-  document& operator*() noexcept { return _document; }
+  operator document &() noexcept { return _document; }
+  document *operator->() noexcept { return &_document; }
+  document &operator*() noexcept { return _document; }
 
   auto operator[](std::string_view key) noexcept { return _document[key]; }
   auto object() noexcept { return _document.get_object(); }
   auto array() noexcept { return _document.get_array(); }
 };
 
-namespace detail {
-[[nodiscard]] inline simdjson::padded_string to_padded_string(const std::vector<uint8_t>& data) {
-  return simdjson::padded_string(reinterpret_cast<const char*>(data.data()), data.size());
-}
-}
-
-[[nodiscard]] inline parsed parse(const std::vector<uint8_t>& data) {
-  return parsed(detail::to_padded_string(data));
+[[nodiscard]] inline parsed parse(const std::vector<uint8_t> &data) {
+  return parsed(simdjson::padded_string(
+      reinterpret_cast<const char *>(data.data()), data.size()));
 }
 
 template <typename T>
-[[nodiscard]] inline T get(object json, std::string_view key) {
-  return json[key].template get<T>();
+[[nodiscard]] inline T get(auto &&source, std::string_view key) {
+  return source[key].template get<T>().value();
 }
 
 template <typename T>
-[[nodiscard]] inline T get(value json, std::string_view key) {
-  return json[key].template get<T>();
-}
-
-template <typename T>
-[[nodiscard]] inline T get(document& document, std::string_view key) {
-  return document[key].template get<T>();
-}
-
-template <typename T>
-[[nodiscard]] inline T value_or(object json, std::string_view key, T fallback) {
-  auto result = json[key];
-  if (result.error()) [[unlikely]] {
+[[nodiscard]] inline T value_or(auto &&source, std::string_view key, T fallback) {
+  auto result = source[key];
+  if (result.error()) [[unlikely]]
     return fallback;
-  }
 
   auto typed = result.template get<T>();
-  if (typed.error()) [[unlikely]] {
+  if (typed.error()) [[unlikely]]
     return fallback;
-  }
 
-  T out;
-  std::move(typed).get(out);
-  return out;
+  return typed.value();
 }
 
-template <typename T>
-[[nodiscard]] inline T value_or(value json, std::string_view key, T fallback) {
-  auto result = json[key];
-  if (result.error()) [[unlikely]] {
-    return fallback;
-  }
-
-  auto typed = result.template get<T>();
-  if (typed.error()) [[unlikely]] {
-    return fallback;
-  }
-
-  T out;
-  std::move(typed).get(out);
-  return out;
+[[nodiscard]] inline bool contains(auto &&source, std::string_view key) noexcept {
+  return !source[key].error();
 }
 
-template <typename T>
-[[nodiscard]] inline T value_or(document& document, std::string_view key, T fallback) {
-  auto result = document[key];
-  if (result.error()) [[unlikely]] {
-    return fallback;
-  }
-
-  auto typed = result.template get<T>();
-  if (typed.error()) [[unlikely]] {
-    return fallback;
-  }
-
-  T out;
-  std::move(typed).get(out);
-  return out;
-}
-
-[[nodiscard]] inline bool contains(value json, std::string_view key) noexcept {
-  return !json[key].error();
-}
-
-[[nodiscard]] inline std::optional<object> find_object(value json, std::string_view key) noexcept {
-  auto result = json[key];
-  if (result.error()) [[unlikely]] {
+[[nodiscard]] inline std::optional<object> find_object(auto &&source, std::string_view key) noexcept {
+  auto result = source[key];
+  if (result.error()) [[unlikely]]
     return std::nullopt;
-  }
-
-  auto typed = result.get_object();
-  if (typed.error()) [[unlikely]] {
-    return std::nullopt;
-  }
 
   object out;
-  std::move(typed).get(out);
+  if (result.get_object().get(out)) [[unlikely]]
+    return std::nullopt;
+
   return out;
 }
 
-[[nodiscard]] inline std::optional<object> find_object(object o, std::string_view key) noexcept {
-  auto result = o[key];
-  if (result.error()) [[unlikely]] {
+[[nodiscard]] inline std::optional<array> find_array(auto &&source, std::string_view key) noexcept {
+  auto result = source[key];
+  if (result.error()) [[unlikely]]
     return std::nullopt;
-  }
-
-  auto typed = result.get_object();
-  if (typed.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  object out;
-  std::move(typed).get(out);
-  return out;
-}
-
-[[nodiscard]] inline std::optional<object> find_object(parsed& p, std::string_view key) noexcept {
-  auto result = p[key];
-  if (result.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  auto typed = result.get_object();
-  if (typed.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  object out;
-  std::move(typed).get(out);
-  return out;
-}
-
-[[nodiscard]] inline std::optional<array> find_array(value json, std::string_view key) noexcept {
-  auto result = json[key];
-  if (result.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  auto typed = result.get_array();
-  if (typed.error()) [[unlikely]] {
-    return std::nullopt;
-  }
 
   array out;
-  std::move(typed).get(out);
-  return out;
-}
-
-[[nodiscard]] inline std::optional<array> find_array(document& document, std::string_view key) noexcept {
-  auto result = document[key];
-  if (result.error()) [[unlikely]] {
+  if (result.get_array().get(out)) [[unlikely]]
     return std::nullopt;
-  }
 
-  auto typed = result.get_array();
-  if (typed.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  array out;
-  std::move(typed).get(out);
   return out;
 }
 
 template <typename T>
-[[nodiscard]] inline std::pair<T, T> range(const std::optional<object>& opt, std::string_view key, T default_start, T default_end) noexcept {
-  if (!opt) [[unlikely]] {
+[[nodiscard]] inline std::pair<T, T> range(std::optional<object> opt, std::string_view key, T default_start, T default_end) noexcept {
+  if (!opt) [[unlikely]]
     return {default_start, default_end};
-  }
 
   auto nested = find_object(*opt, key);
-  if (!nested) [[unlikely]] {
+  if (!nested) [[unlikely]]
     return {default_start, default_end};
-  }
 
   return {
-    value_or(*nested, "start", default_start),
-    value_or(*nested, "end", default_end)
-  };
+      value_or(*nested, "start", default_start),
+      value_or(*nested, "end", default_end)};
 }
+
 }
