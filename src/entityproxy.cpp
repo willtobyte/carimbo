@@ -160,7 +160,7 @@ void entityproxy::set_onend(sol::protected_function&& fn) {
 }
 
 std::shared_ptr<entityproxy> entityproxy::clone() {
-  auto e = _registry.create();
+  const auto e = _registry.create();
 
   if (const auto* m = _registry.try_get<metadata>(_e)) {
     _registry.emplace<metadata>(e, *m);
@@ -203,7 +203,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
     _registry.emplace<renderable>(e, std::move(crn));
   }
 
-  auto proxy = std::make_shared<entityproxy>(e, _registry);
+  const auto proxy = std::make_shared<entityproxy>(e, _registry);
 
   callbacks c;
   c.self = proxy;

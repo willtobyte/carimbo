@@ -22,8 +22,8 @@ inline constexpr action_id no_action = 0;
 
 [[nodiscard]] inline std::optional<std::string_view> action_name(action_id id) noexcept {
   if (id == no_action) return std::nullopt;
-  auto& reg = action_registry();
-  auto it = reg.find(id);
+  const auto& reg = action_registry();
+  const auto it = reg.find(id);
   return it != reg.end() ? std::optional<std::string_view>{it->second} : std::nullopt;
 }
 
@@ -136,7 +136,7 @@ struct atlas final {
   entt::dense_map<action_id, timeline> timelines;
 
   const timeline* find(action_id id) const noexcept {
-    auto it = timelines.find(id);
+    const auto it = timelines.find(id);
     return it != timelines.end() ? &it->second : nullptr;
   }
 };

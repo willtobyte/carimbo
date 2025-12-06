@@ -183,7 +183,7 @@ void scriptengine::run() {
     "SoundFX",
     sol::no_constructor,
      "play", [](soundfx& self, std::optional<bool> loop_opt) {
-       auto loop = loop_opt.value_or(false);
+       const auto loop = loop_opt.value_or(false);
        self.play(loop);
      },
      "stop", &soundfx::stop,
@@ -200,7 +200,7 @@ void scriptengine::run() {
       std::string_view name,
       std::optional<bool> loop_opt
     ) {
-      auto loop = loop_opt.value_or(false);
+      const auto loop = loop_opt.value_or(false);
       self.play(name, loop);
     },
     "stop", &soundmanager::stop

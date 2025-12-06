@@ -94,8 +94,8 @@ cassette::cassette() {
 
   std::string_view remaining{content};
   while (!remaining.empty()) {
-    auto newline_pos = remaining.find('\n');
-    auto line = remaining.substr(0, newline_pos);
+    const auto newline_pos = remaining.find('\n');
+    const auto line = remaining.substr(0, newline_pos);
     remaining = (newline_pos == std::string_view::npos) ? std::string_view{} : remaining.substr(newline_pos + 1);
 
     if (line.empty()) {

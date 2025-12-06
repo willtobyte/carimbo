@@ -30,7 +30,7 @@ std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
 }
 
 void overlay::destroy(const std::variant<std::shared_ptr<label>>& widget) noexcept {
-  auto predicate = [&widget](const auto& existing) {
+  const auto predicate = [&widget](const auto& existing) {
     if (const auto ptr = std::get_if<std::shared_ptr<label>>(&widget)) {
       return existing == *ptr;
     }

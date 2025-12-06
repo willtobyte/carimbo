@@ -23,7 +23,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
   if (auto effects = unmarshal::find_array(document, "effects")) {
     for (auto element : *effects) {
-      auto name = unmarshal::string(element);
+      const auto name = unmarshal::string(element);
       const auto path = std::format("blobs/{}/{}.ogg", scene, name);
       _effects.emplace(name, soundmanager->get(path));
     }
@@ -45,7 +45,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       const auto filename = std::format("objects/{}/{}.json", scene, kind);
       auto dobject = unmarshal::parse(io::read(filename));
 
-      auto entity = _registry.create();
+      const auto entity = _registry.create();
 
       metadata m;
       m.kind = make_action(kind);
@@ -73,7 +73,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       auto at = atlas{};
       for (auto field : dobject["timelines"].get_object()) {
-        auto key = unmarshal::key(field);
+        const auto key = unmarshal::key(field);
         auto tl = timeline{};
         auto value = unmarshal::value_of(field.value());
         from_json(value, tl);
@@ -129,8 +129,8 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 }
 
 scene::~scene() noexcept {
-  auto view = _registry.view<physics>();
-  for (auto entity : view) {
+  const auto view = _registry.view<physics>();
+  for (const auto entity : view) {
     auto& ph = view.get<physics>(entity);
     if (b2Shape_IsValid(ph.shape)) {
       b2DestroyShape(ph.shape, false);

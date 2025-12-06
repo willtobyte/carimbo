@@ -36,7 +36,7 @@ struct particleconfig final {
 
   friend void from_json(unmarshal::document &document, particleconfig &out) {
     for (auto field : document.get_object()) {
-      auto key = unmarshal::key(field);
+      const auto key = unmarshal::key(field);
 
       if (key == "count") {
         uint64_t value;
@@ -46,7 +46,7 @@ struct particleconfig final {
       } else if (key == "spawn") {
         auto object = unmarshal::object_of(field.value());
         for (auto spawn_field : object) {
-          auto spawn_key = unmarshal::key(spawn_field);
+          const auto spawn_key = unmarshal::key(spawn_field);
           auto spawn_object = unmarshal::object_of(spawn_field.value());
 
           if (spawn_key == "x") {
@@ -68,7 +68,7 @@ struct particleconfig final {
       } else if (key == "velocity") {
         auto object = unmarshal::object_of(field.value());
         for (auto vel_field : object) {
-          auto vel_key = unmarshal::key(vel_field);
+          const auto vel_key = unmarshal::key(vel_field);
           auto vel_object = unmarshal::object_of(vel_field.value());
 
           if (vel_key == "x") {
@@ -80,7 +80,7 @@ struct particleconfig final {
       } else if (key == "gravity") {
         auto object = unmarshal::object_of(field.value());
         for (auto grav_field : object) {
-          auto grav_key = unmarshal::key(grav_field);
+          const auto grav_key = unmarshal::key(grav_field);
           auto grav_object = unmarshal::object_of(grav_field.value());
 
           if (grav_key == "x") {
@@ -92,7 +92,7 @@ struct particleconfig final {
       } else if (key == "rotation") {
         auto object = unmarshal::object_of(field.value());
         for (auto rot_field : object) {
-          auto rot_key = unmarshal::key(rot_field);
+          const auto rot_key = unmarshal::key(rot_field);
           auto rot_object = unmarshal::object_of(rot_field.value());
 
           if (rot_key == "force") {
@@ -140,7 +140,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->rotforced = std::uniform_real_distribution<double>(conf.rforce.first, conf.rforce.second);
   props->rotveld = std::uniform_real_distribution<double>(conf.rvel.first, conf.rvel.second);
 
-  auto batch = std::make_shared<particlebatch>();
+  const auto batch = std::make_shared<particlebatch>();
   batch->props = std::move(props);
   batch->particles.resize(conf.count);
   batch->vertices.resize(conf.count * 4);

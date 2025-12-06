@@ -207,9 +207,9 @@ struct functor final {
   template<typename... Args>
   void operator()(Args&&... args) const {
     if (!fn.valid() || !fn.lua_state()) [[unlikely]] return;
-    auto result = fn(std::forward<Args>(args)...);
+    const auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
-      auto error_msg = sol::stack::get<std::string>(result.lua_state(), result.stack_index());
+      const auto error_msg = sol::stack::get<std::string>(result.lua_state(), result.stack_index());
       std::println(stderr, "{}", error_msg);
       throw std::runtime_error(error_msg);
     }
@@ -218,7 +218,7 @@ struct functor final {
   template<typename R, typename... Args>
   [[nodiscard]] R call(Args&&... args) const {
     if (!fn.valid() || !fn.lua_state()) [[unlikely]] return R{};
-    auto result = fn(std::forward<Args>(args)...);
+    const auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
       throw std::runtime_error(sol::stack::get<std::string>(result.lua_state(), result.stack_index()));
     }
