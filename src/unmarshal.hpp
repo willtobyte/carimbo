@@ -185,4 +185,21 @@ template <typename T>
   std::move(typed).get(out);
   return out;
 }
+
+template <typename T>
+[[nodiscard]] inline std::pair<T, T> range(const std::optional<object>& opt, std::string_view key, T default_start, T default_end) noexcept {
+  if (!opt) [[unlikely]] {
+    return {default_start, default_end};
+  }
+
+  auto nested = find_object(*opt, key);
+  if (!nested) [[unlikely]] {
+    return {default_start, default_end};
+  }
+
+  return {
+    value_or(*nested, "start", default_start),
+    value_or(*nested, "end", default_end)
+  };
+}
 }

@@ -16,24 +16,24 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
 
   const auto count = unmarshal::value_or(document, "count", 0uz);
 
-  auto spawn = unmarshal::find_object(document, "spawn");
-  auto velocity = unmarshal::find_object(document, "velocity");
-  auto gravity = unmarshal::find_object(document, "gravity");
-  auto rotation = unmarshal::find_object(document, "rotation");
+  const auto spawn = unmarshal::find_object(document, "spawn");
+  const auto velocity = unmarshal::find_object(document, "velocity");
+  const auto gravity = unmarshal::find_object(document, "gravity");
+  const auto rotation = unmarshal::find_object(document, "rotation");
 
-  auto radius = spawn ? unmarshal::find_object(*spawn, "radius") : std::nullopt;
-  auto angle = spawn ? unmarshal::find_object(*spawn, "angle") : std::nullopt;
-  auto xspawn = spawn ? unmarshal::find_object(*spawn, "x") : std::nullopt;
-  auto yspawn = spawn ? unmarshal::find_object(*spawn, "y") : std::nullopt;
-  auto scale = spawn ? unmarshal::find_object(*spawn, "scale") : std::nullopt;
-  auto life = spawn ? unmarshal::find_object(*spawn, "life") : std::nullopt;
-  auto alpha = spawn ? unmarshal::find_object(*spawn, "alpha") : std::nullopt;
-  auto xvel = velocity ? unmarshal::find_object(*velocity, "x") : std::nullopt;
-  auto yvel = velocity ? unmarshal::find_object(*velocity, "y") : std::nullopt;
-  auto gx = gravity ? unmarshal::find_object(*gravity, "x") : std::nullopt;
-  auto gy = gravity ? unmarshal::find_object(*gravity, "y") : std::nullopt;
-  auto rforce = rotation ? unmarshal::find_object(*rotation, "force") : std::nullopt;
-  auto rvel = rotation ? unmarshal::find_object(*rotation, "velocity") : std::nullopt;
+  const auto [xspawn_start, xspawn_end] = unmarshal::range<float>(spawn, "x", .0f, .0f);
+  const auto [yspawn_start, yspawn_end] = unmarshal::range<float>(spawn, "y", .0f, .0f);
+  const auto [radius_start, radius_end] = unmarshal::range<float>(spawn, "radius", .0f, .0f);
+  const auto [angle_start, angle_end] = unmarshal::range<double>(spawn, "angle", .0, .0);
+  const auto [scale_start, scale_end] = unmarshal::range<float>(spawn, "scale", 1.0f, 1.0f);
+  const auto [life_start, life_end] = unmarshal::range<float>(spawn, "life", 1.0f, 1.0f);
+  const auto [alpha_start, alpha_end] = unmarshal::range<unsigned int>(spawn, "alpha", 255u, 255u);
+  const auto [xvel_start, xvel_end] = unmarshal::range<float>(velocity, "x", .0f, .0f);
+  const auto [yvel_start, yvel_end] = unmarshal::range<float>(velocity, "y", .0f, .0f);
+  const auto [gx_start, gx_end] = unmarshal::range<float>(gravity, "x", .0f, .0f);
+  const auto [gy_start, gy_end] = unmarshal::range<float>(gravity, "y", .0f, .0f);
+  const auto [rforce_start, rforce_end] = unmarshal::range<double>(rotation, "force", .0, .0);
+  const auto [rvel_start, rvel_end] = unmarshal::range<double>(rotation, "velocity", .0, .0);
 
   const auto props = std::make_shared<particleprops>();
   props->active = true;
@@ -41,19 +41,19 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->x = x;
   props->y = y;
   props->pixmap = pixmap;
-  props->xspawnd = std::uniform_real_distribution<float>(xspawn ? unmarshal::value_or(*xspawn, "start", .0f) : .0f, xspawn ? unmarshal::value_or(*xspawn, "end", .0f) : .0f);
-  props->yspawnd = std::uniform_real_distribution<float>(yspawn ? unmarshal::value_or(*yspawn, "start", .0f) : .0f, yspawn ? unmarshal::value_or(*yspawn, "end", .0f) : .0f);
-  props->radiusd = std::uniform_real_distribution<float>(radius ? unmarshal::value_or(*radius, "start", .0f) : .0f, radius ? unmarshal::value_or(*radius, "end", .0f) : .0f);
-  props->angled = std::uniform_real_distribution<double>(angle ? unmarshal::value_or(*angle, "start", .0) : .0, angle ? unmarshal::value_or(*angle, "end", .0) : .0);
-  props->xveld = std::uniform_real_distribution<float>(xvel ? unmarshal::value_or(*xvel, "start", .0f) : .0f, xvel ? unmarshal::value_or(*xvel, "end", .0f) : .0f);
-  props->yveld = std::uniform_real_distribution<float>(yvel ? unmarshal::value_or(*yvel, "start", .0f) : .0f, yvel ? unmarshal::value_or(*yvel, "end", .0f) : .0f);
-  props->gxd = std::uniform_real_distribution<float>(gx ? unmarshal::value_or(*gx, "start", .0f) : .0f, gx ? unmarshal::value_or(*gx, "end", .0f) : .0f);
-  props->gyd = std::uniform_real_distribution<float>(gy ? unmarshal::value_or(*gy, "start", .0f) : .0f, gy ? unmarshal::value_or(*gy, "end", .0f) : .0f);
-  props->lifed = std::uniform_real_distribution<float>(life ? unmarshal::value_or(*life, "start", 1.0f) : 1.0f, life ? unmarshal::value_or(*life, "end", 1.0f) : 1.0f);
-  props->alphad = std::uniform_int_distribution<unsigned int>(alpha ? unmarshal::value_or(*alpha, "start", 255u) : 255u, alpha ? unmarshal::value_or(*alpha, "end", 255u) : 255u);
-  props->scaled = std::uniform_real_distribution<float>(scale ? unmarshal::value_or(*scale, "start", 1.0f) : 1.0f, scale ? unmarshal::value_or(*scale, "end", 1.0f) : 1.0f);
-  props->rotforced = std::uniform_real_distribution<double>(rforce ? unmarshal::value_or(*rforce, "start", .0) : .0, rforce ? unmarshal::value_or(*rforce, "end", .0) : .0);
-  props->rotveld = std::uniform_real_distribution<double>(rvel ? unmarshal::value_or(*rvel, "start", .0) : .0, rvel ? unmarshal::value_or(*rvel, "end", .0) : .0);
+  props->xspawnd = std::uniform_real_distribution<float>(xspawn_start, xspawn_end);
+  props->yspawnd = std::uniform_real_distribution<float>(yspawn_start, yspawn_end);
+  props->radiusd = std::uniform_real_distribution<float>(radius_start, radius_end);
+  props->angled = std::uniform_real_distribution<double>(angle_start, angle_end);
+  props->xveld = std::uniform_real_distribution<float>(xvel_start, xvel_end);
+  props->yveld = std::uniform_real_distribution<float>(yvel_start, yvel_end);
+  props->gxd = std::uniform_real_distribution<float>(gx_start, gx_end);
+  props->gyd = std::uniform_real_distribution<float>(gy_start, gy_end);
+  props->lifed = std::uniform_real_distribution<float>(life_start, life_end);
+  props->alphad = std::uniform_int_distribution<unsigned int>(alpha_start, alpha_end);
+  props->scaled = std::uniform_real_distribution<float>(scale_start, scale_end);
+  props->rotforced = std::uniform_real_distribution<double>(rforce_start, rforce_end);
+  props->rotveld = std::uniform_real_distribution<double>(rvel_start, rvel_end);
 
   auto batch = std::make_shared<particlebatch>();
   batch->props = std::move(props);
