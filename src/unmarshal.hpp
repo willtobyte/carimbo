@@ -1,18 +1,17 @@
 #pragma once
 
 namespace unmarshal {
-
 using document = simdjson::ondemand::document;
 using value = simdjson::ondemand::value;
 using object = simdjson::ondemand::object;
 using array = simdjson::ondemand::array;
 
-struct parsed final {
+struct json final {
   simdjson::padded_string _buffer;
   simdjson::ondemand::parser _parser;
   document _document;
 
-  explicit parsed(simdjson::padded_string &&buffer)
+  explicit json(simdjson::padded_string &&buffer)
       : _buffer(std::move(buffer)), _parser{} {
     _parser.iterate(_buffer).get(_document);
   }
@@ -26,8 +25,8 @@ struct parsed final {
   auto array() noexcept { return _document.get_array(); }
 };
 
-[[nodiscard]] inline parsed parse(const std::vector<uint8_t> &data) {
-  return parsed(simdjson::padded_string(
+[[nodiscard]] inline json parse(const std::vector<uint8_t> &data) {
+  return json(simdjson::padded_string(
       reinterpret_cast<const char *>(data.data()), data.size()));
 }
 
@@ -90,5 +89,4 @@ template <typename T>
       value_or(*nested, "start", default_start),
       value_or(*nested, "end", default_end)};
 }
-
 }
