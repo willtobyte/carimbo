@@ -231,7 +231,7 @@ void eventmanager::update(float delta) {
             }
           }
 
-          _envelopepool->release(ptr);
+          _envelopepool.release(ptr);
         }
       } break;
 
@@ -248,7 +248,7 @@ void eventmanager::update(float delta) {
             }
 
             if (!repeat) {
-              _envelopepool->release(ptr);
+              _envelopepool.release(ptr);
             }
           }
         }
@@ -288,6 +288,6 @@ void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {
     }
 
     auto* ptr = static_cast<envelope*>(const_cast<void*>(event.user.data1));
-    _envelopepool->release(ptr);
+    _envelopepool.release(ptr);
   }
 }

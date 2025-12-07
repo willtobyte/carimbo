@@ -37,8 +37,8 @@ struct alignas(64) layer final {
 class tilemap final {
 public:
   tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool) {
-    auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
-    from_json(document, *this);
+    const auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
+    from_json(*document, *this);
 
     atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
   }

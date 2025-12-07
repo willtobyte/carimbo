@@ -39,6 +39,11 @@ struct json final {
   simdjson::padded_string _buffer;
   document _document;
 
+  json(json const&) = delete;
+  json& operator=(json const&) = delete;
+  json(json&&) = delete;
+  json& operator=(json&&) = delete;
+
   explicit json(simdjson::padded_string &&buffer)
       : _buffer(std::move(buffer)) {
     const auto error = pool::instance().acquire().iterate(_buffer).get(_document);
@@ -49,11 +54,6 @@ struct json final {
     pool::instance().release();
   }
 
-  json(const json&) = delete;
-  json& operator=(const json&) = delete;
-  json(json&&) = delete;
-  json& operator=(json&&) = delete;
-
   operator document &() noexcept { return _document; }
   document *operator->() noexcept { return &_document; }
   document &operator*() noexcept { return _document; }
@@ -63,9 +63,9 @@ struct json final {
   auto array() noexcept { return _document.get_array(); }
 };
 
-[[nodiscard]] inline json parse(const std::vector<uint8_t> &data) {
-  return json(simdjson::padded_string(
-      reinterpret_cast<const char *>(data.data()), data.size()));
+[[nodiscard]] inline std::unique_ptr<json> parse(const std::vector<uint8_t>& data) {
+  return std::make_unique<json>(simdjson::padded_string(
+        reinterpret_cast<const char*>(data.data()), data.size()));
 }
 
 template <typename T>

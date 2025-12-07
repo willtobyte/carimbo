@@ -14,7 +14,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name);
   if (inserted) {
     const auto filename = std::format("scenes/{}.json", name);
-    auto document = unmarshal::parse(io::read(filename));
+    const auto j = unmarshal::parse(io::read(filename)); auto& document = *j;
 
     const auto type = parse_scenetype(unmarshal::get<std::string_view>(document, "type"));
 

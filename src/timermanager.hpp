@@ -16,7 +16,7 @@ protected:
   uint32_t add_timer(uint32_t interval, functor&& fn, bool repeat) noexcept;
 
 private:
-  std::shared_ptr<envelopepool_impl> _envelopepool;
+  envelopepool_impl& _envelopepool;
 
   boost::unordered_flat_map<uint32_t, envelope*> _envelopemapping;
 };

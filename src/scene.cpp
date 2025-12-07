@@ -43,7 +43,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       const auto y = unmarshal::value_or(object, "y", .0f);
 
       const auto filename = std::format("objects/{}/{}.json", scene, kind);
-      auto dobject = unmarshal::parse(io::read(filename));
+      const auto j = unmarshal::parse(io::read(filename)); auto& dobject = *j;
 
       const auto entity = _registry.create();
 

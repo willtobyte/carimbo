@@ -26,5 +26,5 @@ public:
   void post(const mail& message);
 
 private:
-  std::shared_ptr<envelopepool_impl> _envelopepool;
+  envelopepool_impl& _envelopepool;
 };

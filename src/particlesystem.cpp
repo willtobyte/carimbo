@@ -113,10 +113,10 @@ particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanage
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   const auto filename = std::format("particles/{}.json", kind);
-  auto document = unmarshal::parse(io::read(filename));
+  const auto document = unmarshal::parse(io::read(filename));
 
   particleconfig conf;
-  from_json(document, conf);
+  from_json(*document, conf);
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
 

@@ -5,7 +5,7 @@ postalservice::postalservice()
 }
 
 void postalservice::post(const mail& message) {
-  auto envelope = _envelopepool->acquire(mailenvelope(message.to, message.kind, message.body));
+  auto envelope = _envelopepool.acquire(mailenvelope(message.to, message.kind, message.body));
 
   SDL_Event event{};
   event.type = static_cast<uint32_t>(event::type::mail);

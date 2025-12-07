@@ -28,5 +28,5 @@ private:
   boost::unordered_flat_map<uint32_t, std::unique_ptr<SDL_Gamepad, SDL_Deleter>> _controllers;
   boost::container::small_vector<uint32_t, 8> _joystickgorder;
   boost::unordered_flat_map<uint32_t, uint8_t> _joystickmapping;
-  std::shared_ptr<envelopepool_impl> _envelopepool = envelopepool::instance();
+  envelopepool_impl& _envelopepool = envelopepool::instance();
 };

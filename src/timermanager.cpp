@@ -76,9 +76,9 @@ void timermanager::cancel(uint32_t id) noexcept {
       payload->fn = nullptr;
     }
 
-    context ctx{_envelopepool.get(), ptr};
+    context ctx{&_envelopepool, ptr};
     SDL_FilterEvents(filter, &ctx);
-    _envelopepool->release(ptr);
+    _envelopepool.release(ptr);
   }
 }
 
@@ -92,7 +92,7 @@ void timermanager::clear() noexcept {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, functor&& fn, bool repeat) noexcept {
-  auto* ptr = _envelopepool->acquire(timerenvelope(repeat, std::move(fn))).release();
+  auto* ptr = _envelopepool.acquire(timerenvelope(repeat, std::move(fn))).release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   assert(id != 0 && std::format("[SDL_AddTimer] {}", SDL_GetError()).c_str());

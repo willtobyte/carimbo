@@ -7,14 +7,8 @@ class singleton {
 public:
   virtual ~singleton() = default;
 
-  static std::shared_ptr<T> instance() {
-    static std::once_flag _flag;
-    static std::shared_ptr<T> _instance;
-
-    std::call_once(_flag, []() {
-      _instance = std::make_shared<T>();
-    });
-
+  static T& instance() {
+    static T _instance;
     return _instance;
   }
 };
