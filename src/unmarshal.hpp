@@ -6,16 +6,53 @@ using value = simdjson::ondemand::value;
 using object = simdjson::ondemand::object;
 using array = simdjson::ondemand::array;
 
+class parser_pool final {
+public:
+  [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
+    if (_depth >= _parsers.size()) {
+      _parsers.push_back(std::make_unique<simdjson::ondemand::parser>());
+    }
+
+    return *_parsers[_depth++];
+  }
+
+  void release() noexcept {
+    assert(_depth > 0 && "parser pool underflow");
+    --_depth;
+  }
+
+  [[nodiscard]] static parser_pool& instance() noexcept {
+    thread_local parser_pool pool;
+    return pool;
+  }
+
+private:
+  parser_pool() {
+    _parsers.reserve(4);
+  }
+
+  std::vector<std::unique_ptr<simdjson::ondemand::parser>> _parsers;
+  size_t _depth{0};
+};
+
 struct json final {
   simdjson::padded_string _buffer;
-  simdjson::ondemand::parser _parser;
   document _document;
 
   explicit json(simdjson::padded_string &&buffer)
-      : _buffer(std::move(buffer)), _parser{} {
-    const auto error = _parser.iterate(_buffer).get(_document);
+      : _buffer(std::move(buffer)) {
+    const auto error = parser_pool::instance().acquire().iterate(_buffer).get(_document);
     assert(!error && "failed to parse JSON");
   }
+
+  ~json() {
+    parser_pool::instance().release();
+  }
+
+  json(const json&) = delete;
+  json& operator=(const json&) = delete;
+  json(json&&) = delete;
+  json& operator=(json&&) = delete;
 
   operator document &() noexcept { return _document; }
   document *operator->() noexcept { return &_document; }
