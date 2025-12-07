@@ -207,25 +207,28 @@ std::variant<
   std::shared_ptr<soundfx>,
   std::shared_ptr<particleprops>
 > scene::get(std::string_view name, scenekind kind) const {
-  if (kind == scenekind::object) {
-    const auto it = _proxies.find(name);
-    assert(it != _proxies.end() && "entity proxy not found in scene");
-    return it->second;
-  }
+  switch (kind) {
+    case scenekind::object: {
+      const auto it = _proxies.find(name);
+      assert(it != _proxies.end() && "entity proxy not found in scene");
+      return it->second;
+    }
 
-  if (kind == scenekind::effect) {
-    const auto it = _effects.find(name);
-    assert(it != _effects.end() && "effect not found in scene");
-    return it->second;
-  }
+    case scenekind::effect: {
+      const auto it = _effects.find(name);
+      assert(it != _effects.end() && "effect not found in scene");
+      return it->second;
+    }
 
-  if (kind == scenekind::particle) {
-    const auto it = _particles.find(name);
-    assert(it != _particles.end() && "particles not found in scene");
-    return it->second->props;
-  }
+    case scenekind::particle: {
+      const auto it = _particles.find(name);
+      assert(it != _particles.end() && "particles not found in scene");
+      return it->second->props;
+    }
 
-  std::terminate();
+    default:
+      std::terminate();
+  }
 }
 
 void scene::set_onenter(std::function<void()>&& fn) {
