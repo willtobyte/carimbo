@@ -46,10 +46,8 @@ uint8_t entityproxy::alpha() const noexcept {
 }
 
 void entityproxy::set_alpha(uint8_t alpha) noexcept {
-  auto& t = _registry.get<tint>(_e);
+  auto [t, s] = _registry.get<tint, playback>(_e);
   t.a = alpha;
-
-  auto& s = _registry.get<playback>(_e);
   s.redraw = true;
 }
 
@@ -59,10 +57,8 @@ double entityproxy::angle() const noexcept {
 }
 
 void entityproxy::set_angle(double angle) noexcept {
-  auto& t = _registry.get<transform>(_e);
+  auto [t, s] = _registry.get<transform, playback>(_e);
   t.angle = angle;
-
-  auto& s = _registry.get<playback>(_e);
   s.redraw = true;
 }
 
@@ -72,10 +68,8 @@ float entityproxy::scale() const noexcept {
 }
 
 void entityproxy::set_scale(float scale) noexcept {
-  auto& t = _registry.get<transform>(_e);
+  auto [t, s] = _registry.get<transform, playback>(_e);
   t.scale = scale;
-
-  auto& s = _registry.get<playback>(_e);
   s.dirty = true;
   s.redraw = true;
 }
@@ -86,10 +80,8 @@ bool entityproxy::visible() const noexcept {
 }
 
 void entityproxy::set_visible(bool visible) noexcept {
-  auto& r = _registry.get<renderable>(_e);
+  auto [r, p] = _registry.get<renderable, physics>(_e);
   r.visible = visible;
-
-  auto& p = _registry.get<physics>(_e);
   p.dirty = true;
 }
 
@@ -122,10 +114,8 @@ flip entityproxy::flip() const noexcept {
 }
 
 void entityproxy::set_flip(::flip flip) noexcept {
-  auto& o = _registry.get<::orientation>(_e);
+  auto [o, s] = _registry.get<::orientation, playback>(_e);
   o.flip = flip;
-
-  auto& s = _registry.get<playback>(_e);
   s.redraw = true;
 }
 

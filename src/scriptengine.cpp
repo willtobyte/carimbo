@@ -194,16 +194,7 @@ void scriptengine::run() {
 
   lua.new_usertype<soundmanager>(
     "SoundManager",
-    sol::no_constructor,
-    "play", [](
-      soundmanager& self,
-      std::string_view name,
-      std::optional<bool> loop_opt
-    ) {
-      const auto loop = loop_opt.value_or(false);
-      self.play(name, loop);
-    },
-    "stop", &soundmanager::stop
+    sol::no_constructor
   );
 
   lua.new_enum(

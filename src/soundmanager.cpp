@@ -17,18 +17,6 @@ std::shared_ptr<soundfx> soundmanager::get(std::string_view filename) {
   return it->second;
 }
 
-void soundmanager::play(std::string_view filename, bool loop) {
-  if (const auto sound = get(std::format("blobs/{}.ogg", filename)); sound) {
-    sound->play(loop);
-  }
-}
-
-void soundmanager::stop(std::string_view filename) {
-  if (const auto sound = get(std::format("blobs/{}.ogg", filename)); sound) {
-    sound->stop();
-  }
-}
-
 void soundmanager::flush() {
   std::println("[soundmanager] actual size {}", _pool.size());
 

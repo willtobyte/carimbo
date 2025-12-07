@@ -45,60 +45,60 @@ struct particleconfig final {
         }
       } else if (key == "spawn") {
         auto object = unmarshal::object_of(field.value());
-        for (auto spawn_field : object) {
-          const auto spawn_key = unmarshal::key(spawn_field);
-          auto spawn_object = unmarshal::object_of(spawn_field.value());
+        for (auto sfield : object) {
+          const auto skey = unmarshal::key(sfield);
+          auto sobject = unmarshal::object_of(sfield.value());
 
-          if (spawn_key == "x") {
-            out.xspawn = read_range(spawn_object, .0f, .0f);
-          } else if (spawn_key == "y") {
-            out.yspawn = read_range(spawn_object, .0f, .0f);
-          } else if (spawn_key == "radius") {
-            out.radius = read_range(spawn_object, .0f, .0f);
-          } else if (spawn_key == "angle") {
-            out.angle = read_range(spawn_object, .0, .0);
-          } else if (spawn_key == "scale") {
-            out.scale = read_range(spawn_object, 1.0f, 1.0f);
-          } else if (spawn_key == "life") {
-            out.life = read_range(spawn_object, 1.0f, 1.0f);
-          } else if (spawn_key == "alpha") {
-            out.alpha = read_range(spawn_object, 255u, 255u);
+          if (skey == "x") {
+            out.xspawn = read_range(sobject, .0f, .0f);
+          } else if (skey == "y") {
+            out.yspawn = read_range(sobject, .0f, .0f);
+          } else if (skey == "radius") {
+            out.radius = read_range(sobject, .0f, .0f);
+          } else if (skey == "angle") {
+            out.angle = read_range(sobject, .0, .0);
+          } else if (skey == "scale") {
+            out.scale = read_range(sobject, 1.0f, 1.0f);
+          } else if (skey == "life") {
+            out.life = read_range(sobject, 1.0f, 1.0f);
+          } else if (skey == "alpha") {
+            out.alpha = read_range(sobject, 255u, 255u);
           }
         }
       } else if (key == "velocity") {
         auto object = unmarshal::object_of(field.value());
-        for (auto vel_field : object) {
-          const auto vel_key = unmarshal::key(vel_field);
-          auto vel_object = unmarshal::object_of(vel_field.value());
+        for (auto vfield : object) {
+          const auto vkey = unmarshal::key(vfield);
+          auto vobject = unmarshal::object_of(vfield.value());
 
-          if (vel_key == "x") {
-            out.xvel = read_range(vel_object, .0f, .0f);
-          } else if (vel_key == "y") {
-            out.yvel = read_range(vel_object, .0f, .0f);
+          if (vkey == "x") {
+            out.xvel = read_range(vobject, .0f, .0f);
+          } else if (vkey == "y") {
+            out.yvel = read_range(vobject, .0f, .0f);
           }
         }
       } else if (key == "gravity") {
         auto object = unmarshal::object_of(field.value());
-        for (auto grav_field : object) {
-          const auto grav_key = unmarshal::key(grav_field);
-          auto grav_object = unmarshal::object_of(grav_field.value());
+        for (auto gfield : object) {
+          const auto gkey = unmarshal::key(gfield);
+          auto gobject = unmarshal::object_of(gfield.value());
 
-          if (grav_key == "x") {
-            out.gx = read_range(grav_object, .0f, .0f);
-          } else if (grav_key == "y") {
-            out.gy = read_range(grav_object, .0f, .0f);
+          if (gkey == "x") {
+            out.gx = read_range(gobject, .0f, .0f);
+          } else if (gkey == "y") {
+            out.gy = read_range(gobject, .0f, .0f);
           }
         }
       } else if (key == "rotation") {
         auto object = unmarshal::object_of(field.value());
-        for (auto rot_field : object) {
-          const auto rot_key = unmarshal::key(rot_field);
-          auto rot_object = unmarshal::object_of(rot_field.value());
+        for (auto rfield : object) {
+          const auto rkey = unmarshal::key(rfield);
+          auto robject = unmarshal::object_of(rfield.value());
 
-          if (rot_key == "force") {
-            out.rforce = read_range(rot_object, .0, .0);
-          } else if (rot_key == "velocity") {
-            out.rvel = read_range(rot_object, .0, .0);
+          if (rkey == "force") {
+            out.rforce = read_range(robject, .0, .0);
+          } else if (rkey == "velocity") {
+            out.rvel = read_range(robject, .0, .0);
           }
         }
       }

@@ -13,7 +13,8 @@ struct json final {
 
   explicit json(simdjson::padded_string &&buffer)
       : _buffer(std::move(buffer)), _parser{} {
-    _parser.iterate(_buffer).get(_document);
+    const auto error = _parser.iterate(_buffer).get(_document);
+    assert(!error && "failed to parse JSON");
   }
 
   operator document &() noexcept { return _document; }

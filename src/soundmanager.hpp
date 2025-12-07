@@ -9,9 +9,6 @@ public:
 
   std::shared_ptr<soundfx> get(std::string_view filename);
 
-  void play(std::string_view filename, bool loop = false);
-  void stop(std::string_view filename);
-
   void flush();
 
   void update(float delta);

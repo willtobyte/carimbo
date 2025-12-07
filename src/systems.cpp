@@ -112,7 +112,7 @@ void animationsystem::update(uint64_t now) noexcept {
 
 void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexcept {
   _group.each(
-    [world](entt::entity entity, const transform& t, const playback& s, physics& p, const renderable& rn) {
+    [world](entt::entity entity, const transform& t, physics& p, const playback& s, const renderable& rn) {
       if (!p.enabled) [[unlikely]] {
         return;
       }
@@ -154,7 +154,7 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 }
 
 void rendersystem::draw() const noexcept {
-  _group.each(
+  _view.each(
     [](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
       if (!rn.visible || !st.timeline || st.timeline->frames.empty()) [[unlikely]] {
         return;

@@ -19,12 +19,12 @@ private:
 class physicssystem final {
 public:
   explicit physicssystem(entt::registry& registry) noexcept
-    : _group(registry.group<transform, playback, physics, renderable>()) {}
+    : _group(registry.group<transform, physics>(entt::get<playback, renderable>)) {}
 
   void update(b2WorldId world, float delta) noexcept;
 
 private:
-  using group_type = decltype(std::declval<entt::registry&>().group<transform, playback, physics, renderable>());
+  using group_type = decltype(std::declval<entt::registry&>().group<transform, physics>(entt::get<playback, renderable>));
 
   group_type _group;
 };
@@ -32,12 +32,12 @@ private:
 class rendersystem final {
 public:
   explicit rendersystem(entt::registry& registry) noexcept
-    : _group(registry.group<renderable>(entt::get<transform, tint, sprite, playback, orientation>)) {}
+    : _view(registry.view<renderable, transform, tint, sprite, playback, orientation>()) {}
 
   void draw() const noexcept;
 
 private:
-  using group_type = decltype(std::declval<entt::registry&>().group<renderable>(entt::get<transform, tint, sprite, playback, orientation>));
+  using view_type = decltype(std::declval<entt::registry&>().view<renderable, transform, tint, sprite, playback, orientation>());
 
-  group_type _group;
+  view_type _view;
 };
