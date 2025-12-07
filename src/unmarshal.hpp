@@ -6,7 +6,7 @@ using value = simdjson::ondemand::value;
 using object = simdjson::ondemand::object;
 using array = simdjson::ondemand::array;
 
-class parser_pool final {
+class pool final {
 public:
   [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
     if (_depth >= _parsers.size()) {
@@ -21,13 +21,13 @@ public:
     --_depth;
   }
 
-  [[nodiscard]] static parser_pool& instance() noexcept {
-    thread_local parser_pool pool;
+  [[nodiscard]] static pool& instance() noexcept {
+    thread_local pool pool;
     return pool;
   }
 
 private:
-  parser_pool() {
+  pool() {
     _parsers.reserve(4);
   }
 
@@ -41,12 +41,12 @@ struct json final {
 
   explicit json(simdjson::padded_string &&buffer)
       : _buffer(std::move(buffer)) {
-    const auto error = parser_pool::instance().acquire().iterate(_buffer).get(_document);
+    const auto error = pool::instance().acquire().iterate(_buffer).get(_document);
     assert(!error && "failed to parse JSON");
   }
 
   ~json() {
-    parser_pool::instance().release();
+    pool::instance().release();
   }
 
   json(const json&) = delete;
