@@ -47,31 +47,31 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       const auto entity = _registry.create();
 
-      metadata m;
+      metadata m{};
       m.kind = make_action(kind);
       _registry.emplace<metadata>(entity, std::move(m));
 
-      tint tn;
+      tint tn{};
       _registry.emplace<tint>(entity, std::move(tn));
 
-      sprite s;
+      sprite s{};
       s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
       _registry.emplace<sprite>(entity, std::move(s));
 
-      playback pb;
+      playback pb{};
       pb.action = action;
       pb.dirty = true;
       pb.tick = SDL_GetTicks();
       pb.timeline = nullptr;
       _registry.emplace<playback>(entity, std::move(pb));
 
-      auto tf = transform{};
+      transform tf{};
       tf.position = {x, y};
       tf.angle = .0;
       tf.scale = unmarshal::value_or(dobject, "scale", 1.0f);
       _registry.emplace<transform>(entity, std::move(tf));
 
-      auto at = atlas{};
+      atlas at{};
       for (auto field : dobject["timelines"].get_object()) {
         const auto key = unmarshal::key(field);
         auto tl = timeline{};
@@ -82,21 +82,21 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       _registry.emplace<atlas>(entity, std::move(at));
 
-      auto ori = orientation{};
+      orientation ori{};
       _registry.emplace<orientation>(entity, std::move(ori));
 
-      auto ph = physics{};
+      physics ph{};
       _registry.emplace<physics>(entity, std::move(ph));
 
-      auto rn = renderable{};
+      renderable rn{};
       rn.z = zindex++;
       _registry.emplace<renderable>(entity, std::move(rn));
 
-      const auto entity_proxy = std::make_shared<entityproxy>(entity, _registry);
-      _proxies.emplace(std::move(name), entity_proxy);
+      const auto proxy = std::make_shared<entityproxy>(entity, _registry);
+      _proxies.emplace(std::move(name), proxy);
 
-      auto cb = callbacks{};
-      cb.self = entity_proxy;
+      callbacks cb{};
+      cb.self = proxy;
       _registry.emplace<callbacks>(entity, std::move(cb));
     }
 
