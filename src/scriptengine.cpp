@@ -540,7 +540,7 @@ void scriptengine::run() {
     sol::no_constructor,
     "active", sol::property(&particleprops::active),
     "spawning", sol::property(&particleprops::spawning),
-    "placement", sol::property(
+    "position", sol::property(
       []() {
         return nullptr;
       },
@@ -548,7 +548,7 @@ void scriptengine::run() {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
 
-        self.set_placement(x, y);
+        self.set_position(x, y);
       }
     )
   );

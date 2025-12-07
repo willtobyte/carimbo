@@ -36,7 +36,7 @@ struct particleprops final {
   auto randrotforce() noexcept { return rotforced(rng); }
   auto randrotvel() noexcept { return rotveld(rng); }
 
-  void set_placement(float xv, float yv) noexcept { x = xv; y = yv; }
+  void set_position(float xv, float yv) noexcept { x = xv; y = yv; }
 };
 
 struct alignas(64) particle final {

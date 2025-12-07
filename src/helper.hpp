@@ -231,6 +231,14 @@ template<typename T>
   requires requires(const T& t) { { t.valid() } -> std::convertible_to<bool>; }
 inline void verify(const T& result) {
   if (!result.valid()) [[unlikely]] {
-    throw std::runtime_error(sol::stack::get<std::string>(result.lua_state(), result.stack_index()));
+    auto* L = result.lua_state();
+    if (L && lua_gettop(L) > 0) {
+      const char* message = lua_tostring(L, -1);
+      if (message) {
+        throw std::runtime_error(message);
+      }
+    }
+
+    throw std::runtime_error("Lua error (no details available)");
   }
 }
