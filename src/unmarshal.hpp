@@ -10,7 +10,7 @@ class pool final {
 public:
   [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
     if (_depth >= _parsers.size()) {
-      _parsers.push_back(std::make_unique<simdjson::ondemand::parser>());
+      _parsers.emplace_back(std::make_unique<simdjson::ondemand::parser>());
     }
 
     return *_parsers[_depth++];
