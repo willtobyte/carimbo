@@ -34,7 +34,7 @@ struct bounds final {
 
   friend void from_json(unmarshal::value json, bounds& out) {
     if (unmarshal::contains(json, "type")) {
-      out.type = unmarshal::get<uint16_t>(json, "type");
+      out.type = unmarshal::get<uint8_t>(json, "type");
     }
     out.rectangle = unmarshal::make<quad>(json["quad"]);
   }

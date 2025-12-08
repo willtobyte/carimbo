@@ -60,7 +60,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       _registry.emplace<sprite>(entity, pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
 
-      _registry.emplace<playback>(entity, true, false, 0, SDL_GetTicks(), action, nullptr);
+      _registry.emplace<playback>(entity, true, false, uint16_t{0}, SDL_GetTicks(), action, nullptr);
 
       _registry.emplace<transform>(entity, vec2{x, y}, .0, unmarshal::value_or(dobject, "scale", 1.0f));
 
