@@ -45,7 +45,7 @@ std::string decode_string(std::string_view str) {
   return result;
 }
 
-bool parse_line(std::string_view line, std::string_view& type, std::string_view& key, std::string_view& value) {
+bool parse(std::string_view line, std::string_view& type, std::string_view& key, std::string_view& value) {
   if (line.empty()) {
     return false;
   }
@@ -104,7 +104,7 @@ cassette::cassette() {
 
     std::string_view type;
     std::string_view key, value;
-    if (!parse_line(line, type, key, value)) {
+    if (!parse(line, type, key, value)) {
       continue;
     }
 
@@ -127,10 +127,10 @@ cassette::cassette() {
         _data.emplace(std::move(key_str), v);
       }
     } else if (type == TYPE_DOUBLE) {
-      try {
-        double v = std::stod(std::string{value});
+      double v{};
+      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
+      if (ec == std::errc{}) {
         _data.emplace(std::move(key_str), v);
-      } catch (...) {
       }
     } else if (type == TYPE_STRING) {
       _data.emplace(std::move(key_str), decode_string(value));
@@ -148,51 +148,17 @@ void cassette::persist() const noexcept {
       using T = std::decay_t<decltype(v)>;
 
       if constexpr (std::is_same_v<T, std::nullptr_t>) {
-        buffer += TYPE_NULL;
-        buffer += ':';
-        buffer += key;
-        buffer += "=\n";
+        std::format_to(std::back_inserter(buffer), "{}:{}=\n", TYPE_NULL, key);
       } else if constexpr (std::is_same_v<T, bool>) {
-        buffer += TYPE_BOOL;
-        buffer += ':';
-        buffer += key;
-        buffer += '=';
-        buffer += v ? '1' : '0';
-        buffer += '\n';
+        std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_BOOL, key, v ? '1' : '0');
       } else if constexpr (std::is_same_v<T, int64_t>) {
-        buffer += TYPE_INT64;
-        buffer += ':';
-        buffer += key;
-        buffer += '=';
-        std::array<char, 24> num;
-        auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
-        buffer.append(num.data(), static_cast<std::size_t>(ptr - num.data()));
-        buffer += '\n';
+        std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_INT64, key, v);
       } else if constexpr (std::is_same_v<T, uint64_t>) {
-        buffer += TYPE_UINT64;
-        buffer += ':';
-        buffer += key;
-        buffer += '=';
-        std::array<char, 24> num;
-        auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
-        buffer.append(num.data(), static_cast<std::size_t>(ptr - num.data()));
-        buffer += '\n';
+        std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_UINT64, key, v);
       } else if constexpr (std::is_same_v<T, double>) {
-        buffer += TYPE_DOUBLE;
-        buffer += ':';
-        buffer += key;
-        buffer += '=';
-        std::array<char, 32> num;
-        auto [ptr, ec] = std::to_chars(num.data(), num.data() + num.size(), v);
-        buffer.append(num.data(), static_cast<std::size_t>(ptr - num.data()));
-        buffer += '\n';
+        std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_DOUBLE, key, v);
       } else if constexpr (std::is_same_v<T, std::string>) {
-        buffer += TYPE_STRING;
-        buffer += ':';
-        buffer += key;
-        buffer += '=';
-        buffer += encode_string(v);
-        buffer += '\n';
+        std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_STRING, key, encode_string(v));
       }
     }, value);
   }

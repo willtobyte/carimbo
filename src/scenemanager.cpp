@@ -60,10 +60,10 @@ std::shared_ptr<scene> scenemanager::get() const {
   return _scene.lock();
 }
 
-std::vector<std::string> scenemanager::query(std::string_view name) const {
-  std::vector<std::string> result;
-  result.reserve(8);
-  if (name.size() == 1 && name.front() == '*') {
+boost::container::small_vector<std::string, 8> scenemanager::query(std::string_view name) const {
+  boost::container::small_vector<std::string, 8> result;
+  const bool all = name.size() == 1 && name.front() == '*';
+  if (all) {
     for (const auto& [key, _] : _scene_mapping) {
       if (key == _current) continue;
       result.emplace_back(key);
@@ -78,7 +78,7 @@ std::vector<std::string> scenemanager::query(std::string_view name) const {
   return result;
 }
 
-std::vector<std::string> scenemanager::destroy(std::string_view name) {
+boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string_view name) {
   const auto scenes = query(name);
 
   for (const auto& scene : scenes) {

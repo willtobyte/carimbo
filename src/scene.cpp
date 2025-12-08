@@ -47,30 +47,6 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       const auto entity = _registry.create();
 
-      metadata m{};
-      m.kind = make_action(kind);
-      _registry.emplace<metadata>(entity, std::move(m));
-
-      tint tn{};
-      _registry.emplace<tint>(entity, std::move(tn));
-
-      sprite s{};
-      s.pixmap = std::move(pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
-      _registry.emplace<sprite>(entity, std::move(s));
-
-      playback pb{};
-      pb.action = action;
-      pb.dirty = true;
-      pb.tick = SDL_GetTicks();
-      pb.timeline = nullptr;
-      _registry.emplace<playback>(entity, std::move(pb));
-
-      transform tf{};
-      tf.position = {x, y};
-      tf.angle = .0;
-      tf.scale = unmarshal::value_or(dobject, "scale", 1.0f);
-      _registry.emplace<transform>(entity, std::move(tf));
-
       atlas at{};
       for (auto field : dobject["timelines"].get_object()) {
         const auto key = unmarshal::key(field);
@@ -80,24 +56,28 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
         at.timelines.emplace(make_action(key), std::move(tl));
       }
 
+      _registry.emplace<metadata>(entity, make_action(kind));
+
+      _registry.emplace<tint>(entity);
+
+      _registry.emplace<sprite>(entity, pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
+
+      _registry.emplace<playback>(entity, true, false, 0, SDL_GetTicks(), action, nullptr);
+
+      _registry.emplace<transform>(entity, vec2{x, y}, .0, unmarshal::value_or(dobject, "scale", 1.0f));
+
       _registry.emplace<atlas>(entity, std::move(at));
 
-      orientation ori{};
-      _registry.emplace<orientation>(entity, std::move(ori));
+      _registry.emplace<orientation>(entity);
 
-      physics ph{};
-      _registry.emplace<physics>(entity, std::move(ph));
+      _registry.emplace<physics>(entity);
 
-      renderable rn{};
-      rn.z = zindex++;
-      _registry.emplace<renderable>(entity, std::move(rn));
+      _registry.emplace<renderable>(entity, zindex++);
 
       const auto proxy = std::make_shared<entityproxy>(entity, _registry);
       _proxies.emplace(std::move(name), proxy);
 
-      callbacks cb{};
-      cb.self = proxy;
-      _registry.emplace<callbacks>(entity, std::move(cb));
+      _registry.emplace<callbacks>(entity, functor{}, functor{}, functor{}, functor{}, functor{}, functor{}, proxy);
     }
 
     _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {

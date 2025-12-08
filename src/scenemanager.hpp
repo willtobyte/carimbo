@@ -27,9 +27,9 @@ public:
 
   std::shared_ptr<::scene> get() const;
 
-  std::vector<std::string> query(std::string_view name) const;
+  boost::container::small_vector<std::string, 8> query(std::string_view name) const;
 
-  std::vector<std::string> destroy(std::string_view name);
+  boost::container::small_vector<std::string, 8> destroy(std::string_view name);
 
   void update(float delta);
 

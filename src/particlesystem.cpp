@@ -174,13 +174,13 @@ void particlesystem::add(const std::shared_ptr<particlebatch>& batch) {
   _batches.emplace_back(batch);
 }
 
-void particlesystem::set(const std::vector<std::shared_ptr<particlebatch>>& batches) {
+void particlesystem::set(std::vector<std::shared_ptr<particlebatch>> batches) {
   if (batches.empty()) {
     _batches.clear();
     return;
   }
 
-  _batches = batches;
+  _batches = std::move(batches);
 }
 
 void particlesystem::clear() {

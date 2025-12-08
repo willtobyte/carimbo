@@ -79,7 +79,7 @@ public:
 
   void add(const std::shared_ptr<particlebatch>& batch);
 
-  void set(const std::vector<std::shared_ptr<particlebatch>>& batches);
+  void set(std::vector<std::shared_ptr<particlebatch>> batches);
 
   void clear();
 

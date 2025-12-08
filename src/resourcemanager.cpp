@@ -36,12 +36,16 @@ void resourcemanager::update(float delta) {
 }
 
 void resourcemanager::prefetch() {
-  const auto directory = "blobs";
+  static constexpr std::string_view directory = "blobs";
   const auto filenames = io::enumerate(directory);
   std::vector<std::string> f;
   f.reserve(filenames.size());
+  std::string buffer;
+  buffer.reserve(64);
   for (const auto& filename : filenames) {
-    f.emplace_back(std::format("{}/{}", directory, filename));
+    buffer.clear();
+    std::format_to(std::back_inserter(buffer), "{}/{}", directory, filename);
+    f.emplace_back(buffer);
   }
 
   prefetch(f);

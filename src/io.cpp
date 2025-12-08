@@ -29,7 +29,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   return buffer;
 }
 
-std::vector<std::string> io::enumerate(std::string_view directory) noexcept {
+boost::container::small_vector<std::string, 32> io::enumerate(std::string_view directory) noexcept {
   std::unique_ptr<char*[], PHYSFS_Deleter> ptr(PHYSFS_enumerateFiles(directory.data()));
   assert(ptr != nullptr &&
     std::format("error while enumerating directory: {}", directory).c_str());
@@ -39,8 +39,7 @@ std::vector<std::string> io::enumerate(std::string_view directory) noexcept {
   auto n = 0uz;
   while (array[n] != nullptr) ++n;
 
-  std::vector<std::string> names;
-  names.reserve(n);
+  boost::container::small_vector<std::string, 32> names;
 
   for (auto i = 0uz; i < n; ++i) {
     names.emplace_back(array[i]);

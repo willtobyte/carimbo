@@ -137,12 +137,13 @@ void scriptengine::run() {
       out.assign(result);
     }
 #else
-    std::string uppercase_key{key};
-    for (auto& c : uppercase_key) {
-      c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    std::array<char, 64> uppercase_key{};
+    const auto len = std::min(key.size(), uppercase_key.size() - 1);
+    for (std::size_t i = 0; i < len; ++i) {
+      uppercase_key[i] = static_cast<char>(std::toupper(static_cast<unsigned char>(key[i])));
     }
 
-    if (const auto* value = std::getenv(uppercase_key.c_str()); value && *value) {
+    if (const auto* value = std::getenv(uppercase_key.data()); value && *value) {
       out.assign(value);
     }
 #endif
@@ -832,7 +833,7 @@ void scriptengine::run() {
       };
 
       sol::state_view lua{state};
-      const auto name = key.as<std::string>();
+      const auto name = key.as<std::string_view>();
       const auto it = map.find(name);
       if (it == map.end()) [[unlikely]] {
         return sol::make_object(lua, sol::lua_nil);

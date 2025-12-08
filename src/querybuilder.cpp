@@ -29,15 +29,16 @@ network::querybuilder::build() const {
   }
 
   std::string result;
+  result.reserve(_parameters.size() * 32);
   bool first = true;
   for (const auto& [key, value] : _parameters) {
     if (!first) {
-      result.push_back('&');
+      result += '&';
     } else {
       first = false;
     }
 
-    result.append(std::format("{}={}", key, encode(value)));
+    std::format_to(std::back_inserter(result), "{}={}", key, encode(value));
   }
   return result;
 }

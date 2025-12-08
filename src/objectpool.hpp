@@ -34,7 +34,7 @@ private:
 
     for (auto count = target - _available.size(); count-- > 0uz;) {
       void* mem = _pool.allocate(sizeof(envelope), alignof(envelope));
-      _available.push_back(std::construct_at(static_cast<envelope*>(mem), &_pool));
+      _available.emplace_back(std::construct_at(static_cast<envelope*>(mem), &_pool));
     }
 
     std::println("[pool<envelope>] expanded to {} objects", target);
@@ -42,7 +42,7 @@ private:
 
   void recycle(envelope* ptr) noexcept {
     ptr->reset();
-    _available.push_back(ptr);
+    _available.emplace_back(ptr);
   }
 
 public:
