@@ -171,4 +171,13 @@ template <typename T>
   element.get_string().get(out);
   return out;
 }
+
+template <typename T>
+[[nodiscard]] inline T make(auto&& source) noexcept {
+  T out{};
+  value v;
+  source.get(v);
+  from_json(v, out);
+  return out;
+}
 }

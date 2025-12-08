@@ -19,16 +19,10 @@ struct keyframe final {
   quad frame;
 
   friend void from_json(unmarshal::value json, keyframe& out) {
-    unmarshal::value value;
-    json["quad"].get(value);
-    from_json(value, out.frame);
-
+    out.frame = unmarshal::make<quad>(json["quad"]);
     if (unmarshal::contains(json, "offset")) {
-      unmarshal::value value;
-      json["offset"].get(value);
-      from_json(value, out.offset);
+      out.offset = unmarshal::make<vec2>(json["offset"]);
     }
-
     out.duration = unmarshal::get<uint64_t>(json, "duration");
   }
 };
@@ -42,10 +36,7 @@ struct bounds final {
     if (unmarshal::contains(json, "type")) {
       out.type = unmarshal::get<uint16_t>(json, "type");
     }
-
-    unmarshal::value value;
-    json["quad"].get(value);
-    from_json(value, out.rectangle);
+    out.rectangle = unmarshal::make<quad>(json["quad"]);
   }
 };
 

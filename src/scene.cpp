@@ -49,12 +49,10 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       atlas at{};
       for (auto field : dobject["timelines"].get_object()) {
-        const auto key = unmarshal::key(field);
-        auto tl = timeline{};
-        auto value = unmarshal::get<unmarshal::value>(field.value());
-        from_json(value, tl);
-        at.timelines.emplace(make_action(key), std::move(tl));
+        at.timelines.emplace(make_action(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
       }
+
+      _registry.emplace<atlas>(entity, std::move(at));
 
       _registry.emplace<metadata>(entity, make_action(kind));
 
@@ -66,8 +64,6 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       _registry.emplace<transform>(entity, vec2{x, y}, .0, unmarshal::value_or(dobject, "scale", 1.0f));
 
-      _registry.emplace<atlas>(entity, std::move(at));
-
       _registry.emplace<orientation>(entity);
 
       _registry.emplace<physics>(entity);
@@ -77,7 +73,9 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       const auto proxy = std::make_shared<entityproxy>(entity, _registry);
       _proxies.emplace(std::move(name), proxy);
 
-      _registry.emplace<callbacks>(entity, functor{}, functor{}, functor{}, functor{}, functor{}, functor{}, proxy);
+      callbacks c;
+      c.self = proxy;
+      _registry.emplace<callbacks>(entity, std::move(c));
     }
 
     _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {

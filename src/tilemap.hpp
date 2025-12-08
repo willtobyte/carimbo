@@ -25,11 +25,7 @@ struct alignas(64) layer final {
 
     out.tiles.clear();
     for (auto element : json["tiles"].get_array()) {
-      auto t = tile{};
-      unmarshal::value value;
-      element.get(value);
-      from_json(value, t);
-      out.tiles.emplace_back(std::move(t));
+      out.tiles.emplace_back(unmarshal::make<tile>(element));
     }
   }
 };
@@ -50,11 +46,7 @@ public:
 
     out.layers.clear();
     for (auto element : document["layers"].get_array()) {
-      auto l = layer{};
-      unmarshal::value value;
-      element.get(value);
-      from_json(value, l);
-      out.layers.emplace_back(std::move(l));
+      out.layers.emplace_back(unmarshal::make<layer>(element));
     }
   }
 
