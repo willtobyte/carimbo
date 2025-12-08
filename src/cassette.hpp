@@ -22,7 +22,7 @@ public:
   void set(std::string_view key, const T& value);
 
   template <typename T>
-  T get(std::string_view key, const T& default_value) const;
+  T get(std::string_view key, const T& fallback) const;
 
   void clear(std::string_view key) noexcept;
 

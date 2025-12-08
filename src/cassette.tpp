@@ -26,10 +26,10 @@ void cassette::set(std::string_view key, const T& value) {
 }
 
 template<typename T>
-T cassette::get(std::string_view key, const T& default_value) const {
+T cassette::get(std::string_view key, const T& fallback) const {
   const auto it = _data.find(key);
   if (it == _data.end()) {
-    return default_value;
+    return fallback;
   }
 
   const auto& storage = it->second;
@@ -78,5 +78,5 @@ T cassette::get(std::string_view key, const T& default_value) const {
     }
   }
 
-  return default_value;
+  return fallback;
 }

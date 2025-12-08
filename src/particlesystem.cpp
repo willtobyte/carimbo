@@ -7,10 +7,10 @@
 namespace {
 
 template <typename T>
-std::pair<T, T> read_range(unmarshal::object &object, T default_start, T default_end) noexcept {
+std::pair<T, T> read_range(unmarshal::object &object, T fallback_start, T fallback_end) noexcept {
   return {
-    unmarshal::value_or(object, "start", default_start),
-    unmarshal::value_or(object, "end", default_end)
+    unmarshal::value_or(object, "start", fallback_start),
+    unmarshal::value_or(object, "end", fallback_end)
   };
 }
 
@@ -44,10 +44,10 @@ struct particleconfig final {
           out.count = static_cast<size_t>(value);
         }
       } else if (key == "spawn") {
-        auto object = unmarshal::object_of(field.value());
+        auto object = unmarshal::get<unmarshal::object>(field.value());
         for (auto sfield : object) {
           const auto skey = unmarshal::key(sfield);
-          auto sobject = unmarshal::object_of(sfield.value());
+          auto sobject = unmarshal::get<unmarshal::object>(sfield.value());
 
           if (skey == "x") {
             out.xspawn = read_range(sobject, .0f, .0f);
@@ -66,10 +66,10 @@ struct particleconfig final {
           }
         }
       } else if (key == "velocity") {
-        auto object = unmarshal::object_of(field.value());
+        auto object = unmarshal::get<unmarshal::object>(field.value());
         for (auto vfield : object) {
           const auto vkey = unmarshal::key(vfield);
-          auto vobject = unmarshal::object_of(vfield.value());
+          auto vobject = unmarshal::get<unmarshal::object>(vfield.value());
 
           if (vkey == "x") {
             out.xvel = read_range(vobject, .0f, .0f);
@@ -78,10 +78,10 @@ struct particleconfig final {
           }
         }
       } else if (key == "gravity") {
-        auto object = unmarshal::object_of(field.value());
+        auto object = unmarshal::get<unmarshal::object>(field.value());
         for (auto gfield : object) {
           const auto gkey = unmarshal::key(gfield);
-          auto gobject = unmarshal::object_of(gfield.value());
+          auto gobject = unmarshal::get<unmarshal::object>(gfield.value());
 
           if (gkey == "x") {
             out.gx = read_range(gobject, .0f, .0f);
@@ -90,10 +90,10 @@ struct particleconfig final {
           }
         }
       } else if (key == "rotation") {
-        auto object = unmarshal::object_of(field.value());
+        auto object = unmarshal::get<unmarshal::object>(field.value());
         for (auto rfield : object) {
           const auto rkey = unmarshal::key(rfield);
-          auto robject = unmarshal::object_of(rfield.value());
+          auto robject = unmarshal::get<unmarshal::object>(rfield.value());
 
           if (rkey == "force") {
             out.rforce = read_range(robject, .0, .0);

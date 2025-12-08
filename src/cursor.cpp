@@ -20,11 +20,11 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
 
   for (auto field : document["animations"].get_object()) {
     const auto key = unmarshal::key(field);
-    auto aobject = unmarshal::object_of(field.value());
+    auto aobject = unmarshal::get<unmarshal::object>(field.value());
 
     auto keyframes = boost::container::small_vector<keyframe, 16>{};
     for (auto element : aobject["frames"].get_array()) {
-      auto value = unmarshal::value_of(element);
+      auto value = unmarshal::get<unmarshal::value>(element);
 
       auto kf = keyframe{};
       kf.duration = unmarshal::get<uint64_t>(value, "duration");

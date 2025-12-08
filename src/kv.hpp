@@ -18,7 +18,7 @@ private:
 class kv final {
 public:
   ~kv() = default;
-  std::shared_ptr<observable> get(std::string_view key, const sol::object& default_value = sol::lua_nil);
+  std::shared_ptr<observable> get(std::string_view key, const sol::object& fallback = sol::lua_nil);
   void set(std::string_view key, const sol::object& value);
 
 private:

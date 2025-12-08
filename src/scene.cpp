@@ -34,7 +34,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   auto zindex = 0;
   if (auto objects = unmarshal::find_array(document, "objects")) {
     for (auto element : *objects) {
-      auto object = unmarshal::object_of(element);
+      auto object = unmarshal::get<unmarshal::object>(element);
       const auto name = unmarshal::get<std::string_view>(object, "name");
       const auto kind = unmarshal::get<std::string_view>(object, "kind");
       const auto action = make_action(unmarshal::value_or(object, "action", std::string_view{}));
@@ -75,7 +75,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       for (auto field : dobject["timelines"].get_object()) {
         const auto key = unmarshal::key(field);
         auto tl = timeline{};
-        auto value = unmarshal::value_of(field.value());
+        auto value = unmarshal::get<unmarshal::value>(field.value());
         from_json(value, tl);
         at.timelines.emplace(make_action(key), std::move(tl));
       }
@@ -108,12 +108,12 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   const auto factory = _particlesystem.factory();
   if (auto particles = unmarshal::find_array(document, "particles")) {
     for (auto element : *particles) {
-      auto particle_object = unmarshal::object_of(element);
-      const auto name = unmarshal::get<std::string_view>(particle_object, "name");
-      const auto kind = unmarshal::get<std::string_view>(particle_object, "kind");
-      const auto px = unmarshal::get<float>(particle_object, "x");
-      const auto py = unmarshal::get<float>(particle_object, "y");
-      const auto active = unmarshal::value_or(particle_object, "active", true);
+      auto object = unmarshal::get<unmarshal::object>(element);
+      const auto name = unmarshal::get<std::string_view>(object, "name");
+      const auto kind = unmarshal::get<std::string_view>(object, "kind");
+      const auto px = unmarshal::get<float>(object, "x");
+      const auto py = unmarshal::get<float>(object, "y");
+      const auto active = unmarshal::value_or(object, "active", true);
       const auto batch = factory->create(kind, px, py, active);
       _particles.emplace(name, batch);
       _particlesystem.add(batch);

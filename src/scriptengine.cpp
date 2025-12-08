@@ -656,19 +656,19 @@ void scriptengine::run() {
     "get", [](
       const cassette& self,
       std::string_view key,
-      sol::object default_value,
+      sol::object fallback_value,
       sol::this_state state
     ) {
       sol::state_view lua(state);
 
-      switch (default_value.get_type()) {
+      switch (fallback_value.get_type()) {
         case sol::type::boolean: {
-          const auto v = self.get<bool>(key, default_value.as<bool>());
+          const auto v = self.get<bool>(key, fallback_value.as<bool>());
           return sol::make_object(lua, v);
         }
 
         case sol::type::number: {
-          const double x = default_value.as<double>();
+          const double x = fallback_value.as<double>();
           double i{};
           const double frac = std::modf(x, &i);
 
@@ -686,7 +686,7 @@ void scriptengine::run() {
         }
 
         case sol::type::string: {
-          const auto v = self.get<std::string>(key, default_value.as<std::string>());
+          const auto v = self.get<std::string>(key, fallback_value.as<std::string>());
           return sol::make_object(lua, v);
         }
 

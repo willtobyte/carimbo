@@ -19,12 +19,12 @@ void observable::unsubscribe() {
   _subscriber = nullptr;
 }
 
-std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& default_value) {
+std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& fallback) {
   auto [it, inserted] = _values.try_emplace(key);
 
   if (inserted) {
     it->second = std::make_shared<observable>();
-    it->second->set(default_value);
+    it->second->set(fallback);
   }
 
   return it->second;
