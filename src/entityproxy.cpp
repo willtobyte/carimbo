@@ -3,95 +3,95 @@
 #include "helper.hpp"
 
 entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept
-  : _e(entity), _registry(registry) {
+  : _entity(entity), _registry(registry) {
 }
 
 uint64_t entityproxy::id() const noexcept {
-  return static_cast<uint64_t>(_e);
+  return static_cast<uint64_t>(_entity);
 }
 
 float entityproxy::x() const noexcept {
-  const auto& t = _registry.get<transform>(_e);
+  const auto& t = _registry.get<transform>(_entity);
   return t.position.x;
 }
 
 void entityproxy::set_x(float x) noexcept {
-  auto& t = _registry.get<transform>(_e);
+  auto& t = _registry.get<transform>(_entity);
   t.position.x = x;
 }
 
 float entityproxy::y() const noexcept {
-  const auto& t = _registry.get<transform>(_e);
+  const auto& t = _registry.get<transform>(_entity);
   return t.position.y;
 }
 
 void entityproxy::set_y(float y) noexcept {
-  auto& t = _registry.get<transform>(_e);
+  auto& t = _registry.get<transform>(_entity);
   t.position.y = y;
 }
 
 vec2 entityproxy::position() const noexcept {
-  const auto& t = _registry.get<transform>(_e);
+  const auto& t = _registry.get<transform>(_entity);
   return t.position;
 }
 
 void entityproxy::set_position(const vec2& position) noexcept {
-  auto& t = _registry.get<transform>(_e);
+  auto& t = _registry.get<transform>(_entity);
   t.position = position;
 }
 
 uint8_t entityproxy::alpha() const noexcept {
-  const auto& t = _registry.get<tint>(_e);
+  const auto& t = _registry.get<tint>(_entity);
   return t.a;
 }
 
 void entityproxy::set_alpha(uint8_t alpha) noexcept {
-  auto [t, s] = _registry.get<tint, playback>(_e);
+  auto [t, s] = _registry.get<tint, playback>(_entity);
   t.a = alpha;
   s.redraw = true;
 }
 
 double entityproxy::angle() const noexcept {
-  const auto& t = _registry.get<transform>(_e);
+  const auto& t = _registry.get<transform>(_entity);
   return t.angle;
 }
 
 void entityproxy::set_angle(double angle) noexcept {
-  auto [t, s] = _registry.get<transform, playback>(_e);
+  auto [t, s] = _registry.get<transform, playback>(_entity);
   t.angle = angle;
   s.redraw = true;
 }
 
 float entityproxy::scale() const noexcept {
-  const auto& t = _registry.get<transform>(_e);
+  const auto& t = _registry.get<transform>(_entity);
   return t.scale;
 }
 
 void entityproxy::set_scale(float scale) noexcept {
-  auto [t, s] = _registry.get<transform, playback>(_e);
+  auto [t, s] = _registry.get<transform, playback>(_entity);
   t.scale = scale;
   s.dirty = true;
   s.redraw = true;
 }
 
 bool entityproxy::visible() const noexcept {
-  const auto& r = _registry.get<renderable>(_e);
+  const auto& r = _registry.get<renderable>(_entity);
   return r.visible;
 }
 
 void entityproxy::set_visible(bool visible) noexcept {
-  auto [r, p] = _registry.get<renderable, physics>(_e);
+  auto [r, p] = _registry.get<renderable, physics>(_entity);
   r.visible = visible;
   p.dirty = true;
 }
 
 action_id entityproxy::action() const noexcept {
-  const auto& s = _registry.get<playback>(_e);
+  const auto& s = _registry.get<playback>(_entity);
   return s.action;
 }
 
 void entityproxy::set_action(action_id id) noexcept {
-  auto& s = _registry.get<playback>(_e);
+  auto& s = _registry.get<playback>(_entity);
   s.action = id;
   s.current_frame = 0;
   s.dirty = true;
@@ -99,87 +99,87 @@ void entityproxy::set_action(action_id id) noexcept {
 }
 
 action_id entityproxy::kind() const noexcept {
-  const auto& m = _registry.get<metadata>(_e);
+  const auto& m = _registry.get<metadata>(_entity);
   return m.kind;
 }
 
 void entityproxy::set_kind(action_id id) noexcept {
-  auto& m = _registry.get<metadata>(_e);
+  auto& m = _registry.get<metadata>(_entity);
   m.kind = id;
 }
 
 flip entityproxy::flip() const noexcept {
-  const auto& o = _registry.get<::orientation>(_e);
+  const auto& o = _registry.get<::orientation>(_entity);
   return o.flip;
 }
 
 void entityproxy::set_flip(::flip flip) noexcept {
-  auto [o, s] = _registry.get<::orientation, playback>(_e);
+  auto [o, s] = _registry.get<::orientation, playback>(_entity);
   o.flip = flip;
   s.redraw = true;
 }
 
-void entityproxy::set_onmail(sol::protected_function&& fn) {
-  auto& c = _registry.get<callbacks>(_e);
+void entityproxy::set_onmail(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
   c.on_mail = std::move(fn);
 }
 
-void entityproxy::set_onhover(sol::protected_function&& fn) {
-  auto& c = _registry.get<callbacks>(_e);
+void entityproxy::set_onhover(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
   c.on_hover = std::move(fn);
 }
 
-void entityproxy::set_onunhover(sol::protected_function&& fn) {
-  auto& c = _registry.get<callbacks>(_e);
+void entityproxy::set_onunhover(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
   c.on_unhover = std::move(fn);
 }
 
-void entityproxy::set_ontouch(sol::protected_function&& fn) {
-  auto& c = _registry.get<callbacks>(_e);
+void entityproxy::set_ontouch(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
   c.on_touch = std::move(fn);
 }
 
-void entityproxy::set_onbegin(sol::protected_function&& fn) {
-  auto& c = _registry.get<callbacks>(_e);
+void entityproxy::set_onbegin(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
   c.on_begin = std::move(fn);
 }
 
-void entityproxy::set_onend(sol::protected_function&& fn) {
-  auto& c = _registry.get<callbacks>(_e);
+void entityproxy::set_onend(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
   c.on_end = std::move(fn);
 }
 
 std::shared_ptr<entityproxy> entityproxy::clone() {
   const auto e = _registry.create();
 
-  if (const auto* m = _registry.try_get<metadata>(_e)) {
+  if (const auto* m = _registry.try_get<metadata>(_entity)) {
     _registry.emplace<metadata>(e, *m);
   }
 
-  if (const auto* tn = _registry.try_get<tint>(_e)) {
+  if (const auto* tn = _registry.try_get<tint>(_entity)) {
     _registry.emplace<tint>(e, *tn);
   }
 
-  if (const auto* sp = _registry.try_get<sprite>(_e)) {
+  if (const auto* sp = _registry.try_get<sprite>(_entity)) {
     _registry.emplace<sprite>(e, *sp);
   }
 
-  if (const auto* pb = _registry.try_get<playback>(_e)) {
+  if (const auto* pb = _registry.try_get<playback>(_entity)) {
     playback cpb = *pb;
     cpb.dirty = true;
     cpb.redraw = true;
     _registry.emplace<playback>(e, std::move(cpb));
   }
 
-  if (const auto* tf = _registry.try_get<transform>(_e)) {
+  if (const auto* tf = _registry.try_get<transform>(_entity)) {
     _registry.emplace<transform>(e, *tf);
   }
 
-  if (const auto* at = _registry.try_get<atlas>(_e)) {
+  if (const auto* at = _registry.try_get<atlas>(_entity)) {
     _registry.emplace<atlas>(e, *at);
   }
 
-  if (const auto* ori = _registry.try_get<orientation>(_e)) {
+  if (const auto* ori = _registry.try_get<orientation>(_entity)) {
     _registry.emplace<orientation>(e, *ori);
   }
 
@@ -187,7 +187,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   ph.dirty = true;
   _registry.emplace<physics>(e, std::move(ph));
 
-  if (const auto* rn = _registry.try_get<renderable>(_e)) {
+  if (const auto* rn = _registry.try_get<renderable>(_entity)) {
     renderable crn = *rn;
     crn.z = rn->z + 1;
     _registry.emplace<renderable>(e, std::move(crn));
