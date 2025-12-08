@@ -36,6 +36,7 @@ struct bounds final {
     if (unmarshal::contains(json, "type")) {
       out.type = unmarshal::get<uint8_t>(json, "type");
     }
+
     out.rectangle = unmarshal::make<quad>(json["quad"]);
   }
 };
