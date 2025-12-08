@@ -4,8 +4,8 @@
 
 class application final {
 public:
-  application(int argc, char **argv);
-  ~application() = default;
+  application(int argc, char **argv) noexcept;
+  ~application() noexcept = default;
 
   [[nodiscard]] int run();
 };

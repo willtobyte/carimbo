@@ -1,6 +1,6 @@
 #include "application.hpp"
 
-application::application(const int argc, char** const argv) {
+application::application(const int argc, char** const argv) noexcept {
 #ifdef HAS_SENTRY
   std::atexit([] { sentry_close(); });
 #endif
