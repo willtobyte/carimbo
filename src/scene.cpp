@@ -54,27 +54,50 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       _registry.emplace<atlas>(entity, std::move(at));
 
-      _registry.emplace<metadata>(entity, make_action(kind));
+      metadata md{
+        .kind = make_action(kind)
+      };
+      _registry.emplace<metadata>(entity, std::move(md));
 
       _registry.emplace<tint>(entity);
 
-      _registry.emplace<sprite>(entity, pixmappool->get(std::format("blobs/{}/{}.png", scene, kind)));
+      sprite sp{
+        .pixmap = pixmappool->get(std::format("blobs/{}/{}.png", scene, kind))
+      };
+      _registry.emplace<sprite>(entity, std::move(sp));
 
-      _registry.emplace<playback>(entity, true, false, uint16_t{0}, SDL_GetTicks(), action, nullptr);
+      playback pb{
+        .dirty = true,
+        .redraw = false,
+        .current_frame = 0,
+        .tick = SDL_GetTicks(),
+        .action = action,
+        .timeline = nullptr
+      };
+      _registry.emplace<playback>(entity, std::move(pb));
 
-      _registry.emplace<transform>(entity, vec2{x, y}, .0, unmarshal::value_or(dobject, "scale", 1.0f));
+      transform tr{
+        .position = vec2{x, y},
+        .angle = .0,
+        .scale = unmarshal::value_or(dobject, "scale", 1.0f)
+      };
+      _registry.emplace<transform>(entity, std::move(tr));
 
       _registry.emplace<orientation>(entity);
 
       _registry.emplace<physics>(entity);
 
-      _registry.emplace<renderable>(entity, zindex++);
+      renderable rd{
+        .z = zindex++
+      };
+      _registry.emplace<renderable>(entity, std::move(rd));
 
       const auto proxy = std::make_shared<entityproxy>(entity, _registry);
       _proxies.emplace(std::move(name), proxy);
 
-      callbacks c;
-      c.self = proxy;
+      callbacks c {
+        .self = proxy
+      };
       _registry.emplace<callbacks>(entity, std::move(c));
     }
 
