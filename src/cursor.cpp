@@ -42,7 +42,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
 
     const auto oneshot = unmarshal::value_or(aobject, "oneshot", false);
 
-    _animations.emplace(key, animation{oneshot, std::nullopt, std::nullopt, nullptr, keyframes});
+    _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, keyframes});
   }
 
   if (const auto it = _animations.find(ACTION_DEFAULT); it != _animations.end()) {

@@ -27,24 +27,9 @@ struct keyframe final {
   }
 };
 
-struct bounds final {
-  std::optional<uint8_t> type;
-  std::bitset<256> reagents;
-  quad rectangle;
-
-  friend void from_json(unmarshal::value json, bounds& out) {
-    if (unmarshal::contains(json, "type")) {
-      out.type = unmarshal::get<uint8_t>(json, "type");
-    }
-
-    out.rectangle = unmarshal::make<quad>(json["quad"]);
-  }
-};
-
 struct animation final {
   bool oneshot{false};
   std::optional<std::string> next;
-  std::optional<bounds> bounds;
   std::shared_ptr<soundfx> effect;
   boost::container::small_vector<keyframe, 16> keyframes;
 };
