@@ -5,12 +5,12 @@
 struct alignas(16) tile final {
   float x;
   float y;
-  uint32_t id;
+  uint64_t id;
 
   friend void from_json(unmarshal::value json, tile& out) {
     out.x = unmarshal::get<float>(json, "x");
     out.y = unmarshal::get<float>(json, "y");
-    out.id = static_cast<uint32_t>(std::stoul(std::string(unmarshal::get<std::string_view>(json, "id"))));
+    out.id = unmarshal::get<uint64_t>(json, "id");
   }
 };
 
