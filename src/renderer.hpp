@@ -2,8 +2,6 @@
 
 #include "common.hpp"
 
-class window;
-
 class renderer final {
 public:
   explicit renderer(std::shared_ptr<window> window);
