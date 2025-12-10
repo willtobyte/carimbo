@@ -24,17 +24,20 @@ public:
 
   friend void from_json(unmarshal::document& document, tilemap& out);
 
+  void set_viewport(const quad& value) noexcept;
+
   void update(float delta) noexcept;
 
   void draw() const noexcept;
 
 private:
-  int16_t tile_size;
-  uint32_t tiles_per_row;
-  int64_t map_width;
-  int64_t map_height;
-  std::vector<SDL_Vertex> vertices;
-  std::vector<int32_t> indices;
-  std::vector<layer> layers;
-  std::shared_ptr<pixmap> atlas;
+  int16_t _tile_size;
+  uint32_t _tiles_per_row;
+  int64_t _map_width;
+  int64_t _map_height;
+  quad _viewport;
+  std::vector<SDL_Vertex> _vertices;
+  std::vector<int32_t> _indices;
+  std::vector<layer> _layers;
+  std::shared_ptr<pixmap> _atlas;
 };

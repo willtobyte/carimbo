@@ -17,13 +17,13 @@ void from_json(unmarshal::value json, layer& out) {
 }
 
 void from_json(unmarshal::document& document, tilemap& out) {
-  out.tile_size = unmarshal::get<int16_t>(document, "tile_size");
-  out.map_width = unmarshal::get<int64_t>(document, "map_width");
-  out.map_height = unmarshal::get<int64_t>(document, "map_height");
+  out._tile_size = unmarshal::get<int16_t>(document, "tile_size");
+  out._map_width = unmarshal::get<int64_t>(document, "map_width");
+  out._map_height = unmarshal::get<int64_t>(document, "map_height");
 
-  out.layers.clear();
+  out._layers.clear();
   for (auto element : document["layers"].get_array()) {
-    out.layers.emplace_back(unmarshal::make<layer>(element));
+    out._layers.emplace_back(unmarshal::make<layer>(element));
   }
 }
 
@@ -31,7 +31,11 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool) 
   const auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
   from_json(*document, *this);
 
-  atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
+  _atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
+}
+
+void tilemap::set_viewport(const quad& value) noexcept {
+  _viewport = value;
 }
 
 void tilemap::update(float delta) noexcept {
