@@ -20,7 +20,7 @@ struct alignas(64) layer final {
 
 class tilemap final {
 public:
-  tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool);
+  tilemap(std::string_view name, std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool);
 
   friend void from_json(unmarshal::document& document, tilemap& out);
 
@@ -40,4 +40,5 @@ private:
   std::vector<int32_t> _indices;
   std::vector<layer> _layers;
   std::shared_ptr<pixmap> _atlas;
+  std::shared_ptr<renderer> _renderer;
 };
