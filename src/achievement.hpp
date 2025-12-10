@@ -5,8 +5,8 @@
 namespace steam {
 class achievement final {
 public:
-  achievement() = default;
-  ~achievement() = default;
+  achievement() noexcept = default;
+  ~achievement() noexcept = default;
 
   void unlock(std::string_view id) noexcept;
 };
