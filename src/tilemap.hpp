@@ -40,9 +40,9 @@ public:
   }
 
   friend void from_json(unmarshal::document& document, tilemap& out) {
-    out.tile_size = unmarshal::get<int32_t>(document, "tileSize");
-    out.map_width = unmarshal::get<int32_t>(document, "mapWidth");
-    out.map_height = unmarshal::get<int32_t>(document, "mapHeight");
+    out.tile_size = unmarshal::get<int16_t>(document, "tile_size");
+    out.map_width = unmarshal::get<int64_t>(document, "map_width");
+    out.map_height = unmarshal::get<int64_t>(document, "map_height");
 
     out.layers.clear();
     for (auto element : document["layers"].get_array()) {
@@ -51,12 +51,12 @@ public:
   }
 
 private:
-  std::shared_ptr<pixmap> atlas;
+  int16_t tile_size;
+  uint32_t tiles_per_row;
+  int64_t map_width;
+  int64_t map_height;
   std::vector<SDL_Vertex> vertices;
   std::vector<int32_t> indices;
   std::vector<layer> layers;
-  int32_t tile_size;
-  int32_t map_width;
-  int32_t map_height;
-  uint32_t tiles_per_row;
+  std::shared_ptr<pixmap> atlas;
 };
