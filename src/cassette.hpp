@@ -16,7 +16,7 @@ public:
   >;
 
   cassette();
-  ~cassette() = default;
+  ~cassette() noexcept = default;
 
   template <typename T>
   void set(std::string_view key, const T& value);

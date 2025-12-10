@@ -153,24 +153,25 @@ void eventmanager::update(float delta) {
       } break;
 
       case SDL_EVENT_GAMEPAD_REMOVED: {
-        const auto it = _joystickmapping.find(event.cdevice.which);
-          if (it == _joystickmapping.end()) {
-            _controllers.erase(event.cdevice.which);
-            break;
-          }
+        const auto rid = event.cdevice.which;
+        const auto it = _joystickmapping.find(rid);
+        if (it == _joystickmapping.end()) {
+          break;
+        }
 
-          const auto index = it->second;
-          const auto rid = event.cdevice.which;
+        const auto index = it->second;
+
+        if (index != _joystickgorder.size() - 1) {
           const auto lid = _joystickgorder.back();
-
           _joystickgorder[index] = lid;
           _joystickmapping[lid] = index;
+        }
 
-          _joystickgorder.pop_back();
-          _joystickmapping.erase(rid);
-          _controllers.erase(rid);
+        _joystickgorder.pop_back();
+        _joystickmapping.erase(rid);
+        _controllers.erase(rid);
 
-          std::println("[eventmanager] gamepad disconnected {}", rid);
+        std::println("[eventmanager] gamepad disconnected {}", rid);
       } break;
 
       case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
