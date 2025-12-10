@@ -2,7 +2,6 @@
 
 #include "renderer.hpp"
 
-
 canvas::canvas(std::shared_ptr<renderer> renderer) noexcept
     : _renderer(std::move(renderer)) {
   int lw, lh;

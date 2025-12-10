@@ -50,20 +50,20 @@ bool parse(std::string_view line, std::string_view& type, std::string_view& key,
     return false;
   }
 
-  const auto colon_pos = line.find(':');
-  if (colon_pos == std::string_view::npos) {
+  const auto p = line.find(':');
+  if (p == std::string_view::npos) {
     return false;
   }
 
-  type = line.substr(0, colon_pos);
+  type = line.substr(0, p);
 
-  const auto eq_pos = line.find('=', colon_pos + 1);
-  if (eq_pos == std::string_view::npos) {
+  const auto e = line.find('=', p + 1);
+  if (e == std::string_view::npos) {
     return false;
   }
 
-  key = line.substr(colon_pos + 1, eq_pos - colon_pos - 1);
-  value = line.substr(eq_pos + 1);
+  key = line.substr(p + 1, e - p - 1);
+  value = line.substr(e + 1);
   return !key.empty();
 }
 }
