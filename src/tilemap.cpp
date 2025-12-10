@@ -44,7 +44,7 @@ void tilemap::set_viewport(const quad& value) noexcept {
   _viewport = value;
 }
 
-void tilemap::update([[maybe_unused]] float delta) noexcept {
+void tilemap::update(float delta) noexcept {
   _vertices.clear();
   _indices.clear();
 
