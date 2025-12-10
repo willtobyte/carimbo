@@ -125,6 +125,8 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->spawning = spawning;
   props->x = x;
   props->y = y;
+  props->hw = static_cast<float>(pixmap->width()) * 0.5f;
+  props->hh = static_cast<float>(pixmap->height()) * 0.5f;
   props->pixmap = pixmap;
   props->xspawnd = std::uniform_real_distribution<float>(conf.xspawn.first, conf.xspawn.second);
   props->yspawnd = std::uniform_real_distribution<float>(conf.yspawn.first, conf.yspawn.second);
@@ -144,8 +146,8 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   batch->props = std::move(props);
   batch->particles.resize(conf.count);
   batch->vertices.resize(conf.count * 4);
-
   batch->indices.resize(conf.count * 6);
+
   for (auto i = 0uz; i < conf.count; ++i) {
     const auto base = static_cast<int>(i * 4);
     const auto index = i * 6;
@@ -196,7 +198,11 @@ void particlesystem::update(float delta) {
       continue;
     }
 
+    const auto hw = props->hw;
+    const auto hh = props->hh;
+
     auto* particles = batch->particles.data();
+    auto* vertices = batch->vertices.data();
     const auto n = batch->size();
 
     for (auto i = 0uz; i < n; ++i) {
@@ -214,78 +220,66 @@ void particlesystem::update(float delta) {
 
         const auto a = 255.f * p.life;
         p.alpha = static_cast<uint8_t>(std::clamp(a, .0f, 255.f));
-        continue;
+      } else if (props->spawning) [[likely]] {
+        p.x = props->x + props->randxspawn();
+        p.y = props->y + props->randyspawn();
+        p.vx = props->randxvel();
+        p.vy = props->randyvel();
+        p.gx = props->randgx();
+        p.gy = props->randgy();
+        p.av = props->randrotvel();
+        p.af = props->randrotforce();
+        p.life = props->randlife();
+        p.alpha = props->randalpha();
+        p.scale = props->randscale();
+        p.angle = props->randangle();
       }
 
-      if (!props->spawning) [[unlikely]] {
-        continue;
-      }
+      const auto shw = hw * p.scale;
+      const auto shh = hh * p.scale;
+      const auto ca = static_cast<float>(std::cos(p.angle));
+      const auto sa = static_cast<float>(std::sin(p.angle));
+      const SDL_FColor color = {1.f, 1.f, 1.f, p.alpha / 255.f};
 
-      p.x = props->x + props->randxspawn();
-      p.y = props->y + props->randyspawn();
-      p.vx = props->randxvel();
-      p.vy = props->randyvel();
-      p.gx = props->randgx();
-      p.gy = props->randgy();
-      p.av = props->randrotvel();
-      p.af = props->randrotforce();
-      p.life = props->randlife();
-      p.alpha = props->randalpha();
-      p.scale = props->randscale();
-      p.angle = props->randangle();
+      auto* vx = vertices + i * 4;
+
+      vx[0].position.x = p.x - shw * ca + shh * sa;
+      vx[0].position.y = p.y - shw * sa - shh * ca;
+      vx[0].tex_coord.x = 0.f;
+      vx[0].tex_coord.y = 0.f;
+      vx[0].color = color;
+
+      vx[1].position.x = p.x + shw * ca + shh * sa;
+      vx[1].position.y = p.y + shw * sa - shh * ca;
+      vx[1].tex_coord.x = 1.f;
+      vx[1].tex_coord.y = 0.f;
+      vx[1].color = color;
+
+      vx[2].position.x = p.x + shw * ca - shh * sa;
+      vx[2].position.y = p.y + shw * sa + shh * ca;
+      vx[2].tex_coord.x = 1.f;
+      vx[2].tex_coord.y = 1.f;
+      vx[2].color = color;
+
+      vx[3].position.x = p.x - shw * ca - shh * sa;
+      vx[3].position.y = p.y - shw * sa + shh * ca;
+      vx[3].tex_coord.x = 0.f;
+      vx[3].tex_coord.y = 1.f;
+      vx[3].color = color;
     }
   }
 }
 
 void particlesystem::draw() const {
-  static constexpr auto u = std::array{.0f, 1.f, 1.f, .0f};
-  static constexpr auto v = std::array{.0f, .0f, 1.f, 1.f};
-
   for (const auto& batch : _batches) {
     const auto& props = batch->props;
     if (!props->active) [[unlikely]] {
       continue;
     }
 
-    const auto& pixmap = *props->pixmap;
-    const auto hw = static_cast<float>(pixmap.width()) * 0.5f;
-    const auto hh = static_cast<float>(pixmap.height()) * 0.5f;
-    const auto n = batch->size();
-
-    const auto* particles = batch->particles.data();
-    auto* vertices = batch->vertices.data();
-
-    for (auto i = 0uz; i < n; ++i) {
-      const auto& p = particles[i];
-
-      const auto shw = hw * p.scale;
-      const auto shh = hh * p.scale;
-
-      const auto ca = static_cast<float>(std::cos(p.angle));
-      const auto sa = static_cast<float>(std::sin(p.angle));
-
-      const auto lx = std::array{-shw, shw, shw, -shw};
-      const auto ly = std::array{-shh, -shh, shh, shh};
-
-      const SDL_FColor color = {1.f, 1.f, 1.f, p.alpha / 255.f};
-
-      auto* vx = vertices + i * 4;
-
-      for (auto j = 0uz; j < 4; ++j) {
-        const auto rx = lx[j] * ca - ly[j] * sa;
-        const auto ry = lx[j] * sa + ly[j] * ca;
-
-        vx[j].position.x = p.x + rx;
-        vx[j].position.y = p.y + ry;
-        vx[j].tex_coord.x = u[j];
-        vx[j].tex_coord.y = v[j];
-        vx[j].color = color;
-      }
-    }
-
     SDL_RenderGeometry(
         *_renderer,
-        static_cast<SDL_Texture*>(pixmap),
+        static_cast<SDL_Texture*>(*props->pixmap),
         batch->vertices.data(),
         static_cast<int>(batch->vertices.size()),
         batch->indices.data(),

@@ -4,6 +4,7 @@
 
 struct particleprops final {
   float x, y;
+  float hw, hh;
   bool active;
   bool spawning;
   std::shared_ptr<pixmap> pixmap;

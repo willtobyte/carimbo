@@ -4,8 +4,6 @@
 
 #include "systems.hpp"
 
-class entityproxy;
-
 enum class scenekind : uint8_t {
   object = 0,
   effect,
@@ -25,7 +23,7 @@ class scene {
 public:
   scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<scenemanager> scenemanager);
 
-  ~scene() noexcept;
+  virtual ~scene() noexcept;
 
   void update(float delta) noexcept;
 
@@ -101,3 +99,8 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 };
+
+// class tilemapscene : public scene {
+// public:
+//   virtual ~tilemapscene() noexcept = default;
+// };
