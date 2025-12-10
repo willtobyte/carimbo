@@ -6,7 +6,7 @@
 class audiodevice final {
 public:
   audiodevice() noexcept;
-  ~audiodevice() = default;
+  ~audiodevice() noexcept = default;
 
 private:
   std::unique_ptr<ALCdevice, ALC_Deleter> _device;
