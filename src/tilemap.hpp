@@ -7,11 +7,7 @@ struct alignas(16) tile final {
   float y;
   uint64_t id;
 
-  friend void from_json(unmarshal::value json, tile& out) {
-    out.x = unmarshal::get<float>(json, "x");
-    out.y = unmarshal::get<float>(json, "y");
-    out.id = unmarshal::get<uint64_t>(json, "id");
-  }
+  friend void from_json(unmarshal::value json, tile& out);
 };
 
 struct alignas(64) layer final {
@@ -19,36 +15,18 @@ struct alignas(64) layer final {
   std::string name;
   std::vector<tile> tiles;
 
-  friend void from_json(unmarshal::value json, layer& out) {
-    out.collider = unmarshal::get<bool>(json, "collider");
-    out.name = unmarshal::get<std::string_view>(json, "name");
-
-    out.tiles.clear();
-    for (auto element : json["tiles"].get_array()) {
-      out.tiles.emplace_back(unmarshal::make<tile>(element));
-    }
-  }
+  friend void from_json(unmarshal::value json, layer& out);
 };
 
 class tilemap final {
 public:
-  tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool) {
-    const auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
-    from_json(*document, *this);
+  tilemap(std::string_view name, std::shared_ptr<pixmappool> pixmappool);
 
-    atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
-  }
+  friend void from_json(unmarshal::document& document, tilemap& out);
 
-  friend void from_json(unmarshal::document& document, tilemap& out) {
-    out.tile_size = unmarshal::get<int16_t>(document, "tile_size");
-    out.map_width = unmarshal::get<int64_t>(document, "map_width");
-    out.map_height = unmarshal::get<int64_t>(document, "map_height");
+  void update(float delta) noexcept;
 
-    out.layers.clear();
-    for (auto element : document["layers"].get_array()) {
-      out.layers.emplace_back(unmarshal::make<layer>(element));
-    }
-  }
+  void draw() const noexcept;
 
 private:
   int16_t tile_size;
