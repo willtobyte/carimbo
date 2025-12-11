@@ -1,5 +1,17 @@
 #pragma once
 
+#include <boost/throw_exception.hpp>
+
+namespace boost {
+inline void throw_exception(std::exception const& e) {
+  throw e;
+}
+
+inline void throw_exception(std::exception const& e, boost::source_location const&) {
+  throw e;
+}
+}
+
 struct transparent_string_hash final {
   using is_transparent = void;
 
