@@ -52,10 +52,10 @@ private:
   uint64_t _last_frame{0};
   vec2 _position{0, 0};
   vec2 _point;
-  std::string _action{ACTION_DEFAULT};
+  boost::static_string<32> _action{ACTION_DEFAULT};
   std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<pixmap> _spritesheet;
   boost::unordered_flat_map<std::string, animation, transparent_string_hash, std::equal_to<>> _animations;
-  std::optional<std::reference_wrapper<animation>> _current_animation;
-  std::optional<std::string> _queued_action;
+  animation* _current_animation{nullptr};
+  boost::static_string<32> _queued_action;
 };

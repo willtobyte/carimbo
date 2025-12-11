@@ -152,34 +152,36 @@ void entityproxy::set_onend(sol::protected_function fn) {
 std::shared_ptr<entityproxy> entityproxy::clone() {
   const auto e = _registry.create();
 
-  if (const auto* m = _registry.try_get<metadata>(_entity)) {
+  const auto [m, tn, sp, pb, tf, at, ori, rn] = _registry.try_get<metadata, tint, sprite, playback, transform, atlas, orientation, renderable>(_entity);
+
+  if (m) {
     _registry.emplace<metadata>(e, *m);
   }
 
-  if (const auto* tn = _registry.try_get<tint>(_entity)) {
+  if (tn) {
     _registry.emplace<tint>(e, *tn);
   }
 
-  if (const auto* sp = _registry.try_get<sprite>(_entity)) {
+  if (sp) {
     _registry.emplace<sprite>(e, *sp);
   }
 
-  if (const auto* pb = _registry.try_get<playback>(_entity)) {
+  if (pb) {
     playback cpb = *pb;
     cpb.dirty = true;
     cpb.redraw = true;
     _registry.emplace<playback>(e, std::move(cpb));
   }
 
-  if (const auto* tf = _registry.try_get<transform>(_entity)) {
+  if (tf) {
     _registry.emplace<transform>(e, *tf);
   }
 
-  if (const auto* at = _registry.try_get<atlas>(_entity)) {
+  if (at) {
     _registry.emplace<atlas>(e, *at);
   }
 
-  if (const auto* ori = _registry.try_get<orientation>(_entity)) {
+  if (ori) {
     _registry.emplace<orientation>(e, *ori);
   }
 
@@ -187,7 +189,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   ph.dirty = true;
   _registry.emplace<physics>(e, std::move(ph));
 
-  if (const auto* rn = _registry.try_get<renderable>(_entity)) {
+  if (rn) {
     renderable crn = *rn;
     crn.z = rn->z + 1;
     _registry.emplace<renderable>(e, std::move(crn));

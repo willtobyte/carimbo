@@ -154,8 +154,9 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 }
 
 void rendersystem::draw() const noexcept {
-  _view.each(
-    [](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
+  auto view = _registry.view<renderable, transform, tint, sprite, playback, orientation>();
+  view.use<renderable>();
+  view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& st, const orientation& fl) {
       if (!rn.visible || !st.timeline || st.timeline->frames.empty()) [[unlikely]] {
         return;
       }

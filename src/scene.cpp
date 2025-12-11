@@ -297,11 +297,9 @@ void scene::on_touch(float x, float y) {
     return;
   }
 
-  for (auto entity : _hits) {
-    if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_touch) {
-      if (const auto fn = callback->on_touch; fn) {
-        fn(callback->self, x, y);
-      }
+  for (const auto entity : _hits) {
+    if (const auto* c = _registry.try_get<callbacks>(entity); c && c->on_touch) {
+      c->on_touch(c->self, x, y);
     }
   }
 }
@@ -312,19 +310,15 @@ void scene::on_motion(float x, float y) {
 
   for (const auto entity : _hovering) {
     if (_hits.contains(entity)) continue;
-    if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_unhover) {
-      if (const auto fn = callback->on_unhover; fn) {
-        fn(callback->self);
-      }
+    if (const auto* c = _registry.try_get<callbacks>(entity); c && c->on_unhover) {
+      c->on_unhover(c->self);
     }
   }
 
   for (const auto entity : _hits) {
     if (_hovering.contains(entity)) continue;
-    if (auto* callback = _registry.try_get<callbacks>(entity); callback && callback->on_hover) {
-      if (const auto fn = callback->on_hover; fn) {
-        fn(callback->self);
-      }
+    if (const auto* c = _registry.try_get<callbacks>(entity); c && c->on_hover) {
+      c->on_hover(c->self);
     }
   }
 

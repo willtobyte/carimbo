@@ -37,11 +37,19 @@ static void sincos(float x, float& out_sin, float& out_cos) noexcept {
 }
 
 template <typename T>
-std::pair<T, T> read_range(unmarshal::object &object, T fallback_start, T fallback_end) noexcept {
+std::pair<T, T> read_range(unmarshal::object& object, T fallback_start, T fallback_end) noexcept {
   return {
     unmarshal::value_or(object, "start", fallback_start),
     unmarshal::value_or(object, "end", fallback_end)
   };
+}
+
+template <typename T>
+std::pair<T, T> read_range_from(unmarshal::object& parent, std::string_view key, T fallback_start, T fallback_end) noexcept {
+  if (auto opt = unmarshal::find_object(parent, key)) {
+    return read_range(*opt, fallback_start, fallback_end);
+  }
+  return {fallback_start, fallback_end};
 }
 
 struct particleconfig final {
@@ -64,74 +72,32 @@ struct particleconfig final {
   std::pair<float, float> rforce{.0f, .0f};
   std::pair<float, float> rvel{.0f, .0f};
 
-  friend void from_json(unmarshal::document &document, particleconfig &out) {
-    for (auto field : document.get_object()) {
-      const auto key = unmarshal::key(field);
+  friend void from_json(unmarshal::document& document, particleconfig& out) {
+    out.count = static_cast<size_t>(unmarshal::value_or(document, "count", 0ull));
 
-      if (key == "count") {
-        uint64_t value;
-        if (!field.value().get_uint64().get(value)) {
-          out.count = static_cast<size_t>(value);
-        }
-      } else if (key == "spawn") {
-        auto object = unmarshal::get<unmarshal::object>(field.value());
-        for (auto sfield : object) {
-          const auto skey = unmarshal::key(sfield);
-          auto sobject = unmarshal::get<unmarshal::object>(sfield.value());
+    if (auto spawn = unmarshal::find_object(document, "spawn")) {
+      out.xspawn = read_range_from(*spawn, "x", .0f, .0f);
+      out.yspawn = read_range_from(*spawn, "y", .0f, .0f);
+      out.radius = read_range_from(*spawn, "radius", .0f, .0f);
+      out.angle = read_range_from(*spawn, "angle", .0f, .0f);
+      out.scale = read_range_from(*spawn, "scale", 1.0f, 1.0f);
+      out.life = read_range_from(*spawn, "life", 1.0f, 1.0f);
+      out.alpha = read_range_from(*spawn, "alpha", 255u, 255u);
+    }
 
-          if (skey == "x") {
-            out.xspawn = read_range(sobject, .0f, .0f);
-          } else if (skey == "y") {
-            out.yspawn = read_range(sobject, .0f, .0f);
-          } else if (skey == "radius") {
-            out.radius = read_range(sobject, .0f, .0f);
-          } else if (skey == "angle") {
-            out.angle = read_range(sobject, .0f, .0f);
-          } else if (skey == "scale") {
-            out.scale = read_range(sobject, 1.0f, 1.0f);
-          } else if (skey == "life") {
-            out.life = read_range(sobject, 1.0f, 1.0f);
-          } else if (skey == "alpha") {
-            out.alpha = read_range(sobject, 255u, 255u);
-          }
-        }
-      } else if (key == "velocity") {
-        auto object = unmarshal::get<unmarshal::object>(field.value());
-        for (auto vfield : object) {
-          const auto vkey = unmarshal::key(vfield);
-          auto vobject = unmarshal::get<unmarshal::object>(vfield.value());
+    if (auto velocity = unmarshal::find_object(document, "velocity")) {
+      out.xvel = read_range_from(*velocity, "x", .0f, .0f);
+      out.yvel = read_range_from(*velocity, "y", .0f, .0f);
+    }
 
-          if (vkey == "x") {
-            out.xvel = read_range(vobject, .0f, .0f);
-          } else if (vkey == "y") {
-            out.yvel = read_range(vobject, .0f, .0f);
-          }
-        }
-      } else if (key == "gravity") {
-        auto object = unmarshal::get<unmarshal::object>(field.value());
-        for (auto gfield : object) {
-          const auto gkey = unmarshal::key(gfield);
-          auto gobject = unmarshal::get<unmarshal::object>(gfield.value());
+    if (auto gravity = unmarshal::find_object(document, "gravity")) {
+      out.gx = read_range_from(*gravity, "x", .0f, .0f);
+      out.gy = read_range_from(*gravity, "y", .0f, .0f);
+    }
 
-          if (gkey == "x") {
-            out.gx = read_range(gobject, .0f, .0f);
-          } else if (gkey == "y") {
-            out.gy = read_range(gobject, .0f, .0f);
-          }
-        }
-      } else if (key == "rotation") {
-        auto object = unmarshal::get<unmarshal::object>(field.value());
-        for (auto rfield : object) {
-          const auto rkey = unmarshal::key(rfield);
-          auto robject = unmarshal::get<unmarshal::object>(rfield.value());
-
-          if (rkey == "force") {
-            out.rforce = read_range(robject, .0f, .0f);
-          } else if (rkey == "velocity") {
-            out.rvel = read_range(robject, .0f, .0f);
-          }
-        }
-      }
+    if (auto rotation = unmarshal::find_object(document, "rotation")) {
+      out.rforce = read_range_from(*rotation, "force", .0f, .0f);
+      out.rvel = read_range_from(*rotation, "velocity", .0f, .0f);
     }
   }
 };

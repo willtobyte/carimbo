@@ -32,12 +32,10 @@ private:
 class rendersystem final {
 public:
   explicit rendersystem(entt::registry& registry) noexcept
-    : _view(registry.view<renderable, transform, tint, sprite, playback, orientation>()) {}
+    : _registry(registry) {}
 
   void draw() const noexcept;
 
 private:
-  using view_type = decltype(std::declval<entt::registry&>().view<renderable, transform, tint, sprite, playback, orientation>());
-
-  view_type _view;
+  entt::registry& _registry;
 };

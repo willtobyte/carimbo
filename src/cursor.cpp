@@ -22,31 +22,24 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
     const auto key = unmarshal::key(field);
     auto aobject = unmarshal::get<unmarshal::object>(field.value());
 
-    auto keyframes = boost::container::small_vector<keyframe, 16>{};
-    for (auto element : aobject["frames"].get_array()) {
-      auto value = unmarshal::get<unmarshal::value>(element);
-
-      auto kf = keyframe{};
-      kf.duration = unmarshal::get<uint64_t>(value, "duration");
-
-      unmarshal::value offset;
-      value["offset"].get(offset);
-      from_json(offset, kf.offset);
-
-      unmarshal::value quad;
-      value["quad"].get(quad);
-      from_json(quad, kf.frame);
-
-      keyframes.emplace_back(std::move(kf));
-    }
-
     const auto oneshot = unmarshal::value_or(aobject, "oneshot", false);
+
+    auto keyframes = boost::container::small_vector<keyframe, 16>{};
+    if (auto frames = unmarshal::find_array(aobject, "frames")) {
+      for (auto element : *frames) {
+        auto k = keyframe{};
+        k.duration = unmarshal::get<uint64_t>(element, "duration");
+        k.offset = unmarshal::make<vec2>(element["offset"]);
+        k.frame = unmarshal::make<quad>(element["quad"]);
+        keyframes.emplace_back(std::move(k));
+      }
+    }
 
     _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, keyframes});
   }
 
   if (const auto it = _animations.find(ACTION_DEFAULT); it != _animations.end()) {
-    _current_animation = it->second;
+    _current_animation = &it->second;
   }
 }
 
@@ -67,7 +60,7 @@ void cursor::on_mouse_release(const event::mouse::button& event) {
   }
 
   if (const auto it = _animations.find(_action); it != _animations.end()) {
-    _current_animation = it->second;
+    _current_animation = &it->second;
   }
 
   _frame = 0;
@@ -82,7 +75,7 @@ void cursor::update(float delta) {
   if (!_current_animation) [[unlikely]] return;
 
   const auto now = SDL_GetTicks();
-  auto& animation = _current_animation->get();
+  auto& animation = *_current_animation;
   const auto& keyframes = animation.keyframes;
 
   if (_frame >= keyframes.size()) [[unlikely]] return;
@@ -96,9 +89,10 @@ void cursor::update(float delta) {
   _last_frame = now;
 
   if (animation.oneshot && (_frame + 1 >= keyframes.size())) {
-    _action = std::exchange(_queued_action, std::nullopt).value_or(ACTION_DEFAULT);
+    _action = _queued_action.empty() ? ACTION_DEFAULT : _queued_action;
+    _queued_action.clear();
     if (const auto it = _animations.find(_action); it != _animations.end()) {
-      _current_animation = it->second;
+      _current_animation = &it->second;
     }
     _frame = 0;
     return;
@@ -110,7 +104,7 @@ void cursor::update(float delta) {
 void cursor::draw() const {
   if (!_current_animation) [[unlikely]] return;
 
-  const auto& keyframes = _current_animation->get().keyframes;
+  const auto& keyframes = _current_animation->keyframes;
   if (_frame >= keyframes.size()) [[unlikely]] return;
 
   const auto& keyframe = keyframes[_frame];
@@ -128,6 +122,6 @@ void cursor::draw() const {
   );
 }
 
-void cursor::handle(const std::string_view message) {
+void cursor::handle(std::string_view message) {
   _queued_action = message;
 }
