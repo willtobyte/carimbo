@@ -1,8 +1,8 @@
 #include "locales.hpp"
 
-static constexpr std::string_view DEFAULT_LANGUAGE = "en";
+static constexpr std::string DEFAULT_LANGUAGE = "en";
 
-static std::string_view language() {
+static std::string language() {
   auto count = 0;
   const auto locales = std::unique_ptr<SDL_Locale*, SDL_Deleter>(SDL_GetPreferredLocales(&count));
 
