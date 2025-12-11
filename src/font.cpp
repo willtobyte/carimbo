@@ -24,11 +24,11 @@ void font::draw(std::string_view text, const vec2& position, const std::weak_ptr
     return;
   }
 
-  vec2 cursor = position;
+  auto cursor = position;
 
   const auto& first = _map[static_cast<uint8_t>(_glyphs[0])];
   assert(first && "first glyph must be valid");
-  const float height = first->h * _scale;
+  const auto height = first->h * _scale;
 
   for (const auto ch : text) {
     if (ch == '\n') {
