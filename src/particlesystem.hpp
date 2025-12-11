@@ -9,58 +9,52 @@ struct particleprops final {
   bool spawning;
   std::shared_ptr<pixmap> pixmap;
   std::minstd_rand rng{std::random_device{}()};
-  std::uniform_real_distribution<float> xspawnd;
-  std::uniform_real_distribution<float> yspawnd;
-  std::uniform_real_distribution<float> radiusd;
-  std::uniform_real_distribution<double> angled;
-  std::uniform_real_distribution<float> xveld;
-  std::uniform_real_distribution<float> yveld;
-  std::uniform_real_distribution<float> gxd;
-  std::uniform_real_distribution<float> gyd;
-  std::uniform_real_distribution<float> scaled;
-  std::uniform_real_distribution<float> lifed;
+  std::uniform_real_distribution<float> xspawnd, yspawnd, radiusd, angled;
+  std::uniform_real_distribution<float> xveld, yveld, gxd, gyd;
+  std::uniform_real_distribution<float> scaled, lifed, rotforced, rotveld;
   std::uniform_int_distribution<unsigned int> alphad;
-  std::uniform_real_distribution<double> rotforced;
-  std::uniform_real_distribution<double> rotveld;
 
-  auto randradius() noexcept { return radiusd(rng); }
-  auto randangle() noexcept { return angled(rng); }
-  auto randxspawn() noexcept { return xspawnd(rng); }
-  auto randyspawn() noexcept { return yspawnd(rng); }
-  auto randxvel() noexcept { return xveld(rng); }
-  auto randyvel() noexcept { return yveld(rng); }
-  auto randgx() noexcept { return gxd(rng); }
-  auto randgy() noexcept { return gyd(rng); }
-  auto randscale() noexcept { return scaled(rng); }
-  auto randlife() noexcept { return lifed(rng); }
-  auto randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
-  auto randrotforce() noexcept { return rotforced(rng); }
-  auto randrotvel() noexcept { return rotveld(rng); }
+  float randradius() noexcept { return radiusd(rng); }
+  float randangle() noexcept { return angled(rng); }
+  float randxspawn() noexcept { return xspawnd(rng); }
+  float randyspawn() noexcept { return yspawnd(rng); }
+  float randxvel() noexcept { return xveld(rng); }
+  float randyvel() noexcept { return yveld(rng); }
+  float randgx() noexcept { return gxd(rng); }
+  float randgy() noexcept { return gyd(rng); }
+  float randscale() noexcept { return scaled(rng); }
+  float randlife() noexcept { return lifed(rng); }
+  uint8_t randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
+  float randrotforce() noexcept { return rotforced(rng); }
+  float randrotvel() noexcept { return rotveld(rng); }
 
   void set_position(float xv, float yv) noexcept { x = xv; y = yv; }
 };
 
-struct alignas(64) particle final {
-  float x, y;
-  float vx, vy;
-  float gx, gy;
-  float life;
-  float scale;
-  double angle;
-  double av, af;
-  uint8_t alpha;
-  uint8_t _padding[7];
+struct particle final {
+  std::vector<float> x, y, vx, vy, gx, gy;
+  std::vector<float> life, scale, angle, av, af;
+  std::vector<uint8_t> alpha;
+  size_t count{0};
+
+  void resize(size_t n) {
+    count = n;
+    x.resize(n); y.resize(n);
+    vx.resize(n); vy.resize(n);
+    gx.resize(n); gy.resize(n);
+    life.resize(n); scale.resize(n);
+    angle.resize(n); av.resize(n); af.resize(n);
+    alpha.resize(n);
+  }
 };
 
 struct particlebatch final {
   std::shared_ptr<particleprops> props;
-  std::vector<particle> particles;
+  particle particles;
   std::vector<int> indices;
   std::vector<SDL_Vertex> vertices;
 
-  std::size_t size() const noexcept {
-    return particles.size();
-  }
+  size_t size() const noexcept { return particles.count; }
 };
 
 class particlefactory final {

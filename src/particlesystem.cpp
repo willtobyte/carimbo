@@ -6,6 +6,36 @@
 
 namespace {
 
+constexpr float TWO_PI = 6.28318530718f;
+constexpr float HALF_PI = 1.57079632679f;
+constexpr float INV_HALF_PI = 0.63661977236f;
+
+constexpr float SIN_C0 = 0.99997f;
+constexpr float SIN_C1 = 0.16596f;
+constexpr float SIN_C2 = 0.00759f;
+constexpr float COS_C0 = 0.99996f;
+constexpr float COS_C1 = 0.49985f;
+constexpr float COS_C2 = 0.03659f;
+
+constexpr float QUADRANT_SIGNS[8] = {1.f, 1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f};
+constexpr int QUADRANT_MASK = 3;
+
+static void sincos(float x, float& out_sin, float& out_cos) noexcept {
+  const auto q = static_cast<int>(x * INV_HALF_PI);
+  const auto t = x - static_cast<float>(q) * HALF_PI;
+  const auto t2 = t * t;
+
+  const auto sin_t = t * (SIN_C0 - t2 * (SIN_C1 - t2 * SIN_C2));
+  const auto cos_t = COS_C0 - t2 * (COS_C1 - t2 * COS_C2);
+
+  const auto qi = (q & QUADRANT_MASK) * 2;
+  const auto swap = static_cast<float>(q & 1);
+  const auto keep = 1.f - swap;
+
+  out_sin = (sin_t * keep + cos_t * swap) * QUADRANT_SIGNS[qi];
+  out_cos = (cos_t * keep + sin_t * swap) * QUADRANT_SIGNS[qi + 1];
+}
+
 template <typename T>
 std::pair<T, T> read_range(unmarshal::object &object, T fallback_start, T fallback_end) noexcept {
   return {
@@ -20,7 +50,7 @@ struct particleconfig final {
   std::pair<float, float> xspawn{.0f, .0f};
   std::pair<float, float> yspawn{.0f, .0f};
   std::pair<float, float> radius{.0f, .0f};
-  std::pair<double, double> angle{.0, .0};
+  std::pair<float, float> angle{.0f, .0f};
   std::pair<float, float> scale{1.0f, 1.0f};
   std::pair<float, float> life{1.0f, 1.0f};
   std::pair<uint8_t, uint8_t> alpha{255u, 255u};
@@ -31,8 +61,8 @@ struct particleconfig final {
   std::pair<float, float> gx{.0f, .0f};
   std::pair<float, float> gy{.0f, .0f};
 
-  std::pair<double, double> rforce{.0, .0};
-  std::pair<double, double> rvel{.0, .0};
+  std::pair<float, float> rforce{.0f, .0f};
+  std::pair<float, float> rvel{.0f, .0f};
 
   friend void from_json(unmarshal::document &document, particleconfig &out) {
     for (auto field : document.get_object()) {
@@ -56,7 +86,7 @@ struct particleconfig final {
           } else if (skey == "radius") {
             out.radius = read_range(sobject, .0f, .0f);
           } else if (skey == "angle") {
-            out.angle = read_range(sobject, .0, .0);
+            out.angle = read_range(sobject, .0f, .0f);
           } else if (skey == "scale") {
             out.scale = read_range(sobject, 1.0f, 1.0f);
           } else if (skey == "life") {
@@ -96,9 +126,9 @@ struct particleconfig final {
           auto robject = unmarshal::get<unmarshal::object>(rfield.value());
 
           if (rkey == "force") {
-            out.rforce = read_range(robject, .0, .0);
+            out.rforce = read_range(robject, .0f, .0f);
           } else if (rkey == "velocity") {
-            out.rvel = read_range(robject, .0, .0);
+            out.rvel = read_range(robject, .0f, .0f);
           }
         }
       }
@@ -131,7 +161,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->xspawnd = std::uniform_real_distribution<float>(conf.xspawn.first, conf.xspawn.second);
   props->yspawnd = std::uniform_real_distribution<float>(conf.yspawn.first, conf.yspawn.second);
   props->radiusd = std::uniform_real_distribution<float>(conf.radius.first, conf.radius.second);
-  props->angled = std::uniform_real_distribution<double>(conf.angle.first, conf.angle.second);
+  props->angled = std::uniform_real_distribution<float>(conf.angle.first, conf.angle.second);
   props->xveld = std::uniform_real_distribution<float>(conf.xvel.first, conf.xvel.second);
   props->yveld = std::uniform_real_distribution<float>(conf.yvel.first, conf.yvel.second);
   props->gxd = std::uniform_real_distribution<float>(conf.gx.first, conf.gx.second);
@@ -139,8 +169,8 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->lifed = std::uniform_real_distribution<float>(conf.life.first, conf.life.second);
   props->alphad = std::uniform_int_distribution<unsigned int>(conf.alpha.first, conf.alpha.second);
   props->scaled = std::uniform_real_distribution<float>(conf.scale.first, conf.scale.second);
-  props->rotforced = std::uniform_real_distribution<double>(conf.rforce.first, conf.rforce.second);
-  props->rotveld = std::uniform_real_distribution<double>(conf.rvel.first, conf.rvel.second);
+  props->rotforced = std::uniform_real_distribution<float>(conf.rforce.first, conf.rforce.second);
+  props->rotveld = std::uniform_real_distribution<float>(conf.rvel.first, conf.rvel.second);
 
   const auto batch = std::make_shared<particlebatch>();
   batch->props = std::move(props);
@@ -150,7 +180,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
 
   for (auto i = 0uz; i < conf.count; ++i) {
     const auto base = static_cast<int>(i * 4);
-    const auto index = i * 6;
+    const auto index = i * 6uz;
     batch->indices[index] = base;
     batch->indices[index + 1] = base + 1;
     batch->indices[index + 2] = base + 2;
@@ -190,82 +220,92 @@ void particlesystem::clear() {
 }
 
 void particlesystem::update(float delta) {
-  const auto d = static_cast<double>(delta);
-
   for (const auto& batch : _batches) {
-    auto& props = batch->props;
+    auto* props = batch->props.get();
     if (!props->active) [[unlikely]] {
       continue;
     }
 
+    auto& p = batch->particles;
+    const auto n = p.count;
+
+    auto* __restrict xs = p.x.data();
+    auto* __restrict ys = p.y.data();
+    auto* __restrict vxs = p.vx.data();
+    auto* __restrict vys = p.vy.data();
+    auto* __restrict gxs = p.gx.data();
+    auto* __restrict gys = p.gy.data();
+    auto* __restrict lifes = p.life.data();
+    auto* __restrict scales = p.scale.data();
+    auto* __restrict angles = p.angle.data();
+    auto* __restrict avs = p.av.data();
+    auto* __restrict afs = p.af.data();
+    auto* __restrict alphas = p.alpha.data();
+
+    for (size_t i = 0; i < n; ++i) {
+      lifes[i] -= delta;
+      avs[i] += afs[i] * delta;
+      angles[i] += avs[i] * delta;
+      angles[i] -= TWO_PI * static_cast<float>(angles[i] >= TWO_PI);
+      angles[i] += TWO_PI * static_cast<float>(angles[i] < .0f);
+      vxs[i] += gxs[i] * delta;
+      vys[i] += gys[i] * delta;
+      xs[i] += vxs[i] * delta;
+      ys[i] += vys[i] * delta;
+    }
+
+    if (props->spawning) {
+      const auto px = props->x;
+      const auto py = props->y;
+
+      for (size_t i = 0; i < n; ++i) {
+        if (lifes[i] <= 0.f) {
+          xs[i] = px + props->randxspawn();
+          ys[i] = py + props->randyspawn();
+          vxs[i] = props->randxvel();
+          vys[i] = props->randyvel();
+          gxs[i] = props->randgx();
+          gys[i] = props->randgy();
+          avs[i] = props->randrotvel();
+          afs[i] = props->randrotforce();
+          lifes[i] = props->randlife();
+          alphas[i] = props->randalpha();
+          scales[i] = props->randscale();
+          angles[i] = props->randangle();
+        }
+      }
+    }
+
     const auto hw = props->hw;
     const auto hh = props->hh;
-
-    auto* particles = batch->particles.data();
     auto* vertices = batch->vertices.data();
-    const auto n = batch->size();
 
     for (auto i = 0uz; i < n; ++i) {
-      auto& p = particles[i];
+      const auto life = lifes[i];
+      const auto alive = life > 0.f ? 1.f : 0.f;
+      const auto alpha = std::min(life, 1.f) * alive;
 
-      p.life -= delta;
-      if (p.life > 0.f) {
-        p.av += p.af * d;
-        p.angle += p.av * d;
+      const auto scale = scales[i];
+      const auto shw = hw * scale;
+      const auto shh = hh * scale;
 
-        p.vx += p.gx * delta;
-        p.vy += p.gy * delta;
-        p.x += p.vx * delta;
-        p.y += p.vy * delta;
+      float sa, ca;
+      sincos(angles[i], sa, ca);
 
-        const auto a = 255.f * p.life;
-        p.alpha = static_cast<uint8_t>(std::clamp(a, .0f, 255.f));
-      } else if (props->spawning) [[likely]] {
-        p.x = props->x + props->randxspawn();
-        p.y = props->y + props->randyspawn();
-        p.vx = props->randxvel();
-        p.vy = props->randyvel();
-        p.gx = props->randgx();
-        p.gy = props->randgy();
-        p.av = props->randrotvel();
-        p.af = props->randrotforce();
-        p.life = props->randlife();
-        p.alpha = props->randalpha();
-        p.scale = props->randscale();
-        p.angle = props->randangle();
-      }
+      const auto x = xs[i];
+      const auto y = ys[i];
+      const SDL_FColor color = {1.f, 1.f, 1.f, alpha};
 
-      const auto shw = hw * p.scale;
-      const auto shh = hh * p.scale;
-      const auto ca = static_cast<float>(std::cos(p.angle));
-      const auto sa = static_cast<float>(std::sin(p.angle));
-      const SDL_FColor color = {1.f, 1.f, 1.f, p.alpha / 255.f};
+      const auto dx0 = -shw * ca + shh * sa;
+      const auto dy0 = -shw * sa - shh * ca;
+      const auto dx1 = shw * ca + shh * sa;
+      const auto dy1 = shw * sa - shh * ca;
 
       auto* vx = vertices + i * 4;
-
-      vx[0].position.x = p.x - shw * ca + shh * sa;
-      vx[0].position.y = p.y - shw * sa - shh * ca;
-      vx[0].tex_coord.x = 0.f;
-      vx[0].tex_coord.y = 0.f;
-      vx[0].color = color;
-
-      vx[1].position.x = p.x + shw * ca + shh * sa;
-      vx[1].position.y = p.y + shw * sa - shh * ca;
-      vx[1].tex_coord.x = 1.f;
-      vx[1].tex_coord.y = 0.f;
-      vx[1].color = color;
-
-      vx[2].position.x = p.x + shw * ca - shh * sa;
-      vx[2].position.y = p.y + shw * sa + shh * ca;
-      vx[2].tex_coord.x = 1.f;
-      vx[2].tex_coord.y = 1.f;
-      vx[2].color = color;
-
-      vx[3].position.x = p.x - shw * ca - shh * sa;
-      vx[3].position.y = p.y - shw * sa + shh * ca;
-      vx[3].tex_coord.x = 0.f;
-      vx[3].tex_coord.y = 1.f;
-      vx[3].color = color;
+      vx[0] = {{x + dx0, y + dy0}, color, {0.f, 0.f}};
+      vx[1] = {{x + dx1, y + dy1}, color, {1.f, 0.f}};
+      vx[2] = {{x - dx0, y - dy0}, color, {1.f, 1.f}};
+      vx[3] = {{x - dx1, y - dy1}, color, {0.f, 1.f}};
     }
   }
 }
