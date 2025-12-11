@@ -17,7 +17,6 @@ file(GLOB TEMPLATE_FILES CONFIGURE_DEPENDS "src/*.tpp")
 add_compile_definitions(
   NOMINMAX
   WIN32_LEAN_AND_MEAN
-  BOOST_EXCEPTION_DISABLE
 )
 
 add_executable(${PROJECT_NAME})

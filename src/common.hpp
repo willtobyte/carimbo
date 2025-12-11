@@ -13,7 +13,6 @@
 
 #include <boost/container/small_vector.hpp>
 #include <boost/static_string.hpp>
-#include <boost/throw_exception.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 
 #ifdef HAS_SENTRY
