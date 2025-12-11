@@ -92,7 +92,8 @@ static sol::object searcher(sol::this_state state, std::string_view module) {
 
 class lua_loopable final : public loopable {
 public:
-  explicit lua_loopable(const sol::state_view lua) : _L(lua) {}
+  explicit lua_loopable(const sol::state_view lua)
+      : _L(lua), _start(SDL_GetTicks()) {}
 
   void loop(float delta) override {
     _frames++;
@@ -103,7 +104,7 @@ public:
     const auto memory = lua_gc(_L, LUA_GCCOUNT, 0);
 
     if (_elapsed >= 1000) [[unlikely]] {
-      std::println("{:.1f} {}KB", (1000.0 * static_cast<double>(_frames)) / static_cast<double>(_elapsed), memory);
+      std::println("{:.1f} {}KB", static_cast<double>(_frames) * 1000.0 / static_cast<double>(_elapsed), memory);
 
       _elapsed = 0;
       _frames = 0;
@@ -122,7 +123,7 @@ private:
   lua_State* _L;
   uint64_t _frames{0};
   uint64_t _elapsed{0};
-  uint64_t _start{SDL_GetTicks()};
+  uint64_t _start;
 };
 
 struct sentinel final {

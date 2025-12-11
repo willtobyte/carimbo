@@ -107,10 +107,11 @@ void engine::run() {
 }
 
 void engine::_loop() {
-  const auto ticks = SDL_GetTicks();
-  static auto prior = ticks;
-  const auto delta = static_cast<float>(ticks - prior) * 0.001f;
-  prior = ticks;
+  const auto now = SDL_GetPerformanceCounter();
+  static auto prior = now;
+  static const auto frequency = static_cast<double>(SDL_GetPerformanceFrequency());
+  const auto delta = static_cast<float>(static_cast<double>(now - prior) / frequency);
+  prior = now;
 
   for (const auto& observer : _observers) {
     observer->on_beginupdate();
