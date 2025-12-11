@@ -143,6 +143,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   batch->particles.resize(conf.count);
   batch->vertices.resize(conf.count * 4);
   batch->indices.resize(conf.count * 6);
+  batch->respawn.resize(conf.count);
 
   for (auto i = 0uz; i < conf.count; ++i) {
     const auto base = static_cast<int>(i * 4);
@@ -224,21 +225,28 @@ void particlesystem::update(float delta) {
       const auto px = props->x;
       const auto py = props->y;
 
+      auto* __restrict respawn = batch->respawn.data();
+      size_t count = 0;
+
       for (size_t i = 0; i < n; ++i) {
-        if (lifes[i] <= 0.f) {
-          xs[i] = px + props->randxspawn();
-          ys[i] = py + props->randyspawn();
-          vxs[i] = props->randxvel();
-          vys[i] = props->randyvel();
-          gxs[i] = props->randgx();
-          gys[i] = props->randgy();
-          avs[i] = props->randrotvel();
-          afs[i] = props->randrotforce();
-          lifes[i] = props->randlife();
-          alphas[i] = props->randalpha();
-          scales[i] = props->randscale();
-          angles[i] = props->randangle();
-        }
+        respawn[count] = i;
+        count += static_cast<size_t>(lifes[i] <= 0.f);
+      }
+
+      for (size_t j = 0; j < count; ++j) {
+        const auto i = respawn[j];
+        xs[i] = px + props->randxspawn();
+        ys[i] = py + props->randyspawn();
+        vxs[i] = props->randxvel();
+        vys[i] = props->randyvel();
+        gxs[i] = props->randgx();
+        gys[i] = props->randgy();
+        avs[i] = props->randrotvel();
+        afs[i] = props->randrotforce();
+        lifes[i] = props->randlife();
+        alphas[i] = props->randalpha();
+        scales[i] = props->randscale();
+        angles[i] = props->randangle();
       }
     }
 

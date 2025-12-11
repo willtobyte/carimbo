@@ -53,6 +53,7 @@ struct particlebatch final {
   particle particles;
   std::vector<int> indices;
   std::vector<SDL_Vertex> vertices;
+  std::vector<size_t> respawn;
 
   size_t size() const noexcept { return particles.count; }
 };

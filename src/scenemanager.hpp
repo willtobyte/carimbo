@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include <boost/static_string/static_string.hpp>
 
 enum scenetype : std::uint8_t {
   backdrop,
@@ -24,8 +25,6 @@ public:
   std::string_view current() const;
 
   void set(std::string_view name);
-
-  std::shared_ptr<::scene> get() const;
 
   boost::container::small_vector<std::string, 8> query(std::string_view name) const;
 
@@ -51,6 +50,6 @@ private:
   std::shared_ptr<::resourcemanager> _resourcemanager;
   std::shared_ptr<::renderer> _renderer;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
-  std::weak_ptr<::scene> _scene;
-  std::string _current;
+  ::scene* _scene{nullptr};
+  boost::static_string<32> _current;
 };

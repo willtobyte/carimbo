@@ -42,22 +42,17 @@ void scenemanager::set(std::string_view name) {
   const auto it = _scene_mapping.find(name);
   if (it == _scene_mapping.end()) [[unlikely]] return;
 
-  if (const auto active = _scene.lock()) [[ likely ]] {
-    std::println("[scenemanager] left {}", active->name());
-    active->on_leave();
+  if (_scene) [[likely]] {
+    std::println("[scenemanager] left {}", _scene->name());
+    _scene->on_leave();
   }
 
-  const auto& ptr = it->second;
-  _scene = ptr;
+  _scene = it->second.get();
   _current = name;
 
   std::println("[scenemanager] entered {}", name);
 
-  ptr->on_enter();
-}
-
-std::shared_ptr<scene> scenemanager::get() const {
-  return _scene.lock();
+  _scene->on_enter();
 }
 
 boost::container::small_vector<std::string, 8> scenemanager::query(std::string_view name) const {
@@ -92,50 +87,34 @@ boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string
 }
 
 void scenemanager::update(float delta) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->update(delta);
+  _scene->update(delta);
 }
 
 void scenemanager::draw() const {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->draw();
+  _scene->draw();
 }
 
 void scenemanager::on_key_press(const event::keyboard::key& event) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->on_key_press(static_cast<int32_t>(event));
+  _scene->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const event::keyboard::key& event) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->on_key_release(static_cast<int32_t>(event));
+  _scene->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(std::string_view text) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->on_text(text);
+  _scene->on_text(text);
 }
 
 void scenemanager::on_mouse_press(const event::mouse::button& event) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
 }
 
 void scenemanager::on_mouse_release(const event::mouse::button& event) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->on_touch(event.x, event.y);
+  _scene->on_touch(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
-  const auto ptr = _scene.lock();
-  if (!ptr) [[unlikely]] return;
-  ptr->on_motion(event.x, event.y);
+  _scene->on_motion(event.x, event.y);
 }
 
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {

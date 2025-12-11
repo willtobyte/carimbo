@@ -419,7 +419,6 @@ void scriptengine::run() {
     "SceneManager",
     sol::no_constructor,
     "current", sol::property(&scenemanager::current),
-    "get", &scenemanager::get,
     "set", [&lua](scenemanager& self, std::string_view name) {
       try {
         self.set(name);
