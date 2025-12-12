@@ -18,8 +18,8 @@ void from_json(unmarshal::value json, layer& out) {
 
 void from_json(unmarshal::document& document, tilemap& out) {
   out._tile_size = unmarshal::get<int32_t>(document, "tile_size");
-  out._map_width = unmarshal::get<int32_t>(document, "map_width");
-  out._map_height = unmarshal::get<int32_t>(document, "map_height");
+  out._width = unmarshal::get<int32_t>(document, "width");
+  out._height = unmarshal::get<int32_t>(document, "height");
 
   out._layers.clear();
   for (auto element : document["layers"].get_array()) {
@@ -36,8 +36,9 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, std:
 
   _tile_size_f = static_cast<float>(_tile_size);
   _inv_tile_size = 1.0f / _tile_size_f;
-  _tiles_per_row = _atlas->width() / _tile_size;
-  _tiles_per_column = _atlas->height() / _tile_size;
+
+  const auto tiles_per_row = _atlas->width() / _tile_size;
+  const auto tiles_per_column = _atlas->height() / _tile_size;
 
   {
     const auto atlas_width = static_cast<float>(_atlas->width());
@@ -45,12 +46,12 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, std:
     const auto u_scale = _tile_size_f / atlas_width;
     const auto v_scale = _tile_size_f / atlas_height;
 
-    const auto total_tiles = static_cast<size_t>(_tiles_per_row) * static_cast<size_t>(_tiles_per_column);
+    const auto total_tiles = static_cast<size_t>(tiles_per_row) * static_cast<size_t>(tiles_per_column);
     _uv_table.resize(total_tiles);
 
     for (size_t id = 0; id < total_tiles; ++id) {
-      const auto tile_column = static_cast<int32_t>(id % static_cast<size_t>(_tiles_per_row));
-      const auto tile_row = static_cast<int32_t>(id / static_cast<size_t>(_tiles_per_row));
+      const auto tile_column = static_cast<int32_t>(id % static_cast<size_t>(tiles_per_row));
+      const auto tile_row = static_cast<int32_t>(id / static_cast<size_t>(tiles_per_row));
 
       auto& uv = _uv_table[id];
       uv.u0 = static_cast<float>(tile_column) * u_scale;
@@ -61,18 +62,18 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, std:
   }
 
   {
-    const auto grid_size = static_cast<size_t>(_map_width) * static_cast<size_t>(_map_height);
+    const auto grid_size = static_cast<size_t>(_width) * static_cast<size_t>(_height);
 
     _grids.resize(_layers.size());
 
     for (size_t i = 0; i < _layers.size(); ++i) {
       auto& grid = _grids[i];
       grid.collider = _layers[i].collider;
-      grid.tile_ids.assign(grid_size, 0);
+      grid.tiles.assign(grid_size, 0);
 
       for (const auto& tile : _layers[i].tiles) {
-        const auto index = static_cast<size_t>(tile.y) * static_cast<size_t>(_map_width) + static_cast<size_t>(tile.x);
-        grid.tile_ids[index] = tile.id + 1;
+        const auto index = static_cast<size_t>(tile.y) * static_cast<size_t>(_width) + static_cast<size_t>(tile.x);
+        grid.tiles[index] = tile.id + 1;
       }
     }
   }
@@ -98,8 +99,8 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
 
   const auto start_column = std::max(0, static_cast<int32_t>(_viewport.x * _inv_tile_size));
   const auto start_row = std::max(0, static_cast<int32_t>(_viewport.y * _inv_tile_size));
-  const auto end_column = std::min(_map_width - 1, static_cast<int32_t>((_viewport.x + _viewport.w) * _inv_tile_size) + 1);
-  const auto end_row = std::min(_map_height - 1, static_cast<int32_t>((_viewport.y + _viewport.h) * _inv_tile_size) + 1);
+  const auto end_column = std::min(_width - 1, static_cast<int32_t>((_viewport.x + _viewport.w) * _inv_tile_size) + 1);
+  const auto end_row = std::min(_height - 1, static_cast<int32_t>((_viewport.y + _viewport.h) * _inv_tile_size) + 1);
 
   if (start_column > end_column || start_row > end_row) [[unlikely]] {
     return;
@@ -108,19 +109,19 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
   const auto viewport_x = _viewport.x;
   const auto viewport_y = _viewport.y;
   const auto tile_size = _tile_size_f;
-  const auto map_width = _map_width;
+  const auto width = _width;
 
   constexpr SDL_FColor white{1.0f, 1.0f, 1.0f, 1.0f};
 
   for (const auto& grid : _grids) {
-    const auto* __restrict tile_ids = grid.tile_ids.data();
+    const auto* __restrict tiles = grid.tiles.data();
 
     for (auto row = start_row; row <= end_row; ++row) {
-      const auto row_offset = row * map_width;
+      const auto row_offset = row * width;
       const auto dy_base = static_cast<float>(row) * tile_size - viewport_y;
 
       for (auto column = start_column; column <= end_column; ++column) {
-        const auto tile_id = tile_ids[row_offset + column];
+        const auto tile_id = tiles[row_offset + column];
 
         if (tile_id == 0) [[likely]] {
           continue;

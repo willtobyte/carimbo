@@ -23,7 +23,7 @@ struct alignas(16) tile_uv final {
 };
 
 struct alignas(64) layer_grid final {
-  std::vector<uint32_t> tile_ids;
+  std::vector<uint32_t> tiles;
   bool collider;
 };
 
@@ -41,10 +41,8 @@ public:
 
 private:
   int32_t _tile_size;
-  int32_t _map_width;
-  int32_t _map_height;
-  int32_t _tiles_per_row;
-  int32_t _tiles_per_column;
+  int32_t _width;
+  int32_t _height;
   float _tile_size_f;
   float _inv_tile_size;
   quad _viewport;
