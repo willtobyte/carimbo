@@ -108,6 +108,14 @@ void scriptengine::run() {
     return instance;
   };
 
+  lua["math"]["random"] = sol::overload(
+    []() noexcept { return rng::engine().uniform(); },
+    [](lua_Integer upper) noexcept { return rng::engine().range<lua_Integer>(1, upper); },
+    [](lua_Integer low, lua_Integer high) noexcept { return rng::engine().range<lua_Integer>(low, high); }
+  );
+
+  lua["math"]["randomseed"] = [](lua_Integer seed) noexcept { rng::seed(static_cast<uint64_t>(seed)); };
+
   lua["_"] = &localization::text;
 
   lua["moment"] = []() noexcept { return SDL_GetTicks(); };
@@ -765,14 +773,16 @@ void scriptengine::run() {
     }
   };
 
-  lua.new_enum("MouseButton",
+  lua.new_enum(
+    "MouseButton",
     "none",   0,
     "left",   SDL_BUTTON_LEFT,
     "middle", SDL_BUTTON_MIDDLE,
     "right",  SDL_BUTTON_RIGHT
   );
 
-  lua.new_usertype<mouse>("Mouse",
+  lua.new_usertype<mouse>(
+    "Mouse",
     "x", sol::property(&mouse::x),
     "y", sol::property(&mouse::y),
     "xy", &mouse::xy,
@@ -782,7 +792,7 @@ void scriptengine::run() {
   lua["mouse"] = mouse{};
 
   struct keyboard final {
-    static auto index(const keyboard&, sol::stack_object key, sol::this_state state) -> sol::object {
+    static auto index(const keyboard&, sol::stack_object key, sol::this_state state) {
       static const boost::unordered_flat_map<std::string, SDL_Scancode, transparent_string_hash, std::equal_to<>> map{
         {"a", SDL_SCANCODE_A}, {"b", SDL_SCANCODE_B}, {"c", SDL_SCANCODE_C}, {"d", SDL_SCANCODE_D},
         {"e", SDL_SCANCODE_E}, {"f", SDL_SCANCODE_F}, {"g", SDL_SCANCODE_G}, {"h", SDL_SCANCODE_H},
@@ -936,13 +946,6 @@ void scriptengine::run() {
   std::println("License: MIT");
   std::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
-  lua["math"]["random"] = sol::overload(
-    []() noexcept { return rng::global().uniform(); },
-    [](lua_Integer upper) noexcept { return rng::global().range<lua_Integer>(1, upper); },
-    [](lua_Integer low, lua_Integer high) noexcept { return rng::global().range<lua_Integer>(low, high); }
-  );
-
-  lua["math"]["randomseed"] = [](lua_Integer seed) noexcept { rng::global_seed(static_cast<uint64_t>(seed)); };
 
   lua.script(bootstrap, "@bootstrap");
   lua.script(debugger, "@debugger");

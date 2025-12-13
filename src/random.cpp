@@ -14,11 +14,11 @@ global_initializer g_init{};
 }
 
 namespace rng {
-xorshift128plus& global() noexcept {
+xorshift128plus& engine() noexcept {
   return g_init.generator;
 }
 
-void global_seed(uint64_t seed) noexcept {
-  g_init.generator.seed(seed);
+void seed(uint64_t value) noexcept {
+  g_init.generator.seed(value);
 }
 }
