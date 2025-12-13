@@ -51,9 +51,8 @@ public:
     if (low >= high) [[unlikely]] {
       return low;
     }
-    const auto ulow = static_cast<uint64_t>(low);
     const auto range_size = static_cast<uint64_t>(high - low + 1);
-    return static_cast<T>(ulow + ((*this)() % range_size));
+    return static_cast<T>(low + static_cast<T>((*this)() % range_size));
   }
 
   template<std::floating_point T>
