@@ -4,6 +4,8 @@
 
 #include "systems.hpp"
 
+#include "tilemap.hpp"
+
 enum class scenekind : uint8_t {
   object = 0,
   effect,
@@ -98,6 +100,8 @@ private:
 
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
+
+  tilemap _tilemap;
 };
 
 // class tilemapscene : public scene {

@@ -1,7 +1,6 @@
 #include "particlesystem.hpp"
 
 #include "io.hpp"
-#include "pixmap.hpp"
 #include "resourcemanager.hpp"
 
 namespace {

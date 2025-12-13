@@ -10,7 +10,8 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
     : _renderer(std::move(scenemanager->renderer())),
       _scenemanager(std::move(scenemanager)),
       _particlesystem(scenemanager->resourcemanager()),
-      _timermanager(std::make_shared<::timermanager>()) {
+      _timermanager(std::make_shared<::timermanager>()),
+      _tilemap("greenhill", _renderer, _scenemanager->resourcemanager()->pixmappool()) {
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();
@@ -154,6 +155,8 @@ void scene::update(float delta) noexcept {
   _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
 
+  _tilemap.update(delta);
+
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
@@ -180,11 +183,13 @@ void scene::draw() const noexcept {
   const auto w = static_cast<float>(_background->width());
   const auto h = static_cast<float>(_background->height());
 
-  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  // _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  _rendersystem.draw();
+  // _rendersystem.draw();
 
-  _particlesystem.draw();
+  // _particlesystem.draw();
+
+  _tilemap.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
