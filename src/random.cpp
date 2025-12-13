@@ -1,24 +1,24 @@
 #include "random.hpp"
 
 namespace {
-struct global_initializer final {
+struct random final {
   rng::xorshift128plus generator;
 
-  global_initializer() noexcept {
+  random() noexcept {
     const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     generator.seed(static_cast<uint64_t>(now));
   }
 };
 
-global_initializer g_init{};
+random _random{};
 }
 
 namespace rng {
 xorshift128plus& engine() noexcept {
-  return g_init.generator;
+  return _random.generator;
 }
 
 void seed(uint64_t value) noexcept {
-  g_init.generator.seed(value);
+  _random.generator.seed(value);
 }
 }
