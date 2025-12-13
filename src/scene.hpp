@@ -77,12 +77,12 @@ private:
   physicssystem _physicssystem{_registry};
   rendersystem _rendersystem{_registry};
 
-  particlesystem _particlesystem;
-
-  std::shared_ptr<pixmap> _background;
+  std::shared_ptr<scenemanager> _scenemanager;
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<::timermanager> _timermanager;
-  std::shared_ptr<scenemanager> _scenemanager;
+  std::shared_ptr<pixmap> _background;
+
+  particlesystem _particlesystem;
 
   boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
   boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;

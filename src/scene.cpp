@@ -7,11 +7,11 @@
 #include "soundfx.hpp"
 
 scene::scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<scenemanager> scenemanager)
-    : _renderer(std::move(scenemanager->renderer())),
-      _scenemanager(std::move(scenemanager)),
-      _particlesystem(scenemanager->resourcemanager()),
+    : _scenemanager(std::move(scenemanager)),
+      _renderer(_scenemanager->renderer()),
       _timermanager(std::make_shared<::timermanager>()),
-      _tilemap("greenhill", _renderer, _scenemanager->resourcemanager()->pixmappool()) {
+      _particlesystem(_scenemanager->resourcemanager()),
+      _tilemap("greenhill", _scenemanager->resourcemanager()) {
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();

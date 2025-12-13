@@ -29,7 +29,7 @@ struct alignas(64) layer_grid final {
 
 class tilemap final {
 public:
-  tilemap(std::string_view name, std::shared_ptr<renderer> renderer, std::shared_ptr<pixmappool> pixmappool);
+  tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager); 
 
   friend void from_json(unmarshal::document& document, tilemap& out);
 
