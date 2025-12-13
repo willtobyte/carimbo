@@ -155,6 +155,10 @@ void scene::update(float delta) noexcept {
   _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
 
+  int width, height;
+  SDL_GetRenderOutputSize(*_renderer, &width, &height);
+  _tilemap.set_viewport({0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)});
+
   _tilemap.update(delta);
 
   if (const auto fn = _onloop; fn) {
@@ -183,11 +187,11 @@ void scene::draw() const noexcept {
   const auto w = static_cast<float>(_background->width());
   const auto h = static_cast<float>(_background->height());
 
-  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  // _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  _rendersystem.draw();
+  // _rendersystem.draw();
 
-  _particlesystem.draw();
+  // _particlesystem.draw();
 
   _tilemap.draw();
 
