@@ -1,18 +1,14 @@
 #include "tilemap.hpp"
 
-void from_json(unmarshal::value json, tile& out) {
-  out.x = unmarshal::get<int32_t>(json, "x");
-  out.y = unmarshal::get<int32_t>(json, "y");
-  out.id = unmarshal::get<uint32_t>(json, "id");
-}
-
-void from_json(unmarshal::value json, layer& out) {
+void from_json(unmarshal::value json, grid& out) {
   out.collider = unmarshal::get<bool>(json, "collider");
-  out.name = unmarshal::get<std::string_view>(json, "name");
 
+  auto arr = json["tiles"].get_array().value();
   out.tiles.clear();
-  for (auto element : json["tiles"].get_array()) {
-    out.tiles.emplace_back(unmarshal::make<tile>(element));
+  out.tiles.reserve(arr.count_elements().value());
+
+  for (auto element : arr) {
+    out.tiles.emplace_back(static_cast<uint32_t>(element.get_uint64()));
   }
 }
 
@@ -21,9 +17,12 @@ void from_json(unmarshal::document& document, tilemap& out) {
   out._width = unmarshal::get<int32_t>(document, "width");
   out._height = unmarshal::get<int32_t>(document, "height");
 
-  out._layers.clear();
-  for (auto element : document["layers"].get_array()) {
-    out._layers.emplace_back(unmarshal::make<layer>(element));
+  auto layers = document["layers"].get_array().value();
+  out._grids.clear();
+  out._grids.reserve(layers.count_elements().value());
+
+  for (auto element : layers) {
+    out._grids.emplace_back(unmarshal::make<grid>(element));
   }
 }
 
@@ -63,25 +62,6 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourc
     }
   }
 
-  {
-    const auto grid_size = static_cast<size_t>(_width) * static_cast<size_t>(_height);
-
-    _grids.resize(_layers.size());
-
-    for (size_t i = 0; i < _layers.size(); ++i) {
-      auto& grid = _grids[i];
-      grid.collider = _layers[i].collider;
-      grid.tiles.assign(grid_size, 0);
-
-      for (const auto& tile : _layers[i].tiles) {
-        const auto index = static_cast<size_t>(tile.y) * static_cast<size_t>(_width) + static_cast<size_t>(tile.x);
-        grid.tiles[index] = tile.id + 1;
-      }
-    }
-  }
-
-  _layers.clear();
-  _layers.shrink_to_fit();
 }
 
 void tilemap::set_viewport(const quad& value) noexcept {
