@@ -32,6 +32,7 @@ private:
   float _tile_size_f;
   float _inv_tile_size;
   quad _viewport;
+  bool _dirty{true};
 
   std::vector<tile_uv> _uv_table;
   std::vector<grid> _grids;

@@ -4,7 +4,6 @@ void from_json(unmarshal::value json, grid& out) {
   out.collider = unmarshal::get<bool>(json, "collider");
 
   auto arr = json["tiles"].get_array().value();
-  out.tiles.clear();
   out.tiles.reserve(arr.count_elements().value());
 
   for (auto element : arr) {
@@ -18,7 +17,6 @@ void from_json(unmarshal::document& document, tilemap& out) {
   out._height = unmarshal::get<int32_t>(document, "height");
 
   auto layers = document["layers"].get_array().value();
-  out._grids.clear();
   out._grids.reserve(layers.count_elements().value());
 
   for (auto element : layers) {
@@ -65,7 +63,12 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourc
 }
 
 void tilemap::set_viewport(const quad& value) noexcept {
+  if (_viewport == value) [[likely]] {
+    return;
+  }
+
   _viewport = value;
+  _dirty = true;
 
   const auto tiles_x = static_cast<size_t>(value.w * _inv_tile_size) + 2;
   const auto tiles_y = static_cast<size_t>(value.h * _inv_tile_size) + 2;
@@ -76,6 +79,12 @@ void tilemap::set_viewport(const quad& value) noexcept {
 }
 
 void tilemap::update([[maybe_unused]] float delta) noexcept {
+  if (!_dirty) [[likely]] {
+    return;
+  }
+
+  _dirty = false;
+
   _vertices.clear();
   _indices.clear();
 
