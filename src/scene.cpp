@@ -183,11 +183,11 @@ void scene::draw() const noexcept {
   const auto w = static_cast<float>(_background->width());
   const auto h = static_cast<float>(_background->height());
 
-  // _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  // _rendersystem.draw();
+  _rendersystem.draw();
 
-  // _particlesystem.draw();
+  _particlesystem.draw();
 
   _tilemap.draw();
 
