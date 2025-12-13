@@ -1,57 +1,5 @@
 #include "scriptengine.hpp"
 
-namespace {
-  constexpr auto prng_mix = 0xdeadbeefcafebabeULL;
-  constexpr auto prng_inv_max = 1.0 / static_cast<double>(std::numeric_limits<uint64_t>::max());
-
-  std::array<uint64_t, 2> prng_state{};
-
-  void prng_seed(const uint64_t value) noexcept {
-    const auto safe_value = value == 0 ? 1ULL : value;
-    prng_state[0] = safe_value;
-    prng_state[1] = safe_value ^ prng_mix;
-  }
-
-  auto prng_next() noexcept -> uint64_t {
-    const auto s1 = prng_state[0];
-    const auto s0 = prng_state[1];
-    const auto result = s0 + s1;
-    const auto t = s1 ^ (s1 << 23);
-
-    prng_state[0] = s0;
-    prng_state[1] = t ^ s0 ^ (t >> 18) ^ (s0 >> 5);
-
-    return result;
-  }
-
-  auto prng_double() noexcept -> double {
-    return static_cast<double>(prng_next()) * prng_inv_max;
-  }
-
-  auto prng_int_range(const lua_Integer low, const lua_Integer high) noexcept -> lua_Integer {
-    const auto ulow = static_cast<uint64_t>(low);
-    const auto range = static_cast<uint64_t>(high - low + 1);
-    return static_cast<lua_Integer>(ulow + (prng_next() % range));
-  }
-
-  auto prng_int_upper(const lua_Integer upper) noexcept -> lua_Integer {
-    return prng_int_range(1, upper);
-  }
-
-  void prng_seed_lua(const lua_Integer seed_value) noexcept {
-    prng_seed(static_cast<uint64_t>(seed_value));
-  }
-
-  struct prng_initializer final {
-    prng_initializer() noexcept {
-      const auto now = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-      prng_seed(static_cast<uint64_t>(now));
-    }
-  };
-
-  const prng_initializer prng_init{};
-}
-
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
@@ -989,12 +937,12 @@ void scriptengine::run() {
   std::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
 
   lua["math"]["random"] = sol::overload(
-    &prng_double,
-    &prng_int_upper,
-    &prng_int_range
+    []() noexcept { return rng::global().uniform(); },
+    [](lua_Integer upper) noexcept { return rng::global().range<lua_Integer>(1, upper); },
+    [](lua_Integer low, lua_Integer high) noexcept { return rng::global().range<lua_Integer>(low, high); }
   );
 
-  lua["math"]["randomseed"] = &prng_seed_lua;
+  lua["math"]["randomseed"] = [](lua_Integer seed) noexcept { rng::global_seed(static_cast<uint64_t>(seed)); };
 
   lua.script(bootstrap, "@bootstrap");
   lua.script(debugger, "@debugger");

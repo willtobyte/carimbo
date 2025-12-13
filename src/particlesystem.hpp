@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common.hpp"
+#include "random.hpp"
 
 struct particleprops final {
   float x, y;
@@ -8,11 +9,11 @@ struct particleprops final {
   bool active;
   bool spawning;
   std::shared_ptr<pixmap> pixmap;
-  std::minstd_rand rng{std::random_device{}()};
-  std::uniform_real_distribution<float> xspawnd, yspawnd, radiusd, angled;
-  std::uniform_real_distribution<float> xveld, yveld, gxd, gyd;
-  std::uniform_real_distribution<float> scaled, lifed, rotforced, rotveld;
-  std::uniform_int_distribution<unsigned int> alphad;
+  rng::xorshift128plus rng{std::random_device{}()};
+  rng::uniform_real<float> xspawnd, yspawnd, radiusd, angled;
+  rng::uniform_real<float> xveld, yveld, gxd, gyd;
+  rng::uniform_real<float> scaled, lifed, rotforced, rotveld;
+  rng::uniform_int<unsigned int> alphad;
 
   float randradius() noexcept { return radiusd(rng); }
   float randangle() noexcept { return angled(rng); }
