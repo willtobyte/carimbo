@@ -158,13 +158,14 @@ scene::~scene() noexcept {
 void scene::update(float delta) noexcept {
   const auto now = SDL_GetTicks();
 
-  if (_oncamera) {
-    _camera = _oncamera.call<vec2>(delta);
-  }
-
   if (_tilemap) {
+    vec2 camera{};
+    if (_oncamera) {
+      camera = _oncamera.call<vec2>(delta);
+    }
+
     _tilemap->set_viewport({
-        _camera.x, _camera.y,
+        camera.x, camera.y,
         static_cast<float>(_viewport_width),
         static_cast<float>(_viewport_height)});
     _tilemap->update(delta);
