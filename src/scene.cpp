@@ -13,6 +13,8 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
   _hits.reserve(64);
 
+  SDL_GetRenderOutputSize(*_renderer, &_viewport_width, &_viewport_height);
+
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
@@ -33,9 +35,8 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   const auto has_tilemap = unmarshal::contains(document, "tilemap");
 
   if (has_tilemap) {
-    const auto tilemap_name = unmarshal::get<std::string_view>(document, "tilemap");
-    _tilemap.emplace(tilemap_name, resourcemanager); 
-    SDL_GetRenderOutputSize(*_renderer, &_viewport_width, &_viewport_height);
+    const auto name = unmarshal::get<std::string_view>(document, "tilemap");
+    _tilemap.emplace(name, resourcemanager); 
   } else {
     _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
   }
