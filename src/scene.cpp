@@ -39,7 +39,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
     _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
   }
 
-  auto zindex = 0;
+  auto z = 0;
   if (auto objects = unmarshal::find_array(document, "objects")) {
     for (auto element : *objects) {
       auto object = unmarshal::get<unmarshal::object>(element);
@@ -96,7 +96,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       _registry.emplace<physics>(entity);
 
       renderable rd{
-        .z = zindex++
+        .z = z++
       };
       _registry.emplace<renderable>(entity, std::move(rd));
 
@@ -159,10 +159,7 @@ void scene::update(float delta) noexcept {
   const auto now = SDL_GetTicks();
 
   if (_tilemap) {
-    vec2 camera{};
-    if (_oncamera) {
-      camera = _oncamera.call<vec2>(delta);
-    }
+     const auto camera = _oncamera.call<vec2>(delta);
 
     _tilemap->set_viewport({
         camera.x, camera.y,
