@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-#include "parallax.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
 
@@ -101,7 +100,6 @@ private:
   entt::dense_set<entt::entity> _hovering;
 
   std::optional<tilemap> _tilemap;
-  std::optional<parallax> _parallax;
   vec2 _camera{0.f, 0.f};
   int _viewport_width{};
   int _viewport_height{};

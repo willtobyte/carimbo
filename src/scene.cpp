@@ -32,17 +32,11 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
     }
   }
 
-  const auto has_tilemap = unmarshal::contains(document, "tilemap");
-
-  if (has_tilemap) {
+  if (unmarshal::contains(document, "tilemap")) {
     const auto name = unmarshal::get<std::string_view>(document, "tilemap");
     _tilemap.emplace(name, resourcemanager); 
   } else {
     _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
-  }
-
-  if (unmarshal::contains(document, "parallax")) {
-    _parallax.emplace(scene, document, resourcemanager);
   }
 
   auto zindex = 0;
@@ -180,11 +174,6 @@ void scene::update(float delta) noexcept {
   _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
 
-  if (_parallax) {
-    _parallax->set_camera(_camera);
-    _parallax->update(delta);
-  }
-
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
@@ -208,12 +197,11 @@ void scene::update(float delta) noexcept {
 #endif
 
 void scene::draw() const noexcept {
-  if (_parallax) {
-    _parallax->draw_back();
-  } else if (_background) {
-    const auto w = static_cast<float>(_background->width());
-    const auto h = static_cast<float>(_background->height());
-    _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  if (_background) {
+    static const auto width = static_cast<float>(_background->width());
+    static const auto height = static_cast<float>(_background->height());
+
+    _background->draw(.0f, .0f, width, height, .0f, .0f, width, height);
   }
 
   if (_tilemap) {
@@ -223,10 +211,6 @@ void scene::draw() const noexcept {
   _rendersystem.draw();
 
   _particlesystem.draw();
-
-  if (_parallax) {
-    _parallax->draw_front();
-  }
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
