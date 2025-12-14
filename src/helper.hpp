@@ -215,6 +215,10 @@ struct functor final {
     return *this;
   }
 
+  [[nodiscard]] explicit operator bool() const noexcept {
+    return active;
+  }
+
   template<typename... Args>
   void operator()(Args&&... args) const {
     if (!active) [[unlikely]] return;

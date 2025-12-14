@@ -68,7 +68,7 @@ void animationsystem::update(uint64_t now) noexcept {
       s.current_frame = 0;
       s.tick = now;
       s.dirty = false;
-      if (s.timeline && c.on_begin) {
+      if (s.timeline) {
         c.on_begin(c.self);
       }
     }
@@ -103,9 +103,7 @@ void animationsystem::update(uint64_t now) noexcept {
     } else if (is_last & tl.oneshot) {
       s.action = no_action;
       s.timeline = nullptr;
-      if (c.on_end) {
-        c.on_end(c.self);
-      }
+      c.on_end(c.self);
     }
   });
 }
