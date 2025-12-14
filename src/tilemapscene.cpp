@@ -1,17 +1,16 @@
 #include "tilemapscene.hpp"
 
 #include "geometry.hpp"
-#include "scenemanager.hpp"
-#include <SDL3/SDL_render.h>
+
+#include "resourcemanager.hpp"
 
 tilemapscene::tilemapscene(
   std::string_view name,
   unmarshal::document& document,
-  std::weak_ptr<::scenemanager> scenemanager
+  std::weak_ptr<::resourcemanager> resourcemanager
 )
-    : scene(name, document, scenemanager),
-      _tilemap(unmarshal::get<std::string_view>(document, "tilemap"), scenemanager.lock()->resourcemanager()),
-      _parallax(name, document, scenemanager.lock()->resourcemanager()) {
+    : _tilemap(unmarshal::get<std::string_view>(document, "tilemap"), resourcemanager)
+      _parallax(name, document, resourcemanager){
   SDL_GetRenderOutputSize(*_renderer, &_width, &_height);
 }
 
