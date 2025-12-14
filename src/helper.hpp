@@ -201,7 +201,7 @@ struct functor final {
 
   functor() noexcept = default;
   functor(sol::protected_function f) noexcept : fn(std::move(f)), active(fn.valid() && fn.lua_state() != nullptr) {}
-  functor(std::nullptr_t) noexcept = default;
+  functor(std::nullptr_t) noexcept {}
 
   functor& operator=(sol::protected_function f) noexcept {
     fn = std::move(f);
