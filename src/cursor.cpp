@@ -10,7 +10,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
   SDL_HideCursor();
 
   const auto filename = std::format("cursors/{}.json", name);
-  const auto j = unmarshal::parse(io::read(filename)); auto& document = *j;
+  auto json = unmarshal::parse(io::read(filename)); auto& document = *json;
 
   unmarshal::value p;
   document["point"].get(p);

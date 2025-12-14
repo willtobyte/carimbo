@@ -2,7 +2,9 @@
 
 #include "common.hpp"
 
+#include "parallax.hpp"
 #include "systems.hpp"
+#include "tilemap.hpp"
 
 enum class scenekind : uint8_t {
   object = 0,
@@ -10,7 +12,7 @@ enum class scenekind : uint8_t {
   particle
 };
 
-class scene {
+class scene final {
 [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
   auto* const container = static_cast<entt::dense_set<entt::entity>*>(context);
   const auto body = b2Shape_GetBody(shape);
@@ -21,43 +23,43 @@ class scene {
 }
 
 public:
-  scene(std::string_view scene, unmarshal::document& document, std::weak_ptr<::scenemanager> scenemanager);
+  scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager);
 
-  virtual ~scene() noexcept;
+  ~scene() noexcept;
 
-  virtual void update(float delta) noexcept;
+  void update(float delta) noexcept;
 
-  virtual void draw() const noexcept;
+  void draw() const noexcept;
 
   std::string_view name() const noexcept { return ""; }
 
-  virtual std::variant<
+  std::variant<
     std::shared_ptr<entityproxy>,
     std::shared_ptr<soundfx>,
     std::shared_ptr<particleprops>
   > get(std::string_view name, scenekind kind) const;
 
-  virtual void set_onenter(std::function<void()>&& fn);
-  virtual void set_onloop(sol::protected_function&& fn);
-  virtual void set_onleave(std::function<void()>&& fn);
-  virtual void set_ontouch(sol::protected_function&& fn);
-  virtual void set_onkeypress(sol::protected_function&& fn);
-  virtual void set_onkeyrelease(sol::protected_function&& fn);
-  virtual void set_ontext(sol::protected_function&& fn);
-  virtual void set_onmotion(sol::protected_function&& fn);
-  virtual void set_oncamera(sol::protected_function&& fn);
+  void set_onenter(std::function<void()>&& fn);
+  void set_onloop(sol::protected_function&& fn);
+  void set_onleave(std::function<void()>&& fn);
+  void set_ontouch(sol::protected_function&& fn);
+  void set_onkeypress(sol::protected_function&& fn);
+  void set_onkeyrelease(sol::protected_function&& fn);
+  void set_ontext(sol::protected_function&& fn);
+  void set_onmotion(sol::protected_function&& fn);
+  void set_oncamera(sol::protected_function&& fn);
 
-  virtual void on_enter();
-  virtual void on_leave();
-  virtual void on_text(std::string_view text);
-  virtual void on_touch(float x, float y);
-  virtual void on_motion(float x, float y);
-  virtual void on_key_press(int32_t code);
-  virtual void on_key_release(int32_t code);
+  void on_enter();
+  void on_leave();
+  void on_text(std::string_view text);
+  void on_touch(float x, float y);
+  void on_motion(float x, float y);
+  void on_key_press(int32_t code);
+  void on_key_release(int32_t code);
 
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 
-protected:
+private:
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
     auto aabb = b2AABB{};
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
@@ -66,10 +68,9 @@ protected:
     b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
-  std::weak_ptr<scenemanager> _scenemanager;
+  std::shared_ptr<scenemanager> _scenemanager;
   std::shared_ptr<renderer> _renderer;
 
-private:
   entt::registry _registry;
 
   b2WorldId _world;
@@ -94,7 +95,14 @@ private:
   functor _onkeyrelease;
   functor _ontext;
   functor _onmotion;
+  functor _oncamera;
 
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
+
+  std::optional<tilemap> _tilemap;
+  std::optional<parallax> _parallax;
+  vec2 _camera{0.f, 0.f};
+  int _viewport_width{};
+  int _viewport_height{};
 };

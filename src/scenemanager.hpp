@@ -3,11 +3,6 @@
 #include "common.hpp"
 #include <boost/static_string/static_string.hpp>
 
-enum class scenetype : std::uint8_t {
-  backdrop,
-  tilemap
-};
-
 class scenemanager final : public eventreceiver, public std::enable_shared_from_this<scenemanager> {
 public:
   scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer);

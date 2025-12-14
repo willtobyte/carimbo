@@ -41,7 +41,7 @@ struct json final {
 
   json(const json&) = delete;
   json& operator=(const json&) = delete;
-  json(json&&) = delete;
+  json(json&&) = default;
   json& operator=(json&&) = delete;
 
   explicit json(simdjson::padded_string&& buffer)
@@ -79,8 +79,8 @@ struct json final {
   }
 };
 
-[[nodiscard]] inline std::unique_ptr<json> parse(const std::vector<uint8_t>& data) {
-  return std::make_unique<json>(simdjson::padded_string(
+[[nodiscard]] inline json parse(const std::vector<uint8_t>& data) {
+  return json(simdjson::padded_string(
       reinterpret_cast<const char*>(data.data()), data.size()));
 }
 

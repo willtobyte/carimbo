@@ -26,7 +26,7 @@ void from_json(unmarshal::document& document, tilemap& out) {
 
 tilemap::tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager)
     : _renderer(resourcemanager->renderer()) {
-  const auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
+  auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
   from_json(*document, *this);
 
   const auto pixmappool = resourcemanager->pixmappool();

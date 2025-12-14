@@ -20,7 +20,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
   if (inserted) {
     std::println("[fontfactory] cache miss {}", filename);
 
-    const auto j = unmarshal::parse(io::read(filename)); auto& document = *j;
+    auto json = unmarshal::parse(io::read(filename)); auto& document = *json;
 
     const auto glyphs = unmarshal::get<std::string_view>(document, "glyphs");
     const auto spacing = unmarshal::value_or(document, "spacing", int16_t{0});

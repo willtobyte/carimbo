@@ -4,12 +4,6 @@
 #include "io.hpp"
 #include "resourcemanager.hpp"
 #include "scene.hpp"
-#include "tilemapscene.hpp"
-
-[[nodiscard]] static scenetype parse_scenetype(std::string_view str) noexcept {
-  if (str == "tilemap") return scenetype::tilemap;
-  return scenetype::backdrop;
-}
 
 scenemanager::scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer)
     : _resourcemanager(std::move(resourcemanager)),
@@ -20,16 +14,9 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name);
   if (inserted) {
     const auto filename = std::format("scenes/{}.json", name);
-    const auto j = unmarshal::parse(io::read(filename)); auto& document = *j;
+    auto json = unmarshal::parse(io::read(filename)); auto& document = *json;
 
-    const auto type = parse_scenetype(unmarshal::get<std::string_view>(document, "type"));
-
-    switch(type) {
-      case scenetype::tilemap:
-        return it->second = std::make_shared<tilemapscene>(name, document, weak_from_this());
-      default:
-        return it->second = std::make_shared<scene>(name, document, weak_from_this());
-    }
+    return it->second = std::make_shared<scene>(name, document, shared_from_this());
   }
 
   return nullptr;

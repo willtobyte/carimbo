@@ -108,7 +108,7 @@ particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanage
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   const auto filename = std::format("particles/{}.json", kind);
-  const auto document = unmarshal::parse(io::read(filename));
+  auto document = unmarshal::parse(io::read(filename));
 
   particleconfig conf;
   from_json(*document, conf);

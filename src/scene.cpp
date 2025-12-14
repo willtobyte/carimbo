@@ -3,16 +3,12 @@
 #include "entityproxy.hpp"
 #include "geometry.hpp"
 #include "particlesystem.hpp"
-#include "scenemanager.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view scene, unmarshal::document& document, std::weak_ptr<::scenemanager> scenemanager)
-    : _scenemanager(scenemanager),
-      _particlesystem(scenemanager.lock()->resourcemanager()) {
-  const auto locked = _scenemanager.lock();
-  assert(locked && "scenemanager expired");
-
-  _renderer = locked->renderer();
+scene::scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager)
+    : _scenemanager(std::move(scenemanager)),
+      _particlesystem(_scenemanager->resourcemanager()) {
+  _renderer = _scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
   _hits.reserve(64);
@@ -21,9 +17,10 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::weak_pt
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 
-  const auto& soundmanager = locked->resourcemanager()->soundmanager();
-  const auto& pixmappool = locked->resourcemanager()->pixmappool();
-  const auto& fontfactory = locked->resourcemanager()->fontfactory();
+  const auto& resourcemanager = _scenemanager->resourcemanager();
+  const auto& soundmanager = resourcemanager->soundmanager();
+  const auto& pixmappool = resourcemanager->pixmappool();
+  const auto& fontfactory = resourcemanager->fontfactory();
 
   if (auto effects = unmarshal::find_array(document, "effects")) {
     for (auto element : *effects) {
@@ -33,7 +30,19 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::weak_pt
     }
   }
 
-  _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
+  const auto has_tilemap = unmarshal::contains(document, "tilemap");
+
+  if (has_tilemap) {
+    const auto tilemap_name = unmarshal::get<std::string_view>(document, "tilemap");
+    _tilemap.emplace(tilemap_name, resourcemanager); 
+    SDL_GetRenderOutputSize(*_renderer, &_viewport_width, &_viewport_height);
+  } else {
+    _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
+  }
+
+  if (unmarshal::contains(document, "parallax")) {
+    _parallax.emplace(scene, document, resourcemanager);
+  }
 
   auto zindex = 0;
   if (auto objects = unmarshal::find_array(document, "objects")) {
@@ -47,7 +56,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::weak_pt
       const auto y = unmarshal::value_or(object, "y", .0f);
 
       const auto filename = std::format("objects/{}/{}.json", scene, kind);
-      const auto j = unmarshal::parse(io::read(filename)); auto& dobject = *j;
+      auto json = unmarshal::parse(io::read(filename)); auto& dobject = *json;
 
       const auto entity = _registry.create();
 
@@ -154,9 +163,26 @@ scene::~scene() noexcept {
 void scene::update(float delta) noexcept {
   const auto now = SDL_GetTicks();
 
+  if (_oncamera) {
+    _camera = _oncamera.call<vec2>(delta);
+  }
+
+  if (_tilemap) {
+    _tilemap->set_viewport({
+        _camera.x, _camera.y,
+        static_cast<float>(_viewport_width),
+        static_cast<float>(_viewport_height)});
+    _tilemap->update(delta);
+  }
+
   _animationsystem.update(now);
   _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
+
+  if (_parallax) {
+    _parallax->set_camera(_camera);
+    _parallax->update(delta);
+  }
 
   if (const auto fn = _onloop; fn) {
     fn(delta);
@@ -181,14 +207,25 @@ void scene::update(float delta) noexcept {
 #endif
 
 void scene::draw() const noexcept {
-  const auto w = static_cast<float>(_background->width());
-  const auto h = static_cast<float>(_background->height());
+  if (_parallax) {
+    _parallax->draw_back();
+  } else if (_background) {
+    const auto w = static_cast<float>(_background->width());
+    const auto h = static_cast<float>(_background->height());
+    _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  }
 
-  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  if (_tilemap) {
+    _tilemap->draw();
+  }
 
   _rendersystem.draw();
 
   _particlesystem.draw();
+
+  if (_parallax) {
+    _parallax->draw_front();
+  }
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
@@ -268,7 +305,8 @@ void scene::set_onmotion(sol::protected_function&& fn) {
   _onmotion = std::move(fn);
 }
 
-void scene::set_oncamera([[maybe_unused]] sol::protected_function&& fn) {
+void scene::set_oncamera(sol::protected_function&& fn) {
+  _oncamera = std::move(fn);
 }
 
 void scene::on_enter() {
