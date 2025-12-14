@@ -105,6 +105,7 @@ class scriptengine;
 class soundfx;
 class soundmanager;
 class statemanager;
+class tilemap;
 class timermanager;
 class widget;
 class window;

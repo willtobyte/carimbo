@@ -4,8 +4,6 @@
 
 #include "systems.hpp"
 
-#include "tilemap.hpp"
-
 enum class scenekind : uint8_t {
   object = 0,
   effect,
@@ -23,39 +21,39 @@ class scene {
 }
 
 public:
-  scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<scenemanager> scenemanager);
+  scene(std::string_view scene, unmarshal::document& document, std::weak_ptr<::scenemanager> scenemanager);
 
   virtual ~scene() noexcept;
 
-  void update(float delta) noexcept;
+  virtual void update(float delta) noexcept;
 
-  void draw() const noexcept;
+  virtual void draw() const noexcept;
 
   std::string_view name() const noexcept { return ""; }
 
-  std::variant<
+  virtual std::variant<
     std::shared_ptr<entityproxy>,
     std::shared_ptr<soundfx>,
     std::shared_ptr<particleprops>
   > get(std::string_view name, scenekind kind) const;
 
-  void set_onenter(std::function<void()>&& fn);
-  void set_onloop(sol::protected_function&& fn);
-  void set_oncamera(sol::protected_function&& fn);
-  void set_onleave(std::function<void()>&& fn);
-  void set_ontouch(sol::protected_function&& fn);
-  void set_onkeypress(sol::protected_function&& fn);
-  void set_onkeyrelease(sol::protected_function&& fn);
-  void set_ontext(sol::protected_function&& fn);
-  void set_onmotion(sol::protected_function&& fn);
+  virtual void set_onenter(std::function<void()>&& fn);
+  virtual void set_onloop(sol::protected_function&& fn);
+  virtual void set_onleave(std::function<void()>&& fn);
+  virtual void set_ontouch(sol::protected_function&& fn);
+  virtual void set_onkeypress(sol::protected_function&& fn);
+  virtual void set_onkeyrelease(sol::protected_function&& fn);
+  virtual void set_ontext(sol::protected_function&& fn);
+  virtual void set_onmotion(sol::protected_function&& fn);
+  virtual void set_oncamera(sol::protected_function&& fn);
 
-  void on_enter();
-  void on_leave();
-  void on_text(std::string_view text);
-  void on_touch(float x, float y);
-  void on_motion(float x, float y);
-  void on_key_press(int32_t code);
-  void on_key_release(int32_t code);
+  virtual void on_enter();
+  virtual void on_leave();
+  virtual void on_text(std::string_view text);
+  virtual void on_touch(float x, float y);
+  virtual void on_motion(float x, float y);
+  virtual void on_key_press(int32_t code);
+  virtual void on_key_release(int32_t code);
 
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 
@@ -68,6 +66,9 @@ protected:
     b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
+  std::weak_ptr<scenemanager> _scenemanager;
+  std::shared_ptr<renderer> _renderer;
+
 private:
   entt::registry _registry;
 
@@ -76,9 +77,6 @@ private:
   animationsystem _animationsystem{_registry};
   physicssystem _physicssystem{_registry};
   rendersystem _rendersystem{_registry};
-
-  std::shared_ptr<scenemanager> _scenemanager;
-  std::shared_ptr<renderer> _renderer;
   std::shared_ptr<::timermanager> _timermanager;
   std::shared_ptr<pixmap> _background;
 
@@ -91,7 +89,6 @@ private:
   std::function<void()> _onenter;
   std::function<void()> _onleave;
   functor _onloop;
-  functor _oncamera;
   functor _ontouch;
   functor _onkeypress;
   functor _onkeyrelease;
@@ -100,11 +97,4 @@ private:
 
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
-
-  tilemap _tilemap;
 };
-
-// class tilemapscene : public scene {
-// public:
-//   virtual ~tilemapscene() noexcept = default;
-// };

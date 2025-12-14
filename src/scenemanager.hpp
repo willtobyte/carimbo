@@ -3,16 +3,10 @@
 #include "common.hpp"
 #include <boost/static_string/static_string.hpp>
 
-enum scenetype : std::uint8_t {
+enum class scenetype : std::uint8_t {
   backdrop,
-  // tilemap
+  tilemap
 };
-
-[[nodiscard]] inline scenetype parse_scenetype(std::string_view str) noexcept {
-  if (str == "backdrop") return scenetype::backdrop;
-  // if (str == "tilemap") return scenetype::tilemap;
-  return scenetype::backdrop;
-}
 
 class scenemanager final : public eventreceiver, public std::enable_shared_from_this<scenemanager> {
 public:

@@ -6,21 +6,24 @@
 #include "scenemanager.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<scenemanager> scenemanager)
-    : _scenemanager(std::move(scenemanager)),
-      _renderer(_scenemanager->renderer()),
-      _timermanager(std::make_shared<::timermanager>()),
-      _particlesystem(_scenemanager->resourcemanager()),
-      _tilemap("greenhill", _scenemanager->resourcemanager()) {
+scene::scene(std::string_view scene, unmarshal::document& document, std::weak_ptr<::scenemanager> scenemanager)
+    : _scenemanager(scenemanager),
+      _particlesystem(scenemanager.lock()->resourcemanager()) {
+  const auto locked = _scenemanager.lock();
+  assert(locked && "scenemanager expired");
+
+  _renderer = locked->renderer();
+  _timermanager = std::make_shared<::timermanager>();
+
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 
-  const auto& soundmanager = _scenemanager->resourcemanager()->soundmanager();
-  const auto& pixmappool = _scenemanager->resourcemanager()->pixmappool();
-  const auto& fontfactory = _scenemanager->resourcemanager()->fontfactory();
+  const auto& soundmanager = locked->resourcemanager()->soundmanager();
+  const auto& pixmappool = locked->resourcemanager()->pixmappool();
+  const auto& fontfactory = locked->resourcemanager()->fontfactory();
 
   if (auto effects = unmarshal::find_array(document, "effects")) {
     for (auto element : *effects) {
@@ -155,12 +158,6 @@ void scene::update(float delta) noexcept {
   _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
 
-  int width, height;
-  SDL_GetRenderOutputSize(*_renderer, &width, &height);
-  _tilemap.set_viewport({0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height)});
-
-  _tilemap.update(delta);
-
   if (const auto fn = _onloop; fn) {
     fn(delta);
   }
@@ -187,13 +184,11 @@ void scene::draw() const noexcept {
   const auto w = static_cast<float>(_background->width());
   const auto h = static_cast<float>(_background->height());
 
-  // _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+  _background->draw(.0f, .0f, w, h, .0f, .0f, w, h);
 
-  // _rendersystem.draw();
+  _rendersystem.draw();
 
-  // _particlesystem.draw();
-
-  _tilemap.draw();
+  _particlesystem.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
@@ -249,10 +244,6 @@ void scene::set_onloop(sol::protected_function&& fn) {
   _onloop = std::move(fn);
 }
 
-void scene::set_oncamera(sol::protected_function&& fn) {
-  _oncamera = std::move(fn);
-}
-
 void scene::set_onleave(std::function<void()>&& fn) {
   _onleave = std::move(fn);
 }
@@ -275,6 +266,9 @@ void scene::set_ontext(sol::protected_function&& fn) {
 
 void scene::set_onmotion(sol::protected_function&& fn) {
   _onmotion = std::move(fn);
+}
+
+void scene::set_oncamera([[maybe_unused]] sol::protected_function&& fn) {
 }
 
 void scene::on_enter() {
