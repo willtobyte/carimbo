@@ -172,9 +172,7 @@ void scene::update(float delta) noexcept {
   _physicssystem.update(_world, delta);
   _particlesystem.update(delta);
 
-  if (const auto fn = _onloop; fn) {
-    fn(delta);
-  }
+  _onloop(delta);
 }
 
 #ifdef DEBUG
@@ -315,9 +313,7 @@ void scene::on_touch(float x, float y) {
   query(x, y, _hits);
 
   if (_hits.empty()) {
-    if (const auto fn = _ontouch; fn) {
-      fn(x, y);
-    }
+    _ontouch(x, y);
     return;
   }
 
@@ -348,27 +344,19 @@ void scene::on_motion(float x, float y) {
 
   _hovering.swap(_hits);
 
-  if (const auto fn = _onmotion; fn) {
-    fn(x, y);
-  }
+  _onmotion(x, y);
 }
 
 void scene::on_key_press(int32_t code) {
-  if (const auto fn = _onkeypress; fn) {
-    fn(code);
-  }
+  _onkeypress(code);
 }
 
 void scene::on_key_release(int32_t code) {
-  if (const auto fn = _onkeyrelease; fn) {
-    fn(code);
-  }
+  _onkeyrelease(code);
 }
 
 void scene::on_text(std::string_view text) {
-  if (const auto fn = _ontext; fn) {
-    fn(text);
-  }
+  _ontext(text);
 }
 
 std::shared_ptr<timermanager> scene::timermanager() const noexcept {

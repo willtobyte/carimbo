@@ -197,28 +197,27 @@ template<typename T>
 
 struct functor final {
   sol::protected_function fn;
+  bool active = false;
 
   functor() noexcept = default;
-  functor(sol::protected_function f) noexcept : fn(std::move(f)) {}
-  functor(std::nullptr_t) noexcept : fn() {}
+  functor(sol::protected_function f) noexcept : fn(std::move(f)), active(fn.valid() && fn.lua_state() != nullptr) {}
+  functor(std::nullptr_t) noexcept = default;
 
   functor& operator=(sol::protected_function f) noexcept {
     fn = std::move(f);
+    active = fn.valid() && fn.lua_state() != nullptr;
     return *this;
   }
 
   functor& operator=(std::nullptr_t) noexcept {
     fn = sol::protected_function();
+    active = false;
     return *this;
-  }
-
-  [[nodiscard]] explicit operator bool() const noexcept {
-    return fn.valid() && fn.lua_state() != nullptr;
   }
 
   template<typename... Args>
   void operator()(Args&&... args) const {
-    if (!fn.valid() || !fn.lua_state()) [[unlikely]] return;
+    if (!active) [[unlikely]] return;
     const auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
       const auto error_msg = sol::stack::get<std::string>(result.lua_state(), result.stack_index());
@@ -229,7 +228,7 @@ struct functor final {
 
   template<typename R, typename... Args>
   [[nodiscard]] R call(Args&&... args) const {
-    if (!fn.valid() || !fn.lua_state()) [[unlikely]] return R{};
+    if (!active) [[unlikely]] return R{};
     const auto result = fn(std::forward<Args>(args)...);
     if (!result.valid()) [[unlikely]] {
       throw std::runtime_error(sol::stack::get<std::string>(result.lua_state(), result.stack_index()));

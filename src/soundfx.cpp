@@ -68,9 +68,7 @@ void soundfx::play(bool loop) const noexcept {
   _notified = false;
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);
-  if (const auto fn = _onbegin; fn) {
-    fn();
-  }
+  _onbegin();
 }
 
 void soundfx::stop() const noexcept {
@@ -90,9 +88,7 @@ void soundfx::update(float delta) {
   }
 
   _notified = true;
-  if (const auto fn = _onend; fn) {
-    fn();
-  }
+  _onend();
 }
 
 void soundfx::set_volume(float gain) noexcept {
