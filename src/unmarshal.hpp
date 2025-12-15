@@ -161,7 +161,7 @@ template <typename T>
 }
 
 template <typename T>
-[[nodiscard]] inline array array(T&& source, std::string_view key) noexcept {
+[[nodiscard]] inline array get_array(T&& source, std::string_view key) noexcept {
   array out;
   source[key].get_array().get(out);
   return out;
