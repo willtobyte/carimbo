@@ -160,6 +160,19 @@ template <typename T>
   return out;
 }
 
+template <typename T>
+[[nodiscard]] inline array array(T&& source, std::string_view key) noexcept {
+  array out;
+  source[key].get_array().get(out);
+  return out;
+}
+
+[[nodiscard]] inline size_t count(array& arr) noexcept {
+  size_t out;
+  arr.count_elements().get(out);
+  return out;
+}
+
 [[nodiscard]] inline std::string_view key(auto&& field) noexcept {
   std::string_view out;
   field.unescaped_key().get(out);

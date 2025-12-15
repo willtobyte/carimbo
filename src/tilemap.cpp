@@ -3,17 +3,11 @@
 void from_json(unmarshal::value json, grid& out) {
   out.collider = unmarshal::get<bool>(json, "collider");
 
-  unmarshal::array array;
-  json["tiles"].get_array().get(array);
-
-  size_t count;
-  array.count_elements().get(count);
-  out.tiles.reserve(count);
+  auto array = unmarshal::array(json, "tiles");
+  out.tiles.reserve(unmarshal::count(array));
 
   for (auto element : array) {
-    uint64_t value;
-    element.get_uint64().get(value);
-    out.tiles.emplace_back(static_cast<uint32_t>(value));
+    out.tiles.emplace_back(static_cast<uint32_t>(unmarshal::get<uint64_t>(element)));
   }
 }
 
@@ -22,12 +16,8 @@ void from_json(unmarshal::document& document, tilemap& out) {
   out._width = unmarshal::get<int32_t>(document, "width");
   out._height = unmarshal::get<int32_t>(document, "height");
 
-  unmarshal::array layers;
-  document["layers"].get_array().get(layers);
-
-  size_t count;
-  layers.count_elements().get(count);
-  out._grids.reserve(count);
+  auto layers = unmarshal::array(document, "layers");
+  out._grids.reserve(unmarshal::count(layers));
 
   for (auto element : layers) {
     out._grids.emplace_back(unmarshal::make<grid>(element));
