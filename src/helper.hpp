@@ -197,7 +197,7 @@ template<typename T>
 
 struct functor final {
   sol::protected_function fn;
-  bool active = false;
+  bool active{false};
 
   functor() noexcept = default;
   functor(sol::protected_function f) noexcept : fn(std::move(f)), active(fn.valid() && fn.lua_state() != nullptr) {}
