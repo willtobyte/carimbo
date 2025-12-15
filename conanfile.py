@@ -31,21 +31,26 @@ class Carimbo(ConanFile):
         return self._os_name in {"macos", "windows"}
 
     def requirements(self):
-        self.requires("boost/1.89.0")
-        self.requires("box2d/3.1.1")
-        self.requires("entt/3.15.0")
-        self.requires("simdjson/4.2.2")
-        self.requires("openal-soft/1.23.1")
-        self.requires("physfs/3.2.0")
-        self.requires("sdl/3.2.20")
-        self.requires("sol2/3.5.0")
-        self.requires("stb/cci.20240531")
+        for package in [
+            "boost/1.89.0",
+            "box2d/3.1.1",
+            "entt/3.15.0",
+            "simdjson/4.2.2",
+            "openal-soft/1.23.1",
+            "physfs/3.2.0",
+            "sdl/3.2.20",
+            "sol2/3.5.0",
+            "stb/cci.20240531",
+        ]:
+            self.requires(package)
 
-        if self._is_jit_capable:
-            self.requires("luajit/2.1.0-beta3")
-
-        if self._has_sentry:
-            self.requires("sentry-native/0.12.1")
+        for package, condition in [
+            ("luajit/2.1.0-beta3", self._is_jit_capable),
+            ("sentry-native/0.12.1", self._has_sentry),
+            ("openssl/3.6.0", not self._is_webassembly),
+        ]:
+            if condition:
+                self.requires(package)
 
     def configure(self):
         self.options["boost"].header_only = True
@@ -73,9 +78,6 @@ class Carimbo(ConanFile):
             self.options["sentry-native"].with_crashpad = "sentry"
             self.options["sentry-native"].shared = False
 
-        if not self._is_webassembly:
-            self.requires("openssl/3.6.0")
-
     def generate(self):
         license_output = Path(self.build_folder) / "LICENSES"
         with license_output.open("w", encoding="utf-8") as out:
@@ -95,16 +97,14 @@ class Carimbo(ConanFile):
 
         toolchain = CMakeToolchain(self)
 
-        if self._is_jit_capable:
-            toolchain.preprocessor_definitions["HAS_LUAJIT"] = "ON"
-
-        if self._has_steam:
-            toolchain.preprocessor_definitions["HAS_STEAM"] = "ON"
-            toolchain.cache_variables["HAS_STEAM"] = "ON"
-
-        if self._has_sentry:
-            toolchain.preprocessor_definitions["HAS_SENTRY"] = "ON"
-            toolchain.cache_variables["HAS_SENTRY"] = "ON"
+        for flag, condition in [
+            ("HAS_LUAJIT", self._is_jit_capable),
+            ("HAS_STEAM", self._has_steam),
+            ("HAS_SENTRY", self._has_sentry),
+        ]:
+            if condition:
+                toolchain.preprocessor_definitions[flag] = "ON"
+                toolchain.cache_variables[flag] = "ON"
 
         toolchain.generate()
         CMakeDeps(self).generate()
