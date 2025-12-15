@@ -6,23 +6,29 @@ from pathlib import Path
 class Carimbo(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
 
+    @property
     def _os_name(self):
         return str(self.settings.os).lower()
 
+    @property
     def _is_webassembly(self):
-        return self._os_name() == "emscripten"
+        return self._os_name == "emscripten"
 
+    @property
     def _is_jit_capable(self):
-        return self._os_name() in {"linux", "macos", "windows"}
+        return self._os_name in {"linux", "macos", "windows"}
 
+    @property
     def _is_ios(self):
-        return self._os_name() == "ios"
+        return self._os_name == "ios"
 
-    def _have_steam(self):
-        return self._os_name() in {"macos", "windows"}
+    @property
+    def _has_steam(self):
+        return self._os_name in {"macos", "windows"}
 
-    def _have_sentry(self):
-        return self._os_name() in {"macos", "windows"}
+    @property
+    def _has_sentry(self):
+        return self._os_name in {"macos", "windows"}
 
     def requirements(self):
         self.requires("boost/1.89.0")
@@ -35,16 +41,16 @@ class Carimbo(ConanFile):
         self.requires("sol2/3.5.0")
         self.requires("stb/cci.20240531")
 
-        if self._is_jit_capable():
+        if self._is_jit_capable:
             self.requires("luajit/2.1.0-beta3")
 
-        if self._have_sentry():
+        if self._has_sentry:
             self.requires("sentry-native/0.12.1")
 
     def configure(self):
         self.options["boost"].header_only = True
 
-        self.options["sol2"].with_lua = "luajit" if self._is_jit_capable() else "lua"
+        self.options["sol2"].with_lua = "luajit" if self._is_jit_capable else "lua"
 
         for opt in [
             "sevenzip",
@@ -59,15 +65,15 @@ class Carimbo(ConanFile):
         ]:
             setattr(self.options["physfs"], opt, False)
 
-        if self._is_ios():
+        if self._is_ios:
             self.options["sdl"].opengl = False
 
-        if self._have_sentry():
+        if self._has_sentry:
             self.options["sentry-native"].backend = "crashpad"
             self.options["sentry-native"].with_crashpad = "sentry"
             self.options["sentry-native"].shared = False
 
-        if not self._is_webassembly():
+        if not self._is_webassembly:
             self.requires("openssl/3.6.0")
 
     def generate(self):
@@ -89,14 +95,14 @@ class Carimbo(ConanFile):
 
         toolchain = CMakeToolchain(self)
 
-        if self._is_jit_capable():
+        if self._is_jit_capable:
             toolchain.preprocessor_definitions["HAS_LUAJIT"] = "ON"
 
-        if self._have_steam():
+        if self._has_steam:
             toolchain.preprocessor_definitions["HAS_STEAM"] = "ON"
             toolchain.cache_variables["HAS_STEAM"] = "ON"
 
-        if self._have_sentry():
+        if self._has_sentry:
             toolchain.preprocessor_definitions["HAS_SENTRY"] = "ON"
             toolchain.cache_variables["HAS_SENTRY"] = "ON"
 
