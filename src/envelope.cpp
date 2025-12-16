@@ -1,13 +1,16 @@
 #include "envelope.hpp"
 
 mailenvelope::mailenvelope(std::pmr::memory_resource* mr)
-  : to(0), kind(mr), body(mr) {
+    : to(0), kind(mr), body(mr) {
   kind.reserve(32);
   body.reserve(256);
 }
 
-mailenvelope::mailenvelope(const uint64_t to, const std::string_view kind, const std::string_view body, std::pmr::memory_resource* mr)
-  : to(to), kind(kind, mr), body(body, mr) {}
+void mailenvelope::set(uint64_t to_, std::string_view kind_, std::string_view body_) {
+  to = to_;
+  kind.assign(kind_);
+  body.assign(body_);
+}
 
 void mailenvelope::clear() noexcept {
   to = 0;
@@ -15,11 +18,10 @@ void mailenvelope::clear() noexcept {
   body.clear();
 }
 
-timerenvelope::timerenvelope(const bool repeat, functor&& fn) noexcept
-  : repeat(repeat), fn(std::move(fn)) {}
-
-timerenvelope::timerenvelope() noexcept
-  : repeat(false), fn() {}
+void timerenvelope::set(bool repeat_, functor&& fn_) noexcept {
+  repeat = repeat_;
+  fn = std::move(fn_);
+}
 
 void timerenvelope::clear() noexcept {
   repeat = false;
@@ -27,20 +29,24 @@ void timerenvelope::clear() noexcept {
 }
 
 envelope::envelope(std::pmr::memory_resource* mr)
-  : _mr(mr), payload(std::monostate{}) {}
+    : _mr(mr), payload(std::in_place_type<mailenvelope>, mr) {}
 
-void envelope::reset(mailenvelope&& envelope) {
-  if (auto* current = std::get_if<mailenvelope>(&payload)) {
-    current->to = envelope.to;
-    current->kind = std::move(envelope.kind);
-    current->body = std::move(envelope.body);
-  } else {
-    payload.emplace<mailenvelope>(envelope.to, envelope.kind, envelope.body, _mr);
+void envelope::reset(uint64_t to, std::string_view kind, std::string_view body) {
+  auto* mail = std::get_if<mailenvelope>(&payload);
+  if (!mail) {
+    payload.emplace<mailenvelope>(_mr);
+    mail = std::get_if<mailenvelope>(&payload);
   }
+  mail->set(to, kind, body);
 }
 
-void envelope::reset(timerenvelope&& envelope) noexcept {
-  payload.emplace<timerenvelope>(std::move(envelope));
+void envelope::reset(bool repeat, functor&& fn) {
+  auto* timer = std::get_if<timerenvelope>(&payload);
+  if (!timer) {
+    payload.emplace<timerenvelope>();
+    timer = std::get_if<timerenvelope>(&payload);
+  }
+  timer->set(repeat, std::move(fn));
 }
 
 void envelope::reset() noexcept {
@@ -49,8 +55,6 @@ void envelope::reset() noexcept {
   } else if (auto* timer = std::get_if<timerenvelope>(&payload)) {
     timer->clear();
   }
-
-  payload.emplace<std::monostate>();
 }
 
 const mailenvelope* envelope::try_mail() const noexcept {

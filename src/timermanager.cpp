@@ -1,5 +1,9 @@
 #include "timermanager.hpp"
 
+#include "envelope.hpp"
+#include "event.hpp"
+#include "objectpool.hpp"
+
 constexpr auto event_type = static_cast<uint32_t>(event::type::timer);
 
 struct context final {
@@ -92,7 +96,9 @@ void timermanager::clear() noexcept {
 }
 
 uint32_t timermanager::add_timer(uint32_t interval, functor&& fn, bool repeat) noexcept {
-  auto* ptr = _envelopepool.acquire(timerenvelope(repeat, std::move(fn))).release();
+  auto envelope = _envelopepool.acquire();
+  envelope->reset(repeat, std::move(fn));
+  auto* ptr = envelope.release();
 
   const auto id = SDL_AddTimer(interval, repeat ? wrapper : singleshot_wrapper, ptr);
   assert(id != 0 && std::format("[SDL_AddTimer] {}", SDL_GetError()).c_str());

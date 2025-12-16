@@ -5,81 +5,79 @@
 #include "singleton.hpp"
 #include "envelope.hpp"
 
+inline constexpr size_t PoolInitialCapacity = 512;
 
-const constexpr auto InitialCapacity = 512uz;
-const constexpr auto ChunkSize = 64uz;
 class envelopepool_impl final {
-private:
-  struct pmr_deleter final {
-    envelopepool_impl* pool;
-    void operator()(envelope* ptr) const noexcept {
-      if (pool && ptr) pool->recycle(ptr);
-    }
-  };
-
 public:
-  using envelope_ptr = std::unique_ptr<envelope, pmr_deleter>;
+  using envelope_ptr = std::unique_ptr<envelope, void(*)(envelope*)>;
 
 private:
-  std::pmr::unsynchronized_pool_resource _pool{{.max_blocks_per_chunk = ChunkSize, .largest_required_pool_block = sizeof(envelope)}};
-  std::pmr::vector<envelope*> _available{&_pool};
+  std::pmr::monotonic_buffer_resource _upstream;
+  std::pmr::unsynchronized_pool_resource _pool{&_upstream};
+  std::pmr::vector<envelope*> _all{&_upstream};
+  std::pmr::vector<envelope*> _free{&_upstream};
 
-  void expand(size_t minimum) {
-    size_t target = _available.capacity();
-    if (target == 0) target = 1;
-
+  void expand(size_t minimum = 0) {
+    size_t target = _all.capacity();
+    target = target == 0 ? 1 : target;
     target = boost::core::bit_ceil(std::max(target, minimum)) << 1;
 
-    _available.reserve(target);
+    _all.reserve(target);
+    _free.reserve(target);
 
-    for (auto count = target - _available.size(); count-- > 0uz;) {
-      void* mem = _pool.allocate(sizeof(envelope), alignof(envelope));
-      _available.emplace_back(std::construct_at(static_cast<envelope*>(mem), &_pool));
+    for (size_t i = _all.size(); i < target; ++i) {
+      auto* ptr = std::construct_at(
+        static_cast<envelope*>(_pool.allocate(sizeof(envelope), alignof(envelope))),
+        &_pool
+      );
+      _all.emplace_back(ptr);
+      _free.emplace_back(ptr);
     }
 
-    std::println("[pool<envelope>] expanded to {} objects", target);
+    std::println("[envelopepool] expanded to {} objects", target);
   }
 
-  void recycle(envelope* ptr) noexcept {
-    ptr->reset();
-    _available.emplace_back(ptr);
-  }
+  static void release_envelope(envelope* ptr) noexcept;
 
 public:
-  envelopepool_impl() {
-    expand(InitialCapacity);
-  }
+  envelopepool_impl() { expand(PoolInitialCapacity); }
+  ~envelopepool_impl() = default;
 
-  ~envelopepool_impl() {
-    for (envelope* ptr : _available) {
-      if (ptr) {
-        std::destroy_at(ptr);
-        _pool.deallocate(ptr, sizeof(envelope), alignof(envelope));
-      }
-    }
-  }
+  envelopepool_impl(const envelopepool_impl&) = delete;
+  envelopepool_impl& operator=(const envelopepool_impl&) = delete;
 
   template<typename... Args>
   [[nodiscard]] envelope_ptr acquire(Args&&... args) {
-    if (_available.empty()) {
-      expand(_available.capacity());
+    if (_free.empty()) [[unlikely]] {
+      expand(_all.capacity());
     }
-
-    envelope* ptr = _available.back();
-    _available.pop_back();
+    auto* ptr = _free.back();
+    _free.pop_back();
 
     if constexpr (sizeof...(Args) > 0) {
       ptr->reset(std::forward<Args>(args)...);
     }
 
-    return envelope_ptr(ptr, pmr_deleter{this});
+    return {ptr, release_envelope};
   }
 
   void release(envelope* ptr) noexcept {
     if (ptr) {
-      recycle(ptr);
+      ptr->reset();
+      _free.emplace_back(ptr);
     }
+  }
+
+  [[nodiscard]] std::pmr::memory_resource* resource() noexcept {
+    return &_pool;
   }
 };
 
 using envelopepool = singleton<envelopepool_impl>;
+
+inline void envelopepool_impl::release_envelope(envelope* ptr) noexcept {
+  if (ptr) {
+    ptr->reset();
+    envelopepool::instance()._free.emplace_back(ptr);
+  }
+}
