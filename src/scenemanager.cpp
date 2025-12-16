@@ -56,6 +56,7 @@ boost::container::small_vector<std::string, 8> scenemanager::query(std::string_v
       if (key == _current) continue;
       result.emplace_back(key);
     }
+
     return result;
   }
 
