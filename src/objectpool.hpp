@@ -30,11 +30,10 @@ private:
         static_cast<envelope*>(_pool.allocate(sizeof(envelope), alignof(envelope))),
         &_pool
       );
+
       _all.emplace_back(ptr);
       _free.emplace_back(ptr);
     }
-
-    std::println("[envelopepool] expanded to {} objects", target);
   }
 
   static void release_envelope(envelope* ptr) noexcept;
