@@ -1,6 +1,4 @@
 #include "entityproxy.hpp"
-#include "components.hpp"
-#include "helper.hpp"
 
 entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept
   : _entity(entity), _registry(registry) {
@@ -152,7 +150,7 @@ void entityproxy::set_onend(sol::protected_function fn) {
 std::shared_ptr<entityproxy> entityproxy::clone() {
   const auto e = _registry.create();
 
-  const auto [m, tn, sp, pb, tf, at, ori, rn] = _registry.try_get<metadata, tint, sprite, playback, transform, atlas, orientation, renderable>(_entity);
+  auto [m, tn, sp, pb, tf, at, ori, rn] = _registry.try_get<metadata, tint, sprite, playback, transform, atlas, orientation, renderable>(_entity);
 
   if (m) {
     _registry.emplace<metadata>(e, *m);
@@ -190,9 +188,8 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   _registry.emplace<physics>(e, std::move(ph));
 
   if (rn) {
-    renderable crn = *rn;
-    crn.z = rn->z + 1;
-    _registry.emplace<renderable>(e, std::move(crn));
+    rn->z = rn->z + 1;
+    _registry.emplace<renderable>(e, *rn);
   }
 
   const auto proxy = std::make_shared<entityproxy>(e, _registry);
