@@ -137,6 +137,7 @@ void engine::_loop() {
   _renderer->begin();
   _scenemanager->draw();
   _overlay->draw();
+  _canvas->draw();
   _renderer->end();
 
   for (const auto& observer : _observers) {
