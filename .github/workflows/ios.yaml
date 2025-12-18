@@ -62,6 +62,16 @@ jobs:
           tools.build:cflags=["-DLUA_USE_IOS=1"]
           EOF
 
+      - name: Cache Conan packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-ios-release-${{ hashFiles('conanfile.py') }}
+          restore-keys: |
+            conan-${{ runner.os }}-ios-release-
+            conan-${{ runner.os }}-ios-
+            conan-${{ runner.os }}-
+
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --profile=ios --settings compiler.cppstd=23 --settings build_type=Release
 

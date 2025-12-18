@@ -68,6 +68,16 @@ jobs:
           user.sdl:android=True
           EOF
 
+      - name: Cache Conan packages
+        uses: actions/cache@v5
+        with:
+          path: ~/.conan2/p
+          key: conan-${{ runner.os }}-android-release-${{ hashFiles('conanfile.py') }}
+          restore-keys: |
+            conan-${{ runner.os }}-android-release-
+            conan-${{ runner.os }}-android-
+            conan-${{ runner.os }}-
+
       - name: Install dependencies
         run: conan install . --output-folder=build --build=missing --profile=android --settings compiler.cppstd=20 --settings build_type=Release
 
