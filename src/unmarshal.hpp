@@ -8,11 +8,10 @@ using array = simdjson::ondemand::array;
 
 class pool final {
 public:
-  [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
-    if (_depth >= _parsers.size()) {
-      _parsers.emplace_back();
-    }
+  static constexpr size_t max_depth = 4;
 
+  [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
+    assert(_depth < max_depth && "parser pool overflow");
     return _parsers[_depth++];
   }
 
@@ -27,11 +26,7 @@ public:
   }
 
 private:
-  pool() {
-    _parsers.reserve(4);
-  }
-
-  std::vector<simdjson::ondemand::parser> _parsers;
+  std::array<simdjson::ondemand::parser, max_depth> _parsers;
   size_t _depth{0};
 };
 

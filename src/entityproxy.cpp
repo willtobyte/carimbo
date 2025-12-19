@@ -150,7 +150,7 @@ void entityproxy::set_onend(sol::protected_function fn) {
 std::shared_ptr<entityproxy> entityproxy::clone() {
   const auto e = _registry.create();
 
-  auto [m, tn, sp, pb, tf, at, ori, rn] = _registry.try_get<metadata, tint, sprite, playback, transform, atlas, orientation, renderable>(_entity);
+  auto [m, tn, sp, pb, tf, at, ori, rn] = _registry.try_get<metadata, tint, sprite, playback, transform, std::shared_ptr<const atlas>, orientation, renderable>(_entity);
 
   if (m) {
     _registry.emplace<metadata>(e, *m);
@@ -176,7 +176,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   }
 
   if (at) {
-    _registry.emplace<atlas>(e, *at);
+    _registry.emplace<std::shared_ptr<const atlas>>(e, *at);
   }
 
   if (ori) {

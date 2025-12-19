@@ -55,12 +55,12 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       const auto entity = _registry.create();
 
-      atlas at{};
+      auto at = std::make_shared<atlas>();
       for (auto field : dobject["timelines"].get_object()) {
-        at.timelines.emplace(make_action(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
+        at->timelines.emplace(make_action(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
       }
 
-      _registry.emplace<atlas>(entity, std::move(at));
+      _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
 
       metadata md{
         .kind = make_action(kind)

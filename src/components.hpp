@@ -8,23 +8,22 @@
 using action_id = entt::id_type;
 inline constexpr action_id no_action = 0;
 
-[[nodiscard]] inline boost::unordered_flat_map<action_id, std::string>& action_registry() noexcept {
-  static boost::unordered_flat_map<action_id, std::string> registry;
-  return registry;
-}
+static boost::unordered_flat_map<action_id, std::string> _registry;
 
 [[nodiscard]] inline action_id make_action(std::string_view action) noexcept {
-  if (action.empty()) return no_action;
+  if (action.empty()) [[unlikely]] {
+    return no_action;
+  }
+
   const auto id = entt::hashed_string{action.data(), action.size()}.value();
-  action_registry().try_emplace(id, action);
+  _registry.try_emplace(id, action);
   return id;
 }
 
 [[nodiscard]] inline std::optional<std::string_view> action_name(action_id id) noexcept {
   if (id == no_action) return std::nullopt;
-  const auto& reg = action_registry();
-  const auto it = reg.find(id);
-  return it != reg.end() ? std::optional<std::string_view>{it->second} : std::nullopt;
+  const auto it = _registry.find(id);
+  return it != _registry.end() ? std::optional<std::string_view>{it->second} : std::nullopt;
 }
 
 struct transform final {

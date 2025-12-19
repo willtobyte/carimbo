@@ -6,12 +6,12 @@
 class animationsystem final {
 public:
   explicit animationsystem(entt::registry& registry) noexcept
-    : _group(registry.group<atlas, playback, callbacks>()) {}
+    : _group(registry.group<std::shared_ptr<const atlas>, playback, callbacks>()) {}
 
   void update(uint64_t now) noexcept;
 
 private:
-  using group_type = decltype(std::declval<entt::registry&>().group<atlas, playback, callbacks>());
+  using group_type = decltype(std::declval<entt::registry&>().group<std::shared_ptr<const atlas>, playback, callbacks>());
 
   group_type _group;
 };
