@@ -33,11 +33,11 @@ public:
   [[nodiscard]] bool visible() const noexcept;
   void set_visible(bool value) noexcept;
 
-  [[nodiscard]] action_id action() const noexcept;
-  void set_action(action_id value) noexcept;
+  [[nodiscard]] symbol action() const noexcept;
+  void set_action(symbol value) noexcept;
 
-  [[nodiscard]] action_id kind() const noexcept;
-  void set_kind(action_id value) noexcept;
+  [[nodiscard]] symbol kind() const noexcept;
+  void set_kind(symbol value) noexcept;
 
   void set_onmail(sol::protected_function fn);
   void set_onhover(sol::protected_function fn);

@@ -336,13 +336,13 @@ void scriptengine::run() {
     "action", sol::property(
       [](const entityproxy& self) { return action_name(self.action()); },
       [](entityproxy& self, std::optional<std::string_view> name) {
-        self.set_action(name ? make_action(*name) : no_action);
+        self.set_action(name ? _resolve(*name) : no_action);
       }
     ),
     "kind", sol::property(
       [](const entityproxy& self) { return action_name(self.kind()); },
       [](entityproxy& self, std::string_view name) {
-        self.set_kind(make_action(name));
+        self.set_kind(_resolve(name));
       }
     ),
     "position", sol::property(

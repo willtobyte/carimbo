@@ -45,7 +45,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       auto object = unmarshal::get<unmarshal::object>(element);
       const auto name = unmarshal::get<std::string_view>(object, "name");
       const auto kind = unmarshal::get<std::string_view>(object, "kind");
-      const auto action = make_action(unmarshal::value_or(object, "action", std::string_view{}));
+      const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
 
       const auto x = unmarshal::value_or(object, "x", .0f);
       const auto y = unmarshal::value_or(object, "y", .0f);
@@ -57,13 +57,13 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
 
       auto at = std::make_shared<atlas>();
       for (auto field : dobject["timelines"].get_object()) {
-        at->timelines.emplace(make_action(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
+        at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
       }
 
       _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
 
       metadata md{
-        .kind = make_action(kind)
+        .kind = _resolve(kind)
       };
       _registry.emplace<metadata>(entity, std::move(md));
 

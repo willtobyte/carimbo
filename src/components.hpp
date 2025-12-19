@@ -5,12 +5,12 @@
 #include "geometry.hpp"
 #include "flip.hpp"
 
-using action_id = entt::id_type;
-inline constexpr action_id no_action = 0;
+using symbol = entt::id_type;
+inline constexpr symbol no_action = 0;
 
-static boost::unordered_flat_map<action_id, std::string> _registry;
+static boost::unordered_flat_map<symbol, std::string> _registry;
 
-[[nodiscard]] inline action_id make_action(std::string_view action) noexcept {
+[[nodiscard]] inline symbol _resolve(std::string_view action) noexcept {
   if (action.empty()) [[unlikely]] {
     return no_action;
   }
@@ -20,7 +20,7 @@ static boost::unordered_flat_map<action_id, std::string> _registry;
   return id;
 }
 
-[[nodiscard]] inline std::optional<std::string_view> action_name(action_id id) noexcept {
+[[nodiscard]] inline std::optional<std::string_view> action_name(symbol id) noexcept {
   if (id == no_action) return std::nullopt;
   const auto it = _registry.find(id);
   return it != _registry.end() ? std::optional<std::string_view>{it->second} : std::nullopt;
@@ -93,7 +93,7 @@ inline void from_json(unmarshal::value json, b2AABB& out) {
 
 struct timeline final {
   bool oneshot{false};
-  action_id next{no_action};
+  symbol next{no_action};
   std::optional<b2AABB> hitbox;
   boost::container::small_vector<frame, 24> frames;
 
@@ -101,7 +101,7 @@ struct timeline final {
     out.oneshot = unmarshal::value_or(json, "oneshot", false);
 
     if (unmarshal::contains(json, "next")) {
-      out.next = make_action(unmarshal::get<std::string_view>(json, "next"));
+      out.next = _resolve(unmarshal::get<std::string_view>(json, "next"));
     }
 
     if (auto opt = unmarshal::find_object(json, "hitbox")) {
@@ -120,9 +120,9 @@ struct timeline final {
 };
 
 struct atlas final {
-  entt::dense_map<action_id, timeline> timelines;
+  entt::dense_map<symbol, timeline> timelines;
 
-  const timeline* find(action_id id) const noexcept {
+  const timeline* find(symbol id) const noexcept {
     const auto it = timelines.find(id);
     return it != timelines.end() ? &it->second : nullptr;
   }
@@ -137,7 +137,7 @@ struct playback final {
   bool redraw;
   uint16_t current_frame{0};
   uint64_t tick{0};
-  action_id action{no_action};
+  symbol action{no_action};
   const timeline* timeline{nullptr};
 };
 
@@ -147,7 +147,7 @@ struct renderable final {
 };
 
 struct metadata final {
-  action_id kind{no_action};
+  symbol kind{no_action};
 };
 
 struct orientation final {

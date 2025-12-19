@@ -83,12 +83,12 @@ void entityproxy::set_visible(bool visible) noexcept {
   p.dirty = true;
 }
 
-action_id entityproxy::action() const noexcept {
+symbol entityproxy::action() const noexcept {
   const auto& s = _registry.get<playback>(_entity);
   return s.action;
 }
 
-void entityproxy::set_action(action_id id) noexcept {
+void entityproxy::set_action(symbol id) noexcept {
   auto& s = _registry.get<playback>(_entity);
   s.action = id;
   s.current_frame = 0;
@@ -96,12 +96,12 @@ void entityproxy::set_action(action_id id) noexcept {
   s.timeline = nullptr;
 }
 
-action_id entityproxy::kind() const noexcept {
+symbol entityproxy::kind() const noexcept {
   const auto& m = _registry.get<metadata>(_entity);
   return m.kind;
 }
 
-void entityproxy::set_kind(action_id id) noexcept {
+void entityproxy::set_kind(symbol id) noexcept {
   auto& m = _registry.get<metadata>(_entity);
   m.kind = id;
 }

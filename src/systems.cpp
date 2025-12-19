@@ -5,7 +5,7 @@
 #include "geometry.hpp"
 
 namespace {
-[[nodiscard]] inline const timeline* resolve_timeline(const atlas& at, action_id action) noexcept {
+[[nodiscard]] inline const timeline* resolve_timeline(const atlas& at, symbol action) noexcept {
   if (action == no_action) [[unlikely]] {
     return nullptr;
   }
