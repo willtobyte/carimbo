@@ -356,7 +356,7 @@ void scriptengine::run() {
         self.set_position({x, y});
       }
     ),
-    "set_onmail", &entityproxy::set_onmail,
+    "on_mail", &entityproxy::set_onmail,
     "on_hover", &entityproxy::set_onhover,
     "on_unhover", &entityproxy::set_onunhover,
     "on_touch", &entityproxy::set_ontouch,
