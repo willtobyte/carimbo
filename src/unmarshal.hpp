@@ -10,10 +10,10 @@ class pool final {
 public:
   [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
     if (_depth >= _parsers.size()) {
-      _parsers.emplace_back(std::make_unique<simdjson::ondemand::parser>());
+      _parsers.emplace_back();
     }
 
-    return *_parsers[_depth++];
+    return _parsers[_depth++];
   }
 
   void release() noexcept {
@@ -22,8 +22,8 @@ public:
   }
 
   [[nodiscard]] static pool& instance() noexcept {
-    thread_local pool pool;
-    return pool;
+    thread_local pool p;
+    return p;
   }
 
 private:
@@ -31,7 +31,7 @@ private:
     _parsers.reserve(4);
   }
 
-  std::vector<std::unique_ptr<simdjson::ondemand::parser>> _parsers;
+  std::vector<simdjson::ondemand::parser> _parsers;
   size_t _depth{0};
 };
 
