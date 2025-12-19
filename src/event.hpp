@@ -5,7 +5,9 @@
 namespace event {
 enum player : uint8_t {
   one = 0,
-  two
+  two,
+  three,
+  four
 };
 
 enum class type : uint32_t {

@@ -292,7 +292,9 @@ void scriptengine::run() {
   lua.new_enum(
     "Player",
     "one", event::player::one,
-    "two", event::player::two
+    "two", event::player::two,
+    "three", event::player::three,
+    "four", event::player::four
   );
 
   lua.new_usertype<statemanager>(
@@ -946,7 +948,6 @@ void scriptengine::run() {
 
   std::println("License: MIT");
   std::println("Author: Rodrigo Delduca https://rodrigodelduca.org");
-
 
   lua.script(bootstrap, "@bootstrap");
   lua.script(debugger, "@debugger");
