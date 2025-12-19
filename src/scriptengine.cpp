@@ -94,10 +94,10 @@ void scriptengine::run() {
 
   lua["searcher"] = &searcher;
 
-  const auto inject = std::format(R"lua(
+  constexpr auto inject = R"lua(
     local list = package.searchers or package.loaders
     table.insert(list, searcher)
-  )lua");
+  )lua";
 
   lua.script(inject);
 
@@ -300,14 +300,14 @@ void scriptengine::run() {
     sol::no_constructor,
     "players", sol::property(&statemanager::players),
     "player", [](statemanager& self, event::player player) {
-      static std::array<playerwrapper, 4> cache{
+      static std::array<playerwrapper, 4> _p{
         playerwrapper{0, &self},
         playerwrapper{1, &self},
         playerwrapper{2, &self},
         playerwrapper{3, &self}
       };
 
-      return cache[static_cast<uint8_t>(player)];
+      return _p[static_cast<uint8_t>(player)];
     }
   );
 
