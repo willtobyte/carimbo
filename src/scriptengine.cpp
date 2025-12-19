@@ -307,6 +307,7 @@ void scriptengine::run() {
         playerwrapper{3, &self}
       };
 
+      assert(static_cast<uint8_t>(player) < _p.size() && "invalid player index");
       return _p[static_cast<uint8_t>(player)];
     }
   );
