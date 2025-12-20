@@ -12,7 +12,6 @@
 #include <sol/sol.hpp>
 
 #include <boost/container/small_vector.hpp>
-#include <boost/core/bit.hpp>
 #include <boost/static_string.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 
@@ -27,6 +26,7 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <bit>
 #include <chrono>
 #include <cmath>
 #include <cstdint>

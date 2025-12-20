@@ -20,7 +20,7 @@ private:
   void expand(size_t minimum = 0) {
     size_t target = _all.capacity();
     target = target == 0 ? 1 : target;
-    target = boost::core::bit_ceil(std::max(target, minimum)) << 1;
+    target = std::bit_ceil(std::max(target, minimum)) << 1;
 
     _all.reserve(target);
     _free.reserve(target);
