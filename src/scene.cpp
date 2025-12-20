@@ -5,10 +5,13 @@
 #include "particlesystem.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view scene, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager)
-    : _scenemanager(std::move(scenemanager)),
-      _particlesystem(_scenemanager->resourcemanager()) {
-  _renderer = _scenemanager->renderer();
+scene::scene(std::string_view name, unmarshal::document& document, std::weak_ptr<::scenemanager> ptr)
+    : _scenemanager(std::move(ptr)) {
+  const auto scenemanager = _scenemanager.lock();
+  assert(scenemanager && "scenemanager expired");
+
+  _particlesystem.emplace(scenemanager->resourcemanager());
+  _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
   _hits.reserve(64);
@@ -19,38 +22,38 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
   def.gravity = b2Vec2{.0f, .0f};
   _world = b2CreateWorld(&def);
 
-  const auto& resourcemanager = _scenemanager->resourcemanager();
+  const auto& resourcemanager = scenemanager->resourcemanager();
   const auto& soundmanager = resourcemanager->soundmanager();
   const auto& pixmappool = resourcemanager->pixmappool();
   const auto& fontfactory = resourcemanager->fontfactory();
 
   if (auto effects = unmarshal::find_array(document, "effects")) {
     for (auto element : *effects) {
-      const auto name = unmarshal::string(element);
-      const auto path = std::format("blobs/{}/{}.ogg", scene, name);
-      _effects.emplace(name, soundmanager->get(path));
+      const auto effect = unmarshal::string(element);
+      const auto path = std::format("blobs/{}/{}.ogg", name, effect);
+      _effects.emplace(effect, soundmanager->get(path));
     }
   }
 
   if (unmarshal::contains(document, "tilemap")) {
-    const auto name = unmarshal::get<std::string_view>(document, "tilemap");
-    _tilemap.emplace(name, resourcemanager); 
+    const auto tilemap = unmarshal::get<std::string_view>(document, "tilemap");
+    _tilemap.emplace(tilemap, resourcemanager);
   } else {
-    _background = pixmappool->get(std::format("blobs/{}/background.png", scene));
+    _background = pixmappool->get(std::format("blobs/{}/background.png", name));
   }
 
   auto z = 0;
   if (auto objects = unmarshal::find_array(document, "objects")) {
     for (auto element : *objects) {
       auto object = unmarshal::get<unmarshal::object>(element);
-      const auto name = unmarshal::get<std::string_view>(object, "name");
+      const auto oname = unmarshal::get<std::string_view>(object, "name");
       const auto kind = unmarshal::get<std::string_view>(object, "kind");
       const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
 
       const auto x = unmarshal::value_or(object, "x", .0f);
       const auto y = unmarshal::value_or(object, "y", .0f);
 
-      const auto filename = std::format("objects/{}/{}.json", scene, kind);
+      const auto filename = std::format("objects/{}/{}.json", name, kind);
       auto json = unmarshal::parse(io::read(filename)); auto& dobject = *json;
 
       const auto entity = _registry.create();
@@ -70,7 +73,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       _registry.emplace<tint>(entity);
 
       sprite sp{
-        .pixmap = pixmappool->get(std::format("blobs/{}/{}.png", scene, kind))
+        .pixmap = pixmappool->get(std::format("blobs/{}/{}.png", name, kind))
       };
       _registry.emplace<sprite>(entity, std::move(sp));
 
@@ -101,7 +104,7 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
       _registry.emplace<renderable>(entity, std::move(rd));
 
       const auto proxy = std::make_shared<entityproxy>(entity, _registry);
-      _proxies.emplace(std::move(name), proxy);
+      _proxies.emplace(std::move(oname), proxy);
 
       callbacks c {
         .self = proxy
@@ -114,18 +117,18 @@ scene::scene(std::string_view scene, unmarshal::document& document, std::shared_
     });
   }
 
-  const auto factory = _particlesystem.factory();
+  const auto factory = _particlesystem->factory();
   if (auto particles = unmarshal::find_array(document, "particles")) {
     for (auto element : *particles) {
       auto object = unmarshal::get<unmarshal::object>(element);
-      const auto name = unmarshal::get<std::string_view>(object, "name");
+      const auto pname = unmarshal::get<std::string_view>(object, "name");
       const auto kind = unmarshal::get<std::string_view>(object, "kind");
       const auto px = unmarshal::get<float>(object, "x");
       const auto py = unmarshal::get<float>(object, "y");
       const auto active = unmarshal::value_or(object, "active", true);
       const auto batch = factory->create(kind, px, py, active);
-      _particles.emplace(name, batch);
-      _particlesystem.add(batch);
+      _particles.emplace(pname, batch);
+      _particlesystem->add(batch);
     }
   }
 
@@ -170,7 +173,7 @@ void scene::update(float delta) noexcept {
 
   _animationsystem.update(now);
   _physicssystem.update(_world, delta);
-  _particlesystem.update(delta);
+  _particlesystem->update(delta);
 
   _onloop(delta);
 }
@@ -206,7 +209,7 @@ void scene::draw() const noexcept {
 
   _rendersystem.draw();
 
-  _particlesystem.draw();
+  _particlesystem->draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
