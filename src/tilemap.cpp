@@ -107,10 +107,10 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
   for (const auto& grid : _grids) {
     const auto* __restrict tiles = grid.tiles.data();
 
-    for (auto row = start_row; row <= end_row; ++row) {
-      const auto row_offset = row * width;
-      const auto dy_base = static_cast<float>(row) * tile_size - viewport_y;
+    auto row_offset = start_row * width;
+    auto dy_base = static_cast<float>(start_row) * tile_size - viewport_y;
 
+    for (auto row = start_row; row <= end_row; ++row, row_offset += width, dy_base += tile_size) {
       for (auto column = start_column; column <= end_column; ++column) {
         const auto tile_id = tiles[row_offset + column];
 
@@ -121,21 +121,20 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
         const auto& uv = _uv_table[tile_id - 1];
 
         const auto dx = static_cast<float>(column) * tile_size - viewport_x;
-        const auto dy = dy_base;
 
         const auto base = static_cast<int32_t>(_vertices.size());
 
-        _vertices.push_back({{dx, dy}, white, {uv.u0, uv.v0}});
-        _vertices.push_back({{dx + tile_size, dy}, white, {uv.u1, uv.v0}});
-        _vertices.push_back({{dx + tile_size, dy + tile_size}, white, {uv.u1, uv.v1}});
-        _vertices.push_back({{dx, dy + tile_size}, white, {uv.u0, uv.v1}});
+        _vertices.emplace_back(SDL_Vertex{{dx, dy_base}, white, {uv.u0, uv.v0}});
+        _vertices.emplace_back(SDL_Vertex{{dx + tile_size, dy_base}, white, {uv.u1, uv.v0}});
+        _vertices.emplace_back(SDL_Vertex{{dx + tile_size, dy_base + tile_size}, white, {uv.u1, uv.v1}});
+        _vertices.emplace_back(SDL_Vertex{{dx, dy_base + tile_size}, white, {uv.u0, uv.v1}});
 
-        _indices.push_back(base);
-        _indices.push_back(base + 1);
-        _indices.push_back(base + 2);
-        _indices.push_back(base);
-        _indices.push_back(base + 2);
-        _indices.push_back(base + 3);
+        _indices.emplace_back(base);
+        _indices.emplace_back(base + 1);
+        _indices.emplace_back(base + 2);
+        _indices.emplace_back(base);
+        _indices.emplace_back(base + 2);
+        _indices.emplace_back(base + 3);
       }
     }
   }
