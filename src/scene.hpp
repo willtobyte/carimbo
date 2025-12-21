@@ -22,7 +22,7 @@ class scene final {
 }
 
 public:
-  scene(std::string_view name, unmarshal::document& document, std::weak_ptr<::scenemanager> ptr);
+  scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager);
 
   ~scene() noexcept;
 
@@ -67,7 +67,6 @@ private:
     b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
-  std::weak_ptr<scenemanager> _scenemanager;
   std::shared_ptr<renderer> _renderer;
 
   entt::registry _registry;

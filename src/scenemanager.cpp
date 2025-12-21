@@ -16,7 +16,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     const auto filename = std::format("scenes/{}.json", name);
     auto json = unmarshal::parse(io::read(filename)); auto& document = *json;
 
-    return it->second = std::make_shared<scene>(name, document, weak_from_this());
+    return it->second = std::make_shared<scene>(name, document, shared_from_this());
   }
 
   return nullptr;

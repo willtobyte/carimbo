@@ -5,11 +5,7 @@
 #include "particlesystem.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view name, unmarshal::document& document, std::weak_ptr<::scenemanager> ptr)
-    : _scenemanager(std::move(ptr)) {
-  const auto scenemanager = _scenemanager.lock();
-  assert(scenemanager && "scenemanager expired");
-
+scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager) {
   _particlesystem.emplace(scenemanager->resourcemanager());
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
