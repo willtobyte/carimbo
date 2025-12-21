@@ -8,7 +8,7 @@
 using symbol = entt::id_type;
 inline constexpr symbol no_action = 0;
 
-static boost::unordered_flat_map<symbol, std::string> _registry;
+inline boost::unordered_flat_map<symbol, std::string> _registry;
 
 [[nodiscard]] inline symbol _resolve(std::string_view action) noexcept {
   if (action.empty()) [[unlikely]] {
