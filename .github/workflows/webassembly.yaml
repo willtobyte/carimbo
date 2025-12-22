@@ -28,28 +28,46 @@ jobs:
           conan profile detect --force
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
-      - name: Configure tools & CMake
+          git clone https://github.com/conan-io/conan-toolchains.git
+          conan remote add --force conan-toolchains ./conan-toolchains
+
+      - name: Configure profile
         run: |
           cat <<'EOF' >> ~/.conan2/profiles/default
           [replace_tool_requires]
           meson/*: meson/[*]
+          ninja/*: ninja/[*]
           pkgconf/*: pkgconf/[*]
+
+          [settings]
+          build_type=Release
+          compiler=emcc
+          # compiler.cppstd=17
+          # compiler.libcxx=libc++
+          # compiler.version=4.0.22
+          os=Emscripten
+          arch=wasm
 
           [tool_requires]
           !cmake/*: cmake/[>=3 <4]
-          EOF
+          ninja/[*]
+          emsdk/4.0.22
 
-      - name: Conan profile
-        run: |
-          cat > ~/.conan2/profiles/webassembly <<EOF
-          include(default)
+          [platform_tool_requires]
+          emsdk/[*]
 
-          [settings]
-          arch=wasm
-          os=Emscripten
+          [conf]
+          tools.cmake.cmake_layout:build_folder_vars=['settings.build_type', 'settings.arch']
+          tools.cmake.cmaketoolchain:generator=Ninja
+          tools.build:compiler_executables={'c':'emcc', 'cpp':'em++'}
 
-          [tool_requires]
-          *: emsdk/3.1.73
+          [buildenv]
+          CC=emcc
+          CXX=em++
+          AR=emar
+          NM=emnm
+          RANLIB=emranlib
+          STRIP=emstrip
           EOF
 
       - name: Cache Conan packages
