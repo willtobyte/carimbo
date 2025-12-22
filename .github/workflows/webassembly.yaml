@@ -25,7 +25,7 @@ jobs:
       - name: Setup Conan
         run: |
           pip install conan
-          conan profile detect --force
+
           conan config install https://github.com/willtobyte/conan-configs.git --type git
 
           git clone https://github.com/conan-io/conan-toolchains.git
@@ -33,7 +33,7 @@ jobs:
 
       - name: Configure profile
         run: |
-          cat <<'EOF' >> ~/.conan2/profiles/default
+          cat <<'EOF' > ~/.conan2/profiles/default
           [replace_tool_requires]
           meson/*: meson/[*]
           ninja/*: ninja/[*]
