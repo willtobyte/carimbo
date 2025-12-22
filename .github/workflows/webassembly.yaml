@@ -50,7 +50,7 @@ jobs:
           arch=wasm
 
           [tool_requires]
-          !cmake/*: cmake/[>=3 <4]
+          &: cmake/[>=3 <4]
           ninja/[*]
           emsdk/4.0.22
 
