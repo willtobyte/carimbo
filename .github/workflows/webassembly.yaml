@@ -33,7 +33,10 @@ jobs:
 
       - name: Configure profile
         run: |
-          mkdir -p ~/.conan2/profiles
+          conan profile detect --name build
+
+          echo -e "\n[platform_tool_requires]\ncmake/[>=3 <4]" >> ~/.conan2/profiles/build
+
           cat <<'EOF' > ~/.conan2/profiles/default
           [replace_tool_requires]
           meson/*: meson/[*]
@@ -53,7 +56,6 @@ jobs:
           &: ninja/[*]
 
           [platform_tool_requires]
-          cmake/[>=3 <4]
           emsdk/[*]
 
           [conf]
@@ -84,8 +86,9 @@ jobs:
         run: |
           conan install . \
             --output-folder=build \
-            --settings compiler.cppstd=23 \
-            --settings build_type=Release \
+            --profile:build=build \
+            --settings:host compiler.cppstd=23 \
+            --settings:host build_type=Release \
             --build=missing
 
       - name: Build
