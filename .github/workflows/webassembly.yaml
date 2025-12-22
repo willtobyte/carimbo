@@ -33,6 +33,7 @@ jobs:
 
       - name: Configure profile
         run: |
+          mkdir -p ~/.conan2/profiles
           cat <<'EOF' > ~/.conan2/profiles/default
           [replace_tool_requires]
           meson/*: meson/[*]
