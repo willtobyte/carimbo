@@ -85,7 +85,6 @@ jobs:
         run: |
           conan install . \
             --output-folder=build \
-            --profile=webassembly \
             --settings compiler.cppstd=23 \
             --settings build_type=Release \
             --build=missing
