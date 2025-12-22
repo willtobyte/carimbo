@@ -192,19 +192,19 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.conan2/p
-          key: conan-${{ runner.os }}-default-relwithdebinfo-${{ hashFiles('conanfile.py') }}
+          key: conan-${{ runner.os }}-default-release-${{ hashFiles('conanfile.py') }}
           restore-keys: |
-            conan-${{ runner.os }}-default-relwithdebinfo-
+            conan-${{ runner.os }}-default-release-
             conan-${{ runner.os }}-default-
             conan-${{ runner.os }}-
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release --verbose
 
       - name: Copy Crashpad handler from Conan
         run: |
@@ -376,33 +376,33 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.conan2/p
-          key: conan-${{ runner.os }}-default-relwithdebinfo-${{ hashFiles('conanfile.py') }}
+          key: conan-${{ runner.os }}-default-release-${{ hashFiles('conanfile.py') }}
           restore-keys: |
-            conan-${{ runner.os }}-default-relwithdebinfo-
+            conan-${{ runner.os }}-default-release-
             conan-${{ runner.os }}-default-
             conan-${{ runner.os }}-
 
       - name: Install project dependencies
-        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=RelWithDebInfo
+        run: conan install . --output-folder=build --build=missing --settings compiler.cppstd=23 --settings build_type=Release
 
       - name: Build binary
         run: |
-          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="//bigobj"
-          cmake --build build --config RelWithDebInfo --verbose
+          cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="//bigobj"
+          cmake --build build --config Release --verbose
 
       - name: Copy Crashpad handler from Conan
         shell: powershell
         working-directory: build
         run: |
           $crashpadHandler = Get-ChildItem -Path ~/.conan2/p -Filter crashpad_handler.exe -Recurse | Where-Object { $_.DirectoryName -like '*\bin' } | Select-Object -First 1
-          Copy-Item $crashpadHandler.FullName RelWithDebInfo/crashpad_handler.exe
+          Copy-Item $crashpadHandler.FullName Release/crashpad_handler.exe
 
       - name: Package artifacts
         shell: powershell
-        working-directory: build/RelWithDebInfo
+        working-directory: build/Release
         run: |
           New-Item -ItemType Directory -Path "../../artifacts" -Force
-          Compress-Archive -LiteralPath 'carimbo.exe', 'carimbo.pdb', 'crashpad_handler.exe', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
+          Compress-Archive -LiteralPath 'carimbo.exe', 'crashpad_handler.exe', '../LICENSES' -DestinationPath "../../artifacts/Windows.zip"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
