@@ -51,8 +51,7 @@ jobs:
 
           [tool_requires]
           &: cmake/[>=3 <4]
-          ninja/[*]
-          emsdk/4.0.22
+          &: ninja/[*]
 
           [platform_tool_requires]
           emsdk/[*]
