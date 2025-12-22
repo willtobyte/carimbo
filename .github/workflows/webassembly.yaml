@@ -53,10 +53,7 @@ jobs:
           arch=wasm
 
           [tool_requires]
-          &: ninja/[*]
-
-          [platform_tool_requires]
-          emsdk/[*]
+          emsdk/4.0.22
 
           [conf]
           tools.cmake.cmake_layout:build_folder_vars=['settings.build_type', 'settings.arch']
