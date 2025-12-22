@@ -43,9 +43,9 @@ jobs:
           [settings]
           build_type=Release
           compiler=emcc
-          # compiler.cppstd=17
-          # compiler.libcxx=libc++
-          # compiler.version=4.0.22
+          compiler.cppstd=17
+          compiler.libcxx=libc++
+          compiler.version=4.0.22
           os=Emscripten
           arch=wasm
 
