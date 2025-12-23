@@ -70,8 +70,8 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
       continue;
     }
 
-    float xoffset = 0.f;
-    float yoffset = 0.f;
+    float xoffset = .0f;
+    float yoffset = .0f;
     float scale = 1.f;
     uint8_t r = 255;
     uint8_t g = 255;
@@ -89,14 +89,15 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
       alpha = p.alpha;
     }
 
-    const auto s = _scale * scale;
-    const auto w = glyph->w * s;
-    const auto h = glyph->h * s;
-    const auto hw = w * 0.5f;
-    const auto hh = h * 0.5f;
+    const auto bhw = glyph->w * _scale * 0.5f;
+    const auto bhh = glyph->h * _scale * 0.5f;
 
-    const auto cx = cursor_x + xoffset + hw;
-    const auto cy = cursor_y + yoffset + hh;
+    const auto cx = cursor_x + xoffset + bhw;
+    const auto cy = cursor_y + yoffset + bhh;
+
+    const auto s = _scale * scale;
+    const auto hw = glyph->w * s * 0.5f;
+    const auto hh = glyph->h * s * 0.5f;
 
     const auto& uv = _uv_table[char_index];
     constexpr auto inv = 1.f / 255.f;
