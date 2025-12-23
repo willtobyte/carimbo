@@ -87,6 +87,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
       glyphs,
       map,
       pixmap,
+      _renderer,
       spacing,
       leading,
       scale

@@ -117,6 +117,7 @@ struct animation;
 struct mailenvelope;
 struct particle;
 struct particlebatch;
+struct glyphprops;
 struct particleprops;
 struct quad;
 struct timerenvelope;

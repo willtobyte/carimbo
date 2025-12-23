@@ -5,6 +5,12 @@
 #include "font.hpp"
 #include "widget.hpp"
 
+struct glyphprops {
+  float xoffset{0.f};
+  float yoffset{0.f};
+  float scale{1.f};
+  uint8_t alpha{255};
+};
 
 class label final : public widget {
 public:
@@ -17,7 +23,9 @@ public:
 
   void set(float x, float y);
 
-  void set_effect(fonteffect::type type);
+  void set_effects(const boost::unordered_flat_map<size_t, std::optional<glyphprops>>& updates);
+
+  void clear_effects() noexcept;
 
   void clear();
 
@@ -29,5 +37,5 @@ private:
   std::shared_ptr<font> _font;
   std::string _text;
   vec2 _position;
-  std::shared_ptr<fonteffect> _effect;
+  boost::unordered_flat_map<size_t, glyphprops> _effects;
 };

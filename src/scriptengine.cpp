@@ -1,5 +1,7 @@
 #include "scriptengine.hpp"
 
+#include "label.hpp"
+
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
@@ -581,11 +583,6 @@ void scriptengine::run() {
 
   lua["cassette"] = cassette();
 
-  lua.new_enum(
-    "FontEffect",
-    "fadein", fonteffect::type::fadein
-  );
-
   lua.new_usertype<font>(
     "Font",
     sol::no_constructor,
@@ -913,7 +910,33 @@ void scriptengine::run() {
         self->set(text, x, y);
       }
     ),
-    "effect", sol::property(&label::set_effect),
+    "effect_v2", sol::writeonly_property([](label& self, sol::object arg) {
+      if (arg == sol::lua_nil) {
+        self.clear_effects();
+        return;
+      }
+
+      auto table = arg.as<sol::table>();
+      boost::unordered_flat_map<size_t, std::optional<glyphprops>> updates;
+
+      for (const auto& [key, value] : table) {
+        const auto index = key.as<size_t>() - 1;
+
+        if (value == sol::lua_nil) {
+          updates[index] = std::nullopt;
+        } else {
+          auto props = value.as<sol::table>();
+          glyphprops gp;
+          gp.xoffset = props.get_or("xoffset", 0.f);
+          gp.yoffset = props.get_or("yoffset", 0.f);
+          gp.scale = props.get_or("scale", 1.f);
+          gp.alpha = static_cast<uint8_t>(props.get_or("alpha", 255));
+          updates[index] = gp;
+        }
+      }
+
+      self.set_effects(updates);
+    }),
     "clear", &label::clear
   );
 
