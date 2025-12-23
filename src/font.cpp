@@ -116,7 +116,7 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
     _indices.emplace_back(base + 2);
     _indices.emplace_back(base + 3);
 
-    cursor_x += glyph->w * _scale + _spacing;
+    cursor_x += glyph->w + _spacing;
     ++i;
   }
 
