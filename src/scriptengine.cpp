@@ -910,13 +910,13 @@ void scriptengine::run() {
         self->set(text, x, y);
       }
     ),
-    "effect_v2", sol::writeonly_property([](label& self, sol::object arg) {
-      if (arg == sol::lua_nil) {
+    "effect", sol::writeonly_property([](label& self, sol::object argument) {
+      if (argument == sol::lua_nil) {
         self.clear_effects();
         return;
       }
 
-      auto table = arg.as<sol::table>();
+      auto table = argument.as<sol::table>();
       boost::unordered_flat_map<size_t, std::optional<glyphprops>> updates;
 
       for (const auto& [key, value] : table) {
@@ -930,6 +930,9 @@ void scriptengine::run() {
           gp.xoffset = props.get_or("xoffset", 0.f);
           gp.yoffset = props.get_or("yoffset", 0.f);
           gp.scale = props.get_or("scale", 1.f);
+          gp.r = static_cast<uint8_t>(props.get_or("r", 255));
+          gp.g = static_cast<uint8_t>(props.get_or("g", 255));
+          gp.b = static_cast<uint8_t>(props.get_or("b", 255));
           gp.alpha = static_cast<uint8_t>(props.get_or("alpha", 255));
           updates[index] = gp;
         }

@@ -9,6 +9,9 @@ struct glyphprops {
   float xoffset{0.f};
   float yoffset{0.f};
   float scale{1.f};
+  uint8_t r{255};
+  uint8_t g{255};
+  uint8_t b{255};
   uint8_t alpha{255};
 };
 

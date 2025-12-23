@@ -19,9 +19,10 @@ void label::set_effects(const boost::unordered_flat_map<size_t, std::optional<gl
   for (const auto& [index, props] : updates) {
     if (props) {
       _effects[index] = *props;
-    } else {
-      _effects.erase(index);
+      return;
     }
+
+    _effects.erase(index);
   }
 }
 

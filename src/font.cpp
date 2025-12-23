@@ -73,6 +73,9 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
     float xoffset = 0.f;
     float yoffset = 0.f;
     float scale = 1.f;
+    uint8_t r = 255;
+    uint8_t g = 255;
+    uint8_t b = 255;
     uint8_t alpha = 255;
 
     if (const auto it = effects.find(i); it != effects.end()) {
@@ -80,6 +83,9 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
       xoffset = p.xoffset;
       yoffset = p.yoffset;
       scale = p.scale;
+      r = p.r;
+      g = p.g;
+      b = p.b;
       alpha = p.alpha;
     }
 
@@ -93,7 +99,8 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
     const auto cy = cursor_y + yoffset + hh;
 
     const auto& uv = _uv_table[char_index];
-    const SDL_FColor color{1.f, 1.f, 1.f, static_cast<float>(alpha) / 255.f};
+    constexpr auto inv = 1.f / 255.f;
+    const SDL_FColor color{r * inv, g * inv, b * inv, alpha * inv};
     const auto base = static_cast<int32_t>(_vertices.size());
 
     _vertices.emplace_back(SDL_Vertex{{cx - hw, cy - hh}, color, {uv.u0, uv.v0}});
