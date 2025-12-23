@@ -926,15 +926,15 @@ void scriptengine::run() {
           updates[index] = std::nullopt;
         } else {
           auto props = value.as<sol::table>();
-          glyphprops gp;
-          gp.xoffset = props.get_or("xoffset", 0.f);
-          gp.yoffset = props.get_or("yoffset", 0.f);
-          gp.scale = props.get_or("scale", 1.f);
-          gp.r = static_cast<uint8_t>(props.get_or("r", 255));
-          gp.g = static_cast<uint8_t>(props.get_or("g", 255));
-          gp.b = static_cast<uint8_t>(props.get_or("b", 255));
-          gp.alpha = static_cast<uint8_t>(props.get_or("alpha", 255));
-          updates[index] = gp;
+          glyphprops p;
+          p.xoffset = props.get_or("xoffset", 0.f);
+          p.yoffset = props.get_or("yoffset", 0.f);
+          p.scale = props.get_or("scale", 1.f);
+          p.r = static_cast<uint8_t>(props.get_or("r", 255));
+          p.g = static_cast<uint8_t>(props.get_or("g", 255));
+          p.b = static_cast<uint8_t>(props.get_or("b", 255));
+          p.alpha = static_cast<uint8_t>(props.get_or("alpha", 255));
+          updates[index] = p;
         }
       }
 
