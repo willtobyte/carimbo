@@ -21,13 +21,10 @@ font::font(
     _leading(leading),
     _scale(scale)
 {
-  _vertices.reserve(256 * 4);
-  _indices.reserve(256 * 6);
-
   const auto iw = 1.0f / static_cast<float>(_pixmap->width());
   const auto ih = 1.0f / static_cast<float>(_pixmap->height());
 
-  for (size_t i = 0; i < 256; ++i) {
+  for (auto i = 0uz; i < 256; ++i) {
     if (const auto& g = _map[i]) {
       _uv_table[i] = {
         g->x * iw,
@@ -37,6 +34,10 @@ font::font(
       };
     }
   }
+
+  const auto& first = _map[static_cast<uint8_t>(_glyphs[0])];
+  assert(first && "first glyph must be valid");
+  _height = first->h * _scale;
 }
 
 void font::draw(std::string_view text, const vec2& position, const boost::unordered_flat_map<size_t, glyphprops>& effects) const {
@@ -47,9 +48,8 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
   _vertices.clear();
   _indices.clear();
 
-  const auto& first = _map[static_cast<uint8_t>(_glyphs[0])];
-  assert(first && "first glyph must be valid");
-  const auto height = first->h * _scale;
+  constexpr auto inv = 1.f / 255.f;
+  const auto line_height = _height + _leading;
 
   auto cursor_x = position.x;
   auto cursor_y = position.y;
@@ -58,50 +58,39 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
   for (const auto ch : text) {
     if (ch == '\n') {
       cursor_x = position.x;
-      cursor_y += height + _leading;
+      cursor_y += line_height;
       ++i;
       continue;
     }
 
     const auto char_index = static_cast<uint8_t>(ch);
-    const auto& glyph = _map[char_index];
-    if (!glyph) {
+    const auto& uv = _uv_table[char_index];
+    if (uv.u0 == 0.f && uv.v0 == 0.f && uv.u1 == 0.f && uv.v1 == 0.f) [[unlikely]] {
       ++i;
       continue;
     }
 
-    float xoffset = .0f;
-    float yoffset = .0f;
-    float scale = 1.f;
-    uint8_t r = 255;
-    uint8_t g = 255;
-    uint8_t b = 255;
-    uint8_t alpha = 255;
+    const auto& glyph = _map[char_index];
+    const auto gw = glyph->w * _scale;
+    const auto gh = glyph->h * _scale;
+    const auto bhw = gw * 0.5f;
+    const auto bhh = gh * 0.5f;
+
+    auto hw = bhw;
+    auto hh = bhh;
+    auto cx = cursor_x + bhw;
+    auto cy = cursor_y + bhh;
+    SDL_FColor color{1.f, 1.f, 1.f, 1.f};
 
     if (const auto it = effects.find(i); it != effects.end()) {
       const auto& p = it->second;
-      xoffset = p.xoffset;
-      yoffset = p.yoffset;
-      scale = p.scale;
-      r = p.r;
-      g = p.g;
-      b = p.b;
-      alpha = p.alpha;
+      cx += p.xoffset;
+      cy += p.yoffset;
+      hw = bhw * p.scale;
+      hh = bhh * p.scale;
+      color = {p.r * inv, p.g * inv, p.b * inv, p.alpha * inv};
     }
 
-    const auto bhw = glyph->w * _scale * 0.5f;
-    const auto bhh = glyph->h * _scale * 0.5f;
-
-    const auto cx = cursor_x + xoffset + bhw;
-    const auto cy = cursor_y + yoffset + bhh;
-
-    const auto s = _scale * scale;
-    const auto hw = glyph->w * s * 0.5f;
-    const auto hh = glyph->h * s * 0.5f;
-
-    const auto& uv = _uv_table[char_index];
-    constexpr auto inv = 1.f / 255.f;
-    const SDL_FColor color{r * inv, g * inv, b * inv, alpha * inv};
     const auto base = static_cast<int32_t>(_vertices.size());
 
     _vertices.emplace_back(SDL_Vertex{{cx - hw, cy - hh}, color, {uv.u0, uv.v0}});

@@ -42,11 +42,12 @@ private:
   int16_t _spacing{0};
   int16_t _leading{0};
   float _scale{1.0f};
+  float _height{0.0f};
   glyphmap _map;
   std::array<glyph_uv, 256> _uv_table{};
   std::string _glyphs;
   std::shared_ptr<pixmap> _pixmap;
   std::shared_ptr<renderer> _renderer;
-  mutable std::vector<SDL_Vertex> _vertices;
-  mutable std::vector<int32_t> _indices;
+  mutable boost::container::small_vector<SDL_Vertex, 512> _vertices;
+  mutable boost::container::small_vector<int32_t, 768> _indices;
 };
