@@ -5,7 +5,7 @@
 #include "font.hpp"
 #include "widget.hpp"
 
-struct glyphprops {
+struct glypheffect {
   float xoffset{0.f};
   float yoffset{0.f};
   float scale{1.f};
@@ -26,7 +26,7 @@ public:
 
   void set(float x, float y);
 
-  void set_effects(const boost::unordered_flat_map<size_t, std::optional<glyphprops>>& updates);
+  void set_effects(const boost::unordered_flat_map<size_t, std::optional<glypheffect>>& updates);
 
   void clear_effects() noexcept;
 
@@ -40,5 +40,5 @@ private:
   std::shared_ptr<font> _font;
   std::string _text;
   vec2 _position;
-  boost::unordered_flat_map<size_t, glyphprops> _effects;
+  boost::unordered_flat_map<size_t, glypheffect> _effects;
 };

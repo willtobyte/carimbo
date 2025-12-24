@@ -917,7 +917,7 @@ void scriptengine::run() {
       }
 
       auto table = argument.as<sol::table>();
-      boost::unordered_flat_map<size_t, std::optional<glyphprops>> updates;
+      boost::unordered_flat_map<size_t, std::optional<glypheffect>> updates;
 
       for (const auto& [key, value] : table) {
         const auto index = key.as<size_t>() - 1;
@@ -926,7 +926,7 @@ void scriptengine::run() {
           updates[index] = std::nullopt;
         } else {
           auto props = value.as<sol::table>();
-          glyphprops p;
+          glypheffect p;
           p.xoffset = props.get_or("xoffset", 0.f);
           p.yoffset = props.get_or("yoffset", 0.f);
           p.scale = props.get_or("scale", 1.f);

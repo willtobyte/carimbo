@@ -15,7 +15,7 @@ void label::set(float x, float y) {
   _position = {x, y};
 }
 
-void label::set_effects(const boost::unordered_flat_map<size_t, std::optional<glyphprops>>& updates) {
+void label::set_effects(const boost::unordered_flat_map<size_t, std::optional<glypheffect>>& updates) {
   for (const auto& [index, props] : updates) {
     if (props) {
       _effects[index] = *props;
