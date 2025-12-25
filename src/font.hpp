@@ -47,7 +47,7 @@ private:
   float _scale{1.0f};
   float _height{0.0f};
   glyphmap _map;
-  std::array<glyphprops, 256> _uv_table{};
+  std::array<glyphprops, 256> _props;
   std::string _glyphs;
   std::shared_ptr<pixmap> _pixmap;
   std::shared_ptr<renderer> _renderer;

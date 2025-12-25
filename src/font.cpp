@@ -26,7 +26,7 @@ font::font(
 
   for (auto i = 0uz; i < 256; ++i) {
     if (const auto& g = _map[i]) {
-      _uv_table[i] = {
+      _props[i] = {
         g->x * iw,
         g->y * ih,
         (g->x + g->w) * iw,
@@ -67,7 +67,7 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
       continue;
     }
 
-    const auto& glyph = _uv_table[static_cast<uint8_t>(ch)];
+    const auto& glyph = _props[static_cast<uint8_t>(ch)];
     if (!glyph.valid) [[unlikely]] {
       ++i;
       continue;
