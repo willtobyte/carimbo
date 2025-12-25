@@ -53,7 +53,6 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
   _indices.clear();
 
   constexpr auto inv = 1.f / 255.f;
-  const auto line_height = _height + _leading;
 
   auto cursor_x = position.x;
   auto cursor_y = position.y;
@@ -62,7 +61,7 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
   for (const auto ch : text) {
     if (ch == '\n') [[unlikely]] {
       cursor_x = position.x;
-      cursor_y += line_height;
+      cursor_y += _height + _leading;
       ++i;
       continue;
     }
