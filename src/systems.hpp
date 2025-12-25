@@ -39,3 +39,16 @@ public:
 private:
   entt::registry& _registry;
 };
+
+class scriptsystem final {
+public:
+  explicit scriptsystem(entt::registry& registry) noexcept
+    : _view(registry.view<scriptable>()) {}
+
+  void update(float delta) noexcept;
+
+private:
+  using view_type = decltype(std::declval<entt::registry&>().view<scriptable>());
+
+  view_type _view;
+};

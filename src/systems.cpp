@@ -177,3 +177,9 @@ void rendersystem::draw() const noexcept {
       sp.pixmap->draw(q.x, q.y, q.w, q.h, fx, fy, sw, sh, tr.angle, tn.a, fl.flip);
     });
 }
+
+void scriptsystem::update(float delta) noexcept {
+  _view.each([delta](scriptable& sc) {
+    sc.on_loop(delta);
+  });
+}

@@ -164,3 +164,10 @@ struct callbacks {
 
   std::shared_ptr<entityproxy> self;
 };
+
+struct scriptable {
+  sol::environment environment;
+  functor on_begin;
+  functor on_loop;
+  functor on_end;
+};

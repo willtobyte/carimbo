@@ -76,6 +76,7 @@ private:
   animationsystem _animationsystem{_registry};
   physicssystem _physicssystem{_registry};
   rendersystem _rendersystem{_registry};
+  scriptsystem _scriptsystem{_registry};
   std::shared_ptr<::timermanager> _timermanager;
   std::shared_ptr<pixmap> _background;
 

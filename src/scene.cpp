@@ -2,6 +2,7 @@
 
 #include "entityproxy.hpp"
 #include "geometry.hpp"
+#include "io.hpp"
 #include "particlesystem.hpp"
 #include "soundfx.hpp"
 
@@ -101,7 +102,6 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
       const auto lfn = std::format("objects/{}/{}.lua", name, kind);
 
-
       const auto proxy = std::make_shared<entityproxy>(entity, _registry);
       _proxies.emplace(std::move(oname), proxy);
 
@@ -109,6 +109,43 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
         .self = proxy
       };
       _registry.emplace<callbacks>(entity, std::move(c));
+
+      if (io::exists(lfn)) {
+        sol::state_view lua(environment.lua_state());
+        sol::environment env(lua, sol::create, environment);
+        env["self"] = proxy;
+
+        const auto buffer = io::read(lfn);
+        std::string_view source{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
+
+        const auto result = lua.load(source, std::format("@{}", lfn));
+        verify(result);
+
+        auto function = result.get<sol::protected_function>();
+        sol::set_environment(env, function);
+
+        const auto exec = function();
+        verify(exec);
+
+        auto module = exec.get<sol::table>();
+
+        scriptable sc;
+        sc.environment = env;
+
+        if (auto fn = module["on_begin"].get<sol::protected_function>(); fn.valid()) {
+          sc.on_begin = std::move(fn);
+        }
+
+        if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
+          sc.on_loop = std::move(fn);
+        }
+
+        if (auto fn = module["on_end"].get<sol::protected_function>(); fn.valid()) {
+          sc.on_end = std::move(fn);
+        }
+
+        _registry.emplace<scriptable>(entity, std::move(sc));
+      }
     }
 
     _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
@@ -172,6 +209,7 @@ void scene::update(float delta) noexcept {
 
   _animationsystem.update(now);
   _physicssystem.update(_world, delta);
+  _scriptsystem.update(delta);
   _particlesystem->update(delta);
 
   _onloop(delta);
