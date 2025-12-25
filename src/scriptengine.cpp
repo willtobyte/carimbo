@@ -1,7 +1,5 @@
 #include "scriptengine.hpp"
 
-#include "label.hpp"
-
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
 ;
@@ -926,15 +924,17 @@ void scriptengine::run() {
           updates[index] = std::nullopt;
         } else {
           auto props = value.as<sol::table>();
-          glypheffect p;
-          p.xoffset = props.get_or("xoffset", 0.f);
-          p.yoffset = props.get_or("yoffset", 0.f);
-          p.scale = props.get_or("scale", 1.f);
-          p.r = static_cast<uint8_t>(props.get_or("r", 255.0));
-          p.g = static_cast<uint8_t>(props.get_or("g", 255.0));
-          p.b = static_cast<uint8_t>(props.get_or("b", 255.0));
-          p.alpha = static_cast<uint8_t>(props.get_or("alpha", 255.0));
-          updates[index] = p;
+
+          glypheffect effect;
+          effect.xoffset = props.get_or("xoffset", .0f);
+          effect.yoffset = props.get_or("yoffset", .0f);
+          effect.scale = props.get_or("scale", 1.f);
+          effect.r = static_cast<uint8_t>(props.get_or("r", 255.0));
+          effect.g = static_cast<uint8_t>(props.get_or("g", 255.0));
+          effect.b = static_cast<uint8_t>(props.get_or("b", 255.0));
+          effect.alpha = static_cast<uint8_t>(props.get_or("alpha", 255.0));
+
+          updates[index] = effect;
         }
       }
 
