@@ -16,7 +16,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     const auto filename = std::format("scenes/{}.json", name);
     auto json = unmarshal::parse(io::read(filename)); auto& document = *json;
 
-    return it->second = std::make_shared<scene>(name, document, shared_from_this());
+    return it->second = std::make_shared<scene>(name, document, shared_from_this(), _environment);
   }
 
   return nullptr;
@@ -117,4 +117,8 @@ std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept 
 
 std::shared_ptr<::renderer> scenemanager::renderer() const noexcept {
   return _renderer;
+}
+
+void scenemanager::set_runtime(sol::state_view runtime) noexcept {
+  _environment = sol::environment(runtime, sol::create, runtime.globals());
 }

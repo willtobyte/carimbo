@@ -5,7 +5,7 @@
 #include "particlesystem.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager) {
+scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment) {
   _particlesystem.emplace(scenemanager->resourcemanager());
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();

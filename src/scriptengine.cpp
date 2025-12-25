@@ -1001,6 +1001,7 @@ void scriptengine::run() {
   const auto result = setup();
   verify(result);
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
+  engine->scenemanager()->set_runtime(lua);
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =

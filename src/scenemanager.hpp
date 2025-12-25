@@ -27,6 +27,8 @@ public:
 
   std::shared_ptr<::renderer> renderer() const noexcept;
 
+  void set_runtime(sol::state_view runtime) noexcept;
+
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;
   virtual void on_key_release(const event::keyboard::key& event) override;
@@ -38,6 +40,7 @@ protected:
 private:
   std::shared_ptr<::resourcemanager> _resourcemanager;
   std::shared_ptr<::renderer> _renderer;
+  sol::environment _environment;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   ::scene* _scene{nullptr};
   boost::static_string<32> _current;
