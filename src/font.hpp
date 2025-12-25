@@ -46,11 +46,10 @@ private:
   int16_t _leading{0};
   float _scale{1.0f};
   float _height{0.0f};
-  glyphmap _map;
-  std::array<glyphprops, 256> _props;
-  std::string _glyphs;
   std::shared_ptr<pixmap> _pixmap;
   std::shared_ptr<renderer> _renderer;
+  std::string _glyphs;
+  std::array<glyphprops, 256> _props;
   mutable boost::container::small_vector<SDL_Vertex, 512> _vertices;
   mutable boost::container::small_vector<int32_t, 768> _indices;
 };

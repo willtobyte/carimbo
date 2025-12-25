@@ -14,7 +14,6 @@ font::font(
   float scale
 )
   : _glyphs(glyphs),
-    _map(map),
     _pixmap(std::move(pixmap)),
     _renderer(std::move(renderer)),
     _spacing(spacing),
@@ -25,7 +24,7 @@ font::font(
   const auto ih = 1.0f / static_cast<float>(_pixmap->height());
 
   for (auto i = 0uz; i < 256; ++i) {
-    if (const auto& g = _map[i]) {
+    if (const auto& g = map[i]) {
       _props[i] = {
         g->x * iw,
         g->y * ih,
@@ -39,7 +38,7 @@ font::font(
     }
   }
 
-  const auto& first = _map[static_cast<uint8_t>(_glyphs[0])];
+  const auto& first = map[static_cast<uint8_t>(_glyphs[0])];
   assert(first && "first glyph must be valid");
   _height = first->h * _scale;
 }
