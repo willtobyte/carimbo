@@ -1,5 +1,9 @@
 #include "io.hpp"
 
+bool io::exists(std::string_view filename) noexcept {
+  return PHYSFS_exists(filename.data());
+}
+
 std::vector<uint8_t> io::read(std::string_view filename) {
   const auto ptr = unwrap(
     std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data())),
