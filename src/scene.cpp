@@ -49,8 +49,8 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
       const auto x = unmarshal::value_or(object, "x", .0f);
       const auto y = unmarshal::value_or(object, "y", .0f);
 
-      const auto filename = std::format("objects/{}/{}.json", name, kind);
-      auto json = unmarshal::parse(io::read(filename)); auto& dobject = *json;
+      const auto ofn = std::format("objects/{}/{}.json", name, kind);
+      auto json = unmarshal::parse(io::read(ofn)); auto& dobject = *json;
 
       const auto entity = _registry.create();
 
@@ -98,6 +98,9 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
         .z = z++
       };
       _registry.emplace<renderable>(entity, std::move(rd));
+
+      const auto lfn = std::format("objects/{}/{}.lua", name, kind);
+
 
       const auto proxy = std::make_shared<entityproxy>(entity, _registry);
       _proxies.emplace(std::move(oname), proxy);
