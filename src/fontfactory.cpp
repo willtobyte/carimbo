@@ -112,7 +112,7 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
       spacing,
       leading,
       fontheight,
-      _renderer,
+      _renderer
     );
   }
 
