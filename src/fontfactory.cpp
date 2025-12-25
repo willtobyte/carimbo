@@ -56,8 +56,14 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
     const auto* pixels = static_cast<const uint32_t*>(surface->pixels);
     const auto separator = pixels[0];
 
-    glyphmap map;
+    const auto iw = 1.0f / static_cast<float>(width);
+    const auto ih = 1.0f / static_cast<float>(height);
+
+    std::array<glyphprops, 256> props{};
+    auto fontheight = 0.0f;
+
     auto x = 0, y = 0;
+    auto first = true;
     for (char glyph : glyphs) {
       while (x < width && pixels[y * width + x] == separator) {
         ++x;
@@ -75,22 +81,38 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
         ++h;
       }
 
-      map[static_cast<uint8_t>(glyph)] ={
-        static_cast<float>(x), static_cast<float>(y),
-        static_cast<float>(w), static_cast<float>(h)
+      const auto fx = static_cast<float>(x);
+      const auto fy = static_cast<float>(y);
+      const auto fw = static_cast<float>(w);
+      const auto fh = static_cast<float>(h);
+
+      props[static_cast<uint8_t>(glyph)] = {
+        fx * iw,
+        fy * ih,
+        (fx + fw) * iw,
+        (fy + fh) * ih,
+        fw * scale,
+        fh * scale,
+        fw,
+        true
       };
+
+      if (first) {
+        fontheight = fh * scale;
+        first = false;
+      }
 
       x += w;
     }
 
     return it->second = std::make_shared<font>(
       glyphs,
-      map,
+      std::move(props),
       pixmap,
       _renderer,
       spacing,
       leading,
-      scale
+      fontheight
     );
   }
 

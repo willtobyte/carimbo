@@ -15,20 +15,18 @@ struct alignas(32) glyphprops final {
   bool valid;
 };
 
-using glyphmap = std::array<std::optional<quad>, 256>;
-
 class font final {
 public:
   font() = delete;
 
   explicit font(
     std::string_view glyphs,
-    const glyphmap& map,
+    std::array<glyphprops, 256> props,
     std::shared_ptr<pixmap> pixmap,
     std::shared_ptr<renderer> renderer,
     int16_t spacing,
     int16_t leading,
-    float scale
+    float fontheight
   );
 
   ~font() = default;
@@ -44,8 +42,7 @@ public:
 private:
   int16_t _spacing{0};
   int16_t _leading{0};
-  float _scale{1.0f};
-  float _height{0.0f};
+  float _fontheight{0.0f};
   std::shared_ptr<pixmap> _pixmap;
   std::shared_ptr<renderer> _renderer;
   std::string _glyphs;

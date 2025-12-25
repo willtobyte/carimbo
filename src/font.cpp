@@ -6,42 +6,21 @@
 
 font::font(
   std::string_view glyphs,
-  const glyphmap& map,
+  std::array<glyphprops, 256> props,
   std::shared_ptr<pixmap> pixmap,
   std::shared_ptr<renderer> renderer,
   int16_t spacing,
   int16_t leading,
-  float scale
+  float fontheight
 )
   : _glyphs(glyphs),
+    _props(std::move(props)),
     _pixmap(std::move(pixmap)),
     _renderer(std::move(renderer)),
     _spacing(spacing),
     _leading(leading),
-    _scale(scale)
-{
-  const auto iw = 1.0f / static_cast<float>(_pixmap->width());
-  const auto ih = 1.0f / static_cast<float>(_pixmap->height());
-
-  for (auto i = 0uz; i < 256; ++i) {
-    if (const auto& g = map[i]) {
-      _props[i] = {
-        g->x * iw,
-        g->y * ih,
-        (g->x + g->w) * iw,
-        (g->y + g->h) * ih,
-        g->w * _scale,
-        g->h * _scale,
-        g->w,
-        true
-      };
-    }
-  }
-
-  const auto& first = map[static_cast<uint8_t>(_glyphs[0])];
-  assert(first && "first glyph must be valid");
-  _height = first->h * _scale;
-}
+    _fontheight(fontheight)
+{}
 
 void font::draw(std::string_view text, const vec2& position, const boost::unordered_flat_map<size_t, glypheffect>& effects) const {
   if (text.empty()) [[unlikely]] {
@@ -60,7 +39,7 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
   for (const auto ch : text) {
     if (ch == '\n') [[unlikely]] {
       cursor_x = position.x;
-      cursor_y += _height + _leading;
+      cursor_y += _fontheight + _leading;
       ++i;
       continue;
     }
