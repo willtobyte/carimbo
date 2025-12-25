@@ -109,10 +109,10 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
       glyphs,
       std::move(props),
       pixmap,
-      _renderer,
       spacing,
       leading,
-      fontheight
+      fontheight,
+      _renderer,
     );
   }
 

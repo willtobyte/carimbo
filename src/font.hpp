@@ -23,10 +23,10 @@ public:
     std::string_view glyphs,
     std::array<glyphprops, 256> props,
     std::shared_ptr<pixmap> pixmap,
-    std::shared_ptr<renderer> renderer,
     int16_t spacing,
     int16_t leading,
-    float fontheight
+    float fontheight,
+    std::shared_ptr<renderer> renderer
   );
 
   ~font() = default;

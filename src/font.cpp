@@ -8,18 +8,18 @@ font::font(
   std::string_view glyphs,
   std::array<glyphprops, 256> props,
   std::shared_ptr<pixmap> pixmap,
-  std::shared_ptr<renderer> renderer,
   int16_t spacing,
   int16_t leading,
-  float fontheight
+  float fontheight,
+  std::shared_ptr<renderer> renderer
 )
   : _glyphs(glyphs),
     _props(std::move(props)),
     _pixmap(std::move(pixmap)),
-    _renderer(std::move(renderer)),
     _spacing(spacing),
     _leading(leading),
-    _fontheight(fontheight)
+    _fontheight(fontheight),
+    _renderer(std::move(renderer))
 {}
 
 void font::draw(std::string_view text, const vec2& position, const boost::unordered_flat_map<size_t, glypheffect>& effects) const {
