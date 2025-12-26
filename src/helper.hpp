@@ -250,3 +250,26 @@ inline void verify(const T& result) {
     throw std::runtime_error(err.what());
   }
 }
+
+struct guard_t final {
+  std::source_location location;
+
+  constexpr explicit guard_t(std::source_location l = std::source_location::current()) noexcept : location(l) {}
+
+  template<typename F>
+    requires std::invocable<F>
+  friend bool operator|(F&& fn, const guard_t& g) noexcept {
+    try {
+      std::invoke(std::forward<F>(fn));
+      return true;
+    } catch (const std::exception& e) {
+      std::println(stderr, "[{}:{}] {}", g.location.file_name(), g.location.line(), e.what());
+      return false;
+    } catch (...) {
+      std::println(stderr, "[{}:{}] unknown error", g.location.file_name(), g.location.line());
+      return false;
+    }
+  }
+};
+
+#define guard guard_t{}
