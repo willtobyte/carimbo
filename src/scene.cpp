@@ -236,11 +236,11 @@ void scene::update(float delta) {
     _physicssystem->update(*_world, delta);
   }
 
-  _scriptsystem.update(delta);
-
   if (_particlesystem) {
     _particlesystem->update(delta);
   }
+
+  _scriptsystem.update(delta);
 
   _onloop(delta);
 }
