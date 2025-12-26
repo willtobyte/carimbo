@@ -12,7 +12,7 @@ void from_json(unmarshal::value json, grid& out) {
 }
 
 void from_json(unmarshal::document& document, tilemap& out) {
-  out._tile_size = unmarshal::get<int32_t>(document, "tile_size");
+  out._tile_size = unmarshal::get<float>(document, "tile_size");
   out._width = unmarshal::get<int32_t>(document, "width");
   out._height = unmarshal::get<int32_t>(document, "height");
 
@@ -32,18 +32,17 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourc
   const auto pixmappool = resourcemanager->pixmappool();
 
   _atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
+  _tile_size = static_cast<float>(_tile_size);
+  _inv_tile_size = 1.0f / _tile_size;
 
-  _tile_size_f = static_cast<float>(_tile_size);
-  _inv_tile_size = 1.0f / _tile_size_f;
-
-  const auto tiles_per_row = _atlas->width() / _tile_size;
-  const auto tiles_per_column = _atlas->height() / _tile_size;
+  const auto tiles_per_row = _atlas->width() / static_cast<int32_t>(_tile_size);
+  const auto tiles_per_column = _atlas->height() / static_cast<int32_t>(_tile_size);
 
   {
     const auto atlas_width = static_cast<float>(_atlas->width());
     const auto atlas_height = static_cast<float>(_atlas->height());
-    const auto u_scale = _tile_size_f / atlas_width;
-    const auto v_scale = _tile_size_f / atlas_height;
+    const auto u_scale = _tile_size / atlas_width;
+    const auto v_scale = _tile_size / atlas_height;
 
     const auto total_tiles = static_cast<size_t>(tiles_per_row) * static_cast<size_t>(tiles_per_column);
     _uv_table.resize(total_tiles);
@@ -103,9 +102,9 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
     const auto* __restrict tiles = grid.tiles.data();
 
     auto row_offset = start_row * _width;
-    auto dy_base = static_cast<float>(start_row) * _tile_size_f - _viewport.y;
+    auto dy_base = static_cast<float>(start_row) * _tile_size - _viewport.y;
 
-    for (auto row = start_row; row <= end_row; ++row, row_offset += _width, dy_base += _tile_size_f) {
+    for (auto row = start_row; row <= end_row; ++row, row_offset += _width, dy_base += _tile_size) {
       for (auto column = start_column; column <= end_column; ++column) {
         const auto tile_id = tiles[row_offset + column];
 
@@ -115,14 +114,14 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
 
         const auto& uv = _uv_table[tile_id - 1];
 
-        const auto dx = static_cast<float>(column) * _tile_size_f - _viewport.x;
+        const auto dx = static_cast<float>(column) * _tile_size - _viewport.x;
 
         const auto base = static_cast<int32_t>(_vertices.size());
 
         _vertices.emplace_back(SDL_Vertex{{dx, dy_base}, white, {uv.u0, uv.v0}});
-        _vertices.emplace_back(SDL_Vertex{{dx + _tile_size_f, dy_base}, white, {uv.u1, uv.v0}});
-        _vertices.emplace_back(SDL_Vertex{{dx + _tile_size_f, dy_base + _tile_size_f}, white, {uv.u1, uv.v1}});
-        _vertices.emplace_back(SDL_Vertex{{dx, dy_base + _tile_size_f}, white, {uv.u0, uv.v1}});
+        _vertices.emplace_back(SDL_Vertex{{dx + _tile_size, dy_base}, white, {uv.u1, uv.v0}});
+        _vertices.emplace_back(SDL_Vertex{{dx + _tile_size, dy_base + _tile_size}, white, {uv.u1, uv.v1}});
+        _vertices.emplace_back(SDL_Vertex{{dx, dy_base + _tile_size}, white, {uv.u0, uv.v1}});
 
         _indices.emplace_back(base);
         _indices.emplace_back(base + 1);

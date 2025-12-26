@@ -15,7 +15,7 @@ struct alignas(64) grid final {
 
 class tilemap final {
 public:
-  tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager); 
+  tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager);
 
   friend void from_json(unmarshal::document& document, tilemap& out);
 
@@ -26,14 +26,13 @@ public:
   void draw() const noexcept;
 
 private:
-  int32_t _tile_size;
   int32_t _width;
   int32_t _height;
-  float _tile_size_f;
+  float _tile_size;
   float _inv_tile_size;
-  quad _viewport;
   bool _dirty{true};
 
+  quad _viewport;
   std::vector<tile_uv> _uv_table;
   std::vector<grid> _grids;
 
