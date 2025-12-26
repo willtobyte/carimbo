@@ -35,6 +35,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
   const auto pitch = width * 4;
   SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch);
   SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST);
+  SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
 }
 
 void pixmap::draw(
