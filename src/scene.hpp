@@ -101,6 +101,5 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
-  int _viewport_width{};
-  int _viewport_height{};
+  quad _camera{};
 };

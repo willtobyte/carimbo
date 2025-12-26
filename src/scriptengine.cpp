@@ -616,7 +616,7 @@ void scriptengine::run() {
   );
 
   lua.new_usertype<quad>(
-    "quad",
+    "Quad",
     sol::constructors<quad(), quad(float, float, float, float)>(),
     "x", &quad::x,
     "y", &quad::y,

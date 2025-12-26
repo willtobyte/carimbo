@@ -25,6 +25,8 @@ public:
 
   void draw() const noexcept;
 
+  std::span<const quad> quads() const noexcept { return _quads; }
+
 private:
   int32_t _width;
   int32_t _height;
@@ -38,6 +40,7 @@ private:
 
   std::vector<SDL_Vertex> _vertices;
   std::vector<int32_t> _indices;
+  std::vector<quad> _quads;
 
   std::shared_ptr<pixmap> _atlas;
   std::shared_ptr<renderer> _renderer;

@@ -12,8 +12,6 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
   _hits.reserve(64);
 
-  SDL_GetRenderOutputSize(*_renderer, &_viewport_width, &_viewport_height);
-
   if (unmarshal::contains(document, "physics")) {
     auto def = b2DefaultWorldDef();
     if (auto physics = unmarshal::find_object(document, "physics")) {
@@ -46,8 +44,26 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   if (auto layer = unmarshal::find_object(document, "layer")) {
     const auto type = unmarshal::get<std::string_view>(*layer, "type");
 
-    if (type == "tilemap")
-      _layer.emplace<tilemap>(unmarshal::get<std::string_view>(*layer, "content"), resourcemanager);
+    if (type == "tilemap") {
+      auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(*layer, "content"), resourcemanager);
+
+      auto def = b2DefaultBodyDef();
+      def.type = b2_staticBody;
+
+      auto shape = b2DefaultShapeDef();
+
+      for (const auto& q : tilemap.quads()) {
+        const auto hx = q.w * 0.5f;
+        const auto hy = q.h * 0.5f;
+
+        def.position = {q.x + hx, q.y + hy};
+
+        const auto body = b2CreateBody(*_world, &def);
+        const auto poly = b2MakeBox(hx, hy);
+
+        b2CreatePolygonShape(body, &shape, &poly);
+      }
+    }
 
     if (type == "background")
       _layer = pixmappool->get(std::format("blobs/{}/background.png", name));
@@ -220,12 +236,9 @@ void scene::update(float delta) {
   const auto now = SDL_GetTicks();
 
   if (auto* layer = std::get_if<tilemap>(&_layer)) {
-    const auto camera = _oncamera.call<vec2>(delta);
-    layer->set_viewport({
-      camera.x, camera.y,
-      static_cast<float>(_viewport_width),
-      static_cast<float>(_viewport_height)}
-    );
+    _camera = _oncamera.call<quad>(delta);
+
+    layer->set_viewport(_camera);
 
     layer->update(delta);
   }
@@ -247,19 +260,19 @@ void scene::update(float delta) {
 
 #ifdef DEBUG
 [[nodiscard]] static bool _draw_callback(const b2ShapeId shape, void* const ctx) {
-  auto* const renderer = static_cast<SDL_Renderer*>(ctx);
+  const auto [renderer, camera] = *static_cast<std::pair<SDL_Renderer*, const quad*>*>(ctx);
   const auto aabb = b2Shape_GetAABB(shape);
 
   const auto r = SDL_FRect{
-    aabb.lowerBound.x,
-    aabb.lowerBound.y,
+    aabb.lowerBound.x - camera->x,
+    aabb.lowerBound.y - camera->y,
     aabb.upperBound.x - aabb.lowerBound.x,
     aabb.upperBound.y - aabb.lowerBound.y
   };
 
   SDL_RenderRect(renderer, &r);
   return true;
-};
+}
 #endif
 
 void scene::draw() const noexcept {
@@ -281,22 +294,17 @@ void scene::draw() const noexcept {
   }
 
 #ifdef DEBUG
-  SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
-
-  int width, height;
-  SDL_GetRenderOutputSize(*_renderer, &width, &height);
-
-  const auto x0 = .0f;
-  const auto y0 = .0f;
-  const auto x1 = static_cast<float>(width);
-  const auto y1 = static_cast<float>(height);
-
-  b2AABB aabb{{x0 - epsilon, y0 - epsilon}, {x1 + epsilon, y1 + epsilon}};
-  const auto filter = b2DefaultQueryFilter();
-
   if (_world) {
-    b2World_OverlapAABB(*_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
+    SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
+
+    b2AABB aabb{{_camera.x, _camera.y}, {_camera.x + _camera.w, _camera.y + _camera.h}};
+
+    auto filter = b2DefaultQueryFilter();
+    auto context = std::pair{static_cast<SDL_Renderer*>(*_renderer), &_camera};
+    b2World_OverlapAABB(*_world, aabb, filter, _draw_callback, &context);
   }
+
+  SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
 #endif
 }
 

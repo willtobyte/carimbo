@@ -59,6 +59,34 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourc
     }
   }
 
+  auto estimate = 0uz;
+  for (const auto& grid : _grids)
+    estimate += static_cast<size_t>(grid.collider) * static_cast<size_t>(_height);
+
+  _quads.reserve(estimate);
+
+  for (const auto& grid : _grids) {
+    if (!grid.collider) continue;
+
+    const auto* tiles = grid.tiles.data();
+    for (int32_t row = 0; row < _height; ++row) {
+      const auto row_offset = row * _width;
+      int32_t column = 0;
+      while (column < _width) {
+        while (column < _width && tiles[row_offset + column] == 0) ++column;
+        const auto start = column;
+        while (column < _width && tiles[row_offset + column] != 0) ++column;
+        if (column > start) {
+          _quads.emplace_back(
+              static_cast<float>(start) * _tile_size,
+              static_cast<float>(row) * _tile_size,
+              static_cast<float>(column - start) * _tile_size,
+              _tile_size
+          );
+        }
+      }
+    }
+  }
 }
 
 void tilemap::set_viewport(const quad& value) noexcept {
