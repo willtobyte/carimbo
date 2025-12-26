@@ -45,7 +45,7 @@ public:
   explicit scriptsystem(entt::registry& registry) noexcept
     : _view(registry.view<scriptable>()) {}
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
 private:
   using view_type = decltype(std::declval<entt::registry&>().view<scriptable>());

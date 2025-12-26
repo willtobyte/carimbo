@@ -194,7 +194,7 @@ scene::~scene() noexcept {
   }
 }
 
-void scene::update(float delta) noexcept {
+void scene::update(float delta) {
   const auto now = SDL_GetTicks();
 
   if (_tilemap) {

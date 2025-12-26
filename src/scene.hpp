@@ -26,7 +26,7 @@ public:
 
   ~scene() noexcept;
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
   void draw() const noexcept;
 

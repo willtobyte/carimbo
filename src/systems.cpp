@@ -178,7 +178,7 @@ void rendersystem::draw() const noexcept {
     });
 }
 
-void scriptsystem::update(float delta) noexcept {
+void scriptsystem::update(float delta) {
   _view.each([delta](scriptable& sc) {
     sc.on_loop(delta);
   });
