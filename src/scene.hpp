@@ -60,7 +60,6 @@ public:
 
 private:
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
-    if (!_world) return;
     auto aabb = b2AABB{};
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
     aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
@@ -72,17 +71,18 @@ private:
 
   entt::registry _registry;
 
-  std::optional<b2WorldId> _world;
-
-  animationsystem _animationsystem{_registry};
-  std::optional<physicssystem> _physicssystem;
-  rendersystem _rendersystem{_registry};
-  scriptsystem _scriptsystem{_registry};
   std::shared_ptr<::timermanager> _timermanager;
 
-  std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
+  animationsystem _animationsystem{_registry};
+  rendersystem _rendersystem{_registry};
+  scriptsystem _scriptsystem{_registry};
+
+  std::optional<b2WorldId> _world;
+  std::optional<physicssystem> _physicssystem;
 
   std::optional<particlesystem> _particlesystem;
+
+  std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 
   boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
   boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;
