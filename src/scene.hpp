@@ -60,25 +60,27 @@ public:
 
 private:
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
+    if (!_world) return;
     auto aabb = b2AABB{};
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
     aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
     const auto filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
+    b2World_OverlapAABB(*_world, aabb, filter, &collect, &out);
   }
 
   std::shared_ptr<renderer> _renderer;
 
   entt::registry _registry;
 
-  b2WorldId _world;
+  std::optional<b2WorldId> _world;
 
   animationsystem _animationsystem{_registry};
-  physicssystem _physicssystem{_registry};
+  std::optional<physicssystem> _physicssystem;
   rendersystem _rendersystem{_registry};
   scriptsystem _scriptsystem{_registry};
   std::shared_ptr<::timermanager> _timermanager;
-  std::shared_ptr<pixmap> _background;
+
+  std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 
   std::optional<particlesystem> _particlesystem;
 
@@ -99,7 +101,6 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
-  std::optional<tilemap> _tilemap;
   int _viewport_width{};
   int _viewport_height{};
 };

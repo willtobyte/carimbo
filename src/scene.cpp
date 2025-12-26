@@ -7,7 +7,6 @@
 #include "soundfx.hpp"
 
 scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment) {
-  _particlesystem.emplace(scenemanager->resourcemanager());
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
@@ -15,9 +14,21 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
   SDL_GetRenderOutputSize(*_renderer, &_viewport_width, &_viewport_height);
 
-  auto def = b2DefaultWorldDef();
-  def.gravity = b2Vec2{.0f, .0f};
-  _world = b2CreateWorld(&def);
+  if (unmarshal::contains(document, "physics")) {
+    auto def = b2DefaultWorldDef();
+    if (auto physics = unmarshal::find_object(document, "physics")) {
+      if (auto gravity = unmarshal::find_object(*physics, "gravity")) {
+        def.gravity = b2Vec2{
+          unmarshal::value_or(*gravity, "x", .0f),
+          unmarshal::value_or(*gravity, "y", .0f)
+        };
+      }
+    }
+
+    _world.emplace(b2CreateWorld(&def));
+
+    _physicssystem.emplace(_registry);
+  }
 
   const auto& resourcemanager = scenemanager->resourcemanager();
   const auto& soundmanager = resourcemanager->soundmanager();
@@ -32,11 +43,14 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     }
   }
 
-  if (unmarshal::contains(document, "tilemap")) {
-    const auto tilemap = unmarshal::get<std::string_view>(document, "tilemap");
-    _tilemap.emplace(tilemap, resourcemanager);
-  } else {
-    _background = pixmappool->get(std::format("blobs/{}/background.png", name));
+  if (auto layer = unmarshal::find_object(document, "layer")) {
+    const auto type = unmarshal::get<std::string_view>(*layer, "type");
+
+    if (type == "tilemap")
+      _layer.emplace<tilemap>(unmarshal::get<std::string_view>(*layer, "content"), resourcemanager);
+
+    if (type == "background")
+      _layer = pixmappool->get(std::format("blobs/{}/background.png", name));
   }
 
   auto z = 0;
@@ -93,7 +107,9 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
       _registry.emplace<orientation>(entity);
 
-      _registry.emplace<physics>(entity);
+      if (_world) {
+        _registry.emplace<physics>(entity);
+      }
 
       renderable rd{
         .z = z++
@@ -153,8 +169,10 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     });
   }
 
-  const auto factory = _particlesystem->factory();
   if (auto particles = unmarshal::find_array(document, "particles")) {
+    _particlesystem.emplace(scenemanager->resourcemanager());
+
+    const auto factory = _particlesystem->factory();
     for (auto element : *particles) {
       auto object = unmarshal::get<unmarshal::object>(element);
       const auto pname = unmarshal::get<std::string_view>(object, "name");
@@ -177,6 +195,10 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 }
 
 scene::~scene() noexcept {
+  if (!_world) {
+    return;
+  }
+
   const auto view = _registry.view<physics>();
   for (const auto entity : view) {
     auto& ph = view.get<physics>(entity);
@@ -189,28 +211,34 @@ scene::~scene() noexcept {
     }
   }
 
-  if (b2World_IsValid(_world)) {
-    b2DestroyWorld(_world);
+  if (b2World_IsValid(*_world)) {
+    b2DestroyWorld(*_world);
   }
 }
 
 void scene::update(float delta) {
   const auto now = SDL_GetTicks();
 
-  if (_tilemap) {
-     const auto camera = _oncamera.call<vec2>(delta);
-
-    _tilemap->set_viewport({
+  if (auto* layer = std::get_if<tilemap>(&_layer)) {
+    const auto camera = _oncamera.call<vec2>(delta);
+    layer->set_viewport({
         camera.x, camera.y,
         static_cast<float>(_viewport_width),
         static_cast<float>(_viewport_height)});
-    _tilemap->update(delta);
+    layer->update(delta);
   }
 
   _animationsystem.update(now);
-  _physicssystem.update(_world, delta);
+
+  if (_physicssystem) {
+    _physicssystem->update(*_world, delta);
+  }
+
   _scriptsystem.update(delta);
-  _particlesystem->update(delta);
+
+  if (_particlesystem) {
+    _particlesystem->update(delta);
+  }
 
   _onloop(delta);
 }
@@ -233,20 +261,22 @@ void scene::update(float delta) {
 #endif
 
 void scene::draw() const noexcept {
-  if (_background) {
-    static const auto width = static_cast<float>(_background->width());
-    static const auto height = static_cast<float>(_background->height());
-
-    _background->draw(.0f, .0f, width, height, .0f, .0f, width, height);
-  }
-
-  if (_tilemap) {
-    _tilemap->draw();
-  }
+  std::visit([](auto&& argument) {
+    using T = std::decay_t<decltype(argument)>;
+    if constexpr (std::is_same_v<T, std::shared_ptr<pixmap>>) {
+      const auto w = static_cast<float>(argument->width());
+      const auto h = static_cast<float>(argument->height());
+      argument->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+    } else if constexpr (std::is_same_v<T, tilemap>) {
+      argument.draw();
+    }
+  }, _layer);
 
   _rendersystem.draw();
 
-  _particlesystem->draw();
+  if (_particlesystem) {
+    _particlesystem->draw();
+  }
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 255, 255);
@@ -261,7 +291,10 @@ void scene::draw() const noexcept {
 
   b2AABB aabb{{x0 - epsilon, y0 - epsilon}, {x1 + epsilon, y1 + epsilon}};
   const auto filter = b2DefaultQueryFilter();
-  b2World_OverlapAABB(_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
+
+  if (_world) {
+    b2World_OverlapAABB(*_world, aabb, filter, _draw_callback, static_cast<SDL_Renderer*>(*_renderer));
+  }
 #endif
 }
 
