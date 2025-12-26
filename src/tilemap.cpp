@@ -97,20 +97,15 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
     return;
   }
 
-  const auto viewport_x = _viewport.x;
-  const auto viewport_y = _viewport.y;
-  const auto tile_size = _tile_size_f;
-  const auto width = _width;
-
   constexpr SDL_FColor white{1.0f, 1.0f, 1.0f, 1.0f};
 
   for (const auto& grid : _grids) {
     const auto* __restrict tiles = grid.tiles.data();
 
-    auto row_offset = start_row * width;
-    auto dy_base = static_cast<float>(start_row) * tile_size - viewport_y;
+    auto row_offset = start_row * _width;
+    auto dy_base = static_cast<float>(start_row) * _tile_size_f - _viewport.y;
 
-    for (auto row = start_row; row <= end_row; ++row, row_offset += width, dy_base += tile_size) {
+    for (auto row = start_row; row <= end_row; ++row, row_offset += _width, dy_base += _tile_size_f) {
       for (auto column = start_column; column <= end_column; ++column) {
         const auto tile_id = tiles[row_offset + column];
 
@@ -120,14 +115,14 @@ void tilemap::update([[maybe_unused]] float delta) noexcept {
 
         const auto& uv = _uv_table[tile_id - 1];
 
-        const auto dx = static_cast<float>(column) * tile_size - viewport_x;
+        const auto dx = static_cast<float>(column) * _tile_size_f - _viewport.x;
 
         const auto base = static_cast<int32_t>(_vertices.size());
 
         _vertices.emplace_back(SDL_Vertex{{dx, dy_base}, white, {uv.u0, uv.v0}});
-        _vertices.emplace_back(SDL_Vertex{{dx + tile_size, dy_base}, white, {uv.u1, uv.v0}});
-        _vertices.emplace_back(SDL_Vertex{{dx + tile_size, dy_base + tile_size}, white, {uv.u1, uv.v1}});
-        _vertices.emplace_back(SDL_Vertex{{dx, dy_base + tile_size}, white, {uv.u0, uv.v1}});
+        _vertices.emplace_back(SDL_Vertex{{dx + _tile_size_f, dy_base}, white, {uv.u1, uv.v0}});
+        _vertices.emplace_back(SDL_Vertex{{dx + _tile_size_f, dy_base + _tile_size_f}, white, {uv.u1, uv.v1}});
+        _vertices.emplace_back(SDL_Vertex{{dx, dy_base + _tile_size_f}, white, {uv.u0, uv.v1}});
 
         _indices.emplace_back(base);
         _indices.emplace_back(base + 1);

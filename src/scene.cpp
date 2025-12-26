@@ -222,9 +222,11 @@ void scene::update(float delta) {
   if (auto* layer = std::get_if<tilemap>(&_layer)) {
     const auto camera = _oncamera.call<vec2>(delta);
     layer->set_viewport({
-        camera.x, camera.y,
-        static_cast<float>(_viewport_width),
-        static_cast<float>(_viewport_height)});
+      camera.x, camera.y,
+      static_cast<float>(_viewport_width),
+      static_cast<float>(_viewport_height)}
+    );
+
     layer->update(delta);
   }
 
