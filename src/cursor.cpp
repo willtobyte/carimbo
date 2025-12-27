@@ -18,22 +18,15 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
 
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
 
-  for (auto field : document["animations"].get_object()) {
+  auto animations = unmarshal::find<unmarshal::object>(document, "animations");
+  for (auto field : *animations) {
     const auto key = unmarshal::key(field);
     auto aobject = unmarshal::get<unmarshal::object>(field.value());
 
     const auto oneshot = unmarshal::value_or(aobject, "oneshot", false);
 
     auto keyframes = boost::container::small_vector<keyframe, 16>{};
-    if (auto frames = unmarshal::find_array(aobject, "frames")) {
-      for (auto element : *frames) {
-        auto k = keyframe{};
-        k.duration = unmarshal::get<uint64_t>(element, "duration");
-        k.offset = unmarshal::make<vec2>(element["offset"]);
-        k.frame = unmarshal::make<quad>(element["quad"]);
-        keyframes.emplace_back(std::move(k));
-      }
-    }
+    unmarshal::collect<keyframe>(aobject, "frames", keyframes);
 
     _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, keyframes});
   }

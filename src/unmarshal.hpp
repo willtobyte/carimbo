@@ -94,25 +94,6 @@ template <typename T>
 }
 
 template <typename T>
-[[nodiscard]] inline T value_or(auto&& source, std::string_view key, T fallback) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] {
-    return fallback;
-  }
-
-  T out;
-  if (result.template get<T>().get(out)) [[unlikely]] {
-    return fallback;
-  }
-
-  return out;
-}
-
-[[nodiscard]] inline bool contains(auto&& source, std::string_view key) noexcept {
-  return !source[key].error();
-}
-
-template <typename T>
 [[nodiscard]] inline std::optional<T> find(auto&& source, std::string_view key) noexcept {
   auto result = source[key];
   if (result.error()) [[unlikely]] {
@@ -120,51 +101,28 @@ template <typename T>
   }
 
   T out;
-  if (result.template get<T>().get(out)) [[unlikely]] {
-    return std::nullopt;
+  if constexpr (std::is_same_v<T, object>) {
+    if (result.get_object().get(out)) [[unlikely]] return std::nullopt;
+  } else if constexpr (std::is_same_v<T, array>) {
+    if (result.get_array().get(out)) [[unlikely]] return std::nullopt;
+  } else {
+    if (result.template get<T>().get(out)) [[unlikely]] return std::nullopt;
   }
-
-  return out;
-}
-
-[[nodiscard]] inline std::optional<object> find_object(auto&& source, std::string_view key) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  object out;
-  if (result.get_object().get(out)) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  return out;
-}
-
-[[nodiscard]] inline std::optional<array> find_array(auto&& source, std::string_view key) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
-  array out;
-  if (result.get_array().get(out)) [[unlikely]] {
-    return std::nullopt;
-  }
-
   return out;
 }
 
 template <typename T>
-[[nodiscard]] inline array get_array(T&& source, std::string_view key) noexcept {
-  array out;
-  source[key].get_array().get(out);
-  return out;
+[[nodiscard]] inline T value_or(auto&& source, std::string_view key, T fallback) noexcept {
+  return find<T>(source, key).value_or(fallback);
 }
 
-[[nodiscard]] inline size_t count(array& arr) noexcept {
+[[nodiscard]] inline bool contains(auto&& source, std::string_view key) noexcept {
+  return !source[key].error();
+}
+
+[[nodiscard]] inline size_t count(array& a) noexcept {
   size_t out;
-  arr.count_elements().get(out);
+  a.count_elements().get(out);
   return out;
 }
 
@@ -187,5 +145,41 @@ template <typename T>
   source.get(v);
   from_json(v, out);
   return out;
+}
+
+template <typename T>
+inline bool make_if(auto&& source, std::string_view key, T& out) noexcept {
+  auto result = source[key];
+  if (result.error()) [[unlikely]] return false;
+  value v;
+  result.get(v);
+  from_json(v, out);
+  return true;
+}
+
+template <typename T, typename Container>
+inline void collect(auto&& source, std::string_view key, Container& out) noexcept {
+  auto result = source[key];
+  if (result.error()) [[unlikely]] return;
+  array a;
+  if (result.get_array().get(a)) [[unlikely]] return;
+  for (auto element : a) {
+    out.emplace_back(make<T>(element));
+  }
+}
+
+template <typename T, typename Container>
+inline void reserve(auto&& source, std::string_view key, Container& out) noexcept {
+  auto result = source[key];
+  if (result.error()) [[unlikely]] return;
+  array a;
+  if (result.get_array().get(a)) [[unlikely]] return;
+  size_t n;
+  a.count_elements().get(n);
+  a.reset();
+  out.reserve(n);
+  for (auto element : a) {
+    out.emplace_back(make<T>(element));
+  }
 }
 }

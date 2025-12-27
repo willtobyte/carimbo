@@ -45,7 +45,7 @@ std::pair<T, T> read_range(unmarshal::object& object, T fallback_start, T fallba
 
 template <typename T>
 std::pair<T, T> read_range_from(unmarshal::object& parent, std::string_view key, T fallback_start, T fallback_end) noexcept {
-  if (auto opt = unmarshal::find_object(parent, key)) {
+  if (auto opt = unmarshal::find<unmarshal::object>(parent, key)) {
     return read_range(*opt, fallback_start, fallback_end);
   }
   return {fallback_start, fallback_end};
@@ -74,7 +74,7 @@ struct particleconfig final {
   friend void from_json(unmarshal::document& document, particleconfig& out) {
     out.count = static_cast<size_t>(unmarshal::value_or(document, "count", 0ull));
 
-    if (auto spawn = unmarshal::find_object(document, "spawn")) {
+    if (auto spawn = unmarshal::find<unmarshal::object>(document, "spawn")) {
       out.xspawn = read_range_from(*spawn, "x", .0f, .0f);
       out.yspawn = read_range_from(*spawn, "y", .0f, .0f);
       out.radius = read_range_from(*spawn, "radius", .0f, .0f);
@@ -84,17 +84,17 @@ struct particleconfig final {
       out.alpha = read_range_from(*spawn, "alpha", 255u, 255u);
     }
 
-    if (auto velocity = unmarshal::find_object(document, "velocity")) {
+    if (auto velocity = unmarshal::find<unmarshal::object>(document, "velocity")) {
       out.xvel = read_range_from(*velocity, "x", .0f, .0f);
       out.yvel = read_range_from(*velocity, "y", .0f, .0f);
     }
 
-    if (auto gravity = unmarshal::find_object(document, "gravity")) {
+    if (auto gravity = unmarshal::find<unmarshal::object>(document, "gravity")) {
       out.gx = read_range_from(*gravity, "x", .0f, .0f);
       out.gy = read_range_from(*gravity, "y", .0f, .0f);
     }
 
-    if (auto rotation = unmarshal::find_object(document, "rotation")) {
+    if (auto rotation = unmarshal::find<unmarshal::object>(document, "rotation")) {
       out.rforce = read_range_from(*rotation, "force", .0f, .0f);
       out.rvel = read_range_from(*rotation, "velocity", .0f, .0f);
     }

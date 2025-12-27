@@ -12,15 +12,13 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
   _hits.reserve(64);
 
-  if (unmarshal::contains(document, "physics")) {
+  if (auto physics = unmarshal::find<unmarshal::object>(document, "physics")) {
     auto def = b2DefaultWorldDef();
-    if (auto physics = unmarshal::find_object(document, "physics")) {
-      if (auto gravity = unmarshal::find_object(*physics, "gravity")) {
-        def.gravity = b2Vec2{
-          unmarshal::value_or(*gravity, "x", .0f),
-          unmarshal::value_or(*gravity, "y", .0f)
-        };
-      }
+    if (auto gravity = unmarshal::find<unmarshal::object>(*physics, "gravity")) {
+      def.gravity = b2Vec2{
+        unmarshal::value_or(*gravity, "x", .0f),
+        unmarshal::value_or(*gravity, "y", .0f)
+      };
     }
 
     _world.emplace(b2CreateWorld(&def));
@@ -33,7 +31,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   const auto& pixmappool = resourcemanager->pixmappool();
   const auto& fontfactory = resourcemanager->fontfactory();
 
-  if (auto effects = unmarshal::find_array(document, "effects")) {
+  if (auto effects = unmarshal::find<unmarshal::array>(document, "effects")) {
     for (auto element : *effects) {
       const auto effect = unmarshal::string(element);
       const auto path = std::format("blobs/{}/{}.ogg", name, effect);
@@ -41,7 +39,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     }
   }
 
-  if (auto layer = unmarshal::find_object(document, "layer")) {
+  if (auto layer = unmarshal::find<unmarshal::object>(document, "layer")) {
     const auto type = unmarshal::get<std::string_view>(*layer, "type");
 
     if (type == "tilemap") {
@@ -86,7 +84,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   }
 
   auto z = 0;
-  if (auto objects = unmarshal::find_array(document, "objects")) {
+  if (auto objects = unmarshal::find<unmarshal::array>(document, "objects")) {
     for (auto element : *objects) {
       auto object = unmarshal::get<unmarshal::object>(element);
       const auto oname = unmarshal::get<std::string_view>(object, "name");
@@ -102,7 +100,8 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
       const auto entity = _registry.create();
 
       auto at = std::make_shared<atlas>();
-      for (auto field : dobject["timelines"].get_object()) {
+      auto timelines = unmarshal::find<unmarshal::object>(dobject, "timelines");
+      for (auto field : *timelines) {
         at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
       }
 
@@ -210,7 +209,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     });
   }
 
-  if (auto particles = unmarshal::find_array(document, "particles")) {
+  if (auto particles = unmarshal::find<unmarshal::array>(document, "particles")) {
     _particlesystem.emplace(scenemanager->resourcemanager());
 
     const auto factory = _particlesystem->factory();
@@ -227,7 +226,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     }
   }
 
-  if (auto fonts = unmarshal::find_array(document, "fonts")) {
+  if (auto fonts = unmarshal::find<unmarshal::array>(document, "fonts")) {
     for (auto element : *fonts) {
       auto fontname = unmarshal::string(element);
       fontfactory->get(fontname);

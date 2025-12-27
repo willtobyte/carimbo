@@ -56,9 +56,7 @@ struct frame final {
 
   friend void from_json(unmarshal::value json, frame& out) {
     out.duration = unmarshal::get<int64_t>(json, "duration");
-    if (unmarshal::contains(json, "offset")) {
-      out.offset = unmarshal::make<struct offset>(json["offset"]);
-    }
+    unmarshal::make_if(json, "offset", out.offset);
     out.quad = unmarshal::make<struct quad>(json["quad"]);
   }
 };
@@ -100,22 +98,17 @@ struct timeline final {
   friend void from_json(unmarshal::value json, timeline& out) {
     out.oneshot = unmarshal::value_or(json, "oneshot", false);
 
-    if (unmarshal::contains(json, "next")) {
-      out.next = _resolve(unmarshal::get<std::string_view>(json, "next"));
+    if (auto next = unmarshal::find<std::string_view>(json, "next")) {
+      out.next = _resolve(*next);
     }
 
-    if (auto opt = unmarshal::find_object(json, "hitbox")) {
-      auto& h = *opt;
-      if (auto q = h["quad"]; !q.error()) {
+    if (auto h = unmarshal::find<unmarshal::object>(json, "hitbox")) {
+      if (auto q = (*h)["quad"]; !q.error()) {
         out.hitbox = unmarshal::make<b2AABB>(q);
       }
     }
 
-    if (auto array = unmarshal::find_array(json, "frames")) {
-      for (auto element : *array) {
-        out.frames.emplace_back(unmarshal::make<frame>(element));
-      }
-    }
+    unmarshal::collect<frame>(json, "frames", out.frames);
   }
 };
 
