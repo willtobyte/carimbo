@@ -999,11 +999,12 @@ void scriptengine::run() {
 
   lua["viewport"] = viewport;
 
+  engine->scenemanager()->set_runtime(lua);
+
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();
   verify(result);
   engine->add_loopable(std::make_shared<lua_loopable>(lua));
-  engine->scenemanager()->set_runtime(lua);
 
   const auto end = SDL_GetPerformanceCounter();
   const auto elapsed =

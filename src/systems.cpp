@@ -31,7 +31,8 @@ static void patch_shape(physics& p, float hx, float hy) noexcept {
 
   const auto poly = b2MakeBox(hx, hy);
   auto def = b2DefaultShapeDef();
-  def.enableContactEvents = true;
+  def.isSensor = true;
+  def.enableSensorEvents = true;
   p.shape = b2CreatePolygonShape(p.body, &def, &poly);
   p.dirty = false;
 }
@@ -152,12 +153,12 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
       }
     });
 
-  const auto events = b2World_GetContactEvents(world);
+  const auto events = b2World_GetSensorEvents(world);
 
   for (int i = 0; i < events.beginCount; ++i) {
     const auto& e = events.beginEvents[i];
-    const auto dataA = b2Body_GetUserData(b2Shape_GetBody(e.shapeIdA));
-    const auto dataB = b2Body_GetUserData(b2Shape_GetBody(e.shapeIdB));
+    const auto dataA = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
+    const auto dataB = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
     if (!dataA || !dataB) continue;
 
     const auto entityA = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataA));
@@ -173,8 +174,8 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 
   for (int i = 0; i < events.endCount; ++i) {
     const auto& e = events.endEvents[i];
-    const auto dataA = b2Body_GetUserData(b2Shape_GetBody(e.shapeIdA));
-    const auto dataB = b2Body_GetUserData(b2Shape_GetBody(e.shapeIdB));
+    const auto dataA = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
+    const auto dataB = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
     if (!dataA || !dataB) continue;
 
     const auto entityA = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataA));

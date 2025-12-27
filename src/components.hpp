@@ -72,7 +72,7 @@ enum class bodytype : uint8_t {
 struct physics final {
   b2BodyId body;
   b2ShapeId shape;
-  bodytype type{bodytype::static_body};
+  bodytype type{bodytype::kinematic};
   bool dirty{true};
   bool enabled{true};
 
