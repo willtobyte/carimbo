@@ -19,13 +19,14 @@ private:
 class physicssystem final {
 public:
   explicit physicssystem(entt::registry& registry) noexcept
-    : _group(registry.group<transform, physics>(entt::get<playback, renderable>)) {}
+    : _registry(registry), _group(registry.group<transform, physics>(entt::get<playback, renderable>)) {}
 
   void update(b2WorldId world, float delta) noexcept;
 
 private:
   using group_type = decltype(std::declval<entt::registry&>().group<transform, physics>(entt::get<playback, renderable>));
 
+  entt::registry& _registry;
   group_type _group;
 };
 

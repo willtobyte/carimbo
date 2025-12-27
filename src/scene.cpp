@@ -272,46 +272,6 @@ void scene::update(float delta) {
 
   if (_physicssystem) {
     _physicssystem->update(*_world, delta);
-
-    const auto events = b2World_GetContactEvents(*_world);
-
-    for (int i = 0; i < events.beginCount; ++i) {
-      const auto& e = events.beginEvents[i];
-      const auto bodyA = b2Shape_GetBody(e.shapeIdA);
-      const auto bodyB = b2Shape_GetBody(e.shapeIdB);
-      const auto dataA = b2Body_GetUserData(bodyA);
-      const auto dataB = b2Body_GetUserData(bodyB);
-      if (!dataA || !dataB) continue;
-
-      const auto entityA = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataA));
-      const auto entityB = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataB));
-      const auto* cA = _registry.try_get<callbacks>(entityA);
-      const auto* cB = _registry.try_get<callbacks>(entityB);
-      const auto* mA = _registry.try_get<metadata>(entityA);
-      const auto* mB = _registry.try_get<metadata>(entityB);
-
-      if (cA && mB) cA->on_collision(cA->self, static_cast<uint64_t>(entityB), mB->kind);
-      if (cB && mA) cB->on_collision(cB->self, static_cast<uint64_t>(entityA), mA->kind);
-    }
-
-    for (int i = 0; i < events.endCount; ++i) {
-      const auto& e = events.endEvents[i];
-      const auto bodyA = b2Shape_GetBody(e.shapeIdA);
-      const auto bodyB = b2Shape_GetBody(e.shapeIdB);
-      const auto dataA = b2Body_GetUserData(bodyA);
-      const auto dataB = b2Body_GetUserData(bodyB);
-      if (!dataA || !dataB) continue;
-
-      const auto entityA = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataA));
-      const auto entityB = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataB));
-      const auto* cA = _registry.try_get<callbacks>(entityA);
-      const auto* cB = _registry.try_get<callbacks>(entityB);
-      const auto* mA = _registry.try_get<metadata>(entityA);
-      const auto* mB = _registry.try_get<metadata>(entityB);
-
-      if (cA && mB) cA->on_collision_end(cA->self, static_cast<uint64_t>(entityB), mB->kind);
-      if (cB && mA) cB->on_collision_end(cB->self, static_cast<uint64_t>(entityA), mA->kind);
-    }
   }
 
   if (_particlesystem) {
