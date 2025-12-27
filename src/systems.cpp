@@ -157,36 +157,42 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 
   for (int i = 0; i < events.beginCount; ++i) {
     const auto& e = events.beginEvents[i];
-    const auto dataA = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
-    const auto dataB = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
-    if (!dataA || !dataB) continue;
+    const auto dataa = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
+    const auto datab = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
+    if (!dataa || !datab) continue;
 
-    const auto entityA = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataA));
-    const auto entityB = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataB));
-    const auto* cA = _registry.try_get<callbacks>(entityA);
-    const auto* cB = _registry.try_get<callbacks>(entityB);
-    const auto* mA = _registry.try_get<metadata>(entityA);
-    const auto* mB = _registry.try_get<metadata>(entityB);
+    const auto entitya = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataa));
+    const auto entityb = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(datab));
 
-    if (cA && mB) cA->on_collision(cA->self, static_cast<uint64_t>(entityB), mB->kind);
-    if (cB && mA) cB->on_collision(cB->self, static_cast<uint64_t>(entityA), mA->kind);
+    if (entitya >= entityb) continue;
+
+    const auto* ca = _registry.try_get<callbacks>(entitya);
+    const auto* cb = _registry.try_get<callbacks>(entityb);
+    const auto* ma = _registry.try_get<metadata>(entitya);
+    const auto* mb = _registry.try_get<metadata>(entityb);
+
+    if (ca && mb) ca->on_collision(ca->self, static_cast<uint64_t>(entityb), mb->kind);
+    if (cb && ma) cb->on_collision(cb->self, static_cast<uint64_t>(entitya), ma->kind);
   }
 
   for (int i = 0; i < events.endCount; ++i) {
     const auto& e = events.endEvents[i];
-    const auto dataA = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
-    const auto dataB = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
-    if (!dataA || !dataB) continue;
+    const auto dataa = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
+    const auto datab = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
+    if (!dataa || !datab) continue;
 
-    const auto entityA = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataA));
-    const auto entityB = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataB));
-    const auto* cA = _registry.try_get<callbacks>(entityA);
-    const auto* cB = _registry.try_get<callbacks>(entityB);
-    const auto* mA = _registry.try_get<metadata>(entityA);
-    const auto* mB = _registry.try_get<metadata>(entityB);
+    const auto entitya = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataa));
+    const auto entityb = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(datab));
 
-    if (cA && mB) cA->on_collision_end(cA->self, static_cast<uint64_t>(entityB), mB->kind);
-    if (cB && mA) cB->on_collision_end(cB->self, static_cast<uint64_t>(entityA), mA->kind);
+    if (entitya >= entityb) continue;
+
+    const auto* ca = _registry.try_get<callbacks>(entitya);
+    const auto* cb = _registry.try_get<callbacks>(entityb);
+    const auto* ma = _registry.try_get<metadata>(entitya);
+    const auto* mb = _registry.try_get<metadata>(entityb);
+
+    if (ca && mb) ca->on_collision_end(ca->self, static_cast<uint64_t>(entityb), mb->kind);
+    if (cb && ma) cb->on_collision_end(cb->self, static_cast<uint64_t>(entitya), ma->kind);
   }
 }
 
