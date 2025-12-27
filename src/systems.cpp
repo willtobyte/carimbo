@@ -109,6 +109,8 @@ void animationsystem::update(uint64_t now) noexcept {
 }
 
 void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexcept {
+  b2World_Step(world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
+
   _group.each(
     [world](entt::entity entity, const transform& t, physics& p, const playback& s, const renderable& rn) {
       if (!p.enabled) [[unlikely]] {
