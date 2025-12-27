@@ -70,7 +70,9 @@ void animationsystem::update(uint64_t now) noexcept {
       s.tick = now;
       s.dirty = false;
       if (s.timeline) {
-        c.on_begin(c.self);
+        auto self = c.self.lock();
+        assert(self && "self expired");
+        c.on_begin(self);
       }
     }
 
@@ -104,7 +106,9 @@ void animationsystem::update(uint64_t now) noexcept {
     } else if (is_last & tl.oneshot) {
       s.action = no_action;
       s.timeline = nullptr;
-      c.on_end(c.self);
+      auto self = c.self.lock();
+      assert(self && "self expired");
+      c.on_end(self);
     }
   });
 }
@@ -156,43 +160,41 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
   const auto events = b2World_GetSensorEvents(world);
 
   for (int i = 0; i < events.beginCount; ++i) {
-    const auto& e = events.beginEvents[i];
-    const auto dataa = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
-    const auto datab = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
-    if (!dataa || !datab) continue;
+    const auto& event = events.beginEvents[i];
+    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
+    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
+    if (!sd || !vd) [[unlikely]] continue;
 
-    const auto entitya = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataa));
-    const auto entityb = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(datab));
+    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
+    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
 
-    if (entitya >= entityb) continue;
+    const auto* sc = _registry.try_get<callbacks>(sensor);
+    const auto* vm = _registry.try_get<metadata>(visitor);
 
-    const auto* ca = _registry.try_get<callbacks>(entitya);
-    const auto* cb = _registry.try_get<callbacks>(entityb);
-    const auto* ma = _registry.try_get<metadata>(entitya);
-    const auto* mb = _registry.try_get<metadata>(entityb);
-
-    if (ca && mb) ca->on_collision(ca->self, static_cast<uint64_t>(entityb), mb->kind);
-    if (cb && ma) cb->on_collision(cb->self, static_cast<uint64_t>(entitya), ma->kind);
+    if (sc && vm) [[likely]] {
+      auto self = sc->self.lock();
+      assert(self && "self expired");
+      sc->on_collision(self, static_cast<uint64_t>(visitor), vm->kind);
+    }
   }
 
   for (int i = 0; i < events.endCount; ++i) {
-    const auto& e = events.endEvents[i];
-    const auto dataa = b2Body_GetUserData(b2Shape_GetBody(e.sensorShapeId));
-    const auto datab = b2Body_GetUserData(b2Shape_GetBody(e.visitorShapeId));
-    if (!dataa || !datab) continue;
+    const auto& event = events.endEvents[i];
+    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
+    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
+    if (!sd || !vd) [[unlikely]] continue;
 
-    const auto entitya = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(dataa));
-    const auto entityb = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(datab));
+    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
+    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
 
-    if (entitya >= entityb) continue;
+    const auto* sc = _registry.try_get<callbacks>(sensor);
+    const auto* vm = _registry.try_get<metadata>(visitor);
 
-    const auto* ca = _registry.try_get<callbacks>(entitya);
-    const auto* cb = _registry.try_get<callbacks>(entityb);
-    const auto* ma = _registry.try_get<metadata>(entitya);
-    const auto* mb = _registry.try_get<metadata>(entityb);
-
-    if (ca && mb) ca->on_collision_end(ca->self, static_cast<uint64_t>(entityb), mb->kind);
-    if (cb && ma) cb->on_collision_end(cb->self, static_cast<uint64_t>(entitya), ma->kind);
+    if (sc && vm) [[likely]] {
+      auto self = sc->self.lock();
+      assert(self && "self expired");
+      sc->on_collision_end(self, static_cast<uint64_t>(visitor), vm->kind);
+    }
   }
 }
 

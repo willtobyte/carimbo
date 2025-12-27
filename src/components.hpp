@@ -164,7 +164,7 @@ struct callbacks {
   functor on_collision;
   functor on_collision_end;
 
-  std::shared_ptr<entityproxy> self;
+  std::weak_ptr<entityproxy> self;
 };
 
 struct scriptable {

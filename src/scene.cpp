@@ -425,7 +425,9 @@ void scene::on_touch(float x, float y) {
 
   for (const auto entity : _hits) {
     if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      c->on_touch(c->self, x, y);
+      auto self = c->self.lock();
+      assert(self && "self expired");
+      c->on_touch(self, x, y);
     }
   }
 }
@@ -437,14 +439,18 @@ void scene::on_motion(float x, float y) {
   for (const auto entity : _hovering) {
     if (_hits.contains(entity)) continue;
     if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      c->on_unhover(c->self);
+      auto self = c->self.lock();
+      assert(self && "self expired");
+      c->on_unhover(self);
     }
   }
 
   for (const auto entity : _hits) {
     if (_hovering.contains(entity)) continue;
     if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      c->on_hover(c->self);
+      auto self = c->self.lock();
+      assert(self && "self expired");
+      c->on_hover(self);
     }
   }
 
