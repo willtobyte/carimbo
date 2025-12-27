@@ -47,26 +47,42 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     if (type == "tilemap") {
       auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(*layer, "content"), resourcemanager);
 
+      const auto tile_size = tilemap.tile_size();
+      const auto half = tile_size * 0.5f;
+      const auto width = tilemap.width();
+
       auto def = b2DefaultBodyDef();
       def.type = b2_staticBody;
 
       auto shape = b2DefaultShapeDef();
+      const auto poly = b2MakeBox(half, half);
 
-      for (const auto& q : tilemap.quads()) {
-        const auto hx = q.w * 0.5f;
-        const auto hy = q.h * 0.5f;
+      for (const auto& grid : tilemap.grids()) {
+        if (!grid.collider) continue;
 
-        def.position = {q.x + hx, q.y + hy};
+        const auto* tiles = grid.tiles.data();
+        for (int32_t row = 0; row < tilemap.height(); ++row) {
+          const auto row_offset = row * width;
+          for (int32_t column = 0; column < width; ++column) {
+            if (tiles[row_offset + column] == 0) continue;
 
-        const auto body = b2CreateBody(*_world, &def);
-        const auto poly = b2MakeBox(hx, hy);
+            def.position = {
+              static_cast<float>(column) * tile_size + half,
+              static_cast<float>(row) * tile_size + half
+            };
 
-        b2CreatePolygonShape(body, &shape, &poly);
+            const auto body = b2CreateBody(*_world, &def);
+            b2CreatePolygonShape(body, &shape, &poly);
+          }
+        }
       }
     }
 
-    if (type == "background")
+    if (type == "background") {
       _layer = pixmappool->get(std::format("blobs/{}/background.png", name));
+
+      _camera = quad{0, 0, unmarshal::get<float>(document, "width"), unmarshal::get<float>(document, "height")};
+    }
   }
 
   auto z = 0;
@@ -276,12 +292,10 @@ void scene::update(float delta) {
 #endif
 
 void scene::draw() const noexcept {
-  std::visit([](auto&& argument) {
+  std::visit([this](auto&& argument) {
     using T = std::decay_t<decltype(argument)>;
     if constexpr (std::is_same_v<T, std::shared_ptr<pixmap>>) {
-      const auto w = static_cast<float>(argument->width());
-      const auto h = static_cast<float>(argument->height());
-      argument->draw(.0f, .0f, w, h, .0f, .0f, w, h);
+      argument->draw(_camera.x, _camera.y, _camera.w, _camera.h, .0f, .0f, _camera.w, _camera.h);
     } else if constexpr (std::is_same_v<T, tilemap>) {
       argument.draw();
     }
