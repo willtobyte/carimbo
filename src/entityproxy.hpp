@@ -45,6 +45,8 @@ public:
   void set_ontouch(sol::protected_function fn);
   void set_onbegin(sol::protected_function fn);
   void set_onend(sol::protected_function fn);
+  void set_oncollision(sol::protected_function fn);
+  void set_oncollisionend(sol::protected_function fn);
 
   [[nodiscard]] std::shared_ptr<entityproxy> clone();
 

@@ -161,6 +161,8 @@ struct callbacks {
   functor on_touch;
   functor on_begin;
   functor on_end;
+  functor on_collision;
+  functor on_collision_end;
 
   std::shared_ptr<entityproxy> self;
 };

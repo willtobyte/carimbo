@@ -362,6 +362,8 @@ void scriptengine::run() {
     "on_touch", &entityproxy::set_ontouch,
     "on_begin", &entityproxy::set_onbegin,
     "on_end", &entityproxy::set_onend,
+    "on_collision", &entityproxy::set_oncollision,
+    "on_collision_end", &entityproxy::set_oncollisionend,
     "clone", &entityproxy::clone,
 
     sol::meta_function::index, metaentity::index,

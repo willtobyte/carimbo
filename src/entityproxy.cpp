@@ -147,6 +147,16 @@ void entityproxy::set_onend(sol::protected_function fn) {
   c.on_end = std::move(fn);
 }
 
+void entityproxy::set_oncollision(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
+  c.on_collision = std::move(fn);
+}
+
+void entityproxy::set_oncollisionend(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
+  c.on_collision_end = std::move(fn);
+}
+
 std::shared_ptr<entityproxy> entityproxy::clone() {
   const auto e = _registry.create();
 
