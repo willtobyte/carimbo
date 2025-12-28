@@ -1,7 +1,10 @@
-#include "particlesystem.hpp"
+#include "registries.hpp"
 
+#include "entityproxy.hpp"
 #include "io.hpp"
 #include "resourcemanager.hpp"
+#include "soundfx.hpp"
+#include "soundmanager.hpp"
 
 namespace {
 
@@ -102,6 +105,35 @@ struct particleconfig final {
 };
 }
 
+effects::effects(std::shared_ptr<soundmanager> soundmanager, std::string_view scenename)
+    : _soundmanager(std::move(soundmanager)),
+      _scenename(scenename) {
+  _effects.reserve(8);
+}
+
+effects::~effects() noexcept {
+  stop();
+}
+
+void effects::add(std::string_view name) {
+  const auto path = std::format("blobs/{}/{}.ogg", _scenename, name);
+  _effects.emplace(name, _soundmanager->get(path));
+}
+
+std::shared_ptr<soundfx> effects::get(std::string_view name) const {
+  return _effects.find(name)->second;
+}
+
+void effects::stop() const noexcept {
+  for (const auto& [_, effect] : _effects) {
+    effect->stop();
+  }
+}
+
+void effects::clear() {
+  _effects.clear();
+}
+
 particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanager)
     : _resourcemanager(std::move(resourcemanager)) {
 }
@@ -158,13 +190,13 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return batch;
 }
 
-particlesystem::particlesystem(std::shared_ptr<resourcemanager> resourcemanager)
+particles::particles(std::shared_ptr<resourcemanager> resourcemanager)
     : _renderer(resourcemanager->renderer()),
       _factory(std::make_shared<particlefactory>(resourcemanager)) {
   _batches.reserve(16);
 }
 
-void particlesystem::add(unmarshal::object& particle) {
+void particles::add(unmarshal::object& particle) {
   const auto name = unmarshal::get<std::string_view>(particle, "name");
   const auto kind = unmarshal::get<std::string_view>(particle, "kind");
   const auto x = unmarshal::get<float>(particle, "x");
@@ -173,15 +205,15 @@ void particlesystem::add(unmarshal::object& particle) {
   _batches.emplace(name, _factory->create(kind, x, y, spawning));
 }
 
-std::shared_ptr<particleprops> particlesystem::get(std::string_view name) const {
+std::shared_ptr<particleprops> particles::get(std::string_view name) const {
   return _batches.find(name)->second->props;
 }
 
-void particlesystem::clear() {
+void particles::clear() {
   _batches.clear();
 }
 
-void particlesystem::update(float delta) {
+void particles::update(float delta) {
   for (const auto& [_, batch] : _batches) {
     auto* props = batch->props.get();
     if (!props->active) [[unlikely]] {
@@ -279,7 +311,7 @@ void particlesystem::update(float delta) {
   }
 }
 
-void particlesystem::draw() const {
+void particles::draw() const {
   for (const auto& [_, batch] : _batches) {
     const auto& props = batch->props;
     if (!props->active) [[unlikely]] {
@@ -297,6 +329,146 @@ void particlesystem::draw() const {
   }
 }
 
-std::shared_ptr<particlefactory> particlesystem::factory() const noexcept {
+std::shared_ptr<particlefactory> particles::factory() const noexcept {
   return _factory;
+}
+
+objects::objects(
+    entt::registry& registry,
+    std::shared_ptr<pixmappool> pixmappool,
+    std::string_view scenename,
+    sol::environment environment
+)
+    : _registry(registry),
+      _pixmappool(std::move(pixmappool)),
+      _scenename(scenename),
+      _environment(std::move(environment)) {
+  _proxies.reserve(32);
+}
+
+void objects::add(unmarshal::object& object, int32_t z) {
+  const auto oname = unmarshal::get<std::string_view>(object, "name");
+  const auto kind = unmarshal::get<std::string_view>(object, "kind");
+  const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
+
+  const auto x = unmarshal::value_or(object, "x", .0f);
+  const auto y = unmarshal::value_or(object, "y", .0f);
+
+  const auto ofn = std::format("objects/{}/{}.json", _scenename, kind);
+  auto json = unmarshal::parse(io::read(ofn)); auto& dobject = *json;
+
+  const auto entity = _registry.create();
+
+  auto at = std::make_shared<atlas>();
+  if (auto timelines = unmarshal::find<unmarshal::object>(dobject, "timelines")) {
+    for (auto field : *timelines) {
+      at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
+    }
+  }
+
+  _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
+
+  metadata md{
+    .kind = _resolve(kind)
+  };
+  _registry.emplace<metadata>(entity, std::move(md));
+
+  _registry.emplace<tint>(entity);
+
+  sprite sp{
+    .pixmap = _pixmappool->get(std::format("blobs/{}/{}.png", _scenename, kind))
+  };
+  _registry.emplace<sprite>(entity, std::move(sp));
+
+  playback pb{
+    .dirty = true,
+    .redraw = false,
+    .current_frame = 0,
+    .tick = SDL_GetTicks(),
+    .action = action,
+    .timeline = nullptr
+  };
+  _registry.emplace<playback>(entity, std::move(pb));
+
+  transform tr{
+    .position = vec2{x, y},
+    .angle = .0,
+    .scale = unmarshal::value_or(dobject, "scale", 1.0f)
+  };
+  _registry.emplace<transform>(entity, std::move(tr));
+
+  _registry.emplace<orientation>(entity);
+
+  _registry.emplace<::physics>(entity);
+
+  renderable rd{
+    .z = z
+  };
+  _registry.emplace<renderable>(entity, std::move(rd));
+
+  const auto lfn = std::format("objects/{}/{}.lua", _scenename, kind);
+
+  const auto proxy = std::make_shared<entityproxy>(entity, _registry);
+  _proxies.emplace(std::move(oname), proxy);
+
+  callbacks c {
+    .self = proxy
+  };
+  _registry.emplace<callbacks>(entity, std::move(c));
+
+  if (io::exists(lfn)) {
+    sol::state_view lua(_environment.lua_state());
+    sol::environment env(lua, sol::create, _environment);
+    env["self"] = proxy;
+
+    const auto buffer = io::read(lfn);
+    std::string_view source{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
+
+    const auto result = lua.load(source, std::format("@{}", lfn));
+    verify(result);
+
+    auto function = result.get<sol::protected_function>();
+    sol::set_environment(env, function);
+
+    const auto exec = function();
+    verify(exec);
+
+    auto module = exec.get<sol::table>();
+
+    scriptable sc;
+    sc.environment = env;
+
+    if (auto fn = module["on_begin"].get<sol::protected_function>(); fn.valid()) {
+      sc.on_begin = std::move(fn);
+    }
+
+    if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
+      sc.on_loop = std::move(fn);
+    }
+
+    if (auto fn = module["on_end"].get<sol::protected_function>(); fn.valid()) {
+      sc.on_end = std::move(fn);
+    }
+
+    auto& cb = _registry.get<callbacks>(entity);
+    if (auto fn = module["on_collision"].get<sol::protected_function>(); fn.valid()) {
+      cb.on_collision = std::move(fn);
+    }
+
+    if (auto fn = module["on_collision_end"].get<sol::protected_function>(); fn.valid()) {
+      cb.on_collision_end = std::move(fn);
+    }
+
+    _registry.emplace<scriptable>(entity, std::move(sc));
+  }
+}
+
+std::shared_ptr<entityproxy> objects::get(std::string_view name) const {
+  return _proxies.find(name)->second;
+}
+
+void objects::sort() {
+  _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
+    return lhs.z < rhs.z;
+  });
 }

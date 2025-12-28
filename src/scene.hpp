@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 
+#include "registries.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
 
@@ -80,12 +81,11 @@ private:
   b2WorldId _world{};
   physicssystem _physicssystem{_registry};
 
-  particlesystem _particlesystem;
+  effects _effects;
+  particles _particles;
+  objects _objects;
 
   std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
-
-  boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
-  boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;
 
   std::function<void()> _onenter;
   std::function<void()> _onleave;

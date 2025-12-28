@@ -1,13 +1,12 @@
 #include "scene.hpp"
 
-#include "entityproxy.hpp"
 #include "geometry.hpp"
-#include "io.hpp"
-#include "particlesystem.hpp"
 #include "soundfx.hpp"
 
 scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
-    : _particlesystem(scenemanager->resourcemanager()) {
+    : _effects(scenemanager->resourcemanager()->soundmanager(), name),
+      _particles(scenemanager->resourcemanager()),
+      _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, environment) {
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
@@ -26,15 +25,12 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   _world = b2CreateWorld(&def);
 
   const auto& resourcemanager = scenemanager->resourcemanager();
-  const auto& soundmanager = resourcemanager->soundmanager();
   const auto& pixmappool = resourcemanager->pixmappool();
   const auto& fontfactory = resourcemanager->fontfactory();
 
-  if (auto effects = unmarshal::find<unmarshal::array>(document, "effects")) {
-    for (auto element : *effects) {
-      const auto effect = unmarshal::string(element);
-      const auto path = std::format("blobs/{}/{}.ogg", name, effect);
-      _effects.emplace(effect, soundmanager->get(path));
+  if (auto array = unmarshal::find<unmarshal::array>(document, "effects")) {
+    for (auto element : *array) {
+      _effects.add(unmarshal::string(element));
     }
   }
 
@@ -82,140 +78,25 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     }
   }
 
-  auto z = 0;
-  if (auto objects = unmarshal::find<unmarshal::array>(document, "objects")) {
-    for (auto element : *objects) {
+  if (auto array = unmarshal::find<unmarshal::array>(document, "objects")) {
+    auto z = 0;
+    for (auto element : *array) {
       auto object = unmarshal::get<unmarshal::object>(element);
-      const auto oname = unmarshal::get<std::string_view>(object, "name");
-      const auto kind = unmarshal::get<std::string_view>(object, "kind");
-      const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
-
-      const auto x = unmarshal::value_or(object, "x", .0f);
-      const auto y = unmarshal::value_or(object, "y", .0f);
-
-      const auto ofn = std::format("objects/{}/{}.json", name, kind);
-      auto json = unmarshal::parse(io::read(ofn)); auto& dobject = *json;
-
-      const auto entity = _registry.create();
-
-      auto at = std::make_shared<atlas>();
-      if (auto timelines = unmarshal::find<unmarshal::object>(dobject, "timelines")) {
-        for (auto field : *timelines) {
-          at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
-        }
-      }
-
-      _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
-
-      metadata md{
-        .kind = _resolve(kind)
-      };
-      _registry.emplace<metadata>(entity, std::move(md));
-
-      _registry.emplace<tint>(entity);
-
-      sprite sp{
-        .pixmap = pixmappool->get(std::format("blobs/{}/{}.png", name, kind))
-      };
-      _registry.emplace<sprite>(entity, std::move(sp));
-
-      playback pb{
-        .dirty = true,
-        .redraw = false,
-        .current_frame = 0,
-        .tick = SDL_GetTicks(),
-        .action = action,
-        .timeline = nullptr
-      };
-      _registry.emplace<playback>(entity, std::move(pb));
-
-      transform tr{
-        .position = vec2{x, y},
-        .angle = .0,
-        .scale = unmarshal::value_or(dobject, "scale", 1.0f)
-      };
-      _registry.emplace<transform>(entity, std::move(tr));
-
-      _registry.emplace<orientation>(entity);
-
-      _registry.emplace<::physics>(entity);
-
-      renderable rd{
-        .z = z++
-      };
-      _registry.emplace<renderable>(entity, std::move(rd));
-
-      const auto lfn = std::format("objects/{}/{}.lua", name, kind);
-
-      const auto proxy = std::make_shared<entityproxy>(entity, _registry);
-      _proxies.emplace(std::move(oname), proxy);
-
-      callbacks c {
-        .self = proxy
-      };
-      _registry.emplace<callbacks>(entity, std::move(c));
-
-      if (io::exists(lfn)) {
-        sol::state_view lua(environment.lua_state());
-        sol::environment env(lua, sol::create, environment);
-        env["self"] = proxy;
-
-        const auto buffer = io::read(lfn);
-        std::string_view source{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
-
-        const auto result = lua.load(source, std::format("@{}", lfn));
-        verify(result);
-
-        auto function = result.get<sol::protected_function>();
-        sol::set_environment(env, function);
-
-        const auto exec = function();
-        verify(exec);
-
-        auto module = exec.get<sol::table>();
-
-        scriptable sc;
-        sc.environment = env;
-
-        if (auto fn = module["on_begin"].get<sol::protected_function>(); fn.valid()) {
-          sc.on_begin = std::move(fn);
-        }
-
-        if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-          sc.on_loop = std::move(fn);
-        }
-
-        if (auto fn = module["on_end"].get<sol::protected_function>(); fn.valid()) {
-          sc.on_end = std::move(fn);
-        }
-
-        auto& cb = _registry.get<callbacks>(entity);
-        if (auto fn = module["on_collision"].get<sol::protected_function>(); fn.valid()) {
-          cb.on_collision = std::move(fn);
-        }
-
-        if (auto fn = module["on_collision_end"].get<sol::protected_function>(); fn.valid()) {
-          cb.on_collision_end = std::move(fn);
-        }
-
-        _registry.emplace<scriptable>(entity, std::move(sc));
-      }
+      _objects.add(object, z++);
     }
 
-    _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
-      return lhs.z < rhs.z;
-    });
+    _objects.sort();
   }
 
-  if (auto particles = unmarshal::find<unmarshal::array>(document, "particles")) {
-    for (auto element : *particles) {
-      auto object = unmarshal::get<unmarshal::object>(element);
-      _particlesystem.add(object);
+  if (auto array = unmarshal::find<unmarshal::array>(document, "particles")) {
+    for (auto element : *array) {
+      auto particle = unmarshal::get<unmarshal::object>(element);
+      _particles.add(particle);
     }
   }
 
-  if (auto fonts = unmarshal::find<unmarshal::array>(document, "fonts")) {
-    for (auto element : *fonts) {
+  if (auto array = unmarshal::find<unmarshal::array>(document, "fonts")) {
+    for (auto element : *array) {
       auto fontname = unmarshal::string(element);
       fontfactory->get(fontname);
     }
@@ -255,7 +136,7 @@ void scene::update(float delta) {
 
   _physicssystem.update(_world, delta);
 
-  _particlesystem.update(delta);
+  _particles.update(delta);
 
   _scriptsystem.update(delta);
 
@@ -291,7 +172,7 @@ void scene::draw() const noexcept {
 
   _rendersystem.draw();
 
-  _particlesystem.draw();
+  _particles.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
@@ -312,20 +193,14 @@ std::variant<
   std::shared_ptr<particleprops>
 > scene::get(std::string_view name, scenekind kind) const {
   switch (kind) {
-    case scenekind::object: {
-      const auto it = _proxies.find(name);
-      assert(it != _proxies.end() && "entity proxy not found in scene");
-      return it->second;
-    }
+    case scenekind::object:
+      return _objects.get(name);
 
-    case scenekind::effect: {
-      const auto it = _effects.find(name);
-      assert(it != _effects.end() && "effect not found in scene");
-      return it->second;
-    }
+    case scenekind::effect:
+      return _effects.get(name);
 
     case scenekind::particle:
-      return _particlesystem.get(name);
+      return _particles.get(name);
 
     default:
       std::terminate();
@@ -377,9 +252,7 @@ void scene::on_enter() {
 void scene::on_leave() {
   _timermanager->clear();
 
-  for (const auto& [_, e] : _effects) {
-    e->stop();
-  }
+  _effects.stop();
 
   if (auto fn = _onleave; fn) {
     fn();

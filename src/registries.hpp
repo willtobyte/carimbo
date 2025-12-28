@@ -69,10 +69,29 @@ private:
   std::shared_ptr<resourcemanager> _resourcemanager;
 };
 
-class particlesystem final {
+class effects final {
 public:
-  explicit particlesystem(std::shared_ptr<resourcemanager> resourcemanager);
-  ~particlesystem() = default;
+  effects(std::shared_ptr<soundmanager> soundmanager, std::string_view scenename);
+  ~effects() noexcept;
+
+  void add(std::string_view name);
+
+  std::shared_ptr<soundfx> get(std::string_view name) const;
+
+  void stop() const noexcept;
+
+  void clear();
+
+private:
+  std::shared_ptr<soundmanager> _soundmanager;
+  std::string _scenename;
+  boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
+};
+
+class particles final {
+public:
+  explicit particles(std::shared_ptr<resourcemanager> resourcemanager);
+  ~particles() = default;
 
   void add(unmarshal::object& particle);
 
@@ -90,4 +109,28 @@ private:
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<particlefactory> _factory;
   boost::unordered_flat_map<std::string, std::shared_ptr<particlebatch>, transparent_string_hash, std::equal_to<>> _batches;
+};
+
+class objects final {
+public:
+  objects(
+      entt::registry& registry,
+      std::shared_ptr<pixmappool> pixmappool,
+      std::string_view scenename,
+      sol::environment environment
+  );
+  ~objects() noexcept = default;
+
+  void add(unmarshal::object& object, int32_t z);
+
+  std::shared_ptr<entityproxy> get(std::string_view name) const;
+
+  void sort();
+
+private:
+  entt::registry& _registry;
+  std::shared_ptr<pixmappool> _pixmappool;
+  std::string _scenename;
+  sol::environment _environment;
+  boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;
 };
