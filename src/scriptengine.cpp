@@ -86,6 +86,39 @@ struct sentinel final {
   }
 };
 
+struct ipcproxy {
+  std::shared_ptr<entityproxy> proxy;
+
+  static ipcproxy from(entityproxy& ep) {
+    auto* cb = ep._registry.try_get<callbacks>(ep._entity);
+    return ipcproxy{cb ? cb->self.lock() : nullptr};
+  }
+
+  sol::object index(std::string_view name, sol::this_state state) const {
+    sol::state_view lua{state};
+
+    if (!proxy) {
+      return sol::make_object(lua, sol::lua_nil);
+    }
+
+    auto* sc = proxy->_registry.try_get<scriptable>(proxy->_entity);
+    if (!sc || !sc->module.valid()) {
+      return sol::make_object(lua, sol::lua_nil);
+    }
+
+    const auto fn_name = std::format("on_{}", name);
+    auto fn = sc->module[fn_name].get<sol::protected_function>();
+    if (!fn.valid()) {
+      return sol::make_object(lua, sol::lua_nil);
+    }
+
+    auto p = proxy;
+    return sol::make_object(lua, [fn, p](sol::variadic_args va) {
+      fn(p, va);
+    });
+  }
+};
+
 void scriptengine::run() {
   const auto start = SDL_GetPerformanceCounter();
 
@@ -326,6 +359,12 @@ void scriptengine::run() {
     }
   };
 
+  lua.new_usertype<ipcproxy>(
+    "IPCProxy",
+    sol::no_constructor,
+    sol::meta_function::index, &ipcproxy::index
+  );
+
   lua.new_usertype<entityproxy>(
     "Entity",
     sol::no_constructor,
@@ -368,7 +407,9 @@ void scriptengine::run() {
     "clone", &entityproxy::clone,
 
     sol::meta_function::index, metaentity::index,
-    sol::meta_function::new_index, metaentity::new_index
+    sol::meta_function::new_index, metaentity::new_index,
+
+    "ipc", sol::property(&ipcproxy::from)
   );
 
   lua.new_usertype<scene>(

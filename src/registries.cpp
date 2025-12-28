@@ -429,6 +429,7 @@ void objects::add(unmarshal::object& object, int32_t z) {
 
     scriptable sc;
     sc.environment = env;
+    sc.module = module;
 
     if (auto fn = module["on_begin"].get<sol::protected_function>(); fn.valid()) {
       sc.on_begin = std::move(fn);

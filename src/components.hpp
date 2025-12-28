@@ -162,6 +162,7 @@ struct callbacks {
 
 struct scriptable {
   sol::environment environment;
+  sol::table module;
   functor on_begin;
   functor on_loop;
   functor on_end;
