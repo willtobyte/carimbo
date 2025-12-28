@@ -106,8 +106,8 @@ struct ipcproxy {
       return sol::make_object(lua, sol::lua_nil);
     }
 
-    const auto fn_name = std::format("on_{}", name);
-    auto fn = sc->module[fn_name].get<sol::protected_function>();
+    const auto fname = std::format("on_{}", name);
+    auto fn = sc->module[fname].get<sol::protected_function>();
     if (!fn.valid()) {
       return sol::make_object(lua, sol::lua_nil);
     }
