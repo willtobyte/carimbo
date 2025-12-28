@@ -125,5 +125,6 @@ struct vec2;
 struct vec3;
 
 enum class flip : int;
+enum class scenekind : uint8_t;
 
 namespace steam { class achievement; }

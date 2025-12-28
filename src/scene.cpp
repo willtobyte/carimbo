@@ -4,11 +4,14 @@
 #include "soundfx.hpp"
 
 scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
-    : _effects(scenemanager->resourcemanager()->soundmanager(), name),
+    : _environment(std::move(environment)),
+      _effects(scenemanager->resourcemanager()->soundmanager(), name),
       _particles(scenemanager->resourcemanager()),
-      _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, environment) {
+      _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, _environment) {
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
+
+  _environment.set_function("get", &scene::get, this);
 
   _hits.reserve(64);
 
@@ -187,20 +190,16 @@ void scene::draw() const noexcept {
 #endif
 }
 
-std::variant<
-  std::shared_ptr<entityproxy>,
-  std::shared_ptr<soundfx>,
-  std::shared_ptr<particleprops>
-> scene::get(std::string_view name, scenekind kind) const {
+sol::object scene::get(std::string_view name, scenekind kind, sol::this_state state) const {
   switch (kind) {
     case scenekind::object:
-      return _objects.get(name);
+      return sol::make_object(state, _objects.get(name));
 
     case scenekind::effect:
-      return _effects.get(name);
+      return sol::make_object(state, _effects.get(name));
 
     case scenekind::particle:
-      return _particles.get(name);
+      return sol::make_object(state, _particles.get(name));
 
     default:
       std::terminate();

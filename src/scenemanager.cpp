@@ -16,7 +16,8 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
     const auto jfilename = std::format("scenes/{}.json", name);
     auto json = unmarshal::parse(io::read(jfilename)); auto& document = *json;
 
-    return it->second = std::make_shared<scene>(name, document, shared_from_this(), _environment);
+    sol::environment env(_environment.lua_state(), sol::create, _environment);
+    return it->second = std::make_shared<scene>(name, document, shared_from_this(), env);
   }
 
   return nullptr;

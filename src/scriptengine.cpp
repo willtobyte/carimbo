@@ -475,10 +475,10 @@ void scriptengine::run() {
         loaded[std::format("scenes/{}", name)] = module;
         auto ptr = std::weak_ptr<::scene>(scene);
 
-        module["get"] = [ptr, name](sol::table, std::string_view id, scenekind kind) {
+        module["get"] = [ptr, name](sol::table, std::string_view id, scenekind kind, sol::this_state state) {
           auto scene = ptr.lock();
           assert(scene && "scene should be valid");
-          return scene->get(id, kind);
+          return scene->get(id, kind, state);
         };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {

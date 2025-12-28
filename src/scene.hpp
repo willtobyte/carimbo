@@ -33,11 +33,7 @@ public:
 
   std::string_view name() const noexcept { return ""; }
 
-  std::variant<
-    std::shared_ptr<entityproxy>,
-    std::shared_ptr<soundfx>,
-    std::shared_ptr<particleprops>
-  > get(std::string_view name, scenekind kind) const;
+  sol::object get(std::string_view name, scenekind kind, sol::this_state state) const;
 
   void set_onenter(std::function<void()>&& fn);
   void set_onloop(sol::protected_function&& fn);
@@ -82,6 +78,7 @@ private:
   b2WorldId _world{};
   physicssystem _physicssystem{_registry};
 
+  sol::environment _environment;
   effects _effects;
   particles _particles;
   objects _objects;

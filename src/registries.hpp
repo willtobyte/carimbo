@@ -117,7 +117,7 @@ public:
       entt::registry& registry,
       std::shared_ptr<pixmappool> pixmappool,
       std::string_view scenename,
-      sol::environment environment
+      sol::environment& environment
   );
   ~objects() noexcept = default;
 
@@ -131,6 +131,6 @@ private:
   entt::registry& _registry;
   std::shared_ptr<pixmappool> _pixmappool;
   std::string _scenename;
-  sol::environment _environment;
+  sol::environment& _environment;
   boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;
 };

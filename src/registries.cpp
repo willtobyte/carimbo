@@ -329,12 +329,12 @@ objects::objects(
     entt::registry& registry,
     std::shared_ptr<pixmappool> pixmappool,
     std::string_view scenename,
-    sol::environment environment
+    sol::environment& environment
 )
     : _registry(registry),
       _pixmappool(std::move(pixmappool)),
       _scenename(scenename),
-      _environment(std::move(environment)) {
+      _environment(environment) {
   _proxies.reserve(32);
 }
 
