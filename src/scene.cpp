@@ -1,7 +1,6 @@
 #include "scene.hpp"
 
 #include "geometry.hpp"
-#include "soundfx.hpp"
 
 scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
     : _environment(std::move(environment)),
