@@ -11,8 +11,8 @@ struct mail final {
 
   mail(
     std::shared_ptr<entityproxy> to,
-    std::optional<std::shared_ptr<entityproxy>> from,
-    std::string_view body
+    std::string_view body,
+    std::optional<std::shared_ptr<entityproxy>> from
   )
     : to(to->id()),
       kind(from && *from ? action_name((*from)->kind()).value_or("unknown") : "unknown"),

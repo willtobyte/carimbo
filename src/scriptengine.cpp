@@ -861,8 +861,8 @@ void scriptengine::run() {
     "Mail",
     sol::constructors<mail(
       std::shared_ptr<entityproxy>,
-      std::optional<std::shared_ptr<entityproxy>>,
-      std::string_view
+      std::string_view,
+      std::optional<std::shared_ptr<entityproxy>>
     )>()
   );
 

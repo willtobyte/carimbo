@@ -56,6 +56,7 @@ public:
   void on_motion(float x, float y);
   void on_key_press(int32_t code);
   void on_key_release(int32_t code);
+  void on_mail(uint64_t to, std::string_view body);
 
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 

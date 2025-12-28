@@ -111,6 +111,10 @@ void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
   _scene->on_motion(event.x, event.y);
 }
 
+void scenemanager::on_mail(const event::mail& event) {
+  _scene->on_mail(event.to, event.body);
+}
+
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {
   return _resourcemanager;
 }

@@ -451,6 +451,10 @@ void objects::add(unmarshal::object& object, int32_t z) {
       cb.on_collision_end = std::move(fn);
     }
 
+    if (auto fn = module["on_mail"].get<sol::protected_function>(); fn.valid()) {
+      cb.on_mail = std::move(fn);
+    }
+
     _registry.emplace<scriptable>(entity, std::move(sc));
   }
 }
