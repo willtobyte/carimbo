@@ -576,9 +576,7 @@ void scriptengine::run() {
     "ParticleSystem",
     sol::no_constructor,
     "factory", sol::property(&particlesystem::factory),
-    "add", &particlesystem::add,
-    "clear", &particlesystem::clear,
-    "set", &particlesystem::set
+    "clear", &particlesystem::clear
   );
 
   lua["cassette"] = cassette();

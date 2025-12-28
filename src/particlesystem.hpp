@@ -74,9 +74,9 @@ public:
   explicit particlesystem(std::shared_ptr<resourcemanager> resourcemanager);
   ~particlesystem() = default;
 
-  void add(const std::shared_ptr<particlebatch>& batch);
+  void add(unmarshal::object& particle);
 
-  void set(std::vector<std::shared_ptr<particlebatch>> batches);
+  std::shared_ptr<particleprops> get(std::string_view name) const;
 
   void clear();
 
@@ -89,5 +89,5 @@ public:
 private:
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<particlefactory> _factory;
-  std::vector<std::shared_ptr<particlebatch>> _batches;
+  boost::unordered_flat_map<std::string, std::shared_ptr<particlebatch>, transparent_string_hash, std::equal_to<>> _batches;
 };

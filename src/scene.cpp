@@ -208,17 +208,9 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   }
 
   if (auto particles = unmarshal::find<unmarshal::array>(document, "particles")) {
-    const auto factory = _particlesystem.factory();
     for (auto element : *particles) {
       auto object = unmarshal::get<unmarshal::object>(element);
-      const auto pname = unmarshal::get<std::string_view>(object, "name");
-      const auto kind = unmarshal::get<std::string_view>(object, "kind");
-      const auto px = unmarshal::get<float>(object, "x");
-      const auto py = unmarshal::get<float>(object, "y");
-      const auto active = unmarshal::value_or(object, "active", true);
-      const auto batch = factory->create(kind, px, py, active);
-      _particles.emplace(pname, batch);
-      _particlesystem.add(batch);
+      _particlesystem.add(object);
     }
   }
 
@@ -332,11 +324,8 @@ std::variant<
       return it->second;
     }
 
-    case scenekind::particle: {
-      const auto it = _particles.find(name);
-      assert(it != _particles.end() && "particles not found in scene");
-      return it->second->props;
-    }
+    case scenekind::particle:
+      return _particlesystem.get(name);
 
     default:
       std::terminate();

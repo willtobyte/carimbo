@@ -164,21 +164,17 @@ particlesystem::particlesystem(std::shared_ptr<resourcemanager> resourcemanager)
   _batches.reserve(16);
 }
 
-void particlesystem::add(const std::shared_ptr<particlebatch>& batch) {
-  if (!batch) [[unlikely]] {
-    return;
-  }
-
-  _batches.emplace_back(batch);
+void particlesystem::add(unmarshal::object& particle) {
+  const auto name = unmarshal::get<std::string_view>(particle, "name");
+  const auto kind = unmarshal::get<std::string_view>(particle, "kind");
+  const auto x = unmarshal::get<float>(particle, "x");
+  const auto y = unmarshal::get<float>(particle, "y");
+  const auto spawning = unmarshal::value_or(particle, "active", true);
+  _batches.emplace(name, _factory->create(kind, x, y, spawning));
 }
 
-void particlesystem::set(std::vector<std::shared_ptr<particlebatch>> batches) {
-  if (batches.empty()) {
-    _batches.clear();
-    return;
-  }
-
-  _batches = std::move(batches);
+std::shared_ptr<particleprops> particlesystem::get(std::string_view name) const {
+  return _batches.find(name)->second->props;
 }
 
 void particlesystem::clear() {
@@ -186,7 +182,7 @@ void particlesystem::clear() {
 }
 
 void particlesystem::update(float delta) {
-  for (const auto& batch : _batches) {
+  for (const auto& [_, batch] : _batches) {
     auto* props = batch->props.get();
     if (!props->active) [[unlikely]] {
       continue;
@@ -284,7 +280,7 @@ void particlesystem::update(float delta) {
 }
 
 void particlesystem::draw() const {
-  for (const auto& batch : _batches) {
+  for (const auto& [_, batch] : _batches) {
     const auto& props = batch->props;
     if (!props->active) [[unlikely]] {
       continue;
