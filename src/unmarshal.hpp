@@ -65,13 +65,6 @@ struct json final {
     return _document[key];
   }
 
-  auto object() noexcept {
-    return _document.get_object();
-  }
-
-  auto array() noexcept {
-    return _document.get_array();
-  }
 };
 
 [[nodiscard]] inline json parse(const std::vector<uint8_t>& data) {
@@ -93,20 +86,18 @@ template <typename T>
   return out;
 }
 
+static_assert(std::is_same_v<object, simdjson::ondemand::object>, "object type mismatch");
+static_assert(std::is_same_v<array, simdjson::ondemand::array>, "array type mismatch");
+
 template <typename T>
 [[nodiscard]] inline std::optional<T> find(auto&& source, std::string_view key) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] {
-    return std::nullopt;
-  }
-
   T out;
   if constexpr (std::is_same_v<T, object>) {
-    if (result.get_object().get(out)) [[unlikely]] return std::nullopt;
+    if (source[key].get_object().get(out)) [[unlikely]] return std::nullopt;
   } else if constexpr (std::is_same_v<T, array>) {
-    if (result.get_array().get(out)) [[unlikely]] return std::nullopt;
+    if (source[key].get_array().get(out)) [[unlikely]] return std::nullopt;
   } else {
-    if (result.template get<T>().get(out)) [[unlikely]] return std::nullopt;
+    if (source[key].template get<T>().get(out)) [[unlikely]] return std::nullopt;
   }
   return out;
 }
@@ -114,10 +105,6 @@ template <typename T>
 template <typename T>
 [[nodiscard]] inline T value_or(auto&& source, std::string_view key, T fallback) noexcept {
   return find<T>(source, key).value_or(fallback);
-}
-
-[[nodiscard]] inline bool contains(auto&& source, std::string_view key) noexcept {
-  return !source[key].error();
 }
 
 [[nodiscard]] inline size_t count(array& a) noexcept {

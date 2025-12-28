@@ -64,7 +64,7 @@ private:
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
     aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
     const auto filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(*_world, aabb, filter, &collect, &out);
+    b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
   std::shared_ptr<renderer> _renderer;
@@ -77,8 +77,8 @@ private:
   rendersystem _rendersystem{_registry};
   scriptsystem _scriptsystem{_registry};
 
-  std::optional<b2WorldId> _world;
-  std::optional<physicssystem> _physicssystem;
+  b2WorldId _world{};
+  physicssystem _physicssystem{_registry};
 
   std::optional<particlesystem> _particlesystem;
 

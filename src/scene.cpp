@@ -12,19 +12,17 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
   _hits.reserve(64);
 
+  auto def = b2DefaultWorldDef();
   if (auto physics = unmarshal::find<unmarshal::object>(document, "physics")) {
-    auto def = b2DefaultWorldDef();
     if (auto gravity = unmarshal::find<unmarshal::object>(*physics, "gravity")) {
       def.gravity = b2Vec2{
         unmarshal::value_or(*gravity, "x", .0f),
         unmarshal::value_or(*gravity, "y", .0f)
       };
     }
-
-    _world.emplace(b2CreateWorld(&def));
-
-    _physicssystem.emplace(_registry);
   }
+
+  _world = b2CreateWorld(&def);
 
   const auto& resourcemanager = scenemanager->resourcemanager();
   const auto& soundmanager = resourcemanager->soundmanager();
@@ -49,8 +47,8 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
       const auto half = tile_size * 0.5f;
       const auto width = tilemap.width();
 
-      auto def = b2DefaultBodyDef();
-      def.type = b2_staticBody;
+      auto bdef = b2DefaultBodyDef();
+      bdef.type = b2_staticBody;
 
       auto shape = b2DefaultShapeDef();
       const auto poly = b2MakeBox(half, half);
@@ -64,12 +62,12 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
           for (int32_t column = 0; column < width; ++column) {
             if (tiles[row_offset + column] == 0) continue;
 
-            def.position = {
+            bdef.position = {
               static_cast<float>(column) * tile_size + half,
               static_cast<float>(row) * tile_size + half
             };
 
-            const auto body = b2CreateBody(*_world, &def);
+            const auto body = b2CreateBody(_world, &bdef);
             b2CreatePolygonShape(body, &shape, &poly);
           }
         }
@@ -100,9 +98,10 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
       const auto entity = _registry.create();
 
       auto at = std::make_shared<atlas>();
-      auto timelines = unmarshal::find<unmarshal::object>(dobject, "timelines");
-      for (auto field : *timelines) {
-        at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
+      if (auto timelines = unmarshal::find<unmarshal::object>(dobject, "timelines")) {
+        for (auto field : *timelines) {
+          at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
+        }
       }
 
       _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
@@ -138,9 +137,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 
       _registry.emplace<orientation>(entity);
 
-      if (_world) {
-        _registry.emplace<physics>(entity);
-      }
+      _registry.emplace<::physics>(entity);
 
       renderable rd{
         .z = z++
@@ -235,10 +232,6 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 }
 
 scene::~scene() noexcept {
-  if (!_world) {
-    return;
-  }
-
   const auto view = _registry.view<physics>();
   for (const auto entity : view) {
     auto& ph = view.get<physics>(entity);
@@ -251,8 +244,8 @@ scene::~scene() noexcept {
     }
   }
 
-  if (b2World_IsValid(*_world)) {
-    b2DestroyWorld(*_world);
+  if (b2World_IsValid(_world)) {
+    b2DestroyWorld(_world);
   }
 }
 
@@ -269,9 +262,7 @@ void scene::update(float delta) {
 
   _animationsystem.update(now);
 
-  if (_physicssystem) {
-    _physicssystem->update(*_world, delta);
-  }
+  _physicssystem.update(_world, delta);
 
   if (_particlesystem) {
     _particlesystem->update(delta);
@@ -316,15 +307,13 @@ void scene::draw() const noexcept {
   }
 
 #ifdef DEBUG
-  if (_world) {
-    SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
+  SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
 
-    b2AABB aabb{{_camera.x, _camera.y}, {_camera.x + _camera.w, _camera.y + _camera.h}};
+  b2AABB aabb{{_camera.x, _camera.y}, {_camera.x + _camera.w, _camera.y + _camera.h}};
 
-    auto filter = b2DefaultQueryFilter();
-    auto context = std::pair{static_cast<SDL_Renderer*>(*_renderer), &_camera};
-    b2World_OverlapAABB(*_world, aabb, filter, _draw_callback, &context);
-  }
+  auto filter = b2DefaultQueryFilter();
+  auto context = std::pair{static_cast<SDL_Renderer*>(*_renderer), &_camera};
+  b2World_OverlapAABB(_world, aabb, filter, _draw_callback, &context);
 
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
 #endif
