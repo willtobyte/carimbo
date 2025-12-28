@@ -205,6 +205,12 @@ sol::object scene::get(std::string_view name, scenekind kind, sol::this_state st
   }
 }
 
+void scene::populate(sol::table& pool) const {
+  _effects.populate(pool);
+  _particles.populate(pool);
+  _objects.populate(pool);
+}
+
 void scene::set_onenter(std::function<void()>&& fn) {
   _onenter = std::move(fn);
 }

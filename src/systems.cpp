@@ -116,6 +116,52 @@ void animationsystem::update(uint64_t now) noexcept {
 void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexcept {
   b2World_Step(world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
 
+  const auto events = b2World_GetSensorEvents(world);
+
+  for (int i = 0; i < events.beginCount; ++i) {
+    const auto& event = events.beginEvents[i];
+    if (!b2Shape_IsValid(event.sensorShapeId) || !b2Shape_IsValid(event.visitorShapeId)) [[unlikely]] {
+      continue;
+    }
+    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
+    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
+    if (!sd || !vd) [[unlikely]] continue;
+
+    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
+    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
+
+    const auto* sc = _registry.try_get<callbacks>(sensor);
+    const auto* vm = _registry.try_get<metadata>(visitor);
+
+    if (sc && vm) [[likely]] {
+      auto self = sc->self.lock();
+      assert(self && "self expired");
+      sc->on_collision(self, static_cast<uint64_t>(visitor), vm->kind);
+    }
+  }
+
+  for (int i = 0; i < events.endCount; ++i) {
+    const auto& event = events.endEvents[i];
+    if (!b2Shape_IsValid(event.sensorShapeId) || !b2Shape_IsValid(event.visitorShapeId)) [[unlikely]] {
+      continue;
+    }
+    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
+    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
+    if (!sd || !vd) [[unlikely]] continue;
+
+    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
+    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
+
+    const auto* sc = _registry.try_get<callbacks>(sensor);
+    const auto* vm = _registry.try_get<metadata>(visitor);
+
+    if (sc && vm) [[likely]] {
+      auto self = sc->self.lock();
+      assert(self && "self expired");
+      sc->on_collision_end(self, static_cast<uint64_t>(visitor), vm->kind);
+    }
+  }
+
   _group.each(
     [world](entt::entity entity, const transform& t, physics& p, const playback& s, const renderable& rn) {
       if (!p.enabled) [[unlikely]] {
@@ -156,46 +202,6 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
         patch_shape(p, params.hx, params.hy);
       }
     });
-
-  const auto events = b2World_GetSensorEvents(world);
-
-  for (int i = 0; i < events.beginCount; ++i) {
-    const auto& event = events.beginEvents[i];
-    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
-    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
-    if (!sd || !vd) [[unlikely]] continue;
-
-    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
-    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
-
-    const auto* sc = _registry.try_get<callbacks>(sensor);
-    const auto* vm = _registry.try_get<metadata>(visitor);
-
-    if (sc && vm) [[likely]] {
-      auto self = sc->self.lock();
-      assert(self && "self expired");
-      sc->on_collision(self, static_cast<uint64_t>(visitor), vm->kind);
-    }
-  }
-
-  for (int i = 0; i < events.endCount; ++i) {
-    const auto& event = events.endEvents[i];
-    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
-    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
-    if (!sd || !vd) [[unlikely]] continue;
-
-    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
-    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
-
-    const auto* sc = _registry.try_get<callbacks>(sensor);
-    const auto* vm = _registry.try_get<metadata>(visitor);
-
-    if (sc && vm) [[likely]] {
-      auto self = sc->self.lock();
-      assert(self && "self expired");
-      sc->on_collision_end(self, static_cast<uint64_t>(visitor), vm->kind);
-    }
-  }
 }
 
 void rendersystem::draw() const noexcept {

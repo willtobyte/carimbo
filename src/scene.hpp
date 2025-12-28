@@ -35,6 +35,8 @@ public:
 
   sol::object get(std::string_view name, scenekind kind, sol::this_state state) const;
 
+  void populate(sol::table& pool) const;
+
   void set_onenter(std::function<void()>&& fn);
   void set_onloop(sol::protected_function&& fn);
   void set_onleave(std::function<void()>&& fn);

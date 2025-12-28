@@ -124,6 +124,12 @@ std::shared_ptr<soundfx> effects::get(std::string_view name) const {
   return _effects.find(name)->second;
 }
 
+void effects::populate(sol::table& pool) const {
+  for (const auto& [name, effect] : _effects) {
+    pool[name] = effect;
+  }
+}
+
 void effects::stop() const noexcept {
   for (const auto& [_, effect] : _effects) {
     effect->stop();
@@ -206,6 +212,12 @@ void particles::add(unmarshal::object& particle) {
 
 std::shared_ptr<particleprops> particles::get(std::string_view name) const {
   return _batches.find(name)->second->props;
+}
+
+void particles::populate(sol::table& pool) const {
+  for (const auto& [name, batch] : _batches) {
+    pool[name] = batch->props;
+  }
 }
 
 void particles::clear() {
@@ -462,6 +474,12 @@ void objects::add(unmarshal::object& object, int32_t z) {
 
 std::shared_ptr<entityproxy> objects::get(std::string_view name) const {
   return _proxies.find(name)->second;
+}
+
+void objects::populate(sol::table& pool) const {
+  for (const auto& [name, proxy] : _proxies) {
+    pool[name] = proxy;
+  }
 }
 
 void objects::sort() {

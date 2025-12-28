@@ -78,6 +78,8 @@ public:
 
   std::shared_ptr<soundfx> get(std::string_view name) const;
 
+  void populate(sol::table& pool) const;
+
   void stop() const noexcept;
 
   void clear();
@@ -96,6 +98,8 @@ public:
   void add(unmarshal::object& particle);
 
   std::shared_ptr<particleprops> get(std::string_view name) const;
+
+  void populate(sol::table& pool) const;
 
   void clear();
 
@@ -124,6 +128,8 @@ public:
   void add(unmarshal::object& object, int32_t z);
 
   std::shared_ptr<entityproxy> get(std::string_view name) const;
+
+  void populate(sol::table& pool) const;
 
   void sort();
 
