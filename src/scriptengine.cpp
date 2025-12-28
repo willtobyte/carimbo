@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include <sol/property.hpp>
 
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
@@ -551,12 +552,8 @@ void scriptengine::run() {
   lua.new_usertype<particleprops>(
     "ParticleProps",
     sol::no_constructor,
-    "active", sol::property(&particleprops::active),
     "spawning", sol::property(&particleprops::spawning),
-    "position", sol::property(
-      []() {
-        return nullptr;
-      },
+    "position", sol::writeonly_property(
       [](particleprops& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));

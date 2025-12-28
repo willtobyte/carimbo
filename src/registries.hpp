@@ -1,12 +1,12 @@
 #pragma once
 
 #include "common.hpp"
+
 #include "random.hpp"
 
 struct particleprops final {
   float x, y;
   float hw, hh;
-  bool active;
   bool spawning;
   std::shared_ptr<pixmap> pixmap;
   rng::xorshift128plus rng{std::random_device{}()};

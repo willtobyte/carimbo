@@ -148,7 +148,6 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
 
   const auto props = std::make_shared<particleprops>();
-  props->active = true;
   props->spawning = spawning;
   props->x = x;
   props->y = y;
@@ -201,7 +200,7 @@ void particles::add(unmarshal::object& particle) {
   const auto kind = unmarshal::get<std::string_view>(particle, "kind");
   const auto x = unmarshal::get<float>(particle, "x");
   const auto y = unmarshal::get<float>(particle, "y");
-  const auto spawning = unmarshal::value_or(particle, "active", true);
+  const auto spawning = unmarshal::value_or(particle, "spawning", true);
   _batches.emplace(name, _factory->create(kind, x, y, spawning));
 }
 
@@ -216,10 +215,6 @@ void particles::clear() {
 void particles::update(float delta) {
   for (const auto& [_, batch] : _batches) {
     auto* props = batch->props.get();
-    if (!props->active) [[unlikely]] {
-      continue;
-    }
-
     auto& p = batch->particles;
     const auto n = p.count;
 
@@ -314,9 +309,6 @@ void particles::update(float delta) {
 void particles::draw() const {
   for (const auto& [_, batch] : _batches) {
     const auto& props = batch->props;
-    if (!props->active) [[unlikely]] {
-      continue;
-    }
 
     SDL_RenderGeometry(
         *_renderer,
