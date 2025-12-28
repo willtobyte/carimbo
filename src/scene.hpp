@@ -78,7 +78,6 @@ private:
   b2WorldId _world{};
   physicssystem _physicssystem{_registry};
 
-  sol::environment _environment;
   effects _effects;
   particles _particles;
   objects _objects;

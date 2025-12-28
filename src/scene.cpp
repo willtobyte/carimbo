@@ -3,14 +3,14 @@
 #include "geometry.hpp"
 
 scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
-    : _environment(std::move(environment)),
+    :
       _effects(scenemanager->resourcemanager()->soundmanager(), name),
       _particles(scenemanager->resourcemanager()),
-      _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, _environment) {
+      _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, environment) {
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
-  _environment.set_function("get", &scene::get, this);
+  environment.set_function("get", &scene::get, this);
 
   _hits.reserve(64);
 
