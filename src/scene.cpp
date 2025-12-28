@@ -6,7 +6,8 @@
 #include "particlesystem.hpp"
 #include "soundfx.hpp"
 
-scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment) {
+scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
+    : _particlesystem(scenemanager->resourcemanager()) {
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
@@ -207,9 +208,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   }
 
   if (auto particles = unmarshal::find<unmarshal::array>(document, "particles")) {
-    _particlesystem.emplace(scenemanager->resourcemanager());
-
-    const auto factory = _particlesystem->factory();
+    const auto factory = _particlesystem.factory();
     for (auto element : *particles) {
       auto object = unmarshal::get<unmarshal::object>(element);
       const auto pname = unmarshal::get<std::string_view>(object, "name");
@@ -219,7 +218,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
       const auto active = unmarshal::value_or(object, "active", true);
       const auto batch = factory->create(kind, px, py, active);
       _particles.emplace(pname, batch);
-      _particlesystem->add(batch);
+      _particlesystem.add(batch);
     }
   }
 
@@ -264,9 +263,7 @@ void scene::update(float delta) {
 
   _physicssystem.update(_world, delta);
 
-  if (_particlesystem) {
-    _particlesystem->update(delta);
-  }
+  _particlesystem.update(delta);
 
   _scriptsystem.update(delta);
 
@@ -302,9 +299,7 @@ void scene::draw() const noexcept {
 
   _rendersystem.draw();
 
-  if (_particlesystem) {
-    _particlesystem->draw();
-  }
+  _particlesystem.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);

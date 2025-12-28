@@ -80,7 +80,7 @@ private:
   b2WorldId _world{};
   physicssystem _physicssystem{_registry};
 
-  std::optional<particlesystem> _particlesystem;
+  particlesystem _particlesystem;
 
   std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 
