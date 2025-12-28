@@ -1,20 +1,19 @@
 #include "envelope.hpp"
 
 mailenvelope::mailenvelope(std::pmr::memory_resource* mr)
-    : to(0), kind(mr), body(mr) {
-  kind.reserve(32);
-  body.reserve(256);
+    : to(0), from(0), body(mr) {
+  body.reserve(64);
 }
 
-void mailenvelope::set(uint64_t to_, std::string_view kind_, std::string_view body_) {
+void mailenvelope::set(uint64_t to_, uint64_t from_, std::string_view body_) {
   to = to_;
-  kind.assign(kind_);
+  from = from_;
   body.assign(body_);
 }
 
 void mailenvelope::clear() noexcept {
   to = 0;
-  kind.clear();
+  from = 0;
   body.clear();
 }
 
@@ -31,13 +30,13 @@ void timerenvelope::clear() noexcept {
 envelope::envelope(std::pmr::memory_resource* mr)
     : _mr(mr), payload(std::in_place_type<mailenvelope>, mr) {}
 
-void envelope::reset(uint64_t to, std::string_view kind, std::string_view body) {
+void envelope::reset(uint64_t to, uint64_t from, std::string_view body) {
   auto* mail = std::get_if<mailenvelope>(&payload);
   if (!mail) {
     payload.emplace<mailenvelope>(_mr);
     mail = std::get_if<mailenvelope>(&payload);
   }
-  mail->set(to, kind, body);
+  mail->set(to, from, body);
 }
 
 void envelope::reset(bool repeat, functor&& fn) {

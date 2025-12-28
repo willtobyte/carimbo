@@ -9,7 +9,7 @@ postalservice::postalservice()
 
 void postalservice::post(const mail& message) {
   auto envelope = _envelopepool.acquire();
-  envelope->reset(message.to, message.kind, message.body);
+  envelope->reset(message.to, message.from, message.body);
 
   SDL_Event event{};
   event.type = static_cast<uint32_t>(event::type::mail);

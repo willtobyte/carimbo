@@ -226,7 +226,7 @@ void eventmanager::update(float delta) {
 
         if (ptr) {
           if (const auto* payload = ptr->try_mail(); payload) {
-            const auto o = event::mail(payload->to, payload->body);
+            const auto o = event::mail(payload->to, payload->from, payload->body);
             for (const auto& receiver : _receivers) {
               receiver->on_mail(o);
             }

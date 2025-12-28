@@ -316,15 +316,22 @@ void scene::on_text(std::string_view text) {
   _ontext(text);
 }
 
-void scene::on_mail(uint64_t to, std::string_view body) {
+void scene::on_mail(uint64_t to, uint64_t from, std::string_view body) {
   const auto entity = static_cast<entt::entity>(to);
   const auto* c = _registry.try_get<callbacks>(entity);
   if (!c) [[unlikely]] return;
 
   auto self = c->self.lock();
-  if (!self) [[unlikely]] return;
+  assert(self && "recipient expired");
 
-  c->on_mail(self, body);
+  const auto fe = static_cast<entt::entity>(from);
+  const auto* fc = _registry.try_get<callbacks>(fe);
+  if (!fc) [[unlikely]] return;
+
+  auto sender = fc->self.lock();
+  assert(sender && "sender expired");
+
+  c->on_mail(self, sender, body);
 }
 
 std::shared_ptr<timermanager> scene::timermanager() const noexcept {

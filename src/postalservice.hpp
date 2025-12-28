@@ -6,16 +6,16 @@ class envelope;
 
 struct mail final {
   uint64_t to;
-  std::string kind;
+  uint64_t from;
   std::string body;
 
   mail(
     std::shared_ptr<entityproxy> to,
-    std::string_view body,
-    std::optional<std::shared_ptr<entityproxy>> from
+    std::shared_ptr<entityproxy> from,
+    std::string_view body
   )
     : to(to->id()),
-      kind(from && *from ? action_name((*from)->kind()).value_or("unknown") : "unknown"),
+      from(from->id()),
       body(body) {}
 };
 

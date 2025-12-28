@@ -4,11 +4,11 @@
 
 struct mailenvelope final {
   uint64_t to;
-  std::pmr::string kind;
+  uint64_t from;
   std::pmr::string body;
 
   explicit mailenvelope(std::pmr::memory_resource* mr);
-  void set(uint64_t to, std::string_view kind, std::string_view body);
+  void set(uint64_t to, uint64_t from, std::string_view body);
   void clear() noexcept;
 };
 
@@ -32,7 +32,7 @@ public:
   explicit envelope(std::pmr::memory_resource* mr = std::pmr::get_default_resource());
   ~envelope() = default;
 
-  void reset(uint64_t to, std::string_view kind, std::string_view body);
+  void reset(uint64_t to, uint64_t from, std::string_view body);
   void reset(bool repeat, functor&& fn);
   void reset() noexcept;
 
