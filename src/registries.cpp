@@ -120,10 +120,6 @@ void effects::add(std::string_view name) {
   _effects.emplace(name, _soundmanager->get(path));
 }
 
-std::shared_ptr<soundfx> effects::get(std::string_view name) const {
-  return _effects.find(name)->second;
-}
-
 void effects::populate(sol::table& pool) const {
   for (const auto& [name, effect] : _effects) {
     pool[name] = effect;
@@ -208,10 +204,6 @@ void particles::add(unmarshal::object& particle) {
   const auto y = unmarshal::get<float>(particle, "y");
   const auto spawning = unmarshal::value_or(particle, "spawning", true);
   _batches.emplace(name, _factory->create(kind, x, y, spawning));
-}
-
-std::shared_ptr<particleprops> particles::get(std::string_view name) const {
-  return _batches.find(name)->second->props;
 }
 
 void particles::populate(sol::table& pool) const {
@@ -470,10 +462,6 @@ void objects::add(unmarshal::object& object, int32_t z) {
 
     _registry.emplace<scriptable>(entity, std::move(sc));
   }
-}
-
-std::shared_ptr<entityproxy> objects::get(std::string_view name) const {
-  return _proxies.find(name)->second;
 }
 
 void objects::populate(sol::table& pool) const {

@@ -10,8 +10,6 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   _renderer = scenemanager->renderer();
   _timermanager = std::make_shared<::timermanager>();
 
-  environment.set_function("get", &scene::get, this);
-
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();
@@ -187,22 +185,6 @@ void scene::draw() const noexcept {
 
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
 #endif
-}
-
-sol::object scene::get(std::string_view name, scenekind kind, sol::this_state state) const {
-  switch (kind) {
-    case scenekind::object:
-      return sol::make_object(state, _objects.get(name));
-
-    case scenekind::effect:
-      return sol::make_object(state, _effects.get(name));
-
-    case scenekind::particle:
-      return sol::make_object(state, _particles.get(name));
-
-    default:
-      std::terminate();
-  }
 }
 
 void scene::populate(sol::table& pool) const {

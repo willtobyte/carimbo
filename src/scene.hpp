@@ -6,12 +6,6 @@
 #include "systems.hpp"
 #include "tilemap.hpp"
 
-enum class scenekind : uint8_t {
-  object = 0,
-  effect,
-  particle
-};
-
 class scene final {
 [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
   auto* const container = static_cast<entt::dense_set<entt::entity>*>(context);
@@ -32,8 +26,6 @@ public:
   void draw() const noexcept;
 
   std::string_view name() const noexcept { return ""; }
-
-  sol::object get(std::string_view name, scenekind kind, sol::this_state state) const;
 
   void populate(sol::table& pool) const;
 

@@ -241,13 +241,6 @@ void scriptengine::run() {
   );
 
   lua.new_enum(
-    "SceneKind",
-    "object", scenekind::object,
-    "effect", scenekind::effect,
-    "particle", scenekind::particle
-  );
-
-  lua.new_enum(
     "Controller",
     "up", event::gamepad::button::up,
     "down", event::gamepad::button::down,
@@ -412,13 +405,6 @@ void scriptengine::run() {
     "ipc", sol::property(&ipcproxy::from)
   );
 
-  lua.new_usertype<scene>(
-    "Scene",
-    sol::no_constructor,
-    "name", sol::property(&scene::name),
-    "get", &scene::get
-  );
-
   lua.new_usertype<scenemanager>(
     "SceneManager",
     sol::no_constructor,
@@ -474,12 +460,6 @@ void scriptengine::run() {
         auto loaded = lua["package"]["loaded"];
         loaded[std::format("scenes/{}", name)] = module;
         auto ptr = std::weak_ptr<::scene>(scene);
-
-        module["get"] = [ptr, name](sol::table, std::string_view id, scenekind kind, sol::this_state state) {
-          auto scene = ptr.lock();
-          assert(scene && "scene should be valid");
-          return scene->get(id, kind, state);
-        };
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
           const auto wrapper = [fn, ptr, &lua, module]() {

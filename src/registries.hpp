@@ -76,8 +76,6 @@ public:
 
   void add(std::string_view name);
 
-  std::shared_ptr<soundfx> get(std::string_view name) const;
-
   void populate(sol::table& pool) const;
 
   void stop() const noexcept;
@@ -96,8 +94,6 @@ public:
   ~particles() = default;
 
   void add(unmarshal::object& particle);
-
-  std::shared_ptr<particleprops> get(std::string_view name) const;
 
   void populate(sol::table& pool) const;
 
@@ -126,8 +122,6 @@ public:
   ~objects() noexcept = default;
 
   void add(unmarshal::object& object, int32_t z);
-
-  std::shared_ptr<entityproxy> get(std::string_view name) const;
 
   void populate(sol::table& pool) const;
 
