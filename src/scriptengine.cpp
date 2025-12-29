@@ -86,35 +86,24 @@ struct sentinel final {
   }
 };
 
-struct ipcproxy {
-  entt::entity entity{entt::null};
-  entt::registry* registry{nullptr};
+struct metaentity {
+  static sol::object index(entityproxy& self, sol::stack_object key, sol::this_state state) {
+    sol::state_view lua{state};
+    const auto name = key.as<std::string_view>();
 
-  static ipcproxy from(entityproxy& ep) {
-    return ipcproxy{ep._entity, &ep._registry};
+    if (auto* sc = self._registry.try_get<scriptable>(self._entity); sc && sc->module.valid()) {
+      const auto fname = std::format("on_{}", name);
+      if (auto fn = sc->module[fname].get<sol::protected_function>(); fn.valid()) {
+        return sol::make_object(lua, [fn](sol::variadic_args va) { return fn(va); });
+      }
+    }
+
+    const auto ptr = self.kv.get(name);
+    return sol::make_object(state, std::ref(*ptr));
   }
 
-  sol::object index(std::string_view name, sol::this_state state) const {
-    sol::state_view lua{state};
-
-    if (entity == entt::null || !registry) {
-      return sol::make_object(lua, sol::lua_nil);
-    }
-
-    auto* sc = registry->try_get<scriptable>(entity);
-    if (!sc || !sc->module.valid()) {
-      return sol::make_object(lua, sol::lua_nil);
-    }
-
-    const auto fname = std::format("on_{}", name);
-    auto fn = sc->module[fname].get<sol::protected_function>();
-    if (!fn.valid()) {
-      return sol::make_object(lua, sol::lua_nil);
-    }
-
-    return sol::make_object(lua, [fn](sol::variadic_args va) {
-      return fn(va);
-    });
+  static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
+    self.kv.set(key.as<std::string_view>(), value);
   }
 };
 
@@ -340,23 +329,6 @@ void scriptengine::run() {
     }
   );
 
-  struct metaentity {
-    static sol::object index(entityproxy& self, sol::stack_object key, sol::this_state state) {
-      const auto ptr = self.kv.get(key.as<std::string_view>());
-      return sol::make_object(state, std::ref(*ptr));
-    }
-
-    static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
-      self.kv.set(key.as<std::string_view>(), value);
-    }
-  };
-
-  lua.new_usertype<ipcproxy>(
-    "IPCProxy",
-    sol::no_constructor,
-    sol::meta_function::index, &ipcproxy::index
-  );
-
   lua.new_usertype<entityproxy>(
     "Entity",
     sol::no_constructor,
@@ -399,9 +371,7 @@ void scriptengine::run() {
     "clone", &entityproxy::clone,
 
     sol::meta_function::index, metaentity::index,
-    sol::meta_function::new_index, metaentity::new_index,
-
-    "ipc", sol::property(&ipcproxy::from)
+    sol::meta_function::new_index, metaentity::new_index
   );
 
   lua.new_usertype<scenemanager>(

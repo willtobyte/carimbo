@@ -6,10 +6,11 @@
 #include "flip.hpp"
 #include "kv.hpp"
 
-struct ipcproxy;
+struct metaentity;
 
 class entityproxy {
-  friend struct ipcproxy;
+  friend struct metaentity;
+
 public:
   entityproxy(entt::entity entity, entt::registry& registry) noexcept;
   ~entityproxy() noexcept = default;
