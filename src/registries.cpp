@@ -122,6 +122,7 @@ void effects::add(std::string_view name) {
 
 void effects::populate(sol::table& pool) const {
   for (const auto& [name, effect] : _effects) {
+    assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = effect;
   }
 }
@@ -208,6 +209,7 @@ void particles::add(unmarshal::object& particle) {
 
 void particles::populate(sol::table& pool) const {
   for (const auto& [name, batch] : _batches) {
+    assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = batch->props;
   }
 }
@@ -463,6 +465,7 @@ void objects::add(unmarshal::object& object, int32_t z) {
 
 void objects::populate(sol::table& pool) const {
   for (const auto& [name, proxy] : _proxies) {
+    assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = proxy;
   }
 }
