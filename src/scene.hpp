@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 #include "physics.hpp"
-#include "registries.hpp"
+#include "collections.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
 
