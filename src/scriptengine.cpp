@@ -113,7 +113,7 @@ struct ipcproxy {
     }
 
     return sol::make_object(lua, [fn](sol::variadic_args va) {
-      fn(va);
+      return fn(va);
     });
   }
 };
