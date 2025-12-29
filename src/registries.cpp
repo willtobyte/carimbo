@@ -459,6 +459,18 @@ void objects::add(unmarshal::object& object, int32_t z) {
       cb.on_mail = std::move(fn);
     }
 
+    if (auto fn = module["on_hover"].get<sol::protected_function>(); fn.valid()) {
+      cb.on_hover = std::move(fn);
+    }
+
+    if (auto fn = module["on_unhover"].get<sol::protected_function>(); fn.valid()) {
+      cb.on_unhover = std::move(fn);
+    }
+
+    if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
+      cb.on_touch = std::move(fn);
+    }
+
     _registry.emplace<scriptable>(entity, std::move(sc));
   }
 }
