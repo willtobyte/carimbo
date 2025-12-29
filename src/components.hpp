@@ -68,10 +68,34 @@ enum class bodytype : uint8_t {
 };
 
 struct physics final {
+  struct state {
+    b2Vec2 position{};
+    b2Rot rotation{};
+    float hx{};
+    float hy{};
+
+    [[nodiscard]] bool update_transform(const state& other) noexcept {
+      if (position.x == other.position.x && position.y == other.position.y &&
+          rotation.c == other.rotation.c && rotation.s == other.rotation.s)
+        return false;
+      position = other.position;
+      rotation = other.rotation;
+      return true;
+    }
+
+    [[nodiscard]] bool update_shape(const state& other) noexcept {
+      if (hx == other.hx && hy == other.hy)
+        return false;
+      hx = other.hx;
+      hy = other.hy;
+      return true;
+    }
+  };
+
   b2BodyId body;
   b2ShapeId shape;
+  state cache;
   bodytype type{bodytype::kinematic};
-  bool dirty{true};
   bool enabled{true};
 
   bool is_valid() const noexcept {

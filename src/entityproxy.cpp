@@ -78,9 +78,8 @@ bool entityproxy::visible() const noexcept {
 }
 
 void entityproxy::set_visible(bool visible) noexcept {
-  auto [r, p] = _registry.get<renderable, physics>(_entity);
+  auto& r = _registry.get<renderable>(_entity);
   r.visible = visible;
-  p.dirty = true;
 }
 
 symbol entityproxy::action() const noexcept {
@@ -193,9 +192,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
     _registry.emplace<orientation>(e, *ori);
   }
 
-  physics ph;
-  ph.dirty = true;
-  _registry.emplace<physics>(e, std::move(ph));
+  _registry.emplace<physics>(e);
 
   if (rn) {
     rn->z = rn->z + 1;

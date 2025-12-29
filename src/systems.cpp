@@ -12,52 +12,6 @@ namespace {
 
   return at.find(action);
 }
-
-static void destroy_body(physics& p) noexcept {
-  if (b2Shape_IsValid(p.shape)) {
-    b2DestroyShape(p.shape, false);
-    p.shape = b2ShapeId{};
-  }
-
-  b2DestroyBody(p.body);
-  p.body = b2BodyId{};
-  p.dirty = true;
-}
-
-static void patch_shape(physics& p, float hx, float hy) noexcept {
-  if (b2Shape_IsValid(p.shape)) {
-    b2DestroyShape(p.shape, false);
-  }
-
-  const auto poly = b2MakeBox(hx, hy);
-  auto def = b2DefaultShapeDef();
-  def.isSensor = true;
-  def.enableSensorEvents = true;
-  p.shape = b2CreatePolygonShape(p.body, &def, &poly);
-  p.dirty = false;
-}
-
-struct result final {
-  b2Vec2 position;
-  b2Rot rotation;
-  float hx;
-  float hy;
-};
-
-[[nodiscard]] static result compute_hitbox(const b2AABB& hitbox, const transform& t) noexcept {
-  const auto bw = hitbox.upperBound.x - hitbox.lowerBound.x;
-  const auto bh = hitbox.upperBound.y - hitbox.lowerBound.y;
-
-  return {
-    .position = {
-      t.position.x + hitbox.lowerBound.x + bw * 0.5f,
-      t.position.y + hitbox.lowerBound.y + bh * 0.5f
-    },
-    .rotation = b2MakeRot(static_cast<float>(t.angle) * DEGREES_TO_RADIANS),
-    .hx = bw * t.scale * 0.5f,
-    .hy = bh * t.scale * 0.5f
-  };
-}
 }
 
 void animationsystem::update(uint64_t now) noexcept {
@@ -156,42 +110,73 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 
   _group.each(
     [world](entt::entity entity, const transform& t, physics& p, const playback& s, const renderable& rn) {
-      if (!p.enabled) [[unlikely]] {
+      if (!p.enabled) [[unlikely]]
         return;
-      }
 
       const auto valid = p.is_valid();
       const auto destroy = !rn.visible & valid;
       if (destroy) [[unlikely]] {
-        destroy_body(p);
+        if (b2Shape_IsValid(p.shape)) {
+          b2DestroyShape(p.shape, false);
+          p.shape = b2ShapeId{};
+        }
+        b2DestroyBody(p.body);
+        p.body = b2BodyId{};
         return;
       }
 
       const auto collidable = rn.visible & (s.timeline != nullptr) && s.timeline->hitbox.has_value();
-
       if (!collidable) [[unlikely]] {
+        if (valid) {
+          if (b2Shape_IsValid(p.shape)) {
+            b2DestroyShape(p.shape, false);
+            p.shape = b2ShapeId{};
+          }
+          b2DestroyBody(p.body);
+          p.body = b2BodyId{};
+        }
         return;
       }
 
-      const auto params = compute_hitbox(*s.timeline->hitbox, t);
+      const auto& box = *s.timeline->hitbox;
+      const auto bw = box.upperBound.x - box.lowerBound.x;
+      const auto bh = box.upperBound.y - box.lowerBound.y;
+
+      const physics::state state{
+        {t.position.x + box.lowerBound.x + bw * 0.5f, t.position.y + box.lowerBound.y + bh * 0.5f},
+        b2MakeRot(static_cast<float>(t.angle) * DEGREES_TO_RADIANS),
+        bw * t.scale * 0.5f,
+        bh * t.scale * 0.5f
+      };
 
       if (!valid) [[unlikely]] {
         auto def = b2DefaultBodyDef();
         def.type = static_cast<b2BodyType>(p.type);
-        def.position = params.position;
-        def.rotation = params.rotation;
+        def.position = state.position;
+        def.rotation = state.rotation;
         def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
         p.body = b2CreateBody(world, &def);
 
-        patch_shape(p, params.hx, params.hy);
-
+        const auto poly = b2MakeBox(state.hx, state.hy);
+        auto sdef = b2DefaultShapeDef();
+        sdef.isSensor = true;
+        sdef.enableSensorEvents = true;
+        p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
+        p.cache = state;
         return;
       }
 
-      b2Body_SetTransform(p.body, params.position, params.rotation);
+      if (p.cache.update_transform(state))
+        b2Body_SetTransform(p.body, state.position, state.rotation);
 
-      if (p.dirty) [[unlikely]] {
-        patch_shape(p, params.hx, params.hy);
+      if (p.cache.update_shape(state)) {
+        if (b2Shape_IsValid(p.shape))
+          b2DestroyShape(p.shape, false);
+        const auto poly = b2MakeBox(state.hx, state.hy);
+        auto sdef = b2DefaultShapeDef();
+        sdef.isSensor = true;
+        sdef.enableSensorEvents = true;
+        p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
       }
     });
 }
