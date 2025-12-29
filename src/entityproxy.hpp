@@ -54,6 +54,9 @@ public:
 
   [[nodiscard]] std::shared_ptr<entityproxy> clone();
 
+  [[nodiscard]] bool alive() const noexcept;
+  void die() noexcept;
+
   kv kv;
 
 private:

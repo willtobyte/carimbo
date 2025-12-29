@@ -67,7 +67,7 @@ enum class bodytype : uint8_t {
   dynamic
 };
 
-struct physics final {
+struct rigidbody final {
   struct state {
     b2Vec2 position{};
     b2Rot rotation{};

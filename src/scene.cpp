@@ -1,6 +1,7 @@
 #include "scene.hpp"
 
 #include "geometry.hpp"
+#include "physics.hpp"
 
 scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
     :
@@ -44,10 +45,7 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
       const auto half = tile_size * 0.5f;
       const auto width = tilemap.width();
 
-      auto bdef = b2DefaultBodyDef();
-      bdef.type = b2_staticBody;
-
-      auto shape = b2DefaultShapeDef();
+      auto sdef = b2DefaultShapeDef();
       const auto poly = b2MakeBox(half, half);
 
       for (const auto& grid : tilemap.grids()) {
@@ -59,13 +57,13 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
           for (int32_t column = 0; column < width; ++column) {
             if (tiles[row_offset + column] == 0) continue;
 
-            bdef.position = {
+            const auto position = b2Vec2{
               static_cast<float>(column) * tile_size + half,
               static_cast<float>(row) * tile_size + half
             };
 
-            const auto body = b2CreateBody(_world, &bdef);
-            b2CreatePolygonShape(body, &shape, &poly);
+            const auto body = physics::make_static_body(_world, position);
+            b2CreatePolygonShape(body, &sdef, &poly);
           }
         }
       }
@@ -104,21 +102,11 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
 }
 
 scene::~scene() noexcept {
-  const auto view = _registry.view<physics>();
-  for (const auto entity : view) {
-    auto& ph = view.get<physics>(entity);
-    if (b2Shape_IsValid(ph.shape)) {
-      b2DestroyShape(ph.shape, false);
-    }
-
-    if (ph.is_valid()) {
-      b2DestroyBody(ph.body);
-    }
+  for (auto&& [entity, r] : _registry.view<rigidbody>().each()) {
+    physics::destroy(r.shape, r.body);
   }
 
-  if (b2World_IsValid(_world)) {
-    b2DestroyWorld(_world);
-  }
+  physics::destroy_world(_world);
 }
 
 void scene::update(float delta) {

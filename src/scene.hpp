@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 
+#include "physics.hpp"
 #include "registries.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
@@ -9,10 +10,7 @@
 class scene final {
 [[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
   auto* const container = static_cast<entt::dense_set<entt::entity>*>(context);
-  const auto body = b2Shape_GetBody(shape);
-  const auto data = b2Body_GetUserData(body);
-  const auto entity = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(data));
-  container->insert(entity);
+  container->insert(physics::entity_from(shape));
   return true;
 }
 

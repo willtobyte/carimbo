@@ -397,7 +397,7 @@ void objects::add(unmarshal::object& object, int32_t z) {
 
   _registry.emplace<orientation>(entity);
 
-  _registry.emplace<::physics>(entity);
+  _registry.emplace<rigidbody>(entity);
 
   renderable rd{
     .z = z

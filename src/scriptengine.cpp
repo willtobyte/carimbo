@@ -369,6 +369,8 @@ void scriptengine::run() {
     "on_collision", &entityproxy::set_oncollision,
     "on_collision_end", &entityproxy::set_oncollisionend,
     "clone", &entityproxy::clone,
+    "alive", sol::property(&entityproxy::alive),
+    "die", &entityproxy::die,
 
     sol::meta_function::index, metaentity::index,
     sol::meta_function::new_index, metaentity::new_index

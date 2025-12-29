@@ -3,6 +3,7 @@
 #include "components.hpp"
 #include "constant.hpp"
 #include "geometry.hpp"
+#include "physics.hpp"
 
 namespace {
 [[nodiscard]] inline const timeline* resolve_timeline(const atlas& at, symbol action) noexcept {
@@ -70,15 +71,10 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 
   for (int i = 0; i < events.beginCount; ++i) {
     const auto& event = events.beginEvents[i];
-    if (!b2Shape_IsValid(event.sensorShapeId) || !b2Shape_IsValid(event.visitorShapeId)) [[unlikely]] {
-      continue;
-    }
-    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
-    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
-    if (!sd || !vd) [[unlikely]] continue;
+    if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
 
-    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
-    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
+    const auto sensor = physics::entity_from(event.sensorShapeId);
+    const auto visitor = physics::entity_from(event.visitorShapeId);
 
     const auto* sc = _registry.try_get<callbacks>(sensor);
     const auto* vm = _registry.try_get<metadata>(visitor);
@@ -90,15 +86,10 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
 
   for (int i = 0; i < events.endCount; ++i) {
     const auto& event = events.endEvents[i];
-    if (!b2Shape_IsValid(event.sensorShapeId) || !b2Shape_IsValid(event.visitorShapeId)) [[unlikely]] {
-      continue;
-    }
-    const auto sd = b2Body_GetUserData(b2Shape_GetBody(event.sensorShapeId));
-    const auto vd = b2Body_GetUserData(b2Shape_GetBody(event.visitorShapeId));
-    if (!sd || !vd) [[unlikely]] continue;
+    if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
 
-    const auto sensor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(sd));
-    const auto visitor = static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(vd));
+    const auto sensor = physics::entity_from(event.sensorShapeId);
+    const auto visitor = physics::entity_from(event.visitorShapeId);
 
     const auto* sc = _registry.try_get<callbacks>(sensor);
     const auto* vm = _registry.try_get<metadata>(visitor);
@@ -109,40 +100,27 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
   }
 
   _group.each(
-    [world](entt::entity entity, const transform& t, physics& p, const playback& s, const renderable& rn) {
-      if (!p.enabled) [[unlikely]]
-        return;
+    [world](entt::entity entity, const transform& t, rigidbody& r, const playback& p, const renderable& rn) {
+      if (!r.enabled) [[unlikely]] return;
 
-      const auto valid = p.is_valid();
-      const auto destroy = !rn.visible & valid;
-      if (destroy) [[unlikely]] {
-        if (b2Shape_IsValid(p.shape)) {
-          b2DestroyShape(p.shape, false);
-          p.shape = b2ShapeId{};
-        }
-        b2DestroyBody(p.body);
-        p.body = b2BodyId{};
+      const auto valid = r.is_valid();
+
+      if (!rn.visible & valid) [[unlikely]] {
+        physics::destroy(r.shape, r.body);
         return;
       }
 
-      const auto collidable = rn.visible & (s.timeline != nullptr) && s.timeline->hitbox.has_value();
+      const auto collidable = rn.visible & (p.timeline != nullptr) && p.timeline->hitbox.has_value();
       if (!collidable) [[unlikely]] {
-        if (valid) {
-          if (b2Shape_IsValid(p.shape)) {
-            b2DestroyShape(p.shape, false);
-            p.shape = b2ShapeId{};
-          }
-          b2DestroyBody(p.body);
-          p.body = b2BodyId{};
-        }
+        if (valid) physics::destroy(r.shape, r.body);
         return;
       }
 
-      const auto& box = *s.timeline->hitbox;
+      const auto& box = *p.timeline->hitbox;
       const auto bw = box.upperBound.x - box.lowerBound.x;
       const auto bh = box.upperBound.y - box.lowerBound.y;
 
-      const physics::state state{
+      const rigidbody::state state{
         {t.position.x + box.lowerBound.x + bw * 0.5f, t.position.y + box.lowerBound.y + bh * 0.5f},
         b2MakeRot(static_cast<float>(t.angle) * DEGREES_TO_RADIANS),
         bw * t.scale * 0.5f,
@@ -150,33 +128,19 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
       };
 
       if (!valid) [[unlikely]] {
-        auto def = b2DefaultBodyDef();
-        def.type = static_cast<b2BodyType>(p.type);
-        def.position = state.position;
-        def.rotation = state.rotation;
-        def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
-        p.body = b2CreateBody(world, &def);
-
-        const auto poly = b2MakeBox(state.hx, state.hy);
-        auto sdef = b2DefaultShapeDef();
-        sdef.isSensor = true;
-        sdef.enableSensorEvents = true;
-        p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
-        p.cache = state;
+        r.body = physics::make_body(world, static_cast<b2BodyType>(r.type), state.position, state.rotation,
+          reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity)));
+        r.shape = physics::make_sensor(r.body, state.hx, state.hy);
+        r.cache = state;
         return;
       }
 
-      if (p.cache.update_transform(state))
-        b2Body_SetTransform(p.body, state.position, state.rotation);
+      if (r.cache.update_transform(state))
+        b2Body_SetTransform(r.body, state.position, state.rotation);
 
-      if (p.cache.update_shape(state)) {
-        if (b2Shape_IsValid(p.shape))
-          b2DestroyShape(p.shape, false);
-        const auto poly = b2MakeBox(state.hx, state.hy);
-        auto sdef = b2DefaultShapeDef();
-        sdef.isSensor = true;
-        sdef.enableSensorEvents = true;
-        p.shape = b2CreatePolygonShape(p.body, &sdef, &poly);
+      if (r.cache.update_shape(state)) {
+        physics::destroy_shape(r.shape);
+        r.shape = physics::make_sensor(r.body, state.hx, state.hy);
       }
     });
 }

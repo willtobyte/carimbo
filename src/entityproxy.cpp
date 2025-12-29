@@ -1,5 +1,7 @@
 #include "entityproxy.hpp"
 
+#include "physics.hpp"
+
 entityproxy::entityproxy(entt::entity entity, entt::registry& registry) noexcept
   : _entity(entity), _registry(registry) {
 }
@@ -156,6 +158,20 @@ void entityproxy::set_oncollisionend(sol::protected_function fn) {
   c.on_collision_end = std::move(fn);
 }
 
+bool entityproxy::alive() const noexcept {
+  return _registry.valid(_entity);
+}
+
+void entityproxy::die() noexcept {
+  if (!_registry.valid(_entity)) [[unlikely]] return;
+
+  if (auto* r = _registry.try_get<rigidbody>(_entity)) {
+    physics::destroy(r->shape, r->body);
+  }
+
+  _registry.destroy(_entity);
+}
+
 std::shared_ptr<entityproxy> entityproxy::clone() {
   const auto e = _registry.create();
 
@@ -192,7 +208,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
     _registry.emplace<orientation>(e, *ori);
   }
 
-  _registry.emplace<physics>(e);
+  _registry.emplace<rigidbody>(e);
 
   if (rn) {
     rn->z = rn->z + 1;
