@@ -407,10 +407,7 @@ void objects::add(unmarshal::object& object, int32_t z) {
   const auto proxy = std::make_shared<entityproxy>(entity, _registry);
   _proxies.emplace(std::move(oname), proxy);
 
-  callbacks c {
-    .self = proxy
-  };
-  _registry.emplace<callbacks>(entity, std::move(c));
+  _registry.emplace<callbacks>(entity);
 
   if (io::exists(lfn)) {
     sol::state_view lua(_environment.lua_state());

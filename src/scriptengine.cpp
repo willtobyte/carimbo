@@ -87,21 +87,21 @@ struct sentinel final {
 };
 
 struct ipcproxy {
-  std::shared_ptr<entityproxy> proxy;
+  entt::entity entity{entt::null};
+  entt::registry* registry{nullptr};
 
   static ipcproxy from(entityproxy& ep) {
-    auto* cb = ep._registry.try_get<callbacks>(ep._entity);
-    return ipcproxy{cb ? cb->self.lock() : nullptr};
+    return ipcproxy{ep._entity, &ep._registry};
   }
 
   sol::object index(std::string_view name, sol::this_state state) const {
     sol::state_view lua{state};
 
-    if (!proxy) {
+    if (entity == entt::null || !registry) {
       return sol::make_object(lua, sol::lua_nil);
     }
 
-    auto* sc = proxy->_registry.try_get<scriptable>(proxy->_entity);
+    auto* sc = registry->try_get<scriptable>(entity);
     if (!sc || !sc->module.valid()) {
       return sol::make_object(lua, sol::lua_nil);
     }
@@ -112,9 +112,8 @@ struct ipcproxy {
       return sol::make_object(lua, sol::lua_nil);
     }
 
-    auto p = proxy;
-    return sol::make_object(lua, [fn, p](sol::variadic_args va) {
-      fn(p, va);
+    return sol::make_object(lua, [fn](sol::variadic_args va) {
+      fn(va);
     });
   }
 };

@@ -156,8 +156,6 @@ struct callbacks {
   functor on_end;
   functor on_collision;
   functor on_collision_end;
-
-  std::weak_ptr<entityproxy> self;
 };
 
 struct scriptable {

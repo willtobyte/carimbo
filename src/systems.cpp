@@ -70,9 +70,7 @@ void animationsystem::update(uint64_t now) noexcept {
       s.tick = now;
       s.dirty = false;
       if (s.timeline) {
-        auto self = c.self.lock();
-        assert(self && "self expired");
-        c.on_begin(self);
+        c.on_begin();
       }
     }
 
@@ -106,9 +104,7 @@ void animationsystem::update(uint64_t now) noexcept {
     } else if (is_last & tl.oneshot) {
       s.action = no_action;
       s.timeline = nullptr;
-      auto self = c.self.lock();
-      assert(self && "self expired");
-      c.on_end(self);
+      c.on_end();
     }
   });
 }
@@ -134,9 +130,7 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
     const auto* vm = _registry.try_get<metadata>(visitor);
 
     if (sc && vm) [[likely]] {
-      auto self = sc->self.lock();
-      assert(self && "self expired");
-      sc->on_collision(self, static_cast<uint64_t>(visitor), vm->kind);
+      sc->on_collision(static_cast<uint64_t>(visitor), vm->kind);
     }
   }
 
@@ -156,9 +150,7 @@ void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexce
     const auto* vm = _registry.try_get<metadata>(visitor);
 
     if (sc && vm) [[likely]] {
-      auto self = sc->self.lock();
-      assert(self && "self expired");
-      sc->on_collision_end(self, static_cast<uint64_t>(visitor), vm->kind);
+      sc->on_collision_end(static_cast<uint64_t>(visitor), vm->kind);
     }
   }
 

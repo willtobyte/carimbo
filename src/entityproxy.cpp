@@ -204,9 +204,7 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
 
   const auto proxy = std::make_shared<entityproxy>(e, _registry);
 
-  callbacks c;
-  c.self = proxy;
-  _registry.emplace<callbacks>(e, std::move(c));
+  _registry.emplace<callbacks>(e);
 
   return proxy;
 }

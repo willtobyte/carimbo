@@ -256,9 +256,7 @@ void scene::on_touch(float x, float y) {
 
   for (const auto entity : _hits) {
     if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      auto self = c->self.lock();
-      assert(self && "self expired");
-      c->on_touch(self, x, y);
+      c->on_touch(x, y);
     }
   }
 }
@@ -270,18 +268,14 @@ void scene::on_motion(float x, float y) {
   for (const auto entity : _hovering) {
     if (_hits.contains(entity)) continue;
     if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      auto self = c->self.lock();
-      assert(self && "self expired");
-      c->on_unhover(self);
+      c->on_unhover();
     }
   }
 
   for (const auto entity : _hits) {
     if (_hovering.contains(entity)) continue;
     if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      auto self = c->self.lock();
-      assert(self && "self expired");
-      c->on_hover(self);
+      c->on_hover();
     }
   }
 
@@ -307,17 +301,7 @@ void scene::on_mail(uint64_t to, uint64_t from, std::string_view body) {
   const auto* c = _registry.try_get<callbacks>(entity);
   if (!c) [[unlikely]] return;
 
-  auto self = c->self.lock();
-  assert(self && "recipient expired");
-
-  const auto fe = static_cast<entt::entity>(from);
-  const auto* fc = _registry.try_get<callbacks>(fe);
-  if (!fc) [[unlikely]] return;
-
-  auto sender = fc->self.lock();
-  assert(sender && "sender expired");
-
-  c->on_mail(self, sender, body);
+  c->on_mail(from, body);
 }
 
 std::shared_ptr<timermanager> scene::timermanager() const noexcept {
