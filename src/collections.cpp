@@ -434,16 +434,16 @@ void objects::add(unmarshal::object& object, int32_t z) {
     sc.environment = env;
     sc.module = module;
 
-    if (auto fn = module["on_begin"].get<sol::protected_function>(); fn.valid()) {
-      sc.on_begin = std::move(fn);
+    if (auto fn = module["on_spawn"].get<sol::protected_function>(); fn.valid()) {
+      sc.on_spawn = std::move(fn);
+    }
+
+    if (auto fn = module["on_dispose"].get<sol::protected_function>(); fn.valid()) {
+      sc.on_dispose = std::move(fn);
     }
 
     if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
       sc.on_loop = std::move(fn);
-    }
-
-    if (auto fn = module["on_end"].get<sol::protected_function>(); fn.valid()) {
-      sc.on_end = std::move(fn);
     }
 
     auto& cb = _registry.get<callbacks>(entity);

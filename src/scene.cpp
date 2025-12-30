@@ -218,12 +218,19 @@ void scene::set_oncamera(sol::protected_function&& fn) {
 }
 
 void scene::on_enter() {
-  if (auto fn = _onenter; fn) {
-    fn();
+  assert(_onenter && "on_enter callback must be set");
+  _onenter();
+
+  for (auto&& [entity, sc] : _registry.view<scriptable>().each()) {
+    sc.on_spawn();
   }
 }
 
 void scene::on_leave() {
+  for (auto&& [entity, sc] : _registry.view<scriptable>().each()) {
+    sc.on_dispose();
+  }
+
   _timermanager->clear();
 
   _effects.stop();
