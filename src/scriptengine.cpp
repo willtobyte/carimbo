@@ -99,7 +99,7 @@ struct metaentity {
     }
 
     const auto ptr = self.kv.get(name);
-    return ptr->value();
+    return sol::make_object(state, std::ref(*ptr));
   }
 
   static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
@@ -254,7 +254,31 @@ void scriptengine::run() {
     "value", sol::property(&observable::value),
     "set", &observable::set,
     "subscribe", &observable::subscribe,
-    "unsubscribe", &observable::unsubscribe
+    "unsubscribe", &observable::unsubscribe,
+    sol::meta_function::addition, [](const observable& obs, double rhs) {
+      const auto val = obs.value();
+      return (val.valid() ? val.as<double>() : 0.0) + rhs;
+    },
+    sol::meta_function::subtraction, [](const observable& obs, double rhs) {
+      const auto val = obs.value();
+      return (val.valid() ? val.as<double>() : 0.0) - rhs;
+    },
+    sol::meta_function::multiplication, [](const observable& obs, double rhs) {
+      const auto val = obs.value();
+      return (val.valid() ? val.as<double>() : 0.0) * rhs;
+    },
+    sol::meta_function::division, [](const observable& obs, double rhs) {
+      const auto val = obs.value();
+      return (val.valid() ? val.as<double>() : 0.0) / rhs;
+    },
+    sol::meta_function::modulus, [](const observable& obs, double rhs) {
+      const auto val = obs.value();
+      return std::fmod(val.valid() ? val.as<double>() : 0.0, rhs);
+    },
+    sol::meta_function::unary_minus, [](const observable& obs) {
+      const auto val = obs.value();
+      return -(val.valid() ? val.as<double>() : 0.0);
+    }
   );
 
   lua.new_usertype<resourcemanager>(
@@ -371,7 +395,6 @@ void scriptengine::run() {
     "clone", &entityproxy::clone,
     "alive", sol::property(&entityproxy::alive),
     "die", &entityproxy::die,
-
     sol::meta_function::index, metaentity::index,
     sol::meta_function::new_index, metaentity::new_index
   );
