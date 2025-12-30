@@ -98,8 +98,7 @@ struct metaentity {
       }
     }
 
-    const auto ptr = self.kv.get(name);
-    return sol::make_object(state, std::ref(*ptr));
+    return self.kv.get(name)->value();
   }
 
   static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
@@ -256,28 +255,55 @@ void scriptengine::run() {
     "subscribe", &observable::subscribe,
     "unsubscribe", &observable::unsubscribe,
     sol::meta_function::addition, [](const observable& obs, double rhs) {
-      const auto val = obs.value();
-      return (val.valid() ? val.as<double>() : 0.0) + rhs;
+      const auto value = obs.value();
+      return (value.valid() ? value.as<double>() : 0.0) + rhs;
     },
     sol::meta_function::subtraction, [](const observable& obs, double rhs) {
-      const auto val = obs.value();
-      return (val.valid() ? val.as<double>() : 0.0) - rhs;
+      const auto value = obs.value();
+      return (value.valid() ? value.as<double>() : 0.0) - rhs;
     },
     sol::meta_function::multiplication, [](const observable& obs, double rhs) {
-      const auto val = obs.value();
-      return (val.valid() ? val.as<double>() : 0.0) * rhs;
+      const auto value = obs.value();
+      return (value.valid() ? value.as<double>() : 0.0) * rhs;
     },
     sol::meta_function::division, [](const observable& obs, double rhs) {
-      const auto val = obs.value();
-      return (val.valid() ? val.as<double>() : 0.0) / rhs;
+      const auto value = obs.value();
+      return (value.valid() ? value.as<double>() : 0.0) / rhs;
     },
     sol::meta_function::modulus, [](const observable& obs, double rhs) {
-      const auto val = obs.value();
-      return std::fmod(val.valid() ? val.as<double>() : 0.0, rhs);
+      const auto value = obs.value();
+      return std::fmod(value.valid() ? value.as<double>() : 0.0, rhs);
     },
     sol::meta_function::unary_minus, [](const observable& obs) {
-      const auto val = obs.value();
-      return -(val.valid() ? val.as<double>() : 0.0);
+      const auto value = obs.value();
+      return -(value.valid() ? value.as<double>() : 0.0);
+    },
+    sol::meta_function::equal_to, [](const observable& obs, const sol::object& rhs) {
+      const auto value = obs.value();
+      if (!value.valid()) return !rhs.valid() || rhs.is<sol::lua_nil_t>();
+      if (!rhs.valid() || rhs.is<sol::lua_nil_t>()) return false;
+      if (value.get_type() != rhs.get_type()) return false;
+      switch (value.get_type()) {
+        case sol::type::number: return value.as<double>() == rhs.as<double>();
+        case sol::type::string: return value.as<std::string>() == rhs.as<std::string>();
+        case sol::type::boolean: return value.as<bool>() == rhs.as<bool>();
+        default: return value == rhs;
+      }
+    },
+    sol::meta_function::less_than, [](const observable& obs, double rhs) {
+      const auto value = obs.value();
+      return (value.valid() ? value.as<double>() : 0.0) < rhs;
+    },
+    sol::meta_function::to_string, [](const observable& obs) {
+      const auto value = obs.value();
+      if (!value.valid()) return std::string("nil");
+      switch (value.get_type()) {
+        case sol::type::number: return std::to_string(value.as<double>());
+        case sol::type::string: return value.as<std::string>();
+        case sol::type::boolean: return std::string(value.as<bool>() ? "true" : "false");
+        case sol::type::lua_nil: return std::string("nil");
+        default: return std::string("observable");
+      }
     }
   );
 
@@ -395,6 +421,15 @@ void scriptengine::run() {
     "clone", &entityproxy::clone,
     "alive", sol::property(&entityproxy::alive),
     "die", &entityproxy::die,
+    "observable", [](entityproxy& self, std::string_view name) {
+      return self.kv.get(name);
+    },
+    "subscribe", [](entityproxy& self, std::string_view name, sol::protected_function fn) {
+      self.kv.get(name)->subscribe(std::move(fn));
+    },
+    "unsubscribe", [](entityproxy& self, std::string_view name) {
+      self.kv.get(name)->unsubscribe();
+    },
     sol::meta_function::index, metaentity::index,
     sol::meta_function::new_index, metaentity::new_index
   );
