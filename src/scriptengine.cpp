@@ -99,7 +99,7 @@ struct metaentity {
     }
 
     const auto ptr = self.kv.get(name);
-    return sol::make_object(state, std::ref(*ptr));
+    return ptr->value();
   }
 
   static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
