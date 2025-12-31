@@ -74,11 +74,6 @@ template <>
 }
 
 template <>
-[[nodiscard]] inline size_t get<size_t>(value node, const char* key) noexcept {
-  return static_cast<size_t>(yyjson_get_uint(yyjson_obj_get(node, key)));
-}
-
-template <>
 [[nodiscard]] inline unsigned int get<unsigned int>(value node, const char* key) noexcept {
   return static_cast<unsigned int>(yyjson_get_uint(yyjson_obj_get(node, key)));
 }
