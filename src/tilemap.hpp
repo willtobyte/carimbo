@@ -17,7 +17,7 @@ class tilemap final {
 public:
   tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager);
 
-  friend void from_json(unmarshal::document& document, tilemap& out);
+  friend void from_json(unmarshal::value document, tilemap& out);
 
   void set_viewport(const quad& value) noexcept;
 

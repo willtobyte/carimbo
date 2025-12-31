@@ -8,7 +8,7 @@
 #include <lua.hpp>
 #include <physfs.h>
 #include <SDL3/SDL.h>
-#include <simdjson.h>
+#include <yyjson.h>
 #include <sol/sol.hpp>
 
 #include <boost/container/small_vector.hpp>

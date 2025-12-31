@@ -15,7 +15,7 @@ class scene final {
 }
 
 public:
-  scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment);
+  scene(std::string_view name, unmarshal::value document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment);
 
   ~scene() noexcept;
 

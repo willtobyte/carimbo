@@ -39,7 +39,7 @@ static void sincos(float x, float& out_sin, float& out_cos) noexcept {
 }
 
 template <typename T>
-std::pair<T, T> read_range(unmarshal::object& object, T fallback_start, T fallback_end) noexcept {
+std::pair<T, T> read_range(unmarshal::value object, T fallback_start, T fallback_end) noexcept {
   return {
     unmarshal::value_or(object, "start", fallback_start),
     unmarshal::value_or(object, "end", fallback_end)
@@ -47,9 +47,9 @@ std::pair<T, T> read_range(unmarshal::object& object, T fallback_start, T fallba
 }
 
 template <typename T>
-std::pair<T, T> read_range_from(unmarshal::object& parent, std::string_view key, T fallback_start, T fallback_end) noexcept {
-  if (auto opt = unmarshal::find<unmarshal::object>(parent, key)) {
-    return read_range(*opt, fallback_start, fallback_end);
+std::pair<T, T> read_range_from(unmarshal::value parent, const char* key, T fallback_start, T fallback_end) noexcept {
+  if (auto opt = yyjson_obj_get(parent, key)) {
+    return read_range(opt, fallback_start, fallback_end);
   }
   return {fallback_start, fallback_end};
 }
@@ -74,32 +74,32 @@ struct particleconfig final {
   std::pair<float, float> rforce{.0f, .0f};
   std::pair<float, float> rvel{.0f, .0f};
 
-  friend void from_json(unmarshal::document& document, particleconfig& out) {
+  friend void from_json(unmarshal::value document, particleconfig& out) {
     out.count = static_cast<size_t>(unmarshal::value_or(document, "count", 0ull));
 
-    if (auto spawn = unmarshal::find<unmarshal::object>(document, "spawn")) {
-      out.xspawn = read_range_from(*spawn, "x", .0f, .0f);
-      out.yspawn = read_range_from(*spawn, "y", .0f, .0f);
-      out.radius = read_range_from(*spawn, "radius", .0f, .0f);
-      out.angle = read_range_from(*spawn, "angle", .0f, .0f);
-      out.scale = read_range_from(*spawn, "scale", 1.0f, 1.0f);
-      out.life = read_range_from(*spawn, "life", 1.0f, 1.0f);
-      out.alpha = read_range_from(*spawn, "alpha", 255u, 255u);
+    if (auto spawn = yyjson_obj_get(document, "spawn")) {
+      out.xspawn = read_range_from(spawn, "x", .0f, .0f);
+      out.yspawn = read_range_from(spawn, "y", .0f, .0f);
+      out.radius = read_range_from(spawn, "radius", .0f, .0f);
+      out.angle = read_range_from(spawn, "angle", .0f, .0f);
+      out.scale = read_range_from(spawn, "scale", 1.0f, 1.0f);
+      out.life = read_range_from(spawn, "life", 1.0f, 1.0f);
+      out.alpha = read_range_from(spawn, "alpha", 255u, 255u);
     }
 
-    if (auto velocity = unmarshal::find<unmarshal::object>(document, "velocity")) {
-      out.xvel = read_range_from(*velocity, "x", .0f, .0f);
-      out.yvel = read_range_from(*velocity, "y", .0f, .0f);
+    if (auto velocity = yyjson_obj_get(document, "velocity")) {
+      out.xvel = read_range_from(velocity, "x", .0f, .0f);
+      out.yvel = read_range_from(velocity, "y", .0f, .0f);
     }
 
-    if (auto gravity = unmarshal::find<unmarshal::object>(document, "gravity")) {
-      out.gx = read_range_from(*gravity, "x", .0f, .0f);
-      out.gy = read_range_from(*gravity, "y", .0f, .0f);
+    if (auto gravity = yyjson_obj_get(document, "gravity")) {
+      out.gx = read_range_from(gravity, "x", .0f, .0f);
+      out.gy = read_range_from(gravity, "y", .0f, .0f);
     }
 
-    if (auto rotation = unmarshal::find<unmarshal::object>(document, "rotation")) {
-      out.rforce = read_range_from(*rotation, "force", .0f, .0f);
-      out.rvel = read_range_from(*rotation, "velocity", .0f, .0f);
+    if (auto rotation = yyjson_obj_get(document, "rotation")) {
+      out.rforce = read_range_from(rotation, "force", .0f, .0f);
+      out.rvel = read_range_from(rotation, "velocity", .0f, .0f);
     }
   }
 };
@@ -198,7 +198,7 @@ particles::particles(std::shared_ptr<resourcemanager> resourcemanager)
   _batches.reserve(16);
 }
 
-void particles::add(unmarshal::object& particle) {
+void particles::add(unmarshal::value particle) {
   const auto name = unmarshal::get<std::string_view>(particle, "name");
   const auto kind = unmarshal::get<std::string_view>(particle, "kind");
   const auto x = unmarshal::get<float>(particle, "x");
@@ -344,7 +344,7 @@ objects::objects(
   _proxies.reserve(32);
 }
 
-void objects::add(unmarshal::object& object, int32_t z) {
+void objects::add(unmarshal::value object, int32_t z) {
   const auto oname = unmarshal::get<std::string_view>(object, "name");
   const auto kind = unmarshal::get<std::string_view>(object, "kind");
   const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
@@ -353,14 +353,17 @@ void objects::add(unmarshal::object& object, int32_t z) {
   const auto y = unmarshal::value_or(object, "y", .0f);
 
   const auto ofn = std::format("objects/{}/{}.json", _scenename, kind);
-  auto json = unmarshal::parse(io::read(ofn)); auto& dobject = *json;
+  auto json = unmarshal::parse(io::read(ofn));
+  auto dobject = *json;
 
   const auto entity = _registry.create();
 
   auto at = std::make_shared<atlas>();
-  if (auto timelines = unmarshal::find<unmarshal::object>(dobject, "timelines")) {
-    for (auto field : *timelines) {
-      at->timelines.emplace(_resolve(unmarshal::key(field)), unmarshal::make<timeline>(field.value()));
+  if (auto timelines = yyjson_obj_get(dobject, "timelines")) {
+    size_t idx, max;
+    yyjson_val *k, *v;
+    yyjson_obj_foreach(timelines, idx, max, k, v) {
+      at->timelines.emplace(_resolve(unmarshal::key(k)), unmarshal::make<timeline>(v));
     }
   }
 

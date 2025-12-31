@@ -14,10 +14,10 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name);
   if (inserted) {
     const auto jfilename = std::format("scenes/{}.json", name);
-    auto json = unmarshal::parse(io::read(jfilename)); auto& document = *json;
+    auto json = unmarshal::parse(io::read(jfilename));
 
     sol::environment env(_environment.lua_state(), sol::create, _environment);
-    return it->second = std::make_shared<scene>(name, document, shared_from_this(), env);
+    return it->second = std::make_shared<scene>(name, *json, shared_from_this(), env);
   }
 
   return nullptr;

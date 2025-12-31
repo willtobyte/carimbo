@@ -35,7 +35,7 @@ class Carimbo(ConanFile):
             "boost/1.89.0",
             "box2d/3.1.1",
             "entt/3.15.0",
-            "simdjson/4.2.2",
+            "yyjson/0.12.0",
             "openal-soft/1.23.1",
             "physfs/3.2.0",
             "sdl/3.2.20",

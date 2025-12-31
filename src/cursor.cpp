@@ -10,23 +10,22 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
   SDL_HideCursor();
 
   const auto filename = std::format("cursors/{}.json", name);
-  auto json = unmarshal::parse(io::read(filename)); auto& document = *json;
+  auto json = unmarshal::parse(io::read(filename));
+  auto document = *json;
 
-  unmarshal::value p;
-  document["point"].get(p);
-  from_json(p, _point);
+  from_json(yyjson_obj_get(document, "point"), _point);
 
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
 
-  auto animations = unmarshal::find<unmarshal::object>(document, "animations");
-  for (auto field : *animations) {
-    const auto key = unmarshal::key(field);
-    auto aobject = unmarshal::get<unmarshal::object>(field.value());
-
-    const auto oneshot = unmarshal::value_or(aobject, "oneshot", false);
+  auto animations = yyjson_obj_get(document, "animations");
+  size_t idx, max;
+  yyjson_val *k, *v;
+  yyjson_obj_foreach(animations, idx, max, k, v) {
+    const auto key = unmarshal::key(k);
+    const auto oneshot = unmarshal::value_or(v, "oneshot", false);
 
     auto keyframes = boost::container::small_vector<keyframe, 16>{};
-    unmarshal::collect<keyframe>(aobject, "frames", keyframes);
+    unmarshal::collect<keyframe>(v, "frames", keyframes);
 
     _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, keyframes});
   }

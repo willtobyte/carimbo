@@ -93,7 +93,7 @@ public:
   explicit particles(std::shared_ptr<resourcemanager> resourcemanager);
   ~particles() = default;
 
-  void add(unmarshal::object& particle);
+  void add(unmarshal::value particle);
 
   void populate(sol::table& pool) const;
 
@@ -121,7 +121,7 @@ public:
   );
   ~objects() noexcept = default;
 
-  void add(unmarshal::object& object, int32_t z);
+  void add(unmarshal::value object, int32_t z);
 
   void populate(sol::table& pool) const;
 

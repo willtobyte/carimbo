@@ -19,7 +19,7 @@ struct keyframe final {
   quad frame;
 
   friend void from_json(unmarshal::value json, keyframe& out) {
-    out.frame = unmarshal::make<quad>(json["quad"]);
+    out.frame = unmarshal::make<quad>(yyjson_obj_get(json, "quad"));
     unmarshal::make_if(json, "offset", out.offset);
     out.duration = unmarshal::get<uint64_t>(json, "duration");
   }

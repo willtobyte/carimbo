@@ -57,7 +57,7 @@ struct frame final {
   friend void from_json(unmarshal::value json, frame& out) {
     out.duration = unmarshal::get<int64_t>(json, "duration");
     unmarshal::make_if(json, "offset", out.offset);
-    out.quad = unmarshal::make<struct quad>(json["quad"]);
+    out.quad = unmarshal::make<struct quad>(yyjson_obj_get(json, "quad"));
   }
 };
 
@@ -126,8 +126,8 @@ struct timeline final {
       out.next = _resolve(*next);
     }
 
-    if (auto h = unmarshal::find<unmarshal::object>(json, "hitbox")) {
-      if (auto q = (*h)["quad"]; !q.error()) {
+    if (auto h = yyjson_obj_get(json, "hitbox")) {
+      if (auto q = yyjson_obj_get(h, "quad")) {
         out.hitbox = unmarshal::make<b2AABB>(q);
       }
     }

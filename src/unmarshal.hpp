@@ -1,172 +1,188 @@
 #pragma once
 
 namespace unmarshal {
-using document = simdjson::ondemand::document;
-using value = simdjson::ondemand::value;
-using object = simdjson::ondemand::object;
-using array = simdjson::ondemand::array;
 
-class pool final {
-public:
-  static constexpr size_t max_depth = 4;
+inline constexpr size_t stack_size = 64 * 1024;
 
-  [[nodiscard]] simdjson::ondemand::parser& acquire() noexcept {
-    assert(_depth < max_depth && "parser pool overflow");
-    return _parsers[_depth++];
-  }
-
-  void release() noexcept {
-    assert(_depth > 0 && "parser pool underflow");
-    --_depth;
-  }
-
-  [[nodiscard]] static pool& instance() noexcept {
-    thread_local pool p;
-    return p;
-  }
-
-private:
-  std::array<simdjson::ondemand::parser, max_depth> _parsers;
-  size_t _depth{0};
-};
+using value = yyjson_val*;
 
 struct json final {
-  simdjson::padded_string _buffer;
-  document _document;
+  alignas(16) char _stack[stack_size];
+  yyjson_alc _allocator;
+  yyjson_doc* _document;
 
   json(const json&) = delete;
   json& operator=(const json&) = delete;
-  json(json&&) = default;
+  json(json&&) = delete;
   json& operator=(json&&) = delete;
 
-  explicit json(simdjson::padded_string&& buffer)
-      : _buffer(std::move(buffer)) {
-    const auto error = pool::instance().acquire().iterate(_buffer).get(_document);
-    assert(!error && "failed to parse JSON");
+  explicit json(const char* data, size_t length) noexcept {
+    yyjson_alc_pool_init(&_allocator, _stack, stack_size);
+    _document = yyjson_read_opts(const_cast<char*>(data), length, YYJSON_READ_NOFLAG, &_allocator, nullptr);
   }
 
-  ~json() {
-    pool::instance().release();
+  ~json() noexcept = default;
+
+  [[nodiscard]] value root() const noexcept {
+    return yyjson_doc_get_root(_document);
   }
 
-  operator document&() noexcept {
-    return _document;
+  [[nodiscard]] explicit operator bool() const noexcept {
+    return _document != nullptr;
   }
 
-  document* operator->() noexcept {
-    return &_document;
+  [[nodiscard]] value operator*() const noexcept {
+    return root();
   }
-
-  document& operator*() noexcept {
-    return _document;
-  }
-
-  auto operator[](std::string_view key) noexcept {
-    return _document[key];
-  }
-
 };
 
-[[nodiscard]] inline json parse(const std::vector<uint8_t>& data) {
-  return json(simdjson::padded_string(
-      reinterpret_cast<const char*>(data.data()), data.size()));
+[[nodiscard]] inline json parse(const std::vector<uint8_t>& data) noexcept {
+  return json(reinterpret_cast<const char*>(data.data()), data.size());
 }
 
 template <typename T>
-[[nodiscard]] inline T get(auto&& source, std::string_view key) noexcept {
-  T out;
-  source[key].template get<T>().get(out);
-  return out;
+[[nodiscard]] inline T get(value node, const char* key) noexcept;
+
+template <>
+[[nodiscard]] inline float get<float>(value node, const char* key) noexcept {
+  return static_cast<float>(yyjson_get_num(yyjson_obj_get(node, key)));
+}
+
+template <>
+[[nodiscard]] inline double get<double>(value node, const char* key) noexcept {
+  return yyjson_get_num(yyjson_obj_get(node, key));
+}
+
+template <>
+[[nodiscard]] inline int16_t get<int16_t>(value node, const char* key) noexcept {
+  return static_cast<int16_t>(yyjson_get_sint(yyjson_obj_get(node, key)));
+}
+
+template <>
+[[nodiscard]] inline int32_t get<int32_t>(value node, const char* key) noexcept {
+  return static_cast<int32_t>(yyjson_get_sint(yyjson_obj_get(node, key)));
+}
+
+template <>
+[[nodiscard]] inline int64_t get<int64_t>(value node, const char* key) noexcept {
+  return yyjson_get_sint(yyjson_obj_get(node, key));
+}
+
+template <>
+[[nodiscard]] inline uint64_t get<uint64_t>(value node, const char* key) noexcept {
+  return yyjson_get_uint(yyjson_obj_get(node, key));
+}
+
+template <>
+[[nodiscard]] inline size_t get<size_t>(value node, const char* key) noexcept {
+  return static_cast<size_t>(yyjson_get_uint(yyjson_obj_get(node, key)));
+}
+
+template <>
+[[nodiscard]] inline unsigned int get<unsigned int>(value node, const char* key) noexcept {
+  return static_cast<unsigned int>(yyjson_get_uint(yyjson_obj_get(node, key)));
+}
+
+template <>
+[[nodiscard]] inline uint8_t get<uint8_t>(value node, const char* key) noexcept {
+  return static_cast<uint8_t>(yyjson_get_uint(yyjson_obj_get(node, key)));
+}
+
+template <>
+[[nodiscard]] inline bool get<bool>(value node, const char* key) noexcept {
+  return yyjson_get_bool(yyjson_obj_get(node, key));
+}
+
+template <>
+[[nodiscard]] inline std::string_view get<std::string_view>(value node, const char* key) noexcept {
+  auto child = yyjson_obj_get(node, key);
+  return {yyjson_get_str(child), yyjson_get_len(child)};
+}
+
+template <>
+[[nodiscard]] inline value get<value>(value node, const char* key) noexcept {
+  return yyjson_obj_get(node, key);
 }
 
 template <typename T>
-[[nodiscard]] inline T get(auto&& source) noexcept {
-  T out;
-  source.template get<T>().get(out);
-  return out;
+[[nodiscard]] inline T get(value node) noexcept;
+
+template <>
+[[nodiscard]] inline uint64_t get<uint64_t>(value node) noexcept {
+  return yyjson_get_uint(node);
 }
 
-static_assert(std::is_same_v<object, simdjson::ondemand::object>, "object type mismatch");
-static_assert(std::is_same_v<array, simdjson::ondemand::array>, "array type mismatch");
+template <>
+[[nodiscard]] inline value get<value>(value node) noexcept {
+  return node;
+}
 
 template <typename T>
-[[nodiscard]] inline std::optional<T> find(auto&& source, std::string_view key) noexcept {
-  T out;
-  if constexpr (std::is_same_v<T, object>) {
-    if (source[key].get_object().get(out)) [[unlikely]] return std::nullopt;
-  } else if constexpr (std::is_same_v<T, array>) {
-    if (source[key].get_array().get(out)) [[unlikely]] return std::nullopt;
+[[nodiscard]] inline std::optional<T> find(value node, const char* key) noexcept {
+  auto child = yyjson_obj_get(node, key);
+  if (!child) return std::nullopt;
+  if constexpr (std::is_same_v<T, value>) {
+    return child;
   } else {
-    if (source[key].template get<T>().get(out)) [[unlikely]] return std::nullopt;
+    return get<T>(node, key);
   }
-  return out;
 }
 
 template <typename T>
-[[nodiscard]] inline T value_or(auto&& source, std::string_view key, T fallback) noexcept {
-  return find<T>(source, key).value_or(fallback);
+[[nodiscard]] inline T value_or(value node, const char* key, T fallback) noexcept {
+  auto child = yyjson_obj_get(node, key);
+  if (!child) return fallback;
+  return get<T>(node, key);
 }
 
-[[nodiscard]] inline size_t count(array& a) noexcept {
-  size_t out;
-  a.count_elements().get(out);
-  return out;
+[[nodiscard]] inline size_t count(value array) noexcept {
+  return yyjson_arr_size(array);
 }
 
-[[nodiscard]] inline std::string_view key(auto&& field) noexcept {
-  std::string_view out;
-  field.unescaped_key().get(out);
-  return out;
+[[nodiscard]] inline std::string_view key(value node) noexcept {
+  return {yyjson_get_str(node), yyjson_get_len(node)};
 }
 
-[[nodiscard]] inline std::string_view string(auto&& element) noexcept {
-  std::string_view out;
-  element.get_string().get(out);
-  return out;
+[[nodiscard]] inline std::string_view string(value node) noexcept {
+  return {yyjson_get_str(node), yyjson_get_len(node)};
 }
 
 template <typename T>
-[[nodiscard]] inline T make(auto&& source) noexcept {
+[[nodiscard]] inline T make(value node) noexcept {
   T out{};
-  value v;
-  source.get(v);
-  from_json(v, out);
+  from_json(node, out);
   return out;
 }
 
 template <typename T>
-inline bool make_if(auto&& source, std::string_view key, T& out) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] return false;
-  value v;
-  result.get(v);
-  from_json(v, out);
+inline bool make_if(value node, const char* key, T& out) noexcept {
+  auto child = yyjson_obj_get(node, key);
+  if (!child) return false;
+  from_json(child, out);
   return true;
 }
 
 template <typename T, typename Container>
-inline void collect(auto&& source, std::string_view key, Container& out) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] return;
-  array a;
-  if (result.get_array().get(a)) [[unlikely]] return;
-  for (auto element : a) {
+inline void collect(value node, const char* key, Container& out) noexcept {
+  auto array = yyjson_obj_get(node, key);
+  if (!array) return;
+  size_t index, maximum;
+  yyjson_val* element;
+  yyjson_arr_foreach(array, index, maximum, element) {
     out.emplace_back(make<T>(element));
   }
 }
 
 template <typename T, typename Container>
-inline void reserve(auto&& source, std::string_view key, Container& out) noexcept {
-  auto result = source[key];
-  if (result.error()) [[unlikely]] return;
-  array a;
-  if (result.get_array().get(a)) [[unlikely]] return;
-  size_t n;
-  a.count_elements().get(n);
-  a.reset();
-  out.reserve(n);
-  for (auto element : a) {
+inline void reserve(value node, const char* key, Container& out) noexcept {
+  auto array = yyjson_obj_get(node, key);
+  if (!array) return;
+  out.reserve(yyjson_arr_size(array));
+  size_t index, maximum;
+  yyjson_val* element;
+  yyjson_arr_foreach(array, index, maximum, element) {
     out.emplace_back(make<T>(element));
   }
 }
+
 }

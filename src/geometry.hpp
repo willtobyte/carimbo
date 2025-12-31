@@ -82,12 +82,6 @@ struct alignas(16) vec3 {
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 3; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 3; }
-
-  friend void from_json(unmarshal::value json, vec3& out) {
-    out.x = unmarshal::get<float>(json, "x");
-    out.y = unmarshal::get<float>(json, "y");
-    out.z = unmarshal::get<float>(json, "z");
-  }
 };
 
 static_assert(sizeof(vec3) == 16);

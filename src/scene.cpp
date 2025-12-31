@@ -3,7 +3,7 @@
 #include "geometry.hpp"
 #include "physics.hpp"
 
-scene::scene(std::string_view name, unmarshal::document& document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
+scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
     :
       _effects(scenemanager->resourcemanager()->soundmanager(), name),
       _particles(scenemanager->resourcemanager()),
@@ -14,11 +14,11 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();
-  if (auto physics = unmarshal::find<unmarshal::object>(document, "physics")) {
-    if (auto gravity = unmarshal::find<unmarshal::object>(*physics, "gravity")) {
+  if (auto physics = yyjson_obj_get(document, "physics")) {
+    if (auto gravity = yyjson_obj_get(physics, "gravity")) {
       def.gravity = b2Vec2{
-        unmarshal::value_or(*gravity, "x", .0f),
-        unmarshal::value_or(*gravity, "y", .0f)
+        unmarshal::value_or(gravity, "x", .0f),
+        unmarshal::value_or(gravity, "y", .0f)
       };
     }
   }
@@ -29,17 +29,19 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
   const auto& pixmappool = resourcemanager->pixmappool();
   const auto& fontfactory = resourcemanager->fontfactory();
 
-  if (auto array = unmarshal::find<unmarshal::array>(document, "effects")) {
-    for (auto element : *array) {
-      _effects.add(unmarshal::string(element));
+  if (auto array = yyjson_obj_get(document, "effects")) {
+    size_t idx, max;
+    yyjson_val* elem;
+    yyjson_arr_foreach(array, idx, max, elem) {
+      _effects.add(unmarshal::string(elem));
     }
   }
 
-  if (auto layer = unmarshal::find<unmarshal::object>(document, "layer")) {
-    const auto type = unmarshal::get<std::string_view>(*layer, "type");
+  if (auto layer = yyjson_obj_get(document, "layer")) {
+    const auto type = unmarshal::get<std::string_view>(layer, "type");
 
     if (type == "tilemap") {
-      auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(*layer, "content"), resourcemanager);
+      auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(layer, "content"), resourcemanager);
 
       const auto tile_size = tilemap.tile_size();
       const auto half = tile_size * 0.5f;
@@ -76,26 +78,30 @@ scene::scene(std::string_view name, unmarshal::document& document, std::shared_p
     }
   }
 
-  if (auto array = unmarshal::find<unmarshal::array>(document, "objects")) {
+  if (auto array = yyjson_obj_get(document, "objects")) {
     auto z = 0;
-    for (auto element : *array) {
-      auto object = unmarshal::get<unmarshal::object>(element);
-      _objects.add(object, z++);
+    size_t idx, max;
+    yyjson_val* elem;
+    yyjson_arr_foreach(array, idx, max, elem) {
+      _objects.add(elem, z++);
     }
 
     _objects.sort();
   }
 
-  if (auto array = unmarshal::find<unmarshal::array>(document, "particles")) {
-    for (auto element : *array) {
-      auto particle = unmarshal::get<unmarshal::object>(element);
-      _particles.add(particle);
+  if (auto array = yyjson_obj_get(document, "particles")) {
+    size_t idx, max;
+    yyjson_val* elem;
+    yyjson_arr_foreach(array, idx, max, elem) {
+      _particles.add(elem);
     }
   }
 
-  if (auto array = unmarshal::find<unmarshal::array>(document, "fonts")) {
-    for (auto element : *array) {
-      auto fontname = unmarshal::string(element);
+  if (auto array = yyjson_obj_get(document, "fonts")) {
+    size_t idx, max;
+    yyjson_val* elem;
+    yyjson_arr_foreach(array, idx, max, elem) {
+      auto fontname = unmarshal::string(elem);
       fontfactory->get(fontname);
     }
   }

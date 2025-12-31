@@ -26,9 +26,12 @@ static std::string language() {
       try {
         const auto filename = std::format("locales/{}.json", language());
         auto document = unmarshal::parse(io::read(filename));
+        auto root = *document;
 
-        for (auto field : document->get_object()) {
-          data.emplace(unmarshal::key(field), unmarshal::string(field.value()));
+        size_t idx, max;
+        yyjson_val *k, *v;
+        yyjson_obj_foreach(root, idx, max, k, v) {
+          data.emplace(unmarshal::key(k), unmarshal::string(v));
         }
       } catch (...) {
       }
