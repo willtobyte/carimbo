@@ -9,7 +9,7 @@ struct particleprops final {
   float hw, hh;
   bool spawning;
   std::shared_ptr<pixmap> pixmap;
-  rng::xorshift128plus rng{std::random_device{}()};
+  rng::xorshift128plus rng{rng::engine()()};
   rng::uniform_real<float> xspawnd, yspawnd, radiusd, angled;
   rng::uniform_real<float> xveld, yveld, gxd, gyd;
   rng::uniform_real<float> scaled, lifed, rotforced, rotveld;
