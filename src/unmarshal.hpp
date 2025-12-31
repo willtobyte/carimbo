@@ -152,7 +152,7 @@ template <typename T>
 template <typename T>
 inline bool make_if(value node, const char* key, T& out) noexcept {
   auto child = yyjson_obj_get(node, key);
-  if (!child) return false;
+  if (!child) [[unlikely]] return false;
   from_json(child, out);
   return true;
 }
