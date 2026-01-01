@@ -36,6 +36,7 @@ public:
   void set_ontext(sol::protected_function&& fn);
   void set_onmotion(sol::protected_function&& fn);
   void set_oncamera(sol::protected_function&& fn);
+  void set_ontick(sol::protected_function&& fn);
 
   void on_enter();
   void on_leave();
@@ -45,6 +46,7 @@ public:
   void on_key_press(int32_t code);
   void on_key_release(int32_t code);
   void on_mail(uint64_t to, uint64_t from, std::string_view body);
+  void on_tick(int tick);
 
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 
@@ -85,6 +87,7 @@ private:
   functor _ontext;
   functor _onmotion;
   functor _oncamera;
+  functor _ontick;
 
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;

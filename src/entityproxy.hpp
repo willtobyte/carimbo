@@ -51,6 +51,7 @@ public:
   void set_onend(sol::protected_function fn);
   void set_oncollision(sol::protected_function fn);
   void set_oncollisionend(sol::protected_function fn);
+  void set_ontick(sol::protected_function fn);
 
   [[nodiscard]] std::shared_ptr<entityproxy> clone();
 

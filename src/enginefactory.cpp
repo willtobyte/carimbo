@@ -93,6 +93,11 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
   return *this;
 }
 
+enginefactory& enginefactory::with_ticks(const int ticks) noexcept {
+  _ticks = ticks;
+  return *this;
+}
+
 std::shared_ptr<engine> enginefactory::create() const {
   const auto audiodevice = std::make_shared<::audiodevice>();
   const auto engine = std::make_shared<::engine>();
@@ -112,6 +117,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   engine->set_statemanager(statemanager);
   engine->set_window(window);
   engine->set_overlay(overlay);
+  engine->set_ticks(_ticks);
 
   eventmanager->add_receiver(engine);
   eventmanager->add_receiver(engine->statemanager());

@@ -27,6 +27,7 @@ public:
   void set_window(std::shared_ptr<::window> ptr) noexcept;
   void set_renderer(std::shared_ptr<::renderer> ptr) noexcept;
   void set_overlay(std::shared_ptr<::overlay> ptr) noexcept;
+  void set_ticks(int ticks) noexcept;
 
   void add_loopable(std::shared_ptr<::loopable> ptr) noexcept;
 
@@ -54,4 +55,8 @@ private:
   std::shared_ptr<::overlay> _overlay;
   std::shared_ptr<::canvas> _canvas;
   boost::container::small_vector<std::shared_ptr<::lifecycleobserver>, 8> _observers;
+  int _ticks{0};
+  float _tick_interval{0.0f};
+  float _tick_accumulator{0.0f};
+  int _tick_current{0};
 };

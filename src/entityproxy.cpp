@@ -158,6 +158,11 @@ void entityproxy::set_oncollisionend(sol::protected_function fn) {
   c.on_collision_end = std::move(fn);
 }
 
+void entityproxy::set_ontick(sol::protected_function fn) {
+  auto& c = _registry.get<callbacks>(_entity);
+  c.on_tick = std::move(fn);
+}
+
 bool entityproxy::alive() const noexcept {
   return _registry.valid(_entity);
 }

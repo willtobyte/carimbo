@@ -180,6 +180,7 @@ struct callbacks {
   functor on_end;
   functor on_collision;
   functor on_collision_end;
+  functor on_tick;
 };
 
 struct scriptable {

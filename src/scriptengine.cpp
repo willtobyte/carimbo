@@ -419,6 +419,7 @@ void scriptengine::run() {
     "on_end", &entityproxy::set_onend,
     "on_collision", &entityproxy::set_oncollision,
     "on_collision_end", &entityproxy::set_oncollisionend,
+    "on_tick", &entityproxy::set_ontick,
     "clone", &entityproxy::clone,
     "alive", sol::property(&entityproxy::alive),
     "die", &entityproxy::die,
@@ -538,6 +539,10 @@ void scriptengine::run() {
               scene->set_onkeyrelease(std::move(onkeyrelease));
             }
 
+            if (auto ontick = module["on_tick"].get<sol::protected_function>(); ontick.valid()) {
+              scene->set_ontick(std::move(ontick));
+            }
+
             if (auto onleave = module["on_leave"].get<sol::protected_function>(); onleave.valid()) {
               const auto wrapper = [onleave, &lua]() {
                 const auto result = onleave();
@@ -650,6 +655,7 @@ void scriptengine::run() {
     "with_gravity", &enginefactory::with_gravity,
     "with_fullscreen", &enginefactory::with_fullscreen,
     "with_sentry", &enginefactory::with_sentry,
+    "with_ticks", &enginefactory::with_ticks,
     "create", &enginefactory::create
   );
 

@@ -223,6 +223,10 @@ void scene::set_oncamera(sol::protected_function&& fn) {
   _oncamera = std::move(fn);
 }
 
+void scene::set_ontick(sol::protected_function&& fn) {
+  _ontick = std::move(fn);
+}
+
 void scene::on_enter() {
   assert(_onenter && "on_enter callback must be set");
   _onenter();
@@ -303,6 +307,14 @@ void scene::on_mail(uint64_t to, uint64_t from, std::string_view body) {
   if (!c) [[unlikely]] return;
 
   c->on_mail(from, body);
+}
+
+void scene::on_tick(int tick) {
+  _ontick(tick);
+
+  for (auto&& [entity, c] : _registry.view<callbacks>().each()) {
+    c.on_tick(tick);
+  }
 }
 
 std::shared_ptr<timermanager> scene::timermanager() const noexcept {

@@ -23,6 +23,8 @@ public:
 
   void draw() const;
 
+  void on_tick(int tick);
+
   std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
 
   std::shared_ptr<::renderer> renderer() const noexcept;

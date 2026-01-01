@@ -89,6 +89,12 @@ void scenemanager::draw() const {
   _scene->draw();
 }
 
+void scenemanager::on_tick(int tick) {
+  if (_scene) [[likely]] {
+    _scene->on_tick(tick);
+  }
+}
+
 void scenemanager::on_key_press(const event::keyboard::key& event) {
   _scene->on_key_press(static_cast<int32_t>(event));
 }
