@@ -2,13 +2,9 @@
 
 namespace unmarshal {
 
-inline constexpr size_t stack_size = 1024 * 1024;
-
 using value = yyjson_val*;
 
 struct json final {
-  alignas(16) char _stack[stack_size];
-  yyjson_alc _allocator;
   yyjson_doc* _document;
 
   json(const json&) = delete;
@@ -16,12 +12,12 @@ struct json final {
   json(json&&) = delete;
   json& operator=(json&&) = delete;
 
-  explicit json(const char* data, size_t length) noexcept {
-    yyjson_alc_pool_init(&_allocator, _stack, stack_size);
-    _document = yyjson_read_opts(const_cast<char*>(data), length, YYJSON_READ_NOFLAG, &_allocator, nullptr);
-  }
+  explicit json(const char* data, size_t length) noexcept
+      : _document(yyjson_read(data, length, YYJSON_READ_NOFLAG)) {}
 
-  ~json() noexcept = default;
+  ~json() noexcept {
+    yyjson_doc_free(_document);
+  }
 
   [[nodiscard]] explicit operator bool() const noexcept {
     if (!_document) [[unlikely]] return false;
