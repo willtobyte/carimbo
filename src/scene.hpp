@@ -46,7 +46,7 @@ public:
   void on_key_press(int32_t code);
   void on_key_release(int32_t code);
   void on_mail(uint64_t to, uint64_t from, std::string_view body);
-  void on_tick(int tick);
+  void on_tick(uint8_t tick);
 
   std::shared_ptr<::timermanager> timermanager() const noexcept;
 

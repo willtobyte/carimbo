@@ -309,7 +309,7 @@ void scene::on_mail(uint64_t to, uint64_t from, std::string_view body) {
   c->on_mail(from, body);
 }
 
-void scene::on_tick(int tick) {
+void scene::on_tick(uint8_t tick) {
   _ontick(tick);
 
   for (auto&& [entity, c] : _registry.view<callbacks>().each()) {

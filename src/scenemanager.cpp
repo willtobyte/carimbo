@@ -41,7 +41,7 @@ void scenemanager::set(std::string_view name) {
     _scene->on_leave();
   }
 
-  _scene = it->second.get();
+  _scene = it->second;
   _current = name;
 
   std::println("[scenemanager] entered {}", name);
@@ -89,37 +89,49 @@ void scenemanager::draw() const {
   _scene->draw();
 }
 
-void scenemanager::on_tick(int tick) {
-  if (_scene) [[likely]] {
-    _scene->on_tick(tick);
+void scenemanager::on_tick(uint8_t tick) {
+  if (auto scene = _scene) [[likely]] {
+    scene->on_tick(tick);
   }
 }
 
 void scenemanager::on_key_press(const event::keyboard::key& event) {
-  _scene->on_key_press(static_cast<int32_t>(event));
+  if (auto scene = _scene) [[likely]] {
+    scene->on_key_press(static_cast<int32_t>(event));
+  }
 }
 
 void scenemanager::on_key_release(const event::keyboard::key& event) {
-  _scene->on_key_release(static_cast<int32_t>(event));
+  if (auto scene = _scene) [[likely]] {
+    scene->on_key_release(static_cast<int32_t>(event));
+  }
 }
 
 void scenemanager::on_text(std::string_view text) {
-  _scene->on_text(text);
+  if (auto scene = _scene) [[likely]] {
+    scene->on_text(text);
+  }
 }
 
 void scenemanager::on_mouse_press(const event::mouse::button& event) {
 }
 
 void scenemanager::on_mouse_release(const event::mouse::button& event) {
-  _scene->on_touch(event.x, event.y);
+  if (auto scene = _scene) [[likely]] {
+    scene->on_touch(event.x, event.y);
+  }
 }
 
 void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
-  _scene->on_motion(event.x, event.y);
+  if (auto scene = _scene) [[likely]] {
+    scene->on_motion(event.x, event.y);
+  }
 }
 
 void scenemanager::on_mail(const event::mail& event) {
-  _scene->on_mail(event.to, event.from, event.body);
+  if (auto scene = _scene) [[likely]] {
+    scene->on_mail(event.to, event.from, event.body);
+  }
 }
 
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {

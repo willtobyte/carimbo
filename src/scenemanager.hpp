@@ -23,7 +23,7 @@ public:
 
   void draw() const;
 
-  void on_tick(int tick);
+  void on_tick(uint8_t tick);
 
   std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
 
@@ -45,6 +45,6 @@ private:
   std::shared_ptr<::renderer> _renderer;
   sol::environment _environment;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
-  ::scene* _scene{nullptr};
+  std::shared_ptr<::scene> _scene;
   boost::static_string<32> _current;
 };

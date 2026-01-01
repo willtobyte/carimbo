@@ -86,7 +86,7 @@ void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {
   _overlay = std::move(ptr);
 }
 
-void engine::set_ticks(int ticks) noexcept {
+void engine::set_ticks(uint8_t ticks) noexcept {
   _ticks = ticks;
   _tick_interval = ticks > 0 ? 1.0f / static_cast<float>(ticks) : 0.0f;
 }

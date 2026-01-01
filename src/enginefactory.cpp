@@ -93,7 +93,7 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
   return *this;
 }
 
-enginefactory& enginefactory::with_ticks(const int ticks) noexcept {
+enginefactory& enginefactory::with_ticks(const uint8_t ticks) noexcept {
   _ticks = ticks;
   return *this;
 }
