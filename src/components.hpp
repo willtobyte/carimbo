@@ -127,7 +127,7 @@ struct timeline final {
     }
 
     if (auto h = yyjson_obj_get(json, "hitbox")) {
-      if (auto q = yyjson_obj_get(h, "quad")) {
+      if (auto q = yyjson_obj_get(h, "aabb")) {
         out.hitbox = unmarshal::make<b2AABB>(q);
       }
     }
