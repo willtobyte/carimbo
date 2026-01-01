@@ -48,8 +48,6 @@ public:
   void on_mail(uint64_t to, uint64_t from, std::string_view body);
   void on_tick(uint8_t tick);
 
-  std::shared_ptr<::timermanager> timermanager() const noexcept;
-
 private:
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
     auto aabb = b2AABB{};
@@ -62,8 +60,6 @@ private:
   std::shared_ptr<renderer> _renderer;
 
   entt::registry _registry;
-
-  std::shared_ptr<::timermanager> _timermanager;
 
   animationsystem _animationsystem{_registry};
   rendersystem _rendersystem{_registry};

@@ -148,7 +148,6 @@ The **engine** instance, now made global for convenience, holds the following co
 - `soundmanager` manager responsible for playing and stopping sounds, as well as flushing them.
 - `statemanager` manager responsible for allowing instant querying of input state.
 - `scenemanager` manager responsible for registering and setting the current scenario.
-- `timermanager` manager responsible for creating periodic and single-shot timers.
 
 ### Canvas
 
@@ -445,24 +444,4 @@ function setup()
 
   scenemanager:set("myscene")
 end
-```
-
-### TimerManager
-
-Manager responsible for handling periodic and single-shot timers.
-
-```lua
-local timermanager = engine:timermanager()
-
-local delay = 600
--- Creates a periodic timer that calls the callback at the given interval. Returns the timer ID.
-local id = timermanager:set(delay, function()
-  print("On timer.")
-end)
-
--- Stops the timer given a timer ID.
-timermanager:clear(id)
-
--- Calls the callback only once after the specified time.
-timermanager:singleshot(delay, function() print("Only one time.") end)
 ```

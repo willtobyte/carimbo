@@ -497,8 +497,6 @@ void scriptengine::run() {
 
             lua["pool"] = pool;
 
-            lua["timermanager"] = scene->timermanager();
-
             const auto result = fn();
             if (!result.valid()) {
               sol::error err = result;
@@ -545,7 +543,6 @@ void scriptengine::run() {
                   throw std::runtime_error(err.what());
                 }
 
-                lua["timermanager"] = sol::lua_nil;
                 lua["pool"] = sol::lua_nil;
               };
 
@@ -923,15 +920,6 @@ void scriptengine::run() {
   );
 
   lua["postalservice"] = postalservice{};
-
-  lua.new_usertype<timermanager>(
-    "TimerManager",
-    sol::no_constructor,
-    "cancel", &timermanager::cancel,
-    "clear", &timermanager::clear,
-    "set", &timermanager::set,
-    "singleshot", &timermanager::singleshot
-  );
 
   lua.new_usertype<label>(
     "Label",

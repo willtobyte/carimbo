@@ -9,7 +9,6 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
       _particles(scenemanager->resourcemanager()),
       _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, environment) {
   _renderer = scenemanager->renderer();
-  _timermanager = std::make_shared<::timermanager>();
 
   _hits.reserve(64);
 
@@ -241,8 +240,6 @@ void scene::on_leave() {
     sc.on_dispose();
   }
 
-  _timermanager->clear();
-
   _effects.stop();
 
   if (auto fn = _onleave; fn) {
@@ -315,8 +312,4 @@ void scene::on_tick(uint8_t tick) {
   for (auto&& [entity, c] : _registry.view<callbacks>().each()) {
     c.on_tick(tick);
   }
-}
-
-std::shared_ptr<timermanager> scene::timermanager() const noexcept {
-  return _timermanager;
 }
