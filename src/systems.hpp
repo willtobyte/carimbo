@@ -28,6 +28,7 @@ private:
 
   entt::registry& _registry;
   group_type _group;
+  float _accumulator{};
 };
 
 class rendersystem final {

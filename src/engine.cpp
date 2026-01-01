@@ -1,6 +1,7 @@
 #include "engine.hpp"
 
 #include "audiodevice.hpp"
+#include "constant.hpp"
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "renderer.hpp"
@@ -110,7 +111,7 @@ void engine::_loop() {
   const auto now = SDL_GetPerformanceCounter();
   static auto prior = now;
   static const auto frequency = static_cast<double>(SDL_GetPerformanceFrequency());
-  const auto delta = static_cast<float>(static_cast<double>(now - prior) / frequency);
+  const auto delta = std::min(static_cast<float>(static_cast<double>(now - prior) / frequency), MAX_DELTA);
   prior = now;
 
   for (const auto& observer : _observers) {

@@ -64,8 +64,12 @@ void animationsystem::update(uint64_t now) noexcept {
   });
 }
 
-void physicssystem::update(b2WorldId world, [[maybe_unused]] float delta) noexcept {
-  b2World_Step(world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
+void physicssystem::update(b2WorldId world, float delta) noexcept {
+  _accumulator += delta;
+  while (_accumulator >= FIXED_TIMESTEP) {
+    b2World_Step(world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
+    _accumulator -= FIXED_TIMESTEP;
+  }
 
   const auto events = b2World_GetSensorEvents(world);
 

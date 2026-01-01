@@ -10,8 +10,6 @@ std::vector<uint8_t> io::read(std::string_view filename) {
     std::format("error while opening file: {}", filename)
   );
 
-  PHYSFS_setBuffer(ptr.get(), PHYSFS_BUFFER_SIZE);
-
   const auto length = PHYSFS_fileLength(ptr.get());
   [[maybe_unused]] const auto* const error_msg = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
   assert(length >= 0 &&
