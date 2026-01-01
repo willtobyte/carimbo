@@ -75,7 +75,7 @@ struct particleconfig final {
   std::pair<float, float> rvel{.0f, .0f};
 
   friend void from_json(unmarshal::value document, particleconfig& out) {
-    out.count = static_cast<size_t>(unmarshal::value_or(document, "count", 0ull));
+    out.count = static_cast<size_t>(unmarshal::value_or<uint64_t>(document, "count", 0));
 
     if (auto spawn = yyjson_obj_get(document, "spawn")) {
       out.xspawn = read_range_from(spawn, "x", .0f, .0f);
