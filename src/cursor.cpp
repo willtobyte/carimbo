@@ -9,15 +9,13 @@ cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcem
     : _resourcemanager(std::move(resourcemanager)) {
   SDL_HideCursor();
 
-  const auto filename = std::format("cursors/{}.json", name);
-  auto json = unmarshal::parse(io::read(filename));
-  auto document = *json;
+  auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
-  from_json(yyjson_obj_get(document, "point"), _point);
+  from_json(yyjson_obj_get(*json, "point"), _point);
 
   _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
 
-  auto animations = yyjson_obj_get(document, "animations");
+  auto animations = yyjson_obj_get(*json, "animations");
   size_t idx, max;
   yyjson_val *k, *v;
   yyjson_obj_foreach(animations, idx, max, k, v) {

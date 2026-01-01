@@ -51,6 +51,7 @@ std::pair<T, T> read_range_from(unmarshal::value parent, const char* key, T fall
   if (auto opt = yyjson_obj_get(parent, key)) {
     return read_range(opt, fallback_start, fallback_end);
   }
+
   return {fallback_start, fallback_end};
 }
 
@@ -142,11 +143,9 @@ particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanage
 }
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
-  const auto filename = std::format("particles/{}.json", kind);
-  auto document = unmarshal::parse(io::read(filename));
-
+  auto json = unmarshal::parse(io::read(std::format("particles/{}.json", kind)));
   particleconfig conf;
-  from_json(*document, conf);
+  from_json(*json, conf);
 
   const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
 
@@ -352,14 +351,12 @@ void objects::add(unmarshal::value object, int32_t z) {
   const auto x = unmarshal::value_or(object, "x", .0f);
   const auto y = unmarshal::value_or(object, "y", .0f);
 
-  const auto ofn = std::format("objects/{}/{}.json", _scenename, kind);
-  auto json = unmarshal::parse(io::read(ofn));
-  auto dobject = *json;
+  auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
   const auto entity = _registry.create();
 
   auto at = std::make_shared<atlas>();
-  if (auto timelines = yyjson_obj_get(dobject, "timelines")) {
+  if (auto timelines = yyjson_obj_get(*json, "timelines")) {
     size_t idx, max;
     yyjson_val *k, *v;
     yyjson_obj_foreach(timelines, idx, max, k, v) {
@@ -394,7 +391,7 @@ void objects::add(unmarshal::value object, int32_t z) {
   transform tr{
     .position = vec2{x, y},
     .angle = .0,
-    .scale = unmarshal::value_or(dobject, "scale", 1.0f)
+    .scale = unmarshal::value_or(*json, "scale", 1.0f)
   };
   _registry.emplace<transform>(entity, std::move(tr));
 

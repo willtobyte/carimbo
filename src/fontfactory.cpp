@@ -21,12 +21,11 @@ std::shared_ptr<font> fontfactory::get(std::string_view family) noexcept {
     std::println("[fontfactory] cache miss {}", filename);
 
     auto json = unmarshal::parse(io::read(filename));
-    auto document = *json;
 
-    const auto glyphs = unmarshal::get<std::string_view>(document, "glyphs");
-    const auto spacing = unmarshal::value_or(document, "spacing", int16_t{0});
-    const auto leading = unmarshal::value_or(document, "leading", int16_t{0});
-    const auto scale = unmarshal::value_or(document, "scale", float{1.f});
+    const auto glyphs = unmarshal::get<std::string_view>(*json, "glyphs");
+    const auto spacing = unmarshal::value_or(*json, "spacing", int16_t{0});
+    const auto leading = unmarshal::value_or(*json, "leading", int16_t{0});
+    const auto scale = unmarshal::value_or(*json, "scale", float{1.f});
 
     const auto pixmap = _pixmappool->get(std::format("blobs/overlay/{}.png", family));
     const auto width = pixmap->width();
