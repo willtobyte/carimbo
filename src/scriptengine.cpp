@@ -749,7 +749,7 @@ void scriptengine::run() {
         }
 
         default: {
-          const auto* value = self.find(key);
+          const auto value = self.find(key);
           if (!value) {
             return sol::make_object(lua, sol::lua_nil);
           }

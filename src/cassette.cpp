@@ -180,11 +180,11 @@ void cassette::clear(std::string_view key) noexcept {
   persist();
 }
 
-const cassette::value_type* cassette::find(std::string_view key) const noexcept {
+std::optional<cassette::value_type> cassette::find(std::string_view key) const noexcept {
   const auto it = _data.find(key);
   if (it == _data.end()) {
-    return nullptr;
+    return std::nullopt;
   }
 
-  return &it->second;
+  return it->second;
 }
