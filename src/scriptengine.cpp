@@ -500,6 +500,7 @@ void scriptengine::run() {
             scene->populate(pool);
 
             lua["pool"] = pool;
+
             lua["timermanager"] = scene->timermanager();
 
             const auto result = fn();
