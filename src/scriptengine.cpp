@@ -731,7 +731,7 @@ void scriptengine::run() {
           double i{};
           const double frac = std::modf(x, &i);
 
-          if (std::fabs(frac) < epsilon) {
+          if (std::fabs(frac) < std::numeric_limits<double>::epsilon()) {
             if (x < 0) {
               const auto v = self.get<int64_t>(key, static_cast<int64_t>(i));
               return sol::make_object(lua, v);
