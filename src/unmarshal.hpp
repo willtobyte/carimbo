@@ -24,7 +24,8 @@ struct json final {
   ~json() noexcept = default;
 
   [[nodiscard]] explicit operator bool() const noexcept {
-    return _document != nullptr;
+    if (!_document) [[unlikely]] return false;
+    return true;
   }
 
   [[nodiscard]] value operator*() const noexcept {
@@ -111,7 +112,7 @@ template <>
 template <typename T>
 [[nodiscard]] inline std::optional<T> find(value node, const char* key) noexcept {
   auto child = yyjson_obj_get(node, key);
-  if (!child) return std::nullopt;
+  if (!child) [[unlikely]] return std::nullopt;
   if constexpr (std::is_same_v<T, value>) {
     return child;
   } else {
@@ -122,7 +123,7 @@ template <typename T>
 template <typename T>
 [[nodiscard]] inline T value_or(value node, const char* key, T fallback) noexcept {
   auto child = yyjson_obj_get(node, key);
-  if (!child) return fallback;
+  if (!child) [[unlikely]] return fallback;
   return get<T>(node, key);
 }
 
@@ -156,7 +157,7 @@ inline bool make_if(value node, const char* key, T& out) noexcept {
 template <typename T, typename Container>
 inline void collect(value node, const char* key, Container& out) noexcept {
   auto array = yyjson_obj_get(node, key);
-  if (!array) return;
+  if (!array) [[unlikely]] return;
   size_t index, maximum;
   yyjson_val* element;
   yyjson_arr_foreach(array, index, maximum, element) {
@@ -167,7 +168,7 @@ inline void collect(value node, const char* key, Container& out) noexcept {
 template <typename T, typename Container>
 inline void reserve(value node, const char* key, Container& out) noexcept {
   auto array = yyjson_obj_get(node, key);
-  if (!array) return;
+  if (!array) [[unlikely]] return;
   out.reserve(yyjson_arr_size(array));
   size_t index, maximum;
   yyjson_val* element;
