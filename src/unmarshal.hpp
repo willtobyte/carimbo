@@ -23,16 +23,12 @@ struct json final {
 
   ~json() noexcept = default;
 
-  [[nodiscard]] value root() const noexcept {
-    return yyjson_doc_get_root(_document);
-  }
-
   [[nodiscard]] explicit operator bool() const noexcept {
     return _document != nullptr;
   }
 
   [[nodiscard]] value operator*() const noexcept {
-    return root();
+    return yyjson_doc_get_root(_document);
   }
 };
 
