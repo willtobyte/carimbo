@@ -2,7 +2,7 @@
 
 namespace unmarshal {
 
-inline constexpr size_t stack_size = 64 * 1024;
+inline constexpr size_t stack_size = 1024 * 1024;
 
 using value = yyjson_val*;
 
