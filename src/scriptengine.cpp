@@ -386,6 +386,7 @@ void scriptengine::run() {
     "id", sol::property(&entityproxy::id),
     "x", sol::property(&entityproxy::x, &entityproxy::set_x),
     "y", sol::property(&entityproxy::y, &entityproxy::set_y),
+    "z", sol::property(&entityproxy::z, &entityproxy::set_z),
     "alpha", sol::property(&entityproxy::alpha, &entityproxy::set_alpha),
     "angle", sol::property(&entityproxy::angle, &entityproxy::set_angle),
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),

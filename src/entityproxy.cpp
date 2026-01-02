@@ -118,6 +118,23 @@ void entityproxy::set_flip(::flip flip) noexcept {
   s.redraw = true;
 }
 
+int entityproxy::z() const noexcept {
+  const auto& r = _registry.get<renderable>(_entity);
+  return r.z;
+}
+
+void entityproxy::set_z(int value) noexcept {
+  auto& r = _registry.get<renderable>(_entity);
+
+  if (r.z == value) return;
+
+  r.z = value;
+
+  _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
+    return lhs.z < rhs.z;
+  });
+}
+
 void entityproxy::set_onhover(sol::protected_function fn) {
   auto& c = _registry.get<callbacks>(_entity);
   c.on_hover = std::move(fn);

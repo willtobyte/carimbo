@@ -34,6 +34,9 @@ public:
   [[nodiscard]] ::flip flip() const noexcept;
   void set_flip(::flip value) noexcept;
 
+  [[nodiscard]] int z() const noexcept;
+  void set_z(int value) noexcept;
+
   [[nodiscard]] bool visible() const noexcept;
   void set_visible(bool value) noexcept;
 
