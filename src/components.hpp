@@ -172,7 +172,6 @@ struct orientation final {
 };
 
 struct callbacks {
-  functor on_mail;
   functor on_hover;
   functor on_unhover;
   functor on_touch;

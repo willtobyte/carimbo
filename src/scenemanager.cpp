@@ -128,12 +128,6 @@ void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
   }
 }
 
-void scenemanager::on_mail(const event::mail& event) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_mail(event.to, event.from, event.body);
-  }
-}
-
 std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {
   return _resourcemanager;
 }

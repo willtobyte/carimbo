@@ -118,11 +118,6 @@ void entityproxy::set_flip(::flip flip) noexcept {
   s.redraw = true;
 }
 
-void entityproxy::set_onmail(sol::protected_function fn) {
-  auto& c = _registry.get<callbacks>(_entity);
-  c.on_mail = std::move(fn);
-}
-
 void entityproxy::set_onhover(sol::protected_function fn) {
   auto& c = _registry.get<callbacks>(_entity);
   c.on_hover = std::move(fn);

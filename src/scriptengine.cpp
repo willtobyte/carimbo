@@ -411,7 +411,6 @@ void scriptengine::run() {
         self.set_position({x, y});
       }
     ),
-    "on_mail", &entityproxy::set_onmail,
     "on_hover", &entityproxy::set_onhover,
     "on_unhover", &entityproxy::set_onunhover,
     "on_touch", &entityproxy::set_ontouch,
@@ -903,23 +902,6 @@ void scriptengine::run() {
   );
 
   lua["keyboard"] = keyboard{};
-
-  lua.new_usertype<mail>(
-    "Mail",
-    sol::constructors<mail(
-      std::shared_ptr<entityproxy>,
-      std::shared_ptr<entityproxy>,
-      std::string_view
-    )>()
-  );
-
-  lua.new_usertype<postalservice>(
-    "PostalService",
-    sol::constructors<postalservice()>(),
-    "post", &postalservice::post
-  );
-
-  lua["postalservice"] = postalservice{};
 
   lua.new_usertype<label>(
     "Label",

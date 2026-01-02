@@ -455,10 +455,6 @@ void objects::add(unmarshal::value object, int32_t z) {
       cb.on_collision_end = std::move(fn);
     }
 
-    if (auto fn = module["on_mail"].get<sol::protected_function>(); fn.valid()) {
-      cb.on_mail = std::move(fn);
-    }
-
     if (auto fn = module["on_hover"].get<sol::protected_function>(); fn.valid()) {
       cb.on_hover = std::move(fn);
     }

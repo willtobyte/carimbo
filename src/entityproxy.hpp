@@ -43,7 +43,6 @@ public:
   [[nodiscard]] symbol kind() const noexcept;
   void set_kind(symbol value) noexcept;
 
-  void set_onmail(sol::protected_function fn);
   void set_onhover(sol::protected_function fn);
   void set_onunhover(sol::protected_function fn);
   void set_ontouch(sol::protected_function fn);

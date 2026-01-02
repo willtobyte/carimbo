@@ -298,14 +298,6 @@ void scene::on_text(std::string_view text) {
   _ontext(text);
 }
 
-void scene::on_mail(uint64_t to, uint64_t from, std::string_view body) {
-  const auto entity = static_cast<entt::entity>(to);
-  const auto* c = _registry.try_get<callbacks>(entity);
-  if (!c) [[unlikely]] return;
-
-  c->on_mail(from, body);
-}
-
 void scene::on_tick(uint8_t tick) {
   _ontick(tick);
 

@@ -10,11 +10,6 @@ enum player : uint8_t {
   four
 };
 
-enum class type : uint32_t {
-  mail = SDL_EVENT_USER + 1,
-  timer
-};
-
 namespace keyboard {
 enum key : int32_t {
   up = SDLK_UP,
@@ -82,15 +77,4 @@ struct motion {
   int16_t value;
 };
 }
-
-struct mail final {
-  mail(uint64_t to, uint64_t from, std::string_view body)
-      : to(to), from(from), body(body) {}
-
-  mail(const mail& other) = default;
-
-  uint64_t to;
-  uint64_t from;
-  std::string body;
-};
 }

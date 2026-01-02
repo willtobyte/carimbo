@@ -29,9 +29,6 @@ void eventreceiver::on_gamepad_release(uint8_t who, const event::gamepad::button
 void eventreceiver::on_gamepad_motion(uint8_t who, const event::gamepad::motion& event) {
 }
 
-void eventreceiver::on_mail(const event::mail& event) {
-}
-
 #ifndef NDEBUG
 void eventreceiver::on_debug() {
 }

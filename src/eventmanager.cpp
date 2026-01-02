@@ -1,6 +1,5 @@
 #include "eventmanager.hpp"
 
-#include "envelope.hpp"
 #include "event.hpp"
 #include "eventreceiver.hpp"
 #include "renderer.hpp"
@@ -221,38 +220,6 @@ void eventmanager::update(float delta) {
         }
       } break;
 
-      case static_cast<uint32_t>(event::type::mail): {
-        auto* ptr = static_cast<envelope*>(event.user.data1);
-
-        if (ptr) {
-          if (const auto* payload = ptr->try_mail(); payload) {
-            const auto o = event::mail(payload->to, payload->from, payload->body);
-            for (const auto& receiver : _receivers) {
-              receiver->on_mail(o);
-            }
-          }
-
-          _envelopepool.release(ptr);
-        }
-      } break;
-
-      case static_cast<uint32_t>(event::type::timer): {
-        auto* ptr = static_cast<envelope*>(event.user.data1);
-
-        if (ptr) {
-          if (const auto* payload = ptr->try_timer(); payload) {
-            const auto fn = payload->fn;
-            const auto repeat = payload->repeat;
-
-            fn();
-
-            if (!repeat) {
-              _envelopepool.release(ptr);
-            }
-          }
-        }
-      } break;
-
       default:
         break;
     }
@@ -282,11 +249,5 @@ void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {
 
   SDL_Event event;
   while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, begin_event, end_event) > 0) {
-    if (!event.user.data1) [[likely]] {
-      continue;
-    }
-
-    auto* ptr = static_cast<envelope*>(const_cast<void*>(event.user.data1));
-    _envelopepool.release(ptr);
   }
 }

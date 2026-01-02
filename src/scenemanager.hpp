@@ -38,7 +38,6 @@ protected:
   virtual void on_mouse_press(const event::mouse::button& event) override;
   virtual void on_mouse_release(const event::mouse::button& event) override;
   virtual void on_mouse_motion(const event::mouse::motion& event) override;
-  virtual void on_mail(const event::mail& event) override;
 
 private:
   std::shared_ptr<::resourcemanager> _resourcemanager;
