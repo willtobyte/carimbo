@@ -1,5 +1,6 @@
 #pragma once
 
+#define YYJSON_DISABLE_NON_STANDARD 1
 #define YYJSON_DISABLE_UTF8_VALIDATION 1
 
 #include <AL/al.h>
