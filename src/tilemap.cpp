@@ -7,9 +7,9 @@ void from_json(unmarshal::value json, grid& out) {
   out.tiles.reserve(yyjson_arr_size(tiles));
 
   size_t idx, max;
-  yyjson_val* elem;
-  yyjson_arr_foreach(tiles, idx, max, elem) {
-    out.tiles.emplace_back(static_cast<uint32_t>(yyjson_get_uint(elem)));
+  yyjson_val* element;
+  yyjson_arr_foreach(tiles, idx, max, element) {
+    out.tiles.emplace_back(static_cast<uint32_t>(yyjson_get_uint(element)));
   }
 }
 
