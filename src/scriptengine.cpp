@@ -962,6 +962,7 @@ void scriptengine::run() {
   const auto renderer = engine->renderer();
 
   auto fontfactory = lua.create_table();
+
   fontfactory.set_function("get", [renderer](sol::this_state state, sol::table, std::string_view family) -> std::shared_ptr<font> {
     try {
       return std::make_shared<font>(renderer, family);
@@ -970,6 +971,7 @@ void scriptengine::run() {
       std::unreachable();
     }
   });
+
   lua["fontfactory"] = fontfactory;
 
   lua["scenemanager"] = engine->scenemanager();
