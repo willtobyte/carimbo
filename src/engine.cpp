@@ -5,7 +5,6 @@
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "renderer.hpp"
-#include "resourcemanager.hpp"
 #include "scenemanager.hpp"
 #include "statemanager.hpp"
 #include "window.hpp"
@@ -18,10 +17,6 @@ std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
 }
 
-std::shared_ptr<resourcemanager> engine::resourcemanager() const noexcept {
-  return _resourcemanager;
-}
-
 std::shared_ptr<scenemanager> engine::scenemanager() const noexcept {
   return _scenemanager;
 }
@@ -30,9 +25,6 @@ std::shared_ptr<statemanager> engine::statemanager() const noexcept {
   return _statemanager;
 }
 
-std::shared_ptr<soundmanager> engine::soundmanager() const noexcept {
-  return _resourcemanager->soundmanager();
-}
 
 std::shared_ptr<window> engine::window() const noexcept {
   return _window;
@@ -56,10 +48,6 @@ void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept {
 
 void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {
   _eventmanager = std::move(ptr);
-}
-
-void engine::set_resourcemanager(std::shared_ptr<::resourcemanager> ptr) noexcept {
-  _resourcemanager = std::move(ptr);
 }
 
 void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept {
@@ -133,7 +121,6 @@ void engine::_loop() {
   }
 
   _eventmanager->update(delta);
-  _resourcemanager->update(delta);
   _scenemanager->update(delta);
   _overlay->update(delta);
 
@@ -167,9 +154,3 @@ void engine::_loop() {
 void engine::on_quit() noexcept {
   _running = false;
 }
-
-#ifndef NDEBUG
-void engine::on_debug() {
-  _resourcemanager->debug();
-}
-#endif

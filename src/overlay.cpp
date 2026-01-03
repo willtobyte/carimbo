@@ -4,11 +4,11 @@
 #include "eventmanager.hpp"
 #include "eventreceiver.hpp"
 #include "label.hpp"
-#include "resourcemanager.hpp"
+#include "renderer.hpp"
 #include "widget.hpp"
 
-overlay::overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager)
-    : _resourcemanager(std::move(resourcemanager)), _eventmanager(std::move(eventmanager)) {}
+overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager)
+    : _renderer(std::move(renderer)), _eventmanager(std::move(eventmanager)) {}
 
 std::variant<std::shared_ptr<label>> overlay::create(widgettype type) noexcept {
   std::shared_ptr<label> widget;
@@ -62,7 +62,7 @@ void overlay::draw() const noexcept {
 }
 
 void overlay::set_cursor(std::string_view name) {
-  _cursor = std::make_shared<cursor>(name, _resourcemanager);
+  _cursor = std::make_shared<cursor>(name, _renderer);
   _eventmanager->add_receiver(_cursor);
 }
 

@@ -2,12 +2,10 @@
 
 #include "event.hpp"
 #include "io.hpp"
-#include "resourcemanager.hpp"
 #include "scene.hpp"
 
-scenemanager::scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer)
-    : _resourcemanager(std::move(resourcemanager)),
-      _renderer(std::move(renderer)) {
+scenemanager::scenemanager(std::shared_ptr<::renderer> renderer)
+    : _renderer(std::move(renderer)) {
 }
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
@@ -74,7 +72,6 @@ boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string
   for (const auto& scene : scenes) {
     if (_scene_mapping.erase(scene) > 0) {
       std::println("[scenemanager] destroyed {}", scene);
-      _resourcemanager->flush();
     }
   }
 
@@ -126,10 +123,6 @@ void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
   if (auto scene = _scene) [[likely]] {
     scene->on_motion(event.x, event.y);
   }
-}
-
-std::shared_ptr<resourcemanager> scenemanager::resourcemanager() const noexcept {
-  return _resourcemanager;
 }
 
 std::shared_ptr<::renderer> scenemanager::renderer() const noexcept {

@@ -1,19 +1,19 @@
 #include "cursor.hpp"
 
-#include "io.hpp"
 #include "flip.hpp"
-#include "resourcemanager.hpp"
 #include "geometry.hpp"
+#include "io.hpp"
+#include "pixmap.hpp"
+#include "renderer.hpp"
 
-cursor::cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager)
-    : _resourcemanager(std::move(resourcemanager)) {
+cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
   SDL_HideCursor();
 
   auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
   from_json(yyjson_obj_get(*json, "point"), _point);
 
-  _spritesheet = _resourcemanager->pixmappool()->get(std::format("blobs/overlay/{}.png", name));
+  _spritesheet = std::make_shared<pixmap>(std::move(renderer), std::format("blobs/overlay/{}.png", name));
 
   auto animations = yyjson_obj_get(*json, "animations");
   size_t idx, max;

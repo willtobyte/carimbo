@@ -2,12 +2,12 @@
 
 #include "geometry.hpp"
 #include "physics.hpp"
+#include "pixmap.hpp"
 
 scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
-    :
-      _effects(scenemanager->resourcemanager()->soundmanager(), name),
-      _particles(scenemanager->resourcemanager()),
-      _objects(_registry, scenemanager->resourcemanager()->pixmappool(), name, environment) {
+    : _effects(name),
+      _particles(scenemanager->renderer()),
+      _objects(_registry, scenemanager->renderer(), name, environment) {
   _renderer = scenemanager->renderer();
 
   _hits.reserve(64);
@@ -16,17 +16,12 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
   if (auto physics = yyjson_obj_get(document, "physics")) {
     if (auto gravity = yyjson_obj_get(physics, "gravity")) {
       def.gravity = b2Vec2{
-        unmarshal::value_or(gravity, "x", .0f),
-        unmarshal::value_or(gravity, "y", .0f)
-      };
+          unmarshal::value_or(gravity, "x", .0f),
+          unmarshal::value_or(gravity, "y", .0f)};
     }
   }
 
   _world = b2CreateWorld(&def);
-
-  const auto& resourcemanager = scenemanager->resourcemanager();
-  const auto& pixmappool = resourcemanager->pixmappool();
-  const auto& fontfactory = resourcemanager->fontfactory();
 
   if (auto array = yyjson_obj_get(document, "effects")) {
     size_t idx, max;
@@ -40,7 +35,7 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
     const auto type = unmarshal::get<std::string_view>(layer, "type");
 
     if (type == "tilemap") {
-      auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(layer, "content"), resourcemanager);
+      auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(layer, "content"), _renderer);
 
       const auto tile_size = tilemap.tile_size();
       const auto half = tile_size * 0.5f;
@@ -59,9 +54,8 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
             if (tiles[row_offset + column] == 0) continue;
 
             const auto position = b2Vec2{
-              static_cast<float>(column) * tile_size + half,
-              static_cast<float>(row) * tile_size + half
-            };
+                static_cast<float>(column) * tile_size + half,
+                static_cast<float>(row) * tile_size + half};
 
             const auto body = physics::make_static_body(_world, position);
             b2CreatePolygonShape(body, &sdef, &poly);
@@ -71,7 +65,7 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
     }
 
     if (type == "background") {
-      _layer = pixmappool->get(std::format("blobs/{}/background.png", name));
+      _layer = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/background.png", name));
 
       _camera = quad{0, 0, unmarshal::get<float>(document, "width"), unmarshal::get<float>(document, "height")};
     }
@@ -93,15 +87,6 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
     yyjson_val* elem;
     yyjson_arr_foreach(array, idx, max, elem) {
       _particles.add(elem);
-    }
-  }
-
-  if (auto array = yyjson_obj_get(document, "fonts")) {
-    size_t idx, max;
-    yyjson_val* elem;
-    yyjson_arr_foreach(array, idx, max, elem) {
-      auto fontname = unmarshal::string(elem);
-      fontfactory->get(fontname);
     }
   }
 }
@@ -128,6 +113,8 @@ void scene::update(float delta) {
   _animationsystem.update(now);
 
   _physicssystem.update(_world, delta);
+
+  _effects.update(delta);
 
   _particles.update(delta);
 

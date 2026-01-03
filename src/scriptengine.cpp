@@ -223,11 +223,6 @@ void scriptengine::run() {
      "on_end", &soundfx::set_onend
   );
 
-  lua.new_usertype<soundmanager>(
-    "SoundManager",
-    sol::no_constructor
-  );
-
   lua.new_enum(
     "Controller",
     "up", event::gamepad::button::up,
@@ -306,38 +301,6 @@ void scriptengine::run() {
         default: return std::string("observable");
       }
     }
-  );
-
-  lua.new_usertype<resourcemanager>(
-    "ResourceManager",
-    sol::no_constructor,
-    "flush", [&lua](resourcemanager& self) {
-      lua.collect_garbage();
-      self.flush();
-    },
-    "prefetch", sol::overload(
-        [](resourcemanager& self) {
-          self.prefetch();
-        },
-
-        [](resourcemanager& self, sol::table table) {
-          std::vector<std::string> filenames;
-          filenames.reserve(table.size());
-          for (const auto& [key, value] : table) {
-            filenames.emplace_back(value.as<std::string>());
-          }
-          self.prefetch(std::move(filenames));
-        },
-
-        [](resourcemanager& self, sol::variadic_args arguments) {
-          std::vector<std::string> filenames;
-          filenames.reserve(arguments.size());
-          for (const auto& value : arguments) {
-            filenames.emplace_back(value.as<std::string>());
-          }
-          self.prefetch(std::move(filenames));
-        }
-      )
   );
 
   struct playerwrapper {
@@ -966,12 +929,6 @@ void scriptengine::run() {
     sol::no_constructor
   );
 
-  lua.new_usertype<fontfactory>(
-    "FontFactory",
-    sol::no_constructor,
-    "get", &fontfactory::get
-  );
-
   lua.new_usertype<canvas>(
     "Canvas",
     sol::no_constructor,
@@ -1002,9 +959,20 @@ void scriptengine::run() {
   verify(source);
 
   const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
+  const auto renderer = engine->renderer();
+
+  auto fontfactory = lua.create_table();
+  fontfactory.set_function("get", [renderer](sol::this_state state, sol::table, std::string_view family) -> std::shared_ptr<font> {
+    try {
+      return std::make_shared<font>(renderer, family);
+    } catch (const std::exception& exception) {
+      luaL_error(state.lua_state(), "%s", exception.what());
+      std::unreachable();
+    }
+  });
+  lua["fontfactory"] = fontfactory;
 
   lua["scenemanager"] = engine->scenemanager();
-  lua["fontfactory"] = engine->resourcemanager()->fontfactory();
   lua["overlay"] = engine->overlay();
   lua["canvas"] = engine->canvas();
   lua["statemanager"] = engine->statemanager();

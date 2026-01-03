@@ -3,7 +3,6 @@
 #include "audiodevice.hpp"
 #include "engine.hpp"
 #include "eventmanager.hpp"
-#include "resourcemanager.hpp"
 #include "scenemanager.hpp"
 
 enginefactory& enginefactory::with_title(const std::string_view title) noexcept {
@@ -104,15 +103,13 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto window = std::make_shared<::window>(_title, _width, _height, _fullscreen);
   const auto renderer = window->create_renderer(_scale);
   const auto eventmanager = std::make_shared<::eventmanager>(renderer);
-  const auto resourcemanager = std::make_shared<::resourcemanager>(renderer, audiodevice, engine);
-  const auto overlay = std::make_shared<::overlay>(resourcemanager, eventmanager);
+  const auto overlay = std::make_shared<::overlay>(renderer, eventmanager);
   const auto statemanager = std::make_shared<::statemanager>();
-  const auto scenemanager = std::make_shared<::scenemanager>(resourcemanager, renderer);
+  const auto scenemanager = std::make_shared<::scenemanager>(renderer);
 
   engine->set_audiodevice(audiodevice);
   engine->set_eventmanager(eventmanager);
   engine->set_renderer(renderer);
-  engine->set_resourcemanager(resourcemanager);
   engine->set_scenemanager(scenemanager);
   engine->set_statemanager(statemanager);
   engine->set_window(window);

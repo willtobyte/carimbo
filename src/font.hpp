@@ -19,15 +19,7 @@ class font final {
 public:
   font() = delete;
 
-  explicit font(
-    std::string_view glyphs,
-    std::array<glyphprops, 256> props,
-    std::shared_ptr<pixmap> pixmap,
-    int16_t spacing,
-    int16_t leading,
-    float fontheight,
-    std::shared_ptr<renderer> renderer
-  );
+  explicit font(std::shared_ptr<renderer> renderer, std::string_view family);
 
   ~font() = default;
 

@@ -5,10 +5,6 @@
 #include "eventreceiver.hpp"
 #include "geometry.hpp"
 
-  class resourcemanager;
-
-  class pixmap;
-
 constexpr auto ACTION_DEFAULT = "default";
 constexpr auto ACTION_LEFT = "left";
 constexpr auto ACTION_RIGHT = "right";
@@ -34,7 +30,7 @@ struct animation final {
 
 class cursor final : public eventreceiver {
 public:
-  explicit cursor(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager);
+  explicit cursor(std::string_view name, std::shared_ptr<renderer> renderer);
   virtual ~cursor() = default;
 
   virtual void on_mouse_release(const event::mouse::button& event) override;
@@ -51,7 +47,6 @@ private:
   vec2 _position{0, 0};
   vec2 _point;
   boost::static_string<32> _action{ACTION_DEFAULT};
-  std::shared_ptr<resourcemanager> _resourcemanager;
   std::shared_ptr<pixmap> _spritesheet;
   boost::unordered_flat_map<std::string, animation, transparent_string_hash, std::equal_to<>> _animations;
   animation* _current_animation{nullptr};

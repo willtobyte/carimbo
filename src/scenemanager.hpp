@@ -5,7 +5,7 @@
 
 class scenemanager final : public eventreceiver, public std::enable_shared_from_this<scenemanager> {
 public:
-  scenemanager(std::shared_ptr<::resourcemanager> resourcemanager, std::shared_ptr<::renderer> renderer);
+  explicit scenemanager(std::shared_ptr<::renderer> renderer);
 
   ~scenemanager() noexcept = default;
 
@@ -25,8 +25,6 @@ public:
 
   void on_tick(uint8_t tick);
 
-  std::shared_ptr<::resourcemanager> resourcemanager() const noexcept;
-
   std::shared_ptr<::renderer> renderer() const noexcept;
 
   void set_runtime(sol::state_view runtime) noexcept;
@@ -40,7 +38,6 @@ protected:
   virtual void on_mouse_motion(const event::mouse::motion& event) override;
 
 private:
-  std::shared_ptr<::resourcemanager> _resourcemanager;
   std::shared_ptr<::renderer> _renderer;
   sol::environment _environment;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;

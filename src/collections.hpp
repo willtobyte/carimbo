@@ -61,17 +61,17 @@ struct particlebatch final {
 
 class particlefactory final {
 public:
-  explicit particlefactory(std::shared_ptr<resourcemanager> resourcemanager);
+  explicit particlefactory(std::shared_ptr<renderer> renderer);
 
   std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool spawning = true) const;
 
 private:
-  std::shared_ptr<resourcemanager> _resourcemanager;
+  std::shared_ptr<renderer> _renderer;
 };
 
 class effects final {
 public:
-  effects(std::shared_ptr<soundmanager> soundmanager, std::string_view scenename);
+  effects(std::string_view scenename);
   ~effects() noexcept;
 
   void add(std::string_view name);
@@ -82,15 +82,16 @@ public:
 
   void clear();
 
+  void update(float delta);
+
 private:
-  std::shared_ptr<soundmanager> _soundmanager;
   std::string _scenename;
   boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
 };
 
 class particles final {
 public:
-  explicit particles(std::shared_ptr<resourcemanager> resourcemanager);
+  explicit particles(std::shared_ptr<renderer> renderer);
   ~particles() = default;
 
   void add(unmarshal::value particle);
@@ -115,7 +116,7 @@ class objects final {
 public:
   objects(
       entt::registry& registry,
-      std::shared_ptr<pixmappool> pixmappool,
+      std::shared_ptr<renderer> renderer,
       std::string_view scenename,
       sol::environment& environment
   );
@@ -129,7 +130,7 @@ public:
 
 private:
   entt::registry& _registry;
-  std::shared_ptr<pixmappool> _pixmappool;
+  std::shared_ptr<renderer> _renderer;
   std::string _scenename;
   sol::environment& _environment;
   boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;

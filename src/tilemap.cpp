@@ -1,5 +1,8 @@
 #include "tilemap.hpp"
 
+#include "pixmap.hpp"
+#include "renderer.hpp"
+
 void from_json(unmarshal::value json, grid& out) {
   out.collider = unmarshal::get<bool>(json, "collider");
 
@@ -20,14 +23,12 @@ void from_json(unmarshal::value document, tilemap& out) {
   unmarshal::reserve<grid>(document, "layers", out._grids);
 }
 
-tilemap::tilemap(std::string_view name, std::shared_ptr<resourcemanager> resourcemanager)
-    : _renderer(resourcemanager->renderer()) {
+tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
+    : _renderer(std::move(renderer)) {
   auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
   from_json(*document, *this);
 
-  const auto pixmappool = resourcemanager->pixmappool();
-
-  _atlas = pixmappool->get(std::format("blobs/tilemaps/{}.png", name));
+  _atlas = std::make_shared<pixmap>(_renderer, std::format("blobs/tilemaps/{}.png", name));
   _tile_size = static_cast<float>(_tile_size);
   _inv_tile_size = 1.0f / _tile_size;
 

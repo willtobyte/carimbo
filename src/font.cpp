@@ -1,26 +1,93 @@
 #include "font.hpp"
 
+#include "io.hpp"
 #include "label.hpp"
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
-font::font(
-  std::string_view glyphs,
-  std::array<glyphprops, 256> props,
-  std::shared_ptr<pixmap> pixmap,
-  int16_t spacing,
-  int16_t leading,
-  float fontheight,
-  std::shared_ptr<renderer> renderer
-)
-  : _glyphs(glyphs),
-    _props(std::move(props)),
-    _pixmap(std::move(pixmap)),
-    _spacing(spacing),
-    _leading(leading),
-    _fontheight(fontheight),
-    _renderer(std::move(renderer))
-{}
+font::font(std::shared_ptr<renderer> renderer, std::string_view family)
+    : _renderer(std::move(renderer)) {
+  auto json = unmarshal::parse(io::read(std::format("fonts/{}.json", family)));
+
+  _glyphs = unmarshal::get<std::string_view>(*json, "glyphs");
+  _spacing = unmarshal::value_or(*json, "spacing", int16_t{0});
+  _leading = unmarshal::value_or(*json, "leading", int16_t{0});
+  const auto scale = unmarshal::value_or(*json, "scale", float{1.f});
+
+  _pixmap = std::make_shared<pixmap>(_renderer, std::format("blobs/overlay/{}.png", family));
+  const auto width = _pixmap->width();
+  const auto height = _pixmap->height();
+
+  const auto target = std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTexture(
+          *_renderer,
+          SDL_PIXELFORMAT_RGBA32,
+          SDL_TEXTUREACCESS_TARGET,
+          width, height));
+
+  auto* const origin = SDL_GetRenderTarget(*_renderer);
+
+  SDL_FlushRenderer(*_renderer);
+
+  SDL_FRect destination{0, 0, static_cast<float>(width), static_cast<float>(height)};
+
+  SDL_SetRenderTarget(*_renderer, target.get());
+  SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
+  SDL_RenderClear(*_renderer);
+  SDL_RenderTexture(*_renderer, *_pixmap, nullptr, &destination);
+
+  const auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>(SDL_RenderReadPixels(*_renderer, nullptr));
+
+  SDL_SetRenderTarget(*_renderer, origin);
+
+  const auto* pixels = static_cast<const uint32_t*>(surface->pixels);
+  const auto separator = pixels[0];
+
+  const auto iw = 1.0f / static_cast<float>(width);
+  const auto ih = 1.0f / static_cast<float>(height);
+
+  auto x = 0, y = 0;
+  auto first = true;
+  for (char glyph : _glyphs) {
+    while (x < width && pixels[y * width + x] == separator) {
+      ++x;
+    }
+
+    assert(x < width && std::format("missing glyph for '{}'", glyph).c_str());
+
+    auto w = 0;
+    while (x + w < width && pixels[y * width + x + w] != separator) {
+      ++w;
+    }
+
+    auto h = 0;
+    while (y + h < height && pixels[(y + h) * width + x] != separator) {
+      ++h;
+    }
+
+    const auto fx = static_cast<float>(x);
+    const auto fy = static_cast<float>(y);
+    const auto fw = static_cast<float>(w);
+    const auto fh = static_cast<float>(h);
+
+    _props[static_cast<uint8_t>(glyph)] = {
+        fx * iw,
+        fy * ih,
+        (fx + fw) * iw,
+        (fy + fh) * ih,
+        fw * scale,
+        fh * scale,
+        fw,
+        true};
+
+    if (first) {
+      _fontheight = fh * scale;
+      first = false;
+    }
+
+    x += w;
+  }
+}
 
 void font::draw(std::string_view text, const vec2& position, const boost::unordered_flat_map<size_t, glypheffect>& effects) const {
   if (text.empty()) [[unlikely]] {

@@ -2,9 +2,9 @@
 
 #include "entityproxy.hpp"
 #include "io.hpp"
-#include "resourcemanager.hpp"
+#include "pixmap.hpp"
+#include "renderer.hpp"
 #include "soundfx.hpp"
-#include "soundmanager.hpp"
 
 namespace {
 
@@ -106,9 +106,8 @@ struct particleconfig final {
 };
 }
 
-effects::effects(std::shared_ptr<soundmanager> soundmanager, std::string_view scenename)
-    : _soundmanager(std::move(soundmanager)),
-      _scenename(scenename) {
+effects::effects(std::string_view scenename)
+    : _scenename(scenename) {
   _effects.reserve(8);
 }
 
@@ -118,7 +117,13 @@ effects::~effects() noexcept {
 
 void effects::add(std::string_view name) {
   const auto path = std::format("blobs/{}/{}.ogg", _scenename, name);
-  _effects.emplace(name, _soundmanager->get(path));
+  _effects.emplace(name, std::make_shared<soundfx>(path));
+}
+
+void effects::update(float delta) {
+  for (auto& [_, effect] : _effects) {
+    effect->update(delta);
+  }
 }
 
 void effects::populate(sol::table& pool) const {
@@ -138,16 +143,15 @@ void effects::clear() {
   _effects.clear();
 }
 
-particlefactory::particlefactory(std::shared_ptr<resourcemanager> resourcemanager)
-    : _resourcemanager(std::move(resourcemanager)) {
-}
+particlefactory::particlefactory(std::shared_ptr<renderer> renderer)
+    : _renderer(std::move(renderer)) {}
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   auto json = unmarshal::parse(io::read(std::format("particles/{}.json", kind)));
   particleconfig conf;
   from_json(*json, conf);
 
-  const auto pixmap = _resourcemanager->pixmappool()->get(std::format("blobs/particles/{}.png", kind));
+  auto pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/particles/{}.png", kind));
 
   const auto props = std::make_shared<particleprops>();
   props->spawning = spawning;
@@ -155,7 +159,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->y = y;
   props->hw = static_cast<float>(pixmap->width()) * 0.5f;
   props->hh = static_cast<float>(pixmap->height()) * 0.5f;
-  props->pixmap = pixmap;
+  props->pixmap = std::move(pixmap);
   props->xspawnd = rng::uniform_real<float>(conf.xspawn.first, conf.xspawn.second);
   props->yspawnd = rng::uniform_real<float>(conf.yspawn.first, conf.yspawn.second);
   props->radiusd = rng::uniform_real<float>(conf.radius.first, conf.radius.second);
@@ -191,9 +195,9 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return batch;
 }
 
-particles::particles(std::shared_ptr<resourcemanager> resourcemanager)
-    : _renderer(resourcemanager->renderer()),
-      _factory(std::make_shared<particlefactory>(resourcemanager)) {
+particles::particles(std::shared_ptr<renderer> renderer)
+    : _renderer(std::move(renderer)),
+      _factory(std::make_shared<particlefactory>(_renderer)) {
   _batches.reserve(16);
 }
 
@@ -332,12 +336,12 @@ std::shared_ptr<particlefactory> particles::factory() const noexcept {
 
 objects::objects(
     entt::registry& registry,
-    std::shared_ptr<pixmappool> pixmappool,
+    std::shared_ptr<renderer> renderer,
     std::string_view scenename,
     sol::environment& environment
 )
     : _registry(registry),
-      _pixmappool(std::move(pixmappool)),
+      _renderer(std::move(renderer)),
       _scenename(scenename),
       _environment(environment) {
   _proxies.reserve(32);
@@ -374,8 +378,7 @@ void objects::add(unmarshal::value object, int32_t z) {
   _registry.emplace<tint>(entity);
 
   sprite sp{
-    .pixmap = _pixmappool->get(std::format("blobs/{}/{}.png", _scenename, kind))
-  };
+      .pixmap = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind))};
   _registry.emplace<sprite>(entity, std::move(sp));
 
   playback pb{

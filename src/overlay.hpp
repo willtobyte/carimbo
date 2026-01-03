@@ -6,7 +6,7 @@
 
 class overlay final : public eventreceiver {
 public:
-  overlay(std::shared_ptr<resourcemanager> resourcemanager, std::shared_ptr<eventmanager> eventmanager);
+  overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager);
   virtual ~overlay() noexcept = default;
 
   std::variant<std::shared_ptr<label>> create(widgettype type) noexcept;
@@ -24,7 +24,7 @@ public:
   void dispatch(widgettype type, std::string_view message) noexcept;
 
 private:
-  std::shared_ptr<resourcemanager> _resourcemanager;
+  std::shared_ptr<renderer> _renderer;
   std::shared_ptr<eventmanager> _eventmanager;
   boost::container::small_vector<std::shared_ptr<widget>, 16> _widgets;
   std::shared_ptr<cursor> _cursor;
