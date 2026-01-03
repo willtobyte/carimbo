@@ -142,7 +142,7 @@ The **engine** instance, now made global for convenience, holds the following co
 - `canvas` an object that has a pixels property, where you can write arbitrary pixels to the screen — think of it like a poor man’s shader.
 - `cassette` remember when old computers and some consoles used cassette tapes to store programs? Same logic — you can use it as a key-value store to save game data.
 - `objectmanager` manager responsible for creating and destroying objects
-- `fontfactory` manager responsible for loading bitmap fonts.
+- `Font` constructor for loading bitmap fonts.
 - `overlay` manager responsible for handling the Heads-Up Display (HUD)
 - `resourcemanager` manager responsible for batch loading assets and flushing unused ones.
 - `soundmanager` manager responsible for playing and stopping sounds, as well as flushing them.
@@ -244,15 +244,11 @@ local other = objectmanager:clone(object)
 objectmanager:destroy(object)
 ```
 
-### FontFactory
-
 ### Font
 
 ```lua
-local fontfactory = engine:fontfactory()
-
--- Get the font.
-local myfont.font = fontfactory:get("myfont")
+-- Create the font.
+local myfont = Font("myfont")
 
 -- Returns the sequence of glyphs.
 myfont.glyphs
@@ -279,11 +275,10 @@ overlay:dispatch(WidgetType.cursor, "damage")
 To display labels (text) at arbitrary positions on the screen, you need to instantiate a Label, assign it a font and position, with or without text.
 
 ```lua
-local fontfactory = engine:fontfactory()
 local overlay = engine:overlay()
 
--- Load and parse the font if it’s already cached; if so, return the shared instance.
-local myfont = fontfactory:get("myfont")
+-- Create the font.
+local myfont = Font("myfont")
 
 -- Create a label.
 local label = overlay:create(WidgetType.label)

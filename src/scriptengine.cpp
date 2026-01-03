@@ -533,28 +533,12 @@ void scriptengine::run() {
     "label", ::widgettype::label
   );
 
-  struct cursorproxy {
-    overlay& o;
-
-    void set(std::string_view name) noexcept { o.set_cursor(name); }
-
-    void hide() noexcept { o.hide(); }
-  };
-
-  lua.new_usertype<cursorproxy>(
-    "CursorProxy",
-    sol::no_constructor,
-    "set", &cursorproxy::set,
-    "hide", &cursorproxy::hide
-  );
-
   lua.new_usertype<overlay>(
     "Overlay",
     sol::no_constructor,
     "create", &overlay::create,
     "destroy", &overlay::destroy,
-    "dispatch", &overlay::dispatch,
-    "cursor", sol::property([](overlay& o) { return cursorproxy{o}; })
+    "dispatch", &overlay::dispatch
   );
 
   lua.new_usertype<particleprops>(
@@ -586,12 +570,6 @@ void scriptengine::run() {
 
   lua["cassette"] = cassette();
 
-  lua.new_usertype<font>(
-    "Font",
-    sol::no_constructor,
-    "glyphs", sol::property(&font::glyphs)
-  );
-
   lua.new_usertype<enginefactory>(
     "EngineFactory",
     sol::constructors<enginefactory()>(),
@@ -603,7 +581,24 @@ void scriptengine::run() {
     "with_fullscreen", &enginefactory::with_fullscreen,
     "with_sentry", &enginefactory::with_sentry,
     "with_ticks", &enginefactory::with_ticks,
-    "create", &enginefactory::create
+    "create", [](enginefactory& self, sol::this_state state) {
+      sol::state_view lua{state};
+      auto ptr = self.create();
+
+      lua["overlay"] = ptr->overlay();
+      lua["scenemanager"] = ptr->scenemanager();
+      lua["statemanager"] = ptr->statemanager();
+      lua["canvas"] = ptr->canvas();
+
+      auto viewport = lua.create_table();
+      viewport["width"] = ptr->window()->width();
+      viewport["height"] = ptr->window()->height();
+      lua["viewport"] = viewport;
+
+      ptr->scenemanager()->set_runtime(lua);
+
+      return ptr;
+    }
   );
 
   lua.new_usertype<vec2>(
@@ -871,7 +866,6 @@ void scriptengine::run() {
     "Label",
     sol::no_constructor,
     sol::base_classes, sol::bases<widget>(),
-    "font", sol::property(&label::set_font),
     "set", sol::overload(
       [](
         std::shared_ptr<label> self,
@@ -889,6 +883,7 @@ void scriptengine::run() {
         self->set(text, x, y);
       }
     ),
+    "glyphs", sol::property(&label::glyphs),
     "effect", sol::writeonly_property([](label& self, sol::object argument) {
       if (argument == sol::lua_nil) {
         self.clear_effects();
@@ -959,33 +954,6 @@ void scriptengine::run() {
   verify(source);
 
   const auto engine = lua["engine"].get<std::shared_ptr<::engine>>();
-  const auto renderer = engine->renderer();
-
-  auto fontfactory = lua.create_table();
-
-  fontfactory.set_function("get", [renderer](sol::this_state state, sol::table, std::string_view family) -> std::shared_ptr<font> {
-    try {
-      return std::make_shared<font>(renderer, family);
-    } catch (const std::exception& exception) {
-      luaL_error(state.lua_state(), "%s", exception.what());
-      std::unreachable();
-    }
-  });
-
-  lua["fontfactory"] = fontfactory;
-
-  lua["scenemanager"] = engine->scenemanager();
-  lua["overlay"] = engine->overlay();
-  lua["canvas"] = engine->canvas();
-  lua["statemanager"] = engine->statemanager();
-
-  auto viewport = lua.create_table();
-  viewport["width"] = engine->window()->width();
-  viewport["height"] = engine->window()->height();
-
-  lua["viewport"] = viewport;
-
-  engine->scenemanager()->set_runtime(lua);
 
   const auto setup = lua["setup"].get<sol::protected_function>();
   const auto result = setup();

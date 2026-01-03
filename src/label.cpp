@@ -35,6 +35,10 @@ void label::clear() {
   _effects.clear();
 }
 
+std::string_view label::glyphs() const noexcept {
+  return _font->glyphs();
+}
+
 void label::update(float delta) {
 }
 

@@ -32,6 +32,8 @@ public:
 
   void clear();
 
+  std::string_view glyphs() const noexcept;
+
   virtual void update(float delta) override;
 
   virtual void draw() const override;
