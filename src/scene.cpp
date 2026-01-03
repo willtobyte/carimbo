@@ -5,7 +5,8 @@
 #include "pixmap.hpp"
 
 scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
-    : _effects(name),
+    : _name(name),
+      _effects(name),
       _particles(scenemanager->renderer()),
       _objects(_registry, scenemanager->renderer(), name, environment) {
   _renderer = scenemanager->renderer();

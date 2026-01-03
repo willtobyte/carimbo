@@ -23,7 +23,7 @@ public:
 
   void draw() const noexcept;
 
-  std::string_view name() const noexcept { return ""; }
+  std::string_view name() const noexcept { return _name; }
 
   void populate(sol::table& pool) const;
 
@@ -48,6 +48,8 @@ public:
   void on_tick(uint8_t tick);
 
 private:
+  std::string _name;
+
   void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
     auto aabb = b2AABB{};
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
