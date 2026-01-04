@@ -33,6 +33,10 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
   }
 }
 
+cursor::~cursor() {
+  SDL_ShowCursor();
+}
+
 void cursor::on_mouse_release(const event::mouse::button& event) {
   constexpr auto left = event::mouse::button::which::left;
   constexpr auto middle = event::mouse::button::which::middle;

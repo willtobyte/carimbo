@@ -527,17 +527,17 @@ void scriptengine::run() {
       }
     });
 
-  lua.new_enum(
-    "WidgetType",
-    "cursor", ::widgettype::cursor,
-    "label", ::widgettype::label
-  );
-
   lua.new_usertype<overlay>(
     "Overlay",
     sol::no_constructor,
-    "create", &overlay::create,
-    "destroy", &overlay::destroy,
+    "label", sol::overload(
+      sol::resolve<std::shared_ptr<::label>(std::string_view)>(&overlay::label),
+      sol::resolve<void(std::shared_ptr<::label>)>(&overlay::label)
+    ),
+    "cursor", sol::overload(
+      sol::resolve<void(std::string_view)>(&overlay::cursor),
+      sol::resolve<void(std::nullptr_t)>(&overlay::cursor)
+    ),
     "dispatch", &overlay::dispatch
   );
 

@@ -31,7 +31,7 @@ struct animation final {
 class cursor final : public eventreceiver {
 public:
   explicit cursor(std::string_view name, std::shared_ptr<renderer> renderer);
-  virtual ~cursor() = default;
+  virtual ~cursor();
 
   virtual void on_mouse_release(const event::mouse::button& event) override;
   virtual void on_mouse_motion(const event::mouse::motion& event) override;

@@ -2,11 +2,6 @@
 
 #include "common.hpp"
 
-enum class widgettype : uint8_t {
-  cursor = 0,
-  label,
-};
-
 class widget {
 public:
   widget() = default;

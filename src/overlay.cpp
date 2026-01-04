@@ -11,75 +11,63 @@
 overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager)
     : _renderer(std::move(renderer)), _eventmanager(std::move(eventmanager)) {}
 
-std::variant<std::shared_ptr<label>, std::shared_ptr<cursor>> overlay::create(widgettype type, std::string_view resource) {
-  switch (type) {
-  case widgettype::cursor: {
-    _cursor = std::make_shared<cursor>(resource, _renderer);
-    _eventmanager->add_receiver(_cursor);
-    return _cursor;
+std::shared_ptr<::label> overlay::label(std::string_view resource) {
+  auto instance = std::make_shared<::label>();
+
+  auto [it, inserted] = _fonts.try_emplace(resource, nullptr);
+
+  if (inserted) {
+    it->second = std::make_shared<::font>(_renderer, resource);
   }
 
-  case widgettype::label: {
-    auto widget = std::make_shared<label>();
-
-    auto [it, inserted] = _fonts.try_emplace(resource, nullptr);
-    if (inserted) {
-      it->second = std::make_shared<font>(_renderer, resource);
-    }
-
-    widget->set_font(it->second);
-    _widgets.emplace_back(widget);
-    return widget;
-  }
-  }
-
-  std::unreachable();
+  instance->set_font(it->second);
+  _labels.emplace_back(instance);
+  return instance;
 }
 
-void overlay::destroy(const std::variant<std::shared_ptr<label>, std::shared_ptr<cursor>>& widget) noexcept {
-  if (const auto ptr = std::get_if<std::shared_ptr<cursor>>(&widget)) {
-    if (_cursor == *ptr) {
-      _eventmanager->remove_receiver(_cursor);
-      _cursor.reset();
-    }
+void overlay::label(std::shared_ptr<::label> instance) {
+  _labels.erase(std::remove(_labels.begin(), _labels.end(), instance), _labels.end());
+}
 
+void overlay::cursor(std::string_view resource) {
+  cursor(nullptr);
+  _cursor = std::make_shared<::cursor>(resource, _renderer);
+  _eventmanager->add_receiver(_cursor);
+}
+
+void overlay::cursor(std::nullptr_t) {
+  if (!_cursor) {
     return;
   }
 
-  if (const auto ptr = std::get_if<std::shared_ptr<label>>(&widget)) {
-    _widgets.erase(std::remove(_widgets.begin(), _widgets.end(), *ptr), _widgets.end());
+  _eventmanager->remove_receiver(_cursor);
+  _cursor.reset();
+}
+
+void overlay::dispatch(std::string_view message) noexcept {
+  if (!_cursor) {
+    return;
   }
+
+  _cursor->handle(message);
 }
 
 void overlay::update(float delta) noexcept {
-  for (const auto& widget : _widgets) {
-    widget->update(delta);
+  for (const auto& label : _labels) {
+    label->update(delta);
   }
 
-  if (const auto& cursor = _cursor; cursor) {
-    cursor->update(delta);
+  if (_cursor) {
+    _cursor->update(delta);
   }
 }
 
 void overlay::draw() const noexcept {
-  for (const auto& widget : _widgets) {
-    widget->draw();
+  for (const auto& label : _labels) {
+    label->draw();
   }
 
-  if (const auto& cursor = _cursor; cursor) {
-    cursor->draw();
-  }
-}
-
-void overlay::dispatch(widgettype type, std::string_view message) noexcept {
-  switch (type) {
-  case widgettype::cursor: {
-    if (const auto& cursor = _cursor; cursor) {
-      cursor->handle(message);
-    }
-  } break;
-
-  case widgettype::label: {
-  } break;
+  if (_cursor) {
+    _cursor->draw();
   }
 }
