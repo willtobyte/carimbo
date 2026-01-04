@@ -228,8 +228,9 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   _registry.emplace<rigidbody>(e);
 
   if (rn) {
-    rn->z = rn->z + 1;
-    _registry.emplace<renderable>(e, *rn);
+    renderable copy = *rn;
+    copy.z = rn->z + 1;
+    _registry.emplace<renderable>(e, std::move(copy));
   }
 
   const auto proxy = std::make_shared<entityproxy>(e, _registry);
