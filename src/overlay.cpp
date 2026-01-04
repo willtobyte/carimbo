@@ -18,12 +18,15 @@ std::variant<std::shared_ptr<label>, std::shared_ptr<cursor>> overlay::create(wi
     _eventmanager->add_receiver(_cursor);
     return _cursor;
   }
+
   case widgettype::label: {
     auto widget = std::make_shared<label>();
-    auto it = _fonts.find(resource);
-    if (it == _fonts.end()) {
-      it = _fonts.emplace(std::string{resource}, std::make_shared<font>(_renderer, resource)).first;
+
+    auto [it, inserted] = _fonts.try_emplace(resource, nullptr);
+    if (inserted) {
+      it->second = std::make_shared<font>(_renderer, resource);
     }
+
     widget->set_font(it->second);
     _widgets.emplace_back(widget);
     return widget;

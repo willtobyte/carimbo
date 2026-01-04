@@ -20,9 +20,9 @@ public:
   void dispatch(widgettype type, std::string_view message) noexcept;
 
 private:
+  std::shared_ptr<cursor> _cursor;
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<eventmanager> _eventmanager;
   boost::container::small_vector<std::shared_ptr<widget>, 16> _widgets;
-  std::shared_ptr<cursor> _cursor;
   boost::unordered_flat_map<std::string, std::shared_ptr<font>, transparent_string_hash, std::equal_to<>> _fonts;
 };
