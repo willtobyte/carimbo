@@ -348,7 +348,7 @@ objects::objects(
 }
 
 void objects::add(unmarshal::value object, int32_t z) {
-  const auto oname = unmarshal::get<std::string_view>(object, "name");
+  const auto name = unmarshal::get<std::string_view>(object, "name");
   const auto kind = unmarshal::get<std::string_view>(object, "kind");
   const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
 
@@ -410,7 +410,7 @@ void objects::add(unmarshal::value object, int32_t z) {
   const auto lfn = std::format("objects/{}/{}.lua", _scenename, kind);
 
   const auto proxy = std::make_shared<entityproxy>(entity, _registry);
-  _proxies.emplace(std::move(oname), proxy);
+  _proxies.emplace(std::move(name), proxy);
 
   _registry.emplace<callbacks>(entity);
 
