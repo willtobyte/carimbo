@@ -246,12 +246,12 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
 
   const auto proxy = std::make_shared<entityproxy>(entity, _registry);
 
-  if (sc && !sc->bytecode.empty()) {
+  if (sc && sc->bytecode) {
     sol::state_view lua(sc->parent.lua_state());
     sol::environment environment(lua, sol::create, sc->parent);
     environment["self"] = proxy;
 
-    const auto result = lua.load(sc->bytecode, "@clone");
+    const auto result = lua.load(*sc->bytecode, "@clone");
     verify(result);
 
     auto function = result.get<sol::protected_function>();

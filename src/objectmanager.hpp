@@ -10,6 +10,7 @@ public:
       std::string_view scenename,
       sol::environment& environment
   );
+
   ~objectmanager() noexcept = default;
 
   void add(unmarshal::value object, int32_t z);

@@ -194,7 +194,7 @@ struct scriptable {
   sol::environment parent;
   sol::environment environment;
   sol::table module;
-  std::string bytecode;
+  std::shared_ptr<const std::string> bytecode;
   functor on_spawn;
   functor on_dispose;
   functor on_loop;

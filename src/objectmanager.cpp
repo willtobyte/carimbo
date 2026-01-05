@@ -83,6 +83,7 @@ void objectmanager::add(unmarshal::value object, int32_t z) {
   const auto filename = std::format("objects/{}/{}.lua", _scenename, kind);
 
   const auto proxy = std::make_shared<entityproxy>(entity, _registry);
+
   _proxies.emplace(name, proxy);
 
   if (io::exists(filename)) {
@@ -118,7 +119,7 @@ void objectmanager::add(unmarshal::value object, int32_t z) {
     sc.parent = _environment;
     sc.environment = environment;
     sc.module = module;
-    sc.bytecode = std::move(bytecode);
+    sc.bytecode = std::make_shared<const std::string>(std::move(bytecode));
 
     if (auto fn = module["on_spawn"].get<sol::protected_function>(); fn.valid()) {
       sc.on_spawn = std::move(fn);
