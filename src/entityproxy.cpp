@@ -202,12 +202,11 @@ std::shared_ptr<entityproxy> entityproxy::clone() {
   auto [m, tn, sp, pb, tf, at, ori, rn, sc] = _registry.try_get<metadata, tint, sprite, playback, transform, std::shared_ptr<const atlas>, orientation, renderable, scriptable>(_entity);
 
   if (m) {
-    metadata copy = *m;
+    metadata cp = *m;
     const auto original = lookup(m->name);
-    if (!original.empty()) {
-      copy.name = intern(std::format("{}_{}", original, ++counters[m->name]));
-    }
-    _registry.emplace<metadata>(entity, copy);
+    cp.name = intern(std::format("{}_{}", original, ++counters[m->name]));
+
+    _registry.emplace<metadata>(entity, cp);
   }
 
   if (tn) {
