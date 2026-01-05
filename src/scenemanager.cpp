@@ -92,9 +92,9 @@ boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string
 }
 
 void scenemanager::update(float delta) {
-  _scene->update(delta);
-
   commit();
+
+  _scene->update(delta);
 }
 
 void scenemanager::draw() const {
