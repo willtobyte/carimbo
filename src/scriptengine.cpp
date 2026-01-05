@@ -618,7 +618,10 @@ void scriptengine::run() {
   lua.new_usertype<cassette>(
     "Cassette",
     sol::no_constructor,
-    "clear", &cassette::clear,
+    "clear", sol::overload(
+      sol::resolve<void(std::string_view) noexcept>(&cassette::clear),
+      sol::resolve<void() noexcept>(&cassette::clear)
+    ),
     "set", [](
       cassette& self,
       std::string_view key,

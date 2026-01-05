@@ -25,6 +25,7 @@ public:
   T get(std::string_view key, const T& fallback) const;
 
   void clear(std::string_view key) noexcept;
+  void clear() noexcept;
 
   std::optional<value_type> find(std::string_view key) const noexcept;
 
