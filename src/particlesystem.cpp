@@ -1,10 +1,8 @@
-#include "collections.hpp"
+#include "particlesystem.hpp"
 
-#include "entityproxy.hpp"
 #include "io.hpp"
 #include "pixmap.hpp"
 #include "renderer.hpp"
-#include "soundfx.hpp"
 
 namespace {
 
@@ -106,43 +104,6 @@ struct particleconfig final {
 };
 }
 
-effects::effects(std::string_view scenename)
-    : _scenename(scenename) {
-  _effects.reserve(8);
-}
-
-effects::~effects() noexcept {
-  stop();
-}
-
-void effects::add(std::string_view name) {
-  const auto path = std::format("blobs/{}/{}.ogg", _scenename, name);
-  _effects.emplace(name, std::make_shared<soundfx>(path));
-}
-
-void effects::update(float delta) {
-  for (auto& [_, effect] : _effects) {
-    effect->update(delta);
-  }
-}
-
-void effects::populate(sol::table& pool) const {
-  for (const auto& [name, effect] : _effects) {
-    assert(!pool[name].valid() && "duplicate key in pool");
-    pool[name] = effect;
-  }
-}
-
-void effects::stop() const noexcept {
-  for (const auto& [_, effect] : _effects) {
-    effect->stop();
-  }
-}
-
-void effects::clear() {
-  _effects.clear();
-}
-
 particlefactory::particlefactory(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {}
 
@@ -151,7 +112,12 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   particleconfig conf;
   from_json(*json, conf);
 
-  auto pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/particles/{}.png", kind));
+  auto [iterator, inserted] = _pixmaps.try_emplace(std::string{kind});
+  if (inserted) {
+    iterator->second = std::make_shared<::pixmap>(_renderer, std::format("blobs/particles/{}.png", kind));
+  }
+
+  const auto& pixmap = iterator->second;
 
   const auto props = std::make_shared<particleprops>();
   props->spawning = spawning;
@@ -159,7 +125,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->y = y;
   props->hw = static_cast<float>(pixmap->width()) * 0.5f;
   props->hh = static_cast<float>(pixmap->height()) * 0.5f;
-  props->pixmap = std::move(pixmap);
+  props->pixmap = pixmap;
   props->xspawnd = rng::uniform_real<float>(conf.xspawn.first, conf.xspawn.second);
   props->yspawnd = rng::uniform_real<float>(conf.yspawn.first, conf.yspawn.second);
   props->radiusd = rng::uniform_real<float>(conf.radius.first, conf.radius.second);
@@ -195,13 +161,13 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return batch;
 }
 
-particles::particles(std::shared_ptr<renderer> renderer)
+particlesystem::particlesystem(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)),
       _factory(std::make_shared<particlefactory>(_renderer)) {
   _batches.reserve(16);
 }
 
-void particles::add(unmarshal::value particle) {
+void particlesystem::add(unmarshal::value particle) {
   const auto name = unmarshal::get<std::string_view>(particle, "name");
   const auto kind = unmarshal::get<std::string_view>(particle, "kind");
   const auto x = unmarshal::get<float>(particle, "x");
@@ -210,18 +176,18 @@ void particles::add(unmarshal::value particle) {
   _batches.emplace(name, _factory->create(kind, x, y, spawning));
 }
 
-void particles::populate(sol::table& pool) const {
+void particlesystem::populate(sol::table& pool) const {
   for (const auto& [name, batch] : _batches) {
     assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = batch->props;
   }
 }
 
-void particles::clear() {
+void particlesystem::clear() {
   _batches.clear();
 }
 
-void particles::update(float delta) {
+void particlesystem::update(float delta) {
   for (const auto& [_, batch] : _batches) {
     auto* props = batch->props.get();
     auto& p = batch->particles;
@@ -315,7 +281,7 @@ void particles::update(float delta) {
   }
 }
 
-void particles::draw() const {
+void particlesystem::draw() const {
   for (const auto& [_, batch] : _batches) {
     const auto& props = batch->props;
 
@@ -330,159 +296,6 @@ void particles::draw() const {
   }
 }
 
-std::shared_ptr<particlefactory> particles::factory() const noexcept {
+std::shared_ptr<particlefactory> particlesystem::factory() const noexcept {
   return _factory;
-}
-
-objects::objects(
-    entt::registry& registry,
-    std::shared_ptr<renderer> renderer,
-    std::string_view scenename,
-    sol::environment& environment
-)
-    : _registry(registry),
-      _renderer(std::move(renderer)),
-      _scenename(scenename),
-      _environment(environment) {
-  _proxies.reserve(32);
-}
-
-void objects::add(unmarshal::value object, int32_t z) {
-  const auto name = unmarshal::get<std::string_view>(object, "name");
-  const auto kind = unmarshal::get<std::string_view>(object, "kind");
-  const auto action = _resolve(unmarshal::value_or(object, "action", std::string_view{}));
-
-  const auto x = unmarshal::value_or(object, "x", .0f);
-  const auto y = unmarshal::value_or(object, "y", .0f);
-
-  auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
-
-  const auto entity = _registry.create();
-
-  auto at = std::make_shared<atlas>();
-  if (auto timelines = yyjson_obj_get(*json, "timelines")) {
-    size_t idx, max;
-    yyjson_val *k, *v;
-    yyjson_obj_foreach(timelines, idx, max, k, v) {
-      at->timelines.emplace(_resolve(unmarshal::key(k)), unmarshal::make<timeline>(v));
-    }
-  }
-
-  _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
-
-  metadata md{
-    .kind = _resolve(kind)
-  };
-  _registry.emplace<metadata>(entity, std::move(md));
-
-  _registry.emplace<tint>(entity);
-
-  sprite sp{
-      .pixmap = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind))};
-  _registry.emplace<sprite>(entity, std::move(sp));
-
-  playback pb{
-    .dirty = true,
-    .redraw = false,
-    .current_frame = 0,
-    .tick = SDL_GetTicks(),
-    .action = action,
-    .timeline = nullptr
-  };
-  _registry.emplace<playback>(entity, std::move(pb));
-
-  transform tr{
-    .position = vec2{x, y},
-    .angle = .0,
-    .scale = unmarshal::value_or(*json, "scale", 1.0f)
-  };
-  _registry.emplace<transform>(entity, std::move(tr));
-
-  _registry.emplace<orientation>(entity);
-
-  _registry.emplace<rigidbody>(entity);
-
-  renderable rd{
-    .z = z
-  };
-  _registry.emplace<renderable>(entity, std::move(rd));
-
-  const auto lfn = std::format("objects/{}/{}.lua", _scenename, kind);
-
-  const auto proxy = std::make_shared<entityproxy>(entity, _registry);
-  _proxies.emplace(std::move(name), proxy);
-
-  _registry.emplace<callbacks>(entity);
-
-  if (io::exists(lfn)) {
-    sol::state_view lua(_environment.lua_state());
-    sol::environment env(lua, sol::create, _environment);
-    env["self"] = proxy;
-
-    const auto buffer = io::read(lfn);
-    std::string_view source{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
-
-    const auto result = lua.load(source, std::format("@{}", lfn));
-    verify(result);
-
-    auto function = result.get<sol::protected_function>();
-    sol::set_environment(env, function);
-
-    const auto exec = function();
-    verify(exec);
-
-    auto module = exec.get<sol::table>();
-
-    scriptable sc;
-    sc.environment = env;
-    sc.module = module;
-
-    if (auto fn = module["on_spawn"].get<sol::protected_function>(); fn.valid()) {
-      sc.on_spawn = std::move(fn);
-    }
-
-    if (auto fn = module["on_dispose"].get<sol::protected_function>(); fn.valid()) {
-      sc.on_dispose = std::move(fn);
-    }
-
-    if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-      sc.on_loop = std::move(fn);
-    }
-
-    auto& cb = _registry.get<callbacks>(entity);
-    if (auto fn = module["on_collision"].get<sol::protected_function>(); fn.valid()) {
-      cb.on_collision = std::move(fn);
-    }
-
-    if (auto fn = module["on_collision_end"].get<sol::protected_function>(); fn.valid()) {
-      cb.on_collision_end = std::move(fn);
-    }
-
-    if (auto fn = module["on_hover"].get<sol::protected_function>(); fn.valid()) {
-      cb.on_hover = std::move(fn);
-    }
-
-    if (auto fn = module["on_unhover"].get<sol::protected_function>(); fn.valid()) {
-      cb.on_unhover = std::move(fn);
-    }
-
-    if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-      cb.on_touch = std::move(fn);
-    }
-
-    _registry.emplace<scriptable>(entity, std::move(sc));
-  }
-}
-
-void objects::populate(sol::table& pool) const {
-  for (const auto& [name, proxy] : _proxies) {
-    assert(!pool[name].valid() && "duplicate key in pool");
-    pool[name] = proxy;
-  }
-}
-
-void objects::sort() {
-  _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
-    return lhs.z < rhs.z;
-  });
 }

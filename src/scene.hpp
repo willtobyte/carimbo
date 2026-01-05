@@ -2,8 +2,10 @@
 
 #include "common.hpp"
 
+#include "objectmanager.hpp"
+#include "particlesystem.hpp"
 #include "physics.hpp"
-#include "collections.hpp"
+#include "soundmanager.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
 
@@ -69,9 +71,9 @@ private:
   b2WorldId _world{};
   physicssystem _physicssystem{_registry};
 
-  effects _effects;
-  particles _particles;
-  objects _objects;
+  soundmanager _soundmanager;
+  particlesystem _particlesystem;
+  objectmanager _objectmanager;
 
   std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 

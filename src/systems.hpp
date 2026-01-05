@@ -6,14 +6,15 @@
 class animationsystem final {
 public:
   explicit animationsystem(entt::registry& registry) noexcept
-    : _group(registry.group<std::shared_ptr<const atlas>, playback, callbacks>()) {}
+    : _entt(registry), _view(registry.view<std::shared_ptr<const atlas>, playback>()) {}
 
   void update(uint64_t now) noexcept;
 
 private:
-  using group_type = decltype(std::declval<entt::registry&>().group<std::shared_ptr<const atlas>, playback, callbacks>());
+  using view_type = decltype(std::declval<entt::registry&>().view<std::shared_ptr<const atlas>, playback>());
 
-  group_type _group;
+  entt::registry& _entt;
+  view_type _view;
 };
 
 class physicssystem final {

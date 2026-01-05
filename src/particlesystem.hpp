@@ -67,32 +67,13 @@ public:
 
 private:
   std::shared_ptr<renderer> _renderer;
+  mutable boost::unordered_flat_map<std::string, std::shared_ptr<pixmap>, transparent_string_hash, std::equal_to<>> _pixmaps;
 };
 
-class effects final {
+class particlesystem final {
 public:
-  effects(std::string_view scenename);
-  ~effects() noexcept;
-
-  void add(std::string_view name);
-
-  void populate(sol::table& pool) const;
-
-  void stop() const noexcept;
-
-  void clear();
-
-  void update(float delta);
-
-private:
-  std::string _scenename;
-  boost::unordered_flat_map<std::string, std::shared_ptr<soundfx>, transparent_string_hash, std::equal_to<>> _effects;
-};
-
-class particles final {
-public:
-  explicit particles(std::shared_ptr<renderer> renderer);
-  ~particles() = default;
+  explicit particlesystem(std::shared_ptr<renderer> renderer);
+  ~particlesystem() = default;
 
   void add(unmarshal::value particle);
 
@@ -110,28 +91,4 @@ private:
   std::shared_ptr<renderer> _renderer;
   std::shared_ptr<particlefactory> _factory;
   boost::unordered_flat_map<std::string, std::shared_ptr<particlebatch>, transparent_string_hash, std::equal_to<>> _batches;
-};
-
-class objects final {
-public:
-  objects(
-      entt::registry& registry,
-      std::shared_ptr<renderer> renderer,
-      std::string_view scenename,
-      sol::environment& environment
-  );
-  ~objects() noexcept = default;
-
-  void add(unmarshal::value object, int32_t z);
-
-  void populate(sol::table& pool) const;
-
-  void sort();
-
-private:
-  entt::registry& _registry;
-  std::shared_ptr<renderer> _renderer;
-  std::string _scenename;
-  sol::environment& _environment;
-  boost::unordered_flat_map<std::string, std::shared_ptr<entityproxy>, transparent_string_hash, std::equal_to<>> _proxies;
 };

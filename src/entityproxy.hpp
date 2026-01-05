@@ -40,11 +40,13 @@ public:
   [[nodiscard]] bool visible() const noexcept;
   void set_visible(bool value) noexcept;
 
-  [[nodiscard]] symbol action() const noexcept;
-  void set_action(symbol value) noexcept;
+  [[nodiscard]] std::string_view action() const noexcept;
+  void set_action(std::string_view value) noexcept;
 
-  [[nodiscard]] symbol kind() const noexcept;
-  void set_kind(symbol value) noexcept;
+  [[nodiscard]] std::string_view kind() const noexcept;
+  void set_kind(std::string_view value) noexcept;
+
+  [[nodiscard]] std::string_view name() const noexcept;
 
   void set_onhover(sol::protected_function fn);
   void set_onunhover(sol::protected_function fn);

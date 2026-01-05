@@ -6,9 +6,9 @@
 
 scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
     : _name(name),
-      _effects(name),
-      _particles(scenemanager->renderer()),
-      _objects(_registry, scenemanager->renderer(), name, environment) {
+      _soundmanager(name),
+      _particlesystem(scenemanager->renderer()),
+      _objectmanager(_registry, scenemanager->renderer(), name, environment) {
   _renderer = scenemanager->renderer();
 
   _hits.reserve(64);
@@ -26,9 +26,9 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
 
   if (auto array = yyjson_obj_get(document, "effects")) {
     size_t idx, max;
-    yyjson_val* elem;
-    yyjson_arr_foreach(array, idx, max, elem) {
-      _effects.add(unmarshal::string(elem));
+    yyjson_val* element;
+    yyjson_arr_foreach(array, idx, max, element) {
+      _soundmanager.add(unmarshal::string(element));
     }
   }
 
@@ -75,19 +75,19 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
   if (auto array = yyjson_obj_get(document, "objects")) {
     auto z = 0;
     size_t idx, max;
-    yyjson_val* elem;
-    yyjson_arr_foreach(array, idx, max, elem) {
-      _objects.add(elem, z++);
+    yyjson_val* element;
+    yyjson_arr_foreach(array, idx, max, element) {
+      _objectmanager.add(element, z++);
     }
 
-    _objects.sort();
+    _objectmanager.sort();
   }
 
   if (auto array = yyjson_obj_get(document, "particles")) {
     size_t idx, max;
-    yyjson_val* elem;
-    yyjson_arr_foreach(array, idx, max, elem) {
-      _particles.add(elem);
+    yyjson_val* element;
+    yyjson_arr_foreach(array, idx, max, element) {
+      _particlesystem.add(element);
     }
   }
 }
@@ -115,9 +115,9 @@ void scene::update(float delta) {
 
   _physicssystem.update(_world, delta);
 
-  _effects.update(delta);
+  _soundmanager.update(delta);
 
-  _particles.update(delta);
+  _particlesystem.update(delta);
 
   _scriptsystem.update(delta);
 
@@ -153,7 +153,7 @@ void scene::draw() const noexcept {
 
   _rendersystem.draw();
 
-  _particles.draw();
+  _particlesystem.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
@@ -169,9 +169,9 @@ void scene::draw() const noexcept {
 }
 
 void scene::populate(sol::table& pool) const {
-  _effects.populate(pool);
-  _particles.populate(pool);
-  _objects.populate(pool);
+  _soundmanager.populate(pool);
+  _particlesystem.populate(pool);
+  _objectmanager.populate(pool);
 }
 
 void scene::set_onenter(std::function<void()>&& fn) {
@@ -228,7 +228,7 @@ void scene::on_leave() {
     sc.on_dispose();
   }
 
-  _effects.stop();
+  _soundmanager.stop();
 
   if (auto fn = _onleave; fn) {
     fn();
@@ -245,8 +245,8 @@ void scene::on_touch(float x, float y) {
   }
 
   for (const auto entity : _hits) {
-    if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      c->on_touch(x, y);
+    if (const auto* t = _registry.try_get<touchable>(entity)) {
+      t->on_touch(x, y);
     }
   }
 }
@@ -257,15 +257,15 @@ void scene::on_motion(float x, float y) {
 
   for (const auto entity : _hovering) {
     if (_hits.contains(entity)) continue;
-    if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      c->on_unhover();
+    if (const auto* h = _registry.try_get<hoverable>(entity)) {
+      h->on_unhover();
     }
   }
 
   for (const auto entity : _hits) {
     if (_hovering.contains(entity)) continue;
-    if (const auto* c = _registry.try_get<callbacks>(entity)) {
-      c->on_hover();
+    if (const auto* h = _registry.try_get<hoverable>(entity)) {
+      h->on_hover();
     }
   }
 
@@ -289,7 +289,7 @@ void scene::on_text(std::string_view text) {
 void scene::on_tick(uint8_t tick) {
   _ontick(tick);
 
-  for (auto&& [entity, c] : _registry.view<callbacks>().each()) {
-    c.on_tick(tick);
+  for (auto&& [entity, t] : _registry.view<tickable>().each()) {
+    t.on_tick(tick);
   }
 }

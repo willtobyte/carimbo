@@ -355,18 +355,8 @@ void scriptengine::run() {
     "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
     "flip", sol::property(&entityproxy::flip, &entityproxy::set_flip),
     "visible", sol::property(&entityproxy::visible, &entityproxy::set_visible),
-    "action", sol::property(
-      [](const entityproxy& self) { return action_name(self.action()); },
-      [](entityproxy& self, std::optional<std::string_view> name) {
-        self.set_action(name ? _resolve(*name) : no_action);
-      }
-    ),
-    "kind", sol::property(
-      [](const entityproxy& self) { return action_name(self.kind()); },
-      [](entityproxy& self, std::string_view name) {
-        self.set_kind(_resolve(name));
-      }
-    ),
+    "action", sol::property(&entityproxy::action, &entityproxy::set_action),
+    "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),
     "position", sol::property(
       &entityproxy::position,
       [](entityproxy& self, sol::table table) {
@@ -561,11 +551,11 @@ void scriptengine::run() {
     "create", &particlefactory::create
   );
 
-  lua.new_usertype<particles>(
-    "Particles",
+  lua.new_usertype<particlesystem>(
+    "ParticleSystem",
     sol::no_constructor,
-    "factory", sol::property(&particles::factory),
-    "clear", &particles::clear
+    "factory", sol::property(&particlesystem::factory),
+    "clear", &particlesystem::clear
   );
 
   lua["cassette"] = cassette();

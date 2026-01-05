@@ -6,24 +6,19 @@
 #include "flip.hpp"
 
 using symbol = entt::id_type;
-inline constexpr symbol no_action = 0;
+inline constexpr symbol empty = 0;
 
-inline boost::unordered_flat_map<symbol, std::string> _registry;
+inline boost::unordered_flat_map<symbol, std::string> symbols{{empty, {}}};
 
-[[nodiscard]] inline symbol _resolve(std::string_view action) noexcept {
-  if (action.empty()) [[unlikely]] {
-    return no_action;
-  }
-
-  const auto id = entt::hashed_string{action.data(), action.size()}.value();
-  _registry.try_emplace(id, action);
+[[nodiscard]] inline symbol intern(std::string_view value) noexcept {
+  if (value.empty()) [[unlikely]] return empty;
+  const auto id = entt::hashed_string{value.data(), value.size()}.value();
+  symbols.try_emplace(id, value);
   return id;
 }
 
-[[nodiscard]] inline std::optional<std::string_view> action_name(symbol id) noexcept {
-  if (id == no_action) return std::nullopt;
-  const auto it = _registry.find(id);
-  return it != _registry.end() ? std::optional<std::string_view>{it->second} : std::nullopt;
+[[nodiscard]] inline std::string_view lookup(symbol id) noexcept {
+  return symbols.find(id)->second;
 }
 
 struct transform final {
@@ -115,7 +110,7 @@ inline void from_json(unmarshal::value json, b2AABB& out) {
 
 struct timeline final {
   bool oneshot{false};
-  symbol next{no_action};
+  symbol next{empty};
   std::optional<b2AABB> hitbox;
   boost::container::small_vector<frame, 24> frames;
 
@@ -123,7 +118,7 @@ struct timeline final {
     out.oneshot = unmarshal::value_or(json, "oneshot", false);
 
     if (auto next = unmarshal::find<std::string_view>(json, "next")) {
-      out.next = _resolve(*next);
+      out.next = intern(*next);
     }
 
     if (auto h = yyjson_obj_get(json, "hitbox")) {
@@ -154,7 +149,7 @@ struct playback final {
   bool redraw;
   uint16_t current_frame{0};
   uint64_t tick{0};
-  symbol action{no_action};
+  symbol action{empty};
   const timeline* timeline{nullptr};
 };
 
@@ -164,27 +159,42 @@ struct renderable final {
 };
 
 struct metadata final {
-  symbol kind{no_action};
+  symbol kind{empty};
+  symbol name{empty};
 };
 
 struct orientation final {
   flip flip{flip::none};
 };
 
-struct callbacks {
+struct hoverable {
   functor on_hover;
   functor on_unhover;
+};
+
+struct touchable {
   functor on_touch;
+};
+
+struct animatable {
   functor on_begin;
   functor on_end;
+};
+
+struct collidable {
   functor on_collision;
   functor on_collision_end;
+};
+
+struct tickable {
   functor on_tick;
 };
 
 struct scriptable {
+  sol::environment parent;
   sol::environment environment;
   sol::table module;
+  std::string bytecode;
   functor on_spawn;
   functor on_dispose;
   functor on_loop;

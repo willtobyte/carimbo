@@ -3,7 +3,7 @@
 #include "common.hpp"
 
 namespace {
-constexpr uint8_t lookup[256] = {
+static constexpr uint8_t _lookup[256] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -23,7 +23,7 @@ constexpr uint8_t lookup[256] = {
 };
 
 [[nodiscard]] static constexpr uint8_t from_hex(char c) noexcept {
-  return lookup[static_cast<uint8_t>(c)];
+  return _lookup[static_cast<uint8_t>(c)];
 }
 }
 

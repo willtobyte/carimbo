@@ -7,7 +7,7 @@
 
 namespace {
 [[nodiscard]] inline const timeline* resolve_timeline(const atlas& at, symbol action) noexcept {
-  if (action == no_action) [[unlikely]] {
+  if (action == empty) [[unlikely]] {
     return nullptr;
   }
 
@@ -16,7 +16,7 @@ namespace {
 }
 
 void animationsystem::update(uint64_t now) noexcept {
-  _group.each([now](const std::shared_ptr<const atlas>& at, playback& s, callbacks& c) {
+  for (auto&& [entity, at, s] : _view.each()) {
     const bool refresh = s.dirty | !s.timeline;
 
     if (refresh) [[unlikely]] {
@@ -25,12 +25,14 @@ void animationsystem::update(uint64_t now) noexcept {
       s.tick = now;
       s.dirty = false;
       if (s.timeline) {
-        c.on_begin();
+        if (const auto* a = _entt.try_get<animatable>(entity)) {
+          a->on_begin();
+        }
       }
     }
 
     if (!s.timeline || s.timeline->frames.empty()) [[unlikely]] {
-      return;
+      continue;
     }
 
     const auto& tl = *s.timeline;
@@ -43,13 +45,13 @@ void animationsystem::update(uint64_t now) noexcept {
     const auto ready = frame.duration > 0 && elapsed >= static_cast<uint64_t>(frame.duration);
 
     if (!ready) [[likely]] {
-      return;
+      continue;
     }
 
     s.tick = now;
 
     const auto is_last = s.current_frame + 1 >= tl.frames.size();
-    const auto has_next = tl.next != no_action;
+    const auto has_next = tl.next != empty;
 
     s.current_frame = is_last ? 0 : s.current_frame + 1;
 
@@ -57,11 +59,13 @@ void animationsystem::update(uint64_t now) noexcept {
       s.action = tl.next;
       s.dirty = true;
     } else if (is_last & tl.oneshot) {
-      s.action = no_action;
+      s.action = empty;
       s.timeline = nullptr;
-      c.on_end();
+      if (const auto* a = _entt.try_get<animatable>(entity)) {
+        a->on_end();
+      }
     }
-  });
+  }
 }
 
 void physicssystem::update(b2WorldId world, float delta) noexcept {
@@ -80,11 +84,11 @@ void physicssystem::update(b2WorldId world, float delta) noexcept {
     const auto sensor = physics::entity_from(event.sensorShapeId);
     const auto visitor = physics::entity_from(event.visitorShapeId);
 
-    const auto* sc = _registry.try_get<callbacks>(sensor);
-    const auto* vm = _registry.try_get<metadata>(visitor);
+    const auto* c = _registry.try_get<collidable>(sensor);
+    const auto* m = _registry.try_get<metadata>(visitor);
 
-    if (sc && vm) [[likely]] {
-      sc->on_collision(static_cast<uint64_t>(visitor), vm->kind);
+    if (c && m) [[likely]] {
+      c->on_collision(static_cast<uint64_t>(visitor), m->kind);
     }
   }
 
@@ -95,11 +99,11 @@ void physicssystem::update(b2WorldId world, float delta) noexcept {
     const auto sensor = physics::entity_from(event.sensorShapeId);
     const auto visitor = physics::entity_from(event.visitorShapeId);
 
-    const auto* sc = _registry.try_get<callbacks>(sensor);
-    const auto* vm = _registry.try_get<metadata>(visitor);
+    const auto* c = _registry.try_get<collidable>(sensor);
+    const auto* m = _registry.try_get<metadata>(visitor);
 
-    if (sc && vm) [[likely]] {
-      sc->on_collision_end(static_cast<uint64_t>(visitor), vm->kind);
+    if (c && m) [[likely]] {
+      c->on_collision_end(static_cast<uint64_t>(visitor), m->kind);
     }
   }
 
