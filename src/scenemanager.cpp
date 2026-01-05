@@ -35,7 +35,7 @@ void scenemanager::commit() {
   }
 
   if (_current == _pending) [[unlikely]] {
-    std::println("[scenemanager] already in {}", _pending);
+    std::println("[scenemanager] already in {}", std::string_view{_pending});
     _pending.clear();
     return;
   }
@@ -55,7 +55,7 @@ void scenemanager::commit() {
   _current = _pending;
   _pending.clear();
 
-  std::println("[scenemanager] entered {}", _current);
+  std::println("[scenemanager] entered {}", std::string_view{_current});
 
   _scene->on_enter();
 }
