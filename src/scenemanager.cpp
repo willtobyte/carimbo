@@ -26,13 +26,25 @@ std::string_view scenemanager::current() const {
 }
 
 void scenemanager::set(std::string_view name) {
-  if (_current == name) [[unlikely]] {
-    std::println("[scenemanager] already in {}", name);
+  _pending = name;
+}
+
+void scenemanager::commit() {
+  if (_pending.empty()) [[likely]] {
     return;
   }
 
-  const auto it = _scene_mapping.find(name);
-  if (it == _scene_mapping.end()) [[unlikely]] return;
+  if (_current == _pending) [[unlikely]] {
+    std::println("[scenemanager] already in {}", _pending);
+    _pending.clear();
+    return;
+  }
+
+  const auto it = _scene_mapping.find(_pending);
+  if (it == _scene_mapping.end()) [[unlikely]] {
+    _pending.clear();
+    return;
+  }
 
   if (_scene) [[likely]] {
     std::println("[scenemanager] left {}", _scene->name());
@@ -40,9 +52,10 @@ void scenemanager::set(std::string_view name) {
   }
 
   _scene = it->second;
-  _current = name;
+  _current = _pending;
+  _pending.clear();
 
-  std::println("[scenemanager] entered {}", name);
+  std::println("[scenemanager] entered {}", _current);
 
   _scene->on_enter();
 }
@@ -80,6 +93,8 @@ boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string
 
 void scenemanager::update(float delta) {
   _scene->update(delta);
+
+  commit();
 }
 
 void scenemanager::draw() const {

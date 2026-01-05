@@ -30,6 +30,8 @@ public:
   void set_runtime(sol::state_view runtime) noexcept;
 
 protected:
+  void commit();
+
   virtual void on_key_press(const event::keyboard::key& event) override;
   virtual void on_key_release(const event::keyboard::key& event) override;
   virtual void on_text(std::string_view text) override;
@@ -43,4 +45,5 @@ private:
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::shared_ptr<::scene> _scene;
   boost::static_string<32> _current;
+  boost::static_string<32> _pending;
 };
