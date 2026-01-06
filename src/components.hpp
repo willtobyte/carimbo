@@ -38,9 +38,9 @@ struct offset {
   float x{.0f};
   float y{.0f};
 
-  friend void from_json(unmarshal::value json, offset& out) {
-    out.x = unmarshal::get<float>(json, "x");
-    out.y = unmarshal::get<float>(json, "y");
+  friend void from_json(unmarshal::value node, offset& out) {
+    out.x = unmarshal::get<float>(node, "x");
+    out.y = unmarshal::get<float>(node, "y");
   }
 };
 
@@ -49,10 +49,10 @@ struct frame final {
   offset offset;
   quad quad;
 
-  friend void from_json(unmarshal::value json, frame& out) {
-    out.duration = unmarshal::get<int64_t>(json, "duration");
-    unmarshal::make_if(json, "offset", out.offset);
-    out.quad = unmarshal::make<struct quad>(yyjson_obj_get(json, "quad"));
+  friend void from_json(unmarshal::value node, frame& out) {
+    out.duration = unmarshal::get<int64_t>(node, "duration");
+    unmarshal::make_into(node, "offset", out.offset);
+    out.quad = unmarshal::make<struct quad>(unmarshal::child(node, "quad"));
   }
 };
 
@@ -98,11 +98,11 @@ struct rigidbody final {
   }
 };
 
-inline void from_json(unmarshal::value json, b2AABB& out) {
-  const auto x = unmarshal::get<float>(json, "x");
-  const auto y = unmarshal::get<float>(json, "y");
-  const auto w = unmarshal::get<float>(json, "w");
-  const auto h = unmarshal::get<float>(json, "h");
+inline void from_json(unmarshal::value node, b2AABB& out) {
+  const auto x = unmarshal::get<float>(node, "x");
+  const auto y = unmarshal::get<float>(node, "y");
+  const auto w = unmarshal::get<float>(node, "w");
+  const auto h = unmarshal::get<float>(node, "h");
 
   out.lowerBound = b2Vec2(x - epsilon, y - epsilon);
   out.upperBound = b2Vec2(x + w + epsilon, y + h + epsilon);
@@ -114,20 +114,20 @@ struct timeline final {
   std::optional<b2AABB> hitbox;
   boost::container::small_vector<frame, 24> frames;
 
-  friend void from_json(unmarshal::value json, timeline& out) {
-    out.oneshot = unmarshal::value_or(json, "oneshot", false);
+  friend void from_json(unmarshal::value node, timeline& out) {
+    out.oneshot = unmarshal::get_or(node, "oneshot", false);
 
-    if (auto next = unmarshal::find<std::string_view>(json, "next")) {
+    if (auto next = unmarshal::find<std::string_view>(node, "next")) {
       out.next = intern(*next);
     }
 
-    if (auto h = yyjson_obj_get(json, "hitbox")) {
-      if (auto q = yyjson_obj_get(h, "aabb")) {
-        out.hitbox = unmarshal::make<b2AABB>(q);
+    if (auto hitbox = unmarshal::child(node, "hitbox")) {
+      if (auto aabb = unmarshal::child(hitbox, "aabb")) {
+        out.hitbox = unmarshal::make<b2AABB>(aabb);
       }
     }
 
-    unmarshal::collect<frame>(json, "frames", out.frames);
+    unmarshal::collect<frame>(node, "frames", out.frames);
   }
 };
 

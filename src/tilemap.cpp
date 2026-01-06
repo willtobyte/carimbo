@@ -3,24 +3,22 @@
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
-void from_json(unmarshal::value json, grid& out) {
-  out.collider = unmarshal::get<bool>(json, "collider");
+void from_json(unmarshal::value node, grid& out) {
+  out.collider = unmarshal::get<bool>(node, "collider");
 
-  auto tiles = yyjson_obj_get(json, "tiles");
-  out.tiles.reserve(yyjson_arr_size(tiles));
-
-  size_t idx, max;
-  yyjson_val* element;
-  yyjson_arr_foreach(tiles, idx, max, element) {
-    out.tiles.emplace_back(static_cast<uint32_t>(yyjson_get_uint(element)));
+  if (auto tiles = unmarshal::child(node, "tiles")) {
+    out.tiles.reserve(unmarshal::size(tiles));
+    unmarshal::foreach_array(tiles, [&out](unmarshal::value element) {
+      out.tiles.emplace_back(unmarshal::read<uint32_t>(element));
+    });
   }
 }
 
-void from_json(unmarshal::value document, tilemap& out) {
-  out._tile_size = unmarshal::get<float>(document, "tile_size");
-  out._width = unmarshal::get<int32_t>(document, "width");
-  out._height = unmarshal::get<int32_t>(document, "height");
-  unmarshal::reserve<grid>(document, "layers", out._grids);
+void from_json(unmarshal::value node, tilemap& out) {
+  out._tile_size = unmarshal::get<float>(node, "tile_size");
+  out._width = unmarshal::get<int32_t>(node, "width");
+  out._height = unmarshal::get<int32_t>(node, "height");
+  unmarshal::collect<grid>(node, "layers", out._grids);
 }
 
 tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)

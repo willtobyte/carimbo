@@ -14,25 +14,23 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();
-  if (auto physics = yyjson_obj_get(document, "physics")) {
-    if (auto gravity = yyjson_obj_get(physics, "gravity")) {
+  if (auto physics = unmarshal::child(document, "physics")) {
+    if (auto gravity = unmarshal::child(physics, "gravity")) {
       def.gravity = b2Vec2{
-          unmarshal::value_or(gravity, "x", .0f),
-          unmarshal::value_or(gravity, "y", .0f)};
+          unmarshal::get_or(gravity, "x", .0f),
+          unmarshal::get_or(gravity, "y", .0f)};
     }
   }
 
   _world = b2CreateWorld(&def);
 
-  if (auto array = yyjson_obj_get(document, "effects")) {
-    size_t idx, max;
-    yyjson_val* element;
-    yyjson_arr_foreach(array, idx, max, element) {
-      _soundmanager.add(unmarshal::string(element));
-    }
+  if (auto effects = unmarshal::child(document, "effects")) {
+    unmarshal::foreach_array(effects, [this](unmarshal::value element) {
+      _soundmanager.add(unmarshal::str(element));
+    });
   }
 
-  if (auto layer = yyjson_obj_get(document, "layer")) {
+  if (auto layer = unmarshal::child(document, "layer")) {
     const auto type = unmarshal::get<std::string_view>(layer, "type");
 
     if (type == "tilemap") {
@@ -72,23 +70,19 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
     }
   }
 
-  if (auto array = yyjson_obj_get(document, "objects")) {
+  if (auto objects = unmarshal::child(document, "objects")) {
     auto z = 0;
-    size_t idx, max;
-    yyjson_val* element;
-    yyjson_arr_foreach(array, idx, max, element) {
+    unmarshal::foreach_array(objects, [this, &z](unmarshal::value element) {
       _objectmanager.add(element, z++);
-    }
+    });
 
     _objectmanager.sort();
   }
 
-  if (auto array = yyjson_obj_get(document, "particles")) {
-    size_t idx, max;
-    yyjson_val* element;
-    yyjson_arr_foreach(array, idx, max, element) {
+  if (auto particles = unmarshal::child(document, "particles")) {
+    unmarshal::foreach_array(particles, [this](unmarshal::value element) {
       _particlesystem.add(element);
-    }
+    });
   }
 }
 

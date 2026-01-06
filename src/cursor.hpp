@@ -14,10 +14,10 @@ struct keyframe final {
   vec2 offset;
   quad frame;
 
-  friend void from_json(unmarshal::value json, keyframe& out) {
-    out.frame = unmarshal::make<quad>(yyjson_obj_get(json, "quad"));
-    unmarshal::make_if(json, "offset", out.offset);
-    out.duration = unmarshal::get<uint64_t>(json, "duration");
+  friend void from_json(unmarshal::value node, keyframe& out) {
+    out.frame = unmarshal::make<quad>(unmarshal::child(node, "quad"));
+    unmarshal::make_into(node, "offset", out.offset);
+    out.duration = unmarshal::get<uint64_t>(node, "duration");
   }
 };
 

@@ -37,17 +37,17 @@ static void sincos(float x, float& out_sin, float& out_cos) noexcept {
 }
 
 template <typename T>
-std::pair<T, T> read_range(unmarshal::value object, T fallback_start, T fallback_end) noexcept {
+std::pair<T, T> read_range(unmarshal::value node, T fallback_start, T fallback_end) noexcept {
   return {
-    unmarshal::value_or(object, "start", fallback_start),
-    unmarshal::value_or(object, "end", fallback_end)
+    unmarshal::get_or(node, "start", fallback_start),
+    unmarshal::get_or(node, "end", fallback_end)
   };
 }
 
 template <typename T>
 std::pair<T, T> read_range_from(unmarshal::value parent, const char* key, T fallback_start, T fallback_end) noexcept {
-  if (auto opt = yyjson_obj_get(parent, key)) {
-    return read_range(opt, fallback_start, fallback_end);
+  if (auto node = unmarshal::child(parent, key)) {
+    return read_range(node, fallback_start, fallback_end);
   }
 
   return {fallback_start, fallback_end};
@@ -73,30 +73,30 @@ struct particleconfig final {
   std::pair<float, float> rforce{.0f, .0f};
   std::pair<float, float> rvel{.0f, .0f};
 
-  friend void from_json(unmarshal::value document, particleconfig& out) {
-    out.count = static_cast<size_t>(unmarshal::value_or<uint64_t>(document, "count", 0));
+  friend void from_json(unmarshal::value node, particleconfig& out) {
+    out.count = static_cast<size_t>(unmarshal::get_or(node, "count", uint64_t{0}));
 
-    if (auto spawn = yyjson_obj_get(document, "spawn")) {
+    if (auto spawn = unmarshal::child(node, "spawn")) {
       out.xspawn = read_range_from(spawn, "x", .0f, .0f);
       out.yspawn = read_range_from(spawn, "y", .0f, .0f);
       out.radius = read_range_from(spawn, "radius", .0f, .0f);
       out.angle = read_range_from(spawn, "angle", .0f, .0f);
       out.scale = read_range_from(spawn, "scale", 1.0f, 1.0f);
       out.life = read_range_from(spawn, "life", 1.0f, 1.0f);
-      out.alpha = read_range_from(spawn, "alpha", 255u, 255u);
+      out.alpha = read_range_from(spawn, "alpha", uint8_t{255}, uint8_t{255});
     }
 
-    if (auto velocity = yyjson_obj_get(document, "velocity")) {
+    if (auto velocity = unmarshal::child(node, "velocity")) {
       out.xvel = read_range_from(velocity, "x", .0f, .0f);
       out.yvel = read_range_from(velocity, "y", .0f, .0f);
     }
 
-    if (auto gravity = yyjson_obj_get(document, "gravity")) {
+    if (auto gravity = unmarshal::child(node, "gravity")) {
       out.gx = read_range_from(gravity, "x", .0f, .0f);
       out.gy = read_range_from(gravity, "y", .0f, .0f);
     }
 
-    if (auto rotation = yyjson_obj_get(document, "rotation")) {
+    if (auto rotation = unmarshal::child(node, "rotation")) {
       out.rforce = read_range_from(rotation, "force", .0f, .0f);
       out.rvel = read_range_from(rotation, "velocity", .0f, .0f);
     }
@@ -172,7 +172,7 @@ void particlesystem::add(unmarshal::value particle) {
   const auto kind = unmarshal::get<std::string_view>(particle, "kind");
   const auto x = unmarshal::get<float>(particle, "x");
   const auto y = unmarshal::get<float>(particle, "y");
-  const auto spawning = unmarshal::value_or(particle, "spawning", true);
+  const auto spawning = unmarshal::get_or(particle, "spawning", true);
   _batches.emplace(name, _factory->create(kind, x, y, spawning));
 }
 

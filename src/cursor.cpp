@@ -11,21 +11,19 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
 
   auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
-  from_json(yyjson_obj_get(*json, "point"), _point);
+  from_json(unmarshal::child(*json, "point"), _point);
 
   _spritesheet = std::make_shared<pixmap>(std::move(renderer), std::format("blobs/overlay/{}.png", name));
 
-  auto animations = yyjson_obj_get(*json, "animations");
-  size_t idx, max;
-  yyjson_val *k, *v;
-  yyjson_obj_foreach(animations, idx, max, k, v) {
-    const auto key = unmarshal::key(k);
-    const auto oneshot = unmarshal::value_or(v, "oneshot", false);
+  if (auto animations = unmarshal::child(*json, "animations")) {
+    unmarshal::foreach_object(animations, [this](std::string_view key, unmarshal::value value) {
+      const auto oneshot = unmarshal::get_or(value, "oneshot", false);
 
-    auto keyframes = boost::container::small_vector<keyframe, 16>{};
-    unmarshal::collect<keyframe>(v, "frames", keyframes);
+      boost::container::small_vector<keyframe, 16> frames;
+      unmarshal::collect<keyframe>(value, "frames", frames);
 
-    _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, keyframes});
+      _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, std::move(frames)});
+    });
   }
 
   if (const auto it = _animations.find(ACTION_DEFAULT); it != _animations.end()) {

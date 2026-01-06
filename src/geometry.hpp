@@ -37,9 +37,9 @@ struct alignas(8) vec2 {
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
 
-  friend void from_json(unmarshal::value json, vec2& out) {
-    out.x = unmarshal::get<float>(json, "x");
-    out.y = unmarshal::get<float>(json, "y");
+  friend void from_json(unmarshal::value node, vec2& out) {
+    out.x = unmarshal::get<float>(node, "x");
+    out.y = unmarshal::get<float>(node, "y");
   }
 };
 
@@ -136,11 +136,11 @@ struct alignas(16) quad {
     };
   }
 
-  friend void from_json(unmarshal::value json, quad& out) {
-    out.x = unmarshal::get<float>(json, "x");
-    out.y = unmarshal::get<float>(json, "y");
-    out.w = unmarshal::get<float>(json, "w");
-    out.h = unmarshal::get<float>(json, "h");
+  friend void from_json(unmarshal::value node, quad& out) {
+    out.x = unmarshal::get<float>(node, "x");
+    out.y = unmarshal::get<float>(node, "y");
+    out.w = unmarshal::get<float>(node, "w");
+    out.h = unmarshal::get<float>(node, "h");
   }
 };
 

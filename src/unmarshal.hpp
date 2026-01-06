@@ -4,24 +4,21 @@ namespace unmarshal {
 
 using value = yyjson_val*;
 
-struct json final {
+struct document final {
   yyjson_doc* _document;
 
-  json(const json&) = delete;
-  json& operator=(const json&) = delete;
-  json(json&&) = delete;
-  json& operator=(json&&) = delete;
+  document(const document&) = delete;
+  document& operator=(const document&) = delete;
+  document(document&& other) noexcept : _document(std::exchange(other._document, nullptr)) {}
+  document& operator=(document&&) = delete;
 
-  explicit json(const char* data, size_t length) noexcept
-      : _document(yyjson_read(data, length, YYJSON_READ_NOFLAG)) {}
-
-  ~json() noexcept {
-    yyjson_doc_free(_document);
+  explicit document(std::span<const uint8_t> data) noexcept
+      : _document(yyjson_read(reinterpret_cast<const char*>(data.data()), data.size(), YYJSON_READ_NOFLAG)) {
+    assert(_document && "failed to parse json document");
   }
 
-  [[nodiscard]] explicit operator bool() const noexcept {
-    if (!_document) [[unlikely]] return false;
-    return true;
+  ~document() noexcept {
+    yyjson_doc_free(_document);
   }
 
   [[nodiscard]] value operator*() const noexcept {
@@ -29,110 +26,102 @@ struct json final {
   }
 };
 
-[[nodiscard]] inline json parse(const std::vector<uint8_t>& data) noexcept {
-  return json(reinterpret_cast<const char*>(data.data()), data.size());
+[[nodiscard]] inline document parse(std::span<const uint8_t> data) noexcept {
+  return document(data);
 }
 
 template <typename T>
-[[nodiscard]] inline T get(value node, const char* key) noexcept;
+[[nodiscard]] inline T read(value node) noexcept;
 
 template <>
-[[nodiscard]] inline float get<float>(value node, const char* key) noexcept {
-  return static_cast<float>(yyjson_get_num(yyjson_obj_get(node, key)));
+[[nodiscard]] inline float read<float>(value node) noexcept {
+  return static_cast<float>(yyjson_get_num(node));
 }
 
 template <>
-[[nodiscard]] inline double get<double>(value node, const char* key) noexcept {
-  return yyjson_get_num(yyjson_obj_get(node, key));
+[[nodiscard]] inline double read<double>(value node) noexcept {
+  return yyjson_get_num(node);
 }
 
 template <>
-[[nodiscard]] inline int16_t get<int16_t>(value node, const char* key) noexcept {
-  return static_cast<int16_t>(yyjson_get_sint(yyjson_obj_get(node, key)));
+[[nodiscard]] inline int8_t read<int8_t>(value node) noexcept {
+  return static_cast<int8_t>(yyjson_get_sint(node));
 }
 
 template <>
-[[nodiscard]] inline int32_t get<int32_t>(value node, const char* key) noexcept {
-  return static_cast<int32_t>(yyjson_get_sint(yyjson_obj_get(node, key)));
+[[nodiscard]] inline int16_t read<int16_t>(value node) noexcept {
+  return static_cast<int16_t>(yyjson_get_sint(node));
 }
 
 template <>
-[[nodiscard]] inline int64_t get<int64_t>(value node, const char* key) noexcept {
-  return yyjson_get_sint(yyjson_obj_get(node, key));
+[[nodiscard]] inline int32_t read<int32_t>(value node) noexcept {
+  return static_cast<int32_t>(yyjson_get_sint(node));
 }
 
 template <>
-[[nodiscard]] inline uint64_t get<uint64_t>(value node, const char* key) noexcept {
-  return yyjson_get_uint(yyjson_obj_get(node, key));
+[[nodiscard]] inline int64_t read<int64_t>(value node) noexcept {
+  return yyjson_get_sint(node);
 }
 
 template <>
-[[nodiscard]] inline unsigned int get<unsigned int>(value node, const char* key) noexcept {
-  return static_cast<unsigned int>(yyjson_get_uint(yyjson_obj_get(node, key)));
+[[nodiscard]] inline uint8_t read<uint8_t>(value node) noexcept {
+  return static_cast<uint8_t>(yyjson_get_uint(node));
 }
 
 template <>
-[[nodiscard]] inline uint8_t get<uint8_t>(value node, const char* key) noexcept {
-  return static_cast<uint8_t>(yyjson_get_uint(yyjson_obj_get(node, key)));
+[[nodiscard]] inline uint16_t read<uint16_t>(value node) noexcept {
+  return static_cast<uint16_t>(yyjson_get_uint(node));
 }
 
 template <>
-[[nodiscard]] inline bool get<bool>(value node, const char* key) noexcept {
-  return yyjson_get_bool(yyjson_obj_get(node, key));
+[[nodiscard]] inline uint32_t read<uint32_t>(value node) noexcept {
+  return static_cast<uint32_t>(yyjson_get_uint(node));
 }
 
 template <>
-[[nodiscard]] inline std::string_view get<std::string_view>(value node, const char* key) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  return {yyjson_get_str(child), yyjson_get_len(child)};
-}
-
-template <>
-[[nodiscard]] inline value get<value>(value node, const char* key) noexcept {
-  return yyjson_obj_get(node, key);
-}
-
-template <typename T>
-[[nodiscard]] inline T get(value node) noexcept;
-
-template <>
-[[nodiscard]] inline uint64_t get<uint64_t>(value node) noexcept {
+[[nodiscard]] inline uint64_t read<uint64_t>(value node) noexcept {
   return yyjson_get_uint(node);
 }
 
 template <>
-[[nodiscard]] inline value get<value>(value node) noexcept {
-  return node;
+[[nodiscard]] inline bool read<bool>(value node) noexcept {
+  return yyjson_get_bool(node);
+}
+
+template <>
+[[nodiscard]] inline std::string_view read<std::string_view>(value node) noexcept {
+  return {yyjson_get_str(node), yyjson_get_len(node)};
+}
+
+[[nodiscard]] inline value child(value node, const char* key) noexcept {
+  return yyjson_obj_get(node, key);
+}
+
+template <typename T>
+[[nodiscard]] inline T get(value node, const char* key) noexcept {
+  return read<T>(yyjson_obj_get(node, key));
+}
+
+template <typename T>
+[[nodiscard]] inline T get_or(value node, const char* key, T fallback) noexcept {
+  auto c = yyjson_obj_get(node, key);
+  if (!c) [[unlikely]] return fallback;
+  return read<T>(c);
 }
 
 template <typename T>
 [[nodiscard]] inline std::optional<T> find(value node, const char* key) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  if (!child) [[unlikely]] return std::nullopt;
-  if constexpr (std::is_same_v<T, value>) {
-    return child;
-  } else {
-    return get<T>(node, key);
-  }
+  auto c = yyjson_obj_get(node, key);
+  if (!c) [[unlikely]] return std::nullopt;
+  return read<T>(c);
 }
 
-template <typename T>
-[[nodiscard]] inline T value_or(value node, const char* key, T fallback) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  if (!child) [[unlikely]] return fallback;
-  return get<T>(node, key);
+[[nodiscard]] inline std::string_view str(value node) noexcept {
+  return {yyjson_get_str(node), yyjson_get_len(node)};
 }
 
-[[nodiscard]] inline size_t count(value array) noexcept {
+[[nodiscard]] inline size_t size(value array) noexcept {
   return yyjson_arr_size(array);
-}
-
-[[nodiscard]] inline std::string_view key(value node) noexcept {
-  return {yyjson_get_str(node), yyjson_get_len(node)};
-}
-
-[[nodiscard]] inline std::string_view string(value node) noexcept {
-  return {yyjson_get_str(node), yyjson_get_len(node)};
 }
 
 template <typename T>
@@ -143,17 +132,19 @@ template <typename T>
 }
 
 template <typename T>
-inline bool make_if(value node, const char* key, T& out) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  if (!child) [[unlikely]] return false;
-  from_json(child, out);
+inline bool make_into(value node, const char* key, T& out) noexcept {
+  auto c = yyjson_obj_get(node, key);
+  if (!c) [[unlikely]] return false;
+  from_json(c, out);
   return true;
 }
 
 template <typename T, typename Container>
-inline void collect(value node, const char* key, Container& out) noexcept {
-  auto array = yyjson_obj_get(node, key);
+inline void collect(value array, Container& out) noexcept {
   if (!array) [[unlikely]] return;
+  if constexpr (requires { out.reserve(size_t{}); }) {
+    out.reserve(yyjson_arr_size(array));
+  }
   size_t index, maximum;
   yyjson_val* element;
   yyjson_arr_foreach(array, index, maximum, element) {
@@ -162,14 +153,28 @@ inline void collect(value node, const char* key, Container& out) noexcept {
 }
 
 template <typename T, typename Container>
-inline void reserve(value node, const char* key, Container& out) noexcept {
-  auto array = yyjson_obj_get(node, key);
-  if (!array) [[unlikely]] return;
-  out.reserve(yyjson_arr_size(array));
+inline void collect(value node, const char* key, Container& out) noexcept {
+  collect<T>(yyjson_obj_get(node, key), out);
+}
+
+template <typename Function>
+inline void foreach_object(value node, Function&& function) noexcept {
+  if (!node) [[unlikely]] return;
+  size_t index, maximum;
+  yyjson_val* key;
+  yyjson_val* val;
+  yyjson_obj_foreach(node, index, maximum, key, val) {
+    function(str(key), val);
+  }
+}
+
+template <typename Function>
+inline void foreach_array(value node, Function&& function) noexcept {
+  if (!node) [[unlikely]] return;
   size_t index, maximum;
   yyjson_val* element;
-  yyjson_arr_foreach(array, index, maximum, element) {
-    out.emplace_back(make<T>(element));
+  yyjson_arr_foreach(node, index, maximum, element) {
+    function(element);
   }
 }
 

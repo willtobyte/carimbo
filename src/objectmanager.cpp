@@ -22,22 +22,20 @@ objectmanager::objectmanager(
 void objectmanager::add(unmarshal::value object, int32_t z) {
   const auto name = unmarshal::get<std::string_view>(object, "name");
   const auto kind = unmarshal::get<std::string_view>(object, "kind");
-  const auto action = intern(unmarshal::value_or(object, "action", std::string_view{}));
+  const auto action = intern(unmarshal::get_or(object, "action", std::string_view{}));
 
-  const auto x = unmarshal::value_or(object, "x", .0f);
-  const auto y = unmarshal::value_or(object, "y", .0f);
+  const auto x = unmarshal::get_or(object, "x", .0f);
+  const auto y = unmarshal::get_or(object, "y", .0f);
 
   auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
   const auto entity = _registry.create();
 
   auto at = std::make_shared<atlas>();
-  if (auto timelines = yyjson_obj_get(*json, "timelines")) {
-    size_t index, max;
-    yyjson_val *key, *value;
-    yyjson_obj_foreach(timelines, index, max, key, value) {
-      at->timelines.emplace(intern(unmarshal::key(key)), unmarshal::make<timeline>(value));
-    }
+  if (auto timelines = unmarshal::child(*json, "timelines")) {
+    unmarshal::foreach_object(timelines, [&at](std::string_view key, unmarshal::value val) {
+      at->timelines.emplace(intern(key), unmarshal::make<timeline>(val));
+    });
   }
 
   _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
@@ -67,7 +65,7 @@ void objectmanager::add(unmarshal::value object, int32_t z) {
   transform tr{
     .position = vec2{x, y},
     .angle = .0,
-    .scale = unmarshal::value_or(*json, "scale", 1.0f)
+    .scale = unmarshal::get_or(*json, "scale", 1.0f)
   };
   _registry.emplace<transform>(entity, std::move(tr));
 

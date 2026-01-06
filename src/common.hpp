@@ -48,6 +48,7 @@
 #include <print>
 #include <random>
 #include <ranges>
+#include <span>
 #include <stdexcept>
 #include <source_location>
 #include <string>
