@@ -1,5 +1,6 @@
 #include "scriptengine.hpp"
 #include "constant.hpp"
+#include "objectproxy.hpp"
 #include <sol/property.hpp>
 
 inline constexpr auto bootstrap =
@@ -87,8 +88,8 @@ struct sentinel final {
   }
 };
 
-struct metaentity {
-  static sol::object index(entityproxy& self, sol::stack_object key, sol::this_state state) {
+struct metaobject {
+  static sol::object index(objectproxy& self, sol::stack_object key, sol::this_state state) {
     sol::state_view lua{state};
     const auto name = key.as<std::string_view>();
 
@@ -102,7 +103,7 @@ struct metaentity {
     return self.kv.get(name)->value();
   }
 
-  static void new_index(entityproxy& self, sol::stack_object key, sol::stack_object value) {
+  static void new_index(objectproxy& self, sol::stack_object key, sol::stack_object value) {
     self.kv.set(key.as<std::string_view>(), value);
   }
 };
@@ -343,50 +344,50 @@ void scriptengine::run() {
     }
   );
 
-  lua.new_usertype<entityproxy>(
+  lua.new_usertype<objectproxy>(
     "Entity",
     sol::no_constructor,
-    "id", sol::property(&entityproxy::id),
-    "x", sol::property(&entityproxy::x, &entityproxy::set_x),
-    "y", sol::property(&entityproxy::y, &entityproxy::set_y),
-    "z", sol::property(&entityproxy::z, &entityproxy::set_z),
-    "alpha", sol::property(&entityproxy::alpha, &entityproxy::set_alpha),
-    "angle", sol::property(&entityproxy::angle, &entityproxy::set_angle),
-    "scale", sol::property(&entityproxy::scale, &entityproxy::set_scale),
-    "flip", sol::property(&entityproxy::flip, &entityproxy::set_flip),
-    "visible", sol::property(&entityproxy::visible, &entityproxy::set_visible),
-    "action", sol::property(&entityproxy::action, &entityproxy::set_action),
-    "kind", sol::property(&entityproxy::kind, &entityproxy::set_kind),
+    "id", sol::property(&objectproxy::id),
+    "x", sol::property(&objectproxy::x, &objectproxy::set_x),
+    "y", sol::property(&objectproxy::y, &objectproxy::set_y),
+    "z", sol::property(&objectproxy::z, &objectproxy::set_z),
+    "alpha", sol::property(&objectproxy::alpha, &objectproxy::set_alpha),
+    "angle", sol::property(&objectproxy::angle, &objectproxy::set_angle),
+    "scale", sol::property(&objectproxy::scale, &objectproxy::set_scale),
+    "flip", sol::property(&objectproxy::flip, &objectproxy::set_flip),
+    "visible", sol::property(&objectproxy::visible, &objectproxy::set_visible),
+    "action", sol::property(&objectproxy::action, &objectproxy::set_action),
+    "kind", sol::property(&objectproxy::kind, &objectproxy::set_kind),
     "position", sol::property(
-      &entityproxy::position,
-      [](entityproxy& self, sol::table table) {
+      &objectproxy::position,
+      [](objectproxy& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
         self.set_position({x, y});
       }
     ),
-    "on_hover", &entityproxy::set_onhover,
-    "on_unhover", &entityproxy::set_onunhover,
-    "on_touch", &entityproxy::set_ontouch,
-    "on_begin", &entityproxy::set_onbegin,
-    "on_end", &entityproxy::set_onend,
-    "on_collision", &entityproxy::set_oncollision,
-    "on_collision_end", &entityproxy::set_oncollisionend,
-    "on_tick", &entityproxy::set_ontick,
-    "clone", &entityproxy::clone,
-    "alive", sol::property(&entityproxy::alive),
-    "die", &entityproxy::die,
-    "observable", [](entityproxy& self, std::string_view name) {
+    "on_hover", &objectproxy::set_onhover,
+    "on_unhover", &objectproxy::set_onunhover,
+    "on_touch", &objectproxy::set_ontouch,
+    "on_begin", &objectproxy::set_onbegin,
+    "on_end", &objectproxy::set_onend,
+    "on_collision", &objectproxy::set_oncollision,
+    "on_collision_end", &objectproxy::set_oncollisionend,
+    "on_tick", &objectproxy::set_ontick,
+    "clone", &objectproxy::clone,
+    "alive", sol::property(&objectproxy::alive),
+    "die", &objectproxy::die,
+    "observable", [](objectproxy& self, std::string_view name) {
       return self.kv.get(name);
     },
-    "subscribe", [](entityproxy& self, std::string_view name, sol::protected_function fn) {
+    "subscribe", [](objectproxy& self, std::string_view name, sol::protected_function fn) {
       self.kv.get(name)->subscribe(std::move(fn));
     },
-    "unsubscribe", [](entityproxy& self, std::string_view name) {
+    "unsubscribe", [](objectproxy& self, std::string_view name) {
       self.kv.get(name)->unsubscribe();
     },
-    sol::meta_function::index, metaentity::index,
-    sol::meta_function::new_index, metaentity::new_index
+    sol::meta_function::index, metaobject::index,
+    sol::meta_function::new_index, metaobject::new_index
   );
 
   lua.new_usertype<scenemanager>(

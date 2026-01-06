@@ -6,14 +6,14 @@
 #include "flip.hpp"
 #include "kv.hpp"
 
-struct metaentity;
+struct metaobject;
 
-class entityproxy {
-  friend struct metaentity;
+class objectproxy {
+  friend struct metaobject;
 
 public:
-  entityproxy(entt::entity entity, entt::registry& registry) noexcept;
-  ~entityproxy() noexcept = default;
+  objectproxy(entt::entity entity, entt::registry& registry) noexcept;
+  ~objectproxy() noexcept = default;
 
   [[nodiscard]] uint64_t id() const noexcept;
 
@@ -57,7 +57,7 @@ public:
   void set_oncollisionend(sol::protected_function fn);
   void set_ontick(sol::protected_function fn);
 
-  [[nodiscard]] std::shared_ptr<entityproxy> clone();
+  [[nodiscard]] std::shared_ptr<objectproxy> clone();
 
   [[nodiscard]] bool alive() const noexcept;
   void die() noexcept;
@@ -68,3 +68,11 @@ private:
   entt::entity _entity;
   entt::registry& _registry;
 };
+
+void attach(
+    entt::registry& registry,
+    entt::entity entity,
+    sol::environment& parent,
+    std::shared_ptr<objectproxy> proxy,
+    std::string_view filename
+);

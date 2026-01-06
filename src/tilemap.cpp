@@ -12,7 +12,7 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
   _height = json["height"].get<int32_t>();
 
   json["layers"].foreach([this](unmarshal::json node) {
-    _grids.emplace_back(node);
+    _grids.emplace_back(std::move(node));
   });
 
   _atlas = std::make_shared<pixmap>(_renderer, std::format("blobs/tilemaps/{}.png", name));

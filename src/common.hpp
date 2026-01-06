@@ -75,7 +75,7 @@ class cursor;
 class desktop;
 class engine;
 class enginefactory;
-class entityproxy;
+class objectproxy;
 class eventmanager;
 class eventreceiver;
 class fadeineffect;

@@ -1,5 +1,8 @@
 #pragma once
 
+struct vec2;
+struct quad;
+
 namespace unmarshal {
 
 class json final {
@@ -73,6 +76,18 @@ public:
       return static_cast<T>(yyjson_get_uint(_node));
     } else if constexpr (std::same_as<T, std::string_view>) {
       return {yyjson_get_str(_node), yyjson_get_len(_node)};
+    } else if constexpr (std::same_as<T, vec2>) {
+      return {
+        static_cast<float>(yyjson_get_num(yyjson_obj_get(_node, "x"))),
+        static_cast<float>(yyjson_get_num(yyjson_obj_get(_node, "y")))
+      };
+    } else if constexpr (std::same_as<T, quad>) {
+      return {
+        static_cast<float>(yyjson_get_num(yyjson_obj_get(_node, "x"))),
+        static_cast<float>(yyjson_get_num(yyjson_obj_get(_node, "y"))),
+        static_cast<float>(yyjson_get_num(yyjson_obj_get(_node, "w"))),
+        static_cast<float>(yyjson_get_num(yyjson_obj_get(_node, "h")))
+      };
     }
   }
 
