@@ -10,14 +10,17 @@ struct alignas(64) grid final {
   std::vector<uint32_t> tiles;
   bool collider;
 
-  void decode(unmarshal::value node) noexcept;
+  grid(unmarshal::json node) noexcept
+      : collider(node["collider"].get(false)) {
+    node["tiles"].foreach([this](unmarshal::json tile) {
+      tiles.emplace_back(tile.get<uint32_t>());
+    });
+  }
 };
 
 class tilemap final {
 public:
   tilemap(std::string_view name, std::shared_ptr<renderer> renderer);
-
-  void decode(unmarshal::value node) noexcept;
 
   void set_viewport(const quad& value) noexcept;
 

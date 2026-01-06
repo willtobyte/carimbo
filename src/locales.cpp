@@ -27,8 +27,8 @@ static std::string language() {
         const auto filename = std::format("locales/{}.json", language());
         auto json = unmarshal::parse(io::read(filename));
 
-        unmarshal::foreach_object(*json, [this](std::string_view key, unmarshal::value val) {
-          data.emplace(key, unmarshal::str(val));
+        json.foreach([this](std::string_view key, unmarshal::json node) {
+          data.emplace(key, node.get<std::string_view>());
         });
       } catch (...) {
       }

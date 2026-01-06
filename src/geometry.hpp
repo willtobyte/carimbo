@@ -36,11 +36,6 @@ struct alignas(8) vec2 {
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
-
-  void decode(unmarshal::value node) noexcept {
-    x = unmarshal::get<float>(node, "x");
-    y = unmarshal::get<float>(node, "y");
-  }
 };
 
 static_assert(sizeof(vec2) == 8);
@@ -134,13 +129,6 @@ struct alignas(16) quad {
       .w = w,
       .h = h
     };
-  }
-
-  void decode(unmarshal::value node) noexcept {
-    x = unmarshal::get<float>(node, "x");
-    y = unmarshal::get<float>(node, "y");
-    w = unmarshal::get<float>(node, "w");
-    h = unmarshal::get<float>(node, "h");
   }
 };
 

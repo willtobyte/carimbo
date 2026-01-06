@@ -3,28 +3,17 @@
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
-void grid::decode(unmarshal::value node) noexcept {
-  collider = unmarshal::get<bool>(node, "collider");
-
-  if (auto tilesval = unmarshal::child(node, "tiles")) {
-    tiles.reserve(unmarshal::size(tilesval));
-    unmarshal::foreach_array(tilesval, [this](unmarshal::value element) {
-      tiles.emplace_back(unmarshal::as<uint32_t>(element));
-    });
-  }
-}
-
-void tilemap::decode(unmarshal::value node) noexcept {
-  _tile_size = unmarshal::get<float>(node, "tile_size");
-  _width = unmarshal::get<int32_t>(node, "width");
-  _height = unmarshal::get<int32_t>(node, "height");
-  unmarshal::collect<grid>(node, "layers", _grids);
-}
-
 tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
-  auto document = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
-  decode(*document);
+  auto json = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
+
+  _tile_size = json["tile_size"].get<float>();
+  _width = json["width"].get<int32_t>();
+  _height = json["height"].get<int32_t>();
+
+  json["layers"].foreach([this](unmarshal::json node) {
+    _grids.emplace_back(node);
+  });
 
   _atlas = std::make_shared<pixmap>(_renderer, std::format("blobs/tilemaps/{}.png", name));
   _tile_size = static_cast<float>(_tile_size);

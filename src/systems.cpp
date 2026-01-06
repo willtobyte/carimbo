@@ -173,8 +173,8 @@ void rendersystem::draw() const noexcept {
       const auto hh = q.h * 0.5f;
       const auto sw = q.w * tr.scale;
       const auto sh = q.h * tr.scale;
-      const auto fx = frame.offset.x + tr.position.x + hw - sw * 0.5f;
-      const auto fy = frame.offset.y + tr.position.y + hh - sh * 0.5f;
+      const auto fx = frame.offset_x + tr.position.x + hw - sw * 0.5f;
+      const auto fy = frame.offset_y + tr.position.y + hh - sh * 0.5f;
 
       sp.pixmap->draw(q.x, q.y, q.w, q.h, fx, fy, sw, sh, tr.angle, tn.a, fl.flip);
     });

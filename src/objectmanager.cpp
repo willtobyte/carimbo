@@ -19,22 +19,45 @@ objectmanager::objectmanager(
   _proxies.reserve(32);
 }
 
-void objectmanager::add(unmarshal::value object, int32_t z) {
-  const auto name = unmarshal::get<std::string_view>(object, "name");
-  const auto kind = unmarshal::get<std::string_view>(object, "kind");
-  const auto action = intern(unmarshal::get_or(object, "action", std::string_view{}));
-
-  const auto x = unmarshal::get_or(object, "x", .0f);
-  const auto y = unmarshal::get_or(object, "y", .0f);
+void objectmanager::add(unmarshal::json node, int32_t z) {
+  const auto name = node["name"].get<std::string_view>();
+  const auto kind = node["kind"].get<std::string_view>();
+  const auto action = intern(node["action"].get<std::string_view>());
+  const auto x = node["x"].get<float>();
+  const auto y = node["y"].get<float>();
 
   auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
   const auto entity = _registry.create();
 
   auto at = std::make_shared<atlas>();
-  if (auto timelines = unmarshal::child(*json, "timelines")) {
-    unmarshal::foreach_object(timelines, [&at](std::string_view key, unmarshal::value val) {
-      at->timelines.emplace(intern(key), unmarshal::make<timeline>(val));
+  if (auto timelines = json["timelines"]) {
+    timelines.foreach([&at](std::string_view key, unmarshal::json node) {
+      timeline tl{};
+      tl.oneshot = node["oneshot"].get(false);
+
+      if (auto nextnode = node["next"]) {
+        tl.next = intern(nextnode.get<std::string_view>());
+      }
+
+      if (auto hitboxval = node["hitbox"]) {
+        if (auto aabb = hitboxval["aabb"]) {
+          const auto hx = aabb["x"].get<float>();
+          const auto hy = aabb["y"].get<float>();
+          const auto hw = aabb["w"].get<float>();
+          const auto hh = aabb["h"].get<float>();
+          tl.hitbox = b2AABB{
+            .lowerBound = b2Vec2(hx - epsilon, hy - epsilon),
+            .upperBound = b2Vec2(hx + hw + epsilon, hy + hh + epsilon)
+          };
+        }
+      }
+
+      node["frames"].foreach([&tl](unmarshal::json f) {
+        tl.frames.emplace_back(f);
+      });
+
+      at->timelines.emplace(intern(key), std::move(tl));
     });
   }
 
@@ -62,10 +85,12 @@ void objectmanager::add(unmarshal::value object, int32_t z) {
   };
   _registry.emplace<playback>(entity, std::move(pb));
 
+  const auto scale = json["scale"].get(1.0f);
+
   transform tr{
     .position = vec2{x, y},
     .angle = .0,
-    .scale = unmarshal::get_or(*json, "scale", 1.0f)
+    .scale = scale
   };
   _registry.emplace<transform>(entity, std::move(tr));
 

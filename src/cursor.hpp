@@ -13,12 +13,6 @@ struct keyframe final {
   uint64_t duration{0};
   vec2 offset;
   quad frame;
-
-  void decode(unmarshal::value node) noexcept {
-    frame = unmarshal::make<quad>(unmarshal::child(node, "quad"));
-    unmarshal::into(node, "offset", offset);
-    duration = unmarshal::get<uint64_t>(node, "duration");
-  }
 };
 
 struct animation final {

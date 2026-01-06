@@ -34,26 +34,20 @@ struct tint final {
   uint8_t a{255};
 };
 
-struct offset {
-  float x{.0f};
-  float y{.0f};
-
-  void decode(unmarshal::value node) noexcept {
-    x = unmarshal::get<float>(node, "x");
-    y = unmarshal::get<float>(node, "y");
-  }
-};
-
 struct frame final {
-  int duration;
-  offset offset;
+  int32_t duration;
+  float offset_x;
+  float offset_y;
   quad quad;
 
-  void decode(unmarshal::value node) noexcept {
-    duration = unmarshal::get<int64_t>(node, "duration");
-    unmarshal::into(node, "offset", offset);
-    quad = unmarshal::make<struct quad>(unmarshal::child(node, "quad"));
-  }
+  frame(unmarshal::json node) noexcept
+      : duration(node["duration"].get<int32_t>()),
+        offset_x(node["offset"]["x"].get(0.f)),
+        offset_y(node["offset"]["y"].get(0.f)),
+        quad(node["quad"]["x"].get<float>(),
+             node["quad"]["y"].get<float>(),
+             node["quad"]["w"].get<float>(),
+             node["quad"]["h"].get<float>()) {}
 };
 
 enum class bodytype : uint8_t {
@@ -98,37 +92,11 @@ struct rigidbody final {
   }
 };
 
-inline void decode(unmarshal::value node, b2AABB& out) noexcept {
-  const auto x = unmarshal::get<float>(node, "x");
-  const auto y = unmarshal::get<float>(node, "y");
-  const auto w = unmarshal::get<float>(node, "w");
-  const auto h = unmarshal::get<float>(node, "h");
-
-  out.lowerBound = b2Vec2(x - epsilon, y - epsilon);
-  out.upperBound = b2Vec2(x + w + epsilon, y + h + epsilon);
-}
-
 struct timeline final {
   bool oneshot{false};
   symbol next{empty};
   std::optional<b2AABB> hitbox;
   boost::container::small_vector<frame, 24> frames;
-
-  void decode(unmarshal::value node) noexcept {
-    oneshot = unmarshal::get_or(node, "oneshot", false);
-
-    if (auto nextval = unmarshal::find<std::string_view>(node, "next")) {
-      next = intern(*nextval);
-    }
-
-    if (auto hitboxval = unmarshal::child(node, "hitbox")) {
-      if (auto aabb = unmarshal::child(hitboxval, "aabb")) {
-        hitbox = unmarshal::make<b2AABB>(aabb);
-      }
-    }
-
-    unmarshal::collect<frame>(node, "frames", frames);
-  }
 };
 
 struct atlas final {

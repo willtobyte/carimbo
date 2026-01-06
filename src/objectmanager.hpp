@@ -13,7 +13,7 @@ public:
 
   ~objectmanager() noexcept = default;
 
-  void add(unmarshal::value object, int32_t z);
+  void add(unmarshal::json node, int32_t z);
 
   void populate(sol::table& pool) const;
 

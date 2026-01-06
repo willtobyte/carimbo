@@ -11,16 +11,27 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
 
   auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
-  unmarshal::into(*json, "point", _point);
+  _point.x = json["point"]["x"].get<float>();
+  _point.y = json["point"]["y"].get<float>();
 
   _spritesheet = std::make_shared<pixmap>(std::move(renderer), std::format("blobs/overlay/{}.png", name));
 
-  if (auto animations = unmarshal::child(*json, "animations")) {
-    unmarshal::foreach_object(animations, [this](std::string_view key, unmarshal::value value) {
-      const auto oneshot = unmarshal::get_or(value, "oneshot", false);
+  if (auto animations = json["animations"]) {
+    animations.foreach([this](std::string_view key, unmarshal::json node) {
+      const auto oneshot = node["oneshot"].get(false);
 
       boost::container::small_vector<keyframe, 16> frames;
-      unmarshal::collect<keyframe>(value, "frames", frames);
+      node["frames"].foreach([&frames](unmarshal::json f) {
+        keyframe kf{};
+        kf.duration = f["duration"].get<uint64_t>();
+        kf.offset.x = f["offset"]["x"].get(0.f);
+        kf.offset.y = f["offset"]["y"].get(0.f);
+        kf.frame.x = f["quad"]["x"].get<float>();
+        kf.frame.y = f["quad"]["y"].get<float>();
+        kf.frame.w = f["quad"]["w"].get<float>();
+        kf.frame.h = f["quad"]["h"].get<float>();
+        frames.emplace_back(kf);
+      });
 
       _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, std::move(frames)});
     });

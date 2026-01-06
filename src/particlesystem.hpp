@@ -75,7 +75,7 @@ public:
   explicit particlesystem(std::shared_ptr<renderer> renderer);
   ~particlesystem() = default;
 
-  void add(unmarshal::value particle);
+  void add(unmarshal::json node);
 
   void populate(sol::table& pool) const;
 

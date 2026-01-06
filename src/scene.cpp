@@ -4,7 +4,7 @@
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
     : _name(name),
       _soundmanager(name),
       _particlesystem(scenemanager->renderer()),
@@ -14,27 +14,27 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
   _hits.reserve(64);
 
   auto def = b2DefaultWorldDef();
-  if (auto physics = unmarshal::child(document, "physics")) {
-    if (auto gravity = unmarshal::child(physics, "gravity")) {
-      def.gravity = b2Vec2{
-          unmarshal::get_or(gravity, "x", .0f),
-          unmarshal::get_or(gravity, "y", .0f)};
+  if (auto physics = node["physics"]) {
+    if (auto gravity = physics["gravity"]) {
+      def.gravity.x = gravity["x"].get<float>();
+      def.gravity.y = gravity["y"].get<float>();
     }
   }
 
   _world = b2CreateWorld(&def);
 
-  if (auto effects = unmarshal::child(document, "effects")) {
-    unmarshal::foreach_array(effects, [this](unmarshal::value element) {
-      _soundmanager.add(unmarshal::str(element));
+  if (auto effects = node["effects"]) {
+    effects.foreach([this](unmarshal::json node) {
+      _soundmanager.add(node.get<std::string_view>());
     });
   }
 
-  if (auto layer = unmarshal::child(document, "layer")) {
-    const auto type = unmarshal::get<std::string_view>(layer, "type");
+  if (auto layer = node["layer"]) {
+    const auto type = layer["type"].get<std::string_view>();
 
     if (type == "tilemap") {
-      auto& tilemap = _layer.emplace<::tilemap>(unmarshal::get<std::string_view>(layer, "content"), _renderer);
+      const auto content = layer["content"].get<std::string_view>();
+      auto& tilemap = _layer.emplace<::tilemap>(content, _renderer);
 
       const auto tile_size = tilemap.tile_size();
       const auto half = tile_size * 0.5f;
@@ -66,22 +66,24 @@ scene::scene(std::string_view name, unmarshal::value document, std::shared_ptr<:
     if (type == "background") {
       _layer = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/background.png", name));
 
-      _camera = quad{0, 0, unmarshal::get<float>(document, "width"), unmarshal::get<float>(document, "height")};
+      const auto width = node["width"].get<float>();
+      const auto height = node["height"].get<float>();
+      _camera = quad{0, 0, width, height};
     }
   }
 
-  if (auto objects = unmarshal::child(document, "objects")) {
+  if (auto objects = node["objects"]) {
     auto z = 0;
-    unmarshal::foreach_array(objects, [this, &z](unmarshal::value element) {
-      _objectmanager.add(element, z++);
+    objects.foreach([this, &z](unmarshal::json node) {
+      _objectmanager.add(std::move(node), z++);
     });
 
     _objectmanager.sort();
   }
 
-  if (auto particles = unmarshal::child(document, "particles")) {
-    unmarshal::foreach_array(particles, [this](unmarshal::value element) {
-      _particlesystem.add(element);
+  if (auto particles = node["particles"]) {
+    particles.foreach([this](unmarshal::json node) {
+      _particlesystem.add(std::move(node));
     });
   }
 }

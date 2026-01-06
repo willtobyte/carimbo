@@ -9,10 +9,10 @@ font::font(std::shared_ptr<renderer> renderer, std::string_view family)
     : _renderer(std::move(renderer)) {
   auto json = unmarshal::parse(io::read(std::format("fonts/{}.json", family)));
 
-  _glyphs = unmarshal::get<std::string_view>(*json, "glyphs");
-  _spacing = unmarshal::get_or(*json, "spacing", int16_t{0});
-  _leading = unmarshal::get_or(*json, "leading", int16_t{0});
-  const auto scale = unmarshal::get_or(*json, "scale", 1.f);
+  _glyphs = json["glyphs"].get<std::string_view>();
+  _spacing = json["spacing"].get<int16_t>();
+  _leading = json["leading"].get<int16_t>();
+  const auto scale = json["scale"].get(1.f);
 
   _pixmap = std::make_shared<pixmap>(_renderer, std::format("blobs/overlay/{}.png", family));
   const auto width = _pixmap->width();
