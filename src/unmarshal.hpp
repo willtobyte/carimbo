@@ -104,16 +104,16 @@ template <typename T>
 
 template <typename T>
 [[nodiscard]] inline T get_or(value node, const char* key, T fallback) noexcept {
-  auto c = yyjson_obj_get(node, key);
-  if (!c) [[unlikely]] return fallback;
-  return read<T>(c);
+  auto child = yyjson_obj_get(node, key);
+  if (!child) [[unlikely]] return fallback;
+  return read<T>(child);
 }
 
 template <typename T>
 [[nodiscard]] inline std::optional<T> find(value node, const char* key) noexcept {
-  auto c = yyjson_obj_get(node, key);
-  if (!c) [[unlikely]] return std::nullopt;
-  return read<T>(c);
+  auto child = yyjson_obj_get(node, key);
+  if (!child) [[unlikely]] return std::nullopt;
+  return read<T>(child);
 }
 
 [[nodiscard]] inline std::string_view str(value node) noexcept {
@@ -133,18 +133,20 @@ template <typename T>
 
 template <typename T>
 inline bool make_into(value node, const char* key, T& out) noexcept {
-  auto c = yyjson_obj_get(node, key);
-  if (!c) [[unlikely]] return false;
-  from_json(c, out);
+  auto child = yyjson_obj_get(node, key);
+  if (!child) [[unlikely]] return false;
+  from_json(child, out);
   return true;
 }
 
 template <typename T, typename Container>
 inline void collect(value array, Container& out) noexcept {
   if (!array) [[unlikely]] return;
+
   if constexpr (requires { out.reserve(size_t{}); }) {
     out.reserve(yyjson_arr_size(array));
   }
+
   size_t index, maximum;
   yyjson_val* element;
   yyjson_arr_foreach(array, index, maximum, element) {
@@ -160,17 +162,19 @@ inline void collect(value node, const char* key, Container& out) noexcept {
 template <typename Function>
 inline void foreach_object(value node, Function&& function) noexcept {
   if (!node) [[unlikely]] return;
+
   size_t index, maximum;
   yyjson_val* key;
-  yyjson_val* val;
-  yyjson_obj_foreach(node, index, maximum, key, val) {
-    function(str(key), val);
+  yyjson_val* child;
+  yyjson_obj_foreach(node, index, maximum, key, child) {
+    function(str(key), child);
   }
 }
 
 template <typename Function>
 inline void foreach_array(value node, Function&& function) noexcept {
   if (!node) [[unlikely]] return;
+
   size_t index, maximum;
   yyjson_val* element;
   yyjson_arr_foreach(node, index, maximum, element) {
