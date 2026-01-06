@@ -53,9 +53,11 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
         }
       }
 
-      node["frames"].foreach([&tl](unmarshal::json f) {
-        tl.frames.emplace_back(f);
-      });
+      if (auto frames = node["frames"]) {
+        frames.foreach([&tl](unmarshal::json f) {
+          tl.frames.emplace_back(f);
+        });
+      }
 
       at->timelines.emplace(intern(key), std::move(tl));
     });
