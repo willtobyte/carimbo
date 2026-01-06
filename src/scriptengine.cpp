@@ -534,7 +534,7 @@ void scriptengine::run() {
   lua.new_usertype<particleprops>(
     "ParticleProps",
     sol::no_constructor,
-    "spawning", sol::property(&particleprops::spawning),
+    "spawning", &particleprops::spawning,
     "position", sol::writeonly_property(
       [](particleprops& self, sol::table table) {
         const auto x = table.get_or("x", table.get_or(1, .0f));

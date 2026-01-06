@@ -31,66 +31,20 @@ struct document final {
 }
 
 template <typename T>
-[[nodiscard]] inline T read(value node) noexcept;
-
-template <>
-[[nodiscard]] inline float read<float>(value node) noexcept {
-  return static_cast<float>(yyjson_get_num(node));
-}
-
-template <>
-[[nodiscard]] inline double read<double>(value node) noexcept {
-  return yyjson_get_num(node);
-}
-
-template <>
-[[nodiscard]] inline int8_t read<int8_t>(value node) noexcept {
-  return static_cast<int8_t>(yyjson_get_sint(node));
-}
-
-template <>
-[[nodiscard]] inline int16_t read<int16_t>(value node) noexcept {
-  return static_cast<int16_t>(yyjson_get_sint(node));
-}
-
-template <>
-[[nodiscard]] inline int32_t read<int32_t>(value node) noexcept {
-  return static_cast<int32_t>(yyjson_get_sint(node));
-}
-
-template <>
-[[nodiscard]] inline int64_t read<int64_t>(value node) noexcept {
-  return yyjson_get_sint(node);
-}
-
-template <>
-[[nodiscard]] inline uint8_t read<uint8_t>(value node) noexcept {
-  return static_cast<uint8_t>(yyjson_get_uint(node));
-}
-
-template <>
-[[nodiscard]] inline uint16_t read<uint16_t>(value node) noexcept {
-  return static_cast<uint16_t>(yyjson_get_uint(node));
-}
-
-template <>
-[[nodiscard]] inline uint32_t read<uint32_t>(value node) noexcept {
-  return static_cast<uint32_t>(yyjson_get_uint(node));
-}
-
-template <>
-[[nodiscard]] inline uint64_t read<uint64_t>(value node) noexcept {
-  return yyjson_get_uint(node);
-}
-
-template <>
-[[nodiscard]] inline bool read<bool>(value node) noexcept {
-  return yyjson_get_bool(node);
-}
-
-template <>
-[[nodiscard]] inline std::string_view read<std::string_view>(value node) noexcept {
-  return {yyjson_get_str(node), yyjson_get_len(node)};
+[[nodiscard]] constexpr T read(value node) noexcept {
+  if constexpr (std::same_as<T, bool>) {
+    return yyjson_get_bool(node);
+  } else if constexpr (std::same_as<T, float>) {
+    return static_cast<float>(yyjson_get_num(node));
+  } else if constexpr (std::same_as<T, double>) {
+    return yyjson_get_num(node);
+  } else if constexpr (std::signed_integral<T>) {
+    return static_cast<T>(yyjson_get_sint(node));
+  } else if constexpr (std::unsigned_integral<T>) {
+    return static_cast<T>(yyjson_get_uint(node));
+  } else if constexpr (std::same_as<T, std::string_view>) {
+    return {yyjson_get_str(node), yyjson_get_len(node)};
+  }
 }
 
 [[nodiscard]] inline value child(value node, const char* key) noexcept {
@@ -104,16 +58,16 @@ template <typename T>
 
 template <typename T>
 [[nodiscard]] inline T get_or(value node, const char* key, T fallback) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  if (!child) [[unlikely]] return fallback;
-  return read<T>(child);
+  auto result = yyjson_obj_get(node, key);
+  if (!result) [[unlikely]] return fallback;
+  return read<T>(result);
 }
 
 template <typename T>
 [[nodiscard]] inline std::optional<T> find(value node, const char* key) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  if (!child) [[unlikely]] return std::nullopt;
-  return read<T>(child);
+  auto result = yyjson_obj_get(node, key);
+  if (!result) [[unlikely]] return std::nullopt;
+  return read<T>(result);
 }
 
 [[nodiscard]] inline std::string_view str(value node) noexcept {
@@ -125,18 +79,38 @@ template <typename T>
 }
 
 template <typename T>
+concept decodable = requires(T& t, value v) {
+  { t.decode(v) } noexcept;
+};
+
+template <typename T>
+concept adl_decodable = requires(T& t, value v) {
+  { decode(v, t) } noexcept;
+};
+
+template <typename T>
 [[nodiscard]] inline T make(value node) noexcept {
+  static_assert(decodable<T> || adl_decodable<T>, "Type must satisfy decodable or adl_decodable concept");
+  [[assume(node != nullptr)]];
   T out{};
-  from_json(node, out);
+  if constexpr (decodable<T>) {
+    out.decode(node);
+  } else if constexpr (adl_decodable<T>) {
+    decode(node, out);
+  }
   return out;
 }
 
 template <typename T>
-inline bool make_into(value node, const char* key, T& out) noexcept {
-  auto child = yyjson_obj_get(node, key);
-  if (!child) [[unlikely]] return false;
-  from_json(child, out);
-  return true;
+inline void into(value node, const char* key, T& out) noexcept {
+  static_assert(decodable<T> || adl_decodable<T>, "Type must satisfy decodable or adl_decodable concept");
+  auto result = yyjson_obj_get(node, key);
+  if (!result) [[unlikely]] return;
+  if constexpr (decodable<T>) {
+    out.decode(result);
+  } else if constexpr (adl_decodable<T>) {
+    decode(result, out);
+  }
 }
 
 template <typename T, typename Container>
@@ -165,9 +139,9 @@ inline void foreach_object(value node, Function&& function) noexcept {
 
   size_t index, maximum;
   yyjson_val* key;
-  yyjson_val* child;
-  yyjson_obj_foreach(node, index, maximum, key, child) {
-    function(str(key), child);
+  yyjson_val* val;
+  yyjson_obj_foreach(node, index, maximum, key, val) {
+    function(str(key), val);
   }
 }
 

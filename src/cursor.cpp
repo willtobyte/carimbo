@@ -11,7 +11,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
 
   auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
-  from_json(unmarshal::child(*json, "point"), _point);
+  unmarshal::into(*json, "point", _point);
 
   _spritesheet = std::make_shared<pixmap>(std::move(renderer), std::format("blobs/overlay/{}.png", name));
 

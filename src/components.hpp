@@ -38,9 +38,9 @@ struct offset {
   float x{.0f};
   float y{.0f};
 
-  friend void from_json(unmarshal::value node, offset& out) {
-    out.x = unmarshal::get<float>(node, "x");
-    out.y = unmarshal::get<float>(node, "y");
+  void decode(unmarshal::value node) noexcept {
+    x = unmarshal::get<float>(node, "x");
+    y = unmarshal::get<float>(node, "y");
   }
 };
 
@@ -49,10 +49,10 @@ struct frame final {
   offset offset;
   quad quad;
 
-  friend void from_json(unmarshal::value node, frame& out) {
-    out.duration = unmarshal::get<int64_t>(node, "duration");
-    unmarshal::make_into(node, "offset", out.offset);
-    out.quad = unmarshal::make<struct quad>(unmarshal::child(node, "quad"));
+  void decode(unmarshal::value node) noexcept {
+    duration = unmarshal::get<int64_t>(node, "duration");
+    unmarshal::into(node, "offset", offset);
+    quad = unmarshal::make<struct quad>(unmarshal::child(node, "quad"));
   }
 };
 
@@ -98,7 +98,7 @@ struct rigidbody final {
   }
 };
 
-inline void from_json(unmarshal::value node, b2AABB& out) {
+inline void decode(unmarshal::value node, b2AABB& out) noexcept {
   const auto x = unmarshal::get<float>(node, "x");
   const auto y = unmarshal::get<float>(node, "y");
   const auto w = unmarshal::get<float>(node, "w");
@@ -114,20 +114,20 @@ struct timeline final {
   std::optional<b2AABB> hitbox;
   boost::container::small_vector<frame, 24> frames;
 
-  friend void from_json(unmarshal::value node, timeline& out) {
-    out.oneshot = unmarshal::get_or(node, "oneshot", false);
+  void decode(unmarshal::value node) noexcept {
+    oneshot = unmarshal::get_or(node, "oneshot", false);
 
-    if (auto next = unmarshal::find<std::string_view>(node, "next")) {
-      out.next = intern(*next);
+    if (auto nextval = unmarshal::find<std::string_view>(node, "next")) {
+      next = intern(*nextval);
     }
 
-    if (auto hitbox = unmarshal::child(node, "hitbox")) {
-      if (auto aabb = unmarshal::child(hitbox, "aabb")) {
-        out.hitbox = unmarshal::make<b2AABB>(aabb);
+    if (auto hitboxval = unmarshal::child(node, "hitbox")) {
+      if (auto aabb = unmarshal::child(hitboxval, "aabb")) {
+        hitbox = unmarshal::make<b2AABB>(aabb);
       }
     }
 
-    unmarshal::collect<frame>(node, "frames", out.frames);
+    unmarshal::collect<frame>(node, "frames", frames);
   }
 };
 

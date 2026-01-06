@@ -73,32 +73,32 @@ struct particleconfig final {
   std::pair<float, float> rforce{.0f, .0f};
   std::pair<float, float> rvel{.0f, .0f};
 
-  friend void from_json(unmarshal::value node, particleconfig& out) {
-    out.count = static_cast<size_t>(unmarshal::get_or(node, "count", uint64_t{0}));
+  void decode(unmarshal::value node) noexcept {
+    count = static_cast<size_t>(unmarshal::get_or(node, "count", uint64_t{0}));
 
-    if (auto spawn = unmarshal::child(node, "spawn")) {
-      out.xspawn = read_range_from(spawn, "x", .0f, .0f);
-      out.yspawn = read_range_from(spawn, "y", .0f, .0f);
-      out.radius = read_range_from(spawn, "radius", .0f, .0f);
-      out.angle = read_range_from(spawn, "angle", .0f, .0f);
-      out.scale = read_range_from(spawn, "scale", 1.0f, 1.0f);
-      out.life = read_range_from(spawn, "life", 1.0f, 1.0f);
-      out.alpha = read_range_from(spawn, "alpha", uint8_t{255}, uint8_t{255});
+    if (auto spawnval = unmarshal::child(node, "spawn")) {
+      xspawn = read_range_from(spawnval, "x", .0f, .0f);
+      yspawn = read_range_from(spawnval, "y", .0f, .0f);
+      radius = read_range_from(spawnval, "radius", .0f, .0f);
+      angle = read_range_from(spawnval, "angle", .0f, .0f);
+      scale = read_range_from(spawnval, "scale", 1.0f, 1.0f);
+      life = read_range_from(spawnval, "life", 1.0f, 1.0f);
+      alpha = read_range_from(spawnval, "alpha", uint8_t{255}, uint8_t{255});
     }
 
-    if (auto velocity = unmarshal::child(node, "velocity")) {
-      out.xvel = read_range_from(velocity, "x", .0f, .0f);
-      out.yvel = read_range_from(velocity, "y", .0f, .0f);
+    if (auto velocityval = unmarshal::child(node, "velocity")) {
+      xvel = read_range_from(velocityval, "x", .0f, .0f);
+      yvel = read_range_from(velocityval, "y", .0f, .0f);
     }
 
-    if (auto gravity = unmarshal::child(node, "gravity")) {
-      out.gx = read_range_from(gravity, "x", .0f, .0f);
-      out.gy = read_range_from(gravity, "y", .0f, .0f);
+    if (auto gravityval = unmarshal::child(node, "gravity")) {
+      gx = read_range_from(gravityval, "x", .0f, .0f);
+      gy = read_range_from(gravityval, "y", .0f, .0f);
     }
 
-    if (auto rotation = unmarshal::child(node, "rotation")) {
-      out.rforce = read_range_from(rotation, "force", .0f, .0f);
-      out.rvel = read_range_from(rotation, "velocity", .0f, .0f);
+    if (auto rotationval = unmarshal::child(node, "rotation")) {
+      rforce = read_range_from(rotationval, "force", .0f, .0f);
+      rvel = read_range_from(rotationval, "velocity", .0f, .0f);
     }
   }
 };
@@ -109,8 +109,7 @@ particlefactory::particlefactory(std::shared_ptr<renderer> renderer)
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   auto json = unmarshal::parse(io::read(std::format("particles/{}.json", kind)));
-  particleconfig conf;
-  from_json(*json, conf);
+  auto conf = unmarshal::make<particleconfig>(*json);
 
   auto [iterator, inserted] = _pixmaps.try_emplace(std::string{kind});
   if (inserted) {
