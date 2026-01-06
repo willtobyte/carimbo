@@ -29,37 +29,6 @@ void scenemanager::set(std::string_view name) {
   _pending = name;
 }
 
-void scenemanager::commit() {
-  if (_pending.empty()) [[likely]] {
-    return;
-  }
-
-  if (_current == _pending) [[unlikely]] {
-    std::println("[scenemanager] already in {}", std::string_view{_pending});
-    _pending.clear();
-    return;
-  }
-
-  const auto it = _scene_mapping.find(_pending);
-  if (it == _scene_mapping.end()) [[unlikely]] {
-    _pending.clear();
-    return;
-  }
-
-  if (_scene) [[likely]] {
-    std::println("[scenemanager] left {}", _scene->name());
-    _scene->on_leave();
-  }
-
-  _scene = it->second;
-  _current = _pending;
-  _pending.clear();
-
-  std::println("[scenemanager] entered {}", std::string_view{_current});
-
-  _scene->on_enter();
-}
-
 boost::container::small_vector<std::string, 8> scenemanager::query(std::string_view name) const {
   boost::container::small_vector<std::string, 8> result;
   const bool all = name.size() == 1 && name.front() == '*';
@@ -92,7 +61,25 @@ boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string
 }
 
 void scenemanager::update(float delta) {
-  commit();
+  if (!_pending.empty()) [[unlikely]] {
+    const auto it = _scene_mapping.find(_pending);
+
+    if (it != _scene_mapping.end() && _current != _pending) [[unlikely]] {
+      if (_scene) [[likely]] {
+        std::println("[scenemanager] left {}", _scene->name());
+        _scene->on_leave();
+      }
+
+      _scene = it->second;
+      _current = _pending;
+
+      std::println("[scenemanager] entered {}", std::string_view{_current});
+
+      _scene->on_enter();
+    }
+
+    _pending.clear();
+  }
 
   _scene->update(delta);
 }

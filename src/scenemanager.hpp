@@ -30,8 +30,6 @@ public:
   void set_runtime(sol::state_view runtime) noexcept;
 
 protected:
-  void commit();
-
   virtual void on_key_press(const event::keyboard::key& event) override;
   virtual void on_key_release(const event::keyboard::key& event) override;
   virtual void on_text(std::string_view text) override;

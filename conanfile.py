@@ -32,9 +32,9 @@ class Carimbo(ConanFile):
 
     def requirements(self):
         for package in [
-            "boost/1.89.0",
+            "boost/1.90.0",
             "box2d/3.1.1",
-            "entt/3.15.0",
+            "entt/3.16.0",
             "yyjson/0.12.0",
             "openal-soft/1.23.1",
             "physfs/3.2.0",
