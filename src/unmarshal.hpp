@@ -19,7 +19,9 @@ public:
   constexpr json& operator=(const json& other) noexcept {
     assert(!other.is_owner() && "cannot copy owner json");
     assert(!is_owner() && "cannot assign to owner json");
+
     _node = other._node;
+
     return *this;
   }
 
@@ -33,6 +35,7 @@ public:
       _document = std::exchange(other._document, nullptr);
       _node = std::exchange(other._node, nullptr);
     }
+
     return *this;
   }
 
@@ -45,7 +48,7 @@ public:
   }
 
   ~json() noexcept {
-    if (_document) yyjson_doc_free(_document);
+    if (_document) [[likely]] yyjson_doc_free(_document);
   }
 
   [[nodiscard]] explicit operator bool() const noexcept {
@@ -86,6 +89,7 @@ public:
   template <typename Function>
   void foreach(Function&& function) const noexcept {
     assert(_node && "foreach called on null node");
+
     if constexpr (std::invocable<Function, std::string_view, json>) {
       size_t index, maximum;
       yyjson_val* key;
