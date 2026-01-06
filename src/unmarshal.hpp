@@ -31,7 +31,7 @@ struct document final {
 }
 
 template <typename T>
-[[nodiscard]] constexpr T read(value node) noexcept {
+[[nodiscard]] constexpr T as(value node) noexcept {
   if constexpr (std::same_as<T, bool>) {
     return yyjson_get_bool(node);
   } else if constexpr (std::same_as<T, float>) {
@@ -53,21 +53,21 @@ template <typename T>
 
 template <typename T>
 [[nodiscard]] inline T get(value node, const char* key) noexcept {
-  return read<T>(yyjson_obj_get(node, key));
+  return as<T>(yyjson_obj_get(node, key));
 }
 
 template <typename T>
 [[nodiscard]] inline T get_or(value node, const char* key, T fallback) noexcept {
   auto result = yyjson_obj_get(node, key);
   if (!result) [[unlikely]] return fallback;
-  return read<T>(result);
+  return as<T>(result);
 }
 
 template <typename T>
 [[nodiscard]] inline std::optional<T> find(value node, const char* key) noexcept {
   auto result = yyjson_obj_get(node, key);
   if (!result) [[unlikely]] return std::nullopt;
-  return read<T>(result);
+  return as<T>(result);
 }
 
 [[nodiscard]] inline std::string_view str(value node) noexcept {

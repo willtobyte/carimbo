@@ -9,7 +9,7 @@ void grid::decode(unmarshal::value node) noexcept {
   if (auto tilesval = unmarshal::child(node, "tiles")) {
     tiles.reserve(unmarshal::size(tilesval));
     unmarshal::foreach_array(tilesval, [this](unmarshal::value element) {
-      tiles.emplace_back(unmarshal::read<uint32_t>(element));
+      tiles.emplace_back(unmarshal::as<uint32_t>(element));
     });
   }
 }
