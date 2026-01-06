@@ -23,8 +23,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
   const auto name = node["name"].get<std::string_view>();
   const auto kind = node["kind"].get<std::string_view>();
   const auto action = intern(node["action"].get<std::string_view>());
-  const auto x = node["x"].get<float>();
-  const auto y = node["y"].get<float>();
+  const auto position = node.get<vec2>();
 
   auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
@@ -40,22 +39,20 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
         tl.next = intern(nextnode.get<std::string_view>());
       }
 
-      if (auto hitboxval = node["hitbox"]) {
-        if (auto aabb = hitboxval["aabb"]) {
-          const auto hx = aabb["x"].get<float>();
-          const auto hy = aabb["y"].get<float>();
-          const auto hw = aabb["w"].get<float>();
-          const auto hh = aabb["h"].get<float>();
+      if (auto value = node["hitbox"]) {
+        if (auto aabb = value["aabb"]) {
+          const auto q = aabb.get<quad>();
+
           tl.hitbox = b2AABB{
-            .lowerBound = b2Vec2(hx - epsilon, hy - epsilon),
-            .upperBound = b2Vec2(hx + hw + epsilon, hy + hh + epsilon)
+            .lowerBound = b2Vec2(q.x - epsilon, q.y - epsilon),
+            .upperBound = b2Vec2(q.x + q.w + epsilon, q.y + q.h + epsilon)
           };
         }
       }
 
       if (auto frames = node["frames"]) {
         frames.foreach([&tl](unmarshal::json f) {
-          tl.frames.emplace_back(f);
+          tl.frames.emplace_back(std::move(f));
         });
       }
 
@@ -90,7 +87,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
   const auto scale = json["scale"].get(1.0f);
 
   transform tr{
-    .position = vec2{x, y},
+    .position = position,
     .angle = .0,
     .scale = scale
   };

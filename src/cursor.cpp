@@ -11,8 +11,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
 
   auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
-  _point.x = json["point"]["x"].get<float>();
-  _point.y = json["point"]["y"].get<float>();
+  _point = json["point"].get<vec2>();
 
   _spritesheet = std::make_shared<pixmap>(std::move(renderer), std::format("blobs/overlay/{}.png", name));
 
@@ -21,16 +20,8 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
       const auto oneshot = node["oneshot"].get(false);
 
       boost::container::small_vector<keyframe, 16> frames;
-      node["frames"].foreach([&frames](unmarshal::json f) {
-        keyframe kf{};
-        kf.duration = f["duration"].get<uint64_t>();
-        kf.offset.x = f["offset"]["x"].get(0.f);
-        kf.offset.y = f["offset"]["y"].get(0.f);
-        kf.frame.x = f["quad"]["x"].get<float>();
-        kf.frame.y = f["quad"]["y"].get<float>();
-        kf.frame.w = f["quad"]["w"].get<float>();
-        kf.frame.h = f["quad"]["h"].get<float>();
-        frames.emplace_back(kf);
+      node["frames"].foreach([&frames](unmarshal::json node) {
+        frames.emplace_back(std::move(node));
       });
 
       _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, std::move(frames)});

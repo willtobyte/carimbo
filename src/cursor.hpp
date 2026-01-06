@@ -13,6 +13,13 @@ struct keyframe final {
   uint64_t duration{0};
   vec2 offset;
   quad frame;
+
+  keyframe() noexcept = default;
+
+  explicit keyframe(unmarshal::json node) noexcept
+      : duration(node["duration"].get<uint64_t>()),
+        offset(node["offset"].get<vec2>(vec2{})),
+        frame(node["quad"].get<quad>()) {}
 };
 
 struct animation final {
