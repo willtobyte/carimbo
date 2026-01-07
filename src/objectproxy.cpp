@@ -204,13 +204,13 @@ static void hydrate(
     sol::environment& parent,
     std::shared_ptr<objectproxy> proxy,
     std::shared_ptr<const std::string> bytecode,
-    std::string_view chunkname
+    symbol chunkname
 ) {
   sol::state_view lua(parent.lua_state());
   sol::environment environment(lua, sol::create, parent);
   environment["self"] = std::move(proxy);
 
-  const auto result = lua.load(*bytecode, std::string{chunkname});
+  const auto result = lua.load(*bytecode, std::format("@{}", lookup(chunkname)));
   verify(result);
 
   auto function = result.get<sol::protected_function>();
@@ -226,6 +226,7 @@ static void hydrate(
   sc.environment = environment;
   sc.module = module;
   sc.bytecode = std::move(bytecode);
+  sc.chunkname = chunkname;
 
   if (auto fn = module["on_spawn"].get<sol::protected_function>(); fn.valid()) {
     sc.on_spawn = std::move(fn);
@@ -277,22 +278,19 @@ void attach(
     std::shared_ptr<objectproxy> proxy,
     std::string_view filename
 ) {
+  if (!io::exists(filename)) return;
+
   const auto id = intern(filename);
   auto [it, inserted] = bytecodes.try_emplace(id, nullptr);
-
   if (inserted) {
-    if (!io::exists(filename)) {
-      bytecodes.erase(it);
-      return;
-    }
-
     sol::state_view lua(parent.lua_state());
     const auto buffer = io::read(filename);
 
     const auto result = lua.load(
         std::string_view{reinterpret_cast<const char*>(buffer.data()), buffer.size()},
-        std::string{filename}
+        std::format("@{}", filename)
     );
+
     verify(result);
 
     auto function = result.get<sol::protected_function>();
@@ -309,7 +307,7 @@ void attach(
     it->second = std::make_shared<const std::string>(std::move(bytecode));
   }
 
-  hydrate(registry, entity, parent, std::move(proxy), it->second, filename);
+  hydrate(registry, entity, parent, std::move(proxy), it->second, id);
 }
 
 std::shared_ptr<objectproxy> objectproxy::clone() {
@@ -363,7 +361,7 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   auto proxy = std::make_shared<objectproxy>(entity, _registry);
 
   if (sc && sc->bytecode) {
-    hydrate(_registry, entity, sc->parent, proxy, sc->bytecode, "@clone");
+    hydrate(_registry, entity, sc->parent, proxy, sc->bytecode, sc->chunkname);
   }
 
   return proxy;

@@ -163,6 +163,7 @@ struct scriptable {
   sol::environment environment;
   sol::table module;
   std::shared_ptr<const std::string> bytecode;
+  symbol chunkname{};
   functor on_spawn;
   functor on_dispose;
   functor on_loop;
