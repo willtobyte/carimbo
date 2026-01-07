@@ -271,7 +271,7 @@ static void hydrate(
   registry.emplace<scriptable>(entity, std::move(sc));
 }
 
-void attach(
+void mount(
     entt::registry& registry,
     entt::entity entity,
     sol::environment& parent,

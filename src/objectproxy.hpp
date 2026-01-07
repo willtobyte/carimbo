@@ -69,7 +69,7 @@ private:
   entt::registry& _registry;
 };
 
-void attach(
+void mount(
     entt::registry& registry,
     entt::entity entity,
     sol::environment& parent,
