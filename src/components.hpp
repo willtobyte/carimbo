@@ -9,6 +9,8 @@ using symbol = entt::id_type;
 inline constexpr symbol empty = 0;
 
 inline boost::unordered_flat_map<symbol, std::string> symbols{{empty, {}}};
+inline boost::unordered_flat_map<symbol, std::shared_ptr<const std::string>> bytecodes;
+inline boost::unordered_flat_map<symbol, uint32_t> counters;
 
 [[nodiscard]] inline symbol intern(std::string_view value) noexcept {
   if (value.empty()) [[unlikely]] return empty;

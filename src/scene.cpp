@@ -12,6 +12,9 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scen
   _renderer = scenemanager->renderer();
 
   _hits.reserve(64);
+  symbols.reserve(64);
+  bytecodes.reserve(16);
+  counters.reserve(8);
 
   auto def = b2DefaultWorldDef();
   if (auto physics = node["physics"]) {
@@ -94,6 +97,11 @@ scene::~scene() noexcept {
   }
 
   physics::destroy_world(_world);
+
+  symbols.clear();
+  symbols.emplace(empty, std::string{});
+  bytecodes.clear();
+  counters.clear();
 }
 
 void scene::update(float delta) {

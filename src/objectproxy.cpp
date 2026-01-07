@@ -2,8 +2,6 @@
 
 #include "physics.hpp"
 
-static boost::unordered_flat_map<symbol, uint32_t> counters;
-
 objectproxy::objectproxy(entt::entity entity, entt::registry& registry) noexcept
   : _entity(entity), _registry(registry) {
 }
@@ -195,8 +193,6 @@ std::string_view objectproxy::name() const noexcept {
   const auto& m = _registry.get<metadata>(_entity);
   return lookup(m.name);
 }
-
-static boost::unordered_flat_map<symbol, std::shared_ptr<const std::string>> bytecodes;
 
 static void hydrate(
     entt::registry& registry,
