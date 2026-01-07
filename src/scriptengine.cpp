@@ -620,8 +620,8 @@ void scriptengine::run() {
     "Cassette",
     sol::no_constructor,
     "clear", sol::overload(
-      sol::resolve<void(std::string_view) noexcept>(&cassette::clear),
-      sol::resolve<void() noexcept>(&cassette::clear)
+      sol::resolve<void(std::string_view)>(&cassette::clear),
+      sol::resolve<void()>(&cassette::clear)
     ),
     "set", [](
       cassette& self,

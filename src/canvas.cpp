@@ -2,7 +2,7 @@
 
 #include "renderer.hpp"
 
-canvas::canvas(std::shared_ptr<renderer> renderer) noexcept
+canvas::canvas(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
   int lw, lh;
   SDL_RendererLogicalPresentation mode;

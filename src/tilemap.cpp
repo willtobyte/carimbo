@@ -45,7 +45,7 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
 
 }
 
-void tilemap::set_viewport(const quad& value) noexcept {
+void tilemap::set_viewport(const quad& value) {
   if (_viewport == value) [[likely]] {
     return;
   }
@@ -61,7 +61,7 @@ void tilemap::set_viewport(const quad& value) noexcept {
   _indices.reserve(max_tiles * 6);
 }
 
-void tilemap::update([[maybe_unused]] float delta) noexcept {
+void tilemap::update([[maybe_unused]] float delta) {
   if (!_dirty) [[likely]] {
     return;
   }

@@ -5,7 +5,7 @@
 #include "eventmanager.hpp"
 #include "scenemanager.hpp"
 
-enginefactory& enginefactory::with_title(const std::string_view title) noexcept {
+enginefactory& enginefactory::with_title(const std::string_view title) {
   _title = title;
   return *this;
 }
@@ -35,7 +35,7 @@ enginefactory& enginefactory::with_fullscreen(const bool fullscreen) noexcept {
   return *this;
 }
 
-enginefactory& enginefactory::with_sentry(const std::string_view dsn) noexcept {
+enginefactory& enginefactory::with_sentry(const std::string_view dsn) {
   if (dsn.empty()) {
     return *this;
   }

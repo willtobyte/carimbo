@@ -27,7 +27,7 @@ public:
 
   std::shared_ptr<::renderer> renderer() const noexcept;
 
-  void set_runtime(sol::state_view runtime) noexcept;
+  void set_runtime(sol::state_view runtime);
 
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;

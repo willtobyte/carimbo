@@ -62,7 +62,7 @@ void overlay::update(float delta) noexcept {
   }
 }
 
-void overlay::draw() const noexcept {
+void overlay::draw() const {
   for (const auto& label : _labels) {
     label->draw();
   }

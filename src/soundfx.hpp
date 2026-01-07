@@ -4,10 +4,10 @@
 
 class soundfx final {
 public:
-  explicit soundfx(std::string_view filename) noexcept;
+  explicit soundfx(std::string_view filename);
   ~soundfx();
 
-  void play(bool loop) const noexcept;
+  void play(bool loop) const;
   void stop() const noexcept;
 
   void update(float delta);

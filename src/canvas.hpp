@@ -5,7 +5,7 @@
 class renderer;
 class canvas final {
 public:
-  explicit canvas(std::shared_ptr<renderer> renderer) noexcept;
+  explicit canvas(std::shared_ptr<renderer> renderer);
   ~canvas() noexcept = default;
 
   void set_pixels(std::string_view pixels) noexcept;

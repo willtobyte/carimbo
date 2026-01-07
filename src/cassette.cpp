@@ -137,7 +137,7 @@ cassette::cassette() {
   }
 }
 
-void cassette::persist() const noexcept {
+void cassette::persist() const {
   thread_local std::string buffer;
   buffer.clear();
   buffer.reserve(_data.size() * 64);
@@ -171,7 +171,7 @@ void cassette::persist() const noexcept {
 #endif
 }
 
-void cassette::clear(std::string_view key) noexcept {
+void cassette::clear(std::string_view key) {
   if (key.empty()) [[unlikely]] {
     return;
   }
@@ -180,7 +180,7 @@ void cassette::clear(std::string_view key) noexcept {
   persist();
 }
 
-void cassette::clear() noexcept {
+void cassette::clear() {
   _data.clear();
   persist();
 }

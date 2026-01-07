@@ -11,5 +11,5 @@ public:
 
   [[nodiscard]] static std::vector<uint8_t> read(std::string_view filename);
 
-  [[nodiscard]] static boost::container::small_vector<std::string, 32> enumerate(std::string_view directory) noexcept;
+  [[nodiscard]] static boost::container::small_vector<std::string, 32> enumerate(std::string_view directory);
 };

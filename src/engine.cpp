@@ -79,7 +79,7 @@ void engine::set_ticks(uint8_t ticks) noexcept {
   _tick_interval = ticks > 0 ? 1.0f / static_cast<float>(ticks) : 0.0f;
 }
 
-void engine::add_loopable(std::shared_ptr<::loopable> ptr) noexcept {
+void engine::add_loopable(std::shared_ptr<::loopable> ptr) {
   _loopables.emplace_back(std::move(ptr));
 }
 

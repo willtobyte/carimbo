@@ -5,7 +5,7 @@
 
 class audiodevice final {
 public:
-  audiodevice() noexcept;
+  audiodevice();
   ~audiodevice() noexcept = default;
 
 private:

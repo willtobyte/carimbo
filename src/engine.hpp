@@ -25,7 +25,7 @@ public:
   void set_overlay(std::shared_ptr<::overlay> ptr) noexcept;
   void set_ticks(uint8_t ticks) noexcept;
 
-  void add_loopable(std::shared_ptr<::loopable> ptr) noexcept;
+  void add_loopable(std::shared_ptr<::loopable> ptr);
 
   void run();
 

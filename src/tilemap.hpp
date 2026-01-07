@@ -22,9 +22,9 @@ class tilemap final {
 public:
   tilemap(std::string_view name, std::shared_ptr<renderer> renderer);
 
-  void set_viewport(const quad& value) noexcept;
+  void set_viewport(const quad& value);
 
-  void update(float delta) noexcept;
+  void update(float delta);
 
   void draw() const noexcept;
 

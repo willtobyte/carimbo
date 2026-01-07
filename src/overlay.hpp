@@ -19,7 +19,7 @@ public:
 
   void update(float delta) noexcept;
 
-  void draw() const noexcept;
+  void draw() const;
 
 private:
   std::shared_ptr<::cursor> _cursor;

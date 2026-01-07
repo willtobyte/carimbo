@@ -24,8 +24,8 @@ public:
   template <typename T>
   T get(std::string_view key, const T& fallback) const;
 
-  void clear(std::string_view key) noexcept;
-  void clear() noexcept;
+  void clear(std::string_view key);
+  void clear();
 
   std::optional<value_type> find(std::string_view key) const noexcept;
 
@@ -38,7 +38,7 @@ private:
   static constexpr const char* _storagekey = "cassette";
 #endif
 
-  void persist() const noexcept;
+  void persist() const;
 };
 
 #include "cassette.tpp"

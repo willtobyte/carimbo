@@ -4,7 +4,7 @@
 
 #include <stb_vorbis.c>
 
-soundfx::soundfx(std::string_view filename) noexcept {
+soundfx::soundfx(std::string_view filename) {
   const auto buffer = io::read(filename);
 
   auto error = 0;
@@ -64,7 +64,7 @@ soundfx::~soundfx() {
   }
 }
 
-void soundfx::play(bool loop) const noexcept {
+void soundfx::play(bool loop) const {
   _notified = false;
   alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
   alSourcePlay(_source);

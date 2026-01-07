@@ -8,7 +8,7 @@ public:
   explicit animationsystem(entt::registry& registry) noexcept
     : _entt(registry), _view(registry.view<std::shared_ptr<const atlas>, playback>()) {}
 
-  void update(uint64_t now) noexcept;
+  void update(uint64_t now);
 
 private:
   using view_type = decltype(std::declval<entt::registry&>().view<std::shared_ptr<const atlas>, playback>());
@@ -22,7 +22,7 @@ public:
   explicit physicssystem(entt::registry& registry) noexcept
     : _registry(registry), _group(registry.group<transform, rigidbody>(entt::get<playback, renderable>)) {}
 
-  void update(b2WorldId world, float delta) noexcept;
+  void update(b2WorldId world, float delta);
 
 private:
   using group_type = decltype(std::declval<entt::registry&>().group<transform, rigidbody>(entt::get<playback, renderable>));

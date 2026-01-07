@@ -15,7 +15,7 @@ namespace {
 }
 }
 
-void animationsystem::update(uint64_t now) noexcept {
+void animationsystem::update(uint64_t now) {
   for (auto&& [entity, at, s] : _view.each()) {
     const bool refresh = s.dirty | !s.timeline;
 
@@ -68,7 +68,7 @@ void animationsystem::update(uint64_t now) noexcept {
   }
 }
 
-void physicssystem::update(b2WorldId world, float delta) noexcept {
+void physicssystem::update(b2WorldId world, float delta) {
   _accumulator += delta;
   while (_accumulator >= FIXED_TIMESTEP) {
     b2World_Step(world, FIXED_TIMESTEP, WORLD_SUBSTEPS);

@@ -14,9 +14,9 @@ class objectproxy;
 class interning final {
   class counter final {
   public:
-    counter() noexcept { _counters.reserve(8); }
+    counter() { _counters.reserve(8); }
 
-    [[nodiscard]] uint32_t operator()(symbol id) noexcept {
+    [[nodiscard]] uint32_t operator()(symbol id) {
       return ++_counters[id];
     }
 
@@ -25,12 +25,12 @@ class interning final {
   };
 
 public:
-  interning() noexcept {
+  interning() {
     _symbols.reserve(64);
     _bytecodes.reserve(128);
   }
 
-  [[nodiscard]] symbol intern(std::string_view value) noexcept {
+  [[nodiscard]] symbol intern(std::string_view value) {
     if (value.empty()) [[unlikely]] return empty;
     const auto id = entt::hashed_string{value.data(), value.size()}.value();
     _symbols.try_emplace(id, value);

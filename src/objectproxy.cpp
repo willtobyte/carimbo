@@ -91,7 +91,7 @@ std::string_view objectproxy::action() const noexcept {
   return interning.lookup(s.action);
 }
 
-void objectproxy::set_action(std::string_view value) noexcept {
+void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
   auto& s = _registry.get<playback>(_entity);
   s.action = interning.intern(value);
@@ -106,7 +106,7 @@ std::string_view objectproxy::kind() const noexcept {
   return interning.lookup(m.kind);
 }
 
-void objectproxy::set_kind(std::string_view value) noexcept {
+void objectproxy::set_kind(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
   auto& m = _registry.get<metadata>(_entity);
   m.kind = interning.intern(value);

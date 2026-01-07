@@ -131,6 +131,6 @@ std::shared_ptr<::renderer> scenemanager::renderer() const noexcept {
   return _renderer;
 }
 
-void scenemanager::set_runtime(sol::state_view runtime) noexcept {
+void scenemanager::set_runtime(sol::state_view runtime) {
   _environment = sol::environment(runtime, sol::create, runtime.globals());
 }

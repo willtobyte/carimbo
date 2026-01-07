@@ -41,10 +41,10 @@ public:
   void set_visible(bool value) noexcept;
 
   [[nodiscard]] std::string_view action() const noexcept;
-  void set_action(std::string_view value) noexcept;
+  void set_action(std::string_view value);
 
   [[nodiscard]] std::string_view kind() const noexcept;
-  void set_kind(std::string_view value) noexcept;
+  void set_kind(std::string_view value);
 
   [[nodiscard]] std::string_view name() const noexcept;
 

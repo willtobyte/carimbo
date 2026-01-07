@@ -9,13 +9,13 @@ public:
   enginefactory() = default;
   ~enginefactory() = default;
 
-  enginefactory& with_title(std::string_view title) noexcept;
+  enginefactory& with_title(std::string_view title);
   enginefactory& with_width(int width) noexcept;
   enginefactory& with_height(int height) noexcept;
   enginefactory& with_scale(float scale) noexcept;
   enginefactory& with_gravity(float gravity) noexcept;
   enginefactory& with_fullscreen(bool fullscreen) noexcept;
-  enginefactory& with_sentry(std::string_view dsn) noexcept;
+  enginefactory& with_sentry(std::string_view dsn);
   enginefactory& with_ticks(uint8_t ticks) noexcept;
 
   std::shared_ptr<engine> create() const;
