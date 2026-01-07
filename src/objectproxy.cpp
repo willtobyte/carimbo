@@ -151,7 +151,7 @@ void objectproxy::set_onunhover(sol::protected_function fn) {
 }
 
 void objectproxy::set_ontouch(sol::protected_function fn) {
-  auto& t = _registry.emplace_or_replace<touchable>(_entity);
+  auto& t = _registry.get_or_emplace<touchable>(_entity);
   t.on_touch = std::move(fn);
 }
 
@@ -176,7 +176,7 @@ void objectproxy::set_oncollisionend(sol::protected_function fn) {
 }
 
 void objectproxy::set_ontick(sol::protected_function fn) {
-  auto& t = _registry.emplace_or_replace<tickable>(_entity);
+  auto& t = _registry.get_or_emplace<tickable>(_entity);
   t.on_tick = std::move(fn);
 }
 
