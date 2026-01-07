@@ -1,5 +1,6 @@
 #include "objectproxy.hpp"
 
+#include "components.hpp"
 #include "physics.hpp"
 
 objectproxy::objectproxy(entt::entity entity, entt::registry& registry) noexcept
@@ -85,26 +86,30 @@ void objectproxy::set_visible(bool visible) noexcept {
 }
 
 std::string_view objectproxy::action() const noexcept {
+  const auto& interning = _registry.ctx().get<::interning>();
   const auto& s = _registry.get<playback>(_entity);
-  return lookup(s.action);
+  return interning.lookup(s.action);
 }
 
 void objectproxy::set_action(std::string_view value) noexcept {
+  auto& interning = _registry.ctx().get<::interning>();
   auto& s = _registry.get<playback>(_entity);
-  s.action = intern(value);
+  s.action = interning.intern(value);
   s.current_frame = 0;
   s.dirty = true;
   s.timeline = nullptr;
 }
 
 std::string_view objectproxy::kind() const noexcept {
+  const auto& interning = _registry.ctx().get<::interning>();
   const auto& m = _registry.get<metadata>(_entity);
-  return lookup(m.kind);
+  return interning.lookup(m.kind);
 }
 
 void objectproxy::set_kind(std::string_view value) noexcept {
+  auto& interning = _registry.ctx().get<::interning>();
   auto& m = _registry.get<metadata>(_entity);
-  m.kind = intern(value);
+  m.kind = interning.intern(value);
 }
 
 flip objectproxy::flip() const noexcept {
@@ -190,120 +195,9 @@ void objectproxy::die() noexcept {
 }
 
 std::string_view objectproxy::name() const noexcept {
+  const auto& interning = _registry.ctx().get<::interning>();
   const auto& m = _registry.get<metadata>(_entity);
-  return lookup(m.name);
-}
-
-static void hydrate(
-    entt::registry& registry,
-    entt::entity entity,
-    sol::environment& parent,
-    std::shared_ptr<objectproxy> proxy,
-    std::shared_ptr<const std::string> bytecode,
-    symbol chunkname
-) {
-  sol::state_view lua(parent.lua_state());
-  sol::environment environment(lua, sol::create, parent);
-  environment["self"] = std::move(proxy);
-
-  const auto result = lua.load(*bytecode, std::format("@{}", lookup(chunkname)));
-  verify(result);
-
-  auto function = result.get<sol::protected_function>();
-  sol::set_environment(environment, function);
-
-  const auto exec = function();
-  verify(exec);
-
-  auto module = exec.get<sol::table>();
-
-  scriptable sc;
-  sc.parent = parent;
-  sc.environment = environment;
-  sc.module = module;
-  sc.bytecode = std::move(bytecode);
-  sc.chunkname = chunkname;
-
-  if (auto fn = module["on_spawn"].get<sol::protected_function>(); fn.valid()) {
-    sc.on_spawn = std::move(fn);
-  }
-
-  if (auto fn = module["on_dispose"].get<sol::protected_function>(); fn.valid()) {
-    sc.on_dispose = std::move(fn);
-  }
-
-  if (auto fn = module["on_loop"].get<sol::protected_function>(); fn.valid()) {
-    sc.on_loop = std::move(fn);
-  }
-
-  if (auto on_begin = module["on_begin"].get<sol::protected_function>(),
-         on_end = module["on_end"].get<sol::protected_function>();
-      on_begin.valid() || on_end.valid()) {
-    auto& a = registry.emplace<animatable>(entity);
-    a.on_begin = std::move(on_begin);
-    a.on_end = std::move(on_end);
-  }
-
-  if (auto on_collision = module["on_collision"].get<sol::protected_function>(),
-         on_collision_end = module["on_collision_end"].get<sol::protected_function>();
-      on_collision.valid() || on_collision_end.valid()) {
-    auto& c = registry.emplace<collidable>(entity);
-    c.on_collision = std::move(on_collision);
-    c.on_collision_end = std::move(on_collision_end);
-  }
-
-  if (auto on_hover = module["on_hover"].get<sol::protected_function>(),
-         on_unhover = module["on_unhover"].get<sol::protected_function>();
-      on_hover.valid() || on_unhover.valid()) {
-    auto& h = registry.emplace<hoverable>(entity);
-    h.on_hover = std::move(on_hover);
-    h.on_unhover = std::move(on_unhover);
-  }
-
-  if (auto fn = module["on_touch"].get<sol::protected_function>(); fn.valid()) {
-    registry.emplace<touchable>(entity, std::move(fn));
-  }
-
-  registry.emplace<scriptable>(entity, std::move(sc));
-}
-
-void mount(
-    entt::registry& registry,
-    entt::entity entity,
-    sol::environment& parent,
-    std::shared_ptr<objectproxy> proxy,
-    std::string_view filename
-) {
-  if (!io::exists(filename)) return;
-
-  const auto id = intern(filename);
-  auto [it, inserted] = bytecodes.try_emplace(id, nullptr);
-  if (inserted) {
-    sol::state_view lua(parent.lua_state());
-    const auto buffer = io::read(filename);
-
-    const auto result = lua.load(
-        std::string_view{reinterpret_cast<const char*>(buffer.data()), buffer.size()},
-        std::format("@{}", filename)
-    );
-
-    verify(result);
-
-    auto function = result.get<sol::protected_function>();
-
-    std::string bytecode;
-    bytecode.reserve(buffer.size() * 7 / 2);
-    function.push();
-    lua_dump(lua.lua_state(), [](lua_State*, const void* data, size_t size, void* userdata) -> int {
-      static_cast<std::string*>(userdata)->append(static_cast<const char*>(data), size);
-      return 0;
-    }, &bytecode, 0);
-    lua_pop(lua.lua_state(), 1);
-
-    it->second = std::make_shared<const std::string>(std::move(bytecode));
-  }
-
-  hydrate(registry, entity, parent, std::move(proxy), it->second, id);
+  return interning.lookup(m.name);
 }
 
 std::shared_ptr<objectproxy> objectproxy::clone() {
@@ -312,9 +206,10 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   auto [m, tn, sp, pb, tf, at, ori, rn, sc] = _registry.try_get<metadata, tint, sprite, playback, transform, std::shared_ptr<const atlas>, orientation, renderable, scriptable>(_entity);
 
   if (m) {
+    auto& interning = _registry.ctx().get<::interning>();
     metadata cp = *m;
-    const auto original = lookup(m->name);
-    cp.name = intern(std::format("{}_{}", original, ++counters[m->name]));
+    const auto original = interning.lookup(m->name);
+    cp.name = interning.intern(std::format("{}_{}", original, interning.increment(m->name)));
 
     _registry.emplace<metadata>(entity, cp);
   }
@@ -357,7 +252,8 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   auto proxy = std::make_shared<objectproxy>(entity, _registry);
 
   if (sc && sc->bytecode) {
-    hydrate(_registry, entity, sc->parent, proxy, sc->bytecode, sc->chunkname);
+    auto& scripting = _registry.ctx().get<::scripting>();
+    scripting.attach(entity, sc->parent, proxy, sc->bytecode, sc->chunkname);
   }
 
   return proxy;

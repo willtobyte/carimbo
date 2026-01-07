@@ -68,11 +68,3 @@ private:
   entt::entity _entity;
   entt::registry& _registry;
 };
-
-void mount(
-    entt::registry& registry,
-    entt::entity entity,
-    sol::environment& parent,
-    std::shared_ptr<objectproxy> proxy,
-    std::string_view filename
-);

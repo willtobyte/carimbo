@@ -1,8 +1,8 @@
 #include "objectmanager.hpp"
 
 #include "components.hpp"
-#include "objectproxy.hpp"
 #include "io.hpp"
+#include "objectproxy.hpp"
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
@@ -20,9 +20,11 @@ objectmanager::objectmanager(
 }
 
 void objectmanager::add(unmarshal::json node, int32_t z) {
+  auto& interning = _registry.ctx().get<::interning>();
+
   const auto name = node["name"].get<std::string_view>();
   const auto kind = node["kind"].get<std::string_view>();
-  const auto action = intern(node["action"].get<std::string_view>());
+  const auto action = interning.intern(node["action"].get<std::string_view>());
   const auto position = node.get<vec2>();
 
   auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
@@ -31,12 +33,12 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
 
   auto at = std::make_shared<atlas>();
   if (auto timelines = json["timelines"]) {
-    timelines.foreach([&at](std::string_view key, unmarshal::json node) {
+    timelines.foreach([&at, &interning](std::string_view key, unmarshal::json node) {
       timeline tl{};
       tl.oneshot = node["oneshot"].get(false);
 
       if (auto nextnode = node["next"]) {
-        tl.next = intern(nextnode.get<std::string_view>());
+        tl.next = interning.intern(nextnode.get<std::string_view>());
       }
 
       if (auto value = node["hitbox"]) {
@@ -56,15 +58,15 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
         });
       }
 
-      at->timelines.emplace(intern(key), std::move(tl));
+      at->timelines.emplace(interning.intern(key), std::move(tl));
     });
   }
 
   _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
 
   metadata md{
-    .kind = intern(kind),
-    .name = intern(name)
+    .kind = interning.intern(kind),
+    .name = interning.intern(name)
   };
   _registry.emplace<metadata>(entity, md);
 
@@ -106,7 +108,8 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
 
   _proxies.emplace(name, proxy);
 
-  mount(_registry, entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
+  auto& scripting = _registry.ctx().get<::scripting>();
+  scripting.attach(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
 }
 
 void objectmanager::populate(sol::table& pool) const {
