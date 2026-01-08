@@ -25,7 +25,6 @@ std::shared_ptr<statemanager> engine::statemanager() const noexcept {
   return _statemanager;
 }
 
-
 std::shared_ptr<window> engine::window() const noexcept {
   return _window;
 }
