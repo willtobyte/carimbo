@@ -22,29 +22,22 @@ network::querybuilder& network::querybuilder::add(std::string_view key, std::str
   return *this;
 }
 
-std::string
-network::querybuilder::build() const {
+std::string network::querybuilder::build() const {
   if (_parameters.empty()) {
     return {};
   }
 
   std::string result;
   result.reserve(_parameters.size() * 32);
-  bool first = true;
+  const char* separator = "";
   for (const auto& [key, value] : _parameters) {
-    if (!first) {
-      result += '&';
-    } else {
-      first = false;
-    }
-
-    std::format_to(std::back_inserter(result), "{}={}", key, encode(value));
+    std::format_to(std::back_inserter(result), "{}{}={}", separator, encode(key), encode(value));
+    separator = "&";
   }
   return result;
 }
 
-std::string
-network::querybuilder::make(std::initializer_list<std::pair<std::string, std::string>> entries) {
+std::string network::querybuilder::make(std::initializer_list<std::pair<std::string_view, std::string_view>> entries) {
   network::querybuilder builder;
   for (const auto& [key, value] : entries) {
     builder.add(key, value);
