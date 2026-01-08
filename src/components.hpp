@@ -193,12 +193,12 @@ public:
   explicit scripting(entt::registry& registry) noexcept
       : _registry(registry) {}
 
-  void attach(entt::entity entity, sol::environment& parent,
-              std::shared_ptr<objectproxy> proxy, std::string_view filename);
+  void wire(entt::entity entity, sol::environment& parent,
+            std::shared_ptr<objectproxy> proxy, std::string_view filename);
 
-  void attach(entt::entity entity, sol::environment& parent,
-              std::shared_ptr<objectproxy> proxy,
-              std::shared_ptr<const std::string> bytecode, symbol chunkname);
+  void wire(entt::entity entity, sol::environment& parent,
+            std::shared_ptr<objectproxy> proxy,
+            std::shared_ptr<const std::string> bytecode, symbol chunkname);
 
 private:
   entt::registry& _registry;

@@ -109,7 +109,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
   _proxies.emplace(name, proxy);
 
   auto& scripting = _registry.ctx().get<::scripting>();
-  scripting.attach(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
+  scripting.wire(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
 }
 
 void objectmanager::populate(sol::table& pool) const {

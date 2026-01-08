@@ -26,8 +26,8 @@ std::string_view interning::lookup(symbol id) const noexcept {
   return _symbols.find(id)->second;
 }
 
-void scripting::attach(entt::entity entity, sol::environment& parent,
-                       std::shared_ptr<objectproxy> proxy, std::string_view filename) {
+void scripting::wire(entt::entity entity, sol::environment& parent,
+                     std::shared_ptr<objectproxy> proxy, std::string_view filename) {
   if (!io::exists(filename)) return;
 
   auto& interning = _registry.ctx().get<::interning>();
@@ -57,12 +57,12 @@ void scripting::attach(entt::entity entity, sol::environment& parent,
     return std::make_shared<const std::string>(std::move(bytecode));
   });
 
-  attach(entity, parent, std::move(proxy), code, id);
+  wire(entity, parent, std::move(proxy), code, id);
 }
 
-void scripting::attach(entt::entity entity, sol::environment& parent,
-                       std::shared_ptr<objectproxy> proxy,
-                       std::shared_ptr<const std::string> bytecode, symbol chunkname) {
+void scripting::wire(entt::entity entity, sol::environment& parent,
+                     std::shared_ptr<objectproxy> proxy,
+                     std::shared_ptr<const std::string> bytecode, symbol chunkname) {
   const auto& interning = _registry.ctx().get<::interning>();
   sol::state_view lua(parent.lua_state());
   sol::environment environment(lua, sol::create, parent);
