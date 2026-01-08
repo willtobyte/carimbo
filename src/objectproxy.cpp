@@ -253,7 +253,7 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
 
   if (sc && sc->bytecode) {
     auto& scripting = _registry.ctx().get<::scripting>();
-    scripting.wire(entity, sc->parent, proxy, sc->bytecode, sc->chunkname);
+    scripting.derive(entity, sc->parent, proxy, sc->bytecode, sc->chunkname);
   }
 
   return proxy;
