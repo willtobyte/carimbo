@@ -36,18 +36,20 @@ protected:
 
 private:
   bool _running{true};
+
+  uint8_t _ticks{0};
+  uint8_t _tick_current{0};
+  float _tick_interval{0.0f};
+  float _tick_accumulator{0.0f};
+
   std::shared_ptr<::audiodevice> _audiodevice;
   std::shared_ptr<::eventmanager> _eventmanager;
-  boost::container::small_vector<std::shared_ptr<::loopable>, 8> _loopables;
   std::shared_ptr<::scenemanager> _scenemanager;
   std::shared_ptr<::statemanager> _statemanager;
   std::shared_ptr<::renderer> _renderer;
   std::shared_ptr<::window> _window;
   std::shared_ptr<::overlay> _overlay;
   std::shared_ptr<::canvas> _canvas;
+  boost::container::small_vector<std::shared_ptr<::loopable>, 8> _loopables;
   boost::container::small_vector<std::shared_ptr<::lifecycleobserver>, 8> _observers;
-  uint8_t _ticks{0};
-  float _tick_interval{0.0f};
-  float _tick_accumulator{0.0f};
-  uint8_t _tick_current{0};
 };
