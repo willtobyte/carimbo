@@ -56,8 +56,9 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scen
             if (tiles[row_offset + column] == 0) continue;
 
             const auto position = b2Vec2{
-                static_cast<float>(column) * tile_size + half,
-                static_cast<float>(row) * tile_size + half};
+              static_cast<float>(column) * tile_size + half,
+              static_cast<float>(row) * tile_size + half
+            };
 
             const auto body = physics::make_static_body(_world, position);
             b2CreatePolygonShape(body, &sdef, &poly);

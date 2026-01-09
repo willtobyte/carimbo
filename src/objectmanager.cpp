@@ -70,20 +70,18 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
     };
   }
 
-  const auto& [atlas, pixmap, scale] = it->second;
-
-  _registry.emplace<std::shared_ptr<const ::atlas>>(entity, atlas);
+  _registry.emplace<std::shared_ptr<const ::atlas>>(entity, it->second.atlas);
   _registry.emplace<transform>(entity, transform{
     .position = position,
     .angle = .0,
-    .scale = scale
+    .scale = it->second.scale
   });
   _registry.emplace<metadata>(entity, metadata{
     .kind = interning.intern(kind),
     .name = interning.intern(name)
   });
   _registry.emplace<tint>(entity);
-  _registry.emplace<sprite>(entity, sprite{.pixmap = pixmap});
+  _registry.emplace<sprite>(entity, sprite{.pixmap = it->second.pixmap});
   _registry.emplace<playback>(entity, playback{
     .dirty = true,
     .redraw = false,
