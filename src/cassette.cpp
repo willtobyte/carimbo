@@ -105,32 +105,28 @@ cassette::cassette() {
       continue;
     }
 
-    std::string key_str{key};
-
     if (type == TYPE_NULL) {
-      _data.try_emplace(std::move(key_str), nullptr);
+      _data.try_emplace(key, nullptr);
     } else if (type == TYPE_BOOL) {
-      _data.try_emplace(std::move(key_str), value == "1");
+      _data.try_emplace(key, value == "1");
     } else if (type == TYPE_INT64) {
       int64_t v{};
-      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
-      if (ec == std::errc{}) {
-        _data.try_emplace(std::move(key_str), v);
+      if (auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v); ec == std::errc{}) {
+        _data.try_emplace(key, v);
       }
     } else if (type == TYPE_UINT64) {
       uint64_t v{};
-      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
-      if (ec == std::errc{}) {
-        _data.try_emplace(std::move(key_str), v);
+      if (auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v); ec == std::errc{}) {
+        _data.try_emplace(key, v);
       }
     } else if (type == TYPE_DOUBLE) {
       char* end = nullptr;
       const auto v = std::strtod(value.data(), &end);
       if (end != value.data() && end == value.data() + value.size()) {
-        _data.try_emplace(std::move(key_str), v);
+        _data.try_emplace(key, v);
       }
     } else if (type == TYPE_STRING) {
-      _data.try_emplace(std::move(key_str), decode_string(value));
+      _data.try_emplace(key, decode_string(value));
     }
   }
 }

@@ -41,7 +41,7 @@ boost::container::small_vector<std::string, 8> scenemanager::query(std::string_v
     return result;
   }
 
-  if (_scene_mapping.find(name) != _scene_mapping.end()) {
+  if (_scene_mapping.contains(name)) {
     result.emplace_back(name);
   }
 
