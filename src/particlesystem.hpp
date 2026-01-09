@@ -4,11 +4,22 @@
 
 #include "random.hpp"
 
+struct cache final {
+  size_t count;
+  std::pair<float, float> xspawn, yspawn;
+  std::pair<float, float> radius, angle;
+  std::pair<float, float> scale, life;
+  std::pair<uint8_t, uint8_t> alpha;
+  std::pair<float, float> xvel, yvel;
+  std::pair<float, float> gx, gy;
+  std::pair<float, float> rforce, rvel;
+  std::shared_ptr<pixmap> pixmap;
+};
+
 struct particleprops final {
   float x, y;
   float hw, hh;
   bool spawning;
-  std::shared_ptr<pixmap> pixmap;
   rng::xorshift128plus rng{rng::engine()()};
   rng::uniform_real<float> xspawnd, yspawnd, radiusd, angled;
   rng::uniform_real<float> xveld, yveld, gxd, gyd;
@@ -32,7 +43,7 @@ struct particleprops final {
   void set_position(float xv, float yv) noexcept { x = xv; y = yv; }
 };
 
-struct particle final {
+struct particles final {
   std::vector<float> x, y, vx, vy, gx, gy;
   std::vector<float> life, scale, angle, av, af;
   std::vector<uint8_t> alpha;
@@ -51,10 +62,11 @@ struct particle final {
 
 struct particlebatch final {
   std::shared_ptr<particleprops> props;
-  particle particles;
+  std::shared_ptr<pixmap> pixmap;
   std::vector<int> indices;
   std::vector<SDL_Vertex> vertices;
   std::vector<size_t> respawn;
+  particles particles;
 
   size_t size() const noexcept { return particles.count; }
 };
@@ -67,7 +79,7 @@ public:
 
 private:
   std::shared_ptr<renderer> _renderer;
-  mutable boost::unordered_flat_map<std::string, std::shared_ptr<pixmap>, transparent_string_hash, std::equal_to<>> _pixmaps;
+  mutable boost::unordered_flat_map<std::string, cache, transparent_string_hash, std::equal_to<>> _cache;
 };
 
 class particlesystem final {
