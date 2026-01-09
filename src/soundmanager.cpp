@@ -12,8 +12,11 @@ soundmanager::~soundmanager() noexcept {
 }
 
 void soundmanager::add(std::string_view name) {
-  const auto path = std::format("blobs/{}/{}.ogg", _scenename, name);
-  _sounds.emplace(name, std::make_shared<soundfx>(path));
+  if (_sounds.contains(name)) {
+    return;
+  }
+
+  _sounds.emplace(name, std::make_shared<soundfx>(std::format("blobs/{}/{}.ogg", _scenename, name)));
 }
 
 void soundmanager::update(float delta) {

@@ -7,6 +7,11 @@ public:
   explicit soundfx(std::string_view filename);
   ~soundfx();
 
+  soundfx(const soundfx&) = delete;
+  soundfx& operator=(const soundfx&) = delete;
+  soundfx(soundfx&&) = delete;
+  soundfx& operator=(soundfx&&) = delete;
+
   void play(bool loop) const;
   void stop() const noexcept;
 
