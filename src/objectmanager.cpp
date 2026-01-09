@@ -27,85 +27,76 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
   const auto action = interning.intern(node["action"].get<std::string_view>());
   const auto position = node.get<vec2>();
 
-  auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
-
   const auto entity = _registry.create();
 
-  auto at = std::make_shared<atlas>();
-  if (auto timelines = json["timelines"]) {
-    timelines.foreach([&at, &interning](std::string_view key, unmarshal::json node) {
-      timeline tl{};
-      tl.oneshot = node["oneshot"].get(false);
+  auto [it, inserted] = _props.try_emplace(kind);
+  if (inserted) {
+    const auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
-      if (auto nextnode = node["next"]) {
-        tl.next = interning.intern(nextnode.get<std::string_view>());
-      }
+    auto at = std::make_shared<::atlas>();
+    if (auto timelines = json["timelines"]) {
+      timelines.foreach([&at, &interning](std::string_view key, unmarshal::json node) {
+        timeline tl{};
+        tl.oneshot = node["oneshot"].get(false);
 
-      if (auto value = node["hitbox"]) {
-        if (auto aabb = value["aabb"]) {
-          const auto q = aabb.get<quad>();
-
-          tl.hitbox = b2AABB{
-            .lowerBound = b2Vec2(q.x - epsilon, q.y - epsilon),
-            .upperBound = b2Vec2(q.x + q.w + epsilon, q.y + q.h + epsilon)
-          };
+        if (auto nextnode = node["next"]) {
+          tl.next = interning.intern(nextnode.get<std::string_view>());
         }
-      }
 
-      if (auto frames = node["frames"]) {
-        frames.foreach([&tl](unmarshal::json f) {
-          tl.frames.emplace_back(std::move(f));
-        });
-      }
+        if (auto value = node["hitbox"]) {
+          if (auto aabb = value["aabb"]) {
+            const auto q = aabb.get<quad>();
+            tl.hitbox = b2AABB{
+              .lowerBound = b2Vec2(q.x - epsilon, q.y - epsilon),
+              .upperBound = b2Vec2(q.x + q.w + epsilon, q.y + q.h + epsilon)
+            };
+          }
+        }
 
-      at->timelines.emplace(interning.intern(key), std::move(tl));
-    });
+        if (auto frames = node["frames"]) {
+          frames.foreach([&tl](unmarshal::json f) {
+            tl.frames.emplace_back(std::move(f));
+          });
+        }
+
+        at->timelines.emplace(interning.intern(key), std::move(tl));
+      });
+    }
+
+    it->second = props{
+      .atlas = std::move(at),
+      .pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind)),
+      .scale = json["scale"].get(1.0f)
+    };
   }
 
-  _registry.emplace<std::shared_ptr<const atlas>>(entity, std::move(at));
+  const auto& [atlas, pixmap, scale] = it->second;
 
-  metadata md{
+  _registry.emplace<std::shared_ptr<const ::atlas>>(entity, atlas);
+  _registry.emplace<transform>(entity, transform{
+    .position = position,
+    .angle = .0,
+    .scale = scale
+  });
+  _registry.emplace<metadata>(entity, metadata{
     .kind = interning.intern(kind),
     .name = interning.intern(name)
-  };
-  _registry.emplace<metadata>(entity, md);
-
+  });
   _registry.emplace<tint>(entity);
-
-  sprite sp{
-      .pixmap = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind))};
-  _registry.emplace<sprite>(entity, std::move(sp));
-
-  playback pb{
+  _registry.emplace<sprite>(entity, sprite{.pixmap = pixmap});
+  _registry.emplace<playback>(entity, playback{
     .dirty = true,
     .redraw = false,
     .current_frame = 0,
     .tick = SDL_GetTicks(),
     .action = action,
     .timeline = nullptr
-  };
-  _registry.emplace<playback>(entity, std::move(pb));
-
-  const auto scale = json["scale"].get(1.0f);
-
-  transform tr{
-    .position = position,
-    .angle = .0,
-    .scale = scale
-  };
-  _registry.emplace<transform>(entity, std::move(tr));
-
+  });
   _registry.emplace<orientation>(entity);
-
   _registry.emplace<rigidbody>(entity);
-
-  renderable rd{
-    .z = z
-  };
-  _registry.emplace<renderable>(entity, std::move(rd));
+  _registry.emplace<renderable>(entity, renderable{.z = z});
 
   const auto proxy = std::make_shared<objectproxy>(entity, _registry);
-
   _proxies.emplace(name, proxy);
 
   auto& scripting = _registry.ctx().get<::scripting>();

@@ -20,9 +20,18 @@ public:
   void sort();
 
 private:
+  struct props {
+    std::shared_ptr<const atlas> atlas;
+    std::shared_ptr<pixmap> pixmap;
+    float scale;
+  };
+
   entt::registry& _registry;
-  std::shared_ptr<renderer> _renderer;
   std::string _scenename;
   sol::environment& _environment;
+
+  std::shared_ptr<renderer> _renderer;
+
   boost::unordered_flat_map<std::string, std::shared_ptr<objectproxy>, transparent_string_hash, std::equal_to<>> _proxies;
+  boost::unordered_flat_map<std::string, props, transparent_string_hash, std::equal_to<>> _props;
 };
