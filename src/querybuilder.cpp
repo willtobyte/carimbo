@@ -1,20 +1,15 @@
 #include "querybuilder.hpp"
 
-static std::string encode(std::string_view value) {
-  std::string encoded;
-  encoded.reserve(value.size() * 3);
-
-  for (char c : value) {
-    const unsigned char uc = static_cast<unsigned char>(c);
+static void encode_to(std::string_view value, std::string& out) {
+  for (const char c : value) {
+    const auto uc = static_cast<unsigned char>(c);
     if (std::isalnum(uc) || uc == '-' || uc == '_' || uc == '.' || uc == '~') {
-      encoded.push_back(c);
+      out.push_back(c);
       continue;
     }
 
-    std::format_to(std::back_inserter(encoded), "%{:02X}", static_cast<unsigned int>(uc));
+    std::format_to(std::back_inserter(out), "%{:02X}", static_cast<unsigned int>(uc));
   }
-
-  return encoded;
 }
 
 network::querybuilder& network::querybuilder::add(std::string_view key, std::string_view value) {
@@ -29,10 +24,15 @@ std::string network::querybuilder::build() const {
 
   std::string result;
   result.reserve(_parameters.size() * 32);
-  const char* separator = "";
+  auto first = true;
   for (const auto& [key, value] : _parameters) {
-    std::format_to(std::back_inserter(result), "{}{}={}", separator, encode(key), encode(value));
-    separator = "&";
+    if (!first) {
+      result.push_back('&');
+    }
+    first = false;
+    encode_to(key, result);
+    result.push_back('=');
+    encode_to(value, result);
   }
   return result;
 }
