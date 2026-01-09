@@ -1,6 +1,7 @@
 #include "cassette.hpp"
 
 #include <charconv>
+#include <cstdlib>
 #include <fstream>
 
 namespace {
@@ -11,19 +12,15 @@ constexpr std::string_view TYPE_UINT64 = "uint64";
 constexpr std::string_view TYPE_DOUBLE = "double";
 constexpr std::string_view TYPE_STRING = "string";
 
-std::string encode_string(std::string_view str) {
-  std::string result;
-  result.reserve(str.size());
+void encode_string_to(std::string_view str, std::string& out) {
   for (const char c : str) {
     switch (c) {
-      case '\n': result.append("\\n");  break;
-      case '\r': result.append("\\r");  break;
-      case '\\': result.append("\\\\"); break;
-      default:   result += c;           break;
+      case '\n': out.append("\\n");  break;
+      case '\r': out.append("\\r");  break;
+      case '\\': out.append("\\\\"); break;
+      default:   out.push_back(c);   break;
     }
   }
-
-  return result;
 }
 
 std::string decode_string(std::string_view str) {
@@ -127,9 +124,9 @@ cassette::cassette() {
         _data.try_emplace(std::move(key_str), v);
       }
     } else if (type == TYPE_DOUBLE) {
-      double v{};
-      auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
-      if (ec == std::errc{}) {
+      char* end = nullptr;
+      const auto v = std::strtod(value.data(), &end);
+      if (end != value.data() && end == value.data() + value.size()) {
         _data.try_emplace(std::move(key_str), v);
       }
     } else if (type == TYPE_STRING) {
@@ -139,12 +136,11 @@ cassette::cassette() {
 }
 
 void cassette::persist() const {
-  thread_local std::string buffer;
-  buffer.clear();
+  std::string buffer;
   buffer.reserve(_data.size() * 64);
 
   for (const auto& [key, value] : _data) {
-    std::visit([&key](const auto& v) {
+    std::visit([&key, &buffer](const auto& v) {
       using T = std::decay_t<decltype(v)>;
 
       if constexpr (std::is_same_v<T, std::nullptr_t>) {
@@ -158,13 +154,19 @@ void cassette::persist() const {
       } else if constexpr (std::is_same_v<T, double>) {
         std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_DOUBLE, key, v);
       } else if constexpr (std::is_same_v<T, std::string>) {
-        std::format_to(std::back_inserter(buffer), "{}:{}={}\n", TYPE_STRING, key, encode_string(v));
+        std::format_to(std::back_inserter(buffer), "{}:{}=", TYPE_STRING, key);
+        encode_string_to(v, buffer);
+        buffer.push_back('\n');
       }
     }, value);
   }
 
 #ifdef EMSCRIPTEN
-  const auto script = std::format("localStorage.setItem('{}', '{}')", _storagekey, encode_string(buffer));
+  std::string script;
+  script.reserve(buffer.size() + 128);
+  std::format_to(std::back_inserter(script), "localStorage.setItem('{}', '", _storagekey);
+  encode_string_to(buffer, script);
+  script.append("')");
   emscripten_run_script(script.c_str());
 #else
   std::ofstream file(_filename, std::ios::binary | std::ios::trunc);
