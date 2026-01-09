@@ -1,8 +1,8 @@
 #include "locales.hpp"
 
-static constexpr std::string DEFAULT_LANGUAGE = "en";
+static constexpr std::string_view DEFAULT_LANGUAGE = "en";
 
-static std::string language() {
+static std::string_view language() {
   auto count = 0;
   const auto locales = std::unique_ptr<SDL_Locale*, SDL_Deleter>(SDL_GetPreferredLocales(&count));
 
@@ -28,7 +28,7 @@ static std::string language() {
         auto json = unmarshal::parse(io::read(filename));
 
         json.foreach([this](std::string_view key, unmarshal::json node) {
-          data.emplace(key, node.get<std::string_view>());
+          data.try_emplace(key, node.get<std::string_view>());
         });
       } catch (...) {
       }

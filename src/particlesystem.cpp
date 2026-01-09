@@ -148,11 +148,16 @@ particlesystem::particlesystem(std::shared_ptr<renderer> renderer)
 
 void particlesystem::add(unmarshal::json node) {
   const auto name = node["name"].get<std::string_view>();
+  auto [it, inserted] = _batches.try_emplace(name);
+  if (!inserted) {
+    return;
+  }
+
   const auto kind = node["kind"].get<std::string_view>();
   const auto x = node["x"].get<float>();
   const auto y = node["y"].get<float>();
   const auto spawning = node["spawning"].get(true);
-  _batches.emplace(name, _factory->create(kind, x, y, spawning));
+  it->second = _factory->create(kind, x, y, spawning);
 }
 
 void particlesystem::populate(sol::table& pool) const {

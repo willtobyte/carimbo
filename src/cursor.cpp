@@ -17,6 +17,11 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
 
   if (auto animations = json["animations"]) {
     animations.foreach([this](std::string_view key, unmarshal::json node) {
+      auto [it, inserted] = _animations.try_emplace(key);
+      if (!inserted) {
+        return;
+      }
+
       const auto oneshot = node["oneshot"].get(false);
 
       boost::container::small_vector<keyframe, 16> frames;
@@ -24,7 +29,7 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
         frames.emplace_back(std::move(node));
       });
 
-      _animations.emplace(key, animation{oneshot, std::nullopt, nullptr, std::move(frames)});
+      it->second = animation{oneshot, std::nullopt, nullptr, std::move(frames)};
     });
   }
 

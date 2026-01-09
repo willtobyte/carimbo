@@ -26,12 +26,13 @@ eventmanager::eventmanager(std::shared_ptr<renderer> renderer)
       if (auto* const controller = SDL_OpenGamepad(gid)) {
         const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
 
-        if (_controllers.contains(jid)) {
+        auto [it, inserted] = _controllers.try_emplace(jid);
+        if (!inserted) {
           SDL_CloseGamepad(controller);
           break;
         }
 
-        _controllers.emplace(jid, std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller));
+        it->second = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
 
         _joystickgorder.emplace_back(jid);
         _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
@@ -137,12 +138,13 @@ void eventmanager::update(float delta) {
         if (auto* const controller = SDL_OpenGamepad(event.cdevice.which)) {
           const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
 
-          if (_controllers.contains(jid)) {
+          auto [it, inserted] = _controllers.try_emplace(jid);
+          if (!inserted) {
             SDL_CloseGamepad(controller);
             break;
           }
 
-          _controllers[jid] = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
+          it->second = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
 
           _joystickgorder.emplace_back(jid);
           _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);

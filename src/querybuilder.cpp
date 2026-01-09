@@ -18,7 +18,7 @@ static std::string encode(std::string_view value) {
 }
 
 network::querybuilder& network::querybuilder::add(std::string_view key, std::string_view value) {
-  _parameters.emplace(key, value);
+  _parameters.try_emplace(key, value);
   return *this;
 }
 

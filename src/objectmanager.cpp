@@ -59,7 +59,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
           });
         }
 
-        at->timelines.emplace(interning.intern(key), std::move(tl));
+        at->timelines.try_emplace(interning.intern(key), std::move(tl));
       });
     }
 
@@ -95,7 +95,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
   _registry.emplace<renderable>(entity, renderable{.z = z});
 
   const auto proxy = std::make_shared<objectproxy>(entity, _registry);
-  _proxies.emplace(name, proxy);
+  _proxies.try_emplace(name, proxy);
 
   auto& scripting = _registry.ctx().get<::scripting>();
   scripting.wire(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));

@@ -111,28 +111,28 @@ cassette::cassette() {
     std::string key_str{key};
 
     if (type == TYPE_NULL) {
-      _data.emplace(std::move(key_str), nullptr);
+      _data.try_emplace(std::move(key_str), nullptr);
     } else if (type == TYPE_BOOL) {
-      _data.emplace(std::move(key_str), value == "1");
+      _data.try_emplace(std::move(key_str), value == "1");
     } else if (type == TYPE_INT64) {
       int64_t v{};
       auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
       if (ec == std::errc{}) {
-        _data.emplace(std::move(key_str), v);
+        _data.try_emplace(std::move(key_str), v);
       }
     } else if (type == TYPE_UINT64) {
       uint64_t v{};
       auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v);
       if (ec == std::errc{}) {
-        _data.emplace(std::move(key_str), v);
+        _data.try_emplace(std::move(key_str), v);
       }
     } else if (type == TYPE_DOUBLE) {
       try {
-        _data.emplace(std::move(key_str), std::stod(std::string(value)));
+        _data.try_emplace(std::move(key_str), std::stod(std::string(value)));
       } catch (...) {
       }
     } else if (type == TYPE_STRING) {
-      _data.emplace(std::move(key_str), decode_string(value));
+      _data.try_emplace(std::move(key_str), decode_string(value));
     }
   }
 }
