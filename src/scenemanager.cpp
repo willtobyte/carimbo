@@ -26,7 +26,8 @@ std::string_view scenemanager::current() const {
 }
 
 void scenemanager::set(std::string_view name) {
-  _pending = name;
+  const auto it = _scene_mapping.find(name);
+  _pending = it != _scene_mapping.end() ? it->second : nullptr;
 }
 
 std::vector<std::string_view> scenemanager::query(std::string_view name) const {
@@ -62,24 +63,18 @@ std::vector<std::string_view> scenemanager::destroy(std::string_view name) {
 }
 
 void scenemanager::update(float delta) {
-  if (!_pending.empty()) [[unlikely]] {
-    const auto it = _scene_mapping.find(_pending);
-
-    if (it != _scene_mapping.end() && _current != _pending) [[unlikely]] {
-      if (_scene) [[likely]] {
-        std::println("[scenemanager] left {}", _scene->name());
-        _scene->on_leave();
-      }
-
-      _scene = it->second;
-      _current = _pending;
-
-      std::println("[scenemanager] entered {}", std::string_view{_current});
-
-      _scene->on_enter();
+  if (_pending) [[unlikely]] {
+    if (_scene) [[likely]] {
+      std::println("[scenemanager] left {}", _scene->name());
+      _scene->on_leave();
     }
 
-    _pending.clear();
+    _scene = std::exchange(_pending, nullptr);
+    _current = _scene->name();
+
+    std::println("[scenemanager] entered {}", std::string_view{_current});
+
+    _scene->on_enter();
   }
 
   _scene->update(delta);

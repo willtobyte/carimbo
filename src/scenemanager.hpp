@@ -42,6 +42,6 @@ private:
   sol::environment _environment;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::shared_ptr<::scene> _scene;
+  std::shared_ptr<::scene> _pending;
   boost::static_string<32> _current;
-  boost::static_string<32> _pending;
 };
