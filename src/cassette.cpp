@@ -24,21 +24,24 @@ void encode_string_to(std::string_view str, std::string& out) {
 }
 
 std::string decode_string(std::string_view str) {
-  std::string result;
-  result.reserve(str.size());
-  for (std::size_t i = 0; i < str.size(); ++i) {
-    if (str[i] == '\\' && i + 1 < str.size()) {
-      switch (str[i + 1]) {
-        case 'n':  result += '\n'; ++i; break;
-        case 'r':  result += '\r'; ++i; break;
-        case '\\': result += '\\'; ++i; break;
-        default:   result += str[i];    break;
-      }
-    } else {
-      result += str[i];
-    }
+  if (str.find('\\') == std::string_view::npos) [[likely]] {
+    return std::string(str);
   }
 
+  std::string result;
+  result.reserve(str.size());
+  for (std::size_t index = 0; index < str.size(); ++index) {
+    if (str[index] == '\\' && index + 1 < str.size()) {
+      switch (str[index + 1]) {
+        case 'n':  result += '\n'; ++index; break;
+        case 'r':  result += '\r'; ++index; break;
+        case '\\': result += '\\'; ++index; break;
+        default:   result += str[index];    break;
+      }
+    } else {
+      result += str[index];
+    }
+  }
   return result;
 }
 
