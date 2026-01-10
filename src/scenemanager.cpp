@@ -29,10 +29,11 @@ void scenemanager::set(std::string_view name) {
   _pending = name;
 }
 
-boost::container::small_vector<std::string, 8> scenemanager::query(std::string_view name) const {
-  boost::container::small_vector<std::string, 8> result;
-  const bool all = name.size() == 1 && name.front() == '*';
+std::vector<std::string_view> scenemanager::query(std::string_view name) const {
+  std::vector<std::string_view> result;
+  const auto all = name.size() == 1 && name.front() == '*';
   if (all) {
+    result.reserve(_scene_mapping.size());
     for (const auto& [key, _] : _scene_mapping) {
       if (key == _current) continue;
       result.emplace_back(key);
@@ -41,17 +42,17 @@ boost::container::small_vector<std::string, 8> scenemanager::query(std::string_v
     return result;
   }
 
-  if (_scene_mapping.contains(name)) {
-    result.emplace_back(name);
+  if (const auto it = _scene_mapping.find(name); it != _scene_mapping.end()) {
+    result.emplace_back(it->first);
   }
 
   return result;
 }
 
-boost::container::small_vector<std::string, 8> scenemanager::destroy(std::string_view name) {
+std::vector<std::string_view> scenemanager::destroy(std::string_view name) {
   const auto scenes = query(name);
 
-  for (const auto& scene : scenes) {
+  for (const auto scene : scenes) {
     if (_scene_mapping.erase(scene) > 0) {
       std::println("[scenemanager] destroyed {}", scene);
     }

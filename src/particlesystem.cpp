@@ -121,6 +121,10 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   const auto batch = std::make_shared<particlebatch>();
   batch->props = std::move(props);
   batch->pixmap = it->second.pixmap;
+  batch->particles.reserve(count);
+  batch->vertices.reserve(count * 4);
+  batch->indices.reserve(count * 6);
+  batch->respawn.reserve(count);
   batch->particles.resize(count);
   batch->vertices.resize(count * 4);
   batch->indices.resize(count * 6);

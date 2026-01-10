@@ -15,9 +15,9 @@ public:
 
   void set(std::string_view name);
 
-  boost::container::small_vector<std::string, 8> query(std::string_view name) const;
+  std::vector<std::string_view> query(std::string_view name) const;
 
-  boost::container::small_vector<std::string, 8> destroy(std::string_view name);
+  std::vector<std::string_view> destroy(std::string_view name);
 
   void update(float delta);
 

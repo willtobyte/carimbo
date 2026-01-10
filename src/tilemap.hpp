@@ -12,7 +12,9 @@ struct alignas(64) grid final {
 
   grid(unmarshal::json node) noexcept
       : collider(node["collider"].get(false)) {
-    node["tiles"].foreach([this](unmarshal::json tile) {
+    const auto tilesnode = node["tiles"];
+    tiles.reserve(tilesnode.size());
+    tilesnode.foreach([this](unmarshal::json tile) {
       tiles.emplace_back(tile.get<uint32_t>());
     });
   }

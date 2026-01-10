@@ -49,7 +49,17 @@ struct particles final {
   std::vector<uint8_t> alpha;
   size_t count{0};
 
+  void reserve(size_t n) {
+    x.reserve(n); y.reserve(n);
+    vx.reserve(n); vy.reserve(n);
+    gx.reserve(n); gy.reserve(n);
+    life.reserve(n); scale.reserve(n);
+    angle.reserve(n); av.reserve(n); af.reserve(n);
+    alpha.reserve(n);
+  }
+
   void resize(size_t n) {
+    if (x.capacity() < n) reserve(n);
     count = n;
     x.resize(n); y.resize(n);
     vx.resize(n); vy.resize(n);

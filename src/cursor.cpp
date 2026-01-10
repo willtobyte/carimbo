@@ -25,7 +25,9 @@ cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
       const auto oneshot = node["oneshot"].get(false);
 
       boost::container::small_vector<keyframe, 16> frames;
-      node["frames"].foreach([&frames](unmarshal::json node) {
+      const auto fnode = node["frames"];
+      frames.reserve(fnode.size());
+      fnode.foreach([&frames](unmarshal::json node) {
         frames.emplace_back(std::move(node));
       });
 

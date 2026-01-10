@@ -291,15 +291,19 @@ void scriptengine::run() {
       const auto value = obs.value();
       return (value.valid() ? value.as<double>() : 0.0) < rhs;
     },
-    sol::meta_function::to_string, [](const observable& obs) {
+    sol::meta_function::to_string, [](const observable& obs) -> std::string {
+      static constexpr std::string_view nil_str = "nil";
+      static constexpr std::string_view true_str = "true";
+      static constexpr std::string_view false_str = "false";
+      static constexpr std::string_view observable_str = "observable";
       const auto value = obs.value();
-      if (!value.valid()) return std::string("nil");
+      if (!value.valid()) return std::string{nil_str};
       switch (value.get_type()) {
         case sol::type::number: return std::to_string(value.as<double>());
         case sol::type::string: return value.as<std::string>();
-        case sol::type::boolean: return std::string(value.as<bool>() ? "true" : "false");
-        case sol::type::lua_nil: return std::string("nil");
-        default: return std::string("observable");
+        case sol::type::boolean: return std::string{value.as<bool>() ? true_str : false_str};
+        case sol::type::lua_nil: return std::string{nil_str};
+        default: return std::string{observable_str};
       }
     }
   );

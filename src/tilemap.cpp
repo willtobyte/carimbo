@@ -11,7 +11,9 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
   _width = json["width"].get<int32_t>();
   _height = json["height"].get<int32_t>();
 
-  json["layers"].foreach([this](unmarshal::json node) {
+  const auto layers = json["layers"];
+  _grids.reserve(layers.size());
+  layers.foreach([this](unmarshal::json node) {
     _grids.emplace_back(std::move(node));
   });
 

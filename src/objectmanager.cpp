@@ -54,6 +54,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
         }
 
         if (auto frames = node["frames"]) {
+          tl.frames.reserve(frames.size());
           frames.foreach([&tl](unmarshal::json f) {
             tl.frames.emplace_back(std::move(f));
           });
