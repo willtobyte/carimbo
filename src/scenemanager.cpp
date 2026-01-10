@@ -69,7 +69,7 @@ void scenemanager::update(float delta) {
       _scene->on_leave();
     }
 
-    _scene = std::exchange(_pending, nullptr);
+    _scene = std::move(_pending);
     _current = _scene->name();
 
     std::println("[scenemanager] entered {}", std::string_view{_current});
