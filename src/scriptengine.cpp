@@ -585,7 +585,37 @@ void scriptengine::run() {
     "Vec2",
     sol::constructors<vec2(), vec2(float, float)>(),
     "x", &vec2::x,
-    "y", &vec2::y
+    "y", &vec2::y,
+    "zero", &vec2::zero,
+    "one", &vec2::one,
+    "up", &vec2::up,
+    "down", &vec2::down,
+    "left", &vec2::left,
+    "right", &vec2::right,
+    "lerp", sol::resolve<vec2(vec2 const&, vec2 const&, float)>(&lerp),
+    "dot", sol::resolve<float(vec2 const&, vec2 const&)>(&dot),
+    "cross", sol::resolve<float(vec2 const&, vec2 const&)>(&cross),
+    "length", sol::resolve<float(vec2 const&)>(&length),
+    "length_squared", sol::resolve<float(vec2 const&)>(&length_squared),
+    "distance", sol::resolve<float(vec2 const&, vec2 const&)>(&distance),
+    "distance_squared", sol::resolve<float(vec2 const&, vec2 const&)>(&distance_squared),
+    "normalize", sol::resolve<vec2(vec2 const&)>(&normalize),
+    "angle", sol::resolve<float(vec2 const&)>(&angle),
+    "angle_between", sol::resolve<float(vec2 const&, vec2 const&)>(&angle_between),
+    "rotate", sol::resolve<vec2(vec2 const&, float)>(&rotate),
+    "perpendicular", sol::resolve<vec2(vec2 const&)>(&perpendicular),
+    "reflect", sol::resolve<vec2(vec2 const&, vec2 const&)>(&reflect),
+    "project", sol::resolve<vec2(vec2 const&, vec2 const&)>(&project),
+    "clamp", sol::resolve<vec2(vec2 const&, vec2 const&, vec2 const&)>(&clamp),
+    sol::meta_function::addition, sol::resolve<vec2(vec2 const&, vec2 const&)>(&operator+),
+    sol::meta_function::subtraction, sol::resolve<vec2(vec2 const&, vec2 const&)>(&operator-),
+    sol::meta_function::multiplication, sol::overload(
+      sol::resolve<vec2(vec2 const&, float)>(&operator*),
+      sol::resolve<vec2(vec2 const&, vec2 const&)>(&operator*)
+    ),
+    sol::meta_function::division, sol::resolve<vec2(vec2 const&, float)>(&operator/),
+    sol::meta_function::equal_to, sol::resolve<bool(vec2 const&, vec2 const&)>(&operator==),
+    sol::meta_function::unary_minus, sol::resolve<vec2(vec2 const&)>(&operator-)
   );
 
   lua.new_usertype<vec3>(

@@ -36,6 +36,13 @@ struct alignas(8) vec2 {
 
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
+
+  [[nodiscard]] static constexpr vec2 zero() noexcept { return {0.0f, 0.0f}; }
+  [[nodiscard]] static constexpr vec2 one() noexcept { return {1.0f, 1.0f}; }
+  [[nodiscard]] static constexpr vec2 up() noexcept { return {0.0f, -1.0f}; }
+  [[nodiscard]] static constexpr vec2 down() noexcept { return {0.0f, 1.0f}; }
+  [[nodiscard]] static constexpr vec2 left() noexcept { return {-1.0f, 0.0f}; }
+  [[nodiscard]] static constexpr vec2 right() noexcept { return {1.0f, 0.0f}; }
 };
 
 static_assert(sizeof(vec2) == 8);
