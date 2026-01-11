@@ -220,8 +220,12 @@ void particlesystem::update(float delta) {
 
       for (size_t j = 0; j < count; ++j) {
         const auto i = respawn[j];
-        xs[i] = px + props->randxspawn();
-        ys[i] = py + props->randyspawn();
+        const auto radius = props->randradius();
+        const auto spawnangle = props->randangle();
+        float sa, ca;
+        sincos(spawnangle, sa, ca);
+        xs[i] = px + props->randxspawn() + radius * ca;
+        ys[i] = py + props->randyspawn() + radius * sa;
         vxs[i] = props->randxvel();
         vys[i] = props->randyvel();
         gxs[i] = props->randgx();
@@ -231,7 +235,7 @@ void particlesystem::update(float delta) {
         lifes[i] = props->randlife();
         alphas[i] = props->randalpha();
         scales[i] = props->randscale();
-        angles[i] = props->randangle();
+        angles[i] = spawnangle;
       }
     }
 

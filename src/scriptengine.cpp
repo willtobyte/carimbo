@@ -132,9 +132,9 @@ void scriptengine::run() {
   };
 
   lua["math"]["random"] = sol::overload(
-    []() noexcept { return rng::engine().uniform(); },
-    [](lua_Integer upper) noexcept { return rng::engine().range<lua_Integer>(1, upper); },
-    [](lua_Integer low, lua_Integer high) noexcept { return rng::engine().range<lua_Integer>(low, high); }
+    []() noexcept { return rng::global().uniform(); },
+    [](lua_Integer upper) noexcept { return rng::global().range<lua_Integer>(1, upper); },
+    [](lua_Integer low, lua_Integer high) noexcept { return rng::global().range<lua_Integer>(low, high); }
   );
 
   lua["math"]["randomseed"] = [](lua_Integer seed) noexcept { rng::seed(static_cast<uint64_t>(seed)); };

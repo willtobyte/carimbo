@@ -106,6 +106,6 @@ struct uniform_int final {
   [[nodiscard]] constexpr T max() const noexcept { return b; }
 };
 
-xorshift128plus& engine() noexcept;
+xorshift128plus& global() noexcept;
 void seed(uint64_t value) noexcept;
 }

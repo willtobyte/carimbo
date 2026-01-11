@@ -20,25 +20,24 @@ struct particleprops final {
   float x, y;
   float hw, hh;
   bool spawning;
-  rng::xorshift128plus rng{rng::engine()()};
   rng::uniform_real<float> xspawnd, yspawnd, radiusd, angled;
   rng::uniform_real<float> xveld, yveld, gxd, gyd;
   rng::uniform_real<float> scaled, lifed, rotforced, rotveld;
   rng::uniform_int<unsigned int> alphad;
 
-  float randradius() noexcept { return radiusd(rng); }
-  float randangle() noexcept { return angled(rng); }
-  float randxspawn() noexcept { return xspawnd(rng); }
-  float randyspawn() noexcept { return yspawnd(rng); }
-  float randxvel() noexcept { return xveld(rng); }
-  float randyvel() noexcept { return yveld(rng); }
-  float randgx() noexcept { return gxd(rng); }
-  float randgy() noexcept { return gyd(rng); }
-  float randscale() noexcept { return scaled(rng); }
-  float randlife() noexcept { return lifed(rng); }
-  uint8_t randalpha() noexcept { return static_cast<uint8_t>(alphad(rng)); }
-  float randrotforce() noexcept { return rotforced(rng); }
-  float randrotvel() noexcept { return rotveld(rng); }
+  float randradius() noexcept { return radiusd(rng::global()); }
+  float randangle() noexcept { return angled(rng::global()); }
+  float randxspawn() noexcept { return xspawnd(rng::global()); }
+  float randyspawn() noexcept { return yspawnd(rng::global()); }
+  float randxvel() noexcept { return xveld(rng::global()); }
+  float randyvel() noexcept { return yveld(rng::global()); }
+  float randgx() noexcept { return gxd(rng::global()); }
+  float randgy() noexcept { return gyd(rng::global()); }
+  float randscale() noexcept { return scaled(rng::global()); }
+  float randlife() noexcept { return lifed(rng::global()); }
+  uint8_t randalpha() noexcept { return static_cast<uint8_t>(alphad(rng::global())); }
+  float randrotforce() noexcept { return rotforced(rng::global()); }
+  float randrotvel() noexcept { return rotveld(rng::global()); }
 
   void set_position(float xv, float yv) noexcept { x = xv; y = yv; }
 };

@@ -14,7 +14,7 @@ random _random{};
 }
 
 namespace rng {
-xorshift128plus& engine() noexcept {
+xorshift128plus& global() noexcept {
   return _random.generator;
 }
 
