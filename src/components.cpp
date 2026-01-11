@@ -23,7 +23,9 @@ symbol interning::intern(std::string_view value) {
 }
 
 std::string_view interning::lookup(symbol id) const noexcept {
-  return _symbols.find(id)->second;
+  const auto it = _symbols.find(id);
+  assert(it != _symbols.end() && "symbol not found in interning table");
+  return it->second;
 }
 
 void scripting::wire(entt::entity entity, sol::environment& parent,

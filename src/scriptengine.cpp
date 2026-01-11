@@ -321,15 +321,17 @@ void scriptengine::run() {
     sol::no_constructor,
     "players", sol::property(&statemanager::players),
     "player", [](statemanager& self, event::player player) {
-      static std::array<playerwrapper, 4> _p{
-        playerwrapper{0, &self},
-        playerwrapper{1, &self},
-        playerwrapper{2, &self},
-        playerwrapper{3, &self}
+      static std::array<playerwrapper, 4> _players{
+        playerwrapper{0, nullptr},
+        playerwrapper{1, nullptr},
+        playerwrapper{2, nullptr},
+        playerwrapper{3, nullptr}
       };
 
-      assert(static_cast<uint8_t>(player) < _p.size() && "invalid player index");
-      return _p[static_cast<uint8_t>(player)];
+      const auto index = static_cast<uint8_t>(player);
+      assert(index < _players.size() && "player index out of bounds");
+      _players[index].e = &self;
+      return _players[index];
     }
   );
 
