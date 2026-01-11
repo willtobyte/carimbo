@@ -295,11 +295,18 @@ void scriptengine::run() {
 
   struct playerwrapper {
     uint8_t index;
-    const statemanager* e;
+    const statemanager* manager;
 
-    bool on(event::gamepad::button type) noexcept {
-      return e->on(index, type);
+    bool on(event::gamepad::button type) const noexcept {
+      return manager->on(index, type);
     }
+  };
+
+  static std::array<playerwrapper, 4> players{
+    playerwrapper{0, nullptr},
+    playerwrapper{1, nullptr},
+    playerwrapper{2, nullptr},
+    playerwrapper{3, nullptr}
   };
 
   lua.new_usertype<playerwrapper>(
@@ -320,18 +327,10 @@ void scriptengine::run() {
     "StateManager",
     sol::no_constructor,
     "players", sol::property(&statemanager::players),
-    "player", [](statemanager& self, event::player player) {
-      static std::array<playerwrapper, 4> _players{
-        playerwrapper{0, nullptr},
-        playerwrapper{1, nullptr},
-        playerwrapper{2, nullptr},
-        playerwrapper{3, nullptr}
-      };
-
+    "player", [](statemanager& self, event::player player) noexcept {
       const auto index = static_cast<uint8_t>(player);
-      assert(index < _players.size() && "player index out of bounds");
-      _players[index].e = &self;
-      return _players[index];
+      players[index].manager = &self;
+      return sol::light<playerwrapper>(&players[index]);
     }
   );
 
