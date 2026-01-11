@@ -30,8 +30,8 @@ void scenemanager::set(std::string_view name) {
   _pending = it != _scene_mapping.end() ? it->second : nullptr;
 }
 
-std::vector<std::string_view> scenemanager::query(std::string_view name) const {
-  std::vector<std::string_view> result;
+std::vector<std::string> scenemanager::query(std::string_view name) const {
+  std::vector<std::string> result;
   const auto all = name.size() == 1 && name.front() == '*';
   if (all) {
     result.reserve(_scene_mapping.size());
@@ -50,10 +50,10 @@ std::vector<std::string_view> scenemanager::query(std::string_view name) const {
   return result;
 }
 
-std::vector<std::string_view> scenemanager::destroy(std::string_view name) {
+std::vector<std::string> scenemanager::destroy(std::string_view name) {
   const auto scenes = query(name);
 
-  for (const auto scene : scenes) {
+  for (const auto& scene : scenes) {
     if (_scene_mapping.erase(scene) > 0) {
       std::println("[scenemanager] destroyed {}", scene);
     }
