@@ -76,6 +76,7 @@ void physicssystem::update(b2WorldId world, float delta) {
   }
 
   const auto events = b2World_GetSensorEvents(world);
+  const auto& interning = _registry.ctx().get<::interning>();
 
   for (int i = 0; i < events.beginCount; ++i) {
     const auto& event = events.beginEvents[i];
@@ -88,7 +89,7 @@ void physicssystem::update(b2WorldId world, float delta) {
     const auto* m = _registry.try_get<metadata>(visitor);
 
     if (c && m) [[likely]] {
-      c->on_collision(static_cast<uint64_t>(visitor), m->kind);
+      c->on_collision(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
     }
   }
 
@@ -103,7 +104,7 @@ void physicssystem::update(b2WorldId world, float delta) {
     const auto* m = _registry.try_get<metadata>(visitor);
 
     if (c && m) [[likely]] {
-      c->on_collision_end(static_cast<uint64_t>(visitor), m->kind);
+      c->on_collision_end(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
     }
   }
 
@@ -183,5 +184,12 @@ void rendersystem::draw() const noexcept {
 void scriptsystem::update(float delta) {
   _view.each([delta](scriptable& sc) {
     sc.on_loop(delta);
+  });
+}
+
+void velocitysystem::update(float delta) {
+  _view.each([delta](transform& t, const velocity& v) {
+    t.position.x += v.value.x * delta;
+    t.position.y += v.value.y * delta;
   });
 }

@@ -92,6 +92,7 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
     .timeline = nullptr
   });
   _registry.emplace<orientation>(entity);
+  _registry.emplace<velocity>(entity);
   _registry.emplace<rigidbody>(entity);
   _registry.emplace<renderable>(entity, renderable{.z = z});
 

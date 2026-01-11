@@ -125,7 +125,7 @@ void scriptengine::run() {
   lua.script(inject);
 
   lua.new_usertype<sentinel>(
-    "Sentinel",
+    "sentinel",
     sol::no_constructor
   );
 
@@ -332,10 +332,10 @@ void scriptengine::run() {
     "StateManager",
     sol::no_constructor,
     "players", sol::property(&statemanager::players),
-    "player", [](statemanager& self, event::player player) noexcept {
+    "player", [](statemanager& self, event::player player) noexcept -> playerwrapper& {
       const auto index = static_cast<uint8_t>(player);
       players[index].manager = &self;
-      return sol::light<playerwrapper>(&players[index]);
+      return players[index];
     }
   );
 
@@ -359,6 +359,14 @@ void scriptengine::run() {
         const auto x = table.get_or("x", table.get_or(1, .0f));
         const auto y = table.get_or("y", table.get_or(2, .0f));
         self.set_position({x, y});
+      }
+    ),
+    "velocity", sol::property(
+      &objectproxy::velocity,
+      [](objectproxy& self, sol::table table) {
+        const auto x = table.get_or("x", table.get_or(1, .0f));
+        const auto y = table.get_or("y", table.get_or(2, .0f));
+        self.set_velocity({x, y});
       }
     ),
     "on_hover", &objectproxy::set_onhover,

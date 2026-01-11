@@ -67,6 +67,7 @@ private:
   physicssystem _physicssystem{_registry};
   rendersystem _rendersystem{_registry};
   scriptsystem _scriptsystem{_registry};
+  velocitysystem _velocitysystem{_registry};
 
   std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 

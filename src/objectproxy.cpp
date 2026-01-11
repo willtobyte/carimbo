@@ -41,6 +41,16 @@ void objectproxy::set_position(const vec2& position) noexcept {
   t.position = position;
 }
 
+vec2 objectproxy::velocity() const noexcept {
+  const auto& v = _registry.get<::velocity>(_entity);
+  return v.value;
+}
+
+void objectproxy::set_velocity(const vec2& vel) noexcept {
+  auto& v = _registry.get<::velocity>(_entity);
+  v.value = vel;
+}
+
 uint8_t objectproxy::alpha() const noexcept {
   const auto& t = _registry.get<tint>(_entity);
   return t.a;
@@ -242,6 +252,7 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   }
 
   _registry.emplace<rigidbody>(entity);
+  _registry.emplace<struct velocity>(entity);
 
   if (rn) {
     renderable copy = *rn;

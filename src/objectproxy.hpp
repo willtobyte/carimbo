@@ -24,6 +24,9 @@ public:
   [[nodiscard]] vec2 position() const noexcept;
   void set_position(const vec2& position) noexcept;
 
+  [[nodiscard]] vec2 velocity() const noexcept;
+  void set_velocity(const vec2& velocity) noexcept;
+
   [[nodiscard]] uint8_t alpha() const noexcept;
   void set_alpha(uint8_t value) noexcept;
   [[nodiscard]] double angle() const noexcept;

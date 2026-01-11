@@ -55,3 +55,16 @@ private:
 
   view_type _view;
 };
+
+class velocitysystem final {
+public:
+  explicit velocitysystem(entt::registry& registry) noexcept
+    : _view(registry.view<transform, velocity>()) {}
+
+  void update(float delta);
+
+private:
+  using view_type = decltype(std::declval<entt::registry&>().view<transform, velocity>());
+
+  view_type _view;
+};

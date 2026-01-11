@@ -119,6 +119,8 @@ void scene::update(float delta) {
 
   _particlesystem.update(delta);
 
+  _velocitysystem.update(delta);
+
   _scriptsystem.update(delta);
 
   _onloop(delta);

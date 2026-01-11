@@ -46,6 +46,10 @@ struct transform final {
 	float scale;
 };
 
+struct velocity final {
+  vec2 value{0, 0};
+};
+
 struct tint final {
   uint8_t r{0};
   uint8_t g{0};
