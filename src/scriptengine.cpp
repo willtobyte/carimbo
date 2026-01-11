@@ -124,6 +124,11 @@ void scriptengine::run() {
 
   lua.script(inject);
 
+  lua.new_usertype<sentinel>(
+    "Sentinel",
+    sol::no_constructor
+  );
+
   lua["sentinel"] = [&lua](sol::object object, sol::object name) {
     auto instance = sol::make_object<sentinel>(lua, name.as<std::string>());
     object.as<sol::table>().raw_set("__sentinel", instance);
