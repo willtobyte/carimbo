@@ -5,12 +5,12 @@
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment)
-    : _name(name),
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, sol::environment& environment)
+    : _renderer(std::move(scenemanager->renderer())),
+      _name(name),
       _soundmanager(name),
-      _particlesystem(scenemanager->renderer()),
-      _objectmanager(_registry, scenemanager->renderer(), name, environment) {
-  _renderer = scenemanager->renderer();
+      _particlesystem(_renderer),
+      _objectmanager(_registry, _renderer, name, environment) {
 
   _hits.reserve(64);
   _registry.ctx().emplace<interning>();
@@ -67,7 +67,7 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scen
       }
     }
 
-    if (type == "background") {
+    else {
       _layer = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/background.png", name));
 
       const auto width = node["width"].get<float>();

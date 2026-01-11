@@ -17,7 +17,7 @@ class scene final {
 }
 
 public:
-  scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, sol::environment environment);
+  scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, sol::environment& environment);
 
   ~scene() noexcept;
 
@@ -25,7 +25,7 @@ public:
 
   void draw() const noexcept;
 
-  std::string_view name() const noexcept { return _name; }
+  [[nodiscard]] std::string_view name() const noexcept { return _name; }
 
   void populate(sol::table& pool) const;
 
@@ -50,9 +50,7 @@ public:
   void on_tick(uint8_t tick);
 
 private:
-  std::string _name;
-
-  void query(const float x, const float y, entt::dense_set<entt::entity>& out) const {
+  void query(float x, float y, entt::dense_set<entt::entity>& out) const {
     auto aabb = b2AABB{};
     aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
     aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
@@ -60,36 +58,35 @@ private:
     b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
+  entt::registry _registry;
+  b2WorldId _world{};
+  quad _camera{};
   std::shared_ptr<renderer> _renderer;
 
-  entt::registry _registry;
-
   animationsystem _animationsystem{_registry};
+  physicssystem _physicssystem{_registry};
   rendersystem _rendersystem{_registry};
   scriptsystem _scriptsystem{_registry};
 
-  b2WorldId _world{};
-  physicssystem _physicssystem{_registry};
-
-  soundmanager _soundmanager;
-  particlesystem _particlesystem;
-  objectmanager _objectmanager;
-
   std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 
-  std::function<void()> _onenter;
-  std::function<void()> _onleave;
   functor _onloop;
+  functor _oncamera;
+
   functor _ontouch;
+  functor _onmotion;
   functor _onkeypress;
   functor _onkeyrelease;
   functor _ontext;
-  functor _onmotion;
-  functor _oncamera;
   functor _ontick;
+  std::function<void()> _onenter;
+  std::function<void()> _onleave;
 
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
-  quad _camera{};
+  std::string _name;
+  soundmanager _soundmanager;
+  particlesystem _particlesystem;
+  objectmanager _objectmanager;
 };
