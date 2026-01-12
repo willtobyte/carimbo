@@ -103,11 +103,11 @@ std::string_view objectproxy::action() const noexcept {
 
 void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
-  auto& s = _registry.get<playback>(_entity);
+  auto [s, at] = _registry.get<playback, std::shared_ptr<const atlas>>(_entity);
   s.action = interning.intern(value);
   s.current_frame = 0;
-  s.dirty = true;
-  s.timeline = nullptr;
+  s.dirty = false;
+  s.timeline = at->find(s.action);
 }
 
 std::string_view objectproxy::kind() const noexcept {
