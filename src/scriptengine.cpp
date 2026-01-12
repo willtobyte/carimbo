@@ -855,9 +855,9 @@ void scriptengine::run() {
       ptr.reset();
 
       auto count = 0;
-      const auto pads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
-      if (pads && index < count) [[likely]] {
-        ptr.reset(SDL_OpenGamepad(pads[static_cast<size_t>(index)]));
+      const auto gamepads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
+      if (gamepads && index < count) [[likely]] {
+        ptr.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(index)]));
       }
 
       return ptr != nullptr;
