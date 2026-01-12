@@ -4,9 +4,6 @@
 #include "eventreceiver.hpp"
 #include "renderer.hpp"
 
-#include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_keycode.h>
-
 eventmanager::eventmanager(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)) {
   _joystickmapping.reserve(8);

@@ -3,13 +3,6 @@
 #include "common.hpp"
 
 namespace event {
-enum player : uint8_t {
-  one = 0,
-  two,
-  three,
-  four
-};
-
 namespace keyboard {
 enum key : int32_t {
   up = SDLK_UP,

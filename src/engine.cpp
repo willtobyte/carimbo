@@ -6,7 +6,6 @@
 #include "loopable.hpp"
 #include "renderer.hpp"
 #include "scenemanager.hpp"
-#include "statemanager.hpp"
 #include "window.hpp"
 
 std::shared_ptr<audiodevice> engine::audiodevice() const noexcept {
@@ -19,10 +18,6 @@ std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
 
 std::shared_ptr<scenemanager> engine::scenemanager() const noexcept {
   return _scenemanager;
-}
-
-std::shared_ptr<statemanager> engine::statemanager() const noexcept {
-  return _statemanager;
 }
 
 std::shared_ptr<window> engine::window() const noexcept {
@@ -51,12 +46,6 @@ void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {
 
 void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept {
   _scenemanager = std::move(ptr);
-}
-
-void engine::set_statemanager(std::shared_ptr<::statemanager> ptr) noexcept {
-  _statemanager = std::move(ptr);
-
-  _observers.emplace_back(_statemanager);
 }
 
 void engine::set_window(std::shared_ptr<::window> ptr) noexcept {

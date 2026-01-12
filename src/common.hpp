@@ -101,7 +101,6 @@ class scenebackdrop;
 class scenemanager;
 class scriptengine;
 class soundfx;
-class statemanager;
 class tilemap;
 class widget;
 class window;

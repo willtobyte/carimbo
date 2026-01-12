@@ -230,18 +230,6 @@ void scriptengine::run() {
   );
 
   lua.new_enum(
-    "Controller",
-    "up", event::gamepad::button::up,
-    "down", event::gamepad::button::down,
-    "left", event::gamepad::button::left,
-    "right", event::gamepad::button::right,
-    "north", event::gamepad::button::north,
-    "east", event::gamepad::button::east,
-    "south", event::gamepad::button::south,
-    "west", event::gamepad::button::west
-  );
-
-  lua.new_enum(
     "Flip",
     "none", flip::none,
     "horizontal", flip::horizontal,
@@ -298,45 +286,12 @@ void scriptengine::run() {
     }
   );
 
-  struct playerwrapper {
-    uint8_t index;
-    const statemanager* manager;
-
-    bool on(event::gamepad::button type) const noexcept {
-      return manager->on(index, type);
-    }
-  };
-
-  static std::array<playerwrapper, 4> players{
-    playerwrapper{0, nullptr},
-    playerwrapper{1, nullptr},
-    playerwrapper{2, nullptr},
-    playerwrapper{3, nullptr}
-  };
-
-  lua.new_usertype<playerwrapper>(
-    "PlayerWrapper",
-    sol::no_constructor,
-    "on", &playerwrapper::on
-  );
-
   lua.new_enum(
     "Player",
-    "one", event::player::one,
-    "two", event::player::two,
-    "three", event::player::three,
-    "four", event::player::four
-  );
-
-  lua.new_usertype<statemanager>(
-    "StateManager",
-    sol::no_constructor,
-    "players", sol::property(&statemanager::players),
-    "player", [](statemanager& self, event::player player) noexcept -> playerwrapper& {
-      const auto index = static_cast<uint8_t>(player);
-      players[index].manager = &self;
-      return players[index];
-    }
+    "one", 0,
+    "two", 1,
+    "three", 2,
+    "four", 3
   );
 
   lua.new_usertype<objectproxy>(
@@ -581,7 +536,6 @@ void scriptengine::run() {
 
       lua["overlay"] = ptr->overlay();
       lua["scenemanager"] = ptr->scenemanager();
-      lua["statemanager"] = ptr->statemanager();
       lua["canvas"] = ptr->canvas();
 
       auto viewport = lua.create_table();
@@ -888,6 +842,143 @@ void scriptengine::run() {
   );
 
   lua["keyboard"] = keyboard{};
+
+  struct gamepadslot final {
+    int index;
+    std::unique_ptr<SDL_Gamepad, SDL_Deleter> ptr{nullptr};
+
+    [[nodiscard]] bool open() noexcept {
+      if (ptr && SDL_GamepadConnected(ptr.get())) {
+        return true;
+      }
+
+      ptr.reset();
+
+      auto count = 0;
+      const auto pads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
+      if (pads && index < count) [[likely]] {
+        ptr.reset(SDL_OpenGamepad(pads[static_cast<size_t>(index)]));
+      }
+
+      return ptr != nullptr;
+    }
+
+    void close() noexcept {
+      ptr.reset();
+    }
+
+    [[nodiscard]] bool connected() noexcept {
+      return open();
+    }
+
+    [[nodiscard]] bool button(SDL_GamepadButton btn) noexcept {
+      if (open()) [[likely]] {
+        return SDL_GetGamepadButton(ptr.get(), btn);
+      }
+      return false;
+    }
+
+    [[nodiscard]] int16_t axis(SDL_GamepadAxis ax) noexcept {
+      if (open()) [[likely]] {
+        return SDL_GetGamepadAxis(ptr.get(), ax);
+      }
+      return 0;
+    }
+
+    [[nodiscard]] std::tuple<int16_t, int16_t> leftstick() noexcept {
+      if (open()) [[likely]] {
+        return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTY)};
+      }
+      return {0, 0};
+    }
+
+    [[nodiscard]] std::tuple<int16_t, int16_t> rightstick() noexcept {
+      if (open()) [[likely]] {
+        return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTY)};
+      }
+      return {0, 0};
+    }
+
+    [[nodiscard]] std::tuple<int16_t, int16_t> triggers() noexcept {
+      if (open()) [[likely]] {
+        return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)};
+      }
+      return {0, 0};
+    }
+
+    [[nodiscard]] std::optional<std::string> name() noexcept {
+      if (open()) [[likely]] {
+        if (const auto* n = SDL_GetGamepadName(ptr.get())) [[likely]] {
+          return std::string{n};
+        }
+      }
+      return std::nullopt;
+    }
+  };
+
+  static std::array<gamepadslot, 4> gamepadslots{gamepadslot{0}, gamepadslot{1}, gamepadslot{2}, gamepadslot{3}};
+
+  struct gamepads final {
+    [[nodiscard]] static int count() noexcept {
+      auto total = 0;
+      SDL_GetGamepads(&total);
+      return std::min(total, 4);
+    }
+  };
+
+  lua.new_enum(
+    "GamepadButton",
+    "a", SDL_GAMEPAD_BUTTON_SOUTH,
+    "b", SDL_GAMEPAD_BUTTON_EAST,
+    "x", SDL_GAMEPAD_BUTTON_WEST,
+    "y", SDL_GAMEPAD_BUTTON_NORTH,
+    "back", SDL_GAMEPAD_BUTTON_BACK,
+    "guide", SDL_GAMEPAD_BUTTON_GUIDE,
+    "start", SDL_GAMEPAD_BUTTON_START,
+    "leftstick", SDL_GAMEPAD_BUTTON_LEFT_STICK,
+    "rightstick", SDL_GAMEPAD_BUTTON_RIGHT_STICK,
+    "leftshoulder", SDL_GAMEPAD_BUTTON_LEFT_SHOULDER,
+    "rightshoulder", SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER,
+    "up", SDL_GAMEPAD_BUTTON_DPAD_UP,
+    "down", SDL_GAMEPAD_BUTTON_DPAD_DOWN,
+    "left", SDL_GAMEPAD_BUTTON_DPAD_LEFT,
+    "right", SDL_GAMEPAD_BUTTON_DPAD_RIGHT
+  );
+
+  lua.new_enum(
+    "GamepadAxis",
+    "leftx", SDL_GAMEPAD_AXIS_LEFTX,
+    "lefty", SDL_GAMEPAD_AXIS_LEFTY,
+    "rightx", SDL_GAMEPAD_AXIS_RIGHTX,
+    "righty", SDL_GAMEPAD_AXIS_RIGHTY,
+    "triggerleft", SDL_GAMEPAD_AXIS_LEFT_TRIGGER,
+    "triggerright", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER
+  );
+
+  lua.new_usertype<gamepadslot>(
+    "GamepadSlot",
+    sol::no_constructor,
+    "open", &gamepadslot::open,
+    "close", &gamepadslot::close,
+    "connected", sol::property(&gamepadslot::connected),
+    "button", &gamepadslot::button,
+    "axis", &gamepadslot::axis,
+    "leftstick", &gamepadslot::leftstick,
+    "rightstick", &gamepadslot::rightstick,
+    "triggers", &gamepadslot::triggers,
+    "name", sol::property(&gamepadslot::name)
+  );
+
+  lua.new_usertype<gamepads>(
+    "Gamepads",
+    sol::no_constructor,
+    "count", sol::property(&gamepads::count),
+    sol::meta_function::index, [](gamepads&, int slot) noexcept -> gamepadslot& {
+      return gamepadslots[static_cast<size_t>(std::clamp(slot, 0, 3))];
+    }
+  );
+
+  lua["gamepads"] = gamepads{};
 
   lua.new_usertype<label>(
     "Label",
