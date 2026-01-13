@@ -34,7 +34,7 @@ std::vector<uint8_t> io::read(std::string_view filename) {
 std::vector<std::string> io::enumerate(std::string_view directory) {
   std::unique_ptr<char*[], PHYSFS_Deleter> ptr(PHYSFS_enumerateFiles(directory.data()));
   assert(ptr != nullptr &&
-    std::format("error while enumerating directory: {}", directory).c_str());
+    std::format("[PHYSFS_enumerateFiles] error while enumerating directory: {}", directory).c_str());
 
   auto* const *data = ptr.get();
 
