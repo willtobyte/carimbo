@@ -129,12 +129,12 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
     SDL_FColor color{1.f, 1.f, 1.f, 1.f};
 
     if (const auto it = effects.find(i); it != effects.end()) {
-      const auto& p = it->second;
-      cx += p.xoffset;
-      cy += p.yoffset;
-      hw = bhw * p.scale;
-      hh = bhh * p.scale;
-      color = {p.r * inv, p.g * inv, p.b * inv, p.alpha * inv};
+      const auto& e = it->second;
+      cx += e.xoffset;
+      cy += e.yoffset;
+      hw = bhw * e.scale;
+      hh = bhh * e.scale;
+      color = {e.r * inv, e.g * inv, e.b * inv, e.alpha * inv};
     }
 
     const auto base = static_cast<int32_t>(_vertices.size());

@@ -16,6 +16,7 @@ std::shared_ptr<::font> overlay::preload(std::string_view resource) {
   if (inserted) {
     it->second = std::make_shared<::font>(_renderer, resource);
   }
+
   return it->second;
 }
 
