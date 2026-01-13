@@ -9,6 +9,8 @@ public:
   overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager);
   virtual ~overlay() noexcept = default;
 
+  std::shared_ptr<::font> preload(std::string_view font);
+
   std::shared_ptr<::label> label(std::string_view font);
   void label(std::shared_ptr<::label> instance);
 

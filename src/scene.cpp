@@ -1,11 +1,12 @@
 #include "scene.hpp"
 
 #include "components.hpp"
+#include "overlay.hpp"
 #include "geometry.hpp"
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, sol::environment& environment)
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, std::shared_ptr<::overlay> overlay, sol::environment& environment)
     : _renderer(std::move(scenemanager->renderer())),
       _name(name),
       _soundmanager(name),
@@ -29,6 +30,12 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scen
   if (auto effects = node["effects"]) {
     effects.foreach([this](unmarshal::json node) {
       _soundmanager.add(node.get<std::string_view>());
+    });
+  }
+
+  if (auto fonts = node["fonts"]) {
+    fonts.foreach([&overlay](unmarshal::json node) {
+      overlay->preload(node.get<std::string_view>());
     });
   }
 
