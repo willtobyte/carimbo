@@ -3,7 +3,7 @@
 #include "common.hpp"
 #include <boost/static_string/static_string.hpp>
 
-class scenemanager final : public eventreceiver, public std::enable_shared_from_this<scenemanager> {
+class scenemanager final : public eventreceiver {
 public:
   explicit scenemanager(std::shared_ptr<::renderer> renderer);
 
@@ -24,8 +24,6 @@ public:
   void draw() const;
 
   void on_tick(uint8_t tick);
-
-  std::shared_ptr<::renderer> renderer() const noexcept;
 
   void set_runtime(sol::state_view runtime);
 

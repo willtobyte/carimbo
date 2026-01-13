@@ -6,8 +6,8 @@
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::scenemanager> scenemanager, std::shared_ptr<::overlay> overlay, sol::environment& environment)
-    : _renderer(std::move(scenemanager->renderer())),
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::overlay> overlay, sol::environment& environment)
+    : _renderer(std::move(renderer)),
       _name(name),
       _soundmanager(name),
       _particlesystem(_renderer),
