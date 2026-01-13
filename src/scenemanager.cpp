@@ -85,42 +85,30 @@ void scenemanager::draw() const {
 }
 
 void scenemanager::on_tick(uint8_t tick) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_tick(tick);
-  }
+  _scene->on_tick(tick);
 }
 
 void scenemanager::on_key_press(const event::keyboard::key& event) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_key_press(static_cast<int32_t>(event));
-  }
+  _scene->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const event::keyboard::key& event) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_key_release(static_cast<int32_t>(event));
-  }
+  _scene->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(std::string_view text) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_text(text);
-  }
+  _scene->on_text(text);
 }
 
 void scenemanager::on_mouse_press(const event::mouse::button& event) {
 }
 
 void scenemanager::on_mouse_release(const event::mouse::button& event) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_touch(event.x, event.y);
-  }
+  _scene->on_touch(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
-  if (auto scene = _scene) [[likely]] {
-    scene->on_motion(event.x, event.y);
-  }
+  _scene->on_motion(event.x, event.y);
 }
 
 std::shared_ptr<::renderer> scenemanager::renderer() const noexcept {
