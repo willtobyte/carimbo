@@ -1,26 +1,24 @@
 #include "kv.hpp"
 
-sol::object observable::value() const {
+sol::object observable::value() const noexcept {
   return _value;
 }
 
 void observable::set(const sol::object& value) {
   _value = value;
-  for (const auto& subscriber : _subscribers) {
+  for (const auto& [_, subscriber] : _subscribers) {
     subscriber(value);
   }
 }
 
 uint32_t observable::subscribe(sol::protected_function callback) {
-  const auto id = static_cast<uint32_t>(_subscribers.size());
-  _subscribers.emplace_back(std::move(callback));
+  const auto id = _next_id++;
+  _subscribers.emplace(id, std::move(callback));
   return id;
 }
 
-void observable::unsubscribe(uint32_t id) {
-  if (id < _subscribers.size()) {
-    _subscribers[id] = nullptr;
-  }
+void observable::unsubscribe(uint32_t id) noexcept {
+  _subscribers.erase(id);
 }
 
 std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& fallback) {
