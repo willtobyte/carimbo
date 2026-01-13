@@ -4,15 +4,17 @@
 
 class observable final {
 public:
-  ~observable() = default;
-  sol::object value() const;
+  ~observable() noexcept = default;
+
+  [[nodiscard]] sol::object value() const noexcept;
   void set(const sol::object& value);
-  uint32_t subscribe(sol::protected_function callback);
-  void unsubscribe(uint32_t id);
+  [[nodiscard]] uint32_t subscribe(sol::protected_function callback);
+  void unsubscribe(uint32_t id) noexcept;
 
 private:
-  boost::container::small_vector<functor, 16> _subscribers;
+  boost::unordered_flat_map<uint32_t, functor> _subscribers;
   sol::object _value;
+  uint32_t _next_id{0};
 };
 
 class kv final {
