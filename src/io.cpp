@@ -11,11 +11,11 @@ std::vector<uint8_t> io::read(std::string_view filename) {
   );
 
   const auto length = PHYSFS_fileLength(ptr.get());
-  [[maybe_unused]] const auto* const error_msg = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+  [[maybe_unused]] const auto* const length_error = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
   assert(length >= 0 &&
     std::format("[PHYSFS_fileLength] invalid file length, file: {}, error: {}",
       filename,
-      error_msg).c_str());
+      length_error).c_str());
 
   const auto amount = static_cast<std::size_t>(length);
   std::vector<uint8_t> buffer(amount);
