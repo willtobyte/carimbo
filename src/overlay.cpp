@@ -12,13 +12,13 @@ overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanage
     : _renderer(std::move(renderer)), _eventmanager(std::move(eventmanager)) {}
 
 std::shared_ptr<::label> overlay::label(std::string_view resource) {
-  auto label = std::make_shared<::label>();
-
   auto [it, inserted] = _fonts.try_emplace(resource, nullptr);
 
   if (inserted) {
     it->second = std::make_shared<::font>(_renderer, resource);
   }
+
+  auto label = std::make_shared<::label>();
 
   label->set_font(it->second);
   _labels.emplace_back(label);
