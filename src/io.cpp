@@ -36,17 +36,17 @@ std::vector<std::string> io::enumerate(std::string_view directory) {
   assert(ptr != nullptr &&
     std::format("error while enumerating directory: {}", directory).c_str());
 
-  auto* const *array = ptr.get();
+  auto* const *data = ptr.get();
 
   auto n = 0uz;
-  while (array[n] != nullptr) ++n;
+  while (data[n] != nullptr) ++n;
 
-  std::vector<std::string> names;
-  names.reserve(n);
+  std::vector<std::string> entries;
+  entries.reserve(n);
 
   for (auto i = 0uz; i < n; ++i) {
-    names.emplace_back(array[i]);
+    entries.emplace_back(data[i]);
   }
 
-  return names;
+  return entries;
 }
