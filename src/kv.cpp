@@ -6,15 +6,21 @@ sol::object observable::value() const {
 
 void observable::set(const sol::object& value) {
   _value = value;
-  _subscriber(value);
+  for (const auto& subscriber : _subscribers) {
+    subscriber(value);
+  }
 }
 
-void observable::subscribe(sol::protected_function callback) {
-  _subscriber = std::move(callback);
+uint32_t observable::subscribe(sol::protected_function callback) {
+  const auto id = static_cast<uint32_t>(_subscribers.size());
+  _subscribers.emplace_back(std::move(callback));
+  return id;
 }
 
-void observable::unsubscribe() {
-  _subscriber = nullptr;
+void observable::unsubscribe(uint32_t id) {
+  if (id < _subscribers.size()) {
+    _subscribers[id] = nullptr;
+  }
 }
 
 std::shared_ptr<observable> kv::get(std::string_view key, const sol::object& fallback) {

@@ -7,11 +7,11 @@ public:
   ~observable() = default;
   sol::object value() const;
   void set(const sol::object& value);
-  void subscribe(sol::protected_function callback);
-  void unsubscribe();
+  uint32_t subscribe(sol::protected_function callback);
+  void unsubscribe(uint32_t id);
 
 private:
-  functor _subscriber;
+  boost::container::small_vector<functor, 16> _subscribers;
   sol::object _value;
 };
 

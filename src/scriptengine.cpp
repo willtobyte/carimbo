@@ -242,8 +242,12 @@ void scriptengine::run() {
     sol::no_constructor,
     "value", sol::property(&observable::value),
     "set", &observable::set,
-    "subscribe", &observable::subscribe,
-    "unsubscribe", &observable::unsubscribe,
+    "subscribe", [](observable& self, sol::protected_function fn) -> uint32_t {
+      return self.subscribe(std::move(fn));
+    },
+    "unsubscribe", [](observable& self, uint32_t id) {
+      self.unsubscribe(id);
+    },
     sol::meta_function::addition, [](const observable& obs, double rhs) {
       const auto value = obs.value();
       return (value.valid() ? value.as<double>() : 0.0) + rhs;
@@ -338,11 +342,11 @@ void scriptengine::run() {
     "observable", [](objectproxy& self, std::string_view name) {
       return self.kv.get(name);
     },
-    "subscribe", [](objectproxy& self, std::string_view name, sol::protected_function fn) {
-      self.kv.get(name)->subscribe(std::move(fn));
+    "subscribe", [](objectproxy& self, std::string_view name, sol::protected_function fn) -> uint32_t {
+      return self.kv.get(name)->subscribe(std::move(fn));
     },
-    "unsubscribe", [](objectproxy& self, std::string_view name) {
-      self.kv.get(name)->unsubscribe();
+    "unsubscribe", [](objectproxy& self, std::string_view name, uint32_t id) {
+      self.kv.get(name)->unsubscribe(id);
     },
     sol::meta_function::index, metaobject::index,
     sol::meta_function::new_index, metaobject::new_index
@@ -875,6 +879,7 @@ void scriptengine::run() {
       if (open()) [[likely]] {
         return SDL_GetGamepadButton(ptr.get(), btn);
       }
+
       return false;
     }
 
@@ -882,6 +887,7 @@ void scriptengine::run() {
       if (open()) [[likely]] {
         return SDL_GetGamepadAxis(ptr.get(), ax);
       }
+
       return 0;
     }
 
@@ -889,6 +895,7 @@ void scriptengine::run() {
       if (open()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTY)};
       }
+
       return {0, 0};
     }
 
@@ -896,6 +903,7 @@ void scriptengine::run() {
       if (open()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTY)};
       }
+
       return {0, 0};
     }
 
@@ -903,6 +911,7 @@ void scriptengine::run() {
       if (open()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)};
       }
+
       return {0, 0};
     }
 
@@ -912,6 +921,7 @@ void scriptengine::run() {
           return std::string{n};
         }
       }
+
       return std::nullopt;
     }
   };
