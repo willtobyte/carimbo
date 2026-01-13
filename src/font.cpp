@@ -96,8 +96,6 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
 
   _vertices.clear();
   _indices.clear();
-  _vertices.reserve(text.size() * 4);
-  _indices.reserve(text.size() * 6);
 
   constexpr auto inv = 1.f / 255.f;
 
