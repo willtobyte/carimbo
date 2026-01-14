@@ -10,6 +10,7 @@ sol::object observable::value() const noexcept {
 
 void observable::set(const sol::object& value) {
   _value = value;
+
   for (const auto& [_, subscriber] : _subscribers) {
     subscriber(value);
   }
