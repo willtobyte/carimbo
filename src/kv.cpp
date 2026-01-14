@@ -1,5 +1,9 @@
 #include "kv.hpp"
 
+observable::observable() {
+  _subscribers.reserve(8);
+}
+
 sol::object observable::value() const noexcept {
   return _value;
 }
