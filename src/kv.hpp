@@ -12,7 +12,7 @@ public:
   void unsubscribe(uint32_t id) noexcept;
 
 private:
-  boost::unordered_flat_map<uint32_t, functor> _subscribers;
+  boost::container::small_vector<functor, 8> _subscribers;
   sol::object _value;
   uint32_t _next_id{0};
 };
