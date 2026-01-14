@@ -78,13 +78,13 @@ private:
 };
 
 struct sentinel final {
-  std::string _name;
+  boost::static_string<64> _name;
 
-  explicit sentinel(std::string name) noexcept
-      : _name(std::move(name)) {}
+  explicit sentinel(std::string_view name) noexcept
+      : _name(name) {}
 
   ~sentinel() noexcept {
-    std::println("[garbagecollector] collected {}", _name);
+    std::println("[garbagecollector] collected {}", std::string_view{_name});
   }
 };
 
@@ -130,7 +130,7 @@ void scriptengine::run() {
   );
 
   lua["sentinel"] = [&lua](sol::object object, sol::object name) {
-    auto instance = sol::make_object<sentinel>(lua, name.as<std::string>());
+    auto instance = sol::make_object<sentinel>(lua, name.as<std::string_view>());
     object.as<sol::table>().raw_set("__sentinel", instance);
 
     return instance;
@@ -157,9 +157,7 @@ void scriptengine::run() {
 #endif
   };
 
-  lua["queryparam"] = [](std::string_view key, std::string_view defval) {
-    std::string out{defval};
-
+  lua["queryparam"] = [](std::string_view key, std::string_view defval) -> std::string {
 #ifdef EMSCRIPTEN
     const auto script = std::format(
         R"javascript(
@@ -170,7 +168,7 @@ void scriptengine::run() {
     );
 
     if (const auto* result = emscripten_run_script_string(script.c_str()); result && *result) {
-      out.assign(result);
+      return std::string{result};
     }
 #else
     std::array<char, 64> uppercase_key{};
@@ -180,11 +178,11 @@ void scriptengine::run() {
     }
 
     if (const auto* value = std::getenv(uppercase_key.data()); value && *value) {
-      out.assign(value);
+      return std::string{value};
     }
 #endif
 
-    return out;
+    return std::string{defval};
   };
 
   steam::achievement achievement;
@@ -279,7 +277,7 @@ void scriptengine::run() {
       if (value.get_type() != rhs.get_type()) return false;
       switch (value.get_type()) {
         case sol::type::number: return value.as<double>() == rhs.as<double>();
-        case sol::type::string: return value.as<std::string>() == rhs.as<std::string>();
+        case sol::type::string: return value.as<std::string_view>() == rhs.as<std::string_view>();
         case sol::type::boolean: return value.as<bool>() == rhs.as<bool>();
         default: return value == rhs;
       }
@@ -679,8 +677,13 @@ void scriptengine::run() {
         }
 
         case sol::type::string: {
-          const auto v = self.get<std::string>(key, fallback_value.as<std::string>());
-          return sol::make_object(lua, v);
+          if (const auto found = self.find(key)) {
+            if (const auto* v = std::get_if<std::string>(&*found)) {
+              return sol::make_object(lua, *v);
+            }
+          }
+
+          return sol::make_object(lua, fallback_value.as<std::string_view>());
         }
 
         default: {

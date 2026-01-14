@@ -86,7 +86,7 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
-  std::string _name;
+  boost::static_string<32> _name;
   soundmanager _soundmanager;
   particlesystem _particlesystem;
   objectmanager _objectmanager;

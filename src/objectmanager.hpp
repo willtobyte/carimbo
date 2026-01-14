@@ -27,7 +27,7 @@ private:
   };
 
   entt::registry& _registry;
-  std::string _scenename;
+  boost::static_string<32> _scenename;
   sol::environment& _environment;
 
   std::shared_ptr<renderer> _renderer;
