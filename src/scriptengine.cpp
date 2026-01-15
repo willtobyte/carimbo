@@ -722,7 +722,6 @@ void scriptengine::run() {
     "down", event::keyboard::key::down,
     "right", event::keyboard::key::right,
     "space", event::keyboard::key::space,
-
     "backspace", event::keyboard::key::backspace,
     "enter", event::keyboard::key::enter,
     "escape", event::keyboard::key::escape
