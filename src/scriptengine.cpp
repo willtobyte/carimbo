@@ -78,7 +78,7 @@ private:
 };
 
 struct sentinel final {
-  boost::static_string<64> _name;
+  boost::static_string<48> _name;
 
   explicit sentinel(std::string_view name) noexcept
       : _name(name) {}

@@ -22,7 +22,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
 }
 
 std::string_view scenemanager::current() const {
-  return _current;
+  return _scene->name();
 }
 
 void scenemanager::set(std::string_view name) {
@@ -36,7 +36,7 @@ std::vector<std::string> scenemanager::query(std::string_view name) const {
   if (all) {
     result.reserve(_scene_mapping.size());
     for (const auto& [key, _] : _scene_mapping) {
-      if (key == _current) continue;
+      if (key == _scene->name()) continue;
       result.emplace_back(key);
     }
 
@@ -70,9 +70,8 @@ void scenemanager::update(float delta) {
     }
 
     _scene = std::move(_pending);
-    _current = _scene->name();
 
-    std::println("[scenemanager] entered {}", std::string_view{_current});
+    std::println("[scenemanager] entered {}", _scene->name());
 
     _scene->on_enter();
   }

@@ -47,9 +47,9 @@ private:
   uint64_t _last_frame{0};
   vec2 _position{0, 0};
   vec2 _point;
-  boost::static_string<32> _action{ACTION_DEFAULT};
+  boost::static_string<48> _action{ACTION_DEFAULT};
   std::shared_ptr<pixmap> _spritesheet;
   boost::unordered_flat_map<std::string, animation, transparent_string_hash, std::equal_to<>> _animations;
   animation* _current_animation{nullptr};
-  boost::static_string<32> _queued_action;
+  boost::static_string<48> _queued_action;
 };

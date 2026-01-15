@@ -58,7 +58,7 @@ private:
     b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
-  boost::static_string<32> _name;
+  boost::static_string<48> _name;
 
   entt::registry _registry;
   b2WorldId _world{};

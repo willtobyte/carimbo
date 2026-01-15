@@ -1,7 +1,6 @@
 #pragma once
 
 #include "common.hpp"
-#include <boost/static_string/static_string.hpp>
 
 class scenemanager final : public eventreceiver {
 public:
@@ -44,5 +43,4 @@ private:
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::shared_ptr<::scene> _scene;
   std::shared_ptr<::scene> _pending;
-  boost::static_string<32> _current;
 };
