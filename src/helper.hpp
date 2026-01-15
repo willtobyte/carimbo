@@ -21,9 +21,10 @@ struct transparent_string_hash final {
 };
 
 #ifdef _MSC_VER
-  #define CONSTEXPR_IF_NOT_MSVC
+  #include <intrin.h>
+  #define PREFETCH(address) _mm_prefetch(reinterpret_cast<const char*>(address), _MM_HINT_T0)
 #else
-  #define CONSTEXPR_IF_NOT_MSVC constexpr
+  #define PREFETCH(address) __builtin_prefetch(address)
 #endif
 
 extern "C" const char* stbi_failure_reason(void);

@@ -8,14 +8,16 @@
 
 objectpool::objectpool(
     entt::registry& registry,
+    physics::world& world,
     std::shared_ptr<renderer> renderer,
     std::string_view scenename,
     sol::environment& environment
 )
     : _registry(registry),
-      _renderer(std::move(renderer)),
+      _world(world),
       _scenename(scenename),
-      _environment(environment) {
+      _environment(environment),
+      _renderer(std::move(renderer)) {
   _proxies.reserve(32);
 }
 
@@ -45,11 +47,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
 
         if (auto value = node["hitbox"]) {
           if (auto aabb = value["aabb"]) {
-            const auto q = aabb.get<quad>();
-            tl.hitbox = b2AABB{
-              .lowerBound = b2Vec2(q.x - epsilon, q.y - epsilon),
-              .upperBound = b2Vec2(q.x + q.w + epsilon, q.y + q.h + epsilon)
-            };
+            tl.hitbox = aabb.get<quad>();
           }
         }
 
@@ -93,7 +91,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
   });
   _registry.emplace<orientation>(entity);
   _registry.emplace<velocity>(entity);
-  _registry.emplace<rigidbody>(entity);
+  _registry.emplace<physics::body>(entity, physics::body::create(_world, physics::bodytype::kinematic, position, entity));
   _registry.emplace<renderable>(entity, renderable{.z = z});
 
   const auto proxy = std::make_shared<objectproxy>(entity, _registry);

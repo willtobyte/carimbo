@@ -1,8 +1,5 @@
 #pragma once
 
-struct vec2;
-struct quad;
-
 namespace unmarshal {
 
 class json final {

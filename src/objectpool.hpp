@@ -2,10 +2,13 @@
 
 #include "common.hpp"
 
+#include "physics.hpp"
+
 class objectpool final {
 public:
   objectpool(
       entt::registry& registry,
+      physics::world& world,
       std::shared_ptr<renderer> renderer,
       std::string_view scenename,
       sol::environment& environment
@@ -27,6 +30,7 @@ private:
   };
 
   entt::registry& _registry;
+  physics::world& _world;
   std::string_view _scenename;
   sol::environment& _environment;
 

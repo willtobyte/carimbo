@@ -73,52 +73,12 @@ struct frame final {
              node["quad"]["h"].get<float>()) {}
 };
 
-enum class bodytype : uint8_t {
-  static_body = 0,
-  kinematic,
-  dynamic
-};
 
-struct rigidbody final {
-  struct state {
-    b2Vec2 position{};
-    b2Rot rotation{};
-    float hx{};
-    float hy{};
-
-    [[nodiscard]] bool update_transform(const state& other) noexcept {
-      if (position.x == other.position.x && position.y == other.position.y &&
-          rotation.c == other.rotation.c && rotation.s == other.rotation.s)
-        return false;
-      position = other.position;
-      rotation = other.rotation;
-      return true;
-    }
-
-    [[nodiscard]] bool update_shape(const state& other) noexcept {
-      if (hx == other.hx && hy == other.hy)
-        return false;
-      hx = other.hx;
-      hy = other.hy;
-      return true;
-    }
-  };
-
-  b2BodyId body;
-  b2ShapeId shape;
-  state cache;
-  bodytype type{bodytype::kinematic};
-  bool enabled{true};
-
-  bool is_valid() const noexcept {
-    return b2Body_IsValid(body);
-  }
-};
 
 struct timeline final {
   bool oneshot{false};
   symbol next{empty};
-  std::optional<b2AABB> hitbox;
+  std::optional<quad> hitbox;
   boost::container::small_vector<frame, 24> frames;
 };
 

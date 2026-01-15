@@ -68,14 +68,10 @@ void animationsystem::update(uint64_t now) {
   }
 }
 
-void physicssystem::update(b2WorldId world, float delta) {
-  _accumulator += delta;
-  while (_accumulator >= FIXED_TIMESTEP) {
-    b2World_Step(world, FIXED_TIMESTEP, WORLD_SUBSTEPS);
-    _accumulator -= FIXED_TIMESTEP;
-  }
+void physicssystem::update(float delta) {
+  _world.step(delta);
 
-  const auto events = b2World_GetSensorEvents(world);
+  const auto events = _world.sensor_events();
   const auto& interning = _registry.ctx().get<::interning>();
 
   for (int i = 0; i < events.beginCount; ++i) {
@@ -109,48 +105,27 @@ void physicssystem::update(b2WorldId world, float delta) {
   }
 
   _group.each(
-    [world](entt::entity entity, const transform& t, rigidbody& r, const playback& p, const renderable& rn) {
-      if (!r.enabled) [[unlikely]] return;
+    [](entt::entity, const transform& t, physics::body& body, const playback& p, const renderable& rn) {
+      const auto has_hitbox = rn.visible && p.timeline && p.timeline->hitbox.has_value();
 
-      const auto valid = r.is_valid();
-
-      if (!rn.visible & valid) [[unlikely]] {
-        physics::destroy(r.shape, r.body);
-        return;
-      }
-
-      const auto collidable = rn.visible & (p.timeline != nullptr) && p.timeline->hitbox.has_value();
-      if (!collidable) [[unlikely]] {
-        if (valid) physics::destroy(r.shape, r.body);
+      if (!has_hitbox) [[unlikely]] {
+        body.detach_shape();
         return;
       }
 
       const auto& box = *p.timeline->hitbox;
-      const auto bw = box.upperBound.x - box.lowerBound.x;
-      const auto bh = box.upperBound.y - box.lowerBound.y;
+      const auto hx = box.w * t.scale * 0.5f;
+      const auto hy = box.h * t.scale * 0.5f;
 
-      const rigidbody::state state{
-        {t.position.x + box.lowerBound.x + bw * 0.5f, t.position.y + box.lowerBound.y + bh * 0.5f},
-        b2MakeRot(static_cast<float>(t.angle) * DEGREES_TO_RADIANS),
-        bw * t.scale * 0.5f,
-        bh * t.scale * 0.5f
-      };
+      const auto px = t.position.x + box.x + box.w * 0.5f;
+      const auto py = t.position.y + box.y + box.h * 0.5f;
+      const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
 
-      if (!valid) [[unlikely]] {
-        r.body = physics::make_body(world, static_cast<b2BodyType>(r.type), state.position, state.rotation,
-          reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity)));
-        r.shape = physics::make_sensor(r.body, state.hx, state.hy);
-        r.cache = state;
-        return;
+      if (!body.has_shape()) [[unlikely]] {
+        body.attach_sensor(hx, hy);
       }
 
-      if (r.cache.update_transform(state))
-        b2Body_SetTransform(r.body, state.position, state.rotation);
-
-      if (r.cache.update_shape(state)) {
-        physics::destroy_shape(r.shape);
-        r.shape = physics::make_sensor(r.body, state.hx, state.hy);
-      }
+      body.set_transform({px, py}, angle);
     });
 }
 

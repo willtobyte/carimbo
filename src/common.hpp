@@ -64,6 +64,10 @@
 #include "constant.hpp"
 #include "defer.hpp"
 #include "helper.hpp"
+
+struct quad;
+struct vec2;
+
 #include "unmarshal.hpp"
 
 class application;
@@ -113,8 +117,6 @@ struct particle;
 struct particlebatch;
 struct glypheffect;
 struct particleprops;
-struct quad;
-struct vec2;
 struct vec3;
 
 enum class flip : int;

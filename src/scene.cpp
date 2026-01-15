@@ -8,24 +8,16 @@
 
 scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment& environment)
     : _name(name),
+      _world(node),
       _renderer(std::move(renderer)),
       _soundpool(name),
       _particlepool(_renderer),
-      _objectpool(_registry, _renderer, name, environment) {
+      _objectpool(_registry, _world, _renderer, name, environment) {
 
   _hits.reserve(64);
   _registry.ctx().emplace<interning>();
   _registry.ctx().emplace<scripting>(_registry);
-
-  auto def = b2DefaultWorldDef();
-  if (auto physics = node["physics"]) {
-    if (auto gravity = physics["gravity"]) {
-      def.gravity.x = gravity["x"].get<float>();
-      def.gravity.y = gravity["y"].get<float>();
-    }
-  }
-
-  _world = b2CreateWorld(&def);
+  _registry.ctx().emplace<physics::world*>(&_world);
 
   if (auto sounds = node["sounds"]) {
     sounds.foreach([this](unmarshal::json node) {
@@ -72,14 +64,6 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
   }
 }
 
-scene::~scene() noexcept {
-  for (auto&& [entity, r] : _registry.view<rigidbody>().each()) {
-    physics::destroy(r.shape, r.body);
-  }
-
-  physics::destroy_world(_world);
-}
-
 void scene::update(float delta) {
   const auto now = SDL_GetTicks();
 
@@ -93,7 +77,7 @@ void scene::update(float delta) {
 
   _animationsystem.update(now);
 
-  _physicssystem.update(_world, delta);
+  _physicssystem.update(delta);
 
   _soundpool.update(delta);
 
@@ -105,23 +89,6 @@ void scene::update(float delta) {
 
   _onloop(delta);
 }
-
-#ifdef DEBUG
-[[nodiscard]] static bool _draw_callback(const b2ShapeId shape, void* const ctx) {
-  const auto [renderer, camera] = *static_cast<std::pair<SDL_Renderer*, const quad*>*>(ctx);
-  const auto aabb = b2Shape_GetAABB(shape);
-
-  const auto r = SDL_FRect{
-    aabb.lowerBound.x - camera->x,
-    aabb.lowerBound.y - camera->y,
-    aabb.upperBound.x - aabb.lowerBound.x,
-    aabb.upperBound.y - aabb.lowerBound.y
-  };
-
-  SDL_RenderRect(renderer, &r);
-  return true;
-}
-#endif
 
 void scene::draw() const noexcept {
   std::visit([this](auto&& argument) {
@@ -140,11 +107,16 @@ void scene::draw() const noexcept {
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
 
-  b2AABB aabb{{_camera.x, _camera.y}, {_camera.x + _camera.w, _camera.y + _camera.h}};
+  const auto aabb = physics::make_aabb(_camera.x, _camera.y, _camera.w, _camera.h);
+  auto* renderer = static_cast<SDL_Renderer*>(*_renderer);
+  _world.overlap_aabb(aabb, physics::category::all, [renderer, this](b2ShapeId shape, entt::entity) {
+    const auto q = physics::shape_aabb(shape);
+    const auto r = SDL_FRect{q.x - _camera.x, q.y - _camera.y, q.w, q.h};
 
-  auto filter = b2DefaultQueryFilter();
-  auto context = std::pair{static_cast<SDL_Renderer*>(*_renderer), &_camera};
-  b2World_OverlapAABB(_world, aabb, filter, _draw_callback, &context);
+    SDL_RenderRect(renderer, &r);
+
+    return true;
+  });
 
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
 #endif

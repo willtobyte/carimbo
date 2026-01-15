@@ -217,7 +217,7 @@ return scene
 ```
 scenemanager:register("scenename")
   └─> Load scenes/{name}.json
-  └─> Create physics world with gravity
+    └─> Create physics world with gravity
   └─> Load sound effects from "effects" array
   └─> Create layer (background or tilemap with colliders)
   └─> Create objects from "objects" array

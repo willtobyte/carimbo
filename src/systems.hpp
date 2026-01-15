@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 #include "components.hpp"
+#include "physics.hpp"
 
 class animationsystem final {
 public:
@@ -19,17 +20,17 @@ private:
 
 class physicssystem final {
 public:
-  explicit physicssystem(entt::registry& registry) noexcept
-    : _registry(registry), _group(registry.group<transform, rigidbody>(entt::get<playback, renderable>)) {}
+  explicit physicssystem(entt::registry& registry, physics::world& world) noexcept
+    : _registry(registry), _world(world), _group(registry.group<transform, physics::body>(entt::get<playback, renderable>)) {}
 
-  void update(b2WorldId world, float delta);
+  void update(float delta);
 
 private:
-  using group_type = decltype(std::declval<entt::registry&>().group<transform, rigidbody>(entt::get<playback, renderable>));
+  using group_type = decltype(std::declval<entt::registry&>().group<transform, physics::body>(entt::get<playback, renderable>));
 
   entt::registry& _registry;
+  physics::world& _world;
   group_type _group;
-  float _accumulator{};
 };
 
 class rendersystem final {

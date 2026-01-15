@@ -10,16 +10,10 @@
 #include "tilemap.hpp"
 
 class scene final {
-[[nodiscard]] static bool collect(const b2ShapeId shape, void* const context) {
-  auto* const container = static_cast<entt::dense_set<entt::entity>*>(context);
-  container->insert(physics::entity_from(shape));
-  return true;
-}
-
 public:
   scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment& environment);
 
-  ~scene() noexcept;
+  ~scene() noexcept = default;
 
   void update(float delta);
 
@@ -51,22 +45,22 @@ public:
 
 private:
   void query(float x, float y, entt::dense_set<entt::entity>& out) const {
-    auto aabb = b2AABB{};
-    aabb.lowerBound = b2Vec2(x - epsilon, y - epsilon);
-    aabb.upperBound = b2Vec2(x + epsilon, y + epsilon);
-    const auto filter = b2DefaultQueryFilter();
-    b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
+    const auto aabb = physics::make_aabb(x - epsilon, y - epsilon, epsilon * 2.0f, epsilon * 2.0f);
+    _world.overlap_aabb(aabb, physics::category::all, [&out](b2ShapeId, entt::entity entity) {
+      out.insert(entity);
+      return true;
+    });
   }
 
   boost::static_string<48> _name;
 
   entt::registry _registry;
-  b2WorldId _world{};
+  physics::world _world;
   quad _camera{};
   std::shared_ptr<renderer> _renderer;
 
   animationsystem _animationsystem{_registry};
-  physicssystem _physicssystem{_registry};
+  physicssystem _physicssystem{_registry, _world};
   rendersystem _rendersystem{_registry};
   scriptsystem _scriptsystem{_registry};
   velocitysystem _velocitysystem{_registry};

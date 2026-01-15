@@ -197,10 +197,6 @@ bool objectproxy::alive() const noexcept {
 void objectproxy::die() noexcept {
   if (!_registry.valid(_entity)) [[unlikely]] return;
 
-  if (auto* r = _registry.try_get<rigidbody>(_entity)) {
-    physics::destroy(r->shape, r->body);
-  }
-
   _registry.destroy(_entity);
 }
 
@@ -251,7 +247,9 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
     _registry.emplace<orientation>(entity, *ori);
   }
 
-  _registry.emplace<rigidbody>(entity);
+  const auto position = tf ? tf->position : vec2{0, 0};
+  auto* world = _registry.ctx().get<physics::world*>();
+  _registry.emplace<physics::body>(entity, physics::body::create(*world, physics::bodytype::kinematic, position, entity));
   _registry.emplace<struct velocity>(entity);
 
   if (rn) {
