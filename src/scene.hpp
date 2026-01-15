@@ -25,7 +25,7 @@ public:
 
   void draw() const noexcept;
 
-  [[nodiscard]] std::string_view name() const noexcept { return _name; }
+  [[nodiscard]] std::string_view name() const noexcept;
 
   void populate(sol::table& pool) const;
 
@@ -58,6 +58,8 @@ private:
     b2World_OverlapAABB(_world, aabb, filter, &collect, &out);
   }
 
+  boost::static_string<32> _name;
+
   entt::registry _registry;
   b2WorldId _world{};
   quad _camera{};
@@ -86,7 +88,6 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
-  boost::static_string<32> _name;
   soundmanager _soundmanager;
   particlesystem _particlesystem;
   objectmanager _objectmanager;

@@ -7,8 +7,8 @@
 #include "pixmap.hpp"
 
 scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::overlay> overlay, sol::environment& environment)
-    : _renderer(std::move(renderer)),
-      _name(name),
+    : _name(name),
+      _renderer(std::move(renderer)),
       _soundmanager(name),
       _particlesystem(_renderer),
       _objectmanager(_registry, _renderer, name, environment) {
@@ -175,6 +175,10 @@ void scene::draw() const noexcept {
 
   SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
 #endif
+}
+
+std::string_view scene::name() const noexcept {
+  return _name;
 }
 
 void scene::populate(sol::table& pool) const {
