@@ -133,27 +133,27 @@ void rendersystem::draw() const noexcept {
   auto view = _registry.view<renderable, transform, tint, sprite, playback, orientation>();
   view.use<renderable>();
   view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& pb, const orientation& fl) {
-      if (!rn.visible || !pb.timeline || pb.timeline->frames.empty()) [[unlikely]] {
-        return;
-      }
+    if (!rn.visible || !pb.timeline || pb.timeline->frames.empty()) [[unlikely]] {
+      return;
+    }
 
-      const auto& tl = *pb.timeline;
+    const auto& tl = *pb.timeline;
 
-      assert(!tl.frames.empty() && "timeline must have frames");
-      assert(pb.current_frame < tl.frames.size() && "frame index out of bounds");
+    assert(!tl.frames.empty() && "timeline must have frames");
+    assert(pb.current_frame < tl.frames.size() && "frame index out of bounds");
 
-      const auto& frame = tl.frames[pb.current_frame];
-      const auto& q = frame.quad;
+    const auto& frame = tl.frames[pb.current_frame];
+    const auto& q = frame.quad;
 
-      const auto hw = q.w * 0.5f;
-      const auto hh = q.h * 0.5f;
-      const auto sw = q.w * tr.scale;
-      const auto sh = q.h * tr.scale;
-      const auto fx = frame.offset_x + tr.position.x + hw - sw * 0.5f;
-      const auto fy = frame.offset_y + tr.position.y + hh - sh * 0.5f;
+    const auto hw = q.w * 0.5f;
+    const auto hh = q.h * 0.5f;
+    const auto sw = q.w * tr.scale;
+    const auto sh = q.h * tr.scale;
+    const auto fx = frame.offset_x + tr.position.x + hw - sw * 0.5f;
+    const auto fy = frame.offset_y + tr.position.y + hh - sh * 0.5f;
 
-      sp.pixmap->draw(q.x, q.y, q.w, q.h, fx, fy, sw, sh, tr.angle, tn.a, fl.flip);
-    });
+    sp.pixmap->draw(q.x, q.y, q.w, q.h, fx, fy, sw, sh, tr.angle, tn.a, fl.flip);
+  });
 }
 
 void scriptsystem::update(float delta) {
