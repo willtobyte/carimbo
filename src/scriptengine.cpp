@@ -941,10 +941,10 @@ void scriptengine::run() {
 
   lua.new_enum(
     "GamepadButton",
-    "a", SDL_GAMEPAD_BUTTON_SOUTH,
-    "b", SDL_GAMEPAD_BUTTON_EAST,
-    "x", SDL_GAMEPAD_BUTTON_WEST,
-    "y", SDL_GAMEPAD_BUTTON_NORTH,
+    "south", SDL_GAMEPAD_BUTTON_SOUTH,
+    "east", SDL_GAMEPAD_BUTTON_EAST,
+    "west", SDL_GAMEPAD_BUTTON_WEST,
+    "north", SDL_GAMEPAD_BUTTON_NORTH,
     "back", SDL_GAMEPAD_BUTTON_BACK,
     "guide", SDL_GAMEPAD_BUTTON_GUIDE,
     "start", SDL_GAMEPAD_BUTTON_START,

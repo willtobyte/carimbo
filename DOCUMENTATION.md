@@ -595,7 +595,7 @@ if button == MouseButton.right then end
 ```lua
 local player = gamepads[Player.one]
 
-if player:button(GamepadButton.a) then end
+if player:button(GamepadButton.south) then end
 if player:button(GamepadButton.up) then end
 
 local lx, ly = player:leftstick()
@@ -619,10 +619,10 @@ local x = player:axis(GamepadAxis.leftx)
 
 | GamepadButton | Description |
 |---------------|-------------|
-| `GamepadButton.a` | A button (Xbox) / Cross (PS) |
-| `GamepadButton.b` | B button (Xbox) / Circle (PS) |
-| `GamepadButton.x` | X button (Xbox) / Square (PS) |
-| `GamepadButton.y` | Y button (Xbox) / Triangle (PS) |
+| `GamepadButton.south` | A button (Xbox) / Cross (PS) |
+| `GamepadButton.east` | B button (Xbox) / Circle (PS) |
+| `GamepadButton.west` | X button (Xbox) / Square (PS) |
+| `GamepadButton.north` | Y button (Xbox) / Triangle (PS) |
 | `GamepadButton.up` | D-pad up |
 | `GamepadButton.down` | D-pad down |
 | `GamepadButton.left` | D-pad left |
