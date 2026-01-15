@@ -594,17 +594,15 @@ if button == MouseButton.right then end
 
 ```lua
 local player = gamepads[Player.one]
-if player.connected then
-  if player:button(GamepadButton.a) then end
-  if player:button(GamepadButton.up) then end
 
-  local lx, ly = player:leftstick()
-  local rx, ry = player:rightstick()
-  local lt, rt = player:triggers()
+if player:button(GamepadButton.a) then end
+if player:button(GamepadButton.up) then end
 
-  local x = player:axis(GamepadAxis.leftx)
-  local name = player.name
-end
+local lx, ly = player:leftstick()
+local rx, ry = player:rightstick()
+local lt, rt = player:triggers()
+
+local x = player:axis(GamepadAxis.leftx)
 ```
 
 | Property/Method | Description |
