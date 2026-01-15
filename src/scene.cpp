@@ -9,9 +9,9 @@
 scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::overlay> overlay, sol::environment& environment)
     : _name(name),
       _renderer(std::move(renderer)),
-      _soundmanager(name),
-      _particlesystem(_renderer),
-      _objectmanager(_registry, _renderer, name, environment) {
+      _soundpool(name),
+      _particlepool(_renderer),
+      _objectpool(_registry, _renderer, name, environment) {
 
   _hits.reserve(64);
   _registry.ctx().emplace<interning>();
@@ -27,9 +27,9 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
 
   _world = b2CreateWorld(&def);
 
-  if (auto effects = node["effects"]) {
-    effects.foreach([this](unmarshal::json node) {
-      _soundmanager.add(node.get<std::string_view>());
+  if (auto sounds = node["sounds"]) {
+    sounds.foreach([this](unmarshal::json node) {
+      _soundpool.add(node.get<std::string_view>());
     });
   }
 
@@ -86,15 +86,15 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
   if (auto objects = node["objects"]) {
     auto z = 0;
     objects.foreach([this, &z](unmarshal::json node) {
-      _objectmanager.add(std::move(node), z++);
+      _objectpool.add(std::move(node), z++);
     });
 
-    _objectmanager.sort();
+    _objectpool.sort();
   }
 
   if (auto particles = node["particles"]) {
     particles.foreach([this](unmarshal::json node) {
-      _particlesystem.add(std::move(node));
+      _particlepool.add(std::move(node));
     });
   }
 }
@@ -122,9 +122,9 @@ void scene::update(float delta) {
 
   _physicssystem.update(_world, delta);
 
-  _soundmanager.update(delta);
+  _soundpool.update(delta);
 
-  _particlesystem.update(delta);
+  _particlepool.update(delta);
 
   _velocitysystem.update(delta);
 
@@ -162,7 +162,7 @@ void scene::draw() const noexcept {
 
   _rendersystem.draw();
 
-  _particlesystem.draw();
+  _particlepool.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
@@ -182,9 +182,9 @@ std::string_view scene::name() const noexcept {
 }
 
 void scene::populate(sol::table& pool) const {
-  _soundmanager.populate(pool);
-  _particlesystem.populate(pool);
-  _objectmanager.populate(pool);
+  _soundpool.populate(pool);
+  _particlepool.populate(pool);
+  _objectpool.populate(pool);
 }
 
 void scene::set_onenter(std::function<void()>&& fn) {
@@ -241,7 +241,7 @@ void scene::on_leave() {
     sc.on_dispose();
   }
 
-  _soundmanager.stop();
+  _soundpool.stop();
 
   if (auto fn = _onleave; fn) {
     fn();

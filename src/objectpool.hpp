@@ -2,16 +2,16 @@
 
 #include "common.hpp"
 
-class objectmanager final {
+class objectpool final {
 public:
-  objectmanager(
+  objectpool(
       entt::registry& registry,
       std::shared_ptr<renderer> renderer,
       std::string_view scenename,
       sol::environment& environment
   );
 
-  ~objectmanager() noexcept = default;
+  ~objectpool() noexcept = default;
 
   void add(unmarshal::json node, int32_t z);
 
@@ -20,7 +20,7 @@ public:
   void sort();
 
 private:
-  struct props {
+  struct shared {
     std::shared_ptr<const atlas> atlas;
     std::shared_ptr<pixmap> pixmap;
     float scale;
@@ -33,5 +33,5 @@ private:
   std::shared_ptr<renderer> _renderer;
 
   boost::unordered_flat_map<std::string, std::shared_ptr<objectproxy>, transparent_string_hash, std::equal_to<>> _proxies;
-  boost::unordered_flat_map<std::string, props, transparent_string_hash, std::equal_to<>> _props;
+  boost::unordered_flat_map<std::string, shared, transparent_string_hash, std::equal_to<>> _shared;
 };

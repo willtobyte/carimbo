@@ -2,10 +2,10 @@
 
 #include "common.hpp"
 
-#include "objectmanager.hpp"
-#include "particlesystem.hpp"
+#include "objectpool.hpp"
+#include "particlepool.hpp"
 #include "physics.hpp"
-#include "soundmanager.hpp"
+#include "soundpool.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
 
@@ -88,7 +88,7 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
-  soundmanager _soundmanager;
-  particlesystem _particlesystem;
-  objectmanager _objectmanager;
+  soundpool _soundpool;
+  particlepool _particlepool;
+  objectpool _objectpool;
 };

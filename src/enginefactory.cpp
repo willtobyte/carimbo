@@ -3,6 +3,7 @@
 #include "audiodevice.hpp"
 #include "engine.hpp"
 #include "eventmanager.hpp"
+#include "fontpool.hpp"
 #include "scenemanager.hpp"
 
 enginefactory& enginefactory::with_title(const std::string_view title) {
@@ -103,7 +104,8 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto window = std::make_shared<::window>(_title, _width, _height, _fullscreen);
   const auto renderer = window->create_renderer(_scale);
   const auto eventmanager = std::make_shared<::eventmanager>(renderer);
-  const auto overlay = std::make_shared<::overlay>(renderer, eventmanager);
+  const auto fontpool = std::make_shared<::fontpool>(renderer);
+  const auto overlay = std::make_shared<::overlay>(renderer, fontpool, eventmanager);
   const auto scenemanager = std::make_shared<::scenemanager>(renderer);
 
   scenemanager->set_overlay(overlay);

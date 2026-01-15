@@ -6,10 +6,10 @@
 
 class overlay final : public eventreceiver {
 public:
-  overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager);
+  overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<fontpool> fontpool, std::shared_ptr<eventmanager> eventmanager);
   virtual ~overlay() noexcept = default;
 
-  std::shared_ptr<::font> preload(std::string_view font);
+  std::shared_ptr<::font> preload(std::string_view family);
 
   std::shared_ptr<::label> label(std::string_view font);
   void label(std::shared_ptr<::label> instance);
@@ -26,7 +26,7 @@ public:
 private:
   std::shared_ptr<::cursor> _cursor;
   std::shared_ptr<renderer> _renderer;
+  std::shared_ptr<fontpool> _fontpool;
   std::shared_ptr<eventmanager> _eventmanager;
   boost::container::small_vector<std::shared_ptr<widget>, 16> _labels;
-  boost::unordered_flat_map<std::string, std::shared_ptr<font>, transparent_string_hash, std::equal_to<>> _fonts;
 };

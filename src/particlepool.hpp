@@ -91,10 +91,10 @@ private:
   mutable boost::unordered_flat_map<std::string, cache, transparent_string_hash, std::equal_to<>> _cache;
 };
 
-class particlesystem final {
+class particlepool final {
 public:
-  explicit particlesystem(std::shared_ptr<renderer> renderer);
-  ~particlesystem() = default;
+  explicit particlepool(std::shared_ptr<renderer> renderer);
+  ~particlepool() = default;
 
   void add(unmarshal::json node);
 

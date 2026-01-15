@@ -2,10 +2,10 @@
 
 #include "common.hpp"
 
-class soundmanager final {
+class soundpool final {
 public:
-  soundmanager(std::string_view scenename);
-  ~soundmanager() noexcept;
+  soundpool(std::string_view scenename);
+  ~soundpool() noexcept;
 
   void add(std::string_view name);
 

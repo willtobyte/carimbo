@@ -1,42 +1,42 @@
-#include "soundmanager.hpp"
+#include "soundpool.hpp"
 
 #include "soundfx.hpp"
 
-soundmanager::soundmanager(std::string_view scenename)
+soundpool::soundpool(std::string_view scenename)
     : _scenename(scenename) {
   _sounds.reserve(8);
 }
 
-soundmanager::~soundmanager() noexcept {
+soundpool::~soundpool() noexcept {
   stop();
 }
 
-void soundmanager::add(std::string_view name) {
+void soundpool::add(std::string_view name) {
   auto [it, inserted] = _sounds.try_emplace(name);
   if (inserted) {
     it->second = std::make_shared<soundfx>(std::format("blobs/{}/{}.ogg", _scenename, name));
   }
 }
 
-void soundmanager::update(float delta) {
+void soundpool::update(float delta) {
   for (auto& [_, sound] : _sounds) {
     sound->update(delta);
   }
 }
 
-void soundmanager::populate(sol::table& pool) const {
+void soundpool::populate(sol::table& pool) const {
   for (const auto& [name, sound] : _sounds) {
     assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = sound;
   }
 }
 
-void soundmanager::stop() const noexcept {
+void soundpool::stop() const noexcept {
   for (const auto& [_, sound] : _sounds) {
     sound->stop();
   }
 }
 
-void soundmanager::clear() {
+void soundpool::clear() {
   _sounds.clear();
 }

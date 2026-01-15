@@ -1,4 +1,4 @@
-#include "objectmanager.hpp"
+#include "objectpool.hpp"
 
 #include "components.hpp"
 #include "io.hpp"
@@ -6,7 +6,7 @@
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
-objectmanager::objectmanager(
+objectpool::objectpool(
     entt::registry& registry,
     std::shared_ptr<renderer> renderer,
     std::string_view scenename,
@@ -19,7 +19,7 @@ objectmanager::objectmanager(
   _proxies.reserve(32);
 }
 
-void objectmanager::add(unmarshal::json node, int32_t z) {
+void objectpool::add(unmarshal::json node, int32_t z) {
   auto& interning = _registry.ctx().get<::interning>();
 
   const auto name = node["name"].get<std::string_view>();
@@ -29,13 +29,13 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
 
   const auto entity = _registry.create();
 
-  auto [it, inserted] = _props.try_emplace(kind);
+  auto [it, inserted] = _shared.try_emplace(kind);
   if (inserted) {
     const auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
-    auto at = std::make_shared<::atlas>();
+    auto atlas = std::make_shared<::atlas>();
     if (auto timelines = json["timelines"]) {
-      timelines.foreach([&at, &interning](std::string_view key, unmarshal::json node) {
+      timelines.foreach([&atlas, &interning](std::string_view key, unmarshal::json node) {
         timeline tl{};
         tl.oneshot = node["oneshot"].get(false);
 
@@ -60,12 +60,12 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
           });
         }
 
-        at->timelines.try_emplace(interning.intern(key), std::move(tl));
+        atlas->timelines.try_emplace(interning.intern(key), std::move(tl));
       });
     }
 
-    it->second = props{
-      .atlas = std::move(at),
+    it->second = shared{
+      .atlas = std::move(atlas),
       .pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind)),
       .scale = json["scale"].get(1.0f)
     };
@@ -103,14 +103,14 @@ void objectmanager::add(unmarshal::json node, int32_t z) {
   scripting.wire(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
 }
 
-void objectmanager::populate(sol::table& pool) const {
+void objectpool::populate(sol::table& pool) const {
   for (const auto& [name, proxy] : _proxies) {
     assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = proxy;
   }
 }
 
-void objectmanager::sort() {
+void objectpool::sort() {
   _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
     return lhs.z < rhs.z;
   });

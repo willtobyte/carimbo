@@ -3,21 +3,15 @@
 #include "cursor.hpp"
 #include "eventmanager.hpp"
 #include "eventreceiver.hpp"
-#include "font.hpp"
+#include "fontpool.hpp"
 #include "label.hpp"
-#include "renderer.hpp"
 #include "widget.hpp"
 
-overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager)
-    : _renderer(std::move(renderer)), _eventmanager(std::move(eventmanager)) {}
+overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<fontpool> fontpool, std::shared_ptr<eventmanager> eventmanager)
+    : _renderer(std::move(renderer)), _fontpool(std::move(fontpool)), _eventmanager(std::move(eventmanager)) {}
 
-std::shared_ptr<::font> overlay::preload(std::string_view resource) {
-  auto [it, inserted] = _fonts.try_emplace(resource, nullptr);
-  if (inserted) {
-    it->second = std::make_shared<::font>(_renderer, resource);
-  }
-
-  return it->second;
+std::shared_ptr<::font> overlay::preload(std::string_view family) {
+  return _fontpool->get(family);
 }
 
 std::shared_ptr<::label> overlay::label(std::string_view resource) {
@@ -33,6 +27,7 @@ void overlay::label(std::shared_ptr<::label> instance) {
 
 void overlay::cursor(std::string_view resource) {
   cursor(nullptr);
+
   _cursor = std::make_shared<::cursor>(resource, _renderer);
   _eventmanager->add_receiver(_cursor);
 }

@@ -512,11 +512,11 @@ void scriptengine::run() {
     "create", &particlefactory::create
   );
 
-  lua.new_usertype<particlesystem>(
-    "ParticleSystem",
+  lua.new_usertype<particlepool>(
+    "ParticlePool",
     sol::no_constructor,
-    "factory", sol::property(&particlesystem::factory),
-    "clear", &particlesystem::clear
+    "factory", sol::property(&particlepool::factory),
+    "clear", &particlepool::clear
   );
 
   lua["cassette"] = cassette();

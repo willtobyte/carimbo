@@ -1,4 +1,4 @@
-#include "particlesystem.hpp"
+#include "particlepool.hpp"
 
 #include "io.hpp"
 #include "pixmap.hpp"
@@ -144,13 +144,13 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return batch;
 }
 
-particlesystem::particlesystem(std::shared_ptr<renderer> renderer)
+particlepool::particlepool(std::shared_ptr<renderer> renderer)
     : _renderer(std::move(renderer)),
       _factory(std::make_shared<particlefactory>(_renderer)) {
   _batches.reserve(16);
 }
 
-void particlesystem::add(unmarshal::json node) {
+void particlepool::add(unmarshal::json node) {
   const auto name = node["name"].get<std::string_view>();
   auto [it, inserted] = _batches.try_emplace(name);
   if (!inserted) {
@@ -164,18 +164,18 @@ void particlesystem::add(unmarshal::json node) {
   it->second = _factory->create(kind, x, y, spawning);
 }
 
-void particlesystem::populate(sol::table& pool) const {
+void particlepool::populate(sol::table& pool) const {
   for (const auto& [name, batch] : _batches) {
     assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = batch->props;
   }
 }
 
-void particlesystem::clear() {
+void particlepool::clear() {
   _batches.clear();
 }
 
-void particlesystem::update(float delta) {
+void particlepool::update(float delta) {
   for (const auto& [_, batch] : _batches) {
     auto* props = batch->props.get();
     auto& p = batch->particles;
@@ -273,7 +273,7 @@ void particlesystem::update(float delta) {
   }
 }
 
-void particlesystem::draw() const {
+void particlepool::draw() const {
   for (const auto& [_, batch] : _batches) {
     SDL_RenderGeometry(
         *_renderer,
@@ -286,6 +286,6 @@ void particlesystem::draw() const {
   }
 }
 
-std::shared_ptr<particlefactory> particlesystem::factory() const noexcept {
+std::shared_ptr<particlefactory> particlepool::factory() const noexcept {
   return _factory;
 }
