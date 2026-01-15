@@ -26,7 +26,7 @@ public:
 
   void set_runtime(sol::state_view runtime);
 
-  void set_overlay(std::shared_ptr<::overlay> overlay) noexcept;
+  void set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept;
 
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;
@@ -39,7 +39,7 @@ protected:
 private:
   sol::environment _environment;
   std::shared_ptr<::renderer> _renderer;
-  std::shared_ptr<::overlay> _overlay;
+  std::shared_ptr<::fontpool> _fontpool;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::shared_ptr<::scene> _scene;
   std::shared_ptr<::scene> _pending;

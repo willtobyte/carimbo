@@ -6,10 +6,10 @@
 
 class overlay final : public eventreceiver {
 public:
-  overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<fontpool> fontpool, std::shared_ptr<eventmanager> eventmanager);
+  overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager);
   virtual ~overlay() noexcept = default;
 
-  std::shared_ptr<::font> preload(std::string_view family);
+  void set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept;
 
   std::shared_ptr<::label> label(std::string_view font);
   void label(std::shared_ptr<::label> instance);

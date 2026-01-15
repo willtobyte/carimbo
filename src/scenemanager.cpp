@@ -15,7 +15,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
 
     sol::environment environment(_environment.lua_state(), sol::create, _environment);
 
-    return it->second = std::make_shared<scene>(name, std::move(json), _renderer, _overlay, environment);
+    return it->second = std::make_shared<scene>(name, std::move(json), _renderer, _fontpool, environment);
   }
 
   return nullptr;
@@ -114,6 +114,6 @@ void scenemanager::set_runtime(sol::state_view runtime) {
   _environment = sol::environment(runtime, sol::create, runtime.globals());
 }
 
-void scenemanager::set_overlay(std::shared_ptr<::overlay> overlay) noexcept {
-  _overlay = std::move(overlay);
+void scenemanager::set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept {
+  _fontpool = std::move(fontpool);
 }

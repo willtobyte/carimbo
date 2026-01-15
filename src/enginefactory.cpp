@@ -105,10 +105,8 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto renderer = window->create_renderer(_scale);
   const auto eventmanager = std::make_shared<::eventmanager>(renderer);
   const auto fontpool = std::make_shared<::fontpool>(renderer);
-  const auto overlay = std::make_shared<::overlay>(renderer, fontpool, eventmanager);
+  const auto overlay = std::make_shared<::overlay>(renderer, eventmanager);
   const auto scenemanager = std::make_shared<::scenemanager>(renderer);
-
-  scenemanager->set_overlay(overlay);
 
   engine->set_audiodevice(audiodevice);
   engine->set_eventmanager(eventmanager);
@@ -121,6 +119,9 @@ std::shared_ptr<engine> enginefactory::create() const {
   eventmanager->add_receiver(engine);
   eventmanager->add_receiver(overlay);
   eventmanager->add_receiver(scenemanager);
+
+  overlay->set_fontpool(fontpool);
+  scenemanager->set_fontpool(fontpool);
 
   return engine;
 }

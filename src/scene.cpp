@@ -1,12 +1,12 @@
 #include "scene.hpp"
 
 #include "components.hpp"
-#include "overlay.hpp"
+#include "fontpool.hpp"
 #include "geometry.hpp"
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::overlay> overlay, sol::environment& environment)
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment& environment)
     : _name(name),
       _renderer(std::move(renderer)),
       _soundpool(name),
@@ -34,8 +34,8 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
   }
 
   if (auto fonts = node["fonts"]) {
-    fonts.foreach([&overlay](unmarshal::json node) {
-      overlay->preload(node.get<std::string_view>());
+    fonts.foreach([&fontpool](unmarshal::json node) {
+      fontpool->get(node.get<std::string_view>());
     });
   }
 

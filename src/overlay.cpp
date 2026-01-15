@@ -7,16 +7,16 @@
 #include "label.hpp"
 #include "widget.hpp"
 
-overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<fontpool> fontpool, std::shared_ptr<eventmanager> eventmanager)
-    : _renderer(std::move(renderer)), _fontpool(std::move(fontpool)), _eventmanager(std::move(eventmanager)) {}
+overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager)
+    : _renderer(std::move(renderer)), _eventmanager(std::move(eventmanager)) {}
 
-std::shared_ptr<::font> overlay::preload(std::string_view family) {
-  return _fontpool->get(family);
+void overlay::set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept {
+  _fontpool = std::move(fontpool);
 }
 
 std::shared_ptr<::label> overlay::label(std::string_view resource) {
   auto label = std::make_shared<::label>();
-  label->set_font(preload(resource));
+  label->set_font(_fontpool->get(resource));
   _labels.emplace_back(label);
   return label;
 }
