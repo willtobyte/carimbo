@@ -128,13 +128,11 @@ Calling `:create()` initializes the following systems:
 - Renderer with pixel scaling
 - Event manager for input handling
 - Overlay for UI (labels, cursor)
-- State manager for gamepad input
 - Scene manager for scene lifecycle
 
 After `:create()`, the following globals become available:
 - `overlay` - UI overlay system
 - `scenemanager` - Scene management
-- `statemanager` - Gamepad/controller state
 - `canvas` - Pixel manipulation framebuffer
 - `viewport` - Table with `width` and `height` of the window
 
@@ -595,28 +593,58 @@ if button == MouseButton.right then end
 ### Gamepad
 
 ```lua
-local player = statemanager:player(Player.one)
-if player:on(Controller.south) then end
-if player:on(Controller.up) then end
+local player = gamepads[Player.one]
+if player.connected then
+  if player:button(GamepadButton.a) then end
+  if player:button(GamepadButton.up) then end
+
+  local lx, ly = player:leftstick()
+  local rx, ry = player:rightstick()
+  local lt, rt = player:triggers()
+
+  local x = player:axis(GamepadAxis.leftx)
+  local name = player.name
+end
 ```
 
-| Controller | Description |
-|------------|-------------|
-| `Controller.up` | D-pad up |
-| `Controller.down` | D-pad down |
-| `Controller.left` | D-pad left |
-| `Controller.right` | D-pad right |
-| `Controller.north` | Y button (Xbox) / Triangle (PS) |
-| `Controller.east` | B button (Xbox) / Circle (PS) |
-| `Controller.south` | A button (Xbox) / Cross (PS) |
-| `Controller.west` | X button (Xbox) / Square (PS) |
+| Property/Method | Description |
+|-----------------|-------------|
+| `gamepads[0..3]` | Access gamepad by slot (0-3) |
+| `gamepads.count` | Number of connected gamepads |
+| `connected` | Whether gamepad is connected |
+| `name` | Gamepad name (or nil) |
+| `button(btn)` | Check if button is pressed |
+| `axis(ax)` | Get axis value (-32768 to 32767) |
+| `leftstick()` | Returns x, y of left stick |
+| `rightstick()` | Returns x, y of right stick |
+| `triggers()` | Returns left, right trigger values |
 
-| Player | Description |
-|--------|-------------|
-| `Player.one` | First controller |
-| `Player.two` | Second controller |
-| `Player.three` | Third controller |
-| `Player.four` | Fourth controller |
+| GamepadButton | Description |
+|---------------|-------------|
+| `GamepadButton.a` | A button (Xbox) / Cross (PS) |
+| `GamepadButton.b` | B button (Xbox) / Circle (PS) |
+| `GamepadButton.x` | X button (Xbox) / Square (PS) |
+| `GamepadButton.y` | Y button (Xbox) / Triangle (PS) |
+| `GamepadButton.up` | D-pad up |
+| `GamepadButton.down` | D-pad down |
+| `GamepadButton.left` | D-pad left |
+| `GamepadButton.right` | D-pad right |
+| `GamepadButton.start` | Start button |
+| `GamepadButton.back` | Back/Select button |
+| `GamepadButton.guide` | Guide/Home button |
+| `GamepadButton.leftstick` | Left stick press |
+| `GamepadButton.rightstick` | Right stick press |
+| `GamepadButton.leftshoulder` | Left bumper (LB) |
+| `GamepadButton.rightshoulder` | Right bumper (RB) |
+
+| GamepadAxis | Description |
+|-------------|-------------|
+| `GamepadAxis.leftx` | Left stick X axis |
+| `GamepadAxis.lefty` | Left stick Y axis |
+| `GamepadAxis.rightx` | Right stick X axis |
+| `GamepadAxis.righty` | Right stick Y axis |
+| `GamepadAxis.triggerleft` | Left trigger |
+| `GamepadAxis.triggerright` | Right trigger |
 
 ---
 
@@ -734,7 +762,7 @@ The framebuffer size matches the viewport dimensions divided by the scale factor
 |--------|-------------|
 | `engine` | Engine instance |
 | `scenemanager` | Scene management |
-| `statemanager` | Gamepad/controller state |
+| `gamepads` | Gamepad/controller state |
 | `overlay` | UI layer (labels, cursor) |
 | `canvas` | Pixel manipulation framebuffer |
 | `viewport` | `{width, height}` |
