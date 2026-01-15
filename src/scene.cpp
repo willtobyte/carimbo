@@ -43,35 +43,8 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
     const auto type = layer["type"].get<std::string_view>();
 
     if (type == "tilemap") {
-      const auto content = layer["content"].get<std::string_view>();
-      auto& tilemap = _layer.emplace<::tilemap>(content, _renderer);
-
-      const auto tile_size = tilemap.tile_size();
-      const auto half = tile_size * 0.5f;
-      const auto width = tilemap.width();
-
-      auto sdef = b2DefaultShapeDef();
-      const auto poly = b2MakeBox(half, half);
-
-      for (const auto& grid : tilemap.grids()) {
-        if (!grid.collider) continue;
-
-        const auto* tiles = grid.tiles.data();
-        for (int32_t row = 0; row < tilemap.height(); ++row) {
-          const auto row_offset = row * width;
-          for (int32_t column = 0; column < width; ++column) {
-            if (tiles[row_offset + column] == 0) continue;
-
-            const auto position = b2Vec2{
-              static_cast<float>(column) * tile_size + half,
-              static_cast<float>(row) * tile_size + half
-            };
-
-            const auto body = physics::make_static_body(_world, position);
-            b2CreatePolygonShape(body, &sdef, &poly);
-          }
-        }
-      }
+      auto content = layer["content"].get<std::string_view>();
+      _layer.emplace<::tilemap>(content, _renderer, _world);
     }
 
     else {

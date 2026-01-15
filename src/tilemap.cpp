@@ -1,9 +1,10 @@
 #include "tilemap.hpp"
 
+#include "physics.hpp"
 #include "pixmap.hpp"
 #include "renderer.hpp"
 
-tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
+tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, b2WorldId world)
     : _renderer(std::move(renderer)) {
   auto json = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
 
@@ -45,6 +46,75 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer)
     }
   }
 
+  const auto half = _tile_size * 0.5f;
+  const auto sdef = b2DefaultShapeDef();
+  const auto width = static_cast<size_t>(_width);
+  const auto height = static_cast<size_t>(_height);
+  const auto total = width * height;
+  std::vector<uint8_t> visited(total);
+  _bodies.reserve(total / 2);
+
+  for (const auto& grid : _grids) {
+    if (!grid.collider) continue;
+
+    std::memset(visited.data(), 0, total);
+    const auto* __restrict tiles = grid.tiles.data();
+    auto* __restrict visited_data = visited.data();
+
+    for (size_t row = 0; row < height; ++row) {
+      const auto row_offset = row * width;
+
+      for (size_t column = 0; column < width; ++column) {
+        const auto index = row_offset + column;
+        if (tiles[index] == 0 || visited_data[index]) [[likely]] continue;
+
+        auto run_width = size_t{1};
+        while (column + run_width < width && tiles[index + run_width] != 0 && !visited_data[index + run_width]) {
+          ++run_width;
+        }
+
+        auto run_height = size_t{1};
+        while (row + run_height < height) {
+          const auto check_offset = (row + run_height) * width + column;
+          __builtin_prefetch(tiles + check_offset + width);
+          __builtin_prefetch(visited_data + check_offset + width);
+
+          auto valid = true;
+          for (size_t dx = 0; dx < run_width; ++dx) {
+            if (tiles[check_offset + dx] == 0 || visited_data[check_offset + dx]) {
+              valid = false;
+              break;
+            }
+          }
+
+          if (!valid) break;
+          ++run_height;
+        }
+
+        for (size_t dy = 0; dy < run_height; ++dy) {
+          std::memset(visited_data + (row + dy) * width + column, 1, run_width);
+        }
+
+        const auto half_w = static_cast<float>(run_width) * half;
+        const auto half_h = static_cast<float>(run_height) * half;
+        const auto position = b2Vec2{
+          static_cast<float>(column) * _tile_size + half_w,
+          static_cast<float>(row) * _tile_size + half_h
+        };
+
+        const auto poly = b2MakeBox(half_w, half_h);
+        const auto body = physics::make_static_body(world, position);
+        b2CreatePolygonShape(body, &sdef, &poly);
+        _bodies.emplace_back(body);
+      }
+    }
+  }
+}
+
+tilemap::~tilemap() noexcept {
+  for (auto& body : _bodies) {
+    physics::destroy_body(body);
+  }
 }
 
 void tilemap::set_viewport(const quad& value) {
