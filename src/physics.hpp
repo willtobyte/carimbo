@@ -155,6 +155,7 @@ public:
   [[nodiscard]] static body create_static(world& w, const vec2& position, const vec2& half_extents) noexcept;
 
   void attach_sensor(float hx, float hy) noexcept;
+  void attach_sensor_if_changed(float hx, float hy) noexcept;
   void attach_circle_sensor(float radius, const vec2& offset = {0, 0}) noexcept;
   void attach_capsule_sensor(const vec2& p1, const vec2& p2, float radius) noexcept;
   void attach_polygon_sensor(std::span<const b2Vec2> vertices) noexcept;
@@ -197,8 +198,14 @@ public:
   [[nodiscard]] b2ShapeId shape_id() const noexcept;
 
 private:
+  struct alignas(8) cache final {
+    float hx{0};
+    float hy{0};
+  };
+
   b2BodyId _body{};
   b2ShapeId _shape{};
+  cache _cache;
 };
 
 class joint final {
@@ -211,13 +218,13 @@ public:
   joint(const joint&) = delete;
   joint& operator=(const joint&) = delete;
 
-  [[nodiscard]] static joint distance(world& w, body& a, body& b, const vec2& anchor_a, const vec2& anchor_b, float length = -1.0f) noexcept;
-  [[nodiscard]] static joint revolute(world& w, body& a, body& b, const vec2& anchor) noexcept;
-  [[nodiscard]] static joint prismatic(world& w, body& a, body& b, const vec2& anchor, const vec2& axis) noexcept;
-  [[nodiscard]] static joint motor(world& w, body& a, body& b, float max_force = 1000.0f, float max_torque = 1000.0f) noexcept;
-  [[nodiscard]] static joint weld(world& w, body& a, body& b, const vec2& anchor) noexcept;
-  [[nodiscard]] static joint wheel(world& w, body& chassis, body& whl, const vec2& anchor, const vec2& axis) noexcept;
-  [[nodiscard]] static joint mouse(world& w, body& b, const vec2& target, float max_force) noexcept;
+  [[nodiscard]] static joint distance(world& w, const body& a, const body& b, const vec2& anchor_a, const vec2& anchor_b, float length = -1.0f) noexcept;
+  [[nodiscard]] static joint revolute(world& w, const body& a, const body& b, const vec2& anchor) noexcept;
+  [[nodiscard]] static joint prismatic(world& w, const body& a, const body& b, const vec2& anchor, const vec2& axis) noexcept;
+  [[nodiscard]] static joint motor(world& w, const body& a, const body& b, float max_force = 1000.0f, float max_torque = 1000.0f) noexcept;
+  [[nodiscard]] static joint weld(world& w, const body& a, const body& b, const vec2& anchor) noexcept;
+  [[nodiscard]] static joint wheel(world& w, const body& chassis, const body& whl, const vec2& anchor, const vec2& axis) noexcept;
+  [[nodiscard]] static joint mouse(world& w, const body& b, const vec2& target, float max_force) noexcept;
 
   void set_target(const vec2& target) noexcept;
   void destroy() noexcept;

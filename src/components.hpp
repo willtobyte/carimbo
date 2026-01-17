@@ -109,6 +109,27 @@ struct renderable final {
   bool visible{true};
 };
 
+struct renderstate final {
+  bool z_dirty{false};
+
+  void set_z(renderable& r, int value) {
+    if (r.z == value) [[likely]] return;
+
+    r.z = value;
+    z_dirty = true;
+  }
+
+  void flush(entt::registry& registry) {
+    if (!z_dirty) [[likely]] return;
+
+    registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
+      return lhs.z < rhs.z;
+    });
+
+    z_dirty = false;
+  }
+};
+
 struct metadata final {
   symbol kind{empty};
   symbol name{empty};

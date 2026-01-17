@@ -121,10 +121,7 @@ void physicssystem::update(float delta) {
       const auto py = t.position.y + box.y + box.h * 0.5f;
       const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
 
-      if (!body.has_shape()) [[unlikely]] {
-        body.attach_sensor(hx, hy);
-      }
-
+      body.attach_sensor_if_changed(hx, hy);
       body.set_transform({px, py}, angle);
     });
 }

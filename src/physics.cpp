@@ -6,8 +6,7 @@
 using namespace physics;
 
 entt::entity physics::entity_from(b2ShapeId shape) noexcept {
-  const auto b = b2Shape_GetBody(shape);
-  const auto data = b2Body_GetUserData(b);
+  const auto data = b2Shape_GetUserData(shape);
   return static_cast<entt::entity>(reinterpret_cast<std::uintptr_t>(data));
 }
 
@@ -170,7 +169,15 @@ void body::attach_sensor(float hx, float hy) noexcept {
   auto def = b2DefaultShapeDef();
   def.isSensor = true;
   def.enableSensorEvents = true;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreatePolygonShape(_body, &def, &poly);
+  _cache = {hx, hy};
+}
+
+void body::attach_sensor_if_changed(float hx, float hy) noexcept {
+  if (has_shape() && _cache.hx == hx && _cache.hy == hy) [[likely]] return;
+
+  attach_sensor(hx, hy);
 }
 
 void body::attach_circle_sensor(float radius, const vec2& offset) noexcept {
@@ -182,6 +189,7 @@ void body::attach_circle_sensor(float radius, const vec2& offset) noexcept {
   auto def = b2DefaultShapeDef();
   def.isSensor = true;
   def.enableSensorEvents = true;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreateCircleShape(_body, &def, &circle);
 }
 
@@ -195,6 +203,7 @@ void body::attach_capsule_sensor(const vec2& p1, const vec2& p2, float radius) n
   auto def = b2DefaultShapeDef();
   def.isSensor = true;
   def.enableSensorEvents = true;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreateCapsuleShape(_body, &def, &capsule);
 }
 
@@ -206,6 +215,7 @@ void body::attach_polygon_sensor(std::span<const b2Vec2> vertices) noexcept {
   auto def = b2DefaultShapeDef();
   def.isSensor = true;
   def.enableSensorEvents = true;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreatePolygonShape(_body, &def, &poly);
 }
 
@@ -216,6 +226,7 @@ void body::attach_box(float hx, float hy, float density, float friction) noexcep
   auto def = b2DefaultShapeDef();
   def.density = density;
   def.material.friction = friction;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreatePolygonShape(_body, &def, &poly);
 }
 
@@ -228,6 +239,7 @@ void body::attach_circle(float radius, float density, float friction) noexcept {
   auto def = b2DefaultShapeDef();
   def.density = density;
   def.material.friction = friction;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreateCircleShape(_body, &def, &circle);
 }
 
@@ -241,6 +253,7 @@ void body::attach_capsule(const vec2& p1, const vec2& p2, float radius, float de
   auto def = b2DefaultShapeDef();
   def.density = density;
   def.material.friction = friction;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreateCapsuleShape(_body, &def, &capsule);
 }
 
@@ -252,6 +265,7 @@ void body::attach_polygon(std::span<const b2Vec2> vertices, float density, float
   auto def = b2DefaultShapeDef();
   def.density = density;
   def.material.friction = friction;
+  def.userData = b2Body_GetUserData(_body);
   _shape = b2CreatePolygonShape(_body, &def, &poly);
 }
 
@@ -409,7 +423,7 @@ joint& joint::operator=(joint&& other) noexcept {
   return *this;
 }
 
-joint joint::distance(world& w, body& a, body& b, const vec2& anchor_a, const vec2& anchor_b, float length) noexcept {
+joint joint::distance(world& w, const body& a, const body& b, const vec2& anchor_a, const vec2& anchor_b, float length) noexcept {
   joint result;
   auto def = b2DefaultDistanceJointDef();
   def.bodyIdA = a.id();
@@ -430,7 +444,7 @@ joint joint::distance(world& w, body& a, body& b, const vec2& anchor_a, const ve
   return result;
 }
 
-joint joint::revolute(world& w, body& a, body& b, const vec2& anchor) noexcept {
+joint joint::revolute(world& w, const body& a, const body& b, const vec2& anchor) noexcept {
   joint result;
   auto def = b2DefaultRevoluteJointDef();
   def.bodyIdA = a.id();
@@ -442,7 +456,7 @@ joint joint::revolute(world& w, body& a, body& b, const vec2& anchor) noexcept {
   return result;
 }
 
-joint joint::prismatic(world& w, body& a, body& b, const vec2& anchor, const vec2& axis) noexcept {
+joint joint::prismatic(world& w, const body& a, const body& b, const vec2& anchor, const vec2& axis) noexcept {
   joint result;
   auto def = b2DefaultPrismaticJointDef();
   def.bodyIdA = a.id();
@@ -455,7 +469,7 @@ joint joint::prismatic(world& w, body& a, body& b, const vec2& anchor, const vec
   return result;
 }
 
-joint joint::motor(world& w, body& a, body& b, float max_force, float max_torque) noexcept {
+joint joint::motor(world& w, const body& a, const body& b, float max_force, float max_torque) noexcept {
   joint result;
   auto def = b2DefaultMotorJointDef();
   def.bodyIdA = a.id();
@@ -467,7 +481,7 @@ joint joint::motor(world& w, body& a, body& b, float max_force, float max_torque
   return result;
 }
 
-joint joint::weld(world& w, body& a, body& b, const vec2& anchor) noexcept {
+joint joint::weld(world& w, const body& a, const body& b, const vec2& anchor) noexcept {
   joint result;
   auto def = b2DefaultWeldJointDef();
   def.bodyIdA = a.id();
@@ -479,7 +493,7 @@ joint joint::weld(world& w, body& a, body& b, const vec2& anchor) noexcept {
   return result;
 }
 
-joint joint::wheel(world& w, body& chassis, body& whl, const vec2& anchor, const vec2& axis) noexcept {
+joint joint::wheel(world& w, const body& chassis, const body& whl, const vec2& anchor, const vec2& axis) noexcept {
   joint result;
   auto def = b2DefaultWheelJointDef();
   def.bodyIdA = chassis.id();
@@ -492,7 +506,7 @@ joint joint::wheel(world& w, body& chassis, body& whl, const vec2& anchor, const
   return result;
 }
 
-joint joint::mouse(world& w, body& b, const vec2& target, float max_force) noexcept {
+joint joint::mouse(world& w, const body& b, const vec2& target, float max_force) noexcept {
   joint result;
   auto ground_def = b2DefaultBodyDef();
   result._ground = b2CreateBody(w.id(), &ground_def);

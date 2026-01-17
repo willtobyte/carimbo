@@ -140,14 +140,8 @@ int objectproxy::z() const noexcept {
 
 void objectproxy::set_z(int value) noexcept {
   auto& r = _registry.get<renderable>(_entity);
-
-  if (r.z == value) return;
-
-  r.z = value;
-
-  _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
-    return lhs.z < rhs.z;
-  });
+  auto& state = _registry.ctx().get<renderstate>();
+  state.set_z(r, value);
 }
 
 void objectproxy::set_onhover(sol::protected_function fn) {

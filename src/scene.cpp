@@ -18,6 +18,7 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
   _registry.ctx().emplace<interning>();
   _registry.ctx().emplace<scripting>(_registry);
   _registry.ctx().emplace<physics::world*>(&_world);
+  _registry.ctx().emplace<renderstate>();
 
   if (auto sounds = node["sounds"]) {
     sounds.foreach([this](unmarshal::json node) {
@@ -86,6 +87,9 @@ void scene::update(float delta) {
   _velocitysystem.update(delta);
 
   _scriptsystem.update(delta);
+
+  auto& state = _registry.ctx().get<renderstate>();
+  state.flush(_registry);
 
   _onloop(delta);
 }
