@@ -834,25 +834,21 @@ void scriptengine::run() {
       return ptr != nullptr;
     }
 
-    void close() noexcept {
-      ptr.reset();
-    }
-
     [[nodiscard]] bool connected() noexcept {
       return open();
     }
 
-    [[nodiscard]] bool button(SDL_GamepadButton btn) noexcept {
+    [[nodiscard]] bool button(SDL_GamepadButton button) noexcept {
       if (open()) [[likely]] {
-        return SDL_GetGamepadButton(ptr.get(), btn);
+        return SDL_GetGamepadButton(ptr.get(), button);
       }
 
       return false;
     }
 
-    [[nodiscard]] int16_t axis(SDL_GamepadAxis ax) noexcept {
+    [[nodiscard]] int16_t axis(SDL_GamepadAxis axis) noexcept {
       if (open()) [[likely]] {
-        return SDL_GetGamepadAxis(ptr.get(), ax);
+        return SDL_GetGamepadAxis(ptr.get(), axis);
       }
 
       return 0;
@@ -935,8 +931,6 @@ void scriptengine::run() {
   lua.new_usertype<gamepadslot>(
     "GamepadSlot",
     sol::no_constructor,
-    "open", &gamepadslot::open,
-    "close", &gamepadslot::close,
     "connected", sol::property(&gamepadslot::connected),
     "button", &gamepadslot::button,
     "axis", &gamepadslot::axis,
