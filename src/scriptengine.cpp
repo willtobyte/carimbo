@@ -819,11 +819,13 @@ void scriptengine::run() {
     std::unique_ptr<SDL_Gamepad, SDL_Deleter> ptr{nullptr};
 
     [[nodiscard]] bool open() noexcept {
-      if (ptr && SDL_GamepadConnected(ptr.get())) {
-        return true;
-      }
+      if (ptr) [[likely]] {
+        if (SDL_GamepadConnected(ptr.get())) [[likely]] {
+          return true;
+        }
 
-      ptr.reset();
+        ptr.reset();
+      }
 
       auto count = 0;
       const auto gamepads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
@@ -854,7 +856,7 @@ void scriptengine::run() {
       return 0;
     }
 
-    [[nodiscard]] std::tuple<int16_t, int16_t> leftstick() noexcept {
+    [[nodiscard]] std::pair<int16_t, int16_t> leftstick() noexcept {
       if (open()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTY)};
       }
@@ -862,7 +864,7 @@ void scriptengine::run() {
       return {0, 0};
     }
 
-    [[nodiscard]] std::tuple<int16_t, int16_t> rightstick() noexcept {
+    [[nodiscard]] std::pair<int16_t, int16_t> rightstick() noexcept {
       if (open()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTY)};
       }
@@ -870,7 +872,7 @@ void scriptengine::run() {
       return {0, 0};
     }
 
-    [[nodiscard]] std::tuple<int16_t, int16_t> triggers() noexcept {
+    [[nodiscard]] std::pair<int16_t, int16_t> triggers() noexcept {
       if (open()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)};
       }
@@ -878,14 +880,14 @@ void scriptengine::run() {
       return {0, 0};
     }
 
-    [[nodiscard]] std::optional<std::string> name() noexcept {
+    [[nodiscard]] std::string_view name() noexcept {
       if (open()) [[likely]] {
-        if (const auto* n = SDL_GetGamepadName(ptr.get())) [[likely]] {
-          return std::string{n};
+        if (const auto* result = SDL_GetGamepadName(ptr.get())) [[likely]] {
+          return result;
         }
       }
 
-      return std::nullopt;
+      return {};
     }
   };
 
