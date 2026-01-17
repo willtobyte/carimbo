@@ -10,6 +10,7 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
     : _name(name),
       _world(node),
       _renderer(std::move(renderer)),
+      _view(_registry.view<tickable>()),
       _soundpool(name),
       _particlepool(_renderer),
       _objectpool(_registry, _world, _renderer, name, environment) {
@@ -251,7 +252,7 @@ void scene::on_text(std::string_view text) {
 void scene::on_tick(uint8_t tick) {
   _ontick(tick);
 
-  for (auto&& [entity, t] : _registry.view<tickable>().each()) {
+  for (auto&& [entity, t] : _view.each()) {
     t.on_tick(tick);
   }
 }

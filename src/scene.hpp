@@ -59,11 +59,14 @@ private:
   quad _camera{};
   std::shared_ptr<renderer> _renderer;
 
+  using view_type = decltype(std::declval<entt::registry&>().view<tickable>());
+
   animationsystem _animationsystem{_registry};
   physicssystem _physicssystem{_registry, _world};
   rendersystem _rendersystem{_registry};
   scriptsystem _scriptsystem{_registry};
   velocitysystem _velocitysystem{_registry};
+  view_type _view;
 
   std::variant<std::monostate, std::shared_ptr<pixmap>, tilemap> _layer;
 

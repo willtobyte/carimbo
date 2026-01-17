@@ -127,9 +127,7 @@ void physicssystem::update(float delta) {
 }
 
 void rendersystem::draw() const noexcept {
-  auto view = _registry.view<renderable, transform, tint, sprite, playback, orientation>();
-  view.use<renderable>();
-  view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& pb, const orientation& fl) {
+  _view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& pb, const orientation& fl) {
     if (!rn.visible || !pb.timeline || pb.timeline->frames.empty()) [[unlikely]] {
       return;
     }
