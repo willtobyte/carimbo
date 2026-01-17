@@ -773,7 +773,7 @@ void scriptengine::run() {
 
   struct keyboard final {
     static auto index(const keyboard&, sol::stack_object key, sol::this_state state) {
-      static const boost::unordered_flat_map<std::string, SDL_Scancode, transparent_string_hash, std::equal_to<>> map{
+      static const boost::unordered_flat_map<std::string_view, SDL_Scancode> mapping{
         {"a", SDL_SCANCODE_A}, {"b", SDL_SCANCODE_B}, {"c", SDL_SCANCODE_C}, {"d", SDL_SCANCODE_D},
         {"e", SDL_SCANCODE_E}, {"f", SDL_SCANCODE_F}, {"g", SDL_SCANCODE_G}, {"h", SDL_SCANCODE_H},
         {"i", SDL_SCANCODE_I}, {"j", SDL_SCANCODE_J}, {"k", SDL_SCANCODE_K}, {"l", SDL_SCANCODE_L},
@@ -822,15 +822,12 @@ void scriptengine::run() {
       };
 
       sol::state_view lua{state};
-      const auto name = key.as<std::string_view>();
-      const auto it = map.find(name);
-      if (it == map.end()) [[unlikely]] {
+      const auto it = mapping.find(key.as<std::string_view>());
+      if (it == mapping.end()) [[unlikely]] {
         return sol::make_object(lua, sol::lua_nil);
       }
 
-      const auto scancode = it->second;
-      const auto pressed = SDL_GetKeyboardState(nullptr)[scancode];
-      return sol::make_object(lua, pressed);
+      return sol::make_object(lua, SDL_GetKeyboardState(nullptr)[it->second]);
     }
   };
 
