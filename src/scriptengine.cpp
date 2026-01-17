@@ -786,39 +786,14 @@ void scriptengine::run() {
         {"4", SDL_SCANCODE_4}, {"5", SDL_SCANCODE_5}, {"6", SDL_SCANCODE_6}, {"7", SDL_SCANCODE_7},
         {"8", SDL_SCANCODE_8}, {"9", SDL_SCANCODE_9},
 
-        {"f1", SDL_SCANCODE_F1}, {"f2", SDL_SCANCODE_F2}, {"f3", SDL_SCANCODE_F3}, {"f4", SDL_SCANCODE_F4},
-        {"f5", SDL_SCANCODE_F5}, {"f6", SDL_SCANCODE_F6}, {"f7", SDL_SCANCODE_F7}, {"f8", SDL_SCANCODE_F8},
-        {"f9", SDL_SCANCODE_F9}, {"f10", SDL_SCANCODE_F10}, {"f11", SDL_SCANCODE_F11}, {"f12", SDL_SCANCODE_F12},
+        {"up", SDL_SCANCODE_UP}, {"down", SDL_SCANCODE_DOWN},
+        {"left", SDL_SCANCODE_LEFT}, {"right", SDL_SCANCODE_RIGHT},
 
-        {"up", SDL_SCANCODE_UP}, {"down", SDL_SCANCODE_DOWN}, {"left", SDL_SCANCODE_LEFT}, {"right", SDL_SCANCODE_RIGHT},
+        {"shift", SDL_SCANCODE_LSHIFT}, {"ctrl", SDL_SCANCODE_LCTRL},
 
-        {"lshift", SDL_SCANCODE_LSHIFT}, {"rshift", SDL_SCANCODE_RSHIFT},
-        {"lctrl", SDL_SCANCODE_LCTRL}, {"rctrl", SDL_SCANCODE_RCTRL},
-        {"lalt", SDL_SCANCODE_LALT}, {"ralt", SDL_SCANCODE_RALT},
-        {"lgui", SDL_SCANCODE_LGUI}, {"rgui", SDL_SCANCODE_RGUI},
-
-        {"escape", SDL_SCANCODE_ESCAPE}, {"space", SDL_SCANCODE_SPACE}, {"return", SDL_SCANCODE_RETURN},
-        {"enter", SDL_SCANCODE_RETURN}, {"tab", SDL_SCANCODE_TAB}, {"backspace", SDL_SCANCODE_BACKSPACE},
-        {"capslock", SDL_SCANCODE_CAPSLOCK}, {"delete", SDL_SCANCODE_DELETE}, {"insert", SDL_SCANCODE_INSERT},
-        {"home", SDL_SCANCODE_HOME}, {"end", SDL_SCANCODE_END}, {"pageup", SDL_SCANCODE_PAGEUP},
-        {"pagedown", SDL_SCANCODE_PAGEDOWN},
-
-        {"minus", SDL_SCANCODE_MINUS}, {"equals", SDL_SCANCODE_EQUALS}, {"leftbracket", SDL_SCANCODE_LEFTBRACKET},
-        {"rightbracket", SDL_SCANCODE_RIGHTBRACKET}, {"backslash", SDL_SCANCODE_BACKSLASH},
-        {"semicolon", SDL_SCANCODE_SEMICOLON}, {"apostrophe", SDL_SCANCODE_APOSTROPHE},
-        {"grave", SDL_SCANCODE_GRAVE}, {"comma", SDL_SCANCODE_COMMA}, {"period", SDL_SCANCODE_PERIOD},
-        {"slash", SDL_SCANCODE_SLASH},
-
-        {"kp_0", SDL_SCANCODE_KP_0}, {"kp_1", SDL_SCANCODE_KP_1}, {"kp_2", SDL_SCANCODE_KP_2},
-        {"kp_3", SDL_SCANCODE_KP_3}, {"kp_4", SDL_SCANCODE_KP_4}, {"kp_5", SDL_SCANCODE_KP_5},
-        {"kp_6", SDL_SCANCODE_KP_6}, {"kp_7", SDL_SCANCODE_KP_7}, {"kp_8", SDL_SCANCODE_KP_8},
-        {"kp_9", SDL_SCANCODE_KP_9}, {"kp_period", SDL_SCANCODE_KP_PERIOD}, {"kp_divide", SDL_SCANCODE_KP_DIVIDE},
-        {"kp_multiply", SDL_SCANCODE_KP_MULTIPLY}, {"kp_minus", SDL_SCANCODE_KP_MINUS},
-        {"kp_plus", SDL_SCANCODE_KP_PLUS}, {"kp_enter", SDL_SCANCODE_KP_ENTER}, {"kp_equals", SDL_SCANCODE_KP_EQUALS},
-
-        {"printscreen", SDL_SCANCODE_PRINTSCREEN}, {"scrolllock", SDL_SCANCODE_SCROLLLOCK},
-        {"pause", SDL_SCANCODE_PAUSE}, {"numlock", SDL_SCANCODE_NUMLOCKCLEAR},
-        {"menu", SDL_SCANCODE_MENU}, {"application", SDL_SCANCODE_APPLICATION}
+        {"escape", SDL_SCANCODE_ESCAPE}, {"space", SDL_SCANCODE_SPACE},
+        {"enter", SDL_SCANCODE_RETURN}, {"backspace", SDL_SCANCODE_BACKSPACE},
+        {"tab", SDL_SCANCODE_TAB}
       };
 
       sol::state_view lua{state};
