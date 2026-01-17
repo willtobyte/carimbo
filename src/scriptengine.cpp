@@ -545,6 +545,42 @@ void scriptengine::run() {
       viewport["height"] = ptr->window()->height();
       lua["viewport"] = viewport;
 
+      auto* const renderer = static_cast<SDL_Renderer*>(*ptr->renderer());
+
+      auto mouse = lua.create_table();
+
+      mouse["x"] = [renderer]() noexcept -> float {
+        float x, y;
+        SDL_GetMouseState(&x, &y);
+        SDL_RenderCoordinatesFromWindow(renderer, x, y, &x, &y);
+        return x;
+      };
+
+      mouse["y"] = [renderer]() noexcept -> float {
+        float x, y;
+        SDL_GetMouseState(&x, &y);
+        SDL_RenderCoordinatesFromWindow(renderer, x, y, &x, &y);
+        return y;
+      };
+
+      mouse["xy"] = [renderer]() noexcept -> std::tuple<float, float> {
+        float x, y;
+        SDL_GetMouseState(&x, &y);
+        SDL_RenderCoordinatesFromWindow(renderer, x, y, &x, &y);
+        return {x, y};
+      };
+
+      mouse["button"] = []() noexcept -> int {
+        float x, y;
+        const auto button = SDL_GetMouseState(&x, &y);
+        if (button & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
+        if (button & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;
+        if (button & SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) return SDL_BUTTON_RIGHT;
+        return 0;
+      };
+
+      lua["mouse"] = mouse;
+
       ptr->scenemanager()->set_runtime(lua);
 
       return ptr;
@@ -727,39 +763,6 @@ void scriptengine::run() {
     "escape", event::keyboard::key::escape
   );
 
-  struct mouse final {
-  private:
-    [[nodiscard]] static std::tuple<float, float, uint32_t> state() noexcept {
-      float x, y;
-      const auto b = SDL_GetMouseState(&x, &y);
-      return {x, y, b};
-    }
-
-  public:
-    static float x() noexcept {
-      const auto [x, y, b] = state();
-      return x;
-    }
-
-    static float y() noexcept {
-      const auto [x, y, b] = state();
-      return y;
-    }
-
-    static std::tuple<float, float> xy() noexcept {
-      const auto [x, y, b] = state();
-      return {x, y};
-    }
-
-    static int button() noexcept {
-      const auto [x, y, b] = state();
-      if (b & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)) return SDL_BUTTON_LEFT;
-      if (b & SDL_BUTTON_MASK(SDL_BUTTON_MIDDLE)) return SDL_BUTTON_MIDDLE;
-      if (b & SDL_BUTTON_MASK(SDL_BUTTON_RIGHT)) return SDL_BUTTON_RIGHT;
-      return 0;
-    }
-  };
-
   lua.new_enum(
     "MouseButton",
     "none",   0,
@@ -767,16 +770,6 @@ void scriptengine::run() {
     "middle", SDL_BUTTON_MIDDLE,
     "right",  SDL_BUTTON_RIGHT
   );
-
-  lua.new_usertype<mouse>(
-    "Mouse",
-    "x", sol::property(&mouse::x),
-    "y", sol::property(&mouse::y),
-    "xy", &mouse::xy,
-    "button", sol::readonly_property(&mouse::button)
-  );
-
-  lua["mouse"] = mouse{};
 
   struct keyboard final {
     static auto index(const keyboard&, sol::stack_object key, sol::this_state state) {
