@@ -36,6 +36,5 @@ private:
 
   std::shared_ptr<renderer> _renderer;
 
-  boost::unordered_flat_map<std::string, std::shared_ptr<objectproxy>, transparent_string_hash, std::equal_to<>> _proxies;
   boost::unordered_flat_map<std::string, shared, transparent_string_hash, std::equal_to<>> _shared;
 };

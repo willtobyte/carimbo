@@ -18,7 +18,6 @@ objectpool::objectpool(
       _scenename(scenename),
       _environment(environment),
       _renderer(std::move(renderer)) {
-  _proxies.reserve(32);
 }
 
 void objectpool::add(unmarshal::json node, int32_t z) {
@@ -95,14 +94,16 @@ void objectpool::add(unmarshal::json node, int32_t z) {
   _registry.emplace<renderable>(entity, renderable{.z = z});
 
   const auto proxy = std::make_shared<objectproxy>(entity, _registry);
-  _proxies.try_emplace(name, proxy);
+  _registry.emplace<std::shared_ptr<objectproxy>>(entity, proxy);
 
   auto& scripting = _registry.ctx().get<::scripting>();
   scripting.wire(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
 }
 
 void objectpool::populate(sol::table& pool) const {
-  for (const auto& [name, proxy] : _proxies) {
+  auto& interning = _registry.ctx().get<::interning>();
+  for (auto&& [entity, meta, proxy] : _registry.view<metadata, std::shared_ptr<objectproxy>>().each()) {
+    const auto name = interning.lookup(meta.name);
     assert(!pool[name].valid() && "duplicate key in pool");
     pool[name] = proxy;
   }

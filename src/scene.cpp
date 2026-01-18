@@ -3,6 +3,7 @@
 #include "components.hpp"
 #include "fontpool.hpp"
 #include "geometry.hpp"
+#include "objectproxy.hpp"
 #include "physics.hpp"
 #include "pixmap.hpp"
 
@@ -20,6 +21,33 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
   _registry.ctx().emplace<scripting>(_registry);
   _registry.ctx().emplace<physics::world*>(&_world);
   _registry.ctx().emplace<renderstate>();
+
+  environment.new_enum(
+    "Category",
+    "none", physics::category::none,
+    "player", physics::category::player,
+    "enemy", physics::category::enemy,
+    "projectile", physics::category::projectile,
+    "terrain", physics::category::terrain,
+    "trigger", physics::category::trigger,
+    "collectible", physics::category::collectible,
+    "interface", physics::category::interface,
+    "all", physics::category::all
+  );
+
+  environment["world"] = environment.create_with(
+    "raytrace", [this](float x, float y, float angle, float distance, std::optional<physics::category> mask) {
+      const auto entities = _world.raytrace({x, y}, angle, distance, mask.value_or(physics::category::all));
+      std::vector<std::shared_ptr<objectproxy>> result;
+      result.reserve(entities.size());
+      for (const auto entity : entities) {
+        if (auto* proxy = _registry.try_get<std::shared_ptr<objectproxy>>(entity)) {
+          result.push_back(*proxy);
+        }
+      }
+      return result;
+    }
+  );
 
   if (auto sounds = node["sounds"]) {
     sounds.foreach([this](unmarshal::json node) {
