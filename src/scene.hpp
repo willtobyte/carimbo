@@ -11,7 +11,7 @@
 
 class scene final {
 public:
-  scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment& environment);
+  scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment environment);
 
   ~scene() noexcept = default;
 
@@ -85,6 +85,7 @@ private:
   entt::dense_set<entt::entity> _hits;
   entt::dense_set<entt::entity> _hovering;
 
+  sol::environment _environment;
   soundpool _soundpool;
   particlepool _particlepool;
   objectpool _objectpool;

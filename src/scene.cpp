@@ -7,14 +7,15 @@
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment& environment)
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment environment)
     : _name(name),
       _world(node),
       _renderer(std::move(renderer)),
       _view(_registry.view<tickable>()),
+      _environment(std::move(environment)),
       _soundpool(name),
       _particlepool(_renderer),
-      _objectpool(_registry, _world, _renderer, name, environment) {
+      _objectpool(_registry, _world, _renderer, name, _environment) {
 
   _hits.reserve(64);
   _registry.ctx().emplace<interning>();

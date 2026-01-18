@@ -15,7 +15,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
 
     sol::environment environment(_environment.lua_state(), sol::create, _environment);
 
-    return it->second = std::make_shared<scene>(name, std::move(json), _renderer, _fontpool, environment);
+    return it->second = std::make_shared<scene>(name, std::move(json), _renderer, _fontpool, std::move(environment));
   }
 
   return nullptr;
