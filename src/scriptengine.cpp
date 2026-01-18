@@ -398,7 +398,6 @@ void scriptengine::run() {
         verify(exec);
 
         auto module = exec.get<sol::table>();
-
         auto loaded = lua["package"]["loaded"];
         loaded[std::format("scenes/{}", name)] = module;
 
