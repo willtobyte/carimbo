@@ -102,8 +102,8 @@ std::vector<entt::entity> world::raytrace(const vec2& origin, float angle, float
     direction,
     filter,
     [](b2ShapeId shape, b2Vec2, b2Vec2, float fraction, void* userdata) -> float {
-      auto* h = static_cast<boost::container::small_vector<hit, 16>*>(userdata);
-      h->push_back({entity_from(shape), fraction});
+      auto* container = static_cast<boost::container::small_vector<hit, 16>*>(userdata);
+      container->emplace_back(entity_from(shape), fraction);
       return 1.0f;
     },
     &hits
@@ -111,11 +111,8 @@ std::vector<entt::entity> world::raytrace(const vec2& origin, float angle, float
 
   std::ranges::sort(hits, {}, &hit::fraction);
 
-  std::vector<entt::entity> result;
-  result.reserve(hits.size());
-  for (const auto& h : hits) {
-    result.push_back(h.entity);
-  }
+  std::vector<entt::entity> result(hits.size());
+  std::ranges::transform(hits, result.begin(), &hit::entity);
 
   return result;
 }
