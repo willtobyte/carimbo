@@ -398,16 +398,13 @@ void scriptengine::run() {
 
         auto loaded = lua["package"]["loaded"];
         loaded[std::format("scenes/{}", name)] = module;
-        auto ptr = std::weak_ptr<::scene>(scene);
 
         if (auto fn = module["on_enter"].get<sol::protected_function>(); fn.valid()) {
+          auto* const ptr = scene.get();
           const auto wrapper = [fn, ptr, &lua, module]() {
             auto pool = lua.create_table();
 
-            auto scene = ptr.lock();
-            assert(scene && "scene should be valid");
-
-            scene->populate(pool);
+            ptr->populate(pool);
 
             lua["pool"] = pool;
 
@@ -418,35 +415,35 @@ void scriptengine::run() {
             }
 
             if (auto onloop = module["on_loop"].get<sol::protected_function>(); onloop.valid()) {
-              scene->set_onloop(std::move(onloop));
+              ptr->set_onloop(std::move(onloop));
             }
 
             if (auto onmotion = module["on_motion"].get<sol::protected_function>(); onmotion.valid()) {
-              scene->set_onmotion(std::move(onmotion));
+              ptr->set_onmotion(std::move(onmotion));
             }
 
             if (auto oncamera = module["on_camera"].get<sol::protected_function>(); oncamera.valid()) {
-              scene->set_oncamera(std::move(oncamera));
+              ptr->set_oncamera(std::move(oncamera));
             }
 
             if (auto ontext = module["on_text"].get<sol::protected_function>(); ontext.valid()) {
-              scene->set_ontext(std::move(ontext));
+              ptr->set_ontext(std::move(ontext));
             }
 
             if (auto ontouch = module["on_touch"].get<sol::protected_function>(); ontouch.valid()) {
-              scene->set_ontouch(std::move(ontouch));
+              ptr->set_ontouch(std::move(ontouch));
             }
 
             if (auto onkeypress = module["on_keypress"].get<sol::protected_function>(); onkeypress.valid()) {
-              scene->set_onkeypress(std::move(onkeypress));
+              ptr->set_onkeypress(std::move(onkeypress));
             }
 
             if (auto onkeyrelease = module["on_keyrelease"].get<sol::protected_function>(); onkeyrelease.valid()) {
-              scene->set_onkeyrelease(std::move(onkeyrelease));
+              ptr->set_onkeyrelease(std::move(onkeyrelease));
             }
 
             if (auto ontick = module["on_tick"].get<sol::protected_function>(); ontick.valid()) {
-              scene->set_ontick(std::move(ontick));
+              ptr->set_ontick(std::move(ontick));
             }
 
             if (auto onleave = module["on_leave"].get<sol::protected_function>(); onleave.valid()) {
@@ -460,7 +457,7 @@ void scriptengine::run() {
                 lua["pool"] = sol::lua_nil;
               };
 
-              scene->set_onleave(std::move(wrapper));
+              ptr->set_onleave(std::move(wrapper));
             }
           };
 
