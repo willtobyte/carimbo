@@ -22,43 +22,6 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
   _registry.ctx().emplace<physics::world*>(&_world);
   _registry.ctx().emplace<renderstate>();
 
-  environment.new_enum(
-    "Category",
-    "none", physics::category::none,
-    "player", physics::category::player,
-    "enemy", physics::category::enemy,
-    "projectile", physics::category::projectile,
-    "terrain", physics::category::terrain,
-    "trigger", physics::category::trigger,
-    "collectible", physics::category::collectible,
-    "interface", physics::category::interface,
-    "all", physics::category::all
-  );
-
-  const auto raycast = [this](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
-    const auto entities = _world.raycast(origin, angle, distance, mask.value_or(physics::category::all));
-    std::vector<std::shared_ptr<objectproxy>> result;
-    result.reserve(entities.size());
-    for (const auto entity : entities) {
-      if (auto* proxy = _registry.try_get<std::shared_ptr<objectproxy>>(entity)) {
-        result.push_back(*proxy);
-      }
-    }
-
-    return result;
-  };
-
-  environment["world"] = environment.create_with(
-    "raycast", sol::overload(
-      [raycast](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
-        return raycast(origin, angle, distance, mask);
-      },
-      [raycast](float x, float y, float angle, float distance, std::optional<physics::category> mask) {
-        return raycast({x, y}, angle, distance, mask);
-      }
-    )
-  );
-
   if (auto sounds = node["sounds"]) {
     sounds.foreach([this](unmarshal::json node) {
       _soundpool.add(node.get<std::string_view>());
@@ -170,6 +133,45 @@ std::string_view scene::name() const noexcept {
 }
 
 void scene::populate(sol::table& pool) const {
+  sol::state_view lua(pool.lua_state());
+
+  lua.new_enum(
+    "PhysicsCategory",
+    "none", physics::category::none,
+    "player", physics::category::player,
+    "enemy", physics::category::enemy,
+    "projectile", physics::category::projectile,
+    "terrain", physics::category::terrain,
+    "trigger", physics::category::trigger,
+    "collectible", physics::category::collectible,
+    "interface", physics::category::interface,
+    "all", physics::category::all
+  );
+
+  const auto raycast = [&](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
+    const auto entities = _world.raycast(origin, angle, distance, mask.value_or(physics::category::all));
+    std::vector<std::shared_ptr<objectproxy>> result;
+    result.reserve(entities.size());
+    for (const auto entity : entities) {
+      if (const auto* proxy = _registry.try_get<std::shared_ptr<objectproxy>>(entity)) {
+        result.push_back(*proxy);
+      }
+    }
+
+    return sol::as_table(result);
+  };
+
+  lua["world"] = lua.create_table_with(
+    "raycast", sol::overload(
+      [raycast](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
+        return raycast(origin, angle, distance, mask);
+      },
+      [raycast](float x, float y, float angle, float distance, std::optional<physics::category> mask) {
+        return raycast({x, y}, angle, distance, mask);
+      }
+    )
+  );
+
   _soundpool.populate(pool);
   _particlepool.populate(pool);
   _objectpool.populate(pool);
