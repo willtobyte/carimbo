@@ -16,8 +16,9 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
       _soundpool(name),
       _particlepool(_renderer),
       _objectpool(_registry, _world, _renderer, name, _environment) {
+  _hits.reserve(16);
+  _hovering.reserve(16);
 
-  _hits.reserve(64);
   _registry.ctx().emplace<interning>();
   _registry.ctx().emplace<scripting>(_registry);
   _registry.ctx().emplace<physics::world*>(&_world);

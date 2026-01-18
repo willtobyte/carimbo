@@ -22,6 +22,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
 }
 
 std::string_view scenemanager::current() const {
+  if (!_scene) [[unlikely]] return {};
   return _scene->name();
 }
 
@@ -35,8 +36,9 @@ std::vector<std::string> scenemanager::query(std::string_view name) const {
   const auto all = name.size() == 1 && name.front() == '*';
   if (all) {
     result.reserve(_scene_mapping.size());
+    const auto current = _scene ? _scene->name() : std::string_view{};
     for (const auto& [key, _] : _scene_mapping) {
-      if (key == _scene->name()) continue;
+      if (key == current) continue;
       result.emplace_back(key);
     }
 
@@ -76,26 +78,32 @@ void scenemanager::update(float delta) {
     _scene->on_enter();
   }
 
+  if (!_scene) [[unlikely]] return;
   _scene->update(delta);
 }
 
 void scenemanager::draw() const {
+  if (!_scene) [[unlikely]] return;
   _scene->draw();
 }
 
 void scenemanager::on_tick(uint8_t tick) {
+  if (!_scene) [[unlikely]] return;
   _scene->on_tick(tick);
 }
 
 void scenemanager::on_key_press(const event::keyboard::key& event) {
+  if (!_scene) [[unlikely]] return;
   _scene->on_key_press(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_key_release(const event::keyboard::key& event) {
+  if (!_scene) [[unlikely]] return;
   _scene->on_key_release(static_cast<int32_t>(event));
 }
 
 void scenemanager::on_text(std::string_view text) {
+  if (!_scene) [[unlikely]] return;
   _scene->on_text(text);
 }
 
@@ -103,10 +111,12 @@ void scenemanager::on_mouse_press(const event::mouse::button& event) {
 }
 
 void scenemanager::on_mouse_release(const event::mouse::button& event) {
+  if (!_scene) [[unlikely]] return;
   _scene->on_touch(event.x, event.y);
 }
 
 void scenemanager::on_mouse_motion(const event::mouse::motion& event) {
+  if (!_scene) [[unlikely]] return;
   _scene->on_motion(event.x, event.y);
 }
 

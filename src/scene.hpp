@@ -44,10 +44,10 @@ public:
   void on_tick(uint8_t tick);
 
 private:
-  void query(float x, float y, entt::dense_set<entt::entity>& out) const {
+  void query(float x, float y, std::unordered_set<entt::entity>& out) const {
     const auto aabb = physics::make_aabb(x - epsilon, y - epsilon, epsilon * 2.0f, epsilon * 2.0f);
     _world.overlap_aabb(aabb, physics::category::all, [&out](b2ShapeId, entt::entity entity) {
-      out.insert(entity);
+      out.emplace(entity);
       return true;
     });
   }
@@ -82,8 +82,8 @@ private:
   std::function<void()> _onenter;
   std::function<void()> _onleave;
 
-  entt::dense_set<entt::entity> _hits;
-  entt::dense_set<entt::entity> _hovering;
+  std::unordered_set<entt::entity> _hits;
+  std::unordered_set<entt::entity> _hovering;
 
   sol::environment _environment;
   soundpool _soundpool;
