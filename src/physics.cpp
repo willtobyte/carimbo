@@ -84,7 +84,7 @@ b2SensorEvents world::sensor_events() const noexcept {
   return b2World_GetSensorEvents(_id);
 }
 
-std::vector<entt::entity> world::raytrace(const vec2& origin, float angle, float distance, category mask) const noexcept {
+std::vector<entt::entity> world::raycast(const vec2& origin, float angle, float distance, category mask) const noexcept {
   const auto radians = angle * (std::numbers::pi_v<float> / 180.0f);
   const auto direction = b2Vec2{std::cos(radians) * distance, std::sin(radians) * distance};
   const auto filter = make_query_filter(category::all, mask);
@@ -110,7 +110,6 @@ std::vector<entt::entity> world::raytrace(const vec2& origin, float angle, float
   );
 
   std::ranges::sort(hits, {}, &hit::fraction);
-
   std::vector<entt::entity> result(hits.size());
   std::ranges::transform(hits, result.begin(), &hit::entity);
 

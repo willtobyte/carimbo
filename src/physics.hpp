@@ -69,7 +69,7 @@ public:
   [[nodiscard]] b2WorldId id() const noexcept;
   [[nodiscard]] b2SensorEvents sensor_events() const noexcept;
 
-  [[nodiscard]] std::vector<entt::entity> raytrace(const vec2& origin, float angle, float distance, category mask = category::all) const noexcept;
+  [[nodiscard]] std::vector<entt::entity> raycast(const vec2& origin, float angle, float distance, category mask = category::all) const noexcept;
 
   template <typename F>
   void overlap_aabb(const b2AABB& aabb, category mask, F&& callback) const noexcept {

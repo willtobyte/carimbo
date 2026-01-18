@@ -35,18 +35,28 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
     "all", physics::category::all
   );
 
-  environment["world"] = environment.create_with(
-    "raytrace", [this](float x, float y, float angle, float distance, std::optional<physics::category> mask) {
-      const auto entities = _world.raytrace({x, y}, angle, distance, mask.value_or(physics::category::all));
-      std::vector<std::shared_ptr<objectproxy>> result;
-      result.reserve(entities.size());
-      for (const auto entity : entities) {
-        if (auto* proxy = _registry.try_get<std::shared_ptr<objectproxy>>(entity)) {
-          result.push_back(*proxy);
-        }
+  const auto raycast = [this](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
+    const auto entities = _world.raycast(origin, angle, distance, mask.value_or(physics::category::all));
+    std::vector<std::shared_ptr<objectproxy>> result;
+    result.reserve(entities.size());
+    for (const auto entity : entities) {
+      if (auto* proxy = _registry.try_get<std::shared_ptr<objectproxy>>(entity)) {
+        result.push_back(*proxy);
       }
-      return result;
     }
+
+    return result;
+  };
+
+  environment["world"] = environment.create_with(
+    "raycast", sol::overload(
+      [raycast](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
+        return raycast(origin, angle, distance, mask);
+      },
+      [raycast](float x, float y, float angle, float distance, std::optional<physics::category> mask) {
+        return raycast({x, y}, angle, distance, mask);
+      }
+    )
   );
 
   if (auto sounds = node["sounds"]) {
