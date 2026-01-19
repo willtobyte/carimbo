@@ -17,8 +17,9 @@ float objectproxy::x() const noexcept {
 }
 
 void objectproxy::set_x(float x) noexcept {
-  auto& t = _registry.get<transform>(_entity);
+  auto [t, d] = _registry.get<transform, dirtable>(_entity);
   t.position.x = x;
+  d.mark(dirtable::render);
 }
 
 float objectproxy::y() const noexcept {
@@ -27,8 +28,9 @@ float objectproxy::y() const noexcept {
 }
 
 void objectproxy::set_y(float y) noexcept {
-  auto& t = _registry.get<transform>(_entity);
+  auto [t, d] = _registry.get<transform, dirtable>(_entity);
   t.position.y = y;
+  d.mark(dirtable::render);
 }
 
 vec2 objectproxy::position() const noexcept {
@@ -37,8 +39,9 @@ vec2 objectproxy::position() const noexcept {
 }
 
 void objectproxy::set_position(const vec2& position) noexcept {
-  auto& t = _registry.get<transform>(_entity);
+  auto [t, d] = _registry.get<transform, dirtable>(_entity);
   t.position = position;
+  d.mark(dirtable::render);
 }
 
 vec2 objectproxy::velocity() const noexcept {
@@ -57,9 +60,9 @@ uint8_t objectproxy::alpha() const noexcept {
 }
 
 void objectproxy::set_alpha(uint8_t alpha) noexcept {
-  auto [t, s] = _registry.get<tint, playback>(_entity);
+  auto [t, d] = _registry.get<tint, dirtable>(_entity);
   t.a = alpha;
-  s.redraw = true;
+  d.mark(dirtable::physics);
 }
 
 double objectproxy::angle() const noexcept {
@@ -68,9 +71,9 @@ double objectproxy::angle() const noexcept {
 }
 
 void objectproxy::set_angle(double angle) noexcept {
-  auto [t, s] = _registry.get<transform, playback>(_entity);
+  auto [t, d] = _registry.get<transform, dirtable>(_entity);
   t.angle = angle;
-  s.redraw = true;
+  d.mark(dirtable::physics | dirtable::render);
 }
 
 float objectproxy::scale() const noexcept {
@@ -79,10 +82,9 @@ float objectproxy::scale() const noexcept {
 }
 
 void objectproxy::set_scale(float scale) noexcept {
-  auto [t, s] = _registry.get<transform, playback>(_entity);
+  auto [t, d] = _registry.get<transform, dirtable>(_entity);
   t.scale = scale;
-  s.dirty = true;
-  s.redraw = true;
+  d.mark(dirtable::animation | dirtable::physics | dirtable::render);
 }
 
 bool objectproxy::visible() const noexcept {
@@ -103,11 +105,11 @@ std::string_view objectproxy::action() const noexcept {
 
 void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
-  auto [s, at] = _registry.get<playback, std::shared_ptr<const atlas>>(_entity);
+  auto [s, at, d] = _registry.get<playback, std::shared_ptr<const atlas>, dirtable>(_entity);
   s.action = interning.intern(value);
   s.current_frame = 0;
-  s.dirty = false;
   s.timeline = at->find(s.action);
+  d.mark(dirtable::render | dirtable::physics);
 }
 
 std::string_view objectproxy::kind() const noexcept {
@@ -128,9 +130,9 @@ flip objectproxy::flip() const noexcept {
 }
 
 void objectproxy::set_flip(::flip flip) noexcept {
-  auto [o, s] = _registry.get<::orientation, playback>(_entity);
+  auto [o, d] = _registry.get<::orientation, dirtable>(_entity);
   o.flip = flip;
-  s.redraw = true;
+  d.mark(dirtable::render);
 }
 
 int objectproxy::z() const noexcept {
@@ -223,10 +225,7 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   }
 
   if (pb) {
-    playback copy = *pb;
-    copy.dirty = true;
-    copy.redraw = true;
-    _registry.emplace<playback>(entity, std::move(copy));
+    _registry.emplace<playback>(entity, *pb);
   }
 
   if (tf) {
@@ -240,6 +239,9 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   if (ori) {
     _registry.emplace<orientation>(entity, *ori);
   }
+
+  _registry.emplace<dirtable>(entity);
+  _registry.emplace<drawable>(entity);
 
   const auto position = tf ? tf->position : vec2{0, 0};
   auto* world = _registry.ctx().get<physics::world*>();

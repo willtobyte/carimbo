@@ -92,6 +92,8 @@ void scene::update(float delta) {
 
   _scriptsystem.update(delta);
 
+  _rendersystem.update();
+
   auto& state = _registry.ctx().get<renderstate>();
   state.flush(_registry);
 

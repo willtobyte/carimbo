@@ -96,12 +96,29 @@ struct sprite final {
 };
 
 struct playback final {
-  bool dirty;
-  bool redraw;
   uint16_t current_frame{0};
   uint64_t tick{0};
   symbol action{empty};
   const timeline* timeline{nullptr};
+};
+
+struct dirtable final {
+  uint8_t flags{0xff};
+
+  static constexpr uint8_t animation = 1 << 0;
+  static constexpr uint8_t physics = 1 << 1;
+  static constexpr uint8_t render = 1 << 2;
+
+  void mark(uint8_t f) noexcept { flags |= f; }
+  void clear(uint8_t f) noexcept { flags &= ~f; }
+  [[nodiscard]] bool is(uint8_t f) const noexcept { return flags & f; }
+};
+
+struct drawable final {
+  float x{0};
+  float y{0};
+  float w{0};
+  float h{0};
 };
 
 struct renderable final {

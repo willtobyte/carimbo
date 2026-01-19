@@ -81,13 +81,13 @@ void objectpool::add(unmarshal::json node, int32_t z) {
   _registry.emplace<tint>(entity);
   _registry.emplace<sprite>(entity, sprite{.pixmap = it->second.pixmap});
   _registry.emplace<playback>(entity, playback{
-    .dirty = true,
-    .redraw = false,
     .current_frame = 0,
     .tick = SDL_GetTicks(),
     .action = action,
     .timeline = nullptr
   });
+  _registry.emplace<dirtable>(entity);
+  _registry.emplace<drawable>(entity);
   _registry.emplace<orientation>(entity);
   _registry.emplace<velocity>(entity);
   _registry.emplace<physics::body>(entity, physics::body::create(_world, {.type = physics::bodytype::kinematic, .position = position, .entity = entity}));

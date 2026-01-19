@@ -16,14 +16,15 @@ namespace {
 }
 
 void animationsystem::update(uint64_t now) {
-  for (auto&& [entity, at, s] : _view.each()) {
-    const bool refresh = s.dirty | !s.timeline;
+  for (auto&& [entity, at, s, d] : _view.each()) {
+    const bool refresh = d.is(dirtable::animation) | !s.timeline;
 
     if (refresh) [[unlikely]] {
       s.timeline = resolve_timeline(*at, s.action);
       s.current_frame = 0;
       s.tick = now;
-      s.dirty = false;
+      d.clear(dirtable::animation);
+      d.mark(dirtable::render | dirtable::physics);
       if (s.timeline) {
         if (const auto* a = _entt.try_get<animatable>(entity)) {
           a->on_begin();
@@ -53,11 +54,16 @@ void animationsystem::update(uint64_t now) {
     const auto is_last = s.current_frame + 1 >= tl.frames.size();
     const auto has_next = tl.next != empty;
 
+    const auto prev_frame = s.current_frame;
     s.current_frame = is_last ? 0 : s.current_frame + 1;
+
+    if (prev_frame != s.current_frame) {
+      d.mark(dirtable::render);
+    }
 
     if (is_last & has_next) {
       s.action = tl.next;
-      s.dirty = true;
+      d.mark(dirtable::animation);
     } else if (is_last & tl.oneshot) {
       s.action = empty;
       s.timeline = nullptr;
@@ -105,11 +111,21 @@ void physicssystem::update(float delta) {
   }
 
   _group.each(
-    [](entt::entity, const transform& t, physics::body& body, const playback& p, const renderable& rn) {
-      const auto has_hitbox = rn.visible && p.timeline && p.timeline->hitbox.has_value();
+    [](entt::entity, const transform& t, physics::body& body, const playback& p, const renderable& rn, const tint& tn, dirtable& d) {
+      const auto hitbox = rn.visible && tn.a > 0 && p.timeline && p.timeline->hitbox.has_value();
 
-      if (!has_hitbox) [[unlikely]] {
+      if (!hitbox) [[unlikely]] {
         body.detach();
+        d.clear(dirtable::physics);
+        return;
+      }
+
+      if (!d.is(dirtable::physics)) [[likely]] {
+        const auto& box = *p.timeline->hitbox;
+        const auto px = t.position.x + box.x + box.w * 0.5f;
+        const auto py = t.position.y + box.y + box.h * 0.5f;
+        const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
+        body.set_transform({px, py}, angle);
         return;
       }
 
@@ -123,12 +139,17 @@ void physicssystem::update(float delta) {
 
       body.attach_sensor_if_changed(hx, hy);
       body.set_transform({px, py}, angle);
+      d.clear(dirtable::physics);
     });
 }
 
-void rendersystem::draw() const noexcept {
-  _view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& pb, const orientation& fl) {
+void rendersystem::update() noexcept {
+  _view.each([](const renderable& rn, const transform& tr, const tint&, const sprite&, const playback& pb, const orientation&, dirtable& d, drawable& dr) {
     if (!rn.visible || !pb.timeline || pb.timeline->frames.empty()) [[unlikely]] {
+      return;
+    }
+
+    if (!d.is(dirtable::render)) [[likely]] {
       return;
     }
 
@@ -144,10 +165,24 @@ void rendersystem::draw() const noexcept {
     const auto hh = q.h * 0.5f;
     const auto sw = q.w * tr.scale;
     const auto sh = q.h * tr.scale;
-    const auto fx = frame.offset_x + tr.position.x + hw - sw * 0.5f;
-    const auto fy = frame.offset_y + tr.position.y + hh - sh * 0.5f;
+    dr.x = frame.offset_x + tr.position.x + hw - sw * 0.5f;
+    dr.y = frame.offset_y + tr.position.y + hh - sh * 0.5f;
+    dr.w = sw;
+    dr.h = sh;
+    d.clear(dirtable::render);
+  });
+}
 
-    sp.pixmap->draw(q.x, q.y, q.w, q.h, fx, fy, sw, sh, tr.angle, tn.a, fl.flip);
+void rendersystem::draw() const noexcept {
+  _view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& pb, const orientation& fl, const dirtable&, const drawable& dr) {
+    if (!rn.visible || !pb.timeline || pb.timeline->frames.empty()) [[unlikely]] {
+      return;
+    }
+
+    const auto& frame = pb.timeline->frames[pb.current_frame];
+    const auto& q = frame.quad;
+
+    sp.pixmap->draw(q.x, q.y, q.w, q.h, dr.x, dr.y, dr.w, dr.h, tr.angle, tn.a, fl.flip);
   });
 }
 
