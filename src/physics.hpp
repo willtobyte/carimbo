@@ -49,7 +49,7 @@ enum class bodytype : uint8_t {
 
 [[nodiscard]] entt::entity entity_from(b2ShapeId shape) noexcept;
 [[nodiscard]] bool valid_pair(b2ShapeId a, b2ShapeId b) noexcept;
-[[nodiscard]] quad shape_aabb(b2ShapeId shape) noexcept;
+
 
 class world;
 class body;

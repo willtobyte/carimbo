@@ -14,18 +14,6 @@ bool physics::valid_pair(b2ShapeId a, b2ShapeId b) noexcept {
   return b2Shape_IsValid(a) & b2Shape_IsValid(b);
 }
 
-quad physics::shape_aabb(b2ShapeId shape) noexcept {
-  if (!b2Shape_IsValid(shape)) return {};
-
-  const auto aabb = b2Shape_GetAABB(shape);
-
-  return {
-    aabb.lowerBound.x, aabb.lowerBound.y,
-    aabb.upperBound.x - aabb.lowerBound.x,
-    aabb.upperBound.y - aabb.lowerBound.y
-  };
-}
-
 world::world(const unmarshal::json& node) noexcept {
   auto gx = .0f, gy = .0f;
   if (auto p = node["physics"]) {

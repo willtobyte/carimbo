@@ -116,12 +116,16 @@ void scene::draw() const noexcept {
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
 
   const auto aabb = physics::make_aabb(_camera.x, _camera.y, _camera.w, _camera.h);
-  auto* renderer = static_cast<SDL_Renderer*>(*_renderer);
-  _world.overlap_aabb(aabb, physics::category::all, [renderer, this](b2ShapeId shape, entt::entity) {
-    const auto q = physics::shape_aabb(shape);
-    const auto r = SDL_FRect{q.x - _camera.x, q.y - _camera.y, q.w, q.h};
+  _world.overlap_aabb(aabb, physics::category::all, [this](b2ShapeId shape, entt::entity) {
+    const auto box = b2Shape_GetAABB(shape);
+    const SDL_FRect r{
+      box.lowerBound.x - _camera.x,
+      box.lowerBound.y - _camera.y,
+      box.upperBound.x - box.lowerBound.x,
+      box.upperBound.y - box.lowerBound.y
+    };
 
-    SDL_RenderRect(renderer, &r);
+    SDL_RenderRect(*_renderer, &r);
 
     return true;
   });
