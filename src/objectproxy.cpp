@@ -243,7 +243,7 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
 
   const auto position = tf ? tf->position : vec2{0, 0};
   auto* world = _registry.ctx().get<physics::world*>();
-  _registry.emplace<physics::body>(entity, physics::body::create(*world, physics::bodytype::kinematic, position, entity));
+  _registry.emplace<physics::body>(entity, physics::body::create(*world, {.type = physics::bodytype::kinematic, .position = position, .entity = entity}));
   _registry.emplace<struct velocity>(entity);
 
   if (rn) {

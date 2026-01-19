@@ -21,6 +21,14 @@ enum class bodytype : uint8_t {
   kinematic
 };
 
+struct bodydef final {
+  bodytype type{bodytype::staticbody};
+  vec2 position{};
+  entt::entity entity{entt::null};
+  std::optional<vec2> box{};
+  bool sensor{false};
+};
+
 
 
 [[nodiscard]] constexpr b2Vec2 to_b2(const vec2& v) noexcept {
@@ -29,10 +37,6 @@ enum class bodytype : uint8_t {
 
 [[nodiscard]] constexpr vec2 from_b2(b2Vec2 v) noexcept {
   return {v.x, v.y};
-}
-
-[[nodiscard]] constexpr b2AABB aabb(const vec2& center, float hx, float hy) noexcept {
-  return {{center.x - hx, center.y - hy}, {center.x + hx, center.y + hy}};
 }
 
 [[nodiscard]] constexpr b2AABB aabb(float x, float y, float w, float h) noexcept {
@@ -102,16 +106,14 @@ public:
   body(const body&) = delete;
   body& operator=(const body&) = delete;
 
-  [[nodiscard]] static body create(world& w, bodytype type, const vec2& position, entt::entity entity = entt::null) noexcept;
-  [[nodiscard]] static body create_static(world& w, const vec2& position, const vec2& half_extents) noexcept;
+  [[nodiscard]] static body create(world& w, const bodydef& def) noexcept;
 
   void attach_sensor_if_changed(float hx, float hy) noexcept;
-  void detach_shape() noexcept;
+  void detach() noexcept;
   void set_transform(const vec2& position, float angle) noexcept;
 
 private:
-  void attach_sensor(float hx, float hy) noexcept;
-  void attach_box(float hx, float hy) noexcept;
+  void attach(float hx, float hy, bool sensor) noexcept;
   void destroy() noexcept;
   [[nodiscard]] bool has_shape() const noexcept;
   [[nodiscard]] b2BodyId id() const noexcept;

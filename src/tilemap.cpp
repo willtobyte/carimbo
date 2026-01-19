@@ -105,7 +105,7 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, phys
           static_cast<float>(row) * _tile_size + box.y
         };
 
-        _bodies.emplace_back(physics::body::create_static(world, position, box));
+        _bodies.emplace_back(physics::body::create(world, {.position = position, .box = box}));
       }
     }
   }

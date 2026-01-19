@@ -130,56 +130,40 @@ body& body::operator=(body&& other) noexcept {
   return *this;
 }
 
-body body::create(world& w, bodytype type, const vec2& position, entt::entity entity) noexcept {
+body body::create(world& w, const bodydef& d) noexcept {
   body result;
   auto def = b2DefaultBodyDef();
-  def.type = static_cast<b2BodyType>(type);
-  def.position = to_b2(position);
-  def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(entity));
+  def.type = static_cast<b2BodyType>(d.type);
+  def.position = to_b2(d.position);
+  def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(d.entity));
   result._body = b2CreateBody(w.id(), &def);
+
+  if (d.box) {
+    result.attach(d.box->x, d.box->y, d.sensor);
+  }
 
   return result;
 }
 
-body body::create_static(world& w, const vec2& position, const vec2& half_extents) noexcept {
-  body result;
-  auto def = b2DefaultBodyDef();
-  def.type = b2_staticBody;
-  def.position = to_b2(position);
-  result._body = b2CreateBody(w.id(), &def);
-  result.attach_box(half_extents.x, half_extents.y);
-
-  return result;
-}
-
-void body::attach_sensor(float hx, float hy) noexcept {
-  detach_shape();
+void body::attach(float hx, float hy, bool sensor) noexcept {
+  detach();
 
   const auto poly = b2MakeBox(hx, hy);
   auto def = b2DefaultShapeDef();
-  def.isSensor = true;
-  def.enableSensorEvents = true;
+  def.isSensor = sensor;
+  def.enableSensorEvents = sensor;
   def.userData = b2Body_GetUserData(_body);
   _shape = b2CreatePolygonShape(_body, &def, &poly);
-  _cache = {hx, hy};
+  if (sensor) _cache = {hx, hy};
 }
 
 void body::attach_sensor_if_changed(float hx, float hy) noexcept {
   if (has_shape() && _cache.hx == hx && _cache.hy == hy) [[likely]] return;
 
-  attach_sensor(hx, hy);
+  attach(hx, hy, true);
 }
 
-void body::attach_box(float hx, float hy) noexcept {
-  detach_shape();
-
-  const auto poly = b2MakeBox(hx, hy);
-  auto def = b2DefaultShapeDef();
-  def.userData = b2Body_GetUserData(_body);
-  _shape = b2CreatePolygonShape(_body, &def, &poly);
-}
-
-void body::detach_shape() noexcept {
+void body::detach() noexcept {
   if (b2Shape_IsValid(_shape)) {
     b2DestroyShape(_shape, false);
     _shape = b2ShapeId{};
@@ -187,7 +171,7 @@ void body::detach_shape() noexcept {
 }
 
 void body::destroy() noexcept {
-  detach_shape();
+  detach();
 
   if (b2Body_IsValid(_body)) {
     b2DestroyBody(_body);

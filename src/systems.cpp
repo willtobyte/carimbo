@@ -109,7 +109,7 @@ void physicssystem::update(float delta) {
       const auto has_hitbox = rn.visible && p.timeline && p.timeline->hitbox.has_value();
 
       if (!has_hitbox) [[unlikely]] {
-        body.detach_shape();
+        body.detach();
         return;
       }
 

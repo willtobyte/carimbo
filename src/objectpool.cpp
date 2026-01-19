@@ -90,7 +90,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
   });
   _registry.emplace<orientation>(entity);
   _registry.emplace<velocity>(entity);
-  _registry.emplace<physics::body>(entity, physics::body::create(_world, physics::bodytype::kinematic, position, entity));
+  _registry.emplace<physics::body>(entity, physics::body::create(_world, {.type = physics::bodytype::kinematic, .position = position, .entity = entity}));
   _registry.emplace<renderable>(entity, renderable{.z = z});
 
   const auto proxy = std::make_shared<objectproxy>(entity, _registry);
