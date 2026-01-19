@@ -115,8 +115,7 @@ void scene::draw() const noexcept {
 #ifdef DEBUG
   SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
 
-  const auto aabb = physics::make_aabb(_camera.x, _camera.y, _camera.w, _camera.h);
-  _world.overlap_aabb(aabb, physics::category::all, [this](b2ShapeId shape, entt::entity) {
+  _world.query_aabb(physics::aabb(_camera), physics::category::all, [this](b2ShapeId shape, entt::entity) {
     const auto box = b2Shape_GetAABB(shape);
     const SDL_FRect r{
       box.lowerBound.x - _camera.x,

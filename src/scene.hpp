@@ -45,8 +45,7 @@ public:
 
 private:
   void query(float x, float y, std::unordered_set<entt::entity>& out) const {
-    const auto aabb = physics::make_aabb(x - epsilon, y - epsilon, epsilon * 2.0f, epsilon * 2.0f);
-    _world.overlap_aabb(aabb, physics::category::all, [&out](b2ShapeId, entt::entity entity) {
+    _world.query_aabb(physics::aabb(x - epsilon, y - epsilon, epsilon * 2.0f, epsilon * 2.0f), physics::category::all, [&out](b2ShapeId, entt::entity entity) {
       out.emplace(entity);
       return true;
     });

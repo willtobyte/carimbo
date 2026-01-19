@@ -31,12 +31,16 @@ enum class bodytype : uint8_t {
   return {v.x, v.y};
 }
 
-[[nodiscard]] constexpr b2AABB make_aabb(const vec2& center, float hx, float hy) noexcept {
+[[nodiscard]] constexpr b2AABB aabb(const vec2& center, float hx, float hy) noexcept {
   return {{center.x - hx, center.y - hy}, {center.x + hx, center.y + hy}};
 }
 
-[[nodiscard]] constexpr b2AABB make_aabb(float x, float y, float w, float h) noexcept {
+[[nodiscard]] constexpr b2AABB aabb(float x, float y, float w, float h) noexcept {
   return {{x, y}, {x + w, y + h}};
+}
+
+[[nodiscard]] constexpr b2AABB aabb(const quad& q) noexcept {
+  return {{q.x, q.y}, {q.x + q.w, q.y + q.h}};
 }
 
 [[nodiscard]] constexpr b2Filter make_filter(category cat, category mask = category::all) noexcept {
@@ -72,7 +76,7 @@ public:
   [[nodiscard]] std::vector<entt::entity> raycast(const vec2& origin, float angle, float distance, category mask = category::all) const noexcept;
 
   template <typename F>
-  void overlap_aabb(const b2AABB& aabb, category mask, F&& callback) const noexcept {
+  void query_aabb(const b2AABB& aabb, category mask, F&& callback) const noexcept {
     struct context { F* fn; };
     context ctx{&callback};
     const auto filter = make_query_filter(category::all, mask);
