@@ -890,7 +890,7 @@ void scriptengine::run() {
     }
   };
 
-  static std::array<gamepadslot, 4> gamepadslots{gamepadslot{0}, gamepadslot{1}, gamepadslot{2}, gamepadslot{3}};
+  std::array<gamepadslot, 4> gamepadslots{gamepadslot{0}, gamepadslot{1}, gamepadslot{2}, gamepadslot{3}};
 
   struct gamepads final {
     [[nodiscard]] static int count() noexcept {
@@ -945,7 +945,7 @@ void scriptengine::run() {
     "Gamepads",
     sol::no_constructor,
     "count", sol::property(&gamepads::count),
-    sol::meta_function::index, [](gamepads&, int slot) noexcept -> gamepadslot& {
+    sol::meta_function::index, [&gamepadslots](gamepads&, int slot) noexcept -> gamepadslot& {
       return gamepadslots[static_cast<size_t>(std::clamp(slot, 0, 3))];
     }
   );
