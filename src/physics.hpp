@@ -78,8 +78,8 @@ public:
     const auto filter = make_query_filter(category::all, mask);
     b2World_OverlapAABB(_id, aabb, filter,
       [](b2ShapeId shape, void* userdata) -> bool {
-        auto* c = static_cast<context*>(userdata);
-        return (*c->fn)(shape, entity_from(shape));
+        auto* ctx = static_cast<context*>(userdata);
+        return (*ctx->fn)(shape, entity_from(shape));
       }, &ctx);
   }
 
