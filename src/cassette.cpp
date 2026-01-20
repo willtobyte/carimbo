@@ -1,9 +1,5 @@
 #include "cassette.hpp"
 
-#include <charconv>
-#include <cstdlib>
-#include <fstream>
-
 namespace {
 constexpr std::string_view TYPE_NULL   = "null";
 constexpr std::string_view TYPE_BOOL   = "bool";
@@ -18,7 +14,8 @@ void encode_string_to(std::string_view str, std::string& out) {
       case '\n': out.append("\\n");  break;
       case '\r': out.append("\\r");  break;
       case '\\': out.append("\\\\"); break;
-      default:   out.push_back(c);   break;
+      case '\'': out.append("\\'");  break;
+      default: out.push_back(c);   break;
     }
   }
 }
@@ -36,6 +33,7 @@ std::string decode_string(std::string_view str) {
         case 'n':  result += '\n'; ++index; break;
         case 'r':  result += '\r'; ++index; break;
         case '\\': result += '\\'; ++index; break;
+        case '\'': result += '\''; ++index; break;
         default:   result += str[index];    break;
       }
     } else {
@@ -71,7 +69,7 @@ bool parse(std::string_view line, std::string_view& type, std::string_view& key,
 cassette::cassette() {
 #ifdef EMSCRIPTEN
   const auto* const result = emscripten_run_script_string(std::format("localStorage.getItem('{}')", _storagekey).c_str());
-  const std::string_view content{result ? result : ""};
+  const std::string content{result ? result : ""};
 
   if (content.empty() || content == "null") {
     return;
@@ -123,9 +121,8 @@ cassette::cassette() {
         _data.try_emplace(key, v);
       }
     } else if (type == TYPE_DOUBLE) {
-      char* end = nullptr;
-      const auto v = std::strtod(value.data(), &end);
-      if (end != value.data() && end == value.data() + value.size()) {
+      double v{};
+      if (const auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v); ec == std::errc{}) {
         _data.try_emplace(key, v);
       }
     } else if (type == TYPE_STRING) {
