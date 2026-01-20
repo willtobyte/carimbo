@@ -40,6 +40,7 @@ std::string decode_string(std::string_view str) {
       result += str[index];
     }
   }
+
   return result;
 }
 
