@@ -121,8 +121,9 @@ cassette::cassette() {
         _data.try_emplace(key, v);
       }
     } else if (type == TYPE_DOUBLE) {
-      double v{};
-      if (const auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), v); ec == std::errc{}) {
+      char* end{};
+      const auto v = std::strtod(value.data(), &end);
+      if (end != value.data() && end == value.data() + value.size()) {
         _data.try_emplace(key, v);
       }
     } else if (type == TYPE_STRING) {
