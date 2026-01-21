@@ -34,10 +34,12 @@ struct ALC_Deleter final {
   void operator()(T* ptr) const noexcept {
     if (!ptr) return;
 
-    if constexpr (requires { alcCloseDevice(ptr); }) alcCloseDevice(ptr);
-    else if constexpr (requires { alcDestroyContext(ptr); }) {
+    if constexpr (requires { alcCloseDevice(ptr); }) {
+      alcCloseDevice(ptr);
+    } else if constexpr (requires { alcDestroyContext(ptr); }) {
       alcMakeContextCurrent(nullptr);
       alcDestroyContext(ptr);
+      alcCloseDevice(ptr);
     }
   }
 };
