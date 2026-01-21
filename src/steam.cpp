@@ -28,66 +28,106 @@ using GetAchievement_t        = bool(S_CALLTYPE*)(void*, const char*, bool*);
 using SetAchievement_t        = bool(S_CALLTYPE*)(void*, const char*);
 using StoreStats_t            = bool(S_CALLTYPE*)(void*);
 
-static DYNLIB_HANDLE hSteamApi = DYNLIB_LOAD(STEAM_LIB_NAME);
+static DYNLIB_HANDLE _steam_handle() {
+  static DYNLIB_HANDLE h = DYNLIB_LOAD(STEAM_LIB_NAME);
+  return h;
+}
 
-#define LOAD_SYMBOL(name, sym) reinterpret_cast<name>(reinterpret_cast<void*>(DYNLIB_SYM(hSteamApi, sym)))
+template<typename T>
+static T _load_symbol(const char* name) {
+  return reinterpret_cast<T>(reinterpret_cast<void*>(DYNLIB_SYM(_steam_handle(), name)));
+}
 
-static const auto pSteamAPI_InitSafe     = LOAD_SYMBOL(SteamAPI_InitSafe_t, "SteamAPI_InitSafe");
-static const auto pSteamAPI_Shutdown     = LOAD_SYMBOL(SteamAPI_Shutdown_t, "SteamAPI_Shutdown");
-static const auto pSteamAPI_RunCallbacks = LOAD_SYMBOL(SteamAPI_RunCallbacks_t, "SteamAPI_RunCallbacks");
-static const auto pSteamUserStats        = LOAD_SYMBOL(SteamUserStats_t, "SteamAPI_SteamUserStats_v013");
-static const auto pGetAchievement        = LOAD_SYMBOL(GetAchievement_t, "SteamAPI_ISteamUserStats_GetAchievement");
-static const auto pSetAchievement        = LOAD_SYMBOL(SetAchievement_t, "SteamAPI_ISteamUserStats_SetAchievement");
-static const auto pStoreStats            = LOAD_SYMBOL(StoreStats_t, "SteamAPI_ISteamUserStats_StoreStats");
+static SteamAPI_InitSafe_t _SteamAPI_InitSafe() {
+  static auto p = _load_symbol<SteamAPI_InitSafe_t>("SteamAPI_InitSafe");
+  return p;
+}
+
+static SteamAPI_Shutdown_t _SteamAPI_Shutdown() {
+  static auto p = _load_symbol<SteamAPI_Shutdown_t>("SteamAPI_Shutdown");
+  return p;
+}
+
+static SteamAPI_RunCallbacks_t _SteamAPI_RunCallbacks() {
+  static auto p = _load_symbol<SteamAPI_RunCallbacks_t>("SteamAPI_RunCallbacks");
+  return p;
+}
+
+static SteamUserStats_t _SteamUserStats() {
+  static auto p = _load_symbol<SteamUserStats_t>("SteamAPI_SteamUserStats_v013");
+  return p;
+}
+
+static GetAchievement_t _GetAchievement() {
+  static auto p = _load_symbol<GetAchievement_t>("SteamAPI_ISteamUserStats_GetAchievement");
+  return p;
+}
+
+static SetAchievement_t _SetAchievement() {
+  static auto p = _load_symbol<SetAchievement_t>("SteamAPI_ISteamUserStats_SetAchievement");
+  return p;
+}
+
+static StoreStats_t _StoreStats() {
+  static auto p = _load_symbol<StoreStats_t>("SteamAPI_ISteamUserStats_StoreStats");
+  return p;
+}
 
 bool SteamAPI_InitSafe() {
-  if (pSteamAPI_InitSafe) {
-    return pSteamAPI_InitSafe();
+  const auto fn = _SteamAPI_InitSafe();
+  if (fn) [[likely]] {
+    return fn();
   }
 
   return false;
 }
 
 void SteamAPI_Shutdown() {
-  if (pSteamAPI_Shutdown) {
-    pSteamAPI_Shutdown();
+  const auto fn = _SteamAPI_Shutdown();
+  if (fn) [[likely]] {
+    fn();
   }
 }
 
 void SteamAPI_RunCallbacks() {
-  if (pSteamAPI_RunCallbacks) {
-    pSteamAPI_RunCallbacks();
+  const auto fn = _SteamAPI_RunCallbacks();
+  if (fn) [[likely]] {
+    fn();
   }
 }
 
 void* SteamUserStats() {
-  if (pSteamUserStats) {
-    return pSteamUserStats();
+  const auto fn = _SteamUserStats();
+  if (fn) [[likely]] {
+    return fn();
   }
 
   return nullptr;
 }
 
 bool GetAchievement(const char* name) {
-  if (pGetAchievement) {
+  const auto fn = _GetAchievement();
+  if (fn) [[likely]] {
     bool achieved = false;
-    return pGetAchievement(SteamUserStats(), name, &achieved) && achieved;
+    return fn(SteamUserStats(), name, &achieved) && achieved;
   }
 
   return false;
 }
 
 bool SetAchievement(const char* name) {
-  if (pSetAchievement) {
-    return pSetAchievement(SteamUserStats(), name);
+  const auto fn = _SetAchievement();
+  if (fn) [[likely]] {
+    return fn(SteamUserStats(), name);
   }
 
   return false;
 }
 
 bool StoreStats() {
-  if (pStoreStats) {
-    return pStoreStats(SteamUserStats());
+  const auto fn = _StoreStats();
+  if (fn) [[likely]] {
+    return fn(SteamUserStats());
   }
 
   return false;
