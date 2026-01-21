@@ -14,8 +14,6 @@ application::application(const int argc, char** const argv) noexcept {
 }
 
 int application::run() {
-  static_assert(boost::core::endian::native == boost::core::endian::little);
-
   try {
     const char* const p = std::getenv("CARTRIDGE");
 
