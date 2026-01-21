@@ -14,5 +14,5 @@ int main(int argc, char **argv) {
 #endif
 
   application app(argc, argv);
-  return app.run();
+  std::quick_exit(app.run());
 }

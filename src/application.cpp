@@ -2,15 +2,15 @@
 
 application::application(const int argc, char** const argv) noexcept {
 #ifdef HAS_SENTRY
-  std::atexit([] { sentry_close(); });
+  std::at_quick_exit([] { sentry_close(); });
 #endif
 
 #ifdef HAS_STEAM
-  std::atexit([] { SteamAPI_Shutdown(); });
+  std::at_quick_exit([] { SteamAPI_Shutdown(); });
 #endif
 
-  std::atexit([] { PHYSFS_deinit(); });
-  std::atexit([] { SDL_Quit(); });
+  std::at_quick_exit([] { PHYSFS_deinit(); });
+  std::at_quick_exit([] { SDL_Quit(); });
 
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
