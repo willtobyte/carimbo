@@ -15,9 +15,9 @@ application::application(const int argc, char** const argv) noexcept {
 
 int application::run() {
   try {
-    const char* const p = std::getenv("CARTRIDGE");
+    const auto* const rom = std::getenv("CARTRIDGE");
 
-    filesystem::mount(p ? p : "cartridge.rom", "/");
+    filesystem::mount(rom ? rom : "cartridge.rom", "/");
 
     auto se = scriptengine();
     se.run();
