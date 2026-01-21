@@ -1,21 +1,15 @@
 #include "application.hpp"
 
 application::application(const int argc, char** const argv) noexcept {
-#ifdef HAS_SENTRY
-  std::at_quick_exit([] { sentry_close(); });
-#endif
-
-#ifdef HAS_STEAM
-  std::at_quick_exit([] { SteamAPI_Shutdown(); });
-#endif
-
-  std::at_quick_exit([] { PHYSFS_deinit(); });
+  SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   std::at_quick_exit([] { SDL_Quit(); });
 
-  SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   PHYSFS_init(argv[0]);
+  std::at_quick_exit([] { PHYSFS_deinit(); });
+
 #ifdef HAS_STEAM
   SteamAPI_InitSafe();
+  std::at_quick_exit([] { SteamAPI_Shutdown(); });
 #endif
 }
 
