@@ -39,7 +39,6 @@ struct ALC_Deleter final {
     } else if constexpr (requires { alcDestroyContext(ptr); }) {
       alcMakeContextCurrent(nullptr);
       alcDestroyContext(ptr);
-      alcCloseDevice(ptr);
     }
   }
 };
