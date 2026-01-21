@@ -31,7 +31,7 @@ private:
 
   entt::registry& _registry;
   physics::world& _world;
-  std::string_view _scenename;
+  boost::static_string<48> _scenename;
   sol::environment& _environment;
 
   std::shared_ptr<renderer> _renderer;
