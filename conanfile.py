@@ -46,7 +46,7 @@ class Carimbo(ConanFile):
 
         for package, condition in [
             ("luajit/2.1.0-beta3", self._is_jit_capable),
-            ("sentry-native/0.12.1", self._has_sentry),
+            ("sentry-native/0.12.2", self._has_sentry),
             ("openssl/3.6.0", not self._is_webassembly),
         ]:
             if condition:

@@ -67,13 +67,8 @@ struct frame final {
       : duration(node["duration"].get<int32_t>()),
         offset_x(node["offset"]["x"].get(0.f)),
         offset_y(node["offset"]["y"].get(0.f)),
-        quad(node["quad"]["x"].get<float>(),
-             node["quad"]["y"].get<float>(),
-             node["quad"]["w"].get<float>(),
-             node["quad"]["h"].get<float>()) {}
+        quad(node["quad"].get<::quad>()) {}
 };
-
-
 
 struct timeline final {
   bool oneshot{false};
@@ -195,12 +190,9 @@ public:
   explicit scripting(entt::registry& registry) noexcept
       : _registry(registry) {}
 
-  void wire(entt::entity entity, sol::environment& parent,
-            std::shared_ptr<objectproxy> proxy, std::string_view filename);
+  void wire(entt::entity entity, sol::environment& parent, std::shared_ptr<objectproxy> proxy, std::string_view filename);
 
-  void derive(entt::entity entity, sol::environment& parent,
-              std::shared_ptr<objectproxy> proxy,
-              std::shared_ptr<const std::string> bytecode, symbol chunkname);
+  void derive(entt::entity entity, sol::environment& parent, std::shared_ptr<objectproxy> proxy, std::shared_ptr<const std::string> bytecode, symbol chunkname);
 
 private:
   entt::registry& _registry;

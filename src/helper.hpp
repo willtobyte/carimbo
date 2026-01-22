@@ -12,6 +12,14 @@ inline void throw_exception(std::exception const& e, boost::source_location cons
 }
 }
 
+template<std::size_t N>
+struct std::formatter<boost::static_string<N>> : std::formatter<std::string_view> {
+  template<typename FormatContext>
+  auto format(const boost::static_string<N>& str, FormatContext& ctx) const {
+    return std::formatter<std::string_view>::format(std::string_view{str}, ctx);
+  }
+};
+
 struct transparent_string_hash final {
   using is_transparent = void;
 

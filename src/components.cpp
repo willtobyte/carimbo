@@ -28,20 +28,16 @@ std::string_view interning::lookup(symbol id) const noexcept {
   return it->second;
 }
 
-void scripting::wire(entt::entity entity, sol::environment& parent,
-                     std::shared_ptr<objectproxy> proxy, std::string_view filename) {
+void scripting::wire(entt::entity entity, sol::environment& parent, std::shared_ptr<objectproxy> proxy, std::string_view filename) {
   if (!io::exists(filename)) return;
 
   auto& interning = _registry.ctx().get<::interning>();
   const auto id = interning.intern(filename);
   const auto code = interning.bytecode(id, [&] {
-    sol::state_view lua(parent.lua_state());
     const auto buffer = io::read(filename);
-
-    const auto result = lua.load(
-      std::string_view{reinterpret_cast<const char*>(buffer.data()), buffer.size()},
-      std::format("@{}", filename)
-    );
+    std::string_view script{reinterpret_cast<const char*>(buffer.data()), buffer.size()};
+    sol::state_view lua(parent.lua_state());
+    const auto result = lua.load(script, std::format("@{}", filename));
 
     verify(result);
 
@@ -62,9 +58,7 @@ void scripting::wire(entt::entity entity, sol::environment& parent,
   derive(entity, parent, std::move(proxy), code, id);
 }
 
-void scripting::derive(entt::entity entity, sol::environment& parent,
-                       std::shared_ptr<objectproxy> proxy,
-                       std::shared_ptr<const std::string> bytecode, symbol chunkname) {
+void scripting::derive(entt::entity entity, sol::environment& parent, std::shared_ptr<objectproxy> proxy, std::shared_ptr<const std::string> bytecode, symbol chunkname) {
   const auto& interning = _registry.ctx().get<::interning>();
   sol::state_view lua(parent.lua_state());
   sol::environment environment(lua, sol::create, parent);

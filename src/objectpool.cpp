@@ -32,7 +32,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
 
   auto [it, inserted] = _shared.try_emplace(kind);
   if (inserted) {
-    const auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", std::string_view{_scenename}, kind)));
+    const auto json = unmarshal::parse(io::read(std::format("objects/{}/{}.json", _scenename, kind)));
 
     auto atlas = std::make_shared<::atlas>();
     if (auto timelines = json["timelines"]) {
@@ -63,7 +63,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
 
     it->second = shared{
       .atlas = std::move(atlas),
-      .pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/{}/{}.png", std::string_view{_scenename}, kind)),
+      .pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind)),
       .scale = json["scale"].get(1.0f)
     };
   }
@@ -97,7 +97,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
   _registry.emplace<std::shared_ptr<objectproxy>>(entity, proxy);
 
   auto& scripting = _registry.ctx().get<::scripting>();
-  scripting.wire(entity, _environment, proxy, std::format("objects/{}/{}.lua", std::string_view{_scenename}, kind));
+  scripting.wire(entity, _environment, proxy, std::format("objects/{}/{}.lua", _scenename, kind));
 }
 
 void objectpool::populate(sol::table& pool) const {

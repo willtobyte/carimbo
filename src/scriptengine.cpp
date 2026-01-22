@@ -84,7 +84,7 @@ struct sentinel final {
       : _name(name) {}
 
   ~sentinel() noexcept {
-    std::println("[garbagecollector] collected {}", std::string_view{_name});
+    std::println("[garbagecollector] collected {}", _name);
   }
 };
 
