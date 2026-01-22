@@ -13,9 +13,5 @@ int main(int argc, char **argv) {
   }
 #endif
 
-  application app(argc, argv);
-
-  const auto code = app.run();
-
-  std::quick_exit(code);
+  std::quick_exit(application(argc, argv).run());
 }
