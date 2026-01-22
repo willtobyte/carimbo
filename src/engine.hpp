@@ -9,13 +9,11 @@ public:
 
   std::shared_ptr<::eventmanager> eventmanager() const noexcept;
   std::shared_ptr<::scenemanager> scenemanager() const noexcept;
-  std::shared_ptr<::window> window() const noexcept;
   std::shared_ptr<::overlay> overlay() const noexcept;
   std::shared_ptr<::canvas> canvas() const noexcept;
 
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept;
   void set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept;
-  void set_window(std::shared_ptr<::window> ptr) noexcept;
   void set_overlay(std::shared_ptr<::overlay> ptr) noexcept;
   void set_canvas(std::shared_ptr<::canvas> ptr) noexcept;
   void set_ticks(uint8_t ticks) noexcept;
@@ -39,7 +37,6 @@ private:
 
   std::shared_ptr<::eventmanager> _eventmanager;
   std::shared_ptr<::scenemanager> _scenemanager;
-  std::shared_ptr<::window> _window;
   std::shared_ptr<::overlay> _overlay;
   std::shared_ptr<::canvas> _canvas;
 

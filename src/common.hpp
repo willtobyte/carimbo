@@ -108,7 +108,6 @@ class scriptengine;
 class soundfx;
 class tilemap;
 class widget;
-class window;
 
 struct keyframe;
 struct bounds;

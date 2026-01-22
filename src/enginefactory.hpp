@@ -20,6 +20,9 @@ public:
 
   std::shared_ptr<engine> create() const;
 
+  int width() const noexcept;
+  int height() const noexcept;
+
 private:
   std::string _title{"Untitled"};
   int _width{800};

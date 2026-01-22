@@ -531,6 +531,8 @@ void scriptengine::run() {
     "with_fullscreen", &enginefactory::with_fullscreen,
     "with_sentry", &enginefactory::with_sentry,
     "with_ticks", &enginefactory::with_ticks,
+    "width", &enginefactory::width,
+    "height", &enginefactory::height,
     "create", [](enginefactory& self, sol::this_state state) {
       sol::state_view lua{state};
       auto ptr = self.create();
@@ -540,8 +542,8 @@ void scriptengine::run() {
       lua["canvas"] = ptr->canvas();
 
       auto viewport = lua.create_table();
-      viewport["width"] = ptr->window()->width();
-      viewport["height"] = ptr->window()->height();
+      viewport["width"] = self.width();
+      viewport["height"] = self.height();
       lua["viewport"] = viewport;
 
       auto mouse = lua.create_table();

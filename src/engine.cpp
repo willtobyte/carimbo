@@ -4,7 +4,6 @@
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "scenemanager.hpp"
-#include "window.hpp"
 
 SDL_Renderer* renderer = nullptr;
 
@@ -14,10 +13,6 @@ std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
 
 std::shared_ptr<scenemanager> engine::scenemanager() const noexcept {
   return _scenemanager;
-}
-
-std::shared_ptr<window> engine::window() const noexcept {
-  return _window;
 }
 
 std::shared_ptr<::overlay> engine::overlay() const noexcept {
@@ -34,10 +29,6 @@ void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {
 
 void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept {
   _scenemanager = std::move(ptr);
-}
-
-void engine::set_window(std::shared_ptr<::window> ptr) noexcept {
-  _window = std::move(ptr);
 }
 
 void engine::set_canvas(std::shared_ptr<::canvas> ptr) noexcept {

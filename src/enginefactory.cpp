@@ -101,11 +101,20 @@ enginefactory& enginefactory::with_ticks(const uint8_t ticks) noexcept {
 
 std::shared_ptr<engine> enginefactory::create() const {
   const auto engine = std::make_shared<::engine>();
-  const auto window = std::make_shared<::window>(_title, _width, _height, _fullscreen);
+
+  const auto window = SDL_CreateWindow(
+    _title.c_str(),
+    _width, _height,
+    _fullscreen ? SDL_WINDOW_FULLSCREEN : 0
+  );
+
+  const SDL_Rect area = {0, 0, _width, _height};
+  SDL_SetTextInputArea(window, &area, 0);
+  SDL_StartTextInput(window);
 
   const auto vsync = std::getenv("NOVSYNC") ? 0 : 1;
   const auto props = SDL_CreateProperties();
-  SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, static_cast<SDL_Window*>(*window));
+  SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, window);
   SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, vsync);
   SDL_SetStringProperty(props, SDL_PROP_RENDERER_CREATE_NAME_STRING, nullptr);
 
@@ -126,7 +135,6 @@ std::shared_ptr<engine> enginefactory::create() const {
 
   engine->set_eventmanager(eventmanager);
   engine->set_scenemanager(scenemanager);
-  engine->set_window(window);
   engine->set_overlay(overlay);
   engine->set_canvas(canvas);
   engine->set_ticks(_ticks);
@@ -139,4 +147,12 @@ std::shared_ptr<engine> enginefactory::create() const {
   scenemanager->set_fontpool(fontpool);
 
   return engine;
+}
+
+int enginefactory::width() const noexcept {
+  return _width;
+}
+
+int enginefactory::height() const noexcept {
+  return _height;
 }
