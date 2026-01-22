@@ -47,7 +47,7 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, phys
     }
   }
 
-  const auto half = _tile_size * 0.5f;
+  const auto half = _tile_size * .5f;
   const auto w = static_cast<size_t>(_width);
   const auto h = static_cast<size_t>(_height);
   const auto total = w * h;

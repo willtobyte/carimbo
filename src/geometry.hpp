@@ -37,12 +37,12 @@ struct alignas(8) vec2 {
   [[nodiscard]] static constexpr std::size_t size() noexcept { return 2; }
   [[nodiscard]] static constexpr std::size_t max_size() noexcept { return 2; }
 
-  [[nodiscard]] static constexpr vec2 zero() noexcept { return {0.0f, 0.0f}; }
+  [[nodiscard]] static constexpr vec2 zero() noexcept { return {.0f, .0f}; }
   [[nodiscard]] static constexpr vec2 one() noexcept { return {1.0f, 1.0f}; }
-  [[nodiscard]] static constexpr vec2 up() noexcept { return {0.0f, -1.0f}; }
-  [[nodiscard]] static constexpr vec2 down() noexcept { return {0.0f, 1.0f}; }
-  [[nodiscard]] static constexpr vec2 left() noexcept { return {-1.0f, 0.0f}; }
-  [[nodiscard]] static constexpr vec2 right() noexcept { return {1.0f, 0.0f}; }
+  [[nodiscard]] static constexpr vec2 up() noexcept { return {.0f, -1.0f}; }
+  [[nodiscard]] static constexpr vec2 down() noexcept { return {.0f, 1.0f}; }
+  [[nodiscard]] static constexpr vec2 left() noexcept { return {-1.0f, .0f}; }
+  [[nodiscard]] static constexpr vec2 right() noexcept { return {1.0f, .0f}; }
 };
 
 static_assert(sizeof(vec2) == 8);
@@ -419,17 +419,17 @@ constexpr auto& operator*=(quad& lhs, quad const& rhs) noexcept {
 
 [[nodiscard]] inline auto normalize(vec2 const& vec) noexcept {
   const float len = length(vec);
-  return len > 0.0f ? vec / len : vec2{};
+  return len > .0f ? vec / len : vec2{};
 }
 
 [[nodiscard]] inline auto normalize(vec3 const& vec) noexcept {
   const float len = length(vec);
-  return len > 0.0f ? vec / len : vec3{};
+  return len > .0f ? vec / len : vec3{};
 }
 
 [[nodiscard]] inline auto normalize(quad const& vec) noexcept {
   const float len = length(vec);
-  return len > 0.0f ? vec / len : quad{};
+  return len > .0f ? vec / len : quad{};
 }
 
 [[nodiscard]] constexpr auto lerp(vec2 const& a, vec2 const& b, float t) noexcept {
@@ -523,7 +523,7 @@ constexpr auto& operator*=(quad& lhs, quad const& rhs) noexcept {
 [[nodiscard]] inline float angle_between(vec2 const& a, vec2 const& b) noexcept {
   const float d = dot(a, b);
   const float len_product = length(a) * length(b);
-  return len_product > 0.0f ? std::acos(std::clamp(d / len_product, -1.0f, 1.0f)) : 0.0f;
+  return len_product > .0f ? std::acos(std::clamp(d / len_product, -1.0f, 1.0f)) : .0f;
 }
 
 [[nodiscard]] inline auto rotate(vec2 const& vec, float radians) noexcept {
@@ -545,5 +545,5 @@ constexpr auto& operator*=(quad& lhs, quad const& rhs) noexcept {
 
 [[nodiscard]] inline auto project(vec2 const& vec, vec2 const& onto) noexcept {
   const float len_sq = length_squared(onto);
-  return len_sq > 0.0f ? onto * (dot(vec, onto) / len_sq) : vec2{};
+  return len_sq > .0f ? onto * (dot(vec, onto) / len_sq) : vec2{};
 }

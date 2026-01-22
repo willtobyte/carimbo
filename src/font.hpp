@@ -34,7 +34,7 @@ public:
 private:
   int16_t _spacing{0};
   int16_t _leading{0};
-  float _fontheight{0.0f};
+  float _fontheight{.0f};
   std::shared_ptr<pixmap> _pixmap;
   std::shared_ptr<renderer> _renderer;
   std::string _glyphs;

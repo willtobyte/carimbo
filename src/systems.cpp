@@ -122,19 +122,19 @@ void physicssystem::update(float delta) {
 
       if (!d.is(dirtable::physics)) [[likely]] {
         const auto& box = *p.timeline->hitbox;
-        const auto px = t.position.x + box.x + box.w * 0.5f;
-        const auto py = t.position.y + box.y + box.h * 0.5f;
+        const auto px = t.position.x + box.x + box.w * .5f;
+        const auto py = t.position.y + box.y + box.h * .5f;
         const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
         body.set_transform({px, py}, angle);
         return;
       }
 
       const auto& box = *p.timeline->hitbox;
-      const auto hx = box.w * t.scale * 0.5f;
-      const auto hy = box.h * t.scale * 0.5f;
+      const auto hx = box.w * t.scale * .5f;
+      const auto hy = box.h * t.scale * .5f;
 
-      const auto px = t.position.x + box.x + box.w * 0.5f;
-      const auto py = t.position.y + box.y + box.h * 0.5f;
+      const auto px = t.position.x + box.x + box.w * .5f;
+      const auto py = t.position.y + box.y + box.h * .5f;
       const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
 
       body.attach_sensor_if_changed(hx, hy);
@@ -161,12 +161,12 @@ void rendersystem::update() noexcept {
     const auto& frame = tl.frames[pb.current_frame];
     const auto& q = frame.quad;
 
-    const auto hw = q.w * 0.5f;
-    const auto hh = q.h * 0.5f;
+    const auto hw = q.w * .5f;
+    const auto hh = q.h * .5f;
     const auto sw = q.w * tr.scale;
     const auto sh = q.h * tr.scale;
-    dr.x = frame.offset_x + tr.position.x + hw - sw * 0.5f;
-    dr.y = frame.offset_y + tr.position.y + hh - sh * 0.5f;
+    dr.x = frame.offset_x + tr.position.x + hw - sw * .5f;
+    dr.y = frame.offset_y + tr.position.y + hh - sh * .5f;
     dr.w = sw;
     dr.h = sh;
     d.clear(dirtable::render);

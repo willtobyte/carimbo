@@ -93,7 +93,7 @@ public:
 
 private:
   b2WorldId _id{};
-  float _accumulator{0.0f};
+  float _accumulator{.0f};
 };
 
 class body final {

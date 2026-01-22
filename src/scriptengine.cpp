@@ -248,27 +248,27 @@ void scriptengine::run() {
     },
     sol::meta_function::addition, [](const observable& obs, double rhs) {
       const auto value = obs.value();
-      return (value.valid() ? value.as<double>() : 0.0) + rhs;
+      return (value.valid() ? value.as<double>() : .0) + rhs;
     },
     sol::meta_function::subtraction, [](const observable& obs, double rhs) {
       const auto value = obs.value();
-      return (value.valid() ? value.as<double>() : 0.0) - rhs;
+      return (value.valid() ? value.as<double>() : .0) - rhs;
     },
     sol::meta_function::multiplication, [](const observable& obs, double rhs) {
       const auto value = obs.value();
-      return (value.valid() ? value.as<double>() : 0.0) * rhs;
+      return (value.valid() ? value.as<double>() : .0) * rhs;
     },
     sol::meta_function::division, [](const observable& obs, double rhs) {
       const auto value = obs.value();
-      return (value.valid() ? value.as<double>() : 0.0) / rhs;
+      return (value.valid() ? value.as<double>() : .0) / rhs;
     },
     sol::meta_function::modulus, [](const observable& obs, double rhs) {
       const auto value = obs.value();
-      return std::fmod(value.valid() ? value.as<double>() : 0.0, rhs);
+      return std::fmod(value.valid() ? value.as<double>() : .0, rhs);
     },
     sol::meta_function::unary_minus, [](const observable& obs) {
       const auto value = obs.value();
-      return -(value.valid() ? value.as<double>() : 0.0);
+      return -(value.valid() ? value.as<double>() : .0);
     },
     sol::meta_function::equal_to, [](const observable& obs, const sol::object& rhs) {
       const auto value = obs.value();
@@ -284,7 +284,7 @@ void scriptengine::run() {
     },
     sol::meta_function::less_than, [](const observable& obs, double rhs) {
       const auto value = obs.value();
-      return (value.valid() ? value.as<double>() : 0.0) < rhs;
+      return (value.valid() ? value.as<double>() : .0) < rhs;
     }
   );
 

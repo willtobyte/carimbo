@@ -101,8 +101,8 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   props->spawning = spawning;
   props->x = x;
   props->y = y;
-  props->hw = static_cast<float>(it->second.pixmap->width()) * 0.5f;
-  props->hh = static_cast<float>(it->second.pixmap->height()) * 0.5f;
+  props->hw = static_cast<float>(it->second.pixmap->width()) * .5f;
+  props->hh = static_cast<float>(it->second.pixmap->height()) * .5f;
   props->xspawnd = rng::uniform_real<float>(it->second.xspawn.first, it->second.xspawn.second);
   props->yspawnd = rng::uniform_real<float>(it->second.yspawn.first, it->second.yspawn.second);
   props->radiusd = rng::uniform_real<float>(it->second.radius.first, it->second.radius.second);

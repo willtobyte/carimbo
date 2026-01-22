@@ -64,7 +64,7 @@ void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {
 
 void engine::set_ticks(uint8_t ticks) noexcept {
   _ticks = ticks;
-  _tick_interval = ticks > 0 ? 1.0f / static_cast<float>(ticks) : 0.0f;
+  _tick_interval = ticks > 0 ? 1.0f / static_cast<float>(ticks) : .0f;
 }
 
 void engine::add_loopable(std::shared_ptr<::loopable> ptr) {
@@ -95,7 +95,7 @@ void engine::_loop() {
   const auto delta = std::min(static_cast<float>(static_cast<double>(now - prior) / frequency), MAX_DELTA);
   prior = now;
 
-  if (_tick_interval > 0.0f) {
+  if (_tick_interval > .0f) {
     _tick_accumulator += delta;
     while (_tick_accumulator >= _tick_interval) {
       _tick_accumulator -= _tick_interval;

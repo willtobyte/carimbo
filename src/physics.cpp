@@ -37,7 +37,7 @@ world::~world() noexcept {
 world::world(world&& other) noexcept
     : _id(other._id), _accumulator(other._accumulator) {
   other._id = b2WorldId{};
-  other._accumulator = 0.0f;
+  other._accumulator = .0f;
 }
 
 world& world::operator=(world&& other) noexcept {
@@ -49,7 +49,7 @@ world& world::operator=(world&& other) noexcept {
     _id = other._id;
     _accumulator = other._accumulator;
     other._id = b2WorldId{};
-    other._accumulator = 0.0f;
+    other._accumulator = .0f;
   }
 
   return *this;

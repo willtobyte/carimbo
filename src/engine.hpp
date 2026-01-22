@@ -37,8 +37,8 @@ private:
 
   uint8_t _ticks{0};
   uint8_t _tick_current{0};
-  float _tick_interval{0.0f};
-  float _tick_accumulator{0.0f};
+  float _tick_interval{.0f};
+  float _tick_accumulator{.0f};
 
   std::shared_ptr<::audiodevice> _audiodevice;
   std::shared_ptr<::eventmanager> _eventmanager;
