@@ -10,7 +10,7 @@ struct glypheffect;
 
 struct alignas(32) glyphprops final {
   float u0, v0, u1, v1;
-  float scaled_w, scaled_h;
+  float sw, sh;
   float w;
   bool valid;
 };

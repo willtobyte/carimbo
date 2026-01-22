@@ -121,8 +121,8 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
       continue;
     }
 
-    const auto bhw = glyph.scaled_w * 0.5f;
-    const auto bhh = glyph.scaled_h * 0.5f;
+    const auto bhw = glyph.sw * 0.5f;
+    const auto bhh = glyph.sh * 0.5f;
 
     auto hw = bhw;
     auto hh = bhh;
