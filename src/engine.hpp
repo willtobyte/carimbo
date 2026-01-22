@@ -7,7 +7,6 @@ public:
   engine() noexcept = default;
   ~engine() noexcept = default;
 
-  std::shared_ptr<::audiodevice> audiodevice() const noexcept;
   std::shared_ptr<::eventmanager> eventmanager() const noexcept;
   std::shared_ptr<::scenemanager> scenemanager() const noexcept;
   std::shared_ptr<::window> window() const noexcept;
@@ -15,7 +14,6 @@ public:
   std::shared_ptr<::overlay> overlay() const noexcept;
   std::shared_ptr<::canvas> canvas() const noexcept;
 
-  void set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept;
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept;
   void set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept;
   void set_window(std::shared_ptr<::window> ptr) noexcept;
@@ -40,7 +38,6 @@ private:
   float _tick_interval{.0f};
   float _tick_accumulator{.0f};
 
-  std::shared_ptr<::audiodevice> _audiodevice;
   std::shared_ptr<::eventmanager> _eventmanager;
   std::shared_ptr<::scenemanager> _scenemanager;
   std::shared_ptr<::renderer> _renderer;

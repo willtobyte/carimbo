@@ -1,16 +1,11 @@
 #include "engine.hpp"
 
-#include "audiodevice.hpp"
 #include "constant.hpp"
 #include "eventmanager.hpp"
 #include "loopable.hpp"
 #include "renderer.hpp"
 #include "scenemanager.hpp"
 #include "window.hpp"
-
-std::shared_ptr<audiodevice> engine::audiodevice() const noexcept {
-  return _audiodevice;
-}
 
 std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
@@ -34,10 +29,6 @@ std::shared_ptr<::overlay> engine::overlay() const noexcept {
 
 std::shared_ptr<::canvas> engine::canvas() const noexcept {
   return _canvas;
-}
-
-void engine::set_audiodevice(std::shared_ptr<::audiodevice> ptr) noexcept {
-  _audiodevice = std::move(ptr);
 }
 
 void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {

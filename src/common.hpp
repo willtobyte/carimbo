@@ -72,7 +72,6 @@ struct vec2;
 #include "unmarshal.hpp"
 
 class application;
-class audiodevice;
 class canvas;
 class cassette;
 class color;

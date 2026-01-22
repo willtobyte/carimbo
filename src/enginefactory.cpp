@@ -1,6 +1,5 @@
 #include "enginefactory.hpp"
 
-#include "audiodevice.hpp"
 #include "engine.hpp"
 #include "eventmanager.hpp"
 #include "fontpool.hpp"
@@ -100,7 +99,6 @@ enginefactory& enginefactory::with_ticks(const uint8_t ticks) noexcept {
 }
 
 std::shared_ptr<engine> enginefactory::create() const {
-  const auto audiodevice = std::make_shared<::audiodevice>();
   const auto engine = std::make_shared<::engine>();
   const auto window = std::make_shared<::window>(_title, _width, _height, _fullscreen);
   const auto renderer = window->create_renderer(_scale);
@@ -109,7 +107,6 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto overlay = std::make_shared<::overlay>(renderer, eventmanager);
   const auto scenemanager = std::make_shared<::scenemanager>(renderer);
 
-  engine->set_audiodevice(audiodevice);
   engine->set_eventmanager(eventmanager);
   engine->set_renderer(renderer);
   engine->set_scenemanager(scenemanager);
