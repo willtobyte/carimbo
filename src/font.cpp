@@ -78,7 +78,8 @@ font::font(std::shared_ptr<renderer> renderer, std::string_view family)
         fw * scale,
         fh * scale,
         fw,
-        true};
+        true
+    };
 
     if (first) {
       _fontheight = fh * scale;
