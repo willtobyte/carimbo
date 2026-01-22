@@ -7,15 +7,15 @@
 #include "physics.hpp"
 #include "pixmap.hpp"
 
-scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment environment)
+scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::fontpool> fontpool, sol::environment environment)
     : _name(name),
       _world(node),
-      _renderer(std::move(renderer)),
-      _view(_registry.view<tickable>()),
       _environment(std::move(environment)),
       _soundpool(name),
-      _particlepool(_renderer),
-      _objectpool(_registry, _world, _renderer, name, _environment) {
+      _particlepool(),
+      _objectpool(_registry, _world, name, _environment) {
+  (void)fontpool;
+  _view = _registry.view<tickable>();
   _hits.reserve(16);
   _hovering.reserve(16);
 
@@ -41,11 +41,11 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::rend
 
     if (type == "tilemap") {
       auto content = layer["content"].get<std::string_view>();
-      _layer.emplace<::tilemap>(content, _renderer, _world);
+      _layer.emplace<::tilemap>(content, _world);
     }
 
     else {
-      _layer = std::make_shared<pixmap>(_renderer, std::format("blobs/{}/background.png", name));
+      _layer = std::make_shared<pixmap>(std::format("blobs/{}/background.png", name));
 
       const auto width = node["width"].get<float>();
       const auto height = node["height"].get<float>();
@@ -115,7 +115,7 @@ void scene::draw() const noexcept {
   _particlepool.draw();
 
 #ifdef DEBUG
-  SDL_SetRenderDrawColor(*_renderer, 0, 255, 0, 255);
+  SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
   _world.query_aabb(physics::aabb(_camera), physics::category::all, [this](b2ShapeId shape, entt::entity) {
     const auto box = b2Shape_GetAABB(shape);
@@ -126,12 +126,12 @@ void scene::draw() const noexcept {
       box.upperBound.y - box.lowerBound.y
     };
 
-    SDL_RenderRect(*_renderer, &r);
+    SDL_RenderRect(renderer, &r);
 
     return true;
   });
 
-  SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
 #endif
 }
 

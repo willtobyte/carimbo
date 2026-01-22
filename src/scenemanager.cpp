@@ -4,10 +4,6 @@
 #include "io.hpp"
 #include "scene.hpp"
 
-scenemanager::scenemanager(std::shared_ptr<::renderer> renderer)
-    : _renderer(std::move(renderer)) {
-}
-
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name);
   if (inserted) {
@@ -15,7 +11,7 @@ std::shared_ptr<scene> scenemanager::load(std::string_view name) {
 
     sol::environment environment(_environment.lua_state(), sol::create, _environment);
 
-    return it->second = std::make_shared<scene>(name, std::move(json), _renderer, _fontpool, std::move(environment));
+    return it->second = std::make_shared<scene>(name, std::move(json), _fontpool, std::move(environment));
   }
 
   return nullptr;

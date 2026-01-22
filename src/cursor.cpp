@@ -4,16 +4,15 @@
 #include "geometry.hpp"
 #include "io.hpp"
 #include "pixmap.hpp"
-#include "renderer.hpp"
 
-cursor::cursor(std::string_view name, std::shared_ptr<renderer> renderer) {
+cursor::cursor(std::string_view name) {
   SDL_HideCursor();
 
   auto json = unmarshal::parse(io::read(std::format("cursors/{}.json", name)));
 
   _point = json["point"].get<vec2>();
 
-  _spritesheet = std::make_shared<pixmap>(std::move(renderer), std::format("blobs/overlay/{}.png", name));
+  _spritesheet = std::make_shared<pixmap>(std::format("blobs/overlay/{}.png", name));
 
   if (auto animations = json["animations"]) {
     animations.foreach([this](std::string_view key, unmarshal::json node) {

@@ -4,7 +4,7 @@
 
 class scenemanager final : public eventreceiver {
 public:
-  explicit scenemanager(std::shared_ptr<::renderer> renderer);
+  scenemanager() = default;
 
   ~scenemanager() noexcept = default;
 
@@ -38,7 +38,6 @@ protected:
 
 private:
   sol::environment _environment;
-  std::shared_ptr<::renderer> _renderer;
   std::shared_ptr<::fontpool> _fontpool;
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::shared_ptr<::scene> _scene;

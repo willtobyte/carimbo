@@ -82,18 +82,17 @@ struct particlebatch final {
 
 class particlefactory final {
 public:
-  explicit particlefactory(std::shared_ptr<renderer> renderer);
+  particlefactory() = default;
 
   std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool spawning = true) const;
 
 private:
-  std::shared_ptr<renderer> _renderer;
   mutable boost::unordered_flat_map<std::string, cache, transparent_string_hash, std::equal_to<>> _cache;
 };
 
 class particlepool final {
 public:
-  explicit particlepool(std::shared_ptr<renderer> renderer);
+  particlepool();
   ~particlepool() = default;
 
   void add(unmarshal::json node);
@@ -109,7 +108,6 @@ public:
   std::shared_ptr<particlefactory> factory() const noexcept;
 
 private:
-  std::shared_ptr<renderer> _renderer;
   std::shared_ptr<particlefactory> _factory;
   boost::unordered_flat_map<std::string, std::shared_ptr<particlebatch>, transparent_string_hash, std::equal_to<>> _batches;
 };

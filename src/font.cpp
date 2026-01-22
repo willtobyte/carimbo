@@ -3,10 +3,8 @@
 #include "io.hpp"
 #include "label.hpp"
 #include "pixmap.hpp"
-#include "renderer.hpp"
 
-font::font(std::shared_ptr<renderer> renderer, std::string_view family)
-    : _renderer(std::move(renderer)) {
+font::font(std::string_view family) {
   auto json = unmarshal::parse(io::read(std::format("fonts/{}.json", family)));
 
   _glyphs = json["glyphs"].get<std::string_view>();
@@ -14,31 +12,31 @@ font::font(std::shared_ptr<renderer> renderer, std::string_view family)
   _leading = json["leading"].get<int16_t>();
   const auto scale = json["scale"].get(1.f);
 
-  _pixmap = std::make_shared<pixmap>(_renderer, std::format("blobs/overlay/{}.png", family));
+  _pixmap = std::make_shared<pixmap>(std::format("blobs/overlay/{}.png", family));
   const auto width = _pixmap->width();
   const auto height = _pixmap->height();
 
   const auto target = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
-          *_renderer,
+          renderer,
           SDL_PIXELFORMAT_RGBA32,
           SDL_TEXTUREACCESS_TARGET,
           width, height));
 
-  auto* const origin = SDL_GetRenderTarget(*_renderer);
+  auto* const origin = SDL_GetRenderTarget(renderer);
 
-  SDL_FlushRenderer(*_renderer);
+  SDL_FlushRenderer(renderer);
 
   SDL_FRect destination{0, 0, static_cast<float>(width), static_cast<float>(height)};
 
-  SDL_SetRenderTarget(*_renderer, target.get());
-  SDL_SetRenderDrawColor(*_renderer, 0, 0, 0, 0);
-  SDL_RenderClear(*_renderer);
-  SDL_RenderTexture(*_renderer, *_pixmap, nullptr, &destination);
+  SDL_SetRenderTarget(renderer, target.get());
+  SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+  SDL_RenderClear(renderer);
+  SDL_RenderTexture(renderer, *_pixmap, nullptr, &destination);
 
-  const auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>(SDL_RenderReadPixels(*_renderer, nullptr));
+  const auto surface = std::unique_ptr<SDL_Surface, SDL_Deleter>(SDL_RenderReadPixels(renderer, nullptr));
 
-  SDL_SetRenderTarget(*_renderer, origin);
+  SDL_SetRenderTarget(renderer, origin);
 
   const auto* pixels = static_cast<const uint32_t*>(surface->pixels);
   const auto separator = pixels[0];
@@ -162,7 +160,7 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
   }
 
   SDL_RenderGeometry(
-    *_renderer,
+    renderer,
     static_cast<SDL_Texture*>(*_pixmap),
     _vertices.data(),
     static_cast<int>(_vertices.size()),

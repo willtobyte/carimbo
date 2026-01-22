@@ -1,22 +1,19 @@
 #include "canvas.hpp"
 
-#include "renderer.hpp"
-
-canvas::canvas(std::shared_ptr<renderer> renderer)
-    : _renderer(std::move(renderer)) {
+canvas::canvas() {
   int lw, lh;
   SDL_RendererLogicalPresentation mode;
-  SDL_GetRenderLogicalPresentation(*_renderer, &lw, &lh, &mode);
+  SDL_GetRenderLogicalPresentation(renderer, &lw, &lh, &mode);
 
   float sx, sy;
-  SDL_GetRenderScale(*_renderer, &sx, &sy);
+  SDL_GetRenderScale(renderer, &sx, &sy);
 
   const auto width = static_cast<int>(std::lround(static_cast<float>(lw) / sx));
   const auto height = static_cast<int>(std::lround(static_cast<float>(lh) / sy));
 
   _framebuffer =
     std::unique_ptr<SDL_Texture, SDL_Deleter>(
-      SDL_CreateTexture(*_renderer,
+      SDL_CreateTexture(renderer,
         SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STREAMING,
         width, height));
@@ -46,5 +43,5 @@ void canvas::clear() noexcept {
 }
 
 void canvas::draw() const noexcept {
-  SDL_RenderTexture(*_renderer, _framebuffer.get(), nullptr, nullptr);
+  SDL_RenderTexture(renderer, _framebuffer.get(), nullptr, nullptr);
 }

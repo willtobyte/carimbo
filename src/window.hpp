@@ -2,14 +2,12 @@
 
 #include "common.hpp"
 
-class window final : public std::enable_shared_from_this<window> {
+class window final {
 public:
   window(std::string_view title, int width, int height, bool fullscreen);
   ~window() = default;
 
   operator SDL_Window*() const noexcept;
-
-  std::shared_ptr<renderer> create_renderer(float scale);
 
   int width() const noexcept;
 

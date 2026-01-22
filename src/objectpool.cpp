@@ -4,20 +4,17 @@
 #include "io.hpp"
 #include "objectproxy.hpp"
 #include "pixmap.hpp"
-#include "renderer.hpp"
 
 objectpool::objectpool(
     entt::registry& registry,
     physics::world& world,
-    std::shared_ptr<renderer> renderer,
     std::string_view scenename,
     sol::environment& environment
 )
     : _registry(registry),
       _world(world),
       _scenename(scenename),
-      _environment(environment),
-      _renderer(std::move(renderer)) {
+      _environment(environment) {
 }
 
 void objectpool::add(unmarshal::json node, int32_t z) {
@@ -63,7 +60,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
 
     it->second = shared{
       .atlas = std::move(atlas),
-      .pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/{}/{}.png", _scenename, kind)),
+      .pixmap = std::make_shared<::pixmap>(std::format("blobs/{}/{}.png", _scenename, kind)),
       .scale = json["scale"].get(1.0f)
     };
   }

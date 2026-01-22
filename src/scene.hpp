@@ -11,7 +11,7 @@
 
 class scene final {
 public:
-  scene(std::string_view name, unmarshal::json node, std::shared_ptr<::renderer> renderer, std::shared_ptr<::fontpool> fontpool, sol::environment environment);
+  scene(std::string_view name, unmarshal::json node, std::shared_ptr<::fontpool> fontpool, sol::environment environment);
 
   ~scene() noexcept = default;
 
@@ -58,7 +58,6 @@ private:
   entt::registry _registry;
   physics::world _world;
   quad _camera{};
-  std::shared_ptr<renderer> _renderer;
 
   view_type _view;
   animationsystem _animationsystem{_registry};

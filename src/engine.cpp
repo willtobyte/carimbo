@@ -3,9 +3,10 @@
 #include "constant.hpp"
 #include "eventmanager.hpp"
 #include "loopable.hpp"
-#include "renderer.hpp"
 #include "scenemanager.hpp"
 #include "window.hpp"
+
+SDL_Renderer* renderer = nullptr;
 
 std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
@@ -17,10 +18,6 @@ std::shared_ptr<scenemanager> engine::scenemanager() const noexcept {
 
 std::shared_ptr<window> engine::window() const noexcept {
   return _window;
-}
-
-std::shared_ptr<renderer> engine::renderer() const noexcept {
-  return _renderer;
 }
 
 std::shared_ptr<::overlay> engine::overlay() const noexcept {
@@ -43,10 +40,8 @@ void engine::set_window(std::shared_ptr<::window> ptr) noexcept {
   _window = std::move(ptr);
 }
 
-void engine::set_renderer(std::shared_ptr<::renderer> ptr) noexcept {
-  _renderer = std::move(ptr);
-
-  _canvas = std::make_shared<::canvas>(_renderer);
+void engine::set_canvas(std::shared_ptr<::canvas> ptr) noexcept {
+  _canvas = std::move(ptr);
 }
 
 void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {
@@ -115,11 +110,11 @@ void engine::_loop() {
     observer->on_begindraw();
   }
 
-  _renderer->begin();
+  SDL_RenderClear(renderer);
   _scenemanager->draw();
   _overlay->draw();
   _canvas->draw();
-  _renderer->end();
+  SDL_RenderPresent(renderer);
 
   for (const auto& observer : _observers) {
     observer->on_enddraw();

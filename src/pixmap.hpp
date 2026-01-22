@@ -7,7 +7,7 @@
 class pixmap final {
 public:
   pixmap() = delete;
-  pixmap(std::shared_ptr<renderer> renderer, std::string_view filename);
+  explicit pixmap(std::string_view filename);
   ~pixmap() = default;
 
   void draw(
@@ -28,6 +28,5 @@ private:
   int _width;
   int _height;
 
-  std::shared_ptr<renderer> _renderer;
   std::unique_ptr<SDL_Texture, SDL_Deleter> _texture;
 };

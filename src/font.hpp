@@ -5,7 +5,6 @@
 #include "geometry.hpp"
 
 class pixmap;
-class renderer;
 struct glypheffect;
 
 struct alignas(32) glyphprops final {
@@ -19,7 +18,7 @@ class font final {
 public:
   font() = delete;
 
-  explicit font(std::shared_ptr<renderer> renderer, std::string_view family);
+  explicit font(std::string_view family);
 
   ~font() = default;
 
@@ -36,7 +35,6 @@ private:
   int16_t _leading{0};
   float _fontheight{.0f};
   std::shared_ptr<pixmap> _pixmap;
-  std::shared_ptr<renderer> _renderer;
   std::string _glyphs;
   std::array<glyphprops, 256> _props;
   mutable boost::container::small_vector<SDL_Vertex, 512> _vertices;

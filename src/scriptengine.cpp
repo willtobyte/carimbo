@@ -544,25 +544,23 @@ void scriptengine::run() {
       viewport["height"] = ptr->window()->height();
       lua["viewport"] = viewport;
 
-      auto* const renderer = static_cast<SDL_Renderer*>(*ptr->renderer());
-
       auto mouse = lua.create_table();
 
-      mouse["x"] = [renderer]() noexcept -> float {
+      mouse["x"] = []() noexcept -> float {
         float x, y;
         SDL_GetMouseState(&x, &y);
         SDL_RenderCoordinatesFromWindow(renderer, x, y, &x, &y);
         return x;
       };
 
-      mouse["y"] = [renderer]() noexcept -> float {
+      mouse["y"] = []() noexcept -> float {
         float x, y;
         SDL_GetMouseState(&x, &y);
         SDL_RenderCoordinatesFromWindow(renderer, x, y, &x, &y);
         return y;
       };
 
-      mouse["xy"] = [renderer]() noexcept -> std::tuple<float, float> {
+      mouse["xy"] = []() noexcept -> std::tuple<float, float> {
         float x, y;
         SDL_GetMouseState(&x, &y);
         SDL_RenderCoordinatesFromWindow(renderer, x, y, &x, &y);

@@ -9,7 +9,6 @@ public:
   objectpool(
       entt::registry& registry,
       physics::world& world,
-      std::shared_ptr<renderer> renderer,
       std::string_view scenename,
       sol::environment& environment
   );
@@ -33,8 +32,6 @@ private:
   physics::world& _world;
   boost::static_string<48> _scenename;
   sol::environment& _environment;
-
-  std::shared_ptr<renderer> _renderer;
 
   boost::unordered_flat_map<std::string, shared, transparent_string_hash, std::equal_to<>> _shared;
 };

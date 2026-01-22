@@ -2,7 +2,6 @@
 
 #include "io.hpp"
 #include "pixmap.hpp"
-#include "renderer.hpp"
 
 namespace {
 
@@ -46,8 +45,7 @@ static void range(unmarshal::json node, std::pair<T, T>& out) noexcept {
 }
 }
 
-particlefactory::particlefactory(std::shared_ptr<renderer> renderer)
-    : _renderer(std::move(renderer)) {}
+
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   auto [it, inserted] = _cache.try_emplace(kind);
@@ -94,7 +92,7 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
       range(rotation["velocity"], it->second.rvel);
     }
 
-    it->second.pixmap = std::make_shared<::pixmap>(_renderer, std::format("blobs/particles/{}.png", kind));
+    it->second.pixmap = std::make_shared<::pixmap>(std::format("blobs/particles/{}.png", kind));
   }
 
   const auto props = std::make_shared<particleprops>();
@@ -144,9 +142,8 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return batch;
 }
 
-particlepool::particlepool(std::shared_ptr<renderer> renderer)
-    : _renderer(std::move(renderer)),
-      _factory(std::make_shared<particlefactory>(_renderer)) {
+particlepool::particlepool()
+    : _factory(std::make_shared<particlefactory>()) {
   _batches.reserve(16);
 }
 
@@ -276,7 +273,7 @@ void particlepool::update(float delta) {
 void particlepool::draw() const {
   for (const auto& [_, batch] : _batches) {
     SDL_RenderGeometry(
-        *_renderer,
+        renderer,
         static_cast<SDL_Texture*>(*batch->pixmap),
         batch->vertices.data(),
         static_cast<int>(batch->vertices.size()),

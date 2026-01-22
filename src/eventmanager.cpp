@@ -2,10 +2,8 @@
 
 #include "event.hpp"
 #include "eventreceiver.hpp"
-#include "renderer.hpp"
 
-eventmanager::eventmanager(std::shared_ptr<renderer> renderer)
-    : _renderer(std::move(renderer)) {
+eventmanager::eventmanager() {
   _joystickmapping.reserve(8);
   _joystickgorder.reserve(8);
 
@@ -43,7 +41,7 @@ eventmanager::eventmanager(std::shared_ptr<renderer> renderer)
 void eventmanager::update(float delta) {
   SDL_Event event;
   while (SDL_PollEvent(&event)) {
-    SDL_ConvertEventToRenderCoordinates(*_renderer, &event);
+    SDL_ConvertEventToRenderCoordinates(renderer, &event);
 
     switch (event.type) {
       case SDL_EVENT_QUIT: {
@@ -63,7 +61,7 @@ void eventmanager::update(float delta) {
       case SDL_EVENT_KEY_UP: {
         switch (event.key.key) {
           case SDLK_F11: {
-            auto* const window = static_cast<SDL_Window*>(*_renderer);
+            auto* const window = SDL_GetRenderWindow(renderer);
             const auto fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
             SDL_SetWindowFullscreen(window, !fullscreen);
           } break;

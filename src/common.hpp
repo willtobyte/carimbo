@@ -100,7 +100,7 @@ class particlefactory;
 class particlepool;
 class pixmap;
 class querybuilder;
-class renderer;
+extern SDL_Renderer* renderer;
 class scene;
 class scenebackdrop;
 class scenemanager;

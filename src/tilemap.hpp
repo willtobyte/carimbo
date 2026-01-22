@@ -24,7 +24,7 @@ struct alignas(64) grid final {
 
 class tilemap final {
 public:
-  tilemap(std::string_view name, std::shared_ptr<renderer> renderer, physics::world& world);
+  tilemap(std::string_view name, physics::world& world);
   ~tilemap() noexcept;
 
   void set_viewport(const quad& value);
@@ -53,7 +53,6 @@ private:
   std::vector<int32_t> _indices;
 
   std::shared_ptr<pixmap> _atlas;
-  std::shared_ptr<renderer> _renderer;
 
   std::vector<physics::body> _bodies;
 };

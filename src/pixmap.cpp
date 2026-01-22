@@ -7,8 +7,7 @@
 #define STBI_NO_FAILURE_STRINGS
 #include "stb_image.h"
 
-pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
-    : _renderer(std::move(renderer)) {
+pixmap::pixmap(std::string_view filename) {
   const auto buffer = io::read(filename);
 
   int width, height, channels;
@@ -30,7 +29,7 @@ pixmap::pixmap(std::shared_ptr<renderer> renderer, std::string_view filename)
   _height = height;
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(
-        *_renderer,
+        renderer,
         SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STATIC,
         _width, _height));
@@ -52,7 +51,7 @@ void pixmap::draw(
   const SDL_FRect destination{ dx, dy, dw, dh };
 
   SDL_SetTextureAlphaMod(_texture.get(), alpha);
-  SDL_RenderTextureRotated(*_renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(flip));
+  SDL_RenderTextureRotated(renderer, _texture.get(), &source, &destination, angle, nullptr, static_cast<SDL_FlipMode>(flip));
 }
 
 pixmap::operator SDL_Texture*() const noexcept {

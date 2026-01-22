@@ -7,8 +7,8 @@
 #include "label.hpp"
 #include "widget.hpp"
 
-overlay::overlay(std::shared_ptr<renderer> renderer, std::shared_ptr<eventmanager> eventmanager)
-    : _renderer(std::move(renderer)), _eventmanager(std::move(eventmanager)) {}
+overlay::overlay(std::shared_ptr<eventmanager> eventmanager)
+    : _eventmanager(std::move(eventmanager)) {}
 
 void overlay::set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept {
   _fontpool = std::move(fontpool);
@@ -28,7 +28,7 @@ void overlay::label(std::shared_ptr<::label> instance) {
 void overlay::cursor(std::string_view resource) {
   cursor(nullptr);
 
-  _cursor = std::make_shared<::cursor>(resource, _renderer);
+  _cursor = std::make_shared<::cursor>(resource);
   _eventmanager->add_receiver(_cursor);
 }
 

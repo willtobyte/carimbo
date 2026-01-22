@@ -3,10 +3,8 @@
 #include "geometry.hpp"
 #include "physics.hpp"
 #include "pixmap.hpp"
-#include "renderer.hpp"
 
-tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, physics::world& world)
-    : _renderer(std::move(renderer)) {
+tilemap::tilemap(std::string_view name, physics::world& world) {
   auto json = unmarshal::parse(io::read(std::format("tilemaps/{}.json", name)));
 
   _tile_size = json["tile_size"].get<float>();
@@ -19,7 +17,7 @@ tilemap::tilemap(std::string_view name, std::shared_ptr<renderer> renderer, phys
     _grids.emplace_back(std::move(node));
   });
 
-  _atlas = std::make_shared<pixmap>(_renderer, std::format("blobs/tilemaps/{}.png", name));
+  _atlas = std::make_shared<pixmap>(std::format("blobs/tilemaps/{}.png", name));
   _tile_size = static_cast<float>(_tile_size);
   _inv_tile_size = 1.0f / _tile_size;
 
@@ -192,7 +190,7 @@ void tilemap::draw() const noexcept {
   }
 
   SDL_RenderGeometry(
-      *_renderer,
+      renderer,
       static_cast<SDL_Texture*>(*_atlas),
       _vertices.data(),
       static_cast<int>(_vertices.size()),
