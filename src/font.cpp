@@ -71,14 +71,14 @@ font::font(std::shared_ptr<renderer> renderer, std::string_view family)
     const auto fh = static_cast<float>(h);
 
     _props[static_cast<uint8_t>(glyph)] = {
-        fx * iw,
-        fy * ih,
-        (fx + fw) * iw,
-        (fy + fh) * ih,
-        fw * scale,
-        fh * scale,
-        fw,
-        true
+      fx * iw,
+      fy * ih,
+      (fx + fw) * iw,
+      (fy + fh) * ih,
+      fw * scale,
+      fh * scale,
+      fw,
+      true
     };
 
     if (first) {
