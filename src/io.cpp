@@ -7,7 +7,7 @@ bool io::exists(std::string_view filename) noexcept {
 std::vector<uint8_t> io::read(std::string_view filename) {
   const auto ptr = unwrap(
     std::unique_ptr<PHYSFS_File, PHYSFS_Deleter>(PHYSFS_openRead(filename.data())),
-    std::format("error while opening file: {}", filename)
+    std::format("[PHYSFS_openRead] error while opening file: {}", filename)
   );
 
   const auto length = PHYSFS_fileLength(ptr.get());
