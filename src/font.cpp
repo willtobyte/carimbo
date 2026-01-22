@@ -102,14 +102,14 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
 
   constexpr auto inv = 1.f / 255.f;
 
-  auto cursor_x = position.x;
-  auto cursor_y = position.y;
+  auto cx = position.x;
+  auto cy = position.y;
 
   auto i = 0uz;
   for (const auto ch : text) {
     if (ch == '\n') [[unlikely]] {
-      cursor_x = position.x;
-      cursor_y += _fontheight + _leading;
+      cx = position.x;
+      cy += _fontheight + _leading;
       ++i;
       continue;
     }
@@ -125,14 +125,14 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
 
     auto hw = bhw;
     auto hh = bhh;
-    auto cx = cursor_x + bhw;
-    auto cy = cursor_y + bhh;
+    auto gx = cx + bhw;
+    auto gy = cy + bhh;
     SDL_FColor color{1.f, 1.f, 1.f, 1.f};
 
     if (const auto it = effects.find(i); it != effects.end()) {
       const auto& e = it->second;
-      cx += e.xoffset;
-      cy += e.yoffset;
+      gx += e.xoffset;
+      gy += e.yoffset;
       hw = bhw * e.scale;
       hh = bhh * e.scale;
       color = {e.r * inv, e.g * inv, e.b * inv, e.alpha * inv};
@@ -140,10 +140,10 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
 
     const auto base = static_cast<int32_t>(_vertices.size());
 
-    _vertices.emplace_back(SDL_Vertex{{cx - hw, cy - hh}, color, {glyph.u0, glyph.v0}});
-    _vertices.emplace_back(SDL_Vertex{{cx + hw, cy - hh}, color, {glyph.u1, glyph.v0}});
-    _vertices.emplace_back(SDL_Vertex{{cx + hw, cy + hh}, color, {glyph.u1, glyph.v1}});
-    _vertices.emplace_back(SDL_Vertex{{cx - hw, cy + hh}, color, {glyph.u0, glyph.v1}});
+    _vertices.emplace_back(SDL_Vertex{{gx - hw, gy - hh}, color, {glyph.u0, glyph.v0}});
+    _vertices.emplace_back(SDL_Vertex{{gx + hw, gy - hh}, color, {glyph.u1, glyph.v0}});
+    _vertices.emplace_back(SDL_Vertex{{gx + hw, gy + hh}, color, {glyph.u1, glyph.v1}});
+    _vertices.emplace_back(SDL_Vertex{{gx - hw, gy + hh}, color, {glyph.u0, glyph.v1}});
 
     _indices.emplace_back(base);
     _indices.emplace_back(base + 1);
@@ -152,7 +152,7 @@ void font::draw(std::string_view text, const vec2& position, const boost::unorde
     _indices.emplace_back(base + 2);
     _indices.emplace_back(base + 3);
 
-    cursor_x += glyph.w + _spacing;
+    cx += glyph.w + _spacing;
     ++i;
   }
 
