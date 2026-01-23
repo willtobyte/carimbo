@@ -102,9 +102,11 @@ void engine::_loop() {
   }
 
   SDL_RenderClear(renderer);
+
   _scenemanager->draw();
   _overlay->draw();
   _canvas->draw();
+
   SDL_RenderPresent(renderer);
 
   for (const auto& observer : _observers) {
