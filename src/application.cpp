@@ -36,7 +36,7 @@ int application::run() {
     auto se = scriptengine();
     se.run();
   } catch (const std::exception& e) {
-    const auto error = e.what();
+    const auto* const error = e.what();
 
     std::println(stderr, "{}", error);
 
