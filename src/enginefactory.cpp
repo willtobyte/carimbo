@@ -102,7 +102,7 @@ enginefactory& enginefactory::with_ticks(const uint8_t ticks) noexcept {
 std::shared_ptr<engine> enginefactory::create() const {
   const auto engine = std::make_shared<::engine>();
 
-  const auto window = SDL_CreateWindow(
+  static const auto window = SDL_CreateWindow(
     _title.c_str(),
     _width, _height,
     _fullscreen ? SDL_WINDOW_FULLSCREEN : 0
@@ -122,7 +122,10 @@ std::shared_ptr<engine> enginefactory::create() const {
 
   SDL_DestroyProperties(props);
 
-  std::at_quick_exit([] { SDL_DestroyRenderer(renderer); });
+  std::at_quick_exit([] {
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+  });
 
   SDL_SetRenderLogicalPresentation(renderer, _width, _height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
   SDL_SetRenderScale(renderer, _scale, _scale);

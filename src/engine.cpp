@@ -5,7 +5,7 @@
 #include "loopable.hpp"
 #include "scenemanager.hpp"
 
-SDL_Renderer* renderer = nullptr;
+SDL_Renderer *renderer = nullptr;
 
 std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
