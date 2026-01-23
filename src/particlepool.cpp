@@ -19,7 +19,7 @@ constexpr float COS_C2 = 0.03659f;
 constexpr float QUADRANT_SIGNS[8] = {1.f, 1.f, 1.f, -1.f, -1.f, -1.f, -1.f, 1.f};
 constexpr int QUADRANT_MASK = 3;
 
-static void sincos(float x, float& out_sin, float& out_cos) noexcept {
+static void sincos(float x, float& osin, float& ocos) noexcept {
   const auto q = static_cast<int>(x * INV_HALF_PI);
   const auto t = x - static_cast<float>(q) * HALF_PI;
   const auto t2 = t * t;
@@ -31,8 +31,8 @@ static void sincos(float x, float& out_sin, float& out_cos) noexcept {
   const auto swap = static_cast<float>(q & 1);
   const auto keep = 1.f - swap;
 
-  out_sin = (sin_t * keep + cos_t * swap) * QUADRANT_SIGNS[qi];
-  out_cos = (cos_t * keep + sin_t * swap) * QUADRANT_SIGNS[qi + 1];
+  osin = (sin_t * keep + cos_t * swap) * QUADRANT_SIGNS[qi];
+  ocos = (cos_t * keep + sin_t * swap) * QUADRANT_SIGNS[qi + 1];
 }
 
 template <typename T>
@@ -44,8 +44,6 @@ static void range(unmarshal::json node, std::pair<T, T>& out) noexcept {
   out = {node["start"].get(out.first), node["end"].get(out.second)};
 }
 }
-
-
 
 std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
   auto [it, inserted] = _cache.try_emplace(kind);
