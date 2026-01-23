@@ -156,16 +156,14 @@ void scene::populate(sol::table& pool) const {
   );
 
   const auto raycast = [&](const vec2& origin, float angle, float distance, std::optional<physics::category> mask) {
-    const auto entities = _world.raycast(origin, angle, distance, mask.value_or(physics::category::all));
-    std::vector<std::shared_ptr<objectproxy>> result;
-    result.reserve(entities.size());
-    for (const auto entity : entities) {
+    boost::container::small_vector<std::shared_ptr<objectproxy>, 16> result;
+    _world.raycast(origin, angle, distance, mask.value_or(physics::category::all), [&](entt::entity entity) {
       if (const auto* proxy = _registry.try_get<std::shared_ptr<objectproxy>>(entity)) {
         result.push_back(*proxy);
       }
-    }
+    });
 
-    return sol::as_table(result);
+    return sol::as_table(std::move(result));
   };
 
   lua["world"] = lua.create_table_with(

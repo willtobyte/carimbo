@@ -72,38 +72,6 @@ b2SensorEvents world::sensor_events() const noexcept {
   return b2World_GetSensorEvents(_id);
 }
 
-std::vector<entt::entity> world::raycast(const vec2& origin, float angle, float distance, category mask) const noexcept {
-  const auto radians = angle * (std::numbers::pi_v<float> / 180.0f);
-  const auto direction = b2Vec2{std::cos(radians) * distance, std::sin(radians) * distance};
-  const auto filter = make_query_filter(category::all, mask);
-
-  struct hit {
-    entt::entity entity;
-    float fraction;
-  };
-
-  boost::container::small_vector<hit, 16> hits;
-
-  b2World_CastRay(
-    _id,
-    to_b2(origin),
-    direction,
-    filter,
-    [](b2ShapeId shape, b2Vec2, b2Vec2, float fraction, void* userdata) -> float {
-      auto* container = static_cast<boost::container::small_vector<hit, 16>*>(userdata);
-      container->emplace_back(entity_from(shape), fraction);
-      return 1.0f;
-    },
-    &hits
-  );
-
-  std::ranges::sort(hits, {}, &hit::fraction);
-  std::vector<entt::entity> result(hits.size());
-  std::ranges::transform(hits, result.begin(), &hit::entity);
-
-  return result;
-}
-
 body::~body() noexcept {
   destroy();
 }

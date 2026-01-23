@@ -29,8 +29,6 @@ struct bodydef final {
   bool sensor{false};
 };
 
-
-
 [[nodiscard]] constexpr b2Vec2 to_b2(const vec2& v) noexcept {
   return {v.x, v.y};
 }
@@ -51,8 +49,8 @@ struct bodydef final {
   return {static_cast<uint64_t>(cat), static_cast<uint64_t>(mask), 0};
 }
 
-[[nodiscard]] constexpr b2QueryFilter make_query_filter(category cat = category::all, category mask = category::all) noexcept {
-  return {static_cast<uint64_t>(cat), static_cast<uint64_t>(mask)};
+[[nodiscard]] constexpr b2QueryFilter make_query_filter(category c = category::all, category mask = category::all) noexcept {
+  return {static_cast<uint64_t>(c), static_cast<uint64_t>(mask)};
 }
 
 [[nodiscard]] entt::entity entity_from(b2ShapeId shape) noexcept;
@@ -77,14 +75,36 @@ public:
   [[nodiscard]] b2WorldId id() const noexcept;
   [[nodiscard]] b2SensorEvents sensor_events() const noexcept;
 
-  [[nodiscard]] std::vector<entt::entity> raycast(const vec2& origin, float angle, float distance, category mask = category::all) const noexcept;
+  template <typename F>
+  void raycast(const vec2& origin, float angle, float distance, category mask, F&& callback) const noexcept {
+    using hits_t = boost::container::small_vector<std::pair<entt::entity, float>, 16>;
+    hits_t hits;
+
+    const auto radians = angle * (std::numbers::pi_v<float> / 180.0f);
+    const auto direction = b2Vec2{std::cos(radians) * distance, std::sin(radians) * distance};
+    b2World_CastRay(
+      _id,
+      to_b2(origin),
+      direction,
+      make_query_filter(category::all, mask),
+      [](b2ShapeId shape, b2Vec2, b2Vec2, float fraction, void* userdata) -> float {
+        static_cast<hits_t*>(userdata)->emplace_back(entity_from(shape), fraction);
+        return 1.0f;
+      },
+      &hits
+    );
+
+    std::ranges::sort(hits, {}, &std::pair<entt::entity, float>::second);
+    for (const auto& [entity, fraction] : hits) {
+      callback(entity);
+    }
+  }
 
   template <typename F>
   void query_aabb(const b2AABB& aabb, category mask, F&& callback) const noexcept {
     struct context { F* fn; };
     context ctx{&callback};
-    const auto filter = make_query_filter(category::all, mask);
-    b2World_OverlapAABB(_id, aabb, filter,
+    b2World_OverlapAABB(_id, aabb, make_query_filter(category::all, mask),
       [](b2ShapeId shape, void* userdata) -> bool {
         auto* ctx = static_cast<context*>(userdata);
         return (*ctx->fn)(shape, entity_from(shape));
