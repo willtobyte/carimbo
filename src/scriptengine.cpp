@@ -982,6 +982,7 @@ void scriptengine::run() {
 
       auto table = argument.as<sol::table>();
       boost::unordered_flat_map<size_t, std::optional<glypheffect>> updates;
+      updates.reserve(table.size());
 
       for (const auto& [key, value] : table) {
         const auto index = key.as<size_t>() - 1;
