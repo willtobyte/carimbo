@@ -956,31 +956,14 @@ void scriptengine::run() {
     "Label",
     sol::no_constructor,
     sol::base_classes, sol::bases<widget>(),
-    "set", sol::overload(
-      [](
-        std::shared_ptr<label> self,
-        float x,
-        float y
-      ) {
-        self->set(x, y);
-      },
-      [](
-        std::shared_ptr<label> self,
-        std::string_view text,
-        float x,
-        float y
-      ) {
-        self->set(text, x, y);
-      }
-    ),
-    "glyphs", sol::property(&label::glyphs),
+    "clear", &label::clear,
     "effect", sol::writeonly_property([](label& self, sol::object argument) {
       if (argument == sol::lua_nil) {
         self.clear_effects();
         return;
       }
 
-      auto table = argument.as<sol::table>();
+      const auto table = argument.as<sol::table>();
       boost::unordered_flat_map<size_t, std::optional<glypheffect>> updates;
       updates.reserve(table.size());
 
@@ -1007,7 +990,24 @@ void scriptengine::run() {
 
       self.set_effects(updates);
     }),
-    "clear", &label::clear
+    "glyphs", sol::property(&label::glyphs),
+    "set", sol::overload(
+      [](
+        std::shared_ptr<label> self,
+        float x,
+        float y
+      ) {
+        self->set(x, y);
+      },
+      [](
+        std::shared_ptr<label> self,
+        std::string_view text,
+        float x,
+        float y
+      ) {
+        self->set(text, x, y);
+      }
+    )
   );
 
   lua.new_usertype<widget>(
