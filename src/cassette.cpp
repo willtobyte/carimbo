@@ -9,6 +9,7 @@ constexpr std::string_view TYPE_DOUBLE = "double";
 constexpr std::string_view TYPE_STRING = "string";
 
 void encode_string_to(std::string_view str, std::string& out) {
+  out.reserve(out.size() + str.size());
   for (const char c : str) {
     switch (c) {
       case '\n': out.append("\\n");  break;
