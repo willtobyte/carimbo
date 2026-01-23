@@ -113,14 +113,14 @@ std::shared_ptr<engine> enginefactory::create() const {
   SDL_StartTextInput(window);
 
   const auto vsync = std::getenv("NOVSYNC") ? 0 : 1;
-  const auto props = SDL_CreateProperties();
-  SDL_SetPointerProperty(props, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, window);
-  SDL_SetNumberProperty(props, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, vsync);
-  SDL_SetStringProperty(props, SDL_PROP_RENDERER_CREATE_NAME_STRING, nullptr);
+  const auto properties = SDL_CreateProperties();
+  SDL_SetPointerProperty(properties, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, window);
+  SDL_SetNumberProperty(properties, SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER, vsync);
+  SDL_SetStringProperty(properties, SDL_PROP_RENDERER_CREATE_NAME_STRING, nullptr);
 
-  renderer = SDL_CreateRendererWithProperties(props);
+  renderer = SDL_CreateRendererWithProperties(properties);
 
-  SDL_DestroyProperties(props);
+  SDL_DestroyProperties(properties);
 
   std::at_quick_exit([] {
     SDL_DestroyRenderer(renderer);
