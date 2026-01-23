@@ -99,8 +99,6 @@ enginefactory& enginefactory::with_ticks(const uint8_t ticks) noexcept {
 }
 
 std::shared_ptr<engine> enginefactory::create() const {
-  const auto engine = std::make_shared<::engine>();
-
   static const auto window = SDL_CreateWindow(
     _title.c_str(),
     _width, _height,
@@ -135,6 +133,7 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto scenemanager = std::make_shared<::scenemanager>();
   const auto canvas = std::make_shared<::canvas>();
 
+  const auto engine = std::make_shared<::engine>();
   engine->set_eventmanager(eventmanager);
   engine->set_scenemanager(scenemanager);
   engine->set_overlay(overlay);
