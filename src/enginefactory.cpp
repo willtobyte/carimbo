@@ -87,7 +87,6 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) {
   sentry_options_add_attachment(options, "VERSION");
 
   sentry_init(options);
-  std::at_quick_exit([] { sentry_close(); });
 #endif
 #endif
 
