@@ -1,10 +1,6 @@
 #include "application.hpp"
 
 application::application(const int argc, char** const argv) noexcept {
-#ifdef HAS_SENTRY
-  std::at_quick_exit([] { sentry_close(); });
-#endif
-
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
   std::at_quick_exit([] { SDL_Quit(); });
 
