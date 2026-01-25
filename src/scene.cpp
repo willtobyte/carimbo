@@ -4,6 +4,7 @@
 #include "fontpool.hpp"
 #include "geometry.hpp"
 #include "objectproxy.hpp"
+#include "particlepool.hpp"
 #include "physics.hpp"
 #include "pixmap.hpp"
 
@@ -97,6 +98,8 @@ void scene::update(float delta) {
   auto& state = _registry.ctx().get<renderstate>();
   state.flush(_registry);
 
+  _renderqueue.update();
+
   _onloop(delta);
 }
 
@@ -110,9 +113,7 @@ void scene::draw() const noexcept {
     }
   }, _layer);
 
-  _rendersystem.draw();
-
-  _particlepool.draw();
+  _renderqueue.draw();
 
 #ifdef DEBUG
   SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);

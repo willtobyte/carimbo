@@ -70,6 +70,7 @@ struct particles final {
 };
 
 struct particlebatch final {
+  int16_t z{0};
   std::shared_ptr<particleprops> props;
   std::shared_ptr<pixmap> pixmap;
   std::vector<int> indices;
@@ -77,7 +78,7 @@ struct particlebatch final {
   std::vector<size_t> respawn;
   particles particles;
 
-  size_t size() const noexcept { return particles.count; }
+  [[nodiscard]] size_t size() const noexcept { return particles.count; }
 };
 
 class particlefactory final {
@@ -103,9 +104,9 @@ public:
 
   void update(float delta);
 
-  void draw() const;
+  [[nodiscard]] std::shared_ptr<particlefactory> factory() const noexcept;
 
-  std::shared_ptr<particlefactory> factory() const noexcept;
+  [[nodiscard]] const auto& batches() const noexcept { return _batches; }
 
 private:
   std::shared_ptr<particlefactory> _factory;

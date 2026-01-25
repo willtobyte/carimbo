@@ -155,8 +155,10 @@ void particlepool::add(unmarshal::json node) {
   const auto kind = node["kind"].get<std::string_view>();
   const auto x = node["x"].get<float>();
   const auto y = node["y"].get<float>();
+  const auto z = node["z"].get<int16_t>(0);
   const auto spawning = node["spawning"].get(true);
   it->second = _factory->create(kind, x, y, spawning);
+  it->second->z = z;
 }
 
 void particlepool::populate(sol::table& pool) const {
@@ -265,19 +267,6 @@ void particlepool::update(float delta) {
       vx[2] = {{x - dx0, y - dy0}, color, {1.f, 1.f}};
       vx[3] = {{x - dx1, y - dy1}, color, {0.f, 1.f}};
     }
-  }
-}
-
-void particlepool::draw() const {
-  for (const auto& [_, batch] : _batches) {
-    SDL_RenderGeometry(
-        renderer,
-        static_cast<SDL_Texture*>(*batch->pixmap),
-        batch->vertices.data(),
-        static_cast<int>(batch->vertices.size()),
-        batch->indices.data(),
-        static_cast<int>(batch->indices.size())
-    );
   }
 }
 
