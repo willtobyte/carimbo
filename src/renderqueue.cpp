@@ -33,22 +33,17 @@ void renderqueue::update() noexcept {
 }
 
 void renderqueue::draw() const noexcept {
+  if (_drawables.empty()) [[unlikely]] return;
+
   for (const auto& item : _drawables) {
     switch (item.kind) {
     case drawablekind::entity: {
       const auto entity = item.entity;
 
-      const auto& rn = _registry.get<renderable>(entity);
-      if (!rn.visible) [[unlikely]] continue;
-
       const auto* pb = _registry.try_get<playback>(entity);
       if (!pb || !pb->timeline || pb->timeline->frames.empty()) [[unlikely]] continue;
 
-      const auto& tr = _registry.get<transform>(entity);
-      const auto& tn = _registry.get<tint>(entity);
-      const auto& sp = _registry.get<sprite>(entity);
-      const auto& fl = _registry.get<orientation>(entity);
-      const auto& dr = _registry.get<::drawable>(entity);
+      const auto& [tr, tn, sp, fl, dr] = _registry.get<transform, tint, sprite, orientation, ::drawable>(entity);
 
       const auto& frame = pb->timeline->frames[pb->current_frame];
       const auto& q = frame.quad;

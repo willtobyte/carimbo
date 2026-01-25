@@ -30,5 +30,5 @@ public:
 private:
   const entt::registry& _registry;
   const particlepool& _particlepool;
-  std::vector<drawslice> _drawables;
+  boost::container::small_vector<drawslice, 128> _drawables;
 };
