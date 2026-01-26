@@ -146,7 +146,7 @@ particlepool::particlepool(entt::registry& registry)
   _batches.reserve(16);
 }
 
-void particlepool::add(unmarshal::json node) {
+void particlepool::add(unmarshal::json node, int32_t z) {
   const auto name = node["name"].get<std::string_view>();
   auto [it, inserted] = _batches.try_emplace(name);
   if (!inserted) {
@@ -156,7 +156,6 @@ void particlepool::add(unmarshal::json node) {
   const auto kind = node["kind"].get<std::string_view>();
   const auto x = node["x"].get<float>();
   const auto y = node["y"].get<float>();
-  const auto z = node["z"].get<int>(0);
   const auto spawning = node["spawning"].get(true);
 
   auto batch = _factory->create(kind, x, y, spawning);

@@ -60,16 +60,15 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::font
   if (auto objects = node["objects"]) {
     auto z = 0;
     objects.foreach([this, &z](unmarshal::json node) {
-      _objectpool.add(std::move(node), z++);
+      const auto type = node["type"].get<std::string_view>("object");
+      if (type == "particle") {
+        _particlepool.add(std::move(node), z++);
+      } else {
+        _objectpool.add(std::move(node), z++);
+      }
     });
 
     _objectpool.sort();
-  }
-
-  if (auto particles = node["particles"]) {
-    particles.foreach([this](unmarshal::json node) {
-      _particlepool.add(std::move(node));
-    });
   }
 }
 

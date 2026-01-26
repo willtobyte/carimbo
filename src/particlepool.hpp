@@ -96,7 +96,7 @@ public:
   particlepool(entt::registry& registry);
   ~particlepool() = default;
 
-  void add(unmarshal::json node);
+  void add(unmarshal::json node, int32_t z);
 
   void populate(sol::table& pool) const;
 
