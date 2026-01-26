@@ -111,3 +111,13 @@ void objectpool::sort() {
     return lhs.z < rhs.z;
   });
 }
+
+void objectpool::draw(entt::entity entity) const noexcept {
+  const auto& [pb, tr, tn, sp, fl, dr] = _registry.get<playback, transform, tint, sprite, orientation, drawable>(entity);
+
+  if (!pb.timeline || pb.timeline->frames.empty()) [[unlikely]] return;
+
+  const auto& frame = pb.timeline->frames[pb.current_frame];
+  const auto& q = frame.quad;
+  sp.pixmap->draw(q.x, q.y, q.w, q.h, dr.x, dr.y, dr.w, dr.h, tr.angle, tn.a, fl.flip);
+}

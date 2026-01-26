@@ -94,6 +94,8 @@ public:
 
   void update(float delta);
 
+  void draw(entt::entity entity) const noexcept;
+
 private:
   entt::registry& _registry;
   mutable boost::unordered_flat_map<std::string, cache, transparent_string_hash, std::equal_to<>> _cache;

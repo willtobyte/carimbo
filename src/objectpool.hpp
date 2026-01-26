@@ -21,6 +21,8 @@ public:
 
   void sort();
 
+  void draw(entt::entity entity) const noexcept;
+
 private:
   struct shared {
     std::shared_ptr<const atlas> atlas;

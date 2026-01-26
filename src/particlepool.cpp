@@ -181,6 +181,17 @@ void particlepool::clear() {
   _batches.clear();
 }
 
+void particlepool::draw(entt::entity entity) const noexcept {
+  const auto& pr = _registry.get<particlerenderable>(entity);
+
+  SDL_RenderGeometry(renderer,
+    static_cast<SDL_Texture*>(*pr.batch->pixmap),
+    pr.batch->vertices.data(),
+    static_cast<int>(pr.batch->vertices.size()),
+    pr.batch->indices.data(),
+    static_cast<int>(pr.batch->indices.size()));
+}
+
 void particlepool::update(float delta) {
   for (const auto& [_, pair] : _batches) {
     const auto& batch = pair.second;
@@ -279,5 +290,3 @@ void particlepool::update(float delta) {
     }
   }
 }
-
-

@@ -117,25 +117,13 @@ void scene::draw() const noexcept {
     if (!rn.visible) [[unlikely]] continue;
 
     switch (rn.kind) {
-    case renderablekind::sprite: {
-      const auto& [pb, tr, tn, sp, fl, dr] = _registry.get<playback, transform, tint, sprite, orientation, drawable>(entity);
-      if (!pb.timeline || pb.timeline->frames.empty()) [[unlikely]] continue;
-      const auto& frame = pb.timeline->frames[pb.current_frame];
-      const auto& q = frame.quad;
-      sp.pixmap->draw(q.x, q.y, q.w, q.h, dr.x, dr.y, dr.w, dr.h, tr.angle, tn.a, fl.flip);
+    case renderablekind::sprite:
+      _objectpool.draw(entity);
       break;
-    }
 
-    case renderablekind::particle: {
-      const auto& pr = _registry.get<particlerenderable>(entity);
-      SDL_RenderGeometry(renderer,
-        static_cast<SDL_Texture*>(*pr.batch->pixmap),
-        pr.batch->vertices.data(),
-        static_cast<int>(pr.batch->vertices.size()),
-        pr.batch->indices.data(),
-        static_cast<int>(pr.batch->indices.size()));
+    case renderablekind::particle:
+      _particlepool.draw(entity);
       break;
-    }
     }
   }
 
