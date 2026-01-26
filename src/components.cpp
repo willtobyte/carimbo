@@ -55,14 +55,14 @@ void scripting::wire(entt::entity entity, sol::environment& parent, std::shared_
     return std::make_shared<const std::string>(std::move(bytecode));
   });
 
-  derive(entity, parent, std::move(proxy), code, id);
+  derive(entity, parent, proxy, code, id);
 }
 
 void scripting::derive(entt::entity entity, sol::environment& parent, std::shared_ptr<objectproxy> proxy, std::shared_ptr<const std::string> bytecode, symbol chunkname) {
   const auto& interning = _registry.ctx().get<::interning>();
   sol::state_view lua(parent.lua_state());
   sol::environment environment(lua, sol::create, parent);
-  environment["self"] = std::move(proxy);
+  environment["self"] = proxy;
 
   const auto result = lua.load(*bytecode, std::format("@{}", interning.lookup(chunkname)));
   verify(result);

@@ -162,7 +162,7 @@ void particlepool::add(unmarshal::json node) {
   auto batch = _factory->create(kind, x, y, spawning);
   const auto entity = _registry.create();
   _registry.emplace<renderable>(entity, z, true, renderablekind::particle);
-  _registry.emplace<particlerenderable>(entity, batch);
+  _registry.emplace<particlerenderable>(entity, batch.get());
 
   it->second = {entity, batch};
 
@@ -172,7 +172,7 @@ void particlepool::add(unmarshal::json node) {
 void particlepool::populate(sol::table& pool) const {
   for (const auto& [name, pair] : _batches) {
     assert(!pool[name].valid() && "duplicate key in pool");
-    pool[name] = pair.second->props;
+    pool[name] = pair.second->props.get();
   }
 }
 

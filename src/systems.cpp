@@ -125,7 +125,7 @@ void physicssystem::update(float delta) {
         const auto px = t.position.x + box.x + box.w * .5f;
         const auto py = t.position.y + box.y + box.h * .5f;
         const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
-        body.set_transform({px, py}, angle);
+        body.transform({px, py}, angle);
         return;
       }
 
@@ -137,8 +137,8 @@ void physicssystem::update(float delta) {
       const auto py = t.position.y + box.y + box.h * .5f;
       const auto angle = static_cast<float>(t.angle) * DEGREES_TO_RADIANS;
 
-      body.attach_sensor_if_changed(hx, hy);
-      body.set_transform({px, py}, angle);
+      body.attach_sensor(hx, hy);
+      body.transform({px, py}, angle);
       d.clear(dirtable::physics);
     });
 }

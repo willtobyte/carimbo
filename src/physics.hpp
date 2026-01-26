@@ -58,7 +58,7 @@ struct bodydef final {
 
 
 class world;
-class body;
+struct body;
 
 class world final {
 public:
@@ -116,36 +116,25 @@ private:
   float _accumulator{.0f};
 };
 
-class body final {
-public:
-  body() noexcept = default;
-  ~body() noexcept;
-
-  body(body&& other) noexcept;
-  body& operator=(body&& other) noexcept;
-  body(const body&) = delete;
-  body& operator=(const body&) = delete;
-
-  [[nodiscard]] static body create(world& w, const bodydef& def) noexcept;
-
-  void attach_sensor_if_changed(float hx, float hy) noexcept;
-  void detach() noexcept;
-  void set_transform(const vec2& position, float angle) noexcept;
-
-private:
-  void attach(float hx, float hy, bool sensor) noexcept;
-  void destroy() noexcept;
-  [[nodiscard]] bool has_shape() const noexcept;
-  [[nodiscard]] b2BodyId id() const noexcept;
-
-  struct alignas(8) cache final {
+struct body final {
+  struct cache final {
     float hx{0};
     float hy{0};
   };
 
-  b2BodyId _body{};
-  b2ShapeId _shape{};
-  cache _cache;
+  b2BodyId id{};
+  b2ShapeId shape{};
+  cache cache{};
+
+  [[nodiscard]] static body create(world& w, const bodydef& def) noexcept;
+
+  void destroy() noexcept;
+  void attach_sensor(float hx, float hy) noexcept;
+  void detach() noexcept;
+  void transform(const vec2& position, float angle) noexcept;
+  [[nodiscard]] bool has_shape() const noexcept;
 };
+
+static_assert(std::is_trivially_copyable_v<body>);
 
 }

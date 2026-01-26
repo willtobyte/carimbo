@@ -72,89 +72,61 @@ b2SensorEvents world::sensor_events() const noexcept {
   return b2World_GetSensorEvents(_id);
 }
 
-body::~body() noexcept {
-  destroy();
-}
-
-body::body(body&& other) noexcept
-    : _body(other._body), _shape(other._shape), _cache(other._cache) {
-  other._body = b2BodyId{};
-  other._shape = b2ShapeId{};
-  other._cache = {};
-}
-
-body& body::operator=(body&& other) noexcept {
-  if (this != &other) {
-    destroy();
-
-    _body = other._body;
-    _shape = other._shape;
-    _cache = other._cache;
-    other._body = b2BodyId{};
-    other._shape = b2ShapeId{};
-    other._cache = {};
-  }
-
-  return *this;
-}
-
 body body::create(world& w, const bodydef& d) noexcept {
   body result;
   auto def = b2DefaultBodyDef();
   def.type = static_cast<b2BodyType>(d.type);
   def.position = to_b2(d.position);
   def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(d.entity));
-  result._body = b2CreateBody(w.id(), &def);
+  result.id = b2CreateBody(w.id(), &def);
 
   if (d.box) {
-    result.attach(d.box->x, d.box->y, d.sensor);
+    const auto poly = b2MakeBox(d.box->x, d.box->y);
+    auto shape_def = b2DefaultShapeDef();
+    shape_def.isSensor = d.sensor;
+    shape_def.enableSensorEvents = d.sensor;
+    shape_def.userData = reinterpret_cast<void*>(static_cast<std::uintptr_t>(d.entity));
+    result.shape = b2CreatePolygonShape(result.id, &shape_def, &poly);
+    if (d.sensor) result.cache = {d.box->x, d.box->y};
   }
 
   return result;
 }
 
-void body::attach(float hx, float hy, bool sensor) noexcept {
+void body::destroy() noexcept {
+  detach();
+
+  if (b2Body_IsValid(id)) {
+    b2DestroyBody(id);
+    id = b2BodyId{};
+  }
+}
+
+void body::attach_sensor(float hx, float hy) noexcept {
+  if (has_shape() && cache.hx == hx && cache.hy == hy) [[likely]] return;
+
   detach();
 
   const auto poly = b2MakeBox(hx, hy);
   auto def = b2DefaultShapeDef();
-  def.isSensor = sensor;
-  def.enableSensorEvents = sensor;
-  def.userData = b2Body_GetUserData(_body);
-  _shape = b2CreatePolygonShape(_body, &def, &poly);
-  if (sensor) _cache = {hx, hy};
-}
-
-void body::attach_sensor_if_changed(float hx, float hy) noexcept {
-  if (has_shape() && _cache.hx == hx && _cache.hy == hy) [[likely]] return;
-
-  attach(hx, hy, true);
+  def.isSensor = true;
+  def.enableSensorEvents = true;
+  def.userData = b2Body_GetUserData(id);
+  shape = b2CreatePolygonShape(id, &def, &poly);
+  cache = {hx, hy};
 }
 
 void body::detach() noexcept {
-  if (b2Shape_IsValid(_shape)) {
-    b2DestroyShape(_shape, false);
-    _shape = b2ShapeId{};
+  if (b2Shape_IsValid(shape)) {
+    b2DestroyShape(shape, false);
+    shape = b2ShapeId{};
   }
 }
 
-void body::destroy() noexcept {
-  detach();
-
-  if (b2Body_IsValid(_body)) {
-    b2DestroyBody(_body);
-    _body = b2BodyId{};
-  }
-}
-
-void body::set_transform(const vec2& position, float angle) noexcept {
-  b2Body_SetTransform(_body, to_b2(position), b2MakeRot(angle));
+void body::transform(const vec2& position, float angle) noexcept {
+  b2Body_SetTransform(id, to_b2(position), b2MakeRot(angle));
 }
 
 bool body::has_shape() const noexcept {
-  return b2Shape_IsValid(_shape);
-}
-
-b2BodyId body::id() const noexcept {
-  return _body;
+  return b2Shape_IsValid(shape);
 }

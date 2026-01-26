@@ -41,14 +41,18 @@ private:
 };
 
 struct transform final {
-	vec2 position;
-	double angle;
-	float scale;
+  vec2 position;
+  double angle;
+  float scale;
 };
+
+static_assert(std::is_trivially_copyable_v<transform>);
 
 struct velocity final {
   vec2 value{0, 0};
 };
+
+static_assert(std::is_trivially_copyable_v<velocity>);
 
 struct tint final {
   uint8_t r{0};
@@ -56,6 +60,8 @@ struct tint final {
   uint8_t b{0};
   uint8_t a{255};
 };
+
+static_assert(std::is_trivially_copyable_v<tint>);
 
 struct frame final {
   int32_t duration;
@@ -90,12 +96,16 @@ struct sprite final {
   pixmap* pixmap;
 };
 
+static_assert(std::is_trivially_copyable_v<sprite>);
+
 struct playback final {
   uint16_t current_frame{0};
   uint64_t tick{0};
   symbol action{empty};
   const timeline* timeline{nullptr};
 };
+
+static_assert(std::is_trivially_copyable_v<playback>);
 
 struct dirtable final {
   uint8_t flags{0xff};
@@ -109,6 +119,8 @@ struct dirtable final {
   [[nodiscard]] bool is(uint8_t f) const noexcept { return flags & f; }
 };
 
+static_assert(std::is_trivially_copyable_v<dirtable>);
+
 struct drawable final {
   float x{0};
   float y{0};
@@ -116,17 +128,23 @@ struct drawable final {
   float h{0};
 };
 
+static_assert(std::is_trivially_copyable_v<drawable>);
+
 enum class renderablekind : uint8_t { sprite, particle };
 
 struct particlerenderable final {
-  std::shared_ptr<particlebatch> batch;
+  particlebatch* batch;
 };
+
+static_assert(std::is_trivially_copyable_v<particlerenderable>);
 
 struct renderable final {
   int z;
   bool visible{true};
   renderablekind kind{renderablekind::sprite};
 };
+
+static_assert(std::is_trivially_copyable_v<renderable>);
 
 struct renderstate final {
   bool z_dirty{false};
@@ -154,9 +172,13 @@ struct metadata final {
   symbol name{empty};
 };
 
+static_assert(std::is_trivially_copyable_v<metadata>);
+
 struct orientation final {
   flip flip{flip::none};
 };
+
+static_assert(std::is_trivially_copyable_v<orientation>);
 
 struct hoverable {
   functor on_hover;

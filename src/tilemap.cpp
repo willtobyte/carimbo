@@ -109,7 +109,11 @@ tilemap::tilemap(std::string_view name, physics::world& world) {
   }
 }
 
-tilemap::~tilemap() noexcept = default;
+tilemap::~tilemap() noexcept {
+  for (auto& body : _bodies) {
+    body.destroy();
+  }
+}
 
 void tilemap::set_viewport(const quad& value) {
   if (_viewport == value) [[likely]] {

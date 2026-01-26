@@ -24,6 +24,10 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::font
   _registry.ctx().emplace<physics::world*>(&_world);
   _registry.ctx().emplace<renderstate>();
 
+  _registry.on_destroy<physics::body>().connect<[](entt::registry& registry, entt::entity entity) {
+    registry.get<physics::body>(entity).destroy();
+  }>();
+
   if (auto sounds = node["sounds"]) {
     sounds.foreach([this](unmarshal::json node) {
       _soundpool.add(node.get<std::string_view>());
