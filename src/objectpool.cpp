@@ -65,7 +65,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
     };
   }
 
-  _registry.emplace<std::shared_ptr<const ::atlas>>(entity, it->second.atlas);
+  _registry.emplace<const ::atlas*>(entity, it->second.atlas.get());
   _registry.emplace<transform>(entity, transform{
     .position = position,
     .angle = .0,
@@ -76,7 +76,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
     .name = interning.intern(name)
   });
   _registry.emplace<tint>(entity);
-  _registry.emplace<sprite>(entity, sprite{.pixmap = it->second.pixmap});
+  _registry.emplace<sprite>(entity, sprite{.pixmap = it->second.pixmap.get()});
   _registry.emplace<playback>(entity, playback{
     .current_frame = 0,
     .tick = SDL_GetTicks(),

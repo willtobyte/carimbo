@@ -7,12 +7,12 @@
 class animationsystem final {
 public:
   explicit animationsystem(entt::registry& registry) noexcept
-    : _entt(registry), _view(registry.view<std::shared_ptr<const atlas>, playback, dirtable>()) {}
+    : _entt(registry), _view(registry.view<const atlas*, playback, dirtable>()) {}
 
   void update(uint64_t now);
 
 private:
-  using view_type = decltype(std::declval<entt::registry&>().view<std::shared_ptr<const atlas>, playback, dirtable>());
+  using view_type = decltype(std::declval<entt::registry&>().view<const atlas*, playback, dirtable>());
 
   entt::registry& _entt;
   view_type _view;

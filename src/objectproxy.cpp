@@ -105,7 +105,7 @@ std::string_view objectproxy::action() const noexcept {
 
 void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
-  auto [s, at, d] = _registry.get<playback, std::shared_ptr<const atlas>, dirtable>(_entity);
+  auto [s, at, d] = _registry.get<playback, const atlas*, dirtable>(_entity);
   s.action = interning.intern(value);
   s.current_frame = 0;
   s.timeline = at->find(s.action);
@@ -205,7 +205,7 @@ std::string_view objectproxy::name() const noexcept {
 std::shared_ptr<objectproxy> objectproxy::clone() {
   const auto entity = _registry.create();
 
-  auto [m, tn, sp, pb, tf, at, ori, rn, sc] = _registry.try_get<metadata, tint, sprite, playback, transform, std::shared_ptr<const atlas>, orientation, renderable, scriptable>(_entity);
+  auto [m, tn, sp, pb, tf, at, ori, rn, sc] = _registry.try_get<metadata, tint, sprite, playback, transform, const atlas*, orientation, renderable, scriptable>(_entity);
 
   if (m) {
     auto& interning = _registry.ctx().get<::interning>();
@@ -233,7 +233,7 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
   }
 
   if (at) {
-    _registry.emplace<std::shared_ptr<const atlas>>(entity, *at);
+    _registry.emplace<const atlas*>(entity, *at);
   }
 
   if (ori) {

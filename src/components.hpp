@@ -87,7 +87,7 @@ struct atlas final {
 };
 
 struct sprite final {
-  std::shared_ptr<pixmap> pixmap;
+  pixmap* pixmap;
 };
 
 struct playback final {
