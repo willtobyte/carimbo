@@ -96,7 +96,6 @@ class noncopyable;
 class observable;
 class operatingsystem;
 class overlay;
-class particlefactory;
 class particlepool;
 class pixmap;
 class querybuilder;

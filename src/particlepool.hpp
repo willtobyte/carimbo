@@ -81,16 +81,6 @@ struct particlebatch final {
   [[nodiscard]] size_t size() const noexcept { return particles.count; }
 };
 
-class particlefactory final {
-public:
-  particlefactory() = default;
-
-  std::shared_ptr<particlebatch> create(std::string_view kind, float x, float y, bool spawning = true) const;
-
-private:
-  mutable boost::unordered_flat_map<std::string, cache, transparent_string_hash, std::equal_to<>> _cache;
-};
-
 class particlepool final {
 public:
   particlepool(entt::registry& registry);
@@ -104,10 +94,8 @@ public:
 
   void update(float delta);
 
-  [[nodiscard]] std::shared_ptr<particlefactory> factory() const noexcept;
-
 private:
   entt::registry& _registry;
-  std::shared_ptr<particlefactory> _factory;
+  mutable boost::unordered_flat_map<std::string, cache, transparent_string_hash, std::equal_to<>> _cache;
   boost::unordered_flat_map<std::string, std::pair<entt::entity, std::shared_ptr<particlebatch>>, transparent_string_hash, std::equal_to<>> _batches;
 };

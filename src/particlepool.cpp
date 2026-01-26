@@ -46,124 +46,123 @@ static void range(unmarshal::json node, std::pair<T, T>& out) noexcept {
 }
 }
 
-std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, float x, float y, bool spawning) const {
-  auto [it, inserted] = _cache.try_emplace(kind);
-  if (inserted) {
-    auto json = unmarshal::parse(io::read(std::format("particles/{}.json", kind)));
-
-    it->second.count = json["count"].get<size_t>();
-    it->second.xspawn = {.0f, .0f};
-    it->second.yspawn = {.0f, .0f};
-    it->second.radius = {.0f, .0f};
-    it->second.angle = {.0f, .0f};
-    it->second.scale = {1.0f, 1.0f};
-    it->second.life = {1.0f, 1.0f};
-    it->second.alpha = {uint8_t{255}, uint8_t{255}};
-    it->second.xvel = {.0f, .0f};
-    it->second.yvel = {.0f, .0f};
-    it->second.gx = {.0f, .0f};
-    it->second.gy = {.0f, .0f};
-    it->second.rforce = {.0f, .0f};
-    it->second.rvel = {.0f, .0f};
-
-    if (auto spawn = json["spawn"]) {
-      range(spawn["x"], it->second.xspawn);
-      range(spawn["y"], it->second.yspawn);
-      range(spawn["radius"], it->second.radius);
-      range(spawn["angle"], it->second.angle);
-      range(spawn["scale"], it->second.scale);
-      range(spawn["life"], it->second.life);
-      range(spawn["alpha"], it->second.alpha);
-    }
-
-    if (auto velocity = json["velocity"]) {
-      range(velocity["x"], it->second.xvel);
-      range(velocity["y"], it->second.yvel);
-    }
-
-    if (auto gravity = json["gravity"]) {
-      range(gravity["x"], it->second.gx);
-      range(gravity["y"], it->second.gy);
-    }
-
-    if (auto rotation = json["rotation"]) {
-      range(rotation["force"], it->second.rforce);
-      range(rotation["velocity"], it->second.rvel);
-    }
-
-    it->second.pixmap = std::make_shared<::pixmap>(std::format("blobs/particles/{}.png", kind));
-  }
-
-  const auto props = std::make_shared<particleprops>();
-  props->spawning = spawning;
-  props->x = x;
-  props->y = y;
-  props->hw = static_cast<float>(it->second.pixmap->width()) * .5f;
-  props->hh = static_cast<float>(it->second.pixmap->height()) * .5f;
-  props->xspawnd = rng::uniform_real<float>(it->second.xspawn.first, it->second.xspawn.second);
-  props->yspawnd = rng::uniform_real<float>(it->second.yspawn.first, it->second.yspawn.second);
-  props->radiusd = rng::uniform_real<float>(it->second.radius.first, it->second.radius.second);
-  props->angled = rng::uniform_real<float>(it->second.angle.first, it->second.angle.second);
-  props->xveld = rng::uniform_real<float>(it->second.xvel.first, it->second.xvel.second);
-  props->yveld = rng::uniform_real<float>(it->second.yvel.first, it->second.yvel.second);
-  props->gxd = rng::uniform_real<float>(it->second.gx.first, it->second.gx.second);
-  props->gyd = rng::uniform_real<float>(it->second.gy.first, it->second.gy.second);
-  props->lifed = rng::uniform_real<float>(it->second.life.first, it->second.life.second);
-  props->alphad = rng::uniform_int<unsigned int>(it->second.alpha.first, it->second.alpha.second);
-  props->scaled = rng::uniform_real<float>(it->second.scale.first, it->second.scale.second);
-  props->rotforced = rng::uniform_real<float>(it->second.rforce.first, it->second.rforce.second);
-  props->rotveld = rng::uniform_real<float>(it->second.rvel.first, it->second.rvel.second);
-
-  const auto count = it->second.count;
-  const auto batch = std::make_shared<particlebatch>();
-  batch->props = std::move(props);
-  batch->pixmap = it->second.pixmap;
-  batch->particles.reserve(count);
-  batch->vertices.reserve(count * 4);
-  batch->indices.reserve(count * 6);
-  batch->respawn.reserve(count);
-  batch->particles.resize(count);
-  batch->vertices.resize(count * 4);
-  batch->indices.resize(count * 6);
-  batch->respawn.resize(count);
-
-  for (auto i = 0uz; i < count; ++i) {
-    const auto base = static_cast<int>(i * 4);
-    const auto index = i * 6uz;
-    batch->indices[index] = base;
-    batch->indices[index + 1] = base + 1;
-    batch->indices[index + 2] = base + 2;
-    batch->indices[index + 3] = base;
-    batch->indices[index + 4] = base + 2;
-    batch->indices[index + 5] = base + 3;
-  }
-
-  return batch;
-}
-
 particlepool::particlepool(entt::registry& registry)
-    : _registry(registry), _factory(std::make_shared<particlefactory>()) {
+    : _registry(registry) {
   _batches.reserve(16);
 }
 
 void particlepool::add(unmarshal::json node, int32_t z) {
   const auto name = node["name"].get<std::string_view>();
-  auto [it, inserted] = _batches.try_emplace(name);
-  if (!inserted) {
-    return;
-  }
-
   const auto kind = node["kind"].get<std::string_view>();
   const auto x = node["x"].get<float>();
   const auto y = node["y"].get<float>();
   const auto spawning = node["spawning"].get(true);
 
-  auto batch = _factory->create(kind, x, y, spawning);
-  const auto entity = _registry.create();
-  _registry.emplace<renderable>(entity, z, true, renderablekind::particle);
-  _registry.emplace<particlerenderable>(entity, batch.get());
+  std::shared_ptr<particlebatch> batch;
 
-  it->second = {entity, batch};
+  {
+    auto [it, inserted] = _batches.try_emplace(name);
+    if (!inserted) {
+      return;
+    }
+  }
+
+  {
+    auto [it, inserted] = _cache.try_emplace(kind);
+    if (inserted) {
+      auto json = unmarshal::parse(io::read(std::format("particles/{}.json", kind)));
+
+      it->second.count = json["count"].get<size_t>();
+      it->second.xspawn = {.0f, .0f};
+      it->second.yspawn = {.0f, .0f};
+      it->second.radius = {.0f, .0f};
+      it->second.angle = {.0f, .0f};
+      it->second.scale = {1.0f, 1.0f};
+      it->second.life = {1.0f, 1.0f};
+      it->second.alpha = {uint8_t{255}, uint8_t{255}};
+      it->second.xvel = {.0f, .0f};
+      it->second.yvel = {.0f, .0f};
+      it->second.gx = {.0f, .0f};
+      it->second.gy = {.0f, .0f};
+      it->second.rforce = {.0f, .0f};
+      it->second.rvel = {.0f, .0f};
+
+      if (auto spawn = json["spawn"]) {
+        range(spawn["x"], it->second.xspawn);
+        range(spawn["y"], it->second.yspawn);
+        range(spawn["radius"], it->second.radius);
+        range(spawn["angle"], it->second.angle);
+        range(spawn["scale"], it->second.scale);
+        range(spawn["life"], it->second.life);
+        range(spawn["alpha"], it->second.alpha);
+      }
+
+      if (auto velocity = json["velocity"]) {
+        range(velocity["x"], it->second.xvel);
+        range(velocity["y"], it->second.yvel);
+      }
+
+      if (auto gravity = json["gravity"]) {
+        range(gravity["x"], it->second.gx);
+        range(gravity["y"], it->second.gy);
+      }
+
+      if (auto rotation = json["rotation"]) {
+        range(rotation["force"], it->second.rforce);
+        range(rotation["velocity"], it->second.rvel);
+      }
+
+      it->second.pixmap = std::make_shared<::pixmap>(std::format("blobs/particles/{}.png", kind));
+    }
+
+    const auto props = std::make_shared<particleprops>();
+    props->spawning = spawning;
+    props->x = x;
+    props->y = y;
+    props->hw = static_cast<float>(it->second.pixmap->width()) * .5f;
+    props->hh = static_cast<float>(it->second.pixmap->height()) * .5f;
+    props->xspawnd = rng::uniform_real<float>(it->second.xspawn.first, it->second.xspawn.second);
+    props->yspawnd = rng::uniform_real<float>(it->second.yspawn.first, it->second.yspawn.second);
+    props->radiusd = rng::uniform_real<float>(it->second.radius.first, it->second.radius.second);
+    props->angled = rng::uniform_real<float>(it->second.angle.first, it->second.angle.second);
+    props->xveld = rng::uniform_real<float>(it->second.xvel.first, it->second.xvel.second);
+    props->yveld = rng::uniform_real<float>(it->second.yvel.first, it->second.yvel.second);
+    props->gxd = rng::uniform_real<float>(it->second.gx.first, it->second.gx.second);
+    props->gyd = rng::uniform_real<float>(it->second.gy.first, it->second.gy.second);
+    props->lifed = rng::uniform_real<float>(it->second.life.first, it->second.life.second);
+    props->alphad = rng::uniform_int<unsigned int>(it->second.alpha.first, it->second.alpha.second);
+    props->scaled = rng::uniform_real<float>(it->second.scale.first, it->second.scale.second);
+    props->rotforced = rng::uniform_real<float>(it->second.rforce.first, it->second.rforce.second);
+    props->rotveld = rng::uniform_real<float>(it->second.rvel.first, it->second.rvel.second);
+
+    const auto count = it->second.count;
+    batch = std::make_shared<particlebatch>();
+    batch->props = std::move(props);
+    batch->pixmap = it->second.pixmap;
+    batch->particles.resize(count);
+    batch->vertices.resize(count * 4);
+    batch->indices.resize(count * 6);
+    batch->respawn.resize(count);
+
+    for (auto i = 0uz; i < count; ++i) {
+      const auto base = static_cast<int>(i * 4);
+      const auto index = i * 6uz;
+      batch->indices[index] = base;
+      batch->indices[index + 1] = base + 1;
+      batch->indices[index + 2] = base + 2;
+      batch->indices[index + 3] = base;
+      batch->indices[index + 4] = base + 2;
+      batch->indices[index + 5] = base + 3;
+    }
+  }
+
+  {
+    auto [it, inserted] = _batches.try_emplace(name);
+    const auto entity = _registry.create();
+    _registry.emplace<renderable>(entity, z, true, renderablekind::particle);
+    _registry.emplace<particlerenderable>(entity, batch.get());
+    it->second = {entity, batch};
+  }
 
   _registry.ctx().get<renderstate>().z_dirty = true;
 }
@@ -281,6 +280,4 @@ void particlepool::update(float delta) {
   }
 }
 
-std::shared_ptr<particlefactory> particlepool::factory() const noexcept {
-  return _factory;
-}
+

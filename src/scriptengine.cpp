@@ -505,16 +505,9 @@ void scriptengine::run() {
     )
   );
 
-  lua.new_usertype<particlefactory>(
-    "ParticleFactory",
-    sol::no_constructor,
-    "create", &particlefactory::create
-  );
-
   lua.new_usertype<particlepool>(
     "ParticlePool",
     sol::no_constructor,
-    "factory", sol::property(&particlepool::factory),
     "clear", &particlepool::clear
   );
 
