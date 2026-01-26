@@ -5,7 +5,6 @@
 #include "objectpool.hpp"
 #include "particlepool.hpp"
 #include "physics.hpp"
-#include "renderqueue.hpp"
 #include "soundpool.hpp"
 #include "systems.hpp"
 #include "tilemap.hpp"
@@ -86,7 +85,6 @@ private:
 
   sol::environment _environment;
   soundpool _soundpool;
-  particlepool _particlepool;
+  particlepool _particlepool{_registry};
   objectpool _objectpool;
-  renderqueue _renderqueue{_registry, _particlepool};
 };

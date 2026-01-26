@@ -93,7 +93,7 @@ private:
 
 class particlepool final {
 public:
-  particlepool();
+  particlepool(entt::registry& registry);
   ~particlepool() = default;
 
   void add(unmarshal::json node);
@@ -106,9 +106,8 @@ public:
 
   [[nodiscard]] std::shared_ptr<particlefactory> factory() const noexcept;
 
-  [[nodiscard]] const auto& batches() const noexcept { return _batches; }
-
 private:
+  entt::registry& _registry;
   std::shared_ptr<particlefactory> _factory;
-  boost::unordered_flat_map<std::string, std::shared_ptr<particlebatch>, transparent_string_hash, std::equal_to<>> _batches;
+  boost::unordered_flat_map<std::string, std::pair<entt::entity, std::shared_ptr<particlebatch>>, transparent_string_hash, std::equal_to<>> _batches;
 };

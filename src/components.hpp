@@ -116,9 +116,16 @@ struct drawable final {
   float h{0};
 };
 
+enum class renderablekind : uint8_t { sprite, particle };
+
+struct particlerenderable final {
+  std::shared_ptr<particlebatch> batch;
+};
+
 struct renderable final {
   int z;
   bool visible{true};
+  renderablekind kind{renderablekind::sprite};
 };
 
 struct renderstate final {

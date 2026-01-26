@@ -1,5 +1,6 @@
 #include "particlepool.hpp"
 
+#include "components.hpp"
 #include "io.hpp"
 #include "pixmap.hpp"
 
@@ -140,8 +141,8 @@ std::shared_ptr<particlebatch> particlefactory::create(std::string_view kind, fl
   return batch;
 }
 
-particlepool::particlepool()
-    : _factory(std::make_shared<particlefactory>()) {
+particlepool::particlepool(entt::registry& registry)
+    : _registry(registry), _factory(std::make_shared<particlefactory>()) {
   _batches.reserve(16);
 }
 
@@ -155,25 +156,36 @@ void particlepool::add(unmarshal::json node) {
   const auto kind = node["kind"].get<std::string_view>();
   const auto x = node["x"].get<float>();
   const auto y = node["y"].get<float>();
-  const auto z = node["z"].get<int16_t>(0);
+  const auto z = node["z"].get<int>(0);
   const auto spawning = node["spawning"].get(true);
-  it->second = _factory->create(kind, x, y, spawning);
-  it->second->z = z;
+
+  auto batch = _factory->create(kind, x, y, spawning);
+  const auto entity = _registry.create();
+  _registry.emplace<renderable>(entity, z, true, renderablekind::particle);
+  _registry.emplace<particlerenderable>(entity, batch);
+
+  it->second = {entity, batch};
+
+  _registry.ctx().get<renderstate>().z_dirty = true;
 }
 
 void particlepool::populate(sol::table& pool) const {
-  for (const auto& [name, batch] : _batches) {
+  for (const auto& [name, pair] : _batches) {
     assert(!pool[name].valid() && "duplicate key in pool");
-    pool[name] = batch->props;
+    pool[name] = pair.second->props;
   }
 }
 
 void particlepool::clear() {
+  for (const auto& [_, pair] : _batches) {
+    _registry.destroy(pair.first);
+  }
   _batches.clear();
 }
 
 void particlepool::update(float delta) {
-  for (const auto& [_, batch] : _batches) {
+  for (const auto& [_, pair] : _batches) {
+    const auto& batch = pair.second;
     auto* props = batch->props.get();
     auto& p = batch->particles;
     const auto n = p.count;
