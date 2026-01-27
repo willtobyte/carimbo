@@ -65,10 +65,11 @@ void animationsystem::update(uint64_t now) {
       s.action = tl.next;
       d.mark(dirtable::animation);
     } else if (is_last & tl.oneshot) {
-      s.action = empty;
-      s.timeline = nullptr;
       if (const auto* a = _entt.try_get<animatable>(entity)) {
         a->on_end();
+      } else {
+        s.action = empty;
+        s.timeline = nullptr;
       }
     }
   }
