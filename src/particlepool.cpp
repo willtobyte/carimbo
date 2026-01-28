@@ -208,7 +208,7 @@ void particlepool::update(float delta) {
     auto* __restrict avs = p.av.data();
     auto* __restrict afs = p.af.data();
 
-    for (size_t i = 0; i < n; ++i) {
+    for (auto i = 0uz; i < n; ++i) {
       lifes[i] -= delta;
       avs[i] += afs[i] * delta;
       angles[i] += avs[i] * delta;
@@ -225,14 +225,14 @@ void particlepool::update(float delta) {
       const auto py = props->y;
 
       auto* __restrict respawn = batch->respawn.data();
-      size_t count = 0;
+      auto count = 0uz;
 
-      for (size_t i = 0; i < n; ++i) {
+      for (auto i = 0uz; i < n; ++i) {
         respawn[count] = i;
         count += static_cast<size_t>(lifes[i] <= 0.f);
       }
 
-      for (size_t j = 0; j < count; ++j) {
+      for (auto j = 0uz; j < count; ++j) {
         const auto i = respawn[j];
         const auto radius = props->randradius();
         const auto spawnangle = props->randangle();
