@@ -79,7 +79,6 @@ void particlepool::add(unmarshal::json node, int32_t z) {
       it->second.angle = {.0f, .0f};
       it->second.scale = {1.0f, 1.0f};
       it->second.life = {1.0f, 1.0f};
-      it->second.alpha = {uint8_t{255}, uint8_t{255}};
       it->second.xvel = {.0f, .0f};
       it->second.yvel = {.0f, .0f};
       it->second.gx = {.0f, .0f};
@@ -94,7 +93,6 @@ void particlepool::add(unmarshal::json node, int32_t z) {
         range(spawn["angle"], it->second.angle);
         range(spawn["scale"], it->second.scale);
         range(spawn["life"], it->second.life);
-        range(spawn["alpha"], it->second.alpha);
       }
 
       if (auto velocity = json["velocity"]) {
@@ -130,7 +128,6 @@ void particlepool::add(unmarshal::json node, int32_t z) {
     props->gxd = rng::uniform_real<float>(it->second.gx.first, it->second.gx.second);
     props->gyd = rng::uniform_real<float>(it->second.gy.first, it->second.gy.second);
     props->lifed = rng::uniform_real<float>(it->second.life.first, it->second.life.second);
-    props->alphad = rng::uniform_int<unsigned int>(it->second.alpha.first, it->second.alpha.second);
     props->scaled = rng::uniform_real<float>(it->second.scale.first, it->second.scale.second);
     props->rotforced = rng::uniform_real<float>(it->second.rforce.first, it->second.rforce.second);
     props->rotveld = rng::uniform_real<float>(it->second.rvel.first, it->second.rvel.second);
@@ -157,7 +154,7 @@ void particlepool::add(unmarshal::json node, int32_t z) {
   }
 
   {
-    auto [it, inserted] = _batches.try_emplace(name);
+    auto it = _batches.find(name);
     const auto entity = _registry.create();
     _registry.emplace<renderable>(entity, z, true, renderablekind::particle);
     _registry.emplace<particlerenderable>(entity, batch.get());
@@ -210,7 +207,6 @@ void particlepool::update(float delta) {
     auto* __restrict angles = p.angle.data();
     auto* __restrict avs = p.av.data();
     auto* __restrict afs = p.af.data();
-    auto* __restrict alphas = p.alpha.data();
 
     for (size_t i = 0; i < n; ++i) {
       lifes[i] -= delta;
@@ -251,7 +247,6 @@ void particlepool::update(float delta) {
         avs[i] = props->randrotvel();
         afs[i] = props->randrotforce();
         lifes[i] = props->randlife();
-        alphas[i] = props->randalpha();
         scales[i] = props->randscale();
         angles[i] = spawnangle;
       }
@@ -263,8 +258,18 @@ void particlepool::update(float delta) {
 
     for (auto i = 0uz; i < n; ++i) {
       const auto life = lifes[i];
-      const auto alive = life > 0.f ? 1.f : 0.f;
-      const auto alpha = std::min(life, 1.f) * alive;
+      auto* vx = vertices + i * 4;
+
+      if (life <= 0.f) {
+        const SDL_FColor color = {1.f, 1.f, 1.f, 0.f};
+        vx[0] = {{0.f, 0.f}, color, {0.f, 0.f}};
+        vx[1] = {{0.f, 0.f}, color, {1.f, 0.f}};
+        vx[2] = {{0.f, 0.f}, color, {1.f, 1.f}};
+        vx[3] = {{0.f, 0.f}, color, {0.f, 1.f}};
+        continue;
+      }
+
+      const auto alpha = std::min(life, 1.f);
 
       const auto scale = scales[i];
       const auto shw = hw * scale;
@@ -282,7 +287,6 @@ void particlepool::update(float delta) {
       const auto dx1 = shw * ca + shh * sa;
       const auto dy1 = shw * sa - shh * ca;
 
-      auto* vx = vertices + i * 4;
       vx[0] = {{x + dx0, y + dy0}, color, {0.f, 0.f}};
       vx[1] = {{x + dx1, y + dy1}, color, {1.f, 0.f}};
       vx[2] = {{x - dx0, y - dy0}, color, {1.f, 1.f}};

@@ -9,7 +9,6 @@ struct cache final {
   std::pair<float, float> xspawn, yspawn;
   std::pair<float, float> radius, angle;
   std::pair<float, float> scale, life;
-  std::pair<uint8_t, uint8_t> alpha;
   std::pair<float, float> xvel, yvel;
   std::pair<float, float> gx, gy;
   std::pair<float, float> rforce, rvel;
@@ -23,7 +22,6 @@ struct particleprops final {
   rng::uniform_real<float> xspawnd, yspawnd, radiusd, angled;
   rng::uniform_real<float> xveld, yveld, gxd, gyd;
   rng::uniform_real<float> scaled, lifed, rotforced, rotveld;
-  rng::uniform_int<unsigned int> alphad;
 
   float randradius() noexcept { return radiusd(rng::global()); }
   float randangle() noexcept { return angled(rng::global()); }
@@ -35,7 +33,6 @@ struct particleprops final {
   float randgy() noexcept { return gyd(rng::global()); }
   float randscale() noexcept { return scaled(rng::global()); }
   float randlife() noexcept { return lifed(rng::global()); }
-  uint8_t randalpha() noexcept { return static_cast<uint8_t>(alphad(rng::global())); }
   float randrotforce() noexcept { return rotforced(rng::global()); }
   float randrotvel() noexcept { return rotveld(rng::global()); }
 
@@ -45,7 +42,6 @@ struct particleprops final {
 struct particles final {
   std::vector<float> x, y, vx, vy, gx, gy;
   std::vector<float> life, scale, angle, av, af;
-  std::vector<uint8_t> alpha;
   size_t count{0};
 
   void reserve(size_t n) {
@@ -54,7 +50,6 @@ struct particles final {
     gx.reserve(n); gy.reserve(n);
     life.reserve(n); scale.reserve(n);
     angle.reserve(n); av.reserve(n); af.reserve(n);
-    alpha.reserve(n);
   }
 
   void resize(size_t n) {
@@ -65,7 +60,6 @@ struct particles final {
     gx.resize(n); gy.resize(n);
     life.resize(n); scale.resize(n);
     angle.resize(n); av.resize(n); af.resize(n);
-    alpha.resize(n);
   }
 };
 
