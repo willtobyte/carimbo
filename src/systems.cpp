@@ -59,8 +59,8 @@ void animationsystem::update(uint64_t now) {
     const auto is_last = s.current + 1 >= tl.frames.size();
     const auto has_next = tl.next != empty;
     const auto keep_last = is_last && tl.oneshot && !has_next;
-
     const auto prev_frame = s.current;
+
     if (!keep_last) [[likely]] {
       s.current = is_last ? 0 : s.current + 1;
     }
