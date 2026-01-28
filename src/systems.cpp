@@ -56,23 +56,23 @@ void animationsystem::update(uint64_t now) {
 
     s.tick = now;
 
-    const auto is_last = s.current + 1 >= tl.frames.size();
-    const auto has_next = tl.next != empty;
-    const auto keep_last = is_last && tl.oneshot && !has_next;
+    const auto last = s.current + 1 >= tl.frames.size();
+    const auto next = tl.next != empty;
+    const auto keep = last && tl.oneshot && !next;
     const auto previous = s.current;
 
-    if (!keep_last) [[likely]] {
-      s.current = is_last ? 0 : s.current + 1;
+    if (!keep) [[likely]] {
+      s.current = last ? 0 : s.current + 1;
     }
 
     if (previous != s.current) {
       d.mark(dirtable::render);
     }
 
-    if (is_last & has_next) {
+    if (last & next) {
       s.action = tl.next;
       d.mark(dirtable::animation);
-    } else if (is_last & tl.oneshot) {
+    } else if (last & tl.oneshot) {
       if (const auto* a = _entt.try_get<animatable>(entity)) {
         a->on_end();
       }
