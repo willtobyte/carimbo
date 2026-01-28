@@ -21,8 +21,9 @@ void animationsystem::update(uint64_t now) {
 
     if (refresh) [[unlikely]] {
       s.timeline = resolve_timeline(*at, s.action);
-      s.current_frame = 0;
+      s.current = 0;
       s.tick = now;
+      s.finished = false;
       d.clear(dirtable::animation);
       d.mark(dirtable::render | dirtable::physics);
       if (s.timeline) {
@@ -36,12 +37,16 @@ void animationsystem::update(uint64_t now) {
       continue;
     }
 
+    if (s.finished) [[unlikely]] {
+      continue;
+    }
+
     const auto& tl = *s.timeline;
 
     assert(!tl.frames.empty() && "timeline must have frames");
-    assert(s.current_frame < tl.frames.size() && "frame index out of bounds");
+    assert(s.current < tl.frames.size() && "frame index out of bounds");
 
-    const auto& frame = tl.frames[s.current_frame];
+    const auto& frame = tl.frames[s.current];
     const auto elapsed = now - s.tick;
     const auto ready = frame.duration > 0 && elapsed >= static_cast<uint64_t>(frame.duration);
 
@@ -51,13 +56,16 @@ void animationsystem::update(uint64_t now) {
 
     s.tick = now;
 
-    const auto is_last = s.current_frame + 1 >= tl.frames.size();
+    const auto is_last = s.current + 1 >= tl.frames.size();
     const auto has_next = tl.next != empty;
+    const auto keep_last = is_last && tl.oneshot && !has_next;
 
-    const auto prev_frame = s.current_frame;
-    s.current_frame = is_last ? 0 : s.current_frame + 1;
+    const auto prev_frame = s.current;
+    if (!keep_last) [[likely]] {
+      s.current = is_last ? 0 : s.current + 1;
+    }
 
-    if (prev_frame != s.current_frame) {
+    if (prev_frame != s.current) {
       d.mark(dirtable::render);
     }
 
@@ -67,10 +75,9 @@ void animationsystem::update(uint64_t now) {
     } else if (is_last & tl.oneshot) {
       if (const auto* a = _entt.try_get<animatable>(entity)) {
         a->on_end();
-      } else {
-        s.action = empty;
-        s.timeline = nullptr;
       }
+
+      s.finished = true;
     }
   }
 }
@@ -157,9 +164,9 @@ void rendersystem::update() noexcept {
     const auto& tl = *pb.timeline;
 
     assert(!tl.frames.empty() && "timeline must have frames");
-    assert(pb.current_frame < tl.frames.size() && "frame index out of bounds");
+    assert(pb.current < tl.frames.size() && "frame index out of bounds");
 
-    const auto& frame = tl.frames[pb.current_frame];
+    const auto& frame = tl.frames[pb.current];
     const auto& q = frame.quad;
 
     const auto hw = q.w * .5f;
@@ -180,7 +187,7 @@ void rendersystem::draw() const noexcept {
       return;
     }
 
-    const auto& frame = pb.timeline->frames[pb.current_frame];
+    const auto& frame = pb.timeline->frames[pb.current];
     const auto& q = frame.quad;
 
     sp.pixmap->draw(q.x, q.y, q.w, q.h, dr.x, dr.y, dr.w, dr.h, tr.angle, tn.a, fl.flip);

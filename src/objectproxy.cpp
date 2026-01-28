@@ -107,7 +107,8 @@ void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
   auto [s, at, d] = _registry.get<playback, const atlas*, dirtable>(_entity);
   s.action = interning.intern(value);
-  s.current_frame = 0;
+  s.current = 0;
+  s.finished = false;
   s.timeline = at->find(s.action);
   d.mark(dirtable::render | dirtable::physics);
 }

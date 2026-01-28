@@ -99,10 +99,11 @@ struct sprite final {
 static_assert(std::is_trivially_copyable_v<sprite>);
 
 struct playback final {
-  uint16_t current_frame{0};
+  uint16_t current{0};
   uint64_t tick{0};
   symbol action{empty};
   const timeline* timeline{nullptr};
+  bool finished{false};
 };
 
 static_assert(std::is_trivially_copyable_v<playback>);

@@ -78,7 +78,7 @@ void objectpool::add(unmarshal::json node, int32_t z) {
   _registry.emplace<tint>(entity);
   _registry.emplace<sprite>(entity, sprite{.pixmap = it->second.pixmap.get()});
   _registry.emplace<playback>(entity, playback{
-    .current_frame = 0,
+    .current = 0,
     .tick = SDL_GetTicks(),
     .action = action,
     .timeline = nullptr
@@ -117,7 +117,7 @@ void objectpool::draw(entt::entity entity) const noexcept {
 
   if (!pb.timeline || pb.timeline->frames.empty()) [[unlikely]] return;
 
-  const auto& frame = pb.timeline->frames[pb.current_frame];
+  const auto& frame = pb.timeline->frames[pb.current];
   const auto& q = frame.quad;
   sp.pixmap->draw(q.x, q.y, q.w, q.h, dr.x, dr.y, dr.w, dr.h, tr.angle, tn.a, fl.flip);
 }
