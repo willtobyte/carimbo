@@ -807,7 +807,7 @@ void scriptengine::run() {
   lua["keyboard"] = keyboard{};
 
   struct gamepadslot final {
-    int index;
+    size_t index;
     std::unique_ptr<SDL_Gamepad, SDL_Deleter> ptr{nullptr};
 
     [[nodiscard]] bool open() noexcept {
