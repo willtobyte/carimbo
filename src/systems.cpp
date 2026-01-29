@@ -85,8 +85,9 @@ void animationsystem::update(uint64_t now) {
 void physicssystem::update(float delta) {
   _world.step(delta);
 
-  const auto events = _world.sensor_events();
   const auto& interning = _registry.ctx().get<::interning>();
+
+  const auto events = _world.sensor_events();
 
   for (int i = 0; i < events.beginCount; ++i) {
     const auto& event = events.beginEvents[i];
