@@ -872,7 +872,7 @@ void scriptengine::run() {
       return {0, 0};
     }
 
-    [[nodiscard]] std::string_view name() noexcept {
+    [[nodiscard]] std::string name() noexcept {
       if (open()) [[likely]] {
         if (const auto* result = SDL_GetGamepadName(ptr.get())) [[likely]] {
           return result;
