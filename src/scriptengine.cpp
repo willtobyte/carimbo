@@ -830,22 +830,28 @@ void scriptengine::run() {
         return sol::make_object(lua, self.valid());
       }
 
-      if (name == "name") {
-        return sol::make_object(lua, self.valid() ? self.name() : std::string{});
-      }
+      // if (name == "name") {
+      //   return sol::make_object(lua, ...
+      // }
 
       if (name == "leftstick") {
-        const auto [x, y] = self.leftstick();
+        const auto x = SDL_GetGamepadAxis(self.ptr.get(), SDL_GAMEPAD_AXIS_LEFTX);
+        const auto y = SDL_GetGamepadAxis(self.ptr.get(), SDL_GAMEPAD_AXIS_LEFTY);
+
         return sol::make_object(lua, std::make_pair(deadzone(x), deadzone(y)));
       }
 
       if (name == "rightstick") {
-        const auto [x, y] = self.rightstick();
+        const auto x = SDL_GetGamepadAxis(self.ptr.get(), SDL_GAMEPAD_AXIS_RIGHTX);
+        const auto y = SDL_GetGamepadAxis(self.ptr.get(), SDL_GAMEPAD_AXIS_RIGHTY);
+
         return sol::make_object(lua, std::make_pair(deadzone(x), deadzone(y)));
       }
 
       if (name == "triggers") {
-        const auto [left, right] = self.triggers();
+        const auto left = SDL_GetGamepadAxis(self.ptr.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER);
+        const auto right = SDL_GetGamepadAxis(self.ptr.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER);
+
         return sol::make_object(lua, std::make_pair(deadzone(left), deadzone(right)));
       }
 
@@ -860,8 +866,8 @@ void scriptengine::run() {
           {"down", SDL_GAMEPAD_BUTTON_DPAD_DOWN}, {"left", SDL_GAMEPAD_BUTTON_DPAD_LEFT},
           {"right", SDL_GAMEPAD_BUTTON_DPAD_RIGHT}
         };
-  
-        const auto it = mapping.find(key_str);
+
+        const auto it = mapping.find(name);
         if (it != mapping.end()) [[likely]] {
           if (self.valid()) [[likely]] {
             return sol::make_object(lua, SDL_GetGamepadButton(self.ptr.get(), it->second));
@@ -869,7 +875,7 @@ void scriptengine::run() {
           return sol::make_object(lua, false);
         }
       }
-        
+
       {
         static const boost::unordered_flat_map<std::string_view, SDL_GamepadAxis> mapping{
           {"leftx", SDL_GAMEPAD_AXIS_LEFTX}, {"lefty", SDL_GAMEPAD_AXIS_LEFTY},
@@ -877,7 +883,7 @@ void scriptengine::run() {
           {"triggerleft", SDL_GAMEPAD_AXIS_LEFT_TRIGGER}, {"triggerright", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER}
         };
 
-        const auto it = mapping.find(key_str);
+        const auto it = mapping.find(name);
         if (it != mapping.end()) {
           if (self.valid()) [[likely]] {
             const auto value = SDL_GetGamepadAxis(self.ptr.get(), it->second);
@@ -908,60 +914,6 @@ void scriptengine::run() {
 
       return ptr != nullptr;
     }
-
-    [[nodiscard]] bool connected() noexcept {
-      return valid();
-    }
-
-    [[nodiscard]] bool button(SDL_GamepadButton button) noexcept {
-      if (valid()) [[likely]] {
-        return SDL_GetGamepadButton(ptr.get(), button);
-      }
-
-      return false;
-    }
-
-    [[nodiscard]] int16_t axis(SDL_GamepadAxis axis) noexcept {
-      if (valid()) [[likely]] {
-        return SDL_GetGamepadAxis(ptr.get(), axis);
-      }
-
-      return 0;
-    }
-
-    [[nodiscard]] std::pair<int16_t, int16_t> leftstick() noexcept {
-      if (valid()) [[likely]] {
-        return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTY)};
-      }
-
-      return {0, 0};
-    }
-
-    [[nodiscard]] std::pair<int16_t, int16_t> rightstick() noexcept {
-      if (valid()) [[likely]] {
-        return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTY)};
-      }
-
-      return {0, 0};
-    }
-
-    [[nodiscard]] std::pair<int16_t, int16_t> triggers() noexcept {
-      if (valid()) [[likely]] {
-        return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)};
-      }
-
-      return {0, 0};
-    }
-
-    [[nodiscard]] std::string name() noexcept {
-      if (valid()) [[likely]] {
-        if (const auto* result = SDL_GetGamepadName(ptr.get())) [[likely]] {
-          return result;
-        }
-      }
-
-      return {};
-    }
   };
 
   std::array<gamepadslot, 4> gamepadslots{gamepadslot{0}, gamepadslot{1}, gamepadslot{2}, gamepadslot{3}};
@@ -973,35 +925,6 @@ void scriptengine::run() {
       return std::min(total, 4);
     }
   };
-
-  lua.new_enum(
-    "GamepadButton",
-    "south", SDL_GAMEPAD_BUTTON_SOUTH,
-    "east", SDL_GAMEPAD_BUTTON_EAST,
-    "west", SDL_GAMEPAD_BUTTON_WEST,
-    "north", SDL_GAMEPAD_BUTTON_NORTH,
-    "back", SDL_GAMEPAD_BUTTON_BACK,
-    "guide", SDL_GAMEPAD_BUTTON_GUIDE,
-    "start", SDL_GAMEPAD_BUTTON_START,
-    "leftstick", SDL_GAMEPAD_BUTTON_LEFT_STICK,
-    "rightstick", SDL_GAMEPAD_BUTTON_RIGHT_STICK,
-    "leftshoulder", SDL_GAMEPAD_BUTTON_LEFT_SHOULDER,
-    "rightshoulder", SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER,
-    "up", SDL_GAMEPAD_BUTTON_DPAD_UP,
-    "down", SDL_GAMEPAD_BUTTON_DPAD_DOWN,
-    "left", SDL_GAMEPAD_BUTTON_DPAD_LEFT,
-    "right", SDL_GAMEPAD_BUTTON_DPAD_RIGHT
-  );
-
-  lua.new_enum(
-    "GamepadAxis",
-    "leftx", SDL_GAMEPAD_AXIS_LEFTX,
-    "lefty", SDL_GAMEPAD_AXIS_LEFTY,
-    "rightx", SDL_GAMEPAD_AXIS_RIGHTX,
-    "righty", SDL_GAMEPAD_AXIS_RIGHTY,
-    "triggerleft", SDL_GAMEPAD_AXIS_LEFT_TRIGGER,
-    "triggerright", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER
-  );
 
   lua.new_usertype<gamepadslot>(
     "GamepadSlot",
