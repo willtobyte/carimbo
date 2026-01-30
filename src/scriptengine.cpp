@@ -820,7 +820,7 @@ void scriptengine::run() {
 
   struct gamepadslot final {
     int slot;
-    std::unique_ptr<SDL_Gamepad, SDL_Deleter> handler{nullptr};
+    std::unique_ptr<SDL_Gamepad, SDL_Deleter> gamepad{nullptr};
 
     static auto index(gamepadslot& self, sol::stack_object key, sol::this_state state) {
       sol::state_view lua{state};
@@ -835,22 +835,22 @@ void scriptengine::run() {
       // }
 
       if (name == "leftstick") {
-        const auto x = SDL_GetGamepadAxis(self.handler.get(), SDL_GAMEPAD_AXIS_LEFTX);
-        const auto y = SDL_GetGamepadAxis(self.handler.get(), SDL_GAMEPAD_AXIS_LEFTY);
+        const auto x = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_LEFTX);
+        const auto y = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_LEFTY);
 
         return sol::make_object(lua, std::make_pair(deadzone(x), deadzone(y)));
       }
 
       if (name == "rightstick") {
-        const auto x = SDL_GetGamepadAxis(self.handler.get(), SDL_GAMEPAD_AXIS_RIGHTX);
-        const auto y = SDL_GetGamepadAxis(self.handler.get(), SDL_GAMEPAD_AXIS_RIGHTY);
+        const auto x = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_RIGHTX);
+        const auto y = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_RIGHTY);
 
         return sol::make_object(lua, std::make_pair(deadzone(x), deadzone(y)));
       }
 
       if (name == "triggers") {
-        const auto left = SDL_GetGamepadAxis(self.handler.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER);
-        const auto right = SDL_GetGamepadAxis(self.handler.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER);
+        const auto left = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER);
+        const auto right = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER);
 
         return sol::make_object(lua, std::make_pair(deadzone(left), deadzone(right)));
       }
@@ -870,7 +870,7 @@ void scriptengine::run() {
         const auto it = mapping.find(name);
         if (it != mapping.end()) [[likely]] {
           if (self.valid()) [[likely]] {
-            return sol::make_object(lua, SDL_GetGamepadButton(self.handler.get(), it->second));
+            return sol::make_object(lua, SDL_GetGamepadButton(self.gamepad.get(), it->second));
           }
           return sol::make_object(lua, false);
         }
@@ -886,7 +886,7 @@ void scriptengine::run() {
         const auto it = mapping.find(name);
         if (it != mapping.end()) {
           if (self.valid()) [[likely]] {
-            const auto value = SDL_GetGamepadAxis(self.handler.get(), it->second);
+            const auto value = SDL_GetGamepadAxis(self.gamepad.get(), it->second);
             return sol::make_object(lua, deadzone(value));
           }
 
@@ -898,21 +898,21 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] bool valid() noexcept {
-      if (handler) [[likely]] {
-        if (SDL_GamepadConnected(handler.get())) [[likely]] {
+      if (gamepad) [[likely]] {
+        if (SDL_GamepadConnected(gamepad.get())) [[likely]] {
           return true;
         }
 
-        ptr.reset();
+        gamepad.reset();
       }
 
       auto count = 0;
       const auto gamepads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
       if (gamepads && slot < count) [[likely]] {
-        handler.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(slot)]));
+        gamepad.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(slot)]));
       }
 
-      return handler != nullptr;
+      return gamepad != nullptr;
     }
   };
 
