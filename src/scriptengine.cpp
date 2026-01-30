@@ -810,7 +810,7 @@ void scriptengine::run() {
     int index;
     std::unique_ptr<SDL_Gamepad, SDL_Deleter> ptr{nullptr};
 
-    [[nodiscard]] bool open() noexcept {
+    [[nodiscard]] bool valid() noexcept {
       if (ptr) [[likely]] {
         if (SDL_GamepadConnected(ptr.get())) [[likely]] {
           return true;
@@ -829,11 +829,11 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] bool connected() noexcept {
-      return open();
+      return valid();
     }
 
     [[nodiscard]] bool button(SDL_GamepadButton button) noexcept {
-      if (open()) [[likely]] {
+      if (valid()) [[likely]] {
         return SDL_GetGamepadButton(ptr.get(), button);
       }
 
@@ -841,7 +841,7 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] int16_t axis(SDL_GamepadAxis axis) noexcept {
-      if (open()) [[likely]] {
+      if (valid()) [[likely]] {
         return SDL_GetGamepadAxis(ptr.get(), axis);
       }
 
@@ -849,7 +849,7 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] std::pair<int16_t, int16_t> leftstick() noexcept {
-      if (open()) [[likely]] {
+      if (valid()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFTY)};
       }
 
@@ -857,7 +857,7 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] std::pair<int16_t, int16_t> rightstick() noexcept {
-      if (open()) [[likely]] {
+      if (valid()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTX), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHTY)};
       }
 
@@ -865,7 +865,7 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] std::pair<int16_t, int16_t> triggers() noexcept {
-      if (open()) [[likely]] {
+      if (valid()) [[likely]] {
         return {SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_LEFT_TRIGGER), SDL_GetGamepadAxis(ptr.get(), SDL_GAMEPAD_AXIS_RIGHT_TRIGGER)};
       }
 
@@ -873,7 +873,7 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] std::string name() noexcept {
-      if (open()) [[likely]] {
+      if (valid()) [[likely]] {
         if (const auto* result = SDL_GetGamepadName(ptr.get())) [[likely]] {
           return result;
         }
