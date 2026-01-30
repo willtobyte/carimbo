@@ -899,7 +899,7 @@ void scriptengine::run() {
 
     [[nodiscard]] bool valid() noexcept {
       if (ptr) [[likely]] {
-        if (SDL_GamepadConnected(ptr.get())) [[likely]] {
+        if (SDL_GamepadConnected(handler.get())) [[likely]] {
           return true;
         }
 
@@ -909,10 +909,10 @@ void scriptengine::run() {
       auto count = 0;
       const auto gamepads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
       if (gamepads && slot < count) [[likely]] {
-        ptr.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(slot)]));
+        handler.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(slot)]));
       }
 
-      return ptr != nullptr;
+      return handler != nullptr;
     }
   };
 
