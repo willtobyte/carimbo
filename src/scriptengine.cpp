@@ -807,8 +807,75 @@ void scriptengine::run() {
   lua["keyboard"] = keyboard{};
 
   struct gamepadslot final {
-    int index;
+    int slot;
     std::unique_ptr<SDL_Gamepad, SDL_Deleter> ptr{nullptr};
+
+    static auto index(const gamepadslot& self, sol::stack_object key, sol::this_state state) {
+      sol::state_view lua{state};
+      const auto key_str = key.as<std::string_view>();
+
+      if (key_str == "connected") {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        return sol::make_object(lua, non_const_self->valid());
+      }
+
+      if (key_str == "name") {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        return sol::make_object(lua, non_const_self->valid() ? non_const_self->name() : std::string{});
+      }
+
+      if (key_str == "leftstick") {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        return sol::make_object(lua, non_const_self->leftstick());
+      }
+
+      if (key_str == "rightstick") {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        return sol::make_object(lua, non_const_self->rightstick());
+      }
+
+      if (key_str == "triggers") {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        return sol::make_object(lua, non_const_self->triggers());
+      }
+
+      static const boost::unordered_flat_map<std::string_view, SDL_GamepadButton> button_mapping{
+        {"south", SDL_GAMEPAD_BUTTON_SOUTH}, {"east", SDL_GAMEPAD_BUTTON_EAST},
+        {"west", SDL_GAMEPAD_BUTTON_WEST}, {"north", SDL_GAMEPAD_BUTTON_NORTH},
+        {"back", SDL_GAMEPAD_BUTTON_BACK}, {"guide", SDL_GAMEPAD_BUTTON_GUIDE},
+        {"start", SDL_GAMEPAD_BUTTON_START}, {"leftstick", SDL_GAMEPAD_BUTTON_LEFT_STICK},
+        {"rightstick", SDL_GAMEPAD_BUTTON_RIGHT_STICK}, {"leftshoulder", SDL_GAMEPAD_BUTTON_LEFT_SHOULDER},
+        {"rightshoulder", SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER}, {"up", SDL_GAMEPAD_BUTTON_DPAD_UP},
+        {"down", SDL_GAMEPAD_BUTTON_DPAD_DOWN}, {"left", SDL_GAMEPAD_BUTTON_DPAD_LEFT},
+        {"right", SDL_GAMEPAD_BUTTON_DPAD_RIGHT}
+      };
+
+      const auto button_it = button_mapping.find(key_str);
+      if (button_it != button_mapping.end()) [[likely]] {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        if (non_const_self->valid()) [[likely]] {
+          return sol::make_object(lua, SDL_GetGamepadButton(non_const_self->ptr.get(), button_it->second));
+        }
+        return sol::make_object(lua, false);
+      }
+
+      static const boost::unordered_flat_map<std::string_view, SDL_GamepadAxis> axis_mapping{
+        {"leftx", SDL_GAMEPAD_AXIS_LEFTX}, {"lefty", SDL_GAMEPAD_AXIS_LEFTY},
+        {"rightx", SDL_GAMEPAD_AXIS_RIGHTX}, {"righty", SDL_GAMEPAD_AXIS_RIGHTY},
+        {"triggerleft", SDL_GAMEPAD_AXIS_LEFT_TRIGGER}, {"triggerright", SDL_GAMEPAD_AXIS_RIGHT_TRIGGER}
+      };
+
+      const auto axis_it = axis_mapping.find(key_str);
+      if (axis_it != axis_mapping.end()) {
+        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
+        if (non_const_self->valid()) [[likely]] {
+          return sol::make_object(lua, SDL_GetGamepadAxis(non_const_self->ptr.get(), axis_it->second));
+        }
+        return sol::make_object(lua, 0);
+      }
+
+      return sol::make_object(lua, sol::lua_nil);
+    }
 
     [[nodiscard]] bool valid() noexcept {
       if (ptr) [[likely]] {
@@ -821,8 +888,8 @@ void scriptengine::run() {
 
       auto count = 0;
       const auto gamepads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
-      if (gamepads && index < count) [[likely]] {
-        ptr.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(index)]));
+      if (gamepads && slot < count) [[likely]] {
+        ptr.reset(SDL_OpenGamepad(gamepads[static_cast<size_t>(slot)]));
       }
 
       return ptr != nullptr;
@@ -925,13 +992,7 @@ void scriptengine::run() {
   lua.new_usertype<gamepadslot>(
     "GamepadSlot",
     sol::no_constructor,
-    "connected", sol::property(&gamepadslot::connected),
-    "button", &gamepadslot::button,
-    "axis", &gamepadslot::axis,
-    "leftstick", &gamepadslot::leftstick,
-    "rightstick", &gamepadslot::rightstick,
-    "triggers", &gamepadslot::triggers,
-    "name", sol::property(&gamepadslot::name)
+    sol::meta_function::index, &gamepadslot::index
   );
 
   lua.new_usertype<gamepads>(
