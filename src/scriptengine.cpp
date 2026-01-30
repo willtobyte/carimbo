@@ -898,7 +898,7 @@ void scriptengine::run() {
     }
 
     [[nodiscard]] bool valid() noexcept {
-      if (ptr) [[likely]] {
+      if (handler) [[likely]] {
         if (SDL_GamepadConnected(handler.get())) [[likely]] {
           return true;
         }
