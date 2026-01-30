@@ -109,12 +109,13 @@ struct metaobject {
 };
 
 namespace {
-  constexpr int16_t DEADZONE = 8000;
+  constexpr auto DEADZONE = 8000;
 
   int16_t deadzone(int16_t value) noexcept {
     if (std::abs(value) < DEADZONE) {
       return 0;
     }
+
     return value;
   }
 }
@@ -821,35 +822,30 @@ void scriptengine::run() {
     int slot;
     std::unique_ptr<SDL_Gamepad, SDL_Deleter> ptr{nullptr};
 
-    static auto index(const gamepadslot& self, sol::stack_object key, sol::this_state state) {
+    static auto index(gamepadslot& self, sol::stack_object key, sol::this_state state) {
       sol::state_view lua{state};
       const auto key_str = key.as<std::string_view>();
 
       if (key_str == "connected") {
-        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
-        return sol::make_object(lua, non_const_self->valid());
+        return sol::make_object(lua, self.valid());
       }
 
       if (key_str == "name") {
-        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
-        return sol::make_object(lua, non_const_self->valid() ? non_const_self->name() : std::string{});
+        return sol::make_object(lua, self.valid() ? self.name() : std::string{});
       }
 
       if (key_str == "leftstick") {
-        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
-        const auto [x, y] = non_const_self->leftstick();
+        const auto [x, y] = self.leftstick();
         return sol::make_object(lua, std::make_pair(deadzone(x), deadzone(y)));
       }
 
       if (key_str == "rightstick") {
-        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
-        const auto [x, y] = non_const_self->rightstick();
+        const auto [x, y] = self.rightstick();
         return sol::make_object(lua, std::make_pair(deadzone(x), deadzone(y)));
       }
 
       if (key_str == "triggers") {
-        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
-        const auto [left, right] = non_const_self->triggers();
+        const auto [left, right] = self.triggers();
         return sol::make_object(lua, std::make_pair(deadzone(left), deadzone(right)));
       }
 
@@ -881,9 +877,8 @@ void scriptengine::run() {
 
       const auto axis_it = axis_mapping.find(key_str);
       if (axis_it != axis_mapping.end()) {
-        gamepadslot* non_const_self = const_cast<gamepadslot*>(&self);
-        if (non_const_self->valid()) [[likely]] {
-          const auto raw_value = SDL_GetGamepadAxis(non_const_self->ptr.get(), axis_it->second);
+        if (self.valid()) [[likely]] {
+          const auto raw_value = SDL_GetGamepadAxis(self.ptr.get(), axis_it->second);
           return sol::make_object(lua, deadzone(raw_value));
         }
         return sol::make_object(lua, 0);
