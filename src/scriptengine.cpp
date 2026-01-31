@@ -910,6 +910,10 @@ void scriptengine::run() {
         gamepad.reset();
       }
 
+      if (!SDL_HasGamepad()) {
+        return false;
+      }
+
       auto count = 0;
       const auto gamepads = std::unique_ptr<SDL_JoystickID[], SDL_Deleter>(SDL_GetGamepads(&count));
       if (gamepads && slot < count) [[likely]] {
