@@ -7,8 +7,8 @@ application::application(const int argc, char** const argv) noexcept {
   PHYSFS_init(argv[0]);
   std::atexit([] { PHYSFS_deinit(); });
 
-  static const auto device = alcOpenDevice(nullptr);
-  static const auto context = alcCreateContext(device, nullptr);
+  const auto device = alcOpenDevice(nullptr);
+  const auto context = alcCreateContext(device, nullptr);
   alcMakeContextCurrent(context);
 
 #ifdef HAS_STEAM
