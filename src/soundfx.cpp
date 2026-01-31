@@ -51,14 +51,18 @@ soundfx::soundfx(std::string_view filename) {
 }
 
 soundfx::~soundfx() {
-  if (_source != 0) {
+  if (!alcGetCurrentContext()) {
+    return;
+  }
+
+  if (_source) {
     alSourceStop(_source);
     alSourcei(_source, AL_BUFFER, 0);
     alDeleteSources(1, &_source);
     _source = 0;
   }
 
-  if (_buffer != 0) {
+  if (_buffer) {
     alDeleteBuffers(1, &_buffer);
     _buffer = 0;
   }
