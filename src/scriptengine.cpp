@@ -830,9 +830,13 @@ void scriptengine::run() {
         return sol::make_object(lua, self.valid());
       }
 
-      // if (name == "name") {
-      //   return sol::make_object(lua, ...
-      // }
+      if (name == "name") {
+        if (self.valid()) [[likely]] {
+          return sol::make_object(lua, SDL_GetGamepadName(self.gamepad.get()));
+        }
+
+        return sol::make_object(lua, sol::lua_nil);
+      }
 
       if (name == "leftstick") {
         const auto x = SDL_GetGamepadAxis(self.gamepad.get(), SDL_GAMEPAD_AXIS_LEFTX);
