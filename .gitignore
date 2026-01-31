@@ -37,4 +37,7 @@ stdout.txt
 stderr.txt
 
 # Sentry
-.sentry
+.sentry/
+
+# OpenCode
+.opencode/
