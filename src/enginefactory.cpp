@@ -87,7 +87,7 @@ enginefactory& enginefactory::with_sentry(const std::string_view dsn) {
   sentry_options_add_attachment(options, "VERSION");
 
   sentry_init(options);
-  std::at_quick_exit([] { sentry_close(); });
+  std::atexit([] { sentry_close(); });
 #endif
 #endif
 
@@ -118,7 +118,7 @@ std::shared_ptr<engine> enginefactory::create() const {
 
   renderer = SDL_CreateRendererWithProperties(properties);
 
-  std::at_quick_exit([] {
+  std::atexit([] {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
   });

@@ -2,24 +2,18 @@
 
 application::application(const int argc, char** const argv) noexcept {
   SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
-  std::at_quick_exit([] { SDL_Quit(); });
+  std::atexit([] { SDL_Quit(); });
 
   PHYSFS_init(argv[0]);
-  std::at_quick_exit([] { PHYSFS_deinit(); });
+  std::atexit([] { PHYSFS_deinit(); });
 
   static const auto device = alcOpenDevice(nullptr);
   static const auto context = alcCreateContext(device, nullptr);
   alcMakeContextCurrent(context);
 
-  std::at_quick_exit([] {
-    alcMakeContextCurrent(nullptr);
-    alcDestroyContext(context);
-    alcCloseDevice(device);
-  });
-
 #ifdef HAS_STEAM
   SteamAPI_InitSafe();
-  std::at_quick_exit([] { SteamAPI_Shutdown(); });
+  std::atexit([] { SteamAPI_Shutdown(); });
 #endif
 }
 
