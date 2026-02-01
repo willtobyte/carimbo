@@ -25,11 +25,8 @@ int main(int argc, char **argv) {
   SteamAPI_InitSafe();
 #endif
 
-  int result;
-  {
-    application app;
-    result = app.run();
-  }
+  application app;
+  const auto result = app.run();
 
 #ifdef HAS_STEAM
   SteamAPI_Shutdown();
