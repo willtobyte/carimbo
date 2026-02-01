@@ -40,22 +40,51 @@ eventmanager::eventmanager() {
 
 void eventmanager::update(float delta) {
   SDL_Event event;
+
+  const auto prune = [&]() {
+    _receivers.erase(
+      std::remove_if(
+        _receivers.begin(),
+        _receivers.end(),
+        [](const auto& receiver) {
+          return receiver.expired();
+        }
+      ),
+      _receivers.end()
+    );
+  };
+
+  const auto dispatch = [&](auto&& call) {
+    auto dirty = false;
+    for (auto it = _receivers.begin(); it != _receivers.end(); ++it) {
+      if (auto receiver = it->lock()) {
+        call(receiver);
+      } else {
+        dirty = true;
+      }
+    }
+
+    if (dirty) {
+      prune();
+    }
+  };
+
   while (SDL_PollEvent(&event)) {
     SDL_ConvertEventToRenderCoordinates(renderer, &event);
 
     switch (event.type) {
       case SDL_EVENT_QUIT: {
-        for (const auto& receiver : _receivers) {
+        dispatch([](const auto& receiver) {
           receiver->on_quit();
-        }
+        });
       } break;
 
       case SDL_EVENT_KEY_DOWN: {
         const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_key_press(e);
-        }
+        });
       } break;
 
       case SDL_EVENT_KEY_UP: {
@@ -68,9 +97,9 @@ void eventmanager::update(float delta) {
 #ifndef NDEBUG
           case SDLK_D: {
             if (event.key.mod & SDL_KMOD_CTRL) {
-              for (const auto& receiver : _receivers) {
+              dispatch([](const auto& receiver) {
                 receiver->on_debug();
-              }
+              });
             }
           } break;
 #endif
@@ -80,23 +109,23 @@ void eventmanager::update(float delta) {
 
         const event::keyboard::key e{static_cast<event::keyboard::key>(event.key.key)};
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_key_release(e);
-        }
+        });
       } break;
 
       case SDL_EVENT_TEXT_INPUT: {
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_text(event.text.text);
-        }
+        });
       } break;
 
       case SDL_EVENT_MOUSE_MOTION: {
         const event::mouse::motion e{event.motion.x, event.motion.y};
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_mouse_motion(e);
-        }
+        });
       } break;
 
       case SDL_EVENT_MOUSE_BUTTON_DOWN: {
@@ -107,9 +136,9 @@ void eventmanager::update(float delta) {
           .y = event.button.y
         };
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_mouse_press(e);
-        }
+        });
       } break;
 
       case SDL_EVENT_MOUSE_BUTTON_UP: {
@@ -120,9 +149,9 @@ void eventmanager::update(float delta) {
           .y = event.button.y
         };
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_mouse_release(e);
-        }
+        });
       } break;
 
       case SDL_EVENT_GAMEPAD_ADDED: {
@@ -180,9 +209,9 @@ void eventmanager::update(float delta) {
 
         const event::gamepad::button e{event.gbutton.button};
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_gamepad_press(slot, e);
-        }
+        });
       } break;
 
       case SDL_EVENT_GAMEPAD_BUTTON_UP: {
@@ -195,9 +224,9 @@ void eventmanager::update(float delta) {
 
         const event::gamepad::button e{event.gbutton.button};
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_gamepad_release(slot, e);
-        }
+        });
       } break;
 
       case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
@@ -212,9 +241,9 @@ void eventmanager::update(float delta) {
         const auto value = event.gaxis.value;
         const event::gamepad::motion e{axis, value};
 
-        for (const auto& receiver : _receivers) {
+        dispatch([&](const auto& receiver) {
           receiver->on_gamepad_motion(slot, e);
-        }
+        });
       } break;
 
       default:
@@ -236,7 +265,20 @@ void eventmanager::remove_receiver(const std::shared_ptr<eventreceiver>& receive
     return;
   }
 
-  _receivers.erase(std::remove(_receivers.begin(), _receivers.end(), receiver), _receivers.end());
+  _receivers.erase(
+    std::remove_if(
+      _receivers.begin(),
+      _receivers.end(),
+      [&](const auto& candidate) {
+        if (auto locked = candidate.lock()) {
+          return locked == receiver;
+        }
+
+        return true;
+      }
+    ),
+    _receivers.end()
+  );
 }
 
 void eventmanager::flush(uint32_t begin_event, uint32_t end_event) {
