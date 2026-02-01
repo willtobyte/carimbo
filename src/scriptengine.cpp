@@ -460,19 +460,20 @@ void scriptengine::run() {
               ptr->set_ontick(std::move(ontick));
             }
 
-            if (auto onleave = module["on_leave"].get<sol::protected_function>(); onleave.valid()) {
-              const auto wrapper = [onleave, &lua]() {
+            auto onleave = module["on_leave"].get<sol::protected_function>();
+            const auto wrapper = [onleave, &lua]() {
+              if (onleave.valid()) {
                 const auto result = onleave();
                 if (!result.valid()) {
                   sol::error err = result;
                   throw std::runtime_error(err.what());
                 }
+              }
 
-                lua["pool"] = sol::lua_nil;
-              };
+              lua["pool"] = sol::lua_nil;
+            };
 
-              ptr->set_onleave(std::move(wrapper));
-            }
+            ptr->set_onleave(std::move(wrapper));
           };
 
           scene->set_onenter(std::move(wrapper));
