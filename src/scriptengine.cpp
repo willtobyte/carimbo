@@ -1056,7 +1056,4 @@ void scriptengine::run() {
   std::println("boot time {:.3f}ms", elapsed);
 
   engine->run();
-
-  lua.collect_garbage();
-  lua.collect_garbage();
 }
