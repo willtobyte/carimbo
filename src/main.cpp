@@ -1,6 +1,6 @@
 #include <SDL3/SDL_main.h>
 
-#include "application.hpp"
+#include "common.hpp"
 
 int main(int argc, char **argv) {
 #if defined(NDEBUG) && !defined(EMSCRIPTEN) && !defined(DEVELOPMENT)
@@ -13,5 +13,31 @@ int main(int argc, char **argv) {
   }
 #endif
 
-  return application(argc, argv).run();
+  SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
+
+  PHYSFS_init(argv[0]);
+
+  const auto device = alcOpenDevice(nullptr);
+  const auto context = alcCreateContext(device, nullptr);
+  alcMakeContextCurrent(context);
+
+#ifdef HAS_STEAM
+  SteamAPI_InitSafe();
+#endif
+
+  const auto result = application().run();
+
+#ifdef HAS_STEAM
+  SteamAPI_Shutdown();
+#endif
+
+  alcMakeContextCurrent(nullptr);
+  alcDestroyContext(context);
+  alcCloseDevice(device);
+
+  PHYSFS_deinit();
+
+  SDL_Quit();
+
+  return result;
 }

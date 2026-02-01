@@ -1,28 +1,5 @@
 #include "application.hpp"
 
-application::application(const int argc, char** const argv) noexcept {
-  SDL_Init(SDL_INIT_GAMEPAD | SDL_INIT_VIDEO);
-  std::atexit([] { SDL_Quit(); });
-
-  PHYSFS_init(argv[0]);
-  std::atexit([] { PHYSFS_deinit(); });
-
-  static const auto device = alcOpenDevice(nullptr);
-  static const auto context = alcCreateContext(device, nullptr);
-  alcMakeContextCurrent(context);
-
-  std::atexit([] {
-    alcMakeContextCurrent(nullptr);
-    alcDestroyContext(context);
-    alcCloseDevice(device);
-  });
-
-#ifdef HAS_STEAM
-  SteamAPI_InitSafe();
-  std::atexit([] { SteamAPI_Shutdown(); });
-#endif
-}
-
 int application::run() {
   try {
     const auto* const rom = std::getenv("CARTRIDGE");
