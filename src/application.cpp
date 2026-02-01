@@ -17,7 +17,7 @@ int application::run() {
 
 #ifdef HAS_SENTRY
     const auto event = sentry_value_new_event();
-    const auto exc = sentry_value_new_exception("Exception", error);
+    const auto exc = sentry_value_new_exception("exception", error);
     sentry_value_set_stacktrace(exc, nullptr, 0);
     sentry_event_add_exception(event, exc);
     sentry_capture_event(event);
