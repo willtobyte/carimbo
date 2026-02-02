@@ -41,33 +41,4 @@ struct button {
   float y;
 };
 }
-
-namespace gamepad {
-enum button : uint32_t {
-  up = SDL_GAMEPAD_BUTTON_DPAD_UP,
-  down = SDL_GAMEPAD_BUTTON_DPAD_DOWN,
-  left = SDL_GAMEPAD_BUTTON_DPAD_LEFT,
-  right = SDL_GAMEPAD_BUTTON_DPAD_RIGHT,
-  north = SDL_GAMEPAD_BUTTON_NORTH,
-  east = SDL_GAMEPAD_BUTTON_EAST,
-  south = SDL_GAMEPAD_BUTTON_SOUTH,
-  west = SDL_GAMEPAD_BUTTON_WEST,
-};
-
-struct motion {
-  enum axis : int8_t {
-    invalid = SDL_GAMEPAD_AXIS_INVALID,
-    leftx = SDL_GAMEPAD_AXIS_LEFTX,
-    lefty = SDL_GAMEPAD_AXIS_LEFTY,
-    rightx = SDL_GAMEPAD_AXIS_RIGHTX,
-    righty = SDL_GAMEPAD_AXIS_RIGHTY,
-    triggerleft = SDL_GAMEPAD_AXIS_LEFT_TRIGGER,
-    triggerright = SDL_GAMEPAD_AXIS_RIGHT_TRIGGER,
-    max = SDL_GAMEPAD_AXIS_COUNT
-  };
-
-  axis kind;
-  int16_t value;
-};
-}
 }

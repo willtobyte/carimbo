@@ -4,38 +4,7 @@
 #include "eventreceiver.hpp"
 
 eventmanager::eventmanager() {
-  _joystickmapping.reserve(8);
-  _joystickgorder.reserve(8);
-
   _receivers.reserve(32);
-  _controllers.reserve(8);
-
-  auto number = 0;
-  if (const auto gamepads = std::unique_ptr<uint32_t[], SDL_Deleter>(SDL_GetGamepads(&number))) {
-    for (auto index = 0; index < number; ++index) {
-      const auto gid = gamepads[static_cast<size_t>(index)];
-      if (!SDL_IsGamepad(gid)) {
-        continue;
-      }
-
-      if (auto* const controller = SDL_OpenGamepad(gid)) {
-        const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
-
-        auto [it, inserted] = _controllers.try_emplace(jid);
-        if (!inserted) {
-          SDL_CloseGamepad(controller);
-          break;
-        }
-
-        it->second = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
-
-        _joystickgorder.emplace_back(jid);
-        _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
-
-        std::println("[eventmanager] gamepad connected {}", jid);
-      }
-    }
-  }
 }
 
 void eventmanager::update(float delta) {
@@ -151,98 +120,6 @@ void eventmanager::update(float delta) {
 
         dispatch([&](const auto& receiver) {
           receiver->on_mouse_release(e);
-        });
-      } break;
-
-      case SDL_EVENT_GAMEPAD_ADDED: {
-        if (!SDL_IsGamepad(event.cdevice.which)) {
-          break;
-        }
-
-        if (auto* const controller = SDL_OpenGamepad(event.cdevice.which)) {
-          const auto jid = SDL_GetJoystickID(SDL_GetGamepadJoystick(controller));
-
-          auto [it, inserted] = _controllers.try_emplace(jid);
-          if (!inserted) {
-            SDL_CloseGamepad(controller);
-            break;
-          }
-
-          it->second = std::unique_ptr<SDL_Gamepad, SDL_Deleter>(controller);
-
-          _joystickgorder.emplace_back(jid);
-          _joystickmapping[jid] = static_cast<uint8_t>(_joystickgorder.size() - 1);
-
-          std::println("[eventmanager] gamepad connected {}", jid);
-        }
-      } break;
-
-      case SDL_EVENT_GAMEPAD_REMOVED: {
-        const auto rid = event.cdevice.which;
-        const auto it = _joystickmapping.find(rid);
-        if (it == _joystickmapping.end()) {
-          break;
-        }
-
-        const auto index = it->second;
-
-        if (index != _joystickgorder.size() - 1) {
-          const auto lid = _joystickgorder.back();
-          _joystickgorder[index] = lid;
-          _joystickmapping[lid] = index;
-        }
-
-        _joystickgorder.pop_back();
-        _joystickmapping.erase(rid);
-        _controllers.erase(rid);
-
-        std::println("[eventmanager] gamepad disconnected {}", rid);
-      } break;
-
-      case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
-        const auto it = _joystickmapping.find(event.gbutton.which);
-        if (it == _joystickmapping.end()) {
-          break;
-        }
-
-        const auto slot = it->second;
-
-        const event::gamepad::button e{event.gbutton.button};
-
-        dispatch([&](const auto& receiver) {
-          receiver->on_gamepad_press(slot, e);
-        });
-      } break;
-
-      case SDL_EVENT_GAMEPAD_BUTTON_UP: {
-        const auto it = _joystickmapping.find(event.gbutton.which);
-        if (it == _joystickmapping.end()) {
-          break;
-        }
-
-        const auto slot = it->second;
-
-        const event::gamepad::button e{event.gbutton.button};
-
-        dispatch([&](const auto& receiver) {
-          receiver->on_gamepad_release(slot, e);
-        });
-      } break;
-
-      case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
-        const auto it = _joystickmapping.find(event.gbutton.which);
-        if (it == _joystickmapping.end()) {
-          break;
-        }
-
-        const auto slot = it->second;
-
-        const auto axis = static_cast<event::gamepad::motion::axis>(event.gaxis.axis);
-        const auto value = event.gaxis.value;
-        const event::gamepad::motion e{axis, value};
-
-        dispatch([&](const auto& receiver) {
-          receiver->on_gamepad_motion(slot, e);
         });
       } break;
 

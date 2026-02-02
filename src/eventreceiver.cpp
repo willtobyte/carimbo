@@ -20,15 +20,6 @@ void eventreceiver::on_mouse_release(const event::mouse::button& event) {
 void eventreceiver::on_mouse_motion(const event::mouse::motion& event) {
 }
 
-void eventreceiver::on_gamepad_press(uint8_t who, const event::gamepad::button& event) {
-}
-
-void eventreceiver::on_gamepad_release(uint8_t who, const event::gamepad::button& event) {
-}
-
-void eventreceiver::on_gamepad_motion(uint8_t who, const event::gamepad::motion& event) {
-}
-
 #ifndef NDEBUG
 void eventreceiver::on_debug() {
 }
