@@ -4,7 +4,6 @@
 #include "eventreceiver.hpp"
 
 eventmanager::eventmanager() {
-  _receivers.reserve(32);
 }
 
 void eventmanager::update(float delta) {
