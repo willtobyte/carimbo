@@ -205,8 +205,8 @@ void scriptengine::run() {
 
   lua.new_usertype<buddy>(
     "Buddy",
-    "id", &buddy::id,
-    "name", &buddy::name
+    "id", sol::readonly_property(&buddy::id),
+    "name", sol::readonly_property(&buddy::name)
   );
 
   user user;
