@@ -213,8 +213,8 @@ void scriptengine::run() {
 
   lua.new_usertype<::user>(
     "User",
-    "persona", &user::persona,
-    "buddies", &user::buddies
+    "persona", sol::readonly_property(&user::persona),
+    "buddies", sol::readonly_property(&user::buddies)
   );
 
   lua["user"] = &user;
@@ -223,7 +223,7 @@ void scriptengine::run() {
 
   lua.new_usertype<::desktop>(
     "Desktop",
-    "folder", &desktop::folder
+    "folder", sol::readonly_property(&desktop::folder)
   );
 
   lua["desktop"] = &desktop;
@@ -232,9 +232,9 @@ void scriptengine::run() {
 
   lua.new_usertype<::operatingsystem>(
     "OperatingSystem",
-    "compute", &operatingsystem::compute,
-    "memory", &operatingsystem::memory,
-    "name", &operatingsystem::name
+    "compute", sol::readonly_property(&operatingsystem::compute),
+    "memory", sol::readonly_property(&operatingsystem::memory),
+    "name", sol::readonly_property(&operatingsystem::name)
   );
 
   lua["operatingsystem"] = &operatingsystem;
