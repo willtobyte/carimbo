@@ -1,6 +1,13 @@
 #include "user.hpp"
 #include "steam.hpp"
 
+buddy::buddy(uint64_t id, std::string name) noexcept
+    : _id(id), _name(std::move(name)) {}
+
+uint64_t buddy::id() const noexcept { return _id; }
+
+const std::string& buddy::name() const noexcept { return _name; }
+
 std::string user::persona() const noexcept {
   if (!SteamFriends()) [[unlikely]] {
     return {};
@@ -9,12 +16,12 @@ std::string user::persona() const noexcept {
   return GetPersonaName();
 }
 
-std::vector<std::pair<uint64_t, std::string>> user::friends() const noexcept {
+std::vector<buddy> user::buddies() const noexcept {
   if (!SteamFriends()) [[unlikely]] {
     return {};
   }
 
-  std::vector<std::pair<uint64_t, std::string>> result;
+  std::vector<buddy> result;
   const auto count = GetFriendCount();
 
   result.reserve(static_cast<size_t>(count));

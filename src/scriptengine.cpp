@@ -203,12 +203,18 @@ void scriptengine::run() {
 
   lua["achievement"] = &achievement;
 
+  lua.new_usertype<buddy>(
+    "Buddy",
+    "id", &buddy::id,
+    "name", &buddy::name
+  );
+
   user user;
 
   lua.new_usertype<::user>(
     "User",
     "persona", &user::persona,
-    "friends", &user::friends
+    "buddies", &user::buddies
   );
 
   lua["user"] = &user;
