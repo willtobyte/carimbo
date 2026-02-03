@@ -1,7 +1,4 @@
 #include "scriptengine.hpp"
-#include "constant.hpp"
-#include "objectproxy.hpp"
-#include <sol/property.hpp>
 
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
@@ -197,14 +194,24 @@ void scriptengine::run() {
     return std::string{defval};
   };
 
-  steam::achievement achievement;
+  achievement achievement;
 
-  lua.new_usertype<steam::achievement>(
+  lua.new_usertype<::achievement>(
     "Achievement",
-    "unlock", &steam::achievement::unlock
+    "unlock", &achievement::unlock
   );
 
   lua["achievement"] = &achievement;
+
+  user user;
+
+  lua.new_usertype<::user>(
+    "User",
+    "persona", &user::persona,
+    "friends", &user::friends
+  );
+
+  lua["user"] = &user;
 
   desktop desktop;
 

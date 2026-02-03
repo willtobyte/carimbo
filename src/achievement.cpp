@@ -1,6 +1,5 @@
 #include "achievement.hpp"
-
-using namespace steam;
+#include "steam.hpp"
 
 void achievement::unlock(std::string_view id) noexcept {
 #ifdef HAS_STEAM

@@ -2,7 +2,6 @@
 
 #include "common.hpp"
 
-namespace steam {
 class achievement final {
 public:
   achievement() noexcept = default;
@@ -10,4 +9,3 @@ public:
 
   void unlock(std::string_view id) noexcept;
 };
-}

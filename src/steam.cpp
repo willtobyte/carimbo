@@ -27,6 +27,11 @@ using SteamUserStats_t        = void*(S_CALLTYPE*)();
 using GetAchievement_t        = bool(S_CALLTYPE*)(void*, const char*, bool*);
 using SetAchievement_t        = bool(S_CALLTYPE*)(void*, const char*);
 using StoreStats_t            = bool(S_CALLTYPE*)(void*);
+using SteamFriends_t          = void*(S_CALLTYPE*)();
+using GetPersonaName_t        = const char*(S_CALLTYPE*)(void*);
+using GetFriendCount_t        = int(S_CALLTYPE*)(void*, int);
+using GetFriendByIndex_t      = uint64_t(S_CALLTYPE*)(void*, int, int);
+using GetFriendPersonaName_t  = const char*(S_CALLTYPE*)(void*, uint64_t);
 
 static DYNLIB_HANDLE hSteamApi = DYNLIB_LOAD(STEAM_LIB_NAME);
 
@@ -39,8 +44,13 @@ static const auto pSteamUserStats        = LOAD_SYMBOL(SteamUserStats_t, "SteamA
 static const auto pGetAchievement        = LOAD_SYMBOL(GetAchievement_t, "SteamAPI_ISteamUserStats_GetAchievement");
 static const auto pSetAchievement        = LOAD_SYMBOL(SetAchievement_t, "SteamAPI_ISteamUserStats_SetAchievement");
 static const auto pStoreStats            = LOAD_SYMBOL(StoreStats_t, "SteamAPI_ISteamUserStats_StoreStats");
+static const auto pSteamFriends          = LOAD_SYMBOL(SteamFriends_t, "SteamAPI_SteamFriends_v017");
+static const auto pGetPersonaName        = LOAD_SYMBOL(GetPersonaName_t, "SteamAPI_ISteamFriends_GetPersonaName");
+static const auto pGetFriendCount        = LOAD_SYMBOL(GetFriendCount_t, "SteamAPI_ISteamFriends_GetFriendCount");
+static const auto pGetFriendByIndex      = LOAD_SYMBOL(GetFriendByIndex_t, "SteamAPI_ISteamFriends_GetFriendByIndex");
+static const auto pGetFriendPersonaName  = LOAD_SYMBOL(GetFriendPersonaName_t, "SteamAPI_ISteamFriends_GetFriendPersonaName");
 
-bool SteamAPI_InitSafe() {
+bool SteamAPI_InitSafe() noexcept {
   if (pSteamAPI_InitSafe) {
     return pSteamAPI_InitSafe();
   }
@@ -48,19 +58,19 @@ bool SteamAPI_InitSafe() {
   return false;
 }
 
-void SteamAPI_Shutdown() {
+void SteamAPI_Shutdown() noexcept {
   if (pSteamAPI_Shutdown) {
     pSteamAPI_Shutdown();
   }
 }
 
-void SteamAPI_RunCallbacks() {
+void SteamAPI_RunCallbacks() noexcept {
   if (pSteamAPI_RunCallbacks) {
     pSteamAPI_RunCallbacks();
   }
 }
 
-void* SteamUserStats() {
+void* SteamUserStats() noexcept {
   if (pSteamUserStats) {
     return pSteamUserStats();
   }
@@ -68,7 +78,15 @@ void* SteamUserStats() {
   return nullptr;
 }
 
-bool GetAchievement(const char* name) {
+void* SteamFriends() noexcept {
+  if (pSteamFriends) {
+    return pSteamFriends();
+  }
+
+  return nullptr;
+}
+
+bool GetAchievement(const char* name) noexcept {
   if (pGetAchievement) {
     bool achieved = false;
     return pGetAchievement(SteamUserStats(), name, &achieved) && achieved;
@@ -77,7 +95,7 @@ bool GetAchievement(const char* name) {
   return false;
 }
 
-bool SetAchievement(const char* name) {
+bool SetAchievement(const char* name) noexcept {
   if (pSetAchievement) {
     return pSetAchievement(SteamUserStats(), name);
   }
@@ -85,7 +103,7 @@ bool SetAchievement(const char* name) {
   return false;
 }
 
-bool StoreStats() {
+bool StoreStats() noexcept {
   if (pStoreStats) {
     return pStoreStats(SteamUserStats());
   }
@@ -93,14 +111,56 @@ bool StoreStats() {
   return false;
 }
 
+std::string GetPersonaName() noexcept {
+  if (pGetPersonaName) {
+    if (const char* name = pGetPersonaName(SteamFriends())) {
+      return {name};
+    }
+  }
+
+  return {};
+}
+
+int GetFriendCount() noexcept {
+  if (pGetFriendCount) {
+    // k_EFriendFlagImmediate = 0x04
+    return pGetFriendCount(SteamFriends(), 0x04);
+  }
+
+  return 0;
+}
+
+uint64_t GetFriendByIndex(int index) noexcept {
+  if (pGetFriendByIndex) {
+    return pGetFriendByIndex(SteamFriends(), index, 0x04);
+  }
+
+  return 0;
+}
+
+std::string GetFriendPersonaName(uint64_t steamId) noexcept {
+  if (pGetFriendPersonaName) {
+    if (const char* name = pGetFriendPersonaName(SteamFriends(), steamId)) {
+      return {name};
+    }
+  }
+
+  return {};
+}
+
 #else
 
-bool SteamAPI_InitSafe()           { return false; }
-void SteamAPI_Shutdown()           {}
-void SteamAPI_RunCallbacks()       {}
-void* SteamUserStats()             { return nullptr; }
-bool GetAchievement(const char*)   { return false; }
-bool SetAchievement(const char*)   { return false; }
-bool StoreStats()                  { return false; }
+bool SteamAPI_InitSafe() noexcept                   { return false; }
+void SteamAPI_Shutdown() noexcept                   {}
+void SteamAPI_RunCallbacks() noexcept               {}
+void* SteamUserStats() noexcept                     { return nullptr; }
+void* SteamFriends() noexcept                       { return nullptr; }
+bool GetAchievement(const char*) noexcept           { return false; }
+bool SetAchievement(const char*) noexcept           { return false; }
+bool StoreStats() noexcept                          { return false; }
+std::string GetPersonaName() noexcept               { return {}; }
+int GetFriendCount() noexcept                       { return 0; }
+uint64_t GetFriendByIndex(int) noexcept             { return 0; }
+std::string GetFriendPersonaName(uint64_t) noexcept { return {}; }
 
 #endif
