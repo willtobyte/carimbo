@@ -1,41 +1,36 @@
 #include "pixmap.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#define STBI_ONLY_PNG
-#define STBI_NO_LINEAR
-#define STBI_NO_HDR
-#define STBI_NO_FAILURE_STRINGS
-#include "stb_image.h"
-
 pixmap::pixmap(std::string_view filename) {
   const auto buffer = io::read(filename);
 
-  int width, height, channels;
-  const auto pixels = unwrap(
-    std::unique_ptr<stbi_uc, STBI_Deleter>(
-      stbi_load_from_memory(
-        buffer.data(),
-        static_cast<int>(buffer.size()),
-        &width,
-        &height,
-        &channels,
-        STBI_rgb_alpha
-      )
-    ),
-    std::format("error while loading image: {}", filename)
+  auto ctx = unwrap(
+    std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32)),
+    std::format("failed to create spng context: {}", filename)
   );
 
-  _width = width;
-  _height = height;
-  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
-      SDL_CreateTexture(
-        renderer,
-        SDL_PIXELFORMAT_RGBA32,
-        SDL_TEXTUREACCESS_STATIC,
-        _width, _height));
+  spng_set_crc_action(ctx.get(), SPNG_CRC_USE, SPNG_CRC_USE);
+  spng_set_png_buffer(ctx.get(), buffer.data(), buffer.size());
 
-  const auto pitch = width * 4;
-  SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), pitch);
+  spng_ihdr ihdr;
+  spng_get_ihdr(ctx.get(), &ihdr);
+
+  _width = static_cast<int>(ihdr.width);
+  _height = static_cast<int>(ihdr.height);
+
+  size_t length;
+  spng_decoded_image_size(ctx.get(), SPNG_FMT_RGBA8, &length);
+
+  std::vector<uint8_t> pixels(length);
+  spng_decode_image(ctx.get(), pixels.data(), length, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+
+  _texture = unwrap(
+    std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, _width, _height)
+    ),
+    std::format("failed to create texture: {}", filename)
+  );
+
+  SDL_UpdateTexture(_texture.get(), nullptr, pixels.data(), _width * 4);
   SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST);
   SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
 }

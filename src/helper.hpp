@@ -35,8 +35,6 @@ struct transparent_string_hash final {
   #define PREFETCH(address) __builtin_prefetch(address)
 #endif
 
-extern "C" const char* stbi_failure_reason(void);
-
 struct ALC_Deleter final {
   template <typename T>
   void operator()(T* ptr) const noexcept {
@@ -75,12 +73,11 @@ struct SDL_Deleter final {
   }
 };
 
-struct STBI_Deleter final {
-  template <typename T>
-  void operator()(T* ptr) const noexcept {
-    if (!ptr) return;
+struct SPNG_Deleter final {
+  void operator()(spng_ctx* ctx) const noexcept {
+    if (!ctx) [[unlikely]] return;
 
-    if constexpr (requires { stbi_image_free(ptr); }) stbi_image_free(ptr);
+    spng_ctx_free(ctx);
   }
 };
 
@@ -153,19 +150,17 @@ template<typename T>
     return std::move(ptr);
 }
 
-template<typename T>
 [[nodiscard]] inline auto unwrap(
-  std::unique_ptr<T, STBI_Deleter>&& ptr,
+  std::unique_ptr<spng_ctx, SPNG_Deleter>&& ptr,
   std::string_view message,
   std::source_location location = std::source_location::current())
-    -> std::unique_ptr<T, STBI_Deleter> {
+    -> std::unique_ptr<spng_ctx, SPNG_Deleter> {
     if (!ptr) [[unlikely]] {
         throw std::runtime_error(
-            std::format("{}:{} - {} | STBI Error: {}",
+            std::format("{}:{} - {} | SPNG Error",
               location.file_name(),
               location.line(),
-              message,
-              stbi_failure_reason())
+              message)
         );
     }
 

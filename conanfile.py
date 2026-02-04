@@ -38,6 +38,7 @@ class Carimbo(ConanFile):
             "yyjson/0.12.0",
             "openal-soft/1.23.1",
             "physfs/3.2.0",
+            "libspng/0.7.4",
             "sdl/3.2.20",
             "sol2/3.5.0",
             "stb/cci.20240531",

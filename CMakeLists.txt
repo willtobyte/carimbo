@@ -54,6 +54,7 @@ find_package(box2d CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
 find_package(PhysFS CONFIG REQUIRED)
 find_package(SDL3 CONFIG REQUIRED)
+find_package(SPNG CONFIG REQUIRED)
 find_package(yyjson CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
 find_package(stb CONFIG REQUIRED)
@@ -103,6 +104,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   physfs-static
   SDL3::SDL3-static
   yyjson::yyjson
+  spng::spng_static
   sol2::sol2
   stb::stb
   $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>

@@ -11,6 +11,7 @@
 #include <lua.hpp>
 #include <physfs.h>
 #include <SDL3/SDL.h>
+#include <spng.h>
 #include <yyjson.h>
 #include <sol/sol.hpp>
 
