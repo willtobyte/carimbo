@@ -30,7 +30,7 @@ pixmap::pixmap(std::string_view filename) {
     std::format("failed to create texture: {}", filename)
   );
 
-  SDL_UpdateTexture(_texture.get(), nullptr, pixels.data(), _width * 4);
+  SDL_UpdateTexture(_texture.get(), nullptr, pixels.data(), _width * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGBA32));
   SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST);
   SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
 }
