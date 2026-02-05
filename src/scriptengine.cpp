@@ -313,14 +313,6 @@ void scriptengine::run() {
     }
   );
 
-  lua.new_enum(
-    "Player",
-    "one", 0,
-    "two", 1,
-    "three", 2,
-    "four", 3
-  );
-
   lua.new_usertype<objectproxy>(
     "Entity",
     sol::no_constructor,
@@ -964,6 +956,14 @@ void scriptengine::run() {
   );
 
   lua["gamepads"] = gamepads{};
+
+  lua.new_enum(
+    "Player",
+    "one", 0,
+    "two", 1,
+    "three", 2,
+    "four", 3
+  );
 
   lua.new_usertype<label>(
     "Label",
