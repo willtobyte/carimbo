@@ -187,6 +187,16 @@ void objectproxy::set_ontick(sol::protected_function fn) {
   t.on_tick = std::move(fn);
 }
 
+void objectproxy::set_onscreenexit(sol::protected_function fn) {
+  auto& sb = _registry.get_or_emplace<screenboundable>(_entity);
+  sb.on_screen_exit = std::move(fn);
+}
+
+void objectproxy::set_onscreenenter(sol::protected_function fn) {
+  auto& sb = _registry.get_or_emplace<screenboundable>(_entity);
+  sb.on_screen_enter = std::move(fn);
+}
+
 bool objectproxy::alive() const noexcept {
   return _registry.valid(_entity);
 }

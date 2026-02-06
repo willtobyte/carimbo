@@ -59,6 +59,8 @@ public:
   void set_oncollision(sol::protected_function fn);
   void set_oncollisionend(sol::protected_function fn);
   void set_ontick(sol::protected_function fn);
+  void set_onscreenexit(sol::protected_function fn);
+  void set_onscreenenter(sol::protected_function fn);
 
   [[nodiscard]] std::shared_ptr<objectproxy> clone();
 

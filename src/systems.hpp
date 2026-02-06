@@ -23,6 +23,7 @@ public:
   explicit physicssystem(entt::registry& registry, physics::world& world) noexcept
     : _registry(registry), _world(world), _group(registry.group<transform, physics::body>(entt::get<playback, renderable, tint, dirtable>)) {}
 
+  void set_camera(const quad* camera) noexcept { _camera = camera; }
   void update(float delta);
 
 private:
@@ -31,6 +32,7 @@ private:
   entt::registry& _registry;
   physics::world& _world;
   group_type _group;
+  const quad* _camera{nullptr};
 };
 
 class rendersystem final {

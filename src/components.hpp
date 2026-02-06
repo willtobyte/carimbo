@@ -200,6 +200,17 @@ struct collidable {
   functor on_collision_end;
 };
 
+struct screenboundable {
+  functor on_screen_exit;
+  functor on_screen_enter;
+  uint8_t previous{0};
+
+  static constexpr uint8_t left   = 1 << 0;
+  static constexpr uint8_t right  = 1 << 1;
+  static constexpr uint8_t top    = 1 << 2;
+  static constexpr uint8_t bottom = 1 << 3;
+};
+
 struct tickable {
   functor on_tick;
 };

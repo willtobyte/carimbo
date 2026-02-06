@@ -150,6 +150,34 @@ void physicssystem::update(float delta) {
       body.transform({px, py}, angle);
       d.clear(dirtable::physics);
     });
+
+  static constexpr std::string_view directions[] = {"left", "right", "top", "bottom"};
+
+  const auto& camera = *_camera;
+
+  auto sbview = _registry.view<screenboundable, const physics::body>();
+  for (auto&& [entity, sb, body] : sbview.each()) {
+    if (!body.has_shape()) continue;
+
+    const auto aabb = b2Shape_GetAABB(body.shape);
+
+    uint8_t current = 0;
+    if (aabb.lowerBound.x < camera.x)             current |= screenboundable::left;
+    if (aabb.upperBound.x > camera.x + camera.w)  current |= screenboundable::right;
+    if (aabb.lowerBound.y < camera.y)             current |= screenboundable::top;
+    if (aabb.upperBound.y > camera.y + camera.h)  current |= screenboundable::bottom;
+
+    const auto exited  = static_cast<uint8_t>(current & ~sb.previous);
+    const auto entered = static_cast<uint8_t>(sb.previous & ~current);
+
+    for (uint8_t bit = 0; bit < 4; ++bit) {
+      const auto mask = static_cast<uint8_t>(1u << bit);
+      if (exited & mask)  sb.on_screen_exit(directions[bit]);
+      if (entered & mask) sb.on_screen_enter(directions[bit]);
+    }
+
+    sb.previous = current;
+  }
 }
 
 void rendersystem::update() noexcept {

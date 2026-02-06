@@ -352,6 +352,8 @@ void scriptengine::run() {
     "on_collision", &objectproxy::set_oncollision,
     "on_collision_end", &objectproxy::set_oncollisionend,
     "on_tick", &objectproxy::set_ontick,
+    "on_screen_exit", &objectproxy::set_onscreenexit,
+    "on_screen_enter", &objectproxy::set_onscreenenter,
     "clone", &objectproxy::clone,
     "alive", sol::property(&objectproxy::alive),
     "die", &objectproxy::die,

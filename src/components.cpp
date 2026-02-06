@@ -122,5 +122,13 @@ void scripting::derive(entt::entity entity, sol::environment& parent, std::share
     _registry.emplace<touchable>(entity, std::move(fn));
   }
 
+  if (auto on_screen_exit = module["on_screen_exit"].get<sol::protected_function>(),
+         on_screen_enter = module["on_screen_enter"].get<sol::protected_function>();
+      on_screen_exit.valid() || on_screen_enter.valid()) {
+    auto& sb = _registry.emplace<screenboundable>(entity);
+    sb.on_screen_exit = std::move(on_screen_exit);
+    sb.on_screen_enter = std::move(on_screen_enter);
+  }
+
   _registry.emplace<scriptable>(entity, std::move(sc));
 }

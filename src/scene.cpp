@@ -24,6 +24,17 @@ scene::scene(std::string_view name, unmarshal::json node, std::shared_ptr<::font
   _registry.ctx().emplace<physics::world*>(&_world);
   _registry.ctx().emplace<renderstate>();
 
+  _physicssystem.set_camera(&_camera);
+
+  {
+    int lw, lh;
+    SDL_RendererLogicalPresentation mode;
+    SDL_GetRenderLogicalPresentation(renderer, &lw, &lh, &mode);
+    float sx, sy;
+    SDL_GetRenderScale(renderer, &sx, &sy);
+    _camera = {0, 0, static_cast<float>(lw) / sx, static_cast<float>(lh) / sy};
+  }
+
   _registry.on_destroy<physics::body>().connect<[](entt::registry& registry, entt::entity entity) {
     registry.get<physics::body>(entity).destroy();
   }>();
