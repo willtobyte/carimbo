@@ -118,7 +118,7 @@ void physicssystem::update(float delta) {
   const auto& interning = _registry.ctx().get<::interning>();
 
   _world.step(delta, [&](const b2SensorEvents& events) {
-    for (int i = 0; i < events.beginCount; ++i) {
+    for (auto i = 0; i < events.beginCount; ++i) {
       const auto& event = events.beginEvents[i];
       if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
 
@@ -133,7 +133,7 @@ void physicssystem::update(float delta) {
       }
     }
 
-    for (int i = 0; i < events.endCount; ++i) {
+    for (auto i = 0; i < events.endCount; ++i) {
       const auto& event = events.endEvents[i];
       if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
 
