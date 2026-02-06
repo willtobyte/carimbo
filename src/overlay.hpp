@@ -16,6 +16,7 @@ public:
 
   void cursor(std::string_view resource);
   void cursor(std::nullptr_t);
+  std::shared_ptr<::cursor> cursor() const noexcept;
 
   void dispatch(std::string_view message) noexcept;
 

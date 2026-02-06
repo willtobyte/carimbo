@@ -1,4 +1,5 @@
 #include "scriptengine.hpp"
+#include <string_view>
 
 inline constexpr auto bootstrap =
 #include "bootstrap.lua"
@@ -495,6 +496,12 @@ void scriptengine::run() {
       }
     });
 
+  lua.new_usertype<cursor>(
+    "Cursor",
+    sol::no_constructor,
+    "visible", &cursor::set_visible
+  );
+
   lua.new_usertype<overlay>(
     "Overlay",
     sol::no_constructor,
@@ -502,9 +509,15 @@ void scriptengine::run() {
       sol::resolve<std::shared_ptr<::label>(std::string_view)>(&overlay::label),
       sol::resolve<void(std::shared_ptr<::label>)>(&overlay::label)
     ),
-    "cursor", sol::overload(
-      sol::resolve<void(std::string_view)>(&overlay::cursor),
-      sol::resolve<void(std::nullptr_t)>(&overlay::cursor)
+    "cursor", sol::property(
+      [](overlay& self) -> std::shared_ptr<::cursor> { return self.cursor(); },
+      [](overlay& self, sol::object value) {
+        if (value.is<std::string_view>()) {
+          self.cursor(value.as<std::string_view>());
+        } else {
+          self.cursor(nullptr);
+        }
+      }
     ),
     "dispatch", &overlay::dispatch
   );

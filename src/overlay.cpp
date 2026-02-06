@@ -41,6 +41,10 @@ void overlay::cursor(std::nullptr_t) {
   _cursor.reset();
 }
 
+std::shared_ptr<::cursor> overlay::cursor() const noexcept {
+  return _cursor;
+}
+
 void overlay::dispatch(std::string_view message) noexcept {
   if (!_cursor) {
     return;

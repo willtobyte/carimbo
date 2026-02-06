@@ -101,7 +101,12 @@ void cursor::update(float delta) {
   _frame = (_frame + 1) % keyframes.size();
 }
 
+void cursor::set_visible(bool visible) noexcept {
+  _visible = visible;
+}
+
 void cursor::draw() const {
+  if (!_visible) [[likely]] return;
   if (!_current_animation) [[unlikely]] return;
 
   const auto& keyframes = _current_animation->keyframes;

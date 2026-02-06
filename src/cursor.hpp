@@ -42,7 +42,10 @@ public:
 
   void handle(std::string_view message);
 
+  void set_visible(bool visible) noexcept;
+
 private:
+  bool _visible{true};
   uint64_t _frame{0};
   uint64_t _last_frame{0};
   vec2 _position{0, 0};
