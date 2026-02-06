@@ -101,6 +101,12 @@ void physicssystem::update(float delta) {
 
     if (c && m) [[likely]] {
       c->on_collision(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
+    } else {
+      const auto* c2 = _registry.try_get<collidable>(visitor);
+      const auto* m2 = _registry.try_get<metadata>(sensor);
+      if (c2 && m2) {
+        c2->on_collision(static_cast<uint64_t>(sensor), interning.lookup(m2->kind));
+      }
     }
   }
 
@@ -116,6 +122,12 @@ void physicssystem::update(float delta) {
 
     if (c && m) [[likely]] {
       c->on_collision_end(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
+    } else {
+      const auto* c2 = _registry.try_get<collidable>(visitor);
+      const auto* m2 = _registry.try_get<metadata>(sensor);
+      if (c2 && m2) {
+        c2->on_collision_end(static_cast<uint64_t>(sensor), interning.lookup(m2->kind));
+      }
     }
   }
 
