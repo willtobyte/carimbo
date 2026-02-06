@@ -202,8 +202,13 @@ void scriptsystem::update(float delta) {
 }
 
 void velocitysystem::update(float delta) {
-  _view.each([delta](transform& t, const velocity& v) {
+  _view.each([delta](transform& t, const velocity& v, dirtable& d) {
+    if (v.value.x == 0.f && v.value.y == 0.f) [[likely]] {
+      return;
+    }
+
     t.position.x += v.value.x * delta;
     t.position.y += v.value.y * delta;
+    d.mark(dirtable::render);
   });
 }
