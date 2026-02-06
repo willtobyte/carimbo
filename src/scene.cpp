@@ -96,13 +96,13 @@ void scene::update(float delta) {
 
   _animationsystem.update(now);
 
+  _velocitysystem.update(delta);
+
   _physicssystem.update(delta);
 
   _soundpool.update(delta);
 
   _particlepool.update(delta);
-
-  _velocitysystem.update(delta);
 
   _scriptsystem.update(delta);
 

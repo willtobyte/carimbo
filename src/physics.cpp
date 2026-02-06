@@ -1,6 +1,5 @@
 #include "physics.hpp"
 
-#include "constant.hpp"
 #include "geometry.hpp"
 
 using namespace physics;
@@ -55,21 +54,8 @@ world& world::operator=(world&& other) noexcept {
   return *this;
 }
 
-void world::step(float delta) noexcept {
-  _accumulator += delta;
-
-  while (_accumulator >= FIXED_TIMESTEP) {
-    b2World_Step(_id, FIXED_TIMESTEP, WORLD_SUBSTEPS);
-    _accumulator -= FIXED_TIMESTEP;
-  }
-}
-
 b2WorldId world::id() const noexcept {
   return _id;
-}
-
-b2SensorEvents world::sensor_events() const noexcept {
-  return b2World_GetSensorEvents(_id);
 }
 
 body body::create(world& w, const bodydef& d) noexcept {

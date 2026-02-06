@@ -83,54 +83,6 @@ void animationsystem::update(uint64_t now) {
 }
 
 void physicssystem::update(float delta) {
-  _world.step(delta);
-
-  const auto& interning = _registry.ctx().get<::interning>();
-
-  const auto events = _world.sensor_events();
-
-  for (int i = 0; i < events.beginCount; ++i) {
-    const auto& event = events.beginEvents[i];
-    if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
-
-    const auto sensor = physics::entity_from(event.sensorShapeId);
-    const auto visitor = physics::entity_from(event.visitorShapeId);
-
-    const auto* c = _registry.try_get<collidable>(sensor);
-    const auto* m = _registry.try_get<metadata>(visitor);
-
-    if (c && m) [[likely]] {
-      c->on_collision(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
-    } else {
-      const auto* c2 = _registry.try_get<collidable>(visitor);
-      const auto* m2 = _registry.try_get<metadata>(sensor);
-      if (c2 && m2) {
-        c2->on_collision(static_cast<uint64_t>(sensor), interning.lookup(m2->kind));
-      }
-    }
-  }
-
-  for (int i = 0; i < events.endCount; ++i) {
-    const auto& event = events.endEvents[i];
-    if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
-
-    const auto sensor = physics::entity_from(event.sensorShapeId);
-    const auto visitor = physics::entity_from(event.visitorShapeId);
-
-    const auto* c = _registry.try_get<collidable>(sensor);
-    const auto* m = _registry.try_get<metadata>(visitor);
-
-    if (c && m) [[likely]] {
-      c->on_collision_end(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
-    } else {
-      const auto* c2 = _registry.try_get<collidable>(visitor);
-      const auto* m2 = _registry.try_get<metadata>(sensor);
-      if (c2 && m2) {
-        c2->on_collision_end(static_cast<uint64_t>(sensor), interning.lookup(m2->kind));
-      }
-    }
-  }
-
   _group.each(
     [](entt::entity, const transform& t, physics::body& body, const playback& p, const renderable& rn, const tint& tn, dirtable& d) {
       const auto hitbox = rn.visible && tn.a > 0 && p.timeline && p.timeline->hitbox.has_value();
@@ -162,6 +114,40 @@ void physicssystem::update(float delta) {
       body.transform({px, py}, angle);
       d.clear(dirtable::physics);
     });
+
+  const auto& interning = _registry.ctx().get<::interning>();
+
+  _world.step(delta, [&](const b2SensorEvents& events) {
+    for (int i = 0; i < events.beginCount; ++i) {
+      const auto& event = events.beginEvents[i];
+      if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
+
+      const auto sensor = physics::entity_from(event.sensorShapeId);
+      const auto visitor = physics::entity_from(event.visitorShapeId);
+
+      const auto* c = _registry.try_get<collidable>(sensor);
+      const auto* m = _registry.try_get<metadata>(visitor);
+
+      if (c && m) [[likely]] {
+        c->on_collision(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
+      }
+    }
+
+    for (int i = 0; i < events.endCount; ++i) {
+      const auto& event = events.endEvents[i];
+      if (!physics::valid_pair(event.sensorShapeId, event.visitorShapeId)) [[unlikely]] continue;
+
+      const auto sensor = physics::entity_from(event.sensorShapeId);
+      const auto visitor = physics::entity_from(event.visitorShapeId);
+
+      const auto* c = _registry.try_get<collidable>(sensor);
+      const auto* m = _registry.try_get<metadata>(visitor);
+
+      if (c && m) [[likely]] {
+        c->on_collision_end(static_cast<uint64_t>(visitor), interning.lookup(m->kind));
+      }
+    }
+  });
 
   static constexpr std::string_view directions[] = {"left", "right", "top", "bottom"};
 

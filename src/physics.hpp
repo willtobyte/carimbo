@@ -70,10 +70,18 @@ public:
   world(const world&) = delete;
   world& operator=(const world&) = delete;
 
-  void step(float delta) noexcept;
+  template <typename F>
+  void step(float delta, F&& on_sensor_events) noexcept {
+    _accumulator += delta;
+
+    while (_accumulator >= FIXED_TIMESTEP) {
+      b2World_Step(_id, FIXED_TIMESTEP, WORLD_SUBSTEPS);
+      _accumulator -= FIXED_TIMESTEP;
+      on_sensor_events(b2World_GetSensorEvents(_id));
+    }
+  }
 
   [[nodiscard]] b2WorldId id() const noexcept;
-  [[nodiscard]] b2SensorEvents sensor_events() const noexcept;
 
   template <typename F>
   void raycast(const vec2& origin, float angle, float distance, category mask, F&& callback) const noexcept {
