@@ -3,7 +3,7 @@ PROFILE := $(if $(profile),$(profile),default)
 BUILDTYPE := $(if $(buildtype),$(buildtype),Debug)
 SCENE := $(if $(SCENE),$(SCENE),prelude)
 CARTRIDGE := $(if $(CARTRIDGE),$(CARTRIDGE),../reprobate)
-NCPUS := 10
+NCPUS := $(shell sysctl -n hw.ncpu 2>/dev/null | awk '{print $$1 - 1}')
 
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
