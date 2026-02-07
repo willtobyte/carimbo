@@ -2,6 +2,11 @@
 
 #include "io.hpp"
 
+#define STB_VORBIS_NO_PUSHDATA_API
+#define STB_VORBIS_NO_STDIO
+#define STB_VORBIS_NO_INTEGER_CONVERSION
+#define STB_VORBIS_MAX_CHANNELS 2
+
 #include <stb_vorbis.c>
 
 soundfx::soundfx(std::string_view filename) {
