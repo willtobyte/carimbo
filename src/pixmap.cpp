@@ -4,7 +4,7 @@ pixmap::pixmap(std::string_view filename) {
   const auto buffer = io::read(filename);
 
   auto spng =
-    std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32)));
+    std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32));
 
   spng_set_crc_action(spng.get(), SPNG_CRC_USE, SPNG_CRC_USE);
   spng_set_png_buffer(spng.get(), buffer.data(), buffer.size());
