@@ -3,32 +3,26 @@
 pixmap::pixmap(std::string_view filename) {
   const auto buffer = io::read(filename);
 
-  auto ctx = unwrap(
-    std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32)),
-    std::format("failed to create spng context: {}", filename)
-  );
+  auto spng =
+    std::unique_ptr<spng_ctx, SPNG_Deleter>(spng_ctx_new(SPNG_CTX_IGNORE_ADLER32)));
 
-  spng_set_crc_action(ctx.get(), SPNG_CRC_USE, SPNG_CRC_USE);
-  spng_set_png_buffer(ctx.get(), buffer.data(), buffer.size());
+  spng_set_crc_action(spng.get(), SPNG_CRC_USE, SPNG_CRC_USE);
+  spng_set_png_buffer(spng.get(), buffer.data(), buffer.size());
 
   spng_ihdr ihdr;
-  spng_get_ihdr(ctx.get(), &ihdr);
+  spng_get_ihdr(spng.get(), &ihdr);
 
   _width = static_cast<int>(ihdr.width);
   _height = static_cast<int>(ihdr.height);
 
   size_t length;
-  spng_decoded_image_size(ctx.get(), SPNG_FMT_RGBA8, &length);
+  spng_decoded_image_size(spng.get(), SPNG_FMT_RGBA8, &length);
 
   std::vector<uint8_t> pixels(length);
-  spng_decode_image(ctx.get(), pixels.data(), length, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+  spng_decode_image(spng.get(), pixels.data(), length, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
 
-  _texture = unwrap(
-    std::unique_ptr<SDL_Texture, SDL_Deleter>(
-      SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, _width, _height)
-    ),
-    std::format("failed to create texture: {}", filename)
-  );
+  _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
+      SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, _width, _height));
 
   SDL_UpdateTexture(_texture.get(), nullptr, pixels.data(), _width * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGBA32));
   SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST);
