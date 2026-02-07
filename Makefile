@@ -8,7 +8,7 @@ NCPUS := $(shell sysctl -n hw.ncpu 2>/dev/null | awk '{print $$1 - 1}')
 .SHELLFLAGS := -eu -o pipefail -c
 .DEFAULT_GOAL := help
 
-DEBUG_COMPILER_FLAGS := -Wpedantic -Werror -Wextra -Wno-unused-parameter -Wshadow -Wconversion -Wsign-conversion -Wimplicit-fallthrough -Wdouble-promotion -Wformat=2 -Wnull-dereference -Wnon-virtual-dtor -fsanitize=address,undefined -fsanitize-address-use-after-scope -fno-omit-frame-pointer
+DEBUG_COMPILER_FLAGS := -g3 -O0 -Wpedantic -Werror -Wextra -Wno-unused-parameter -Wshadow -Wconversion -Wsign-conversion -Wimplicit-fallthrough -Wdouble-promotion -Wformat=2 -Wnull-dereference -Wnon-virtual-dtor -fsanitize=address,undefined -fsanitize-address-use-after-scope -fno-omit-frame-pointer
 DEBUG_LINKER_FLAGS := -g3 -fno-optimize-sibling-calls -fsanitize=address,undefined -fsanitize-address-use-after-scope -fno-omit-frame-pointer
 
 .PHONY: clean
