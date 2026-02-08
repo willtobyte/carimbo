@@ -236,8 +236,10 @@ void particlepool::update(float delta) {
         const auto i = respawn[j];
         const auto radius = props->randradius();
         const auto spawnangle = props->randangle();
+
         float sa, ca;
         sincos(spawnangle, sa, ca);
+
         xs[i] = px + props->randxspawn() + radius * ca;
         ys[i] = py + props->randyspawn() + radius * sa;
         vxs[i] = props->randxvel();
