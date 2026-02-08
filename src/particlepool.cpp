@@ -266,6 +266,7 @@ void particlepool::update(float delta) {
         vx[1] = {{0.f, 0.f}, color, {1.f, 0.f}};
         vx[2] = {{0.f, 0.f}, color, {1.f, 1.f}};
         vx[3] = {{0.f, 0.f}, color, {0.f, 1.f}};
+
         continue;
       }
 
