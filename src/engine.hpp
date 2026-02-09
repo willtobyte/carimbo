@@ -41,6 +41,5 @@ private:
   std::shared_ptr<::canvas> _canvas;
 
   boost::container::small_vector<std::shared_ptr<::loopable>, 8> _loopables;
-
   boost::container::small_vector<std::shared_ptr<::lifecycleobserver>, 8> _observers;
 };
