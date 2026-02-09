@@ -557,8 +557,6 @@ void scriptengine::run() {
     "with_fullscreen", &enginefactory::with_fullscreen,
     "with_sentry", &enginefactory::with_sentry,
     "with_ticks", &enginefactory::with_ticks,
-    "width", &enginefactory::width,
-    "height", &enginefactory::height,
     "create", [](enginefactory& self, sol::this_state state) {
       sol::state_view lua{state};
       auto ptr = self.create();
@@ -568,8 +566,16 @@ void scriptengine::run() {
       lua["canvas"] = ptr->canvas();
 
       auto viewport = lua.create_table();
-      viewport["width"] = self.width();
-      viewport["height"] = self.height();
+
+      int lw, lh;
+      SDL_RendererLogicalPresentation mode;
+      SDL_GetRenderLogicalPresentation(renderer, &lw, &lh, &mode);
+
+      float sx, sy;
+      SDL_GetRenderScale(renderer, &sx, &sy);
+      viewport["width"] = static_cast<int>(std::lround(static_cast<float>(lw) / sx));
+      viewport["height"] = static_cast<int>(std::lround(static_cast<float>(lh) / sy));
+
       lua["viewport"] = viewport;
 
       auto mouse = lua.create_table();

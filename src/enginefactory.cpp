@@ -149,10 +149,3 @@ std::shared_ptr<engine> enginefactory::create() const {
   return engine;
 }
 
-int enginefactory::width() const noexcept {
-  return _width;
-}
-
-int enginefactory::height() const noexcept {
-  return _height;
-}
