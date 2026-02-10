@@ -44,6 +44,8 @@ font::font(std::string_view family) {
   const auto iw = 1.0f / static_cast<float>(width);
   const auto ih = 1.0f / static_cast<float>(height);
 
+  constexpr auto inset = .5f;
+
   auto x = 0, y = 0;
   auto first = true;
   for (char glyph : _glyphs) {
@@ -69,10 +71,10 @@ font::font(std::string_view family) {
     const auto fh = static_cast<float>(h);
 
     _props[static_cast<uint8_t>(glyph)] = {
-      fx * iw,
-      fy * ih,
-      (fx + fw) * iw,
-      (fy + fh) * ih,
+      (fx + inset) * iw,
+      (fy + inset) * ih,
+      (fx + fw - inset) * iw,
+      (fy + fh - inset) * ih,
       fw * scale,
       fh * scale,
       fw,
