@@ -567,14 +567,8 @@ void scriptengine::run() {
 
       auto viewport = lua.create_table();
 
-      int lw, lh;
-      SDL_RendererLogicalPresentation mode;
-      SDL_GetRenderLogicalPresentation(renderer, &lw, &lh, &mode);
-
-      float sx, sy;
-      SDL_GetRenderScale(renderer, &sx, &sy);
-      viewport["width"] = static_cast<int>(std::lround(static_cast<float>(lw) / sx));
-      viewport["height"] = static_cast<int>(std::lround(static_cast<float>(lh) / sy));
+      viewport["width"] = screen::width();
+      viewport["height"] = screen::height();
 
       lua["viewport"] = viewport;
 

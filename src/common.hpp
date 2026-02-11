@@ -101,6 +101,13 @@ class particlepool;
 class pixmap;
 class querybuilder;
 extern SDL_Renderer* renderer;
+
+namespace screen {
+  float width() noexcept;
+  float height() noexcept;
+  void present(float width, float height) noexcept;
+}
+
 class scene;
 class scenebackdrop;
 class scenemanager;

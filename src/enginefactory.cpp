@@ -126,6 +126,11 @@ std::shared_ptr<engine> enginefactory::create() const {
   SDL_SetRenderLogicalPresentation(renderer, _width, _height, SDL_LOGICAL_PRESENTATION_LETTERBOX);
   SDL_SetRenderScale(renderer, _scale, _scale);
 
+  screen::present(
+    static_cast<float>(_width) / _scale,
+    static_cast<float>(_height) / _scale
+  );
+
   const auto eventmanager = std::make_shared<::eventmanager>();
   const auto fontpool = std::make_shared<::fontpool>();
   const auto overlay = std::make_shared<::overlay>(eventmanager);

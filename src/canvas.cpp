@@ -1,15 +1,8 @@
 #include "canvas.hpp"
 
 canvas::canvas() {
-  int lw, lh;
-  SDL_RendererLogicalPresentation mode;
-  SDL_GetRenderLogicalPresentation(renderer, &lw, &lh, &mode);
-
-  float sx, sy;
-  SDL_GetRenderScale(renderer, &sx, &sy);
-
-  const auto width = static_cast<int>(std::lround(static_cast<float>(lw) / sx));
-  const auto height = static_cast<int>(std::lround(static_cast<float>(lh) / sy));
+  const auto width = static_cast<int>(std::lround(screen::width()));
+  const auto height = static_cast<int>(std::lround(screen::height()));
 
   _framebuffer =
     std::unique_ptr<SDL_Texture, SDL_Deleter>(

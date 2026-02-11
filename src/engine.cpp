@@ -7,6 +7,15 @@
 
 SDL_Renderer *renderer = nullptr;
 
+namespace screen {
+  static float _width = 0.f;
+  static float _height = 0.f;
+
+  float width() noexcept { return _width; }
+  float height() noexcept { return _height; }
+  void present(float width, float height) noexcept { _width = width; _height = height; }
+}
+
 std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {
   return _eventmanager;
 }
