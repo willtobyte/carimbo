@@ -160,10 +160,10 @@ void physicssystem::update(float delta) {
     const auto aabb = b2Shape_GetAABB(body.shape);
 
     uint8_t current = 0;
-    if (aabb.lowerBound.x < camera.x)             current |= screenboundable::left;
-    if (aabb.upperBound.x > camera.x + camera.w)  current |= screenboundable::right;
-    if (aabb.lowerBound.y < camera.y)             current |= screenboundable::top;
-    if (aabb.upperBound.y > camera.y + camera.h)  current |= screenboundable::bottom;
+    if (aabb.upperBound.x < camera.x)             current |= screenboundable::left;
+    if (aabb.lowerBound.x > camera.x + camera.w)  current |= screenboundable::right;
+    if (aabb.upperBound.y < camera.y)             current |= screenboundable::top;
+    if (aabb.lowerBound.y > camera.y + camera.h)  current |= screenboundable::bottom;
 
     const auto exited  = static_cast<uint8_t>(current & ~sb.previous);
     const auto entered = static_cast<uint8_t>(sb.previous & ~current);
