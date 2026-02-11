@@ -136,7 +136,6 @@ struct body final {
 
   [[nodiscard]] static body create(world& w, const bodydef& def) noexcept;
 
-  void destroy() noexcept;
   void attach_sensor(float hx, float hy) noexcept;
   void detach() noexcept;
   void transform(const vec2& position, float angle) noexcept;

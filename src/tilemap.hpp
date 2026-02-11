@@ -25,7 +25,6 @@ struct alignas(64) grid final {
 class tilemap final {
 public:
   tilemap(std::string_view name, physics::world& world);
-  ~tilemap() noexcept;
 
   void set_viewport(const quad& value);
 

@@ -79,15 +79,6 @@ body body::create(world& w, const bodydef& d) noexcept {
   return result;
 }
 
-void body::destroy() noexcept {
-  detach();
-
-  if (b2Body_IsValid(id)) {
-    b2DestroyBody(id);
-    id = b2BodyId{};
-  }
-}
-
 void body::attach_sensor(float hx, float hy) noexcept {
   if (has_shape() && cache.hx == hx && cache.hy == hy) [[likely]] return;
 
