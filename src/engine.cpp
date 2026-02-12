@@ -105,7 +105,6 @@ void engine::_loop() {
   SDL_RenderClear(renderer);
 
   _scenemanager->draw();
-
   _overlay->draw();
 
   SDL_RenderPresent(renderer);
