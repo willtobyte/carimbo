@@ -14,7 +14,6 @@ void overlay::set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept {
   _fontpool = std::move(fontpool);
 }
 
-
 void overlay::cursor(std::string_view resource) {
   cursor(nullptr);
 
