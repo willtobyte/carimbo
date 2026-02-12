@@ -2,10 +2,8 @@
 
 #include "cursor.hpp"
 #include "eventmanager.hpp"
-#include "eventreceiver.hpp"
 #include "fontpool.hpp"
 #include "label.hpp"
-#include "widget.hpp"
 
 overlay::overlay(std::shared_ptr<eventmanager> eventmanager)
     : _eventmanager(std::move(eventmanager)) {}
