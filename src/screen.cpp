@@ -1,8 +1,8 @@
 #include "screen.hpp"
 
 namespace screen {
-  static float _width = 0.f;
-  static float _height = 0.f;
+  static float _width{.0f};
+  static float _height{.0f};
 
   float width() noexcept { return _width; }
   float height() noexcept { return _height; }
