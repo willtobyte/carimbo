@@ -11,12 +11,12 @@ public:
 
   void set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept;
 
-  std::shared_ptr<::label> label(std::string_view font);
-  void label(std::shared_ptr<::label> instance);
-
   void cursor(std::string_view resource);
   void cursor(std::nullptr_t);
   std::shared_ptr<::cursor> cursor() const noexcept;
+
+  std::shared_ptr<::label> label(std::string_view font);
+  void label(std::shared_ptr<::label> instance);
 
   void dispatch(std::string_view message) noexcept;
 

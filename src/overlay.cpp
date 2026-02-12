@@ -14,16 +14,6 @@ void overlay::set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept {
   _fontpool = std::move(fontpool);
 }
 
-std::shared_ptr<::label> overlay::label(std::string_view resource) {
-  auto label = std::make_shared<::label>();
-  label->set_font(_fontpool->get(resource));
-  _labels.emplace_back(label);
-  return label;
-}
-
-void overlay::label(std::shared_ptr<::label> instance) {
-  _labels.erase(std::remove(_labels.begin(), _labels.end(), instance), _labels.end());
-}
 
 void overlay::cursor(std::string_view resource) {
   cursor(nullptr);
@@ -43,6 +33,17 @@ void overlay::cursor(std::nullptr_t) {
 
 std::shared_ptr<::cursor> overlay::cursor() const noexcept {
   return _cursor;
+}
+
+std::shared_ptr<::label> overlay::label(std::string_view resource) {
+  auto label = std::make_shared<::label>();
+  label->set_font(_fontpool->get(resource));
+  _labels.emplace_back(label);
+  return label;
+}
+
+void overlay::label(std::shared_ptr<::label> instance) {
+  _labels.erase(std::remove(_labels.begin(), _labels.end(), instance), _labels.end());
 }
 
 void overlay::dispatch(std::string_view message) noexcept {
