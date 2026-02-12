@@ -15,7 +15,6 @@ public:
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept;
   void set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept;
   void set_overlay(std::shared_ptr<::overlay> ptr) noexcept;
-  void set_canvas(std::shared_ptr<::canvas> ptr) noexcept;
   void set_ticks(uint8_t ticks) noexcept;
 
   void add_loopable(std::shared_ptr<::loopable> ptr);

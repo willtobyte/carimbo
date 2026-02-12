@@ -1,6 +1,5 @@
 #include "enginefactory.hpp"
 
-#include "canvas.hpp"
 #include "engine.hpp"
 #include "eventmanager.hpp"
 #include "fontpool.hpp"
@@ -135,13 +134,11 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto fontpool = std::make_shared<::fontpool>();
   const auto overlay = std::make_shared<::overlay>(eventmanager);
   const auto scenemanager = std::make_shared<::scenemanager>();
-  const auto canvas = std::make_shared<::canvas>();
 
   const auto engine = std::make_shared<::engine>();
   engine->set_eventmanager(eventmanager);
   engine->set_scenemanager(scenemanager);
   engine->set_overlay(overlay);
-  engine->set_canvas(canvas);
   engine->set_ticks(_ticks);
 
   eventmanager->add_receiver(engine);

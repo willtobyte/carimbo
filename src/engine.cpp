@@ -28,20 +28,12 @@ std::shared_ptr<::overlay> engine::overlay() const noexcept {
   return _overlay;
 }
 
-std::shared_ptr<::canvas> engine::canvas() const noexcept {
-  return _canvas;
-}
-
 void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {
   _eventmanager = std::move(ptr);
 }
 
 void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept {
   _scenemanager = std::move(ptr);
-}
-
-void engine::set_canvas(std::shared_ptr<::canvas> ptr) noexcept {
-  _canvas = std::move(ptr);
 }
 
 void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {
@@ -113,8 +105,8 @@ void engine::_loop() {
   SDL_RenderClear(renderer);
 
   _scenemanager->draw();
+
   _overlay->draw();
-  _canvas->draw();
 
   SDL_RenderPresent(renderer);
 

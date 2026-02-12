@@ -106,6 +106,13 @@ struct uniform_int final {
   [[nodiscard]] constexpr T max() const noexcept { return b; }
 };
 
+namespace engine {
 xorshift128plus& global() noexcept;
 void seed(uint64_t value) noexcept;
+}
+
+namespace script {
+xorshift128plus& global() noexcept;
+void seed(uint64_t value) noexcept;
+}
 }

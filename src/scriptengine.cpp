@@ -147,12 +147,12 @@ void scriptengine::run() {
   };
 
   lua["math"]["random"] = sol::overload(
-    []() noexcept { return rng::global().uniform(); },
-    [](lua_Integer upper) noexcept { return rng::global().range<lua_Integer>(1, upper); },
-    [](lua_Integer low, lua_Integer high) noexcept { return rng::global().range<lua_Integer>(low, high); }
+    []() noexcept { return rng::script::global().uniform(); },
+    [](lua_Integer upper) noexcept { return rng::script::global().range<lua_Integer>(1, upper); },
+    [](lua_Integer low, lua_Integer high) noexcept { return rng::script::global().range<lua_Integer>(low, high); }
   );
 
-  lua["math"]["randomseed"] = [](lua_Integer seed) noexcept { rng::seed(static_cast<uint64_t>(seed)); };
+  lua["math"]["randomseed"] = [](lua_Integer seed) noexcept { rng::script::seed(static_cast<uint64_t>(seed)); };
 
   lua["_"] = &localization::text;
 
@@ -563,7 +563,6 @@ void scriptengine::run() {
 
       lua["overlay"] = ptr->overlay();
       lua["scenemanager"] = ptr->scenemanager();
-      lua["canvas"] = ptr->canvas();
 
       auto viewport = lua.create_table();
 
@@ -1041,13 +1040,6 @@ void scriptengine::run() {
   lua.new_usertype<widget>(
     "Widget",
     sol::no_constructor
-  );
-
-  lua.new_usertype<canvas>(
-    "Canvas",
-    sol::no_constructor,
-    "clear", &canvas::clear,
-    "pixels", sol::property(&canvas::set_pixels)
   );
 
   std::println("Powered by Carimbo: https://carimbo.site");
