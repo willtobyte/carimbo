@@ -162,7 +162,7 @@ struct renderstate final {
 
     registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
       return lhs.z < rhs.z;
-    });
+    }, entt::insertion_sort{});
 
     z_dirty = false;
   }

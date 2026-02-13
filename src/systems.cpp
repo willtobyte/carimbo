@@ -208,19 +208,6 @@ void rendersystem::update() noexcept {
   });
 }
 
-void rendersystem::draw() const noexcept {
-  _view.each([](const renderable& rn, const transform& tr, const tint& tn, const sprite& sp, const playback& pb, const orientation& fl, const dirtable&, const drawable& dr) {
-    if (!rn.visible || !pb.timeline || pb.timeline->frames.empty()) [[unlikely]] {
-      return;
-    }
-
-    const auto& frame = pb.timeline->frames[pb.current];
-    const auto& q = frame.quad;
-
-    sp.pixmap->draw(q.x, q.y, q.w, q.h, dr.x, dr.y, dr.w, dr.h, tr.angle, tn.a, fl.flip);
-  });
-}
-
 void scriptsystem::update(float delta) {
   _view.each([delta](scriptable& sc) {
     sc.on_loop(delta);

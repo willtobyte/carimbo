@@ -64,7 +64,6 @@ struct particles final {
 };
 
 struct particlebatch final {
-  int16_t z{0};
   std::shared_ptr<particleprops> props;
   std::shared_ptr<pixmap> pixmap;
   std::vector<int> indices;

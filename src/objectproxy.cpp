@@ -263,9 +263,11 @@ std::shared_ptr<objectproxy> objectproxy::clone() {
     renderable copy = *rn;
     copy.z = rn->z + 1;
     _registry.emplace<renderable>(entity, std::move(copy));
+    _registry.ctx().get<renderstate>().z_dirty = true;
   }
 
   auto proxy = std::make_shared<objectproxy>(entity, _registry);
+  _registry.emplace<std::shared_ptr<objectproxy>>(entity, proxy);
 
   if (sc && sc->bytecode) {
     auto& scripting = _registry.ctx().get<::scripting>();

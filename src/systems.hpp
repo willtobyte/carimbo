@@ -42,7 +42,6 @@ public:
       _view(registry.view<renderable, transform, tint, sprite, playback, orientation, dirtable, drawable>()) {}
 
   void update() noexcept;
-  void draw() const noexcept;
 
 private:
   using view_type = decltype(std::declval<entt::registry&>()

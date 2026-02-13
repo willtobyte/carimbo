@@ -109,7 +109,7 @@ void objectpool::populate(sol::table& pool) const {
 void objectpool::sort() {
   _registry.sort<renderable>([](const renderable& lhs, const renderable& rhs) {
     return lhs.z < rhs.z;
-  });
+  }, entt::insertion_sort{});
 }
 
 void objectpool::draw(entt::entity entity) const noexcept {
