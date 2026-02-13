@@ -202,7 +202,7 @@ bool objectproxy::alive() const noexcept {
 }
 
 void objectproxy::die() noexcept {
-  if (!_registry.valid(_entity)) [[unlikely]] return;
+  if (!alive()) [[unlikely]] return;
 
   _registry.destroy(_entity);
 }
