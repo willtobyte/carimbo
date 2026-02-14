@@ -41,7 +41,8 @@ class Carimbo(ConanFile):
             "libspng/0.7.4",
             "sdl/3.4.0",
             "sol2/3.5.0",
-            "stb/cci.20240531",
+            "opus/1.5.2",
+            "opusfile/0.12",
         ]:
             self.requires(package)
 

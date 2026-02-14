@@ -57,7 +57,7 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(yyjson CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
-find_package(stb CONFIG REQUIRED)
+find_package(opusfile CONFIG REQUIRED)
 
 if(NOT IS_EMSCRIPTEN)
   find_package(OpenAL CONFIG REQUIRED)
@@ -115,7 +115,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   yyjson::yyjson
   spng::spng_static
   sol2::sol2
-  stb::stb
+  opusfile::opusfile
   $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
   $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>

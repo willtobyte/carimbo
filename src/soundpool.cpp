@@ -14,7 +14,7 @@ soundpool::~soundpool() noexcept {
 void soundpool::add(std::string_view name) {
   auto [it, inserted] = _sounds.try_emplace(name);
   if (inserted) {
-    it->second = std::make_shared<soundfx>(std::format("blobs/{}/{}.ogg", _scenename, name));
+    it->second = std::make_shared<soundfx>(std::format("blobs/{}/{}.opus", _scenename, name));
   }
 }
 

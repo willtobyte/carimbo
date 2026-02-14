@@ -2,54 +2,61 @@
 
 #include "io.hpp"
 
-#define STB_VORBIS_NO_PUSHDATA_API
-#define STB_VORBIS_NO_STDIO
-#define STB_VORBIS_NO_INTEGER_CONVERSION
-#define STB_VORBIS_MAX_CHANNELS 2
-
-#include <stb_vorbis.c>
+#include <opusfile.h>
 
 soundfx::soundfx(std::string_view filename) {
-  const auto buffer = io::read(filename);
+  int channels = 0;
+  std::vector<float> samples;
 
-  auto error = 0;
-  const std::unique_ptr<stb_vorbis, decltype(&stb_vorbis_close)> vorbis(
-    stb_vorbis_open_memory(
-      buffer.data(),
-      static_cast<int>(buffer.size()),
-      &error,
-      nullptr
-    ),
-    &stb_vorbis_close
-  );
+  {
+    const auto buffer = io::read(filename);
 
-  assert((error == VORBIS__no_error)
-    && std::format("[stb_vorbis_open_memory] failed to decode: {}", filename).c_str());
+    auto error = 0;
+    const std::unique_ptr<OggOpusFile, decltype(&op_free)> opus(
+      op_open_memory(buffer.data(), buffer.size(), &error),
+      &op_free
+    );
 
-  const auto info = stb_vorbis_get_info(vorbis.get());
-  const auto total_samples = stb_vorbis_stream_length_in_samples(vorbis.get());
-  const auto channels = info.channels;
-  const auto sample_rate = info.sample_rate;
-  const auto total_floats = static_cast<size_t>(total_samples) * static_cast<size_t>(channels);
+    assert((error == 0)
+      && std::format("[op_open_memory] failed to decode: {}", filename).c_str());
 
-  auto samples = std::vector<float>(total_floats);
+    channels = op_channel_count(opus.get(), -1);
+    const auto total_samples = op_pcm_total(opus.get(), -1);
+    const auto total_floats = static_cast<size_t>(total_samples) * static_cast<size_t>(channels);
 
-  const auto decoded = stb_vorbis_get_samples_float_interleaved(
-    vorbis.get(),
-    channels,
-    samples.data(),
-    static_cast<int>(total_floats)
-  );
+    samples.resize(total_floats);
 
-  assert((decoded > 0)
-    && std::format("[stb_vorbis_get_samples_float_interleaved] failed to decode: {}", filename).c_str());
+    size_t offset = 0;
+    while (offset < total_floats) {
+      const auto read = op_read_float(
+        opus.get(),
+        samples.data() + offset,
+        static_cast<int>(total_floats - offset),
+        nullptr
+      );
+
+      if (read == OP_HOLE) {
+        continue;
+      }
+
+      assert((read >= 0)
+        && std::format("[op_read_float] failed to decode: {}", filename).c_str());
+
+      if (read == 0) {
+        break;
+      }
+
+      offset += static_cast<size_t>(read) * static_cast<size_t>(channels);
+    }
+
+    samples.resize(offset);
+  }
 
   const auto format = (channels == 1) ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
-  const auto frequency = static_cast<ALsizei>(sample_rate);
-  const auto size = static_cast<size_t>(decoded) * static_cast<size_t>(channels) * sizeof(float);
+  constexpr ALsizei frequency = 48000;
 
   alGenBuffers(1, &_buffer);
-  alBufferData(_buffer, format, samples.data(), static_cast<ALsizei>(size), frequency);
+  alBufferData(_buffer, format, samples.data(), static_cast<ALsizei>(samples.size() * sizeof(float)), frequency);
 
   alGenSources(1, &_source);
   alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));

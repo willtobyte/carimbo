@@ -70,7 +70,7 @@ cartridge.rom (or cartridge/ directory)
 │   ├── <scene>/
 │   │   ├── <object>.png      # Object sprites
 │   │   ├── background.png    # Background images
-│   │   └── <sound>.ogg       # Sound effects
+│   │   └── <sound>.opus      # Sound effects
 │   ├── tilemaps/
 │   │   └── <tilemap>.png     # Tilemap atlas
 │   └── particles/
