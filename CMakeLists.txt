@@ -74,7 +74,8 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
-  $<$<NOT:$<CONFIG:Debug>>:-ffast-math>
+  $<$<AND:$<NOT:$<CONFIG:Debug>>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-ffast-math>
+  $<$<AND:$<NOT:$<CONFIG:Debug>>,$<CXX_COMPILER_ID:MSVC>>:/fp:fast>
 )
 
 target_link_options(${PROJECT_NAME} PRIVATE
