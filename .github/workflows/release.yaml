@@ -315,8 +315,8 @@ jobs:
         run: |
           cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -g0 -ffast-math -fno-stack-protector -msimd128" \
-            -DCMAKE_CXX_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -fvisibility-inlines-hidden -g0 -ffast-math -fno-stack-protector -msimd128" \
+            -DCMAKE_C_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -g0 -fno-stack-protector" \
+            -DCMAKE_CXX_FLAGS_RELEASE:STRING="-Oz -DNDEBUG -ffunction-sections -fdata-sections -flto -fvisibility=hidden -fvisibility-inlines-hidden -g0 -fno-stack-protector" \
             -DCMAKE_EXE_LINKER_FLAGS_RELEASE:STRING="-fuse-ld=lld -flto -Wl,-O2,--gc-sections,-s --strip-al --strip-debug -Wl,--compress-relocations -Wl,--strip-all -Wl,--lto-O3"
 
           cmake --build build --config Release --verbose
