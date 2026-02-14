@@ -21,17 +21,17 @@ soundfx::soundfx(std::string_view filename) {
       && std::format("[op_open_memory] failed to decode: {}", filename).c_str());
 
     channels = op_channel_count(opus.get(), -1);
-    const auto total_samples = op_pcm_total(opus.get(), -1);
-    const auto total_floats = static_cast<size_t>(total_samples) * static_cast<size_t>(channels);
+    const auto nsamples = op_pcm_total(opus.get(), -1);
+    const auto total = static_cast<size_t>(nsamples) * static_cast<size_t>(channels);
 
-    samples.resize(total_floats);
+    samples.resize(total);
 
     size_t offset = 0;
-    while (offset < total_floats) {
+    while (offset < total) {
       const auto read = op_read_float(
         opus.get(),
         samples.data() + offset,
-        static_cast<int>(total_floats - offset),
+        static_cast<int>(total - offset),
         nullptr
       );
 
