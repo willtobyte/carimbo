@@ -68,14 +68,18 @@ if(NOT IS_EMSCRIPTEN)
   endif()
 endif()
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(DEBUG TRUE)
+endif()
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   $<$<BOOL:${DEVELOPMENT}>:DEVELOPMENT>
-  $<$<CONFIG:Debug>:DEBUG>
+  $<$<BOOL:${DEBUG}>:DEBUG>
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
-  $<$<AND:$<NOT:$<CONFIG:Debug>>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-ffast-math>
-  $<$<AND:$<NOT:$<CONFIG:Debug>>,$<CXX_COMPILER_ID:MSVC>>:/fp:fast>
+  $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-ffast-math>
+  $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<CXX_COMPILER_ID:MSVC>>:/fp:fast>
 )
 
 target_link_options(${PROJECT_NAME} PRIVATE
