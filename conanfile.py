@@ -105,6 +105,7 @@ class Carimbo(ConanFile):
             ("HAS_LUAJIT", self._is_jit_capable),
             ("HAS_STEAM", self._has_steam),
             ("HAS_SENTRY", self._has_sentry),
+            ("MA_ENABLE_AUDIO_WORKLETS", self._is_webassembly),
         ]:
             if condition:
                 toolchain.preprocessor_definitions[flag] = "ON"
