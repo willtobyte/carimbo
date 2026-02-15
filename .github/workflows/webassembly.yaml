@@ -58,6 +58,8 @@ jobs:
           [conf]
           tools.cmake.cmake_layout:build_folder_vars=['settings.build_type', 'settings.arch']
           tools.cmake.cmaketoolchain:generator=Ninja
+          tools.cmake.cmaketoolchain:extra_cflags=["-pthread"]
+          tools.cmake.cmaketoolchain:extra_cxxflags=["-pthread"]
           tools.build:compiler_executables={'c':'emcc', 'cpp':'em++'}
 
           [buildenv]
@@ -67,8 +69,6 @@ jobs:
           NM=emnm
           RANLIB=emranlib
           STRIP=emstrip
-          CFLAGS=-pthread
-          CXXFLAGS=-pthread
           EOF
 
       - name: Cache Conan packages
