@@ -106,22 +106,17 @@ std::string_view objectproxy::action() const noexcept {
 void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
   auto [s, at, d] = _registry.get<playback, const atlas*, dirtable>(_entity);
-  const auto was = s.timeline != nullptr;
+  const auto had = s.timeline != nullptr;
   s.action = interning.intern(value);
   s.current = 0;
   s.finished = false;
   s.timeline = at->find(s.action);
   d.mark(dirtable::render | dirtable::physics);
-  const auto is = s.timeline != nullptr;
-  if (was == is) return;
+  const auto has = s.timeline != nullptr;
+  if (had == has) return;
 
-  const auto* a = _registry.try_get<appearable>(_entity);
-  if (!a) [[unlikely]] return;
-
-  if (is) {
-    a->on_appear(value);
-  } else {
-    a->on_disappear();
+  if (const auto* a = _registry.try_get<appearable>(_entity)) {
+    has ? a->on_appear(value) : a->on_disappear();
   }
 }
 
