@@ -5,6 +5,7 @@
 #include "loopable.hpp"
 #include "scenemanager.hpp"
 
+ma_engine *audioengine = nullptr;
 SDL_Renderer *renderer = nullptr;
 
 std::shared_ptr<eventmanager> engine::eventmanager() const noexcept {

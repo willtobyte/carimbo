@@ -2,8 +2,6 @@
 
 #include "common.hpp"
 
-ma_engine* audioengine = nullptr;
-
 int main(int argc, char **argv) {
 #if defined(NDEBUG) && !defined(EMSCRIPTEN) && !defined(DEVELOPMENT)
   if (auto* out = std::freopen("stdout.txt", "w", stdout)) {
