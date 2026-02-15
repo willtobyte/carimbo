@@ -8,6 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+
 set(SDL3_DIR "${CMAKE_BINARY_DIR}")
 
 file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
@@ -48,6 +50,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
   set(IS_EMSCRIPTEN TRUE)
 endif()
 
+find_package(Threads REQUIRED)
 find_package(Boost CONFIG REQUIRED)
 find_package(box2d CONFIG REQUIRED)
 find_package(EnTT CONFIG REQUIRED)
@@ -80,6 +83,8 @@ target_compile_options(${PROJECT_NAME} PRIVATE
   $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-ffast-math>
   $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<CXX_COMPILER_ID:MSVC>>:/fp:fast>
 )
+
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 
 target_link_options(${PROJECT_NAME} PRIVATE
   $<$<BOOL:${IS_EMSCRIPTEN}>:
