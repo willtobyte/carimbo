@@ -61,6 +61,8 @@ public:
   void set_ontick(sol::protected_function fn);
   void set_onscreenexit(sol::protected_function fn);
   void set_onscreenenter(sol::protected_function fn);
+  void set_onappear(sol::protected_function fn);
+  void set_ondisappear(sol::protected_function fn);
 
   [[nodiscard]] std::shared_ptr<objectproxy> clone();
 

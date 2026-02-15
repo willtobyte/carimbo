@@ -106,11 +106,23 @@ std::string_view objectproxy::action() const noexcept {
 void objectproxy::set_action(std::string_view value) {
   auto& interning = _registry.ctx().get<::interning>();
   auto [s, at, d] = _registry.get<playback, const atlas*, dirtable>(_entity);
+  const auto was = s.timeline != nullptr;
   s.action = interning.intern(value);
   s.current = 0;
   s.finished = false;
   s.timeline = at->find(s.action);
   d.mark(dirtable::render | dirtable::physics);
+  const auto is = s.timeline != nullptr;
+  if (was == is) return;
+
+  const auto* a = _registry.try_get<appearable>(_entity);
+  if (!a) [[unlikely]] return;
+
+  if (is) {
+    a->on_appear();
+  } else {
+    a->on_disappear();
+  }
 }
 
 std::string_view objectproxy::kind() const noexcept {
@@ -195,6 +207,16 @@ void objectproxy::set_onscreenexit(sol::protected_function fn) {
 void objectproxy::set_onscreenenter(sol::protected_function fn) {
   auto& sb = _registry.get_or_emplace<screenboundable>(_entity);
   sb.on_screen_enter = std::move(fn);
+}
+
+void objectproxy::set_onappear(sol::protected_function fn) {
+  auto& a = _registry.get_or_emplace<appearable>(_entity);
+  a.on_appear = std::move(fn);
+}
+
+void objectproxy::set_ondisappear(sol::protected_function fn) {
+  auto& a = _registry.get_or_emplace<appearable>(_entity);
+  a.on_disappear = std::move(fn);
 }
 
 bool objectproxy::alive() const noexcept {

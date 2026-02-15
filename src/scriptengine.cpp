@@ -354,6 +354,8 @@ void scriptengine::run() {
     "on_tick", &objectproxy::set_ontick,
     "on_screen_exit", &objectproxy::set_onscreenexit,
     "on_screen_enter", &objectproxy::set_onscreenenter,
+    "on_appear", &objectproxy::set_onappear,
+    "on_disappear", &objectproxy::set_ondisappear,
     "clone", &objectproxy::clone,
     "alive", sol::property(&objectproxy::alive),
     "die", &objectproxy::die,

@@ -130,5 +130,13 @@ void scripting::derive(entt::entity entity, sol::environment& parent, std::share
     sb.on_screen_enter = std::move(on_screen_enter);
   }
 
+  if (auto on_appear = module["on_appear"].get<sol::protected_function>(),
+         on_disappear = module["on_disappear"].get<sol::protected_function>();
+      on_appear.valid() || on_disappear.valid()) {
+    auto& a = _registry.emplace<appearable>(entity);
+    a.on_appear = std::move(on_appear);
+    a.on_disappear = std::move(on_disappear);
+  }
+
   _registry.emplace<scriptable>(entity, std::move(sc));
 }

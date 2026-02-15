@@ -215,6 +215,11 @@ struct tickable {
   functor on_tick;
 };
 
+struct appearable {
+  functor on_appear;
+  functor on_disappear;
+};
+
 struct scriptable {
   sol::environment parent;
   sol::environment environment;
