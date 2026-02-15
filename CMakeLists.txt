@@ -99,8 +99,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sASSERTIONS=1
 
     -sAUDIO_WORKLET=1
-    -sWASM_WORKERS=1
-    -sASYNCIFY
 
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
