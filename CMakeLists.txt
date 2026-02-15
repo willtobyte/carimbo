@@ -98,8 +98,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sDISABLE_EXCEPTION_CATCHING=0
     -sASSERTIONS=1
 
-    -sAUDIO_WORKLET=1
-
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
   >
