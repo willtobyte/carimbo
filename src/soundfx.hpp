@@ -12,8 +12,8 @@ public:
   soundfx(soundfx&&) = delete;
   soundfx& operator=(soundfx&&) = delete;
 
-  void play(bool loop) const;
-  void stop() const noexcept;
+  void play(bool loop);
+  void stop() noexcept;
 
   void update(float delta);
 
@@ -24,8 +24,8 @@ public:
   void set_onend(sol::protected_function callback);
 
 private:
-  ALuint _source{0};
-  ALuint _buffer{0};
+  ma_audio_buffer _buffer{};
+  ma_sound _sound{};
 
   functor _onbegin;
   functor _onend;

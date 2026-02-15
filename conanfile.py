@@ -36,7 +36,7 @@ class Carimbo(ConanFile):
             "box2d/3.1.1",
             "entt/3.16.0",
             "yyjson/0.12.0",
-            "openal-soft/1.23.1",
+            "miniaudio/0.11.22",
             "physfs/3.2.0",
             "libspng/0.7.4",
             "sdl/3.4.0",
@@ -56,6 +56,8 @@ class Carimbo(ConanFile):
 
     def configure(self):
         self.options["boost"].header_only = True
+
+        self.options["miniaudio"].header_only = False
 
         self.options["sol2"].with_lua = "luajit" if self._is_jit_capable else "lua"
 

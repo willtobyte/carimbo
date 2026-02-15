@@ -2,6 +2,8 @@
 
 #include "common.hpp"
 
+ma_engine* audioengine = nullptr;
+
 int main(int argc, char **argv) {
 #if defined(NDEBUG) && !defined(EMSCRIPTEN) && !defined(DEVELOPMENT)
   if (auto* out = std::freopen("stdout.txt", "w", stdout)) {
@@ -17,9 +19,12 @@ int main(int argc, char **argv) {
 
   PHYSFS_init(argv[0]);
 
-  const auto device = alcOpenDevice(nullptr);
-  const auto context = alcCreateContext(device, nullptr);
-  alcMakeContextCurrent(context);
+  ma_engine engine;
+  auto engine_config = ma_engine_config_init();
+  engine_config.channels = 2;
+  engine_config.sampleRate = 48000;
+  ma_engine_init(&engine_config, &engine);
+  audioengine = &engine;
 
 #ifdef HAS_STEAM
   SteamAPI_InitSafe();
@@ -32,9 +37,7 @@ int main(int argc, char **argv) {
   SteamAPI_Shutdown();
 #endif
 
-  alcMakeContextCurrent(nullptr);
-  alcDestroyContext(context);
-  alcCloseDevice(device);
+  ma_engine_uninit(&engine);
 
   PHYSFS_deinit();
 

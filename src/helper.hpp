@@ -35,20 +35,6 @@ struct transparent_string_hash final {
   #define PREFETCH(address) __builtin_prefetch(address)
 #endif
 
-struct ALC_Deleter final {
-  template <typename T>
-  void operator()(T* ptr) const noexcept {
-    if (!ptr) return;
-
-    if constexpr (requires { alcCloseDevice(ptr); }) {
-      alcCloseDevice(ptr);
-    } else if constexpr (requires { alcDestroyContext(ptr); }) {
-      alcMakeContextCurrent(nullptr);
-      alcDestroyContext(ptr);
-    }
-  }
-};
-
 struct SDL_Deleter final {
   template <typename T>
   void operator()(T* ptr) const {
@@ -161,39 +147,6 @@ template<typename T>
               location.file_name(),
               location.line(),
               message)
-        );
-    }
-
-    return std::move(ptr);
-}
-
-template<typename T>
-[[nodiscard]] inline auto unwrap(
-  std::unique_ptr<T, ALC_Deleter>&& ptr,
-  std::string_view message,
-  ALCdevice* device = nullptr,
-  std::source_location location = std::source_location::current())
-    -> std::unique_ptr<T, ALC_Deleter> {
-    if (!ptr) [[unlikely]] {
-        const auto error = alcGetError(device);
-        const char* error_str = "Unknown error";
-
-        switch (error) {
-            case ALC_NO_ERROR: error_str = "No error"; break;
-            case ALC_INVALID_DEVICE: error_str = "Invalid device"; break;
-            case ALC_INVALID_CONTEXT: error_str = "Invalid context"; break;
-            case ALC_INVALID_ENUM: error_str = "Invalid enum"; break;
-            case ALC_INVALID_VALUE: error_str = "Invalid value"; break;
-            case ALC_OUT_OF_MEMORY: error_str = "Out of memory"; break;
-        }
-
-        throw std::runtime_error(
-            std::format("{}:{} - {} | OpenAL Error: {} ({:#x})",
-              location.file_name(),
-              location.line(),
-              message,
-              error_str,
-              error)
         );
     }
 

@@ -14,7 +14,6 @@ file(GLOB SOURCE_FILES CONFIGURE_DEPENDS "src/*.cpp")
 file(GLOB HEADER_FILES CONFIGURE_DEPENDS "src/*.hpp")
 
 add_compile_definitions(
-  AL_LIBTYPE_STATIC
   NOMINMAX
   WIN32_LEAN_AND_MEAN
 )
@@ -57,10 +56,10 @@ find_package(SDL3 CONFIG REQUIRED)
 find_package(SPNG CONFIG REQUIRED)
 find_package(yyjson CONFIG REQUIRED)
 find_package(sol2 CONFIG REQUIRED)
+find_package(miniaudio CONFIG REQUIRED)
 find_package(opusfile CONFIG REQUIRED)
 
 if(NOT IS_EMSCRIPTEN)
-  find_package(OpenAL CONFIG REQUIRED)
   find_package(OpenSSL CONFIG REQUIRED)
   find_package(sentry CONFIG QUIET)
   if(HAS_LUAJIT)
@@ -101,6 +100,10 @@ target_link_options(${PROJECT_NAME} PRIVATE
     -sDISABLE_EXCEPTION_CATCHING=0
     -sASSERTIONS=1
 
+    -sAUDIO_WORKLET=1
+    -sWASM_WORKERS=1
+    -sASYNCIFY
+
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
   >
@@ -115,8 +118,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   yyjson::yyjson
   spng::spng_static
   sol2::sol2
+  miniaudio::miniaudio
   opusfile::opusfile
-  $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:OpenAL::OpenAL;openssl::openssl>
+  $<$<NOT:$<BOOL:${IS_EMSCRIPTEN}>>:openssl::openssl>
   $<$<BOOL:${luajit_FOUND}>:luajit::luajit>
   $<$<BOOL:${sentry_FOUND}>:sentry-native::sentry-native>
 )

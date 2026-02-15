@@ -52,37 +52,41 @@ soundfx::soundfx(std::string_view filename) {
     samples.resize(offset);
   }
 
-  const auto format = (channels == 1) ? AL_FORMAT_MONO_FLOAT32 : AL_FORMAT_STEREO_FLOAT32;
-  constexpr ALsizei frequency = 48000;
+  auto config = ma_audio_buffer_config_init(
+    ma_format_f32,
+    static_cast<ma_uint32>(channels),
+    samples.size() / static_cast<size_t>(channels),
+    samples.data(),
+    nullptr
+  );
+  config.sampleRate = 48000;
 
-  alGenBuffers(1, &_buffer);
-  alBufferData(_buffer, format, samples.data(), static_cast<ALsizei>(samples.size() * sizeof(float)), frequency);
+  ma_audio_buffer_init_copy(&config, &_buffer);
 
-  alGenSources(1, &_source);
-  alSourcei(_source, AL_BUFFER, static_cast<ALint>(_buffer));
+  ma_sound_init_from_data_source(
+    audioengine,
+    &_buffer,
+    MA_SOUND_FLAG_NO_SPATIALIZATION | MA_SOUND_FLAG_NO_PITCH,
+    nullptr,
+    &_sound
+  );
 }
 
 soundfx::~soundfx() {
-  if (_source) {
-    alSourceStop(_source);
-    alSourcei(_source, AL_BUFFER, 0);
-    alDeleteSources(1, &_source);
-  }
-
-  if (_buffer) {
-    alDeleteBuffers(1, &_buffer);
-  }
+  ma_sound_uninit(&_sound);
+  ma_audio_buffer_uninit(&_buffer);
 }
 
-void soundfx::play(bool loop) const {
+void soundfx::play(bool loop) {
   _notified = false;
-  alSourcei(_source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
-  alSourcePlay(_source);
+  ma_sound_seek_to_pcm_frame(&_sound, 0);
+  ma_sound_set_looping(&_sound, loop ? MA_TRUE : MA_FALSE);
+  ma_sound_start(&_sound);
   _onbegin();
 }
 
-void soundfx::stop() const noexcept {
-  alSourceStop(_source);
+void soundfx::stop() noexcept {
+  ma_sound_stop(&_sound);
 }
 
 void soundfx::update(float delta) {
@@ -90,10 +94,7 @@ void soundfx::update(float delta) {
     return;
   }
 
-  auto state = AL_INITIAL;
-  alGetSourcei(_source, AL_SOURCE_STATE, &state);
-
-  if (state != AL_STOPPED) {
+  if (!ma_sound_at_end(&_sound)) {
     return;
   }
 
@@ -102,13 +103,11 @@ void soundfx::update(float delta) {
 }
 
 void soundfx::set_volume(float gain) noexcept {
-  alSourcef(_source, AL_GAIN, std::clamp(gain, .0f, 1.0f));
+  ma_sound_set_volume(&_sound, std::clamp(gain, .0f, 1.0f));
 }
 
 float soundfx::volume() const noexcept {
-  float gain;
-  alGetSourcef(_source, AL_GAIN, &gain);
-  return gain;
+  return ma_sound_get_volume(&_sound);
 }
 
 void soundfx::set_onbegin(sol::protected_function callback) {

@@ -3,9 +3,8 @@
 #define YYJSON_DISABLE_NON_STANDARD 1
 #define YYJSON_DISABLE_UTF8_VALIDATION 1
 
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/alext.h>
+#include <miniaudio.h>
+
 #include <box2d/box2d.h>
 #include <entt/entt.hpp>
 #include <lua.hpp>
@@ -101,6 +100,7 @@ class particlepool;
 class pixmap;
 class querybuilder;
 extern SDL_Renderer* renderer;
+extern ma_engine* audioengine;
 
 class scene;
 class scenebackdrop;
