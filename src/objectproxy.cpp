@@ -119,7 +119,7 @@ void objectproxy::set_action(std::string_view value) {
   if (!a) [[unlikely]] return;
 
   if (is) {
-    a->on_appear();
+    a->on_appear(value);
   } else {
     a->on_disappear();
   }
