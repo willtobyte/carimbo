@@ -101,9 +101,6 @@ class Carimbo(ConanFile):
 
         toolchain = CMakeToolchain(self)
 
-        toolchain.extra_cflags = ["-pthread"]
-        toolchain.extra_cxxflags = ["-pthread"]
-
         for flag, condition in [
             ("HAS_LUAJIT", self._is_jit_capable),
             ("HAS_STEAM", self._has_steam),
