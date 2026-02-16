@@ -290,6 +290,8 @@ jobs:
           NM=emnm
           RANLIB=emranlib
           STRIP=emstrip
+          CFLAGS=-pthread
+          CXXFLAGS=-pthread
           EOF
 
       - name: Cache Conan packages

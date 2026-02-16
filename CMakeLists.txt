@@ -77,6 +77,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
+  $<$<BOOL:${IS_EMSCRIPTEN}>:-pthread>
   $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-ffast-math>
   $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<CXX_COMPILER_ID:MSVC>>:/fp:fast>
 )
