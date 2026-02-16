@@ -11,10 +11,6 @@
 #define MA_NO_RESOURCE_MANAGER
 #define MA_NO_GENERATION
 
-#ifdef EMSCRIPTEN
-#define MA_ENABLE_AUDIO_WORKLETS
-#endif
-
 #include <miniaudio.h>
 
 #include <box2d/box2d.h>

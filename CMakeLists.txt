@@ -77,7 +77,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
-  $<$<BOOL:${IS_EMSCRIPTEN}>:-pthread>
   $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<NOT:$<CXX_COMPILER_ID:MSVC>>>:-ffast-math>
   $<$<AND:$<NOT:$<BOOL:${DEBUG}>>,$<CXX_COMPILER_ID:MSVC>>:/fp:fast>
 )
@@ -101,10 +100,6 @@ target_link_options(${PROJECT_NAME} PRIVATE
 
     -sEXPORTED_FUNCTIONS=['_main']
     -sEXPORTED_RUNTIME_METHODS=['callMain']
-
-    -sAUDIO_WORKLET=1
-    -sWASM_WORKERS=1
-    -sASYNCIFY
   >
 )
 
