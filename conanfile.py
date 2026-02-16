@@ -57,7 +57,7 @@ class Carimbo(ConanFile):
     def configure(self):
         self.options["boost"].header_only = True
 
-        self.options["miniaudio"].header_only = False
+        self.options["miniaudio"].header_only = True
 
         self.options["sol2"].with_lua = "luajit" if self._is_jit_capable else "lua"
 
