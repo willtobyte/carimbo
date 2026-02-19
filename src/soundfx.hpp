@@ -29,5 +29,5 @@ private:
 
   functor _onbegin;
   functor _onend;
-  mutable bool _notified{false};
+  bool _notified{false};
 };
