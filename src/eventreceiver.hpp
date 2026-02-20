@@ -15,8 +15,4 @@ public:
   virtual void on_mouse_press(const event::mouse::button& event);
   virtual void on_mouse_release(const event::mouse::button& event);
   virtual void on_mouse_motion(const event::mouse::motion& event);
-
-#ifndef NDEBUG
-  virtual void on_debug();
-#endif
 };

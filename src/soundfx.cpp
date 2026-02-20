@@ -70,6 +70,10 @@ soundfx::soundfx(std::string_view filename) {
     nullptr,
     &_sound
   );
+
+  ma_sound_set_end_callback(&_sound, [](void* ptr, ma_sound*) {
+    static_cast<soundfx*>(ptr)->_ended.store(true, std::memory_order_release);
+  }, this);
 }
 
 soundfx::~soundfx() {
@@ -78,7 +82,7 @@ soundfx::~soundfx() {
 }
 
 void soundfx::play(bool loop) {
-  _notified = false;
+  _ended.store(false, std::memory_order_relaxed);
   ma_sound_seek_to_pcm_frame(&_sound, 0);
   ma_sound_set_looping(&_sound, loop ? MA_TRUE : MA_FALSE);
   ma_sound_start(&_sound);
@@ -90,16 +94,9 @@ void soundfx::stop() noexcept {
 }
 
 void soundfx::update(float delta) {
-  if (_notified) {
-    return;
+  if (_ended.exchange(false, std::memory_order_acquire)) {
+    _onend();
   }
-
-  if (!ma_sound_at_end(&_sound)) {
-    return;
-  }
-
-  _notified = true;
-  _onend();
 }
 
 void soundfx::set_volume(float gain) noexcept {

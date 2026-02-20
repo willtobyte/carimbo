@@ -62,15 +62,7 @@ void eventmanager::update(float delta) {
             const auto fullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) != 0;
             SDL_SetWindowFullscreen(window, !fullscreen);
           } break;
-#ifndef NDEBUG
-          case SDLK_D: {
-            if (event.key.mod & SDL_KMOD_CTRL) {
-              dispatch([](const auto& receiver) {
-                receiver->on_debug();
-              });
-            }
-          } break;
-#endif
+
           default:
             break;
         }

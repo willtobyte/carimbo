@@ -20,7 +20,3 @@ void eventreceiver::on_mouse_release(const event::mouse::button& event) {
 void eventreceiver::on_mouse_motion(const event::mouse::motion& event) {
 }
 
-#ifndef NDEBUG
-void eventreceiver::on_debug() {
-}
-#endif

@@ -29,5 +29,5 @@ private:
 
   functor _onbegin;
   functor _onend;
-  bool _notified{false};
+  std::atomic<bool> _ended{false};
 };
