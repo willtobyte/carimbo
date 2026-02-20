@@ -16,7 +16,7 @@ canvas::canvas() {
   const auto pixel = SDL_MapRGBA(SDL_GetPixelFormatDetails(SDL_PIXELFORMAT_RGBA32), nullptr, 0, 0, 0, 0);
   const auto count = static_cast<size_t>(width) * static_cast<size_t>(height);
 
-  _transparent = std::make_unique<uint32_t[]>(count);
+  _transparent = std::make_unique_for_overwrite<uint32_t[]>(count);
 
   std::fill(_transparent.get(), _transparent.get() + count, pixel);
 }

@@ -18,13 +18,13 @@ pixmap::pixmap(std::string_view filename) {
   size_t length;
   spng_decoded_image_size(spng.get(), SPNG_FMT_RGBA8, &length);
 
-  std::vector<uint8_t> pixels(length);
-  spng_decode_image(spng.get(), pixels.data(), length, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
+  auto pixels = std::make_unique_for_overwrite<uint8_t[]>(length);
+  spng_decode_image(spng.get(), pixels.get(), length, SPNG_FMT_RGBA8, SPNG_DECODE_TRNS);
 
   _texture = std::unique_ptr<SDL_Texture, SDL_Deleter>(
       SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA32, SDL_TEXTUREACCESS_STATIC, _width, _height));
 
-  SDL_UpdateTexture(_texture.get(), nullptr, pixels.data(), _width * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGBA32));
+  SDL_UpdateTexture(_texture.get(), nullptr, pixels.get(), _width * SDL_BYTESPERPIXEL(SDL_PIXELFORMAT_RGBA32));
   SDL_SetTextureScaleMode(_texture.get(), SDL_SCALEMODE_NEAREST);
   SDL_SetTextureBlendMode(_texture.get(), SDL_BLENDMODE_BLEND);
 }
