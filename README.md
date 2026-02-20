@@ -25,7 +25,7 @@ It is a spiritual successor to the [Wintermoon](https://github.com/wintermoon/wi
 
 ### Under the hood
 
-Carimbo doesn't reinvent the wheel; it uses the best libraries, such as boost, Box2D, EnTT, stb, simdjson, sol2, PhysFS, SDL, and miniaudio.
+Carimbo doesn't reinvent the wheel; it uses the best libraries, such as boost, Box2D, EnTT, stb, yyjson, sol2, PhysFS, SDL, and miniaudio.
 
 ### Documentation
 
