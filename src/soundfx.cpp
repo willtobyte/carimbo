@@ -61,7 +61,7 @@ soundfx::soundfx(std::string_view filename) {
   );
   config.sampleRate = 48000;
 
-  ma_audio_buffer_init_copy(&config, &_buffer);
+  ma_audio_buffer_init(&config, &_buffer);
 
   ma_sound_init_from_data_source(
     audioengine,
