@@ -52,11 +52,13 @@ soundfx::soundfx(std::string_view filename) {
     samples.resize(offset);
   }
 
+  _samples = std::move(samples);
+
   auto config = ma_audio_buffer_config_init(
     ma_format_f32,
     static_cast<ma_uint32>(channels),
-    samples.size() / static_cast<size_t>(channels),
-    samples.data(),
+    _samples.size() / static_cast<size_t>(channels),
+    _samples.data(),
     nullptr
   );
   config.sampleRate = 48000;

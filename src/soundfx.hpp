@@ -24,6 +24,7 @@ public:
   void set_onend(sol::protected_function callback);
 
 private:
+  std::vector<float> _samples;
   ma_audio_buffer _buffer{};
   ma_sound _sound{};
 
