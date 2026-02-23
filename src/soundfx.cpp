@@ -52,18 +52,16 @@ soundfx::soundfx(std::string_view filename) {
     samples.resize(offset);
   }
 
-  _samples = std::move(samples);
-
   auto config = ma_audio_buffer_config_init(
     ma_format_f32,
     static_cast<ma_uint32>(channels),
-    _samples.size() / static_cast<size_t>(channels),
-    _samples.data(),
+    samples.size() / static_cast<size_t>(channels),
+    samples.data(),
     nullptr
   );
   config.sampleRate = 48000;
 
-  ma_audio_buffer_init(&config, &_buffer);
+  ma_audio_buffer_init_copy(&config, &_buffer);
 
   ma_sound_init_from_data_source(
     audioengine,
