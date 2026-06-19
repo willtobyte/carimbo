@@ -14,6 +14,7 @@ defaults:
 
 env:
   CMAKE_BUILD_PARALLEL_LEVEL: 8
+  CMAKE_POLICY_VERSION_MINIMUM: "3.5"
 
 jobs:
   build:
@@ -35,7 +36,7 @@ jobs:
         run: |
           conan profile detect --name build
 
-          echo -e "\n[platform_tool_requires]\ncmake/[>=3 <4]" >> ~/.conan2/profiles/build
+          printf '\n[platform_tool_requires]\ncmake/%s\n' "$(cmake --version | head -n1 | awk '{print $3}')" >> ~/.conan2/profiles/build
 
           cat <<'EOF' > ~/.conan2/profiles/default
           [replace_tool_requires]
