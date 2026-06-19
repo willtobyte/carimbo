@@ -49,12 +49,12 @@ jobs:
           compiler=emcc
           compiler.cppstd=23
           compiler.libcxx=libc++
-          compiler.version=4.0.22
+          compiler.version=5.0.3
           os=Emscripten
           arch=wasm
 
           [tool_requires]
-          emsdk/4.0.22
+          emsdk/5.0.3
 
           [conf]
           tools.cmake.cmake_layout:build_folder_vars=['settings.build_type', 'settings.arch']
