@@ -2,8 +2,15 @@
 
 #include "common.hpp"
 
+struct OggOpusFile;
+
 class soundfx final {
 public:
+  struct stream final {
+    ma_data_source_base base{};
+    OggOpusFile* file{nullptr};
+  };
+
   explicit soundfx(std::string_view filename);
   ~soundfx();
 
@@ -24,7 +31,8 @@ public:
   void set_onend(sol::protected_function callback);
 
 private:
-  ma_audio_buffer _buffer{};
+  std::vector<uint8_t> _encoded;
+  stream _stream{};
   ma_sound _sound{};
 
   functor _onbegin;
