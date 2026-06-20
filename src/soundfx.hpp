@@ -31,7 +31,7 @@ public:
   void set_onend(sol::protected_function callback);
 
 private:
-  std::vector<uint8_t> _encoded;
+  std::unique_ptr<PHYSFS_File, PHYSFS_Deleter> _file;
   stream _stream{};
   ma_sound _sound{};
 
