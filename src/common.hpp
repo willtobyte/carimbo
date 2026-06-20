@@ -115,6 +115,7 @@ class scenebackdrop;
 class scenemanager;
 class scriptengine;
 class soundfx;
+class textinput;
 class tilemap;
 class widget;
 

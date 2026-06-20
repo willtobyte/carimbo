@@ -11,10 +11,12 @@ public:
   std::shared_ptr<::scenemanager> scenemanager() const noexcept;
   std::shared_ptr<::overlay> overlay() const noexcept;
   std::shared_ptr<::canvas> canvas() const noexcept;
+  std::shared_ptr<::textinput> textinput() const noexcept;
 
   void set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept;
   void set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept;
   void set_overlay(std::shared_ptr<::overlay> ptr) noexcept;
+  void set_textinput(std::shared_ptr<::textinput> ptr) noexcept;
   void set_ticks(uint8_t ticks) noexcept;
 
   void add_loopable(std::shared_ptr<::loopable> ptr);
@@ -35,6 +37,7 @@ private:
   float _tick_accumulator{.0f};
 
   std::shared_ptr<::eventmanager> _eventmanager;
+  std::shared_ptr<::textinput> _textinput;
   std::shared_ptr<::scenemanager> _scenemanager;
   std::shared_ptr<::overlay> _overlay;
   std::shared_ptr<::canvas> _canvas;

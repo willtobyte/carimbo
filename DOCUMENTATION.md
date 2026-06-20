@@ -235,6 +235,8 @@ end)
 
 `text.on(callback)` registers the callback invoked whenever the user types text. It fires for committed UTF-8 input (respecting keyboard layout and IME), not raw key codes. Calling it again replaces the previously registered callback.
 
+Text input stops automatically on every scene change, so `text.off()` is optional and never needs to be called in `on_leave`. A scene that needs input re-registers with `text.on(...)` in its own `on_enter`. Call `text.off()` only to stop input explicitly mid-scene.
+
 ### `viewport` — Logical Resolution
 
 ```lua

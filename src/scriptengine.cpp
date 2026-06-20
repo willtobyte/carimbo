@@ -106,52 +106,6 @@ struct metaobject {
   }
 };
 
-struct textinput final : private noncopyable {
-  sol::protected_function callback;
-
-  textinput() {
-    SDL_AddEventWatch(&dispatch, this);
-  }
-
-  ~textinput() {
-    SDL_RemoveEventWatch(&dispatch, this);
-  }
-
-  void on(sol::protected_function fn) {
-    callback = std::move(fn);
-
-    const auto properties = SDL_CreateProperties();
-    SDL_SetBooleanProperty(properties, SDL_PROP_TEXTINPUT_AUTOCORRECT_BOOLEAN, false);
-    SDL_StartTextInputWithProperties(SDL_GetRenderWindow(renderer), properties);
-    SDL_DestroyProperties(properties);
-  }
-
-  void off() {
-    callback = sol::protected_function();
-
-    SDL_StopTextInput(SDL_GetRenderWindow(renderer));
-  }
-
-  static bool dispatch(void* userdata, SDL_Event* event) {
-    if (event->type != SDL_EVENT_TEXT_INPUT) [[likely]] {
-      return true;
-    }
-
-    auto* self = static_cast<textinput*>(userdata);
-    if (!self->callback.valid()) [[unlikely]] {
-      return true;
-    }
-
-    const auto result = self->callback(std::string_view{event->text.text});
-    if (!result.valid()) [[unlikely]] {
-      const sol::error err = result;
-      std::println(stderr, "{}", err.what());
-    }
-
-    return true;
-  }
-};
-
 namespace {
   constexpr auto DEADZONE = 8000;
 
@@ -608,15 +562,15 @@ void scriptengine::run() {
       lua["overlay"] = ptr->overlay();
       lua["scenemanager"] = ptr->scenemanager();
 
-      auto handler = std::make_shared<textinput>();
+      const auto input = ptr->textinput();
 
       auto text = lua.create_table();
-      text.set_function("on", [handler](sol::protected_function callback) {
-        handler->on(std::move(callback));
+      text.set_function("on", [input](sol::protected_function callback) {
+        input->on(std::move(callback));
       });
 
-      text.set_function("off", [handler]() {
-        handler->off();
+      text.set_function("off", [input]() {
+        input->off();
       });
 
       lua["text"] = text;

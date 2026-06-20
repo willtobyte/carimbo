@@ -28,6 +28,8 @@ public:
 
   void set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept;
 
+  void set_textinput(std::shared_ptr<::textinput> textinput) noexcept;
+
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;
   virtual void on_key_release(const event::keyboard::key& event) override;
@@ -41,4 +43,5 @@ private:
   boost::unordered_flat_map<std::string, std::shared_ptr<::scene>, transparent_string_hash, std::equal_to<>> _scene_mapping;
   std::shared_ptr<::scene> _scene;
   std::shared_ptr<::scene> _pending;
+  std::shared_ptr<::textinput> _textinput;
 };

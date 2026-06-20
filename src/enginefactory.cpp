@@ -4,6 +4,7 @@
 #include "eventmanager.hpp"
 #include "fontpool.hpp"
 #include "scenemanager.hpp"
+#include "textinput.hpp"
 
 enginefactory& enginefactory::with_title(const std::string_view title) {
   _title = title;
@@ -129,12 +130,14 @@ std::shared_ptr<engine> enginefactory::create() const {
   const auto eventmanager = std::make_shared<::eventmanager>();
   const auto fontpool = std::make_shared<::fontpool>();
   const auto overlay = std::make_shared<::overlay>(eventmanager);
+  const auto textinput = std::make_shared<::textinput>();
   const auto scenemanager = std::make_shared<::scenemanager>();
 
   const auto engine = std::make_shared<::engine>();
   engine->set_eventmanager(eventmanager);
   engine->set_scenemanager(scenemanager);
   engine->set_overlay(overlay);
+  engine->set_textinput(textinput);
   engine->set_ticks(_ticks);
 
   eventmanager->add_receiver(engine);
@@ -143,6 +146,7 @@ std::shared_ptr<engine> enginefactory::create() const {
 
   overlay->set_fontpool(fontpool);
   scenemanager->set_fontpool(fontpool);
+  scenemanager->set_textinput(textinput);
 
   return engine;
 }

@@ -20,6 +20,10 @@ std::shared_ptr<::overlay> engine::overlay() const noexcept {
   return _overlay;
 }
 
+std::shared_ptr<::textinput> engine::textinput() const noexcept {
+  return _textinput;
+}
+
 void engine::set_eventmanager(std::shared_ptr<::eventmanager> ptr) noexcept {
   _eventmanager = std::move(ptr);
 }
@@ -30,6 +34,10 @@ void engine::set_scenemanager(std::shared_ptr<::scenemanager> ptr) noexcept {
 
 void engine::set_overlay(std::shared_ptr<::overlay> ptr) noexcept {
   _overlay = std::move(ptr);
+}
+
+void engine::set_textinput(std::shared_ptr<::textinput> ptr) noexcept {
+  _textinput = std::move(ptr);
 }
 
 void engine::set_ticks(uint8_t ticks) noexcept {

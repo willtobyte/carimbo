@@ -3,6 +3,7 @@
 #include "event.hpp"
 #include "io.hpp"
 #include "scene.hpp"
+#include "textinput.hpp"
 
 std::shared_ptr<scene> scenemanager::load(std::string_view name) {
   const auto [it, inserted] = _scene_mapping.try_emplace(name);
@@ -67,6 +68,8 @@ void scenemanager::update(float delta) {
       _scene->on_leave();
     }
 
+    _textinput->off();
+
     _scene = std::move(_pending);
 
     std::println("[scenemanager] entered {}", _scene->name());
@@ -117,4 +120,8 @@ void scenemanager::set_runtime(sol::state_view runtime) {
 
 void scenemanager::set_fontpool(std::shared_ptr<::fontpool> fontpool) noexcept {
   _fontpool = std::move(fontpool);
+}
+
+void scenemanager::set_textinput(std::shared_ptr<::textinput> textinput) noexcept {
+  _textinput = std::move(textinput);
 }
