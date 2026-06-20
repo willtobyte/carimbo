@@ -106,6 +106,46 @@ struct metaobject {
   }
 };
 
+struct textinput final : private noncopyable {
+  sol::protected_function callback;
+
+  textinput() {
+    SDL_AddEventWatch(&dispatch, this);
+  }
+
+  ~textinput() {
+    SDL_RemoveEventWatch(&dispatch, this);
+  }
+
+  void on(sol::protected_function fn) {
+    callback = std::move(fn);
+
+    const auto properties = SDL_CreateProperties();
+    SDL_SetBooleanProperty(properties, SDL_PROP_TEXTINPUT_AUTOCORRECT_BOOLEAN, false);
+    SDL_StartTextInputWithProperties(SDL_GetRenderWindow(renderer), properties);
+    SDL_DestroyProperties(properties);
+  }
+
+  static bool dispatch(void* userdata, SDL_Event* event) {
+    if (event->type != SDL_EVENT_TEXT_INPUT) [[likely]] {
+      return true;
+    }
+
+    auto* self = static_cast<textinput*>(userdata);
+    if (!self->callback.valid()) [[unlikely]] {
+      return true;
+    }
+
+    const auto result = self->callback(std::string_view{event->text.text});
+    if (!result.valid()) [[unlikely]] {
+      const sol::error err = result;
+      std::println(stderr, "{}", err.what());
+    }
+
+    return true;
+  }
+};
+
 namespace {
   constexpr auto DEADZONE = 8000;
 
@@ -450,10 +490,6 @@ void scriptengine::run() {
               ptr->set_oncamera(std::move(oncamera));
             }
 
-            if (auto ontext = module["on_text"].get<sol::protected_function>(); ontext.valid()) {
-              ptr->set_ontext(std::move(ontext));
-            }
-
             if (auto ontouch = module["on_touch"].get<sol::protected_function>(); ontouch.valid()) {
               ptr->set_ontouch(std::move(ontouch));
             }
@@ -565,6 +601,15 @@ void scriptengine::run() {
 
       lua["overlay"] = ptr->overlay();
       lua["scenemanager"] = ptr->scenemanager();
+
+      auto handler = std::make_shared<textinput>();
+
+      auto text = lua.create_table();
+      text.set_function("on", [handler](sol::protected_function callback) {
+        handler->on(std::move(callback));
+      });
+
+      lua["text"] = text;
 
       auto viewport = lua.create_table();
 

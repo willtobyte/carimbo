@@ -98,11 +98,6 @@ void scenemanager::on_key_release(const event::keyboard::key& event) {
   _scene->on_key_release(static_cast<int32_t>(event));
 }
 
-void scenemanager::on_text(std::string_view text) {
-  if (!_scene) [[unlikely]] return;
-  _scene->on_text(text);
-}
-
 void scenemanager::on_mouse_press(const event::mouse::button& event) {
 }
 

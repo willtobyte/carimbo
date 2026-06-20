@@ -223,6 +223,18 @@ Type: `Keyboard`. See [Keyboard](#24-keyboard).
 
 Type: `Gamepads`. See [Gamepad](#25-gamepad).
 
+### `text` — Typed Text Input
+
+Type: `Text`. Set after `create()`.
+
+```lua
+text.on(function(s)
+  print("typed " .. s)
+end)
+```
+
+`text.on(callback)` registers the callback invoked whenever the user types text. It fires for committed UTF-8 input (respecting keyboard layout and IME), not raw key codes. Calling it again replaces the previously registered callback.
+
 ### `viewport` — Logical Resolution
 
 ```lua
@@ -577,7 +589,6 @@ return scene
 | `on_motion(x, y)` | `(float, float) -> void` | Mouse/pointer movement. Coordinates in logical space. |
 | `on_keypress(code)` | `(integer) -> void` | Key pressed. `code` matches `KeyEvent` enum values. |
 | `on_keyrelease(code)` | `(integer) -> void` | Key released. `code` matches `KeyEvent` enum values. |
-| `on_text(text)` | `(string) -> void` | Text input event (for text fields, chat, etc.). |
 | `on_camera(delta)` | `(float) -> Quad` | **Tilemap scenes only**. Must return a `Quad` representing the camera viewport position and size. Called every frame. |
 
 ### Callback Execution Order Per Frame
@@ -1976,7 +1987,6 @@ return scene
 | `on_motion` | `x: float, y: float` | void | No |
 | `on_keypress` | `code: integer` | void | No |
 | `on_keyrelease` | `code: integer` | void | No |
-| `on_text` | `text: string` | void | No |
 | `on_camera` | `delta: float` | `Quad` | Only for tilemap scenes |
 
 ### Object Script Callbacks

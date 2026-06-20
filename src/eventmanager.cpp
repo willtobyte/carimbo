@@ -74,12 +74,6 @@ void eventmanager::update(float delta) {
         });
       } break;
 
-      case SDL_EVENT_TEXT_INPUT: {
-        dispatch([&](const auto& receiver) {
-          receiver->on_text(event.text.text);
-        });
-      } break;
-
       case SDL_EVENT_MOUSE_MOTION: {
         const event::mouse::motion e{event.motion.x, event.motion.y};
 

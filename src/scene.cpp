@@ -219,10 +219,6 @@ void scene::set_onkeyrelease(sol::protected_function&& fn) {
   _onkeyrelease = std::move(fn);
 }
 
-void scene::set_ontext(sol::protected_function&& fn) {
-  _ontext = std::move(fn);
-}
-
 void scene::set_onmotion(sol::protected_function&& fn) {
   _onmotion = std::move(fn);
 }
@@ -301,10 +297,6 @@ void scene::on_key_press(int32_t code) {
 
 void scene::on_key_release(int32_t code) {
   _onkeyrelease(code);
-}
-
-void scene::on_text(std::string_view text) {
-  _ontext(text);
 }
 
 void scene::on_tick(uint8_t tick) {

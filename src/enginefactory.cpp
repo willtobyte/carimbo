@@ -105,10 +105,6 @@ std::shared_ptr<engine> enginefactory::create() const {
     _fullscreen ? SDL_WINDOW_FULLSCREEN : 0
   );
 
-  const SDL_Rect area = {0, 0, _width, _height};
-  SDL_SetTextInputArea(window, &area, 0);
-  SDL_StartTextInput(window);
-
   const auto vsync = std::getenv("NOVSYNC") ? 0 : 1;
   const auto properties = SDL_CreateProperties();
   SDL_SetPointerProperty(properties, SDL_PROP_RENDERER_CREATE_WINDOW_POINTER, window);

@@ -31,7 +31,6 @@ public:
 protected:
   virtual void on_key_press(const event::keyboard::key& event) override;
   virtual void on_key_release(const event::keyboard::key& event) override;
-  virtual void on_text(std::string_view text) override;
   virtual void on_mouse_press(const event::mouse::button& event) override;
   virtual void on_mouse_release(const event::mouse::button& event) override;
   virtual void on_mouse_motion(const event::mouse::motion& event) override;

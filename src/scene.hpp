@@ -29,14 +29,12 @@ public:
   void set_ontouch(sol::protected_function&& fn);
   void set_onkeypress(sol::protected_function&& fn);
   void set_onkeyrelease(sol::protected_function&& fn);
-  void set_ontext(sol::protected_function&& fn);
   void set_onmotion(sol::protected_function&& fn);
   void set_oncamera(sol::protected_function&& fn);
   void set_ontick(sol::protected_function&& fn);
 
   void on_enter();
   void on_leave();
-  void on_text(std::string_view text);
   void on_touch(float x, float y);
   void on_motion(float x, float y);
   void on_key_press(int32_t code);
@@ -75,7 +73,6 @@ private:
   functor _onmotion;
   functor _onkeypress;
   functor _onkeyrelease;
-  functor _ontext;
   functor _ontick;
   std::function<void()> _onenter;
   std::function<void()> _onleave;
