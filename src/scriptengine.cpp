@@ -126,6 +126,12 @@ struct textinput final : private noncopyable {
     SDL_DestroyProperties(properties);
   }
 
+  void off() {
+    callback = sol::protected_function();
+
+    SDL_StopTextInput(SDL_GetRenderWindow(renderer));
+  }
+
   static bool dispatch(void* userdata, SDL_Event* event) {
     if (event->type != SDL_EVENT_TEXT_INPUT) [[likely]] {
       return true;
@@ -607,6 +613,10 @@ void scriptengine::run() {
       auto text = lua.create_table();
       text.set_function("on", [handler](sol::protected_function callback) {
         handler->on(std::move(callback));
+      });
+
+      text.set_function("off", [handler]() {
+        handler->off();
       });
 
       lua["text"] = text;
