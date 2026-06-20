@@ -672,8 +672,8 @@ These set callback functions on the entity. They can be called from scene script
 | `entity:on_collision(fn)` | `fn(id, kind)` | Physics collision begins. `id` is the other entity's ID, `kind` is its kind string. |
 | `entity:on_collision_end(fn)` | `fn(id, kind)` | Physics collision ends. |
 | `entity:on_tick(fn)` | `fn(tick)` | Per-tick update (at the engine tick rate). `tick` is the current tick number. |
-| `entity:on_screen_exit(fn)` | `fn()` | Entity moves completely outside the camera viewport |
-| `entity:on_screen_enter(fn)` | `fn()` | Entity re-enters the camera viewport |
+| `entity:on_screen_exit(fn)` | `fn(direction)` | Entity moves completely outside the camera viewport. `direction` is the edge crossed: `"left"`, `"right"`, `"top"`, or `"bottom"`. |
+| `entity:on_screen_enter(fn)` | `fn(direction)` | Entity re-enters the camera viewport. `direction` is the edge crossed: `"left"`, `"right"`, `"top"`, or `"bottom"`. |
 | `entity:on_appear(fn)` | `fn(action)` | Entity's action changes to a timeline that has frames (becomes visible in animation). |
 | `entity:on_disappear(fn)` | `fn()` | Entity's action changes to a timeline that has no frames (becomes invisible in animation). |
 
@@ -793,8 +793,8 @@ return {
 | `on_end(action)` | `(string) -> void` | Animation timeline finishes. |
 | `on_collision(id, kind)` | `(integer, string) -> void` | Physics collision begins. `id` is entity ID, `kind` is kind string. |
 | `on_collision_end(id, kind)` | `(integer, string) -> void` | Physics collision ends. |
-| `on_screen_exit()` | `() -> void` | Entity exits camera viewport |
-| `on_screen_enter()` | `() -> void` | Entity enters camera viewport |
+| `on_screen_exit(direction)` | `(string) -> void` | Entity exits camera viewport. `direction` is the edge crossed: `"left"`, `"right"`, `"top"`, or `"bottom"`. |
+| `on_screen_enter(direction)` | `(string) -> void` | Entity enters camera viewport. `direction` is the edge crossed: `"left"`, `"right"`, `"top"`, or `"bottom"`. |
 | `on_appear(action)` | `(string) -> void` | Entity becomes visible (action changed to a timeline with frames). |
 | `on_disappear()` | `() -> void` | Entity becomes invisible (action changed to a timeline without frames). |
 
@@ -2005,8 +2005,8 @@ return scene
 | `on_end` | `action: string` | void |
 | `on_collision` | `id: integer, kind: string` | void |
 | `on_collision_end` | `id: integer, kind: string` | void |
-| `on_screen_exit` | none | void |
-| `on_screen_enter` | none | void |
+| `on_screen_exit` | `direction: string` | void |
+| `on_screen_enter` | `direction: string` | void |
 | `on_appear` | `action: string` | void |
 | `on_disappear` | none | void |
 
@@ -2022,7 +2022,7 @@ return scene
 | `entity:on_collision(fn)` | `fn(id, kind)` |
 | `entity:on_collision_end(fn)` | `fn(id, kind)` |
 | `entity:on_tick(fn)` | `fn(tick)` |
-| `entity:on_screen_exit(fn)` | `fn()` |
-| `entity:on_screen_enter(fn)` | `fn()` |
+| `entity:on_screen_exit(fn)` | `fn(direction)` |
+| `entity:on_screen_enter(fn)` | `fn(direction)` |
 | `entity:on_appear(fn)` | `fn(action)` |
 | `entity:on_disappear(fn)` | `fn()` |
