@@ -114,6 +114,8 @@ std::shared_ptr<engine> enginefactory::create() const {
 
   renderer = SDL_CreateRendererWithProperties(properties);
 
+  SDL_DestroyProperties(properties);
+
   std::atexit([] {
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
